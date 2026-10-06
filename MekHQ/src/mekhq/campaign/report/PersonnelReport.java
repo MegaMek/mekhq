@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson
@@ -68,9 +69,11 @@ public class PersonnelReport extends AbstractReport {
         int countDead = 0;
         int countStudents = 0;
         int countRetired = 0;
+        int countBloodnamed = 0;
+        int countTrueborn = 0;
         Money salary = Money.zero();
 
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             if ((!person.getPrimaryRole().isCombat()) || (!person.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
@@ -85,6 +88,15 @@ public class PersonnelReport extends AbstractReport {
                     countInjured++;
                 }
                 salary = salary.plus(person.getSalary(getCampaign()));
+                // Counted among the active only, so the figure describes the warriors currently
+                // serving rather than everyone the command has ever had on its books.
+                if (person.getPhenotype().isTrueborn()) {
+                    countTrueborn++;
+                }
+                String bloodname = person.getBloodname();
+                if ((bloodname != null) && !bloodname.isBlank()) {
+                    countBloodnamed++;
+                }
             } else if ((person.getPrisonerStatus().isBondsman()) && (person.getStatus().isActive())) {
                 if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
@@ -105,8 +117,15 @@ public class PersonnelReport extends AbstractReport {
 
         // Add Salaries of Temp Combat Crew
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
-                salary = salary.plus(getTempCrewPay(role, getCampaign().getTempCrewPool(role)));
+            if (role.isCombat()) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                    Campaign campaign = getCampaign();
+                    salary = salary.plus(getTempCrewPay(role,
+                          campaign.getPlayerForce().getHumanResources().getTempCrewPool(role)));
+                }
             }
         }
 
@@ -117,23 +136,40 @@ public class PersonnelReport extends AbstractReport {
         for (PersonnelRole role : personnelRoles) {
             if (role.isCombat()) {
                 sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
         }
 
         // Add Temp Crew to Combat List
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
-                int poolSize = getCampaign().getTempCrewPool(role);
-                if (poolSize > 0) {
-                    String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
-                    String label = resources.containsKey(labelKey) ?
-                        resources.getString(labelKey) :
-                        "Temp " + role.getLabel(getCampaign().getFaction().isClan());
-                    sb.append(String.format("    %-30s    %4s\n", label, poolSize));
+            if (role.isCombat()) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                    Campaign campaign = getCampaign();
+                    int poolSize = campaign.getPlayerForce().getHumanResources().getTempCrewPool(role);
+                    if (poolSize > 0) {
+                        String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
+                        String label;
+                        if (resources.containsKey(labelKey)) {label = resources.getString(labelKey);} else {
+                            label = "Temp " + role.getLabel(getCampaign().getPlayerForce().getFaction().isClan());
+                        }
+                        sb.append(String.format("    %-30s    %4s\n", label, poolSize));
+                    }
                 }
             }
+        }
+
+        // Bloodnamed warriors, shown only where there are trueborns to count them against - the line
+        // means nothing in a command with no Clan personnel.
+        if (countTrueborn > 0) {
+            sb.append('\n')
+                  .append(String.format("%-30s        %4s\n",
+                        resources.getString("combat.trueborn.text"), countTrueborn))
+                  .append(String.format("%-30s        %4s\n",
+                        resources.getString("combat.bloodnamed.text"), countBloodnamed));
         }
 
         sb.append(getSecondaryCombatPersonnelDetails());
@@ -172,7 +208,7 @@ public class PersonnelReport extends AbstractReport {
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
                 campFollowers++;
                 continue;
@@ -229,8 +265,10 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Salaries of Temp Workers
-        salary = salary.plus(getTempCrewPay(PersonnelRole.ASTECH, getCampaign().getTemporaryAsTechPool()));
-        salary = salary.plus(getTempCrewPay(PersonnelRole.MEDIC, getCampaign().getTemporaryMedicPool()));
+        salary = salary.plus(getTempCrewPay(PersonnelRole.ASTECH,
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool()));
+        salary = salary.plus(getTempCrewPay(PersonnelRole.MEDIC,
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool()));
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
@@ -239,14 +277,17 @@ public class PersonnelReport extends AbstractReport {
         for (PersonnelRole role : personnelRoles) {
             if (role.isSupport(true)) {
                 sb.append(String.format("    %-30s       %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       countPersonByType[role.ordinal()]));
             }
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getTemporaryMedicPool()));
-        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getTemporaryAsTechPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics",
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n",
+              "Temp Astechs",
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());
 
@@ -298,13 +339,13 @@ public class PersonnelReport extends AbstractReport {
 
     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return getCampaign().getCampaignOptions()
-                     .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() * tempPersonnelPool;
+                     .get(CampaignOption.ROLE_BASE_SALARIES)[personnelRole.ordinal()].getAmount().doubleValue() * tempPersonnelPool;
     }
 
     public String getSecondarySupportPersonnelDetails() {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
 
@@ -323,7 +364,7 @@ public class PersonnelReport extends AbstractReport {
         {
             if (role.isSupport(true) && value >= 0) {
                 sb.append(String.format("    %-30s       %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       value));
             }
         });
@@ -335,7 +376,7 @@ public class PersonnelReport extends AbstractReport {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
 
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondaryCombat = person.getSecondaryRole().isCombat();
 
@@ -354,7 +395,7 @@ public class PersonnelReport extends AbstractReport {
         {
             if (role.isCombat() && value >= 0) {
                 sb.append(String.format("    %-30s    %4s\n",
-                      role.getLabel(getCampaign().getFaction().isClan()),
+                      role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()),
                       value));
             }
         });

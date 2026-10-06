@@ -73,18 +73,20 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForceStub;
+import mekhq.campaign.mission.scenarios.Loot;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.BriefingStyle;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * @author Neoancient
@@ -145,7 +147,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private JTree playerForceTree;
 
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
 
     private final StubTreeModel playerForceModel;
 
@@ -180,7 +182,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         JPanel statsSection = BriefingStyle.createSectionPanel(scenario.getName());
         panStats = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
         playerForceTree = new JTree() {
             @Override
             public Dimension getMinimumSize() {
@@ -210,12 +212,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
             JPanel reportSection = BriefingStyle.createSectionPanel("After-Action Report");
-            JTextArea txtReport = new JTextArea();
+            JTextPane txtReport = new JTextPane();
             txtReport.setName("txtReport");
-            txtReport.setText(scenario.getReport());
             txtReport.setEditable(false);
-            txtReport.setLineWrap(true);
-            txtReport.setWrapStyleWord(true);
+            txtReport.setContentType("text/html");
+            txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
             txtReport.setBorder(BorderFactory.createEmptyBorder());
             reportSection.add(txtReport, BorderLayout.CENTER);
             gridBagConstraints = new GridBagConstraints();
@@ -278,10 +279,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForce, gridBagConstraints);
 
             if (null != scenario.getCombatTeamById(campaign)) {
-                Formation formation = campaign.getFormation(scenario.getCombatTeamId());
+                int id1 = scenario.getCombatTeamId();
+                Formation formation = campaign.getPlayerForce().getFormation(id1);
 
                 if (formation != null) {
-                    lblForceDesc.setText(campaign.getFormation(scenario.getCombatTeamId()).getFullName());
+                    int id = scenario.getCombatTeamId();
+                    lblForceDesc.setText(campaign.getPlayerForce().getFormation(id).getFullName());
                 } else {
                     lblForceDesc.setText("Unknown Force ID: " + scenario.getCombatTeamId());
                 }
@@ -290,7 +293,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 forceBuilder.append("<html>");
                 boolean chop = false;
                 for (int forceID : scenario.getForceIDs()) {
-                    forceBuilder.append(campaign.getFormation(forceID).getFullName());
+                    forceBuilder.append(campaign.getPlayerForce().getFormation(forceID).getFullName());
                     forceBuilder.append("<br/>");
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
                                                            .get(forceID);
@@ -350,10 +353,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
@@ -654,7 +656,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblLight, gridBagConstraints);
 
         chkReroll[REROLL_LIGHT] = new JCheckBox();
-        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().isUseLightConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().get(CampaignOption.USE_LIGHT_CONDITIONS)) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -667,8 +669,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblLightDesc, gridBagConstraints);
-        lblLight.setVisible(campaign.getCampaignOptions().isUseLightConditions());
-        lblLightDesc.setVisible(campaign.getCampaignOptions().isUseLightConditions());
+        lblLight.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_LIGHT_CONDITIONS));
+        lblLightDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_LIGHT_CONDITIONS));
 
         lblWeather.setText(resourceMap.getString("lblWeather.text"));
         gridBagConstraints.gridx = 0;
@@ -677,7 +679,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblWeather, gridBagConstraints);
 
         chkReroll[REROLL_WEATHER] = new JCheckBox();
-        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().isUseWeatherConditions()) {
+        if (scenario.getStatus().isCurrent() && campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS)) {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
@@ -690,8 +692,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWeatherDesc, gridBagConstraints);
-        lblWeather.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
-        lblWeatherDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblWeather.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
+        lblWeatherDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
 
         lblWind.setText(resourceMap.getString("lblWind.text"));
         gridBagConstraints.gridx = 0;
@@ -703,8 +705,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWindDesc, gridBagConstraints);
-        lblWind.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
-        lblWindDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblWind.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
+        lblWindDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
 
         lblFog.setText(resourceMap.getString("lblFog.text"));
         gridBagConstraints.gridx = 0;
@@ -716,8 +718,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblFogDesc, gridBagConstraints);
-        lblFog.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
-        lblFogDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblFog.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
+        lblFogDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
 
         lblBlowingSand.setText(resourceMap.getString("lblBlowingSand.text"));
         gridBagConstraints.gridx = 0;
@@ -730,8 +732,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblBlowingSandDesc, gridBagConstraints);
-        lblBlowingSand.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
-        lblBlowingSandDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblBlowingSand.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
+        lblBlowingSandDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
 
         lblEMI.setText(resourceMap.getString("lblEMI.text"));
         gridBagConstraints.gridx = 0;
@@ -744,8 +746,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblEMIDesc, gridBagConstraints);
-        lblEMI.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
-        lblEMIDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblEMI.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
+        lblEMIDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_WEATHER_CONDITIONS));
 
         lblTemp.setText(resourceMap.getString("lblTemperature.text"));
         gridBagConstraints.gridx = 0;
@@ -757,8 +759,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblTempDesc, gridBagConstraints);
-        lblTemp.setVisible(campaign.getCampaignOptions().isUsePlanetaryConditions());
-        lblTempDesc.setVisible(campaign.getCampaignOptions().isUsePlanetaryConditions());
+        lblTemp.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS));
+        lblTempDesc.setVisible(campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS));
 
         lblGravity.setText(resourceMap.getString("lblGravity.text"));
         gridBagConstraints.gridx = 0;
@@ -903,7 +905,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void rerollBattleConditions() {
         if (chkReroll[REROLL_TERRAIN] != null && chkReroll[REROLL_TERRAIN].isSelected()) {
             scenario.setTerrain();
-            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
+            scenario.setScenarioMap(campaign.getCampaignOptions().get(CampaignOption.FIXED_MAP_CHANCE));
             scenario.useReroll();
             chkReroll[REROLL_TERRAIN].setSelected(false);
             lblTerrainDesc.setText(scenario.getTerrainType());
@@ -911,7 +913,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAP] != null && chkReroll[REROLL_MAP].isSelected()) {
-            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
+            scenario.setScenarioMap(campaign.getCampaignOptions().get(CampaignOption.FIXED_MAP_CHANCE));
             scenario.useReroll();
             chkReroll[REROLL_MAP].setSelected(false);
             lblMapDesc.setText(scenario.getMapForDisplay());
@@ -919,7 +921,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
         if (chkReroll[REROLL_MAP_SIZE] != null && chkReroll[REROLL_MAP_SIZE].isSelected()) {
             scenario.setMapSize(campaign);
-            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
+            scenario.setScenarioMap(campaign.getCampaignOptions().get(CampaignOption.FIXED_MAP_CHANCE));
             scenario.useReroll();
             chkReroll[REROLL_MAP_SIZE].setSelected(false);
             lblMapDesc.setText(scenario.getMapForDisplay());
@@ -932,7 +934,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblLightDesc.setText(scenario.getLight().toString());
         }
         if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
-            scenario.setWeatherConditions(campaign.getCampaignOptions().isUseNoTornadoes());
+            scenario.setWeatherConditions(campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);
             lblWeatherDesc.setText(scenario.getWeather().toString());

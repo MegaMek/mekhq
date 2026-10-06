@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,10 +40,12 @@ import java.util.Collection;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.EmployerLostPlanet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -91,23 +93,39 @@ public class NagController {
         final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
         final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
 
-        if (InvalidFactionNagDialog.checkNag(campaign.getFaction(), today)) {
+        if (InvalidFactionNagDialog.checkNag(campaign.getPlayerForce().getFaction(), today)) {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
             if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
 
-        final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
+        // Employer losing control of a contract's planet tomorrow. One dialog per affected contract; cancelling any of
+        // them cancels the day advance.
+        List<AbstractContract> contractsAwaitingResponse = EmployerLostPlanet.getContractsAwaitingResponse(campaign);
+        if (EmployerLostPlanetNagDialog.checkNag(EmployerLostPlanet.isEnabled(campaign), contractsAwaitingResponse)) {
+            for (AbstractContract contract : contractsAwaitingResponse) {
+                EmployerLostPlanetNagDialog employerLostPlanetNagDialog = new EmployerLostPlanetNagDialog(campaign,
+                      contract);
+                if (employerLostPlanetNagDialog.shouldCancelAdvanceDay()) {
+                    return true;
+                }
+            }
+        }
+
+        final List<Person> activePersonnel = campaign.getPlayerForce()
+                                                   .getHumanResources()
+                                                   .getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final int doctorCapacity = campaignOptions.getMaximumPatients();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
+        final int doctorCapacity = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
 
         // Untreated personnel
-        boolean isUseMASHTheatres = campaignOptions.isUseMASHTheatres();
-        int mashTheatreCapacity = isUseMASHTheatres && campaign.isOnContractAndPlanetside() ?
-                                        campaign.calculateMASHTheaterCapacity() :
-                                        Integer.MAX_VALUE;
+        boolean isUseMASHTheatres = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
+        int mashTheatreCapacity;
+        mashTheatreCapacity = isUseMASHTheatres && campaign.isOnContractAndPlanetside() ?
+                                    campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                    Integer.MAX_VALUE;
         if (UntreatedPersonnelNagDialog.checkNag(activePersonnel,
               doctorCapacity,
               isDoctorsUseAdministration,
@@ -137,7 +155,7 @@ public class NagController {
         }
 
         // Unable to afford next loan payment
-        final Finances finances = campaign.getFinances();
+        final Finances finances = campaign.getPlayerForce().getFinances();
 
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
             UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
@@ -148,8 +166,8 @@ public class NagController {
         }
 
         // Unable to afford all items on shopping list
-        final Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
-        final Money currentFunds = campaign.getFunds();
+        final Money totalBuyCost = campaign.getPlayerForce().getShoppingList().getTotalBuyCost();
+        final Money currentFunds = campaign.getPlayerForce().getFunds();
         if (UnableToAffordShoppingListNagDialog.checkNag(totalBuyCost, currentFunds)) {
             UnableToAffordShoppingListNagDialog unableToAffordShoppingListNagDialog = new UnableToAffordShoppingListNagDialog(
                   campaign);
@@ -160,7 +178,7 @@ public class NagController {
 
         // Unmaintained Units
         final Collection<Unit> units = campaign.getAllUnits();
-        final boolean isCheckMaintenance = campaignOptions.isCheckMaintenance();
+        final boolean isCheckMaintenance = campaignOptions.get(CampaignOption.CHECK_MAINTENANCE);
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
             UnmaintainedUnitsNagDialog unmaintainedUnitsNagDialog = new UnmaintainedUnitsNagDialog(campaign);
@@ -170,7 +188,7 @@ public class NagController {
         }
 
         // Insufficient Medics
-        if (InsufficientMedicsNagDialog.checkNag(campaign.getMedicsNeed())) {
+        if (InsufficientMedicsNagDialog.checkNag(campaign.getPlayerForce().getHumanResources().getMedicsNeed())) {
             InsufficientMedicsNagDialog insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
             if (insufficientMedicsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -178,7 +196,9 @@ public class NagController {
         }
 
         // Insufficient AsTechs
-        if (InsufficientAsTechsNagDialog.checkNag(campaign.getAsTechNeed())) {
+        if (InsufficientAsTechsNagDialog.checkNag(campaign.getPlayerForce()
+                                                        .getHumanResources()
+                                                        .getAsTechNeed(campaign.getCampaignOptions()))) {
             InsufficientAsTechsNagDialog insufficientAstechsNagDialog = new InsufficientAsTechsNagDialog(campaign);
             if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -186,9 +206,13 @@ public class NagController {
         }
 
         // Insufficient AsTech Time
-        final int possibleAsTechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
+        final int possibleAsTechPoolMinutes = campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getPossibleAsTechPoolMinutes(campaign.getCampaignOptions());
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-        final int possibleAsTechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
+        final int possibleAsTechPoolOvertime = campaign.getPlayerForce()
+                                                     .getHumanResources()
+                                                     .getPossibleAsTechPoolOvertime(campaign.getCampaignOptions());
 
         if (InsufficientAstechTimeNagDialog.checkNag(units,
               possibleAsTechPoolMinutes,
@@ -203,12 +227,20 @@ public class NagController {
 
         // Unresolved StratCon AO Contacts
         final boolean isUseStratCon = campaignOptions.isUseStratCon();
-        final List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        final List<AbstractContract> activeContracts = campaign.getActiveContracts();
 
         if (UnresolvedStratConContactsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
             UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
                   campaign);
             if (unresolvedStratConContactsNagDialog.shouldCancelAdvanceDay()) {
+                return true;
+            }
+        }
+
+        // Expiring StratCon Nav Points
+        if (ExpiringNavPointsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
+            ExpiringNavPointsNagDialog expiringNavPointsNagDialog = new ExpiringNavPointsNagDialog(campaign);
+            if (expiringNavPointsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }
@@ -221,19 +253,9 @@ public class NagController {
             }
         }
 
-        // Deployment Shortfall
-        final boolean isUseAtB = campaignOptions.isUseStratCon();
-
-        if (DeploymentShortfallNagDialog.checkNag(isUseAtB, campaign)) {
-            DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
-            if (deploymentShortfallNagDialog.shouldCancelAdvanceDay()) {
-                return true;
-            }
-        }
-
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
-        final boolean hasPrisoners = !campaign.getCurrentPrisoners().isEmpty();
+        final boolean hasPrisoners = !campaign.getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty();
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
@@ -251,8 +273,8 @@ public class NagController {
         }
 
         // HR Strain
-        if (HRStrainNagDialog.checkNag(campaignOptions.isUseRandomRetirement(),
-              campaignOptions.isUseHRStrain(),
+        if (HRStrainNagDialog.checkNag(campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT),
+              campaignOptions.get(CampaignOption.USE_HR_STRAIN),
               getHRStrainModifier(campaign))) {
             HRStrainNagDialog HRStrainNagDialog = new HRStrainNagDialog(campaign);
             if (HRStrainNagDialog.shouldCancelAdvanceDay()) {

@@ -1,5 +1,5 @@
-package mekhq.campaign.universe.factionHints;/*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+/*
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,6 +30,7 @@ package mekhq.campaign.universe.factionHints;/*
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
+package mekhq.campaign.universe.factionHints;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -163,5 +164,84 @@ public class FactionHintsTest {
 
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
         assertFalse(hints.isContainedFactionOpponent(outer, inner, nonOpponent, now));
+    }
+
+    @Test
+    public void testHasSameDiplomaticDataForIdenticalContent() {
+        Faction factionOne = createTestFaction("F1");
+        Faction factionTwo = createTestFaction("F2");
+        Faction factionThree = createTestFaction("F3");
+        LocalDate start = LocalDate.of(3050, 1, 1);
+        LocalDate end = LocalDate.of(3052, 12, 31);
+
+        FactionHints first = new FactionHints();
+        FactionHints second = new FactionHints();
+        for (FactionHints hints : new FactionHints[] { first, second }) {
+            hints.addWar("Some War", start, end, factionOne, factionTwo);
+            hints.addAlliance("", null, null, factionOne, factionThree);
+            hints.addRivalry("", start, null, factionTwo, factionThree);
+            hints.addNeutralFaction(factionThree);
+            hints.addNeutralExceptions("", start, end, factionThree, factionOne);
+            hints.addContainedFaction(factionOne, factionTwo, start, end, 0.25,
+                  Collections.singletonList(factionThree));
+        }
+
+        assertTrue(first.hasSameDiplomaticData(second));
+        assertTrue(second.hasSameDiplomaticData(first));
+    }
+
+    @Test
+    public void testHasSameDiplomaticDataDetectsExtraWar() {
+        Faction factionOne = createTestFaction("F1");
+        Faction factionTwo = createTestFaction("F2");
+
+        FactionHints first = new FactionHints();
+        FactionHints second = new FactionHints();
+        first.addWar("Some War", null, null, factionOne, factionTwo);
+        second.addWar("Some War", null, null, factionOne, factionTwo);
+        second.addWar("Custom War", LocalDate.of(3055, 1, 1), null, factionOne, factionTwo);
+
+        assertFalse(first.hasSameDiplomaticData(second));
+        assertFalse(second.hasSameDiplomaticData(first));
+    }
+
+    @Test
+    public void testHasSameDiplomaticDataDetectsChangedDates() {
+        Faction factionOne = createTestFaction("F1");
+        Faction factionTwo = createTestFaction("F2");
+
+        FactionHints first = new FactionHints();
+        FactionHints second = new FactionHints();
+        first.addWar("Some War", LocalDate.of(3050, 1, 1), LocalDate.of(3052, 12, 31), factionOne, factionTwo);
+        second.addWar("Some War", LocalDate.of(3050, 1, 1), LocalDate.of(3053, 12, 31), factionOne, factionTwo);
+
+        assertFalse(first.hasSameDiplomaticData(second));
+    }
+
+    @Test
+    public void testHasSameDiplomaticDataDistinguishesRelationshipTypes() {
+        Faction factionOne = createTestFaction("F1");
+        Faction factionTwo = createTestFaction("F2");
+
+        FactionHints first = new FactionHints();
+        FactionHints second = new FactionHints();
+        first.addWar("", null, null, factionOne, factionTwo);
+        second.addRivalry("", null, null, factionOne, factionTwo);
+
+        assertFalse(first.hasSameDiplomaticData(second),
+              "A war and a rivalry between the same pair are different diplomatic data");
+    }
+
+    @Test
+    public void testHasSameDiplomaticDataDetectsChangedFraction() {
+        Faction outer = createTestFaction("outer");
+        Faction inner = createTestFaction("inner");
+
+        FactionHints first = new FactionHints();
+        FactionHints second = new FactionHints();
+        first.addContainedFaction(outer, inner, null, null, 0.25);
+        second.addContainedFaction(outer, inner, null, null, 0.5);
+
+        assertFalse(first.hasSameDiplomaticData(second));
     }
 }

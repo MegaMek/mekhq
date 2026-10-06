@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.skills;
 
 import java.util.List;
+import java.util.Map;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -46,17 +47,19 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
  *
  * <p><b>Note:</b> For Unit Tests you can usually get away with {@code TestSkillModifierData#createDefault()}</p>
  *
- * @param characterOptions   the person's options and special traits
- * @param attributes         the person's physical and mental attributes
- * @param adjustedReputation the calculated reputation modifier (0 if not applicable)
- * @param injuryEffects      a list of injury effects currently affecting the character
- * @param age                the age of the character, in years
+ * @param characterOptions    the person's options and special traits
+ * @param attributes          the person's physical and mental attributes
+ * @param adjustedReputation  the calculated reputation modifier (0 if not applicable)
+ * @param injuryEffects       a list of injury effects currently affecting the character
+ * @param age                 the age of the character, in years
+ * @param equipmentKitBonuses skill name -&gt; bonus granted by the equipment kits the person carries (empty when none);
+ *                            see {@code EquipmentKitCatalog.kitSkillBonuses(Person)}
  *
  * @author Illiani
  * @since 0.50.10
  */
 public record SkillModifierData(PersonnelOptions characterOptions, Attributes attributes, int adjustedReputation,
-      List<InjuryEffect> injuryEffects, int age) {
+      List<InjuryEffect> injuryEffects, int age, Map<String, Integer> equipmentKitBonuses) {
     /**
      * Special age value indicating that aging effects should be ignored.
      *
@@ -66,5 +69,5 @@ public record SkillModifierData(PersonnelOptions characterOptions, Attributes at
      *
      * <p>The value {@code -1} is used as a sentinel and does not correspond to any valid chronological age.</p>
      */
-    public static int IGNORE_AGE = -1;
+    public static final int IGNORE_AGE = -1;
 }

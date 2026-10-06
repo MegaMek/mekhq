@@ -34,12 +34,19 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,20 +57,31 @@ import java.util.Vector;
 
 import megamek.client.IClient;
 import megamek.common.Player;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
+import megamek.common.units.Crew;
 import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
+import megamek.common.units.SmallCraft;
+import megamek.common.units.Tank;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.TestUnit;
+import mekhq.campaign.unit.TrooperSlots;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Tests for {@link ResolveScenarioTracker#processGame()}, verifying that enemy entities destroyed by ammo detonation
@@ -110,8 +128,8 @@ class ResolveScenarioTrackerTest {
         when(scenario.isTraitor(any(Entity.class), any(Campaign.class))).thenReturn(false);
 
         // Mock Campaign
-        campaign = mock(Campaign.class);
-        when(campaign.getFaction()).thenReturn(null);
+        campaign = mockCampaign();
+        when(campaign.getPlayerForce().getFaction()).thenReturn(null);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         CampaignOptions campaignOptions = new CampaignOptions();
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -159,10 +177,9 @@ class ResolveScenarioTrackerTest {
     void processGameAddsDevastatedEnemyUnitsToDevastatedList() {
         Entity devastatedEnemy = createEnemyEntity("Locust LCT-1V");
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)))
-              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
-              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(devastatedEnemy)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.processGame();
@@ -191,10 +208,9 @@ class ResolveScenarioTrackerTest {
         ejectedCrew.getCrew().setExternalIdAsString(ejectedId.toString(), 0);
         ejectedCrew.setCamouflage(new Camouflage());
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(ejectedCrew)))
-              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
-              .thenReturn(Collections.enumeration(List.of(ejectedCrew)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(ejectedCrew)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.processGame();
@@ -287,9 +303,9 @@ class ResolveScenarioTrackerTest {
         // Make the entity appear in the devastated list — it IS in results, genuinely destroyed
         playerEntity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(playerEntity)))
-              .thenReturn(Collections.enumeration(List.of(playerEntity)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(playerEntity)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.units.add(unit);
@@ -302,4 +318,382 @@ class ResolveScenarioTrackerTest {
         assertTrue(status.isTotalLoss(),
               "Unit that appeared in devastated results should remain a total loss");
     }
+
+    /**
+     * Creates a mock crew member with a unique ID.
+     */
+    private Person mockCrewMember(String fullName) {
+        Person person = mock(Person.class);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        when(person.getFullName()).thenReturn(fullName);
+        return person;
+    }
+
+    /**
+     * Sets up a unit credited with a single kill, and returns it.
+     */
+    private Unit unitCreditedWithAKill(ResolveScenarioTracker tracker, List<Person> activeCrew) {
+        Entity playerEntity = createPlayerEntity("Locust LCT-1V");
+        UUID unitId = UUID.fromString(playerEntity.getExternalIdAsString());
+        Unit unit = createMockUnit(playerEntity, unitId);
+        when(unit.getFormationId()).thenReturn(1);
+        when(unit.getActiveCrew()).thenReturn(activeCrew);
+
+        tracker.units.add(unit);
+        tracker.killCredits.put("Atlas AS7-D", unitId.toString());
+        return unit;
+    }
+
+    /**
+     * A unit scores a kill once, not once per crew member. Multi-crew units used to record the same destroyed unit in
+     * their history for every named crew member aboard.
+     */
+    @Test
+    void assignKillsRecordsOneUnitHistoryEntryForAMultiCrewUnit() {
+        ResolveScenarioTracker tracker = createTracker();
+        Person commander = mockCrewMember("Natasha Kerensky");
+        Unit unit = unitCreditedWithAKill(tracker,
+              List.of(commander, mockCrewMember("Joanna Fetladral"), mockCrewMember("Nikolai Malthus")));
+        when(unit.getCommander()).thenReturn(commander);
+
+        tracker.assignKills();
+
+        verify(unit, times(1)).addKillLogEntry(any());
+    }
+
+    /**
+     * A unit run entirely by temporary (blob) crew still scored the kill, so it still records one. Its history used to
+     * be empty, because the entry was written from inside the loop over named crew.
+     */
+    @Test
+    void assignKillsRecordsAUnitHistoryEntryForAUnitWithoutNamedCrew() {
+        ResolveScenarioTracker tracker = createTracker();
+        Unit unit = unitCreditedWithAKill(tracker, List.of());
+
+        tracker.assignKills();
+
+        verify(unit, times(1)).addKillLogEntry(any());
+    }
+
+    // region Blob (temporary) crew casualties
+
+    /**
+     * Loads a test entity from a BLK file (infantry, vehicles) and prepares it as a player unit with a valid external
+     * ID and crew ID.
+     */
+    private Entity createPlayerBlkEntity(String unitName) {
+        Entity entity = getEntityForUnitTesting(unitName, true);
+        if (entity == null) {
+            throw new IllegalStateException("Failed to load test entity: " + unitName);
+        }
+        entity.setOwner(localPlayer);
+        entity.setExternalIdAsString(UUID.randomUUID().toString());
+        entity.setCamouflage(new Camouflage());
+        if (entity.getCrew() != null) {
+            entity.getCrew().setExternalIdAsString(UUID.randomUUID().toString(), 0);
+        }
+        return entity;
+    }
+
+    /**
+     * Creates a mock {@link Unit} wrapping the given entity with no named crew but the supplied number of temp (blob)
+     * crew of a single role.
+     */
+    private Unit createBlobCrewUnit(Entity entity, PersonnelRole tempRole, int tempCount, int totalCrewSize) {
+        UUID unitId = UUID.fromString(entity.getExternalIdAsString());
+        Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(unitId);
+        when(unit.getEntity()).thenReturn(entity);
+        // Use a literal rather than entity.getDisplayName(): calling a method on the (possibly mocked) entity while
+        // this stubbing is open trips Mockito's unfinished-stubbing detection.
+        when(unit.getName()).thenReturn("Blob Crew Test Unit");
+        when(unit.getActiveCrew()).thenReturn(new ArrayList<>());
+        when(unit.getCrew()).thenReturn(new ArrayList<>());
+        when(unit.getTotalCrewSize()).thenReturn(totalCrewSize);
+        when(unit.getTotalTempCrew()).thenReturn(tempCount);
+        when(unit.getTempCrewByPersonnelRole(tempRole)).thenReturn(tempCount);
+        return unit;
+    }
+
+    /**
+     * Registers a unit with the tracker, forcing its post-battle entity and total-loss state.
+     */
+    private void registerUnit(ResolveScenarioTracker tracker, Unit unit, Entity entity, boolean totalLoss) {
+        tracker.units.add(unit);
+        ResolveScenarioTracker.UnitStatus status = new ResolveScenarioTracker.UnitStatus(unit);
+        status.assignFoundEntity(entity, totalLoss);
+        tracker.unitsStatus.put(unit.getId(), status);
+    }
+
+    /**
+     * A wiped-out infantry platoon (for example a field gun) crewed almost entirely by temp crew used to process only
+     * one casualty per named crew member, leaving the rest of the platoon untouched. Every casualty must now fall on
+     * the temp crew, and each loss must be removed from the campaign pool so it is permanent.
+     */
+    @Test
+    void checkStatusOfPersonnelDrainsAllTempCrewWhenInfantryIsWipedOut() {
+        Entity infantry = createPlayerBlkEntity("Foot Platoon (DCMS) (MG 2620+)");
+        int tempCrew = 10;
+        Unit unit = createBlobCrewUnit(infantry, PersonnelRole.SOLDIER, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, infantry, true);
+
+        tracker.checkStatusOfPersonnel();
+
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.SOLDIER, tempCrew);
+        verify(unit).setTempCrew(PersonnelRole.SOLDIER, 0);
+    }
+
+    /**
+     * A destroyed vehicle crewed by temp crew now kills them: each temp crew member rolls to survive on the same odds
+     * as named vehicle crew (2d6 >= 7 survives). Here the roll is lethal, so all of them die and are removed from the
+     * campaign pool.
+     */
+    @Test
+    void checkStatusOfPersonnelKillsVehicleTempCrewWhenCrewIsLostAndRollIsLethal() {
+        Entity tank = createPlayerBlkEntity("Prime Mover");
+        int tempCrew = 5;
+        Unit unit = createBlobCrewUnit(tank, PersonnelRole.VEHICLE_CREW_GROUND, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, tank, true);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2); // < 7: killed
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, tempCrew);
+    }
+
+    /**
+     * Same destroyed vehicle, but the survival rolls are non-lethal: the temp crew survive, so nothing is removed from
+     * the campaign pool.
+     */
+    @Test
+    void checkStatusOfPersonnelSparesVehicleTempCrewWhenCrewIsLostButRollSurvives() {
+        Entity tank = createPlayerBlkEntity("Prime Mover");
+        int tempCrew = 5;
+        Unit unit = createBlobCrewUnit(tank, PersonnelRole.VEHICLE_CREW_GROUND, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, tank, true);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(12); // >= 7: survives
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verify(campaign, never()).decreaseTempCrewPool(any(PersonnelRole.class), anyInt());
+    }
+
+    /**
+     * A vehicle that survives the battle with its named crew intact does not endanger its temp crew.
+     */
+    @Test
+    void checkStatusOfPersonnelSparesVehicleTempCrewWhenVehicleSurvivesWithItsCrew() {
+        Entity tank = createPlayerBlkEntity("Prime Mover");
+        int tempCrew = 5;
+        Unit unit = createBlobCrewUnit(tank, PersonnelRole.VEHICLE_CREW_GROUND, tempCrew, tempCrew + 1);
+        Person commander = mockCrewMember("Driver");
+        when(unit.getCommander()).thenReturn(commander);
+
+        ResolveScenarioTracker tracker = createTracker();
+        // A recovered crew means the vehicle was not lost.
+        tracker.pilots.put(commander.getId(), tank.getCrew());
+        registerUnit(tracker, unit, tank, false);
+
+        tracker.checkStatusOfPersonnel();
+
+        verify(campaign, never()).decreaseTempCrewPool(any(PersonnelRole.class), anyInt());
+    }
+
+    /**
+     * A vehicle that survives as a total unit but whose hull is breached (a non-turret, non-body location reduced to
+     * zero internal structure) has lost its crew compartment, so its temp crew are at risk even though it was not a
+     * total loss and its named crew were recovered.
+     */
+    @Test
+    void checkStatusOfPersonnelKillsVehicleTempCrewWhenHullIsBreached() {
+        Entity tank = createPlayerBlkEntity("Prime Mover");
+        breachFirstCrewLocation(tank);
+        int tempCrew = 4;
+        Unit unit = createBlobCrewUnit(tank, PersonnelRole.VEHICLE_CREW_GROUND, tempCrew, tempCrew + 1);
+        Person commander = mockCrewMember("Driver");
+        when(unit.getCommander()).thenReturn(commander);
+
+        ResolveScenarioTracker tracker = createTracker();
+        tracker.pilots.put(commander.getId(), tank.getCrew());
+        registerUnit(tracker, unit, tank, false);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2); // < 7: killed
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, tempCrew);
+    }
+
+    /**
+     * Reduces the first non-turret, non-body location of a vehicle to zero internal structure, matching the "hull
+     * breach" criteria used by the resolution logic.
+     */
+    private void breachFirstCrewLocation(Entity tank) {
+        for (int loc = 0; loc < tank.locations(); loc++) {
+            if ((loc == Tank.LOC_TURRET) || (loc == Tank.LOC_TURRET_2) || (loc == Tank.LOC_BODY)) {
+                continue;
+            }
+            tank.setInternal(0, loc);
+            return;
+        }
+    }
+
+    /**
+     * A destroyed large craft (DropShip, JumpShip, WarShip, Small Craft) computes casualties from crew hits, which can
+     * far exceed the number of named crew. The overflow must fall on the temp (blob) vessel crew rather than being
+     * dropped, and each loss must leave the campaign pool.
+     */
+    @Test
+    void checkStatusOfPersonnelDrainsLargeCraftTempCrewBeyondNamedCrew() {
+        SmallCraft smallCraft = mock(SmallCraft.class);
+        Crew crew = mock(Crew.class); // isEjected() and getHits() default to false/0
+        when(smallCraft.getCrew()).thenReturn(crew);
+        when(smallCraft.isDestroyed()).thenReturn(true);
+        when(smallCraft.getFullChassis()).thenReturn("Test");
+        when(smallCraft.getModel()).thenReturn("Craft");
+        when(smallCraft.getExternalIdAsString()).thenReturn(UUID.randomUUID().toString());
+
+        int fullCrewSize = 8;
+        int tempCrew = 20;
+        Unit unit = createBlobCrewUnit(smallCraft, PersonnelRole.VESSEL_CREW, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, smallCraft, true);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.getFullCrewSize(smallCraft)).thenReturn(fullCrewSize);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, fullCrewSize);
+    }
+
+    // endregion Blob (temporary) crew casualties
+
+    // region Battle armor casualties by suit
+
+    /**
+     * Sets up a four-trooper battle armor squad with one named person in each suit, registered with the tracker.
+     * The suits listed in {@code lostSuits} come back from the battle with no living trooper.
+     */
+    private List<Person> squadThatLostSuits(ResolveScenarioTracker tracker, boolean isTotalLoss, int... lostSuits) {
+        BattleArmor battleArmor = (BattleArmor) createPlayerBlkEntity("IS Standard BA [Laser] (Sqd4)");
+        List<Person> troopers = new ArrayList<>();
+        List<UUID> trooperIds = new ArrayList<>();
+        List<Integer> suits = new ArrayList<>();
+        for (int slot = BattleArmor.LOC_TROOPER_1; slot <= battleArmor.getSquadSize(); slot++) {
+            Person trooper = mockCrewMember("Trooper " + slot);
+            troopers.add(trooper);
+            trooperIds.add(trooper.getId());
+            suits.add(slot);
+            battleArmor.setInternal(1, slot);
+        }
+        TrooperSlots trooperSlots = new TrooperSlots();
+        trooperSlots.seat(trooperIds, suits);
+        for (int lostSuit : lostSuits) {
+            battleArmor.setInternal(IArmorState.ARMOR_DESTROYED, lostSuit);
+        }
+
+        Unit squad = mock(Unit.class);
+        UUID squadId = UUID.fromString(battleArmor.getExternalIdAsString());
+        when(squad.getId()).thenReturn(squadId);
+        when(squad.getEntity()).thenReturn(battleArmor);
+        when(squad.getName()).thenReturn("Battle Armor Test Squad");
+        when(squad.getActiveCrew()).thenAnswer(invocation -> new ArrayList<>(troopers));
+        when(squad.getCrew()).thenReturn(troopers);
+        when(squad.getTotalCrewSize()).thenReturn(troopers.size());
+        when(squad.getCommander()).thenReturn(troopers.getFirst());
+        when(squad.getTrooperSlots()).thenReturn(trooperSlots);
+        tracker.pilots.put(troopers.getFirst().getId(), battleArmor.getCrew());
+        registerUnit(tracker, squad, battleArmor, isTotalLoss);
+        return troopers;
+    }
+
+    private static boolean isCasualty(ResolveScenarioTracker tracker, Person trooper) {
+        PersonStatus status = tracker.getPeopleStatus().get(trooper.getId());
+        assertNotNull(status, trooper.getFullName() + " has a status");
+        return status.isDead() || (status.getHits() > 0);
+    }
+
+    /**
+     * The person in the lost suit is the casualty, not someone picked at random from the squad (issue #10257).
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsTheTrooperWhoseSuitWasLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, false, 3);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2); // < 7: killed
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        assertTrue(tracker.getPeopleStatus().get(troopers.get(2).getId()).isDead(), "The trooper in suit 3 died");
+        for (Person survivor : List.of(troopers.get(0), troopers.get(1), troopers.get(3))) {
+            assertFalse(isCasualty(tracker, survivor), survivor.getFullName() + " is unhurt");
+        }
+    }
+
+    /**
+     * A squad that comes back with every suit intact has no casualties.
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsNobodyWhenNoSuitWasLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, false);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        for (Person trooper : troopers) {
+            assertFalse(isCasualty(tracker, trooper), trooper.getFullName() + " is unhurt");
+        }
+    }
+
+    /**
+     * When the whole squad is lost, everyone in it is a casualty.
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsEveryTrooperWhenTheSquadIsLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, true, 1, 2, 3, 4);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        for (Person trooper : troopers) {
+            assertTrue(tracker.getPeopleStatus().get(trooper.getId()).isDead(), trooper.getFullName() + " died");
+        }
+    }
+
+    // endregion Battle armor casualties by suit
 }

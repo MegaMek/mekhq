@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -77,7 +77,9 @@ public class ResupplyDialogUtilities {
      */
     static List<String> createPartsReport(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
-        Faction originFaction = campaign.getFaction();
+        Faction originFaction = campaign.getPlayerForce().getFaction();
+        boolean originIsClan = originFaction.isClan();
+        megamek.common.enums.Faction originTechFaction = getTechFaction(originFaction);
         int year = campaign.getGameYear();
 
         final List<Part> convoyContents = resupply.getConvoyContents();
@@ -90,7 +92,7 @@ public class ResupplyDialogUtilities {
                   String append = part.isClan() ? " (Clan)" : "";
                   append = part.isMixedTech() ? " (Mixed)" : append;
                   append += " (" + quality + ')';
-                  append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
+                  append += part.isExtinct(year, originIsClan, originTechFaction) ?
                                   " (<b>EXTINCT!</b>)" : "";
 
                   if (part instanceof AmmoBin) {
@@ -152,9 +154,9 @@ public class ResupplyDialogUtilities {
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {
-        final AtBContract contract = resupply.getContract();
+        final AbstractContract contract = resupply.getContract();
 
-        String enemyFactionReference = contract.getEnemyBotName();
+        String enemyFactionReference = contract.getEnemyDisplayName();
 
         if (!enemyFactionReference.contains("Clan")) {
             enemyFactionReference = "the " + enemyFactionReference;

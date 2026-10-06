@@ -53,8 +53,11 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_C;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_E;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_AERO;
+import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_AERO;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -74,7 +77,9 @@ import javax.swing.UIManager;
 import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
+import megamek.common.MPCalculationSetting;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -87,6 +92,7 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
+import megamek.common.equipment.enums.BombType;
 import megamek.common.equipment.enums.FuelType;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
@@ -105,9 +111,11 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
@@ -116,14 +124,17 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.UnitLogger;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
@@ -149,6 +160,8 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -169,7 +182,12 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Unit implements ITechnology, ILocation {
+public class Unit implements ITechnology, ILocatable {
+    /** Under Alternate Unit Cost, units always sell for this fraction of their value */
+    static final double ALTERNATE_UNIT_COST_SELL_FRACTION = 0.5;
+    private static final double GOOD_REPUTATION_1_PRICE_MULTIPLIER = 1.1;
+    private static final double GOOD_REPUTATION_2_PRICE_MULTIPLIER = 1.25;
+
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
@@ -191,6 +209,17 @@ public class Unit implements ITechnology, ILocation {
     private UUID id;
     private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
+    /**
+     * {@code true} when this unit is a support carrier: an infantry unit that exists to hold support personnel in the
+     * TOE. Carriers are created by {@code SupportPersonnelToTOE} and kept current by
+     * {@code SupportCarrierReconciler}. Whether a carrier may deploy is decided in one place,
+     * {@code SupportCarrierDeployment} - closed today, to be opened by a future scenario type that pulls support staff
+     * into a fight. Absent from saves written before carriers were tracked, which read back as {@code false}.
+     */
+    private boolean carrier;
+    private String armorKitName;
+    private String designedInfantryKitName;
+    private String intendedArmorKitName;
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -221,6 +250,8 @@ public class Unit implements ITechnology, ILocation {
     private Person tech;
     // blob crew - temporary personnel not represented by Person objects
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
+    // which person wears which battle armor suit
+    private final TrooperSlots trooperSlots = new TrooperSlots();
 
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
@@ -244,6 +275,11 @@ public class Unit implements ITechnology, ILocation {
     private Person engineer;
 
     private String history;
+    private List<LogEntry> unitLog;
+    private List<LogEntry> killLog;
+    private List<LogEntry> crewLog;
+    private List<LogEntry> deploymentLog;
+    private List<LogEntry> repairLog;
 
     // for delivery
     protected int daysToArrival;
@@ -269,6 +305,11 @@ public class Unit implements ITechnology, ILocation {
         formationId = Formation.FORMATION_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
         this.history = "";
+        this.unitLog = new ArrayList<>();
+        this.killLog = new ArrayList<>();
+        this.crewLog = new ArrayList<>();
+        this.deploymentLog = new ArrayList<>();
+        this.repairLog = new ArrayList<>();
         this.lastMaintenanceReport = "";
         this.fluffName = "";
         this.maintenanceMultiplier = 4;
@@ -337,7 +378,7 @@ public class Unit implements ITechnology, ILocation {
 
             double minutesInWorkDay = TECH_WORK_DAY;
             if (refitTech != null) {
-                boolean isTechsUseAdmin = getCampaign().getCampaignOptions().isTechsUseAdministration();
+                boolean isTechsUseAdmin = getCampaign().getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
                 minutesInWorkDay = refitTech.getDailyAvailableTechTime(isTechsUseAdmin);
             }
 
@@ -545,7 +586,7 @@ public class Unit implements ITechnology, ILocation {
         this.entity = en;
     }
 
-    public Entity getEntity() {
+    public @Nullable Entity getEntity() {
         return entity;
     }
 
@@ -804,6 +845,131 @@ public class Unit implements ITechnology, ILocation {
         this.history = s;
     }
 
+    /**
+     * Returns this unit's general log, sorted by date. The general log keeps tabs on ownership events: who originally
+     * owned it (if salvaged), when it was purchased, and refits.
+     *
+     * @return the unit's general log entries, sorted by date
+     */
+    public List<LogEntry> getUnitLog() {
+        unitLog.sort(Comparator.comparing(LogEntry::getDate));
+        return unitLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's general log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addUnitLogEntry(final LogEntry entry) {
+        unitLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's kill log, sorted by date. The kill log records the kills scored by the unit through its
+     * pilot.
+     *
+     * @return the unit's kill log entries, sorted by date
+     */
+    public List<LogEntry> getKillLog() {
+        killLog.sort(Comparator.comparing(LogEntry::getDate));
+        return killLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's kill log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addKillLogEntry(final LogEntry entry) {
+        killLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's crew log, sorted by date. The crew log records who has crewed the unit.
+     *
+     * @return the unit's crew log entries, sorted by date
+     */
+    public List<LogEntry> getCrewLog() {
+        crewLog.sort(Comparator.comparing(LogEntry::getDate));
+        return crewLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's crew log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addCrewLogEntry(final LogEntry entry) {
+        crewLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's deployment log, sorted by date. The deployment log records deployments to scenarios.
+     *
+     * @return the unit's deployment log entries, sorted by date
+     */
+    public List<LogEntry> getDeploymentLog() {
+        deploymentLog.sort(Comparator.comparing(LogEntry::getDate));
+        return deploymentLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's deployment log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addDeploymentLogEntry(final LogEntry entry) {
+        deploymentLog.add(entry);
+    }
+
+    /**
+     * Returns this unit's repair log, sorted by date. The repair log records repairs conducted on the unit.
+     *
+     * @return the unit's repair log entries, sorted by date
+     */
+    public List<LogEntry> getRepairLog() {
+        repairLog.sort(Comparator.comparing(LogEntry::getDate));
+        return repairLog;
+    }
+
+    /**
+     * Adds a new entry to this unit's repair log.
+     *
+     * @param entry the log entry to add
+     */
+    public void addRepairLogEntry(final LogEntry entry) {
+        repairLog.add(entry);
+    }
+
+    /**
+     * Loads log entries from a log node (e.g. {@code <unitLog>}) into the provided list.
+     *
+     * @param logNode the XML node containing {@code <logEntry>} children
+     * @param target  the list to populate with the parsed entries
+     * @param logName the name of the log, used for error reporting
+     */
+    private static void loadLogEntriesFromXML(Node logNode, List<LogEntry> target, String logName) {
+        NodeList nl = logNode.getChildNodes();
+        for (int y = 0; y < nl.getLength(); y++) {
+            Node wn = nl.item(y);
+            // If it's not an element node, we ignore it.
+            if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn.getNodeName().equalsIgnoreCase("logEntry")) {
+                LOGGER.error("({}) Unknown node type not loaded in unit logEntry nodes: {}", logName, wn.getNodeName());
+                continue;
+            }
+
+            final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn);
+            if (logEntry != null) {
+                target.add(logEntry);
+            }
+        }
+    }
+
     public static boolean isFunctional(Entity en) {
         if (en instanceof Mek) {
             // center torso bad?? head bad?
@@ -825,9 +991,10 @@ public class Unit implements ITechnology, ILocation {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+                boolean isTurretOrRotor = VehicleLocations.isTurret(tank, i) || VehicleLocations.isRotor(tank, i);
+                if (isTurretOrRotor) {
                     continue;
                 }
                 if (en.isLocationBad(i)) {
@@ -865,10 +1032,10 @@ public class Unit implements ITechnology, ILocation {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             // can't repair a tank with a destroyed location
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
+                if (VehicleLocations.canLoseWithoutWrecking(tank, i)) {
                     continue;
                 }
                 if (en.getInternal(i) <= 0) {
@@ -1112,7 +1279,7 @@ public class Unit implements ITechnology, ILocation {
             }
             if (part instanceof MissingPart) {
                 Part newPart = (Part) ((MissingPart) part).getNewEquipment();
-                newPart.setBrandNew(!getCampaign().getCampaignOptions().isBLCSaleValue());
+                newPart.setBrandNew(!getCampaign().getCampaignOptions().get(CampaignOption.BLC_SALE_VALUE));
                 value = value.plus(newPart.getActualValue());
             } else if (part instanceof AmmoBin) {
                 value = value.plus(((AmmoBin) part).getValueNeeded());
@@ -1137,6 +1304,112 @@ public class Unit implements ITechnology, ILocation {
             }
         }
         return value;
+    }
+
+    /**
+     * Earlier versions gave a ProtoMek a second set of jump jets the first time its campaign was loaded: one
+     * {@link JumpJet} per jump jet mount and one {@link ProtoMekJumpJet} per point of jump MP. The jump jets tied to
+     * the mounts stay; the extra ProtoMek jump jets are removed from the unit and the warehouse.
+     *
+     * @param protoJumpJets the ProtoMek's jump jet parts of both kinds; the removed ones are taken out of it
+     * @param jumpMP        the ProtoMek's jump MP, one jump jet per point
+     */
+    private void removeDuplicateProtoMekJumpJets(List<Part> protoJumpJets, int jumpMP) {
+        int duplicates = protoJumpJets.size() - jumpMP;
+        int removed = 0;
+        for (Iterator<Part> jumpJetIterator = protoJumpJets.iterator();
+              jumpJetIterator.hasNext() && (removed < duplicates); ) {
+            Part jumpJet = jumpJetIterator.next();
+            boolean isProtoMekJumpJet = (jumpJet instanceof ProtoMekJumpJet)
+                  || (jumpJet instanceof MissingProtoMekJumpJet);
+            if (isProtoMekJumpJet) {
+                jumpJetIterator.remove();
+                removePart(jumpJet);
+                jumpJet.setUnit(null);
+                if (campaign != null) {
+                    getWarehouse().removePart(jumpJet);
+                }
+                removed++;
+            }
+        }
+        if (removed > 0) {
+            LOGGER.info("{}: removed {} duplicate ProtoMek jump jet parts", getName(), removed);
+        }
+    }
+
+    /**
+     * @return one trooper's armor part for the platoon: its armor kit, taking the kit's damage divisor and price, or
+     *       armor described by the platoon's armor properties when it has no kit
+     */
+    private InfantryArmorPart createInfantryArmorPart(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        double damageDivisor = (armorKit instanceof MiscType kit) ? kit.getDamageDivisor()
+              : infantry.getCustomArmorDamageDivisor();
+        return new InfantryArmorPart(0,
+              getCampaign(),
+              armorKit,
+              damageDivisor,
+              infantry.isArmorEncumbering(),
+              infantry.hasDEST(),
+              infantry.hasSneakCamo(),
+              infantry.hasSneakIR(),
+              infantry.hasSneakECM(),
+              infantry.hasSpaceSuit());
+    }
+
+    /**
+     * Armor parts saved before parts recorded their armor kit know only the kit's properties, so two different kits
+     * looked the same. They take the platoon's kit when the campaign loads.
+     */
+    private void giveArmorPartsTheirKit(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        if (armorKit == null) {
+            return;
+        }
+        int updated = 0;
+        for (Part part : parts) {
+            if ((part instanceof InfantryArmorPart armorPart) && (armorPart.getArmorKit() == null)) {
+                armorPart.setArmorKit(armorKit);
+                updated++;
+            }
+        }
+        if (updated > 0) {
+            LOGGER.info("{}: {} armor parts now record their {}", getName(), updated, armorKit.getName());
+        }
+    }
+
+    /**
+     * @return the part for one of a vehicle's locations: its rotor, one of its turrets, or plain structure. Turret and
+     *       rotor locations come from the vehicle, since superheavy tanks, large support tanks and VTOLs number them
+     *       differently from other tanks.
+     */
+    private TankLocation createVehicleLocationPart(Tank tank, int location) {
+        int tonnage = (int) tank.getWeight();
+        if (VehicleLocations.isRotor(tank, location)) {
+            return new Rotor(tonnage, getCampaign());
+        }
+        if (VehicleLocations.isTurret(tank, location)) {
+            return new Turret(location, tonnage, getCampaign());
+        }
+        return new TankLocation(location, tonnage, getCampaign());
+    }
+
+    /**
+     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
+     */
+    private void discardPart(Part part) {
+        removePart(part);
+        // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
+        LocalWarehouse warehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                         ? holdingWarehouse
+                                         : part.getWarehouse();
+        if ((warehouse != null) && (warehouse.getPart(part.getId()) == part)) {
+            warehouse.removePart(part);
+        } else {
+            LOGGER.warn("[UnitParts] {}: could not find the warehouse keeping {} #{}", getName(), part.getName(),
+                  part.getId());
+        }
+        part.setUnit(null);
     }
 
     public void removePart(Part part) {
@@ -1205,6 +1478,12 @@ public class Unit implements ITechnology, ILocation {
         return scenarioId != -1;
     }
 
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A deployed unit is committed to a scenario, and a unit still in transit from a purchase hasn't arrived yet.
+        return isPresent() && !isDeployed();
+    }
+
     public void undeploy() {
         scenarioId = -1;
     }
@@ -1264,6 +1543,40 @@ public class Unit implements ITechnology, ILocation {
             for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
                 if (entity.getInternal(i) == 0) {
                     return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
+                }
+            }
+        }
+        return checkCrewArmorKits(entity, getCrew(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * The armor-kit part of {@link #checkDeployment()}: when the campaign requires it, a Mek may not deploy unless every
+     * crew member wears one of the three MekWarrior kits (Basic, Advanced, or Clan), and an aerospace fighter may not
+     * deploy unless every crew member wears the Aerospace Fighter Pilot Kit — in both cases the kit carries the
+     * neurohelmet. Conventional fighters are not affected.
+     *
+     * @param entity  the unit's entity
+     * @param crew    the unit's crew
+     * @param options the campaign options
+     *
+     * @return the reason the crew cannot deploy, or {@code null} if their kits allow it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String checkCrewArmorKits(@Nullable Entity entity, List<Person> crew, CampaignOptions options) {
+        if ((entity instanceof Mek) && options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)) {
+            for (Person crewMember : crew) {
+                if (!ArmorKitCatalog.isMekWarriorKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsMekWarriorKit");
+                }
+            }
+        }
+        if ((entity != null) && entity.isAerospaceFighter()
+                  && options.get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY)) {
+            for (Person crewMember : crew) {
+                if (!ArmorKitCatalog.isAerospacePilotKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsAerospaceKit");
                 }
             }
         }
@@ -1464,6 +1777,10 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public Money getSellValue() {
+        if (isUseAlternateUnitCost()) {
+            return getAlternateSellValue();
+        }
+
         Money partsValue = Money.zero();
 
         partsValue = partsValue.plus(parts.stream()
@@ -1473,7 +1790,7 @@ public class Unit implements ITechnology, ILocation {
         // we use an alternative method of getting sell value for infantry
         if (entity instanceof Infantry) {
             Money unitCost = Money.of(entity.getAlternateCost());
-            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().get(CampaignOption.USED_PART_PRICE_MULTIPLIERS);
 
             Money infantryValue = switch (this.getQuality()) {
                 case QUALITY_A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
@@ -1598,14 +1915,37 @@ public class Unit implements ITechnology, ILocation {
         StringBuilder breakdown = new StringBuilder();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
+        if (isUseAlternateUnitCost()) {
+            Money alternateUnitCost = getAlternateUnitCost();
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.battleValue",
+                  getUnitBattleValue())).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
+                  alternateUnitCost.toAmountAndSymbolString())).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.half",
+                  String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
+                  getQualityName(), String.format("%.2f", getAlternateQualityMultiplier()))).append("<br>");
+            double obsoleteMultiplier = (entity == null) ? 1.0 :
+                                              entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if ((entity != null) && (obsoleteMultiplier < 1.0)) {
+                int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
+                breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.obsolete",
+                      yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
+            }
+            breakdown.append("<hr>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
+                  getAlternateSellValue().toAmountString()));
+            return breakdown.toString();
+        }
+
         // Get the "buy new" price
         Money buyNewPrice = getBuyCost();
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
               buyNewPrice.toAmountAndSymbolString())).append("<br>");
 
         // Get quality info
-        String qualityName = getQuality().toName(campaignOptions.isReverseQualityNames());
-        double[] usedPartPriceMultipliers = campaignOptions.getUsedPartPriceMultipliers();
+        String qualityName = getQuality().toName(campaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES));
+        double[] usedPartPriceMultipliers = campaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS);
         double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
 
         // Calculate current worth (before obsolete modifier)
@@ -1643,7 +1983,7 @@ public class Unit implements ITechnology, ILocation {
         // Infantry uses alternate calculation
         if (entity instanceof Infantry) {
             Money unitCost = Money.of(entity.getAlternateCost());
-            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().get(CampaignOption.USED_PART_PRICE_MULTIPLIERS);
             double qualityMultiplier = usedPartPriceMultipliers[getQuality().toNumeric()];
             return unitCost.multipliedBy(qualityMultiplier);
         }
@@ -1738,7 +2078,10 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public double getCargoCapacityForSalvage() {
-        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), FormationType.SALVAGE);
+        // Based on the unit's current walk MP, so battle damage limits how much it can haul. Scenario circumstances,
+        // such as the weather and gravity of whatever game the unit was last in, are ignored.
+        int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
+        return getCargoCapacity(Math.max(0, currentWalkMP - 1), FormationType.SALVAGE);
     }
 
     public double getCargoCapacityForConvoy() {
@@ -1882,8 +2225,12 @@ public class Unit implements ITechnology, ILocation {
 
         // No using your arms, roof rack, or lift hoists for convoys!
         if (formationType != FormationType.CONVOY) {
+            // Current rather than original MP, so battle damage is taken into account (but not the conditions of
+            // whatever game the unit was last in)
+            int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
             if (liftHoistCount > 0) {
-                double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
+                // Active TSM doubles what a lift hoist can pick up, so its capacity can exceed the usual limit
+                double maxLiftHoistCapacity = max(liftHoistCount * getEntity().getTonnage() / 2, liftHoistCapacity);
                 // Lift Hoist
                 if (maximumMpPenalty == 0) {
                     capacity += Math.clamp(getEntity().getTonnage() / 2, liftHoistCapacity,
@@ -1898,9 +2245,9 @@ public class Unit implements ITechnology, ILocation {
 
             if (roofRackCapacity > 0) {
                 if (maximumMpPenalty - currentMpReduction > 2 ||
-                          maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                          maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                     // If we're okay with the max roof rack penalty, let's take it
-                    if (maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                    if (maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                         capacity += roofRackCapacity;
                     } else {
                         capacity += Math.max(roofRackCapacity, getEntity().getTonnage() / 4.0);
@@ -2705,19 +3052,178 @@ public class Unit implements ITechnology, ILocation {
     // End Transport Assignments
 
     public Money getBuyCost() {
+        if (isUseAlternateUnitCost()) {
+            return getAlternateUnitCost();
+        }
+
         Money cost = Money.of((getEntity() instanceof Infantry) ?
                                     getEntity().getAlternateCost() :
                                     getEntity().getCost(false));
 
-        if (getEntity().isMixedTech()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getMixedTechUnitPriceMultiplier());
-        } else if (getEntity().isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getClanUnitPriceMultiplier());
-        } else { // Inner Sphere Entity
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().getInnerSphereUnitPriceMultiplier());
+        return cost.multipliedBy(getUnitPriceMultiplier());
+    }
+
+    /**
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching this unit's tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double getUnitPriceMultiplier() {
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        Entity unitEntity = getEntity();
+        if (unitEntity.isMixedTech()) {
+            return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
+        } else if (unitEntity.isClan()) {
+            return campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
+        }
+        return campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
+    }
+
+    /**
+     * @return {@code true} if units are valued by Battle Value ({@link CampaignOption#USE_ALTERNATE_UNIT_COST})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isUseAlternateUnitCost() {
+        return getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST) && (getEntity() != null);
+    }
+
+    /**
+     * The unit's condition when its Battle Value was last calculated. Battle Value is expensive to work out and unit
+     * value is read constantly (unit tables, finances), so it is only recalculated when the condition changes.
+     */
+    private record BattleValueCondition(int totalArmor, int totalInternal, int damagedEquipment, int equipmentCount,
+          int battleValue) {}
+
+    private transient BattleValueCondition cachedBattleValueCondition;
+
+    /**
+     * @return the unit's Battle Value in its current condition, excluding pilot skill, C3, and TAG
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int getUnitBattleValue() {
+        Entity unitEntity = getEntity();
+        int totalArmor = unitEntity.getTotalArmor();
+        int totalInternal = unitEntity.getTotalInternal();
+        int damagedEquipment = 0;
+        int equipmentCount = 0;
+        for (Mounted<?> mounted : unitEntity.getEquipment()) {
+            equipmentCount++;
+            if (mounted.isDestroyed() || mounted.isHit() || mounted.isMissing()) {
+                damagedEquipment++;
+            }
         }
 
-        return cost;
+        BattleValueCondition cached = cachedBattleValueCondition;
+        if (cached != null
+                  && cached.totalArmor() == totalArmor
+                  && cached.totalInternal() == totalInternal
+                  && cached.damagedEquipment() == damagedEquipment
+                  && cached.equipmentCount() == equipmentCount) {
+            return cached.battleValue();
+        }
+
+        int battleValue = unitEntity.calculateBattleValue(true, true, true);
+        cachedBattleValueCondition = new BattleValueCondition(totalArmor, totalInternal, damagedEquipment,
+              equipmentCount, battleValue);
+        return battleValue;
+    }
+
+    /**
+     * Gets the unit's value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: one support point per point of
+     * Battle Value, converted to C-bills when support point conversion is enabled, then adjusted by the unit price
+     * multiplier for the unit's tech base.
+     *
+     * <p>Battle Value is calculated from the unit's current state, so damage, lost armor, and destroyed equipment
+     * lower it. Pilot skill, C3 networks, and TAG are excluded, since they depend on the crew and force rather than the
+     * unit itself.</p>
+     *
+     * <p>Quirks that affect a unit's traditional price, such as Good Reputation, affect this value too (see
+     * {@link #getQuirkPriceMultiplier(Entity)}).</p>
+     *
+     * @return the unit's Battle Value-based value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getAlternateUnitCost() {
+        int battleValue = getUnitBattleValue();
+        double valueInSupportPoints = battleValue * getUnitPriceMultiplier() * getQuirkPriceMultiplier(getEntity());
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
+            return Money.of(valueInSupportPoints);
+        }
+        // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
+        return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
+    }
+
+    /**
+     * Gets the price multiplier from quirks that affect a unit's traditional price, for use with
+     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
+     * Good Reputation 2 (×1.25), which only affect 'Meks.
+     *
+     * @param unitEntity the unit's entity; may be {@code null}
+     *
+     * @return the quirk price multiplier, or 1.0 if no price quirks apply
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getQuirkPriceMultiplier(@Nullable Entity unitEntity) {
+        if (!(unitEntity instanceof Mek)) {
+            return 1.0;
+        }
+
+        if (unitEntity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)) {
+            return GOOD_REPUTATION_1_PRICE_MULTIPLIER;
+        } else if (unitEntity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)) {
+            return GOOD_REPUTATION_2_PRICE_MULTIPLIER;
+        }
+        return 1.0;
+    }
+
+    /**
+     * Gets the unit's sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: half its
+     * {@link #getAlternateUnitCost()}, adjusted for the unit's quality (see {@link #getAlternateQualityMultiplier()}),
+     * then reduced further by the obsolete quirk resale modifier as a traditionally priced unit would be.
+     *
+     * @return the unit's Battle Value-based sell value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Money getAlternateSellValue() {
+        Money sellValue = getAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION)
+                                .multipliedBy(getAlternateQualityMultiplier());
+        double obsoleteMultiplier = getEntity().getObsoleteResaleModifier(getCampaign().getGameYear());
+        if (obsoleteMultiplier < 1.0) {
+            sellValue = sellValue.multipliedBy(obsoleteMultiplier);
+        }
+        return sellValue;
+    }
+
+    /**
+     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}.
+     * Battle Value takes no account of quality, so the Used Part Price Multipliers are applied relative to average
+     * (quality D): a quality D unit sells for exactly half its value, while better and worse units sell for more and
+     * less. With the default multipliers, quality A sells at x0.2 of that half and quality F at x1.8.
+     *
+     * @return the quality multiplier, or 1.0 if the quality D multiplier is not positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    double getAlternateQualityMultiplier() {
+        double[] usedPartPriceMultipliers = getCampaign().getCampaignOptions()
+                                                  .get(CampaignOption.USED_PART_PRICE_MULTIPLIERS);
+        double averageMultiplier = usedPartPriceMultipliers[QUALITY_D.toNumeric()];
+        if (averageMultiplier <= 0) {
+            return 1.0;
+        }
+        return usedPartPriceMultipliers[getQuality().toNumeric()] / averageMultiplier;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -2758,6 +3264,7 @@ public class Unit implements ITechnology, ILocation {
             }
             pw.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewMap>");
         }
+        trooperSlots.writeToXML(pw, indent);
 
         // If this entity is assigned to a transport ship, write that
         if (hasTransportShipAssignment()) {
@@ -2839,6 +3346,10 @@ public class Unit implements ITechnology, ILocation {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
+        if (carrier) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "carrier", true);
+        }
+
         if (site != SITE_FACILITY_BASIC) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
@@ -2881,8 +3392,60 @@ public class Unit implements ITechnology, ILocation {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
         }
 
+        if (armorKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKitName", armorKitName);
+        }
+
+        if (designedInfantryKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "designedInfantryKitName", designedInfantryKitName);
+        }
+
+        if (intendedArmorKitName != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedArmorKitName", intendedArmorKitName);
+        }
+
         if (!history.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "history", history);
+        }
+
+        if (!unitLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitLog");
+            for (LogEntry entry : unitLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitLog");
+        }
+
+        if (!killLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "killLog");
+            for (LogEntry entry : killLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "killLog");
+        }
+
+        if (!crewLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "crewLog");
+            for (LogEntry entry : crewLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "crewLog");
+        }
+
+        if (!deploymentLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "deploymentLog");
+            for (LogEntry entry : deploymentLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "deploymentLog");
+        }
+
+        if (!repairLog.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "repairLog");
+            for (LogEntry entry : repairLog) {
+                entry.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "repairLog");
         }
 
         if (refit != null) {
@@ -2891,7 +3454,7 @@ public class Unit implements ITechnology, ILocation {
 
         if ((lastMaintenanceReport != null) &&
                   !lastMaintenanceReport.isEmpty() &&
-                  getCampaign().getCampaignOptions().isCheckMaintenance()) {
+                  getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
             pw.println(MHQXMLUtility.indentStr(indent) +
                              "<lastMaintenanceReport><![CDATA[" +
                              lastMaintenanceReport +
@@ -2996,6 +3559,8 @@ public class Unit implements ITechnology, ILocation {
                             }
                         }
                     }
+                } else if (TrooperSlots.isTrooperSlotsNode(wn2.getNodeName())) {
+                    retVal.trooperSlots.readFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
@@ -3034,43 +3599,9 @@ public class Unit implements ITechnology, ILocation {
                     retVal.setSuperHeavyVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAssignment")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType;
-                    if (attributes.getNamedItem("campaignTransportType") != null) {
-                        campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                              "campaignTransportType").getTextContent());
-                    } else {
-                        // Tactical transports were added before the campaignTransportType attribute
-                        // was. Assume it's a tactical transport.
-                        campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
-                    }
-                    UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
-
-                    if (attributes.getNamedItem("transportedLocation") != null) {
-                        int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation")
-                                                                             .getTextContent());
-                        retVal.setTransportAssignment(campaignTransportType,
-                              new TransportAssignment(new UnitRef(id), transportedLocationHash));
-                    } else if (attributes.getNamedItem("transporterType") != null) {
-                        try {
-                            TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
-                                  "transporterType").getTextContent()));
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id), transporterType));
-                        } catch (IllegalArgumentException e) {
-                            LOGGER.error(e, "Could not find transporter type.");
-                            retVal.setTransportAssignment(campaignTransportType,
-                                  new TransportAssignment(new UnitRef(id)));
-                        }
-                    } else {
-                        retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
-                    }
+                    parseTransportAssignmentNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")) {
-                    NamedNodeMap attributes = wn2.getAttributes();
-                    CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
-                          "campaignTransportType").getTextContent());
-                    retVal.addTransportedUnit(campaignTransportType,
-                          new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
+                    parseTransportedUnitNode(wn2, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
                                  wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.formationId = Integer.parseInt(wn2.getTextContent());
@@ -3086,8 +3617,26 @@ public class Unit implements ITechnology, ILocation {
                     retVal.refit = Refit.generateInstanceFromXML(wn2, version, campaign, retVal);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {
                     retVal.history = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.unitLog, "unitLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("killLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.killLog, "killLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("crewLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.crewLog, "crewLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("deploymentLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.deploymentLog, "deploymentLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("repairLog")) {
+                    loadLogEntriesFromXML(wn2, retVal.repairLog, "repairLog");
+                } else if (wn2.getNodeName().equalsIgnoreCase("carrier")) {
+                    retVal.carrier = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
                     retVal.fluffName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("armorKitName")) {
+                    retVal.armorKitName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("designedInfantryKitName")) {
+                    retVal.designedInfantryKitName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("intendedArmorKitName")) {
+                    retVal.intendedArmorKitName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
@@ -3117,6 +3666,69 @@ public class Unit implements ITechnology, ILocation {
         }
 
         return retVal;
+    }
+
+    // Attribute names on the <transportAssignment> and <transportedUnit> save-file nodes. The id is
+    // the transport's UUID on an assignment node and the transported unit's UUID on a transported
+    // node; the other three only ever appear on an assignment node.
+    private static final String TRANSPORT_ATTRIBUTE_ID = "id";
+    private static final String TRANSPORT_ATTRIBUTE_TYPE = "campaignTransportType";
+    private static final String TRANSPORT_ATTRIBUTE_LOCATION = "transportedLocation";
+    private static final String TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE = "transporterType";
+
+    /**
+     * Parses a {@code <transportAssignment>} save-file node onto the given unit. Entries carry a
+     * {@code campaignTransportType} attribute; entries without one predate that attribute and only ever meant a
+     * tactical transport, so they load as TACTICAL. Package-visible so the routing is unit-testable without loading a
+     * full entity.
+     */
+    static void parseTransportAssignmentNode(Node transportNode, Unit retVal) {
+        NamedNodeMap attributes = transportNode.getAttributes();
+        CampaignTransportType campaignTransportType;
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TYPE) != null) {
+            campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+                  TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
+        } else {
+            // Tactical transports were added before the campaignTransportType attribute
+            // was. Assume it's a tactical transport.
+            campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
+        }
+        UUID id = UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent());
+
+        if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION) != null) {
+            // A hash that does not parse, or does not match any of the transport's bays, leaves the
+            // assignment without a location - the same state as an entry that never carried one.
+            int transportedLocationHash = MathUtility.parseInt(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_LOCATION)
+                                                                     .getTextContent(), 0);
+            retVal.setTransportAssignment(campaignTransportType,
+                  new TransportAssignment(new UnitRef(id), transportedLocationHash));
+        } else if (attributes.getNamedItem(TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE) != null) {
+            try {
+                TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem(
+                      TRANSPORT_ATTRIBUTE_TRANSPORTER_TYPE).getTextContent()));
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id), transporterType));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(e, "Could not find transporter type.");
+                retVal.setTransportAssignment(campaignTransportType,
+                      new TransportAssignment(new UnitRef(id)));
+            }
+        } else {
+            retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
+        }
+    }
+
+    /**
+     * Parses a {@code <transportedUnit>} save-file node onto the given unit, routing it to the summary matching its
+     * {@code campaignTransportType} attribute. Package-visible so the routing is unit-testable without loading a full
+     * entity.
+     */
+    static void parseTransportedUnitNode(Node transportedNode, Unit retVal) {
+        NamedNodeMap attributes = transportedNode.getAttributes();
+        CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem(
+              TRANSPORT_ATTRIBUTE_TYPE).getTextContent());
+        retVal.addTransportedUnit(campaignTransportType,
+              new UnitRef(UUID.fromString(attributes.getNamedItem(TRANSPORT_ATTRIBUTE_ID).getTextContent())));
     }
 
     /**
@@ -3153,7 +3765,7 @@ public class Unit implements ITechnology, ILocation {
      * manage so lets just make maintenance costs relative to the length of the maintenance cycle that the user defined
      */
     public Money getMaintenanceCost() {
-        return getWeeklyMaintenanceCost().multipliedBy(getCampaign().getCampaignOptions().getMaintenanceCycleDays())
+        return getWeeklyMaintenanceCost().multipliedBy(getCampaign().getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS))
                      .dividedBy(7.0);
     }
 
@@ -3163,13 +3775,13 @@ public class Unit implements ITechnology, ILocation {
         Money value;
 
         // we will assume sale value for now, but make this customizable
-        if (getCampaign().getCampaignOptions().isEquipmentContractSaleValue()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.EQUIPMENT_CONTRACT_SALE_VALUE)) {
             value = getSellValue();
         } else {
             value = getBuyCost();
         }
 
-        if (getCampaign().getCampaignOptions().isUsePercentageMaintenance()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_PERCENTAGE_MAINTENANCE)) {
             if (en instanceof Mek) {
                 mCost = value.multipliedBy(0.02);
             } else if (en instanceof Warship) {
@@ -3243,7 +3855,7 @@ public class Unit implements ITechnology, ILocation {
         int engineRating = 0;
         int builtInHeatSinks = 0;
         if (!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
-            engineRating = entity.getEngine().getRating();
+            engineRating = (int) Math.floor(entity.getEngine().getRating(entity));
             if (entity.getEngine().isFusion()) {
                 // 10 weight-free heats inks for fusion engines.
                 // Used for fighters to prevent adding extra parts
@@ -3253,6 +3865,7 @@ public class Unit implements ITechnology, ILocation {
 
         ArrayList<Part> partsToAdd = new ArrayList<>();
         ArrayList<Part> partsToRemove = new ArrayList<>();
+        ArrayList<Part> bombBinsToRemove = new ArrayList<>();
 
         Part gyro = null;
         Part engine = null;
@@ -3377,8 +3990,9 @@ public class Unit implements ITechnology, ILocation {
                 }
             } else if (part instanceof MissingRotor) {
                 locations[VTOL.LOC_ROTOR] = part;
-            } else if (part instanceof MissingTurret && Tank.LOC_TURRET < locations.length) {
-                locations[Tank.LOC_TURRET] = part;
+            } else if ((part instanceof MissingTurret missingTurret)
+                             && (missingTurret.getTurretLocation() < locations.length)) {
+                locations[missingTurret.getTurretLocation()] = part;
             } else if (part instanceof ProtoMekLocation) {
                 if (((ProtoMekLocation) part).getLoc() < locations.length) {
                     locations[((ProtoMekLocation) part).getLoc()] = part;
@@ -3421,9 +4035,17 @@ public class Unit implements ITechnology, ILocation {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof AmmoBin) {
-                ammoParts.put(((AmmoBin) part).getEquipmentNum(), part);
+                if (((AmmoBin) part).getType() instanceof BombType) {
+                    bombBinsToRemove.add(part);
+                } else {
+                    ammoParts.put(((AmmoBin) part).getEquipmentNum(), part);
+                }
             } else if (part instanceof MissingAmmoBin) {
-                ammoParts.put(((MissingAmmoBin) part).getEquipmentNum(), part);
+                if (((MissingAmmoBin) part).getType() instanceof BombType) {
+                    bombBinsToRemove.add(part);
+                } else {
+                    ammoParts.put(((MissingAmmoBin) part).getEquipmentNum(), part);
+                }
             } else if (part instanceof HeatSink) {
                 heatSinks.put(((HeatSink) part).getEquipmentNum(), part);
             } else if (part instanceof MissingHeatSink) {
@@ -3433,25 +4055,33 @@ public class Unit implements ITechnology, ILocation {
             } else if (part instanceof MissingJumpJet) {
                 jumpJets.put(((MissingJumpJet) part).getEquipmentNum(), part);
             } else if (part instanceof BattleArmorEquipmentPart) {
-                if (!(entity instanceof BattleArmor)) {
+                int trooperIndex = ((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1;
+                if (!(entity instanceof BattleArmor) || (trooperIndex < 0) ||
+                          (trooperIndex >= ((BattleArmor) entity).getSquadSize())) {
+                    // A detached BA equipment part reports a trooper of -1, which would index the squad array
+                    // out of bounds. Drop it rather than crashing the load.
                     partsToRemove.add(part);
                 } else {
                     Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart) part).getEquipmentNum());
                     if (null == parts) {
                         parts = new Part[((BattleArmor) entity).getSquadSize()];
                     }
-                    parts[((BattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    parts[trooperIndex] = part;
                     baEquipParts.put(((BattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
             } else if (part instanceof MissingBattleArmorEquipmentPart) {
-                if (!(entity instanceof BattleArmor)) {
+                int trooperIndex = ((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1;
+                if (!(entity instanceof BattleArmor) || (trooperIndex < 0) ||
+                          (trooperIndex >= ((BattleArmor) entity).getSquadSize())) {
+                    // A detached BA equipment part reports a trooper of -1, which would index the squad array
+                    // out of bounds. Drop it rather than crashing the load.
                     partsToRemove.add(part);
                 } else {
                     Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart) part).getEquipmentNum());
                     if (null == parts) {
                         parts = new Part[((BattleArmor) entity).getSquadSize()];
                     }
-                    parts[((MissingBattleArmorEquipmentPart) part).getTrooper() - BattleArmor.LOC_TROOPER_1] = part;
+                    parts[trooperIndex] = part;
                     baEquipParts.put(((MissingBattleArmorEquipmentPart) part).getEquipmentNum(), parts);
                 }
             } else if (part instanceof EquipmentPart) {
@@ -3642,9 +4272,22 @@ public class Unit implements ITechnology, ILocation {
 
             part.updateConditionFromPart();
         }
-        // Remove invalid Aero parts due to changes after 0.45.4
+        // Parts the unit has no place for, such as heat sink parts for the sinks a fusion engine provides, leave the
+        // campaign rather than staying in the warehouse tied to the unit, where they turned into free spares once it left
         for (Part part : partsToRemove) {
+            discardPart(part);
+        }
+        if (!partsToRemove.isEmpty()) {
+            LOGGER.debug("[UnitParts] {}: {} parts it has no place for were discarded", getName(), partsToRemove.size());
+        }
+
+        LocalWarehouse warehouse = getWarehouse();
+        for (Part part : bombBinsToRemove) {
             removePart(part);
+            part.setUnit(null);
+            if (warehouse != null) {
+                warehouse.removePart(part);
+            }
         }
         // now check to see what is null
         for (int i = 0; i < locations.length; i++) {
@@ -3674,52 +4317,10 @@ public class Unit implements ITechnology, ILocation {
                           getCampaign());
                     addPart(protoMekLocation);
                     partsToAdd.add(protoMekLocation);
-                } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
-                    if (entity instanceof VTOL) {
-                        if (i == VTOL.LOC_ROTOR) {
-                            Rotor rotor = new Rotor((int) getEntity().getWeight(), getCampaign());
-                            addPart(rotor);
-                            partsToAdd.add(rotor);
-                        } else if (i == VTOL.LOC_TURRET) {
-                            if (((VTOL) entity).hasNoTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else if (i == VTOL.LOC_TURRET_2) {
-                            if (((VTOL) entity).hasNoDualTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else {
-                            TankLocation tankLocation = new TankLocation(i,
-                                  (int) getEntity().getWeight(),
-                                  getCampaign());
-                            addPart(tankLocation);
-                            partsToAdd.add(tankLocation);
-                        }
-                    } else if (i == Tank.LOC_TURRET) {
-                        if (((Tank) entity).hasNoTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else if (i == Tank.LOC_TURRET_2) {
-                        if (((Tank) entity).hasNoDualTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else {
-                        TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(tankLocation);
-                        partsToAdd.add(tankLocation);
-                    }
+                } else if ((entity instanceof Tank tank) && (i != tank.getBodyLocation())) {
+                    Part tankLocation = createVehicleLocationPart(tank, i);
+                    addPart(tankLocation);
+                    partsToAdd.add(tankLocation);
                 } else if ((entity instanceof BattleArmor) &&
                                  (i != 0) &&
                                  (i <= ((BattleArmor) entity).getSquadSize())) {
@@ -3796,6 +4397,10 @@ public class Unit implements ITechnology, ILocation {
             }
             // We want to ignore weapon groups so that we don't get phantom weapons
             if (m.isWeaponGroup()) {
+                continue;
+            }
+
+            if (m.isBombMounted() || (m.getType() instanceof BombType)) {
                 continue;
             }
             // Anti-Mek attacks aren't actual parts
@@ -3893,9 +4498,9 @@ public class Unit implements ITechnology, ILocation {
                           getCampaign());
                     addPart(epart);
                     partsToAdd.add(epart);
-                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
-                        protoJumpJets.add(epart);
-                    }
+                }
+                if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
+                    protoJumpJets.add(epart);
                 }
             } else {
                 int equipmentNum = entity.getEquipmentNum(m);
@@ -4024,7 +4629,8 @@ public class Unit implements ITechnology, ILocation {
                     partsToAdd.add(door);
                 }
                 if (bayType.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
-                    for (int i = 0; i < bay.getCapacity(); i++) {
+                    int cubicleCount = (int) bay.getCapacity();
+                    for (int i = 0; i < cubicleCount; i++) {
                         Part cubicle = new Cubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
@@ -4048,7 +4654,7 @@ public class Unit implements ITechnology, ILocation {
                                                 .stream()
                                                 .filter(p -> ((p instanceof Cubicle) || (p instanceof MissingCubicle)))
                                                 .collect(Collectors.toList());
-                    while (bay.getCapacity() > cubicles.size()) {
+                    while ((int) bay.getCapacity() > cubicles.size()) {
                         Part cubicle = new MissingCubicle((int) entity.getWeight(), bayType, getCampaign());
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
@@ -4059,11 +4665,11 @@ public class Unit implements ITechnology, ILocation {
             }
         }
 
-        if (entity instanceof Mek) {
+        if (entity instanceof Mek mek) {
             if (null == gyro) {
                 gyro = new MekGyro((int) entity.getWeight(),
                       entity.getGyroType(),
-                      entity.getOriginalWalkMP(),
+                      MekGyro.getGyroTonnage(mek),
                       entity.isClan(),
                       getCampaign());
                 addPart(gyro);
@@ -4515,6 +5121,7 @@ public class Unit implements ITechnology, ILocation {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
+            removeDuplicateProtoMekJumpJets(protoJumpJets, entity.getOriginalJumpMP());
             int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while (jj > 0) {
                 ProtoMekJumpJet protoJJ = new ProtoMekJumpJet((int) entity.getWeight(), getCampaign());
@@ -4539,37 +5146,18 @@ public class Unit implements ITechnology, ILocation {
                 }
             }
             if (null == infantryArmor) {
-                EquipmentType eq = infantry.getArmorKit();
-                if (null != eq) {
-                    infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
-                } else {
-                    infantryArmor = new InfantryArmorPart(0,
-                          getCampaign(),
-                          infantry.getCustomArmorDamageDivisor(),
-                          infantry.isArmorEncumbering(),
-                          infantry.hasDEST(),
-                          infantry.hasSneakCamo(),
-                          infantry.hasSneakECM(),
-                          infantry.hasSneakIR(),
-                          infantry.hasSpaceSuit());
-                }
+                infantryArmor = createInfantryArmorPart(infantry);
                 if (infantryArmor.getStickerPrice().isPositive()) {
                     int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                     while (number > 0) {
-                        infantryArmor = new InfantryArmorPart(0,
-                              getCampaign(),
-                              infantry.getCustomArmorDamageDivisor(),
-                              infantry.isArmorEncumbering(),
-                              infantry.hasDEST(),
-                              infantry.hasSneakCamo(),
-                              infantry.hasSneakECM(),
-                              infantry.hasSneakIR(),
-                              infantry.hasSpaceSuit());
+                        infantryArmor = createInfantryArmorPart(infantry);
                         addPart(infantryArmor);
                         partsToAdd.add(infantryArmor);
                         number--;
                     }
                 }
+            } else {
+                giveArmorPartsTheirKit(infantry);
             }
             InfantryWeapon primaryType = infantry.getPrimaryWeapon();
             InfantryWeapon secondaryType = infantry.getSecondaryWeapon();
@@ -4727,10 +5315,11 @@ public class Unit implements ITechnology, ILocation {
 
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
-            final Formation formation = campaign.getFormation(getFormationId());
-            return (formation != null) ?
-                         formation.getCamouflageOrElse(campaign.getCamouflage()) :
-                         campaign.getCamouflage();
+            int id1 = getFormationId();
+            final Formation formation = campaign.getPlayerForce().getFormation(id1);
+            if ((formation != null)) {return formation.getCamouflageOrElse(campaign.getPlayerForce().getCamouflage());} else {
+                return campaign.getPlayerForce().getCamouflage();
+            }
         } else {
             return getCamouflage();
         }
@@ -4748,18 +5337,28 @@ public class Unit implements ITechnology, ILocation {
         return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
 
+    public @Nullable EntityImage getEntityImage() {
+        if (MHQStaticDirectoryManager.getMekTileset() == null) {
+            return null;
+        }
+        final Image base = MHQStaticDirectoryManager.getMekTileset().imageFor(getEntity());
+        return new EntityImage(base, getUtilizedCamouflage(getCampaign()), null, getEntity());
+    }
+
     public Color determineForegroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();
         } else if (!isPresent()) {
             return MekHQ.getMHQOptions().getInTransitForeground();
+        } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            return MekHQ.getMHQOptions().getQueuedForTravelForeground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingForeground();
         } else if (isMothballing()) {
             return MekHQ.getMHQOptions().getMothballingForeground();
         } else if (isMothballed()) {
             return MekHQ.getMHQOptions().getMothballedForeground();
-        } else if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
+        } else if (getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE) && isUnmaintained()) {
             return MekHQ.getMHQOptions().getUnmaintainedForeground();
         } else if (!isRepairable()) {
             return MekHQ.getMHQOptions().getNotRepairableForeground();
@@ -4779,13 +5378,15 @@ public class Unit implements ITechnology, ILocation {
             return MekHQ.getMHQOptions().getDeployedBackground();
         } else if (!isPresent()) {
             return MekHQ.getMHQOptions().getInTransitBackground();
+        } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            return MekHQ.getMHQOptions().getQueuedForTravelBackground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingBackground();
         } else if (isMothballing()) {
             return MekHQ.getMHQOptions().getMothballingBackground();
         } else if (isMothballed()) {
             return MekHQ.getMHQOptions().getMothballedBackground();
-        } else if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
+        } else if (getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE) && isUnmaintained()) {
             return MekHQ.getMHQOptions().getUnmaintainedBackground();
         } else if (!isRepairable()) {
             return MekHQ.getMHQOptions().getNotRepairableBackground();
@@ -4815,6 +5416,9 @@ public class Unit implements ITechnology, ILocation {
         if (!isPresent()) {
             reasons.add("colorReason.unit.inTransit");
         }
+        if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            reasons.add("colorReason.unit.queuedForTravel");
+        }
         if (isRefitting()) {
             reasons.add("colorReason.unit.refitting");
         }
@@ -4824,7 +5428,7 @@ public class Unit implements ITechnology, ILocation {
         if (isMothballed()) {
             reasons.add("colorReason.unit.mothballed");
         }
-        if (getCampaign().getCampaignOptions().isCheckMaintenance() && isUnmaintained()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE) && isUnmaintained()) {
             reasons.add("colorReason.unit.unmaintained");
         }
         if (!isRepairable()) {
@@ -4921,33 +5525,47 @@ public class Unit implements ITechnology, ILocation {
         // handling built into their methods.
         Person commander = getCommander();
 
-        if (campaignOptions.isUseTactics() || campaignOptions.isUseInitiativeBonus()) {
+        if (campaignOptions.get(CampaignOption.USE_TACTICS) || campaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)) {
             setTacticsInitiativeBonus(commander);
         }
 
-        if (campaignOptions.isUseAbilities() || campaignOptions.isUseEdge() || campaignOptions.isUseImplants()) {
+        if (campaignOptions.get(CampaignOption.USE_ABILITIES) || campaignOptions.get(CampaignOption.USE_EDGE) || campaignOptions.get(CampaignOption.USE_IMPLANTS)) {
             processUnitSPAs(commander);
+        }
+
+        if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
+            convInfantry.setArmorKit(EquipmentType.get(armorKitName));
         }
     }
 
     public boolean isOnlyCommandersMatter(CampaignOptions campaignOptions) {
-        return (isVehicle() && campaignOptions.isOnlyCommandersMatterVehicles()) ||
-                     (isConventionalInfantry() && campaignOptions.isOnlyCommandersMatterInfantry()) ||
-                     (isBattleArmor() && campaignOptions.isOnlyCommandersMatterBattleArmor());
+        return (isVehicle() && campaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)) ||
+                     (isConventionalInfantry() && campaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY)) ||
+                     (isBattleArmor() && campaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR));
     }
 
     private void updateCrew(boolean isOnlyCommandersMatter) {
-        if (entity.getCrew().getSlotCount() > 1) {
-            final String driveType = SkillType.getDrivingSkillFor(entity);
-            final String gunType = SkillType.getGunnerySkillFor(entity);
-            if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
+        final Crew crew = entity.getCrew();
+        final String driveType = SkillType.getDrivingSkillFor(entity);
+        final String gunType = SkillType.getGunnerySkillFor(entity);
+        final Person commander = getCommander();
+
+        if (crew.getSlotCount() > 1) {
+            // Each crew member brings their own aptitudes via assignToCrewSlot; clear every slot first so temp crew
+            // and empty slots don't keep a previous occupant's aptitudes
+            for (int slot = 0; slot < crew.getSlotCount(); slot++) {
+                updateCrewNaturalAptitudes(crew, slot, null, gunType, driveType);
+                updateCrewSmallArms(crew, slot, null);
+            }
+
+            if (crew.getCrewType().getPilotPos() == crew.getCrewType().getGunnerPos()) {
                 // Command console; each crew is assigned as both driver and gunner
                 int slot = 0;
                 for (Person p : gunners) {
                     if (p.hasSkill(gunType) &&
                               p.hasSkill(driveType) &&
                               p.getStatus().isActive() &&
-                              slot < entity.getCrew().getSlotCount()) {
+                              slot < crew.getSlotCount()) {
                         assignToCrewSlot(p, slot, gunType, driveType);
                         slot++;
                     }
@@ -4957,13 +5575,13 @@ public class Unit implements ITechnology, ILocation {
                 // crew, if we don't we should fix that upstream
                 int availableTempCrew = getTotalTempCrew();
 
-                while (slot < entity.getCrew().getSlotCount()) {
+                while (slot < crew.getSlotCount()) {
                     if (availableTempCrew > 0) {
                         // Fill slot with temp crew (don't mark as missing)
-                        entity.getCrew().setMissing(false, slot);
+                        crew.setMissing(false, slot);
                         availableTempCrew--;
                     } else {
-                        entity.getCrew().setMissing(true, slot);
+                        crew.setMissing(true, slot);
                     }
                     slot++;
                 }
@@ -4975,15 +5593,15 @@ public class Unit implements ITechnology, ILocation {
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 0, gunType, driveType);
                 } else {
-                    entity.getCrew().setMissing(true, 0);
+                    crew.setMissing(true, 0);
                 }
                 person = gunners.stream().filter(p -> p.hasSkill(driveType) && p.getStatus().isActive()).findFirst();
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 1, gunType, driveType);
                 } else {
-                    entity.getCrew().setMissing(true, 1);
+                    crew.setMissing(true, 1);
                 }
-                int techPos = entity.getCrew().getCrewType().getTechPos();
+                int techPos = crew.getCrewType().getTechPos();
                 if (techPos >= 0) {
                     Person to = techOfficer;
                     if (to != null) {
@@ -4994,37 +5612,147 @@ public class Unit implements ITechnology, ILocation {
                     if (to != null) {
                         assignToCrewSlot(to, techPos, gunType, driveType);
                     } else {
-                        entity.getCrew().setMissing(true, techPos);
+                        crew.setMissing(true, techPos);
                     }
                 }
             }
         } else {
+            // Single-slot crews, including composite vehicle and vessel crews, use the commander's aptitudes and
+            // Small Arms
+            updateCrewNaturalAptitudes(crew, 0, commander, gunType, driveType);
+            updateCrewSmallArms(crew, 0, commander);
+
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
             } else {
                 refreshLAMPilot();
             }
-            if (entity.getCrew().isMissing(0)) {
+            if (crew.isMissing(0)) {
                 return;
             }
-            Person commander = getCommander();
+
             if (null == commander) {
-                entity.getCrew().setMissing(true, 0);
+                crew.setMissing(true, 0);
                 return;
             }
-            entity.getCrew().setName(commander.getFullTitle(), 0);
-            entity.getCrew().setNickname(commander.getCallsign(), 0);
-            entity.getCrew().setGender(commander.getGender(), 0);
-            entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
-            entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
-            entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
-            entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
+            crew.setName(commander.getFullTitle(), 0);
+            crew.setNickname(commander.getCallsign(), 0);
+            crew.setGender(commander.getGender(), 0);
+            crew.setClanPilot(commander.isClanPersonnel(), 0);
+            if (ArmorKitCatalog.canWearIssuedKit(entity)) {
+                crew.setArmorKitName(commander.getArmorKitName(), 0);
+            }
+            crew.setPortrait(commander.getPortrait().clone(), 0);
+            crew.setExternalIdAsString(commander.getId().toString(), 0);
+            crew.setToughness(commander.getAdjustedToughness(), 0);
 
             if (entity instanceof Tank) {
-                ((Tank) entity).setCommanderHit(commander.getHits() > 0);
+                ((Tank) entity).setCommanderHit(commander.getTotalInjurySeverity() > 0);
             }
-            entity.getCrew().setMissing(false, 0);
+            crew.setMissing(false, 0);
         }
+    }
+
+    /**
+     * Copies a person's Natural Aptitudes onto one slot of the entity's crew. If there is no person, the slot's
+     * aptitudes are cleared so a previous occupant's aptitudes don't linger on the unit.
+     *
+     * <p>When the campaign doesn't use the separate Artillery skill, artillery is fired using Gunnery, so the
+     * Artillery aptitude mirrors the Gunnery aptitude.</p>
+     *
+     * <p>The aptitude for fighting on foot is set by {@link #updateCrewSmallArms(Crew, int, Person)}, alongside
+     * the skill it applies to.</p>
+     *
+     * @param crew      the entity's crew
+     * @param slot      the crew slot to update
+     * @param person    the person in that slot (the commander, for single-slot crews), or {@code null} if none
+     * @param gunType   the gunnery skill used by this unit; replaced by the person's best infantry weapon skill for
+     *                  conventional infantry
+     * @param driveType the piloting or driving skill used by this unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // package-private for testing
+    void updateCrewNaturalAptitudes(Crew crew, int slot, @Nullable Person person, String gunType,
+          String driveType) {
+        // Conventional infantry fire with their best infantry weapon skill, as in calcCompositeCrew, so the aptitude
+        // must come from that same skill
+        if ((person != null) && entity.isConventionalInfantry()) {
+            gunType = getInfantryGunnerySkill(person);
+        }
+
+        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(person, gunType);
+        crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery, slot);
+        crew.setHasNaturalAptitudePiloting(hasNaturalAptitude(person, driveType), slot);
+
+        boolean isUseArtillerySkill = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        crew.setHasNaturalAptitudeArtillery(isUseArtillerySkill ?
+                                                  hasNaturalAptitude(person, SkillType.S_ARTILLERY) :
+                                                  hasNaturalAptitudeGunnery, slot);
+    }
+
+    /**
+     * Records the skill, and Natural Aptitude, a person fights with on foot on one slot of the entity's crew. MegaMek
+     * calls this the Small Arms skill and uses it once the crew has left their unit. It is the person's best infantry
+     * weapon skill, or strictly Small Arms if the campaign uses Small Arms only, as for conventional infantry.
+     *
+     * <p>With no person, or a person without any usable skill, the slot's skill is left unset so MegaMek falls back
+     * to its default for the unit type. Chassis familiarity isn't applied, as it doesn't carry over to fighting
+     * outside the unit.</p>
+     *
+     * @param crew   the entity's crew
+     * @param slot   the crew slot to update
+     * @param person the person in that slot (the commander, for single-slot crews), or {@code null} if none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // package-private for testing
+    void updateCrewSmallArms(Crew crew, int slot, @Nullable Person person) {
+        String skillName = (person == null) ? null : getInfantryGunnerySkill(person);
+        if ((person == null) || !person.hasSkill(skillName)) {
+            crew.setSmallArms(Crew.SMALL_ARMS_UNSET, slot);
+            crew.setHasNaturalAptitudeSmallArms(false, slot);
+            return;
+        }
+
+        Skill skill = person.getSkill(skillName);
+        int smallArms = skill.getFinalSkillValue(person.getSkillModifierData());
+        if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
+            smallArms += person.getInjuryModifiers(false);
+        }
+        crew.setSmallArms(Math.clamp(smallArms, 0, Crew.MAX_SKILL), slot);
+        crew.setHasNaturalAptitudeSmallArms(skill.getHasNaturalAptitude(), slot);
+    }
+
+    /**
+     * The infantry weapon skill a person fights with: their best infantry gunnery skill, honouring the campaign's
+     * Small Arms only option. Falls back to Small Arms when the person has none, so callers always have a skill to
+     * look up (the person may still lack it).
+     *
+     * @param person the person to check
+     *
+     * @return the skill name, never {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // package-private for testing
+    String getInfantryGunnerySkill(Person person) {
+        boolean isSmallArmsOnly = getCampaign().getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY);
+        String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, isSmallArmsOnly);
+        return (skillName == null) ? SkillType.S_SMALL_ARMS : skillName;
+    }
+
+    /**
+     * @return {@code true} if the person exists, has the named skill, and has a Natural Aptitude in it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean hasNaturalAptitude(@Nullable Person person, String skillName) {
+        return (person != null) && person.hasSkill(skillName) && person.getSkill(skillName).getHasNaturalAptitude();
     }
 
     private void setTacticsInitiativeBonus(@Nullable Person commander) {
@@ -5037,13 +5765,13 @@ public class Unit implements ITechnology, ILocation {
                                               .getTotalSkillLevel(skillModifierData);
 
             CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-            if (campaignOptions.isUseSensibleTactics()) {
+            if (campaignOptions.get(CampaignOption.USE_SENSIBLE_TACTICS)) {
                 commanderTacticsBonus = (int) floor(commanderTacticsBonus / 2.0);
             }
 
-            if (campaignOptions.isUseTactics()) {
+            if (campaignOptions.get(CampaignOption.USE_TACTICS)) {
                 entity.getCrew().setCommandBonus(commanderTacticsBonus);
-            } else if (campaignOptions.isUseInitiativeBonus()) {
+            } else if (campaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)) {
                 entity.getCrew().setInitBonus(commanderTacticsBonus);
             }
         }
@@ -5069,13 +5797,13 @@ public class Unit implements ITechnology, ILocation {
             IOptionGroup group = i.nextElement();
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
-                if (campaignOptions.isUseImplants() &&
+                if (campaignOptions.get(CampaignOption.USE_IMPLANTS) &&
                           group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                     cyberOptionNames.add(option.getName());
-                } else if (campaignOptions.isUseEdge() &&
+                } else if (campaignOptions.get(CampaignOption.USE_EDGE) &&
                                  group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
-                } else if (campaignOptions.isUseAbilities() &&
+                } else if (campaignOptions.get(CampaignOption.USE_ABILITIES) &&
                                  !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                     optionNames.add(option.getName());
                 }
@@ -5125,10 +5853,10 @@ public class Unit implements ITechnology, ILocation {
                                                                                      .filter(e -> (cyberOptionNames.contains(
                                                                                            e.getKey()) ?
                                                                                                          e.getValue() >=
-                                                                                                         crewSize :
+                                                                                                               crewSize :
                                                                                                          e.getValue() >
-                                                                                                         crewSize /
-                                                                                                         2))
+                                                                                                               crewSize /
+                                                                                                                     2))
                                                                                      .max(Entry.comparingByValue())
                                                                                      .map(Entry::getKey))));
 
@@ -5169,7 +5897,7 @@ public class Unit implements ITechnology, ILocation {
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
-            if (campaignOptions.isUseEdge()) {
+            if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
 
@@ -5203,12 +5931,12 @@ public class Unit implements ITechnology, ILocation {
                     entity.getCrew().setMissing(true, 0);
                     return;
                 }
-                entity.getCrew().setHits(commander.getHits(), 0);
+                entity.getCrew().setHits(commander.getTotalInjurySeverity(), 0);
             }
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
             // assigned above (which will always be 0 in 0.50.10+).
-            if (campaignOptions.isUseEdge()) {
+            if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 setEdgeForCrew(usesSoloPilot() ? 1 : getCrew().size(), onlyCommandersMatter);
             }
         }
@@ -5281,17 +6009,23 @@ public class Unit implements ITechnology, ILocation {
         boolean entityIsConventionalInfantry = entity.isConventionalInfantry();
         boolean isTank = entity instanceof Tank; // Includes Wet Naval and VTOLs
 
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+
         // For certain entities both drivers and gunners contribute to gunnery & piloting
         List<Person> relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, true);
         for (Person person : relevantCrew) {
-            if (person.getHits() > 0 && !usesSoloPilot()) {
+            if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
             }
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
+            int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarity, false);
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
 
             if (person.hasSkill(driveType)) {
-                sumPiloting += person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+                sumPiloting += person.getSkill(driveType)
+                                     .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
                 nDrivers++;
             } else if (entity instanceof Infantry) {
                 // For infantry, we need to assign an 8 if they have no anti-mek skill
@@ -5300,7 +6034,8 @@ public class Unit implements ITechnology, ILocation {
             }
 
             if (entity instanceof Tank && Compute.getFullCrewSize(entity) == 1 && person.hasSkill(gunType)) {
-                sumGunnery += person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(gunType)
+                                    .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5309,29 +6044,28 @@ public class Unit implements ITechnology, ILocation {
         }
 
         relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
-        boolean smallArmsOnly = campaign.getCampaignOptions().isUseSmallArmsOnly();
+        List<UUID> gunnerIds = new ArrayList<>();
         for (Person person : relevantCrew) {
-            if (person.getHits() > 0 && !usesSoloPilot()) {
+            if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
             }
 
             SkillModifierData skillModifierData = person.getSkillModifierData();
+            int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
 
-            String tempGunType = gunType;
-            if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, smallArmsOnly);
-                if (tempGunType == null) {
-                    tempGunType = SkillType.S_SMALL_ARMS;
-                }
-            }
+            String tempGunType = entityIsConventionalInfantry ? getInfantryGunnerySkill(person) : gunType;
 
             if (person.hasSkill(tempGunType)) {
-                sumGunnery += person.getSkill(tempGunType).getFinalSkillValue(skillModifierData);
+                sumGunnery += person.getSkill(tempGunType)
+                                    .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
+                gunnerIds.add(person.getId());
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                      person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
-                artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+                      person.getSkill(SkillType.S_ARTILLERY)
+                            .getFinalSkillValue(skillModifierData, familiarityBonusGunnery) < artillery) {
+                artillery = person.getSkill(SkillType.S_ARTILLERY)
+                                  .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
             }
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 sumGunnery += person.getInjuryModifiers(false);
@@ -5339,11 +6073,11 @@ public class Unit implements ITechnology, ILocation {
         }
 
         for (Person p : vesselCrew) {
-            if (p.getHits() == 0) {
+            if (p.getTotalInjurySeverity() == 0) {
                 nCrew++;
             }
         }
-        if ((getNavigator() != null) && (getNavigator().getHits() == 0)) {
+        if ((getNavigator() != null) && (getNavigator().getTotalInjurySeverity() == 0)) {
             nCrew++;
         }
         // Using the tech officer field for the secondary commander; if nobody assigned to the command
@@ -5351,7 +6085,7 @@ public class Unit implements ITechnology, ILocation {
         // to a single commander. As the console commander is not counted against crew requirements, we do not
         // increase nCrew if present.
         if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
-            if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
+            if ((techOfficer == null) || (techOfficer.getTotalInjurySeverity() > 0)) {
                 ((Tank) entity).setUsingConsoleCommander(true);
             }
         }
@@ -5365,66 +6099,39 @@ public class Unit implements ITechnology, ILocation {
 
         if (isOnlyCommandersMatter && getCommander() != null) {
             SkillModifierData skillModifierData = getCommander().getSkillModifierData();
+            int familiarityBonusPiloting = getCommander().getChassisFamiliarityCombatBonus(familiarity, false);
+            int familiarityBonusGunnery = getCommander().getChassisFamiliarityCombatBonus(familiarity, true);
 
             Skill drivingSkill = getCommander().getSkill(driveType);
-            piloting = drivingSkill == null ? 13 : drivingSkill.getFinalSkillValue(skillModifierData);
+            piloting = drivingSkill == null ?
+                             13 :
+                             drivingSkill.getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
             if (entity instanceof Infantry && drivingSkill == null) {
                 piloting = 8;
             }
 
-            String tempGunType = gunType;
-            if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(getCommander(), smallArmsOnly);
-                if (tempGunType == null) {
-                    tempGunType = SkillType.S_SMALL_ARMS;
-                }
-            }
+            String tempGunType = entityIsConventionalInfantry ? getInfantryGunnerySkill(getCommander()) : gunType;
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
-            gunnery = gunnerySkill == null ? 13 : gunnerySkill.getFinalSkillValue(skillModifierData);
+            gunnery = gunnerySkill == null ?
+                            13 :
+                            gunnerySkill.getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
+
+
+            if (getCommander().hasSkill(SkillType.S_ARTILLERY)) {
+                artillery = getCommander().getSkill(SkillType.S_ARTILLERY)
+                                  .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
+            }
         }
 
         if (entity instanceof Infantry) {
-            if (entity instanceof BattleArmor) {
-                int numTroopers = 0;
-                // OK, we want to reorder the way we move through suits, so that we always put BA in the suits with
-                // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
-                // waiting further down the line.
-                Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
-                    bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
-                    if (entity.getInternal(i) < 0) {
-                        bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
-                    }
-                    bestSuits = Utilities.sortMapByValue(bestSuits, true);
-                }
-                // Get temp BA count up front so it can fill suits after real troopers are placed
-                int tempBACount = getCampaign().getCampaignOptions().isUseBlobBattleArmor()
-                                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
-                int tempBAUsed = 0;
-                for (String key : bestSuits.keySet()) {
-                    int i = Integer.parseInt(key);
-                    if (!isBattleArmorSuitOperable(i)) {
-                        // no suit here move along
-                        continue;
-                    }
-                    if (numTroopers < nGunners) {
-                        entity.setInternal(1, i);
-                        numTroopers++;
-                    } else if (tempBACount > 0) {
-                        entity.setInternal(1, i);
-                        tempBACount--;
-                        tempBAUsed++;
-                    } else {
-                        entity.setInternal(0, i);
-                    }
-                }
-                nGunners += tempBAUsed;
+            if (entity instanceof BattleArmor battleArmor) {
+                nGunners += seatBattleArmorTroopers(battleArmor, gunnerIds);
             }
 
             // Add temp crew to fill shortfall for conventional infantry
             if (entity instanceof Infantry && !isBattleArmor()
-                      && getCampaign().getCampaignOptions().isUseBlobInfantry()) {
+                      && getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_INFANTRY)) {
                 nGunners += getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
             }
             entity.setInternal(nGunners, ConvInfantry.LOC_INFANTRY);
@@ -5437,8 +6144,13 @@ public class Unit implements ITechnology, ILocation {
 
             // Get available temp crew for this vehicle type
             int availableTempCrew = 0;
-            if (driverRole != null && getCampaign().isBlobCrewEnabled(driverRole)) {
-                availableTempCrew = getTempCrewByPersonnelRole(driverRole);
+            if (driverRole != null) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(driverRole, campaign1.getCampaignOptions())) {
+                    availableTempCrew = getTempCrewByPersonnelRole(driverRole);
+                }
             }
 
             // Calculate how many drivers and gunners we need
@@ -5492,16 +6204,18 @@ public class Unit implements ITechnology, ILocation {
             nGunners += tempGunnersToAdd;
         }
 
-        // Add temp crew for large aero vessels
-        if ((entity instanceof SmallCraft || entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-            if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-                nCrew += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+        // Add temp crew for aero vessels (small craft, dropships, jumpships, warships, and space stations). Each role
+        // must have at least one real crew member before its temp ("blob") crew counts, so
+        // getEffectiveTempCrewByPersonnelRole() returns 0 for a role with no real person.
+        if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+            if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_CREW)) {
+                nCrew += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
             }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-                nGunners += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_GUNNER)) {
+                nGunners += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
             }
-            if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-                nDrivers += getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            if (getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_VESSEL_PILOT)) {
+                nDrivers += getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
             }
         }
 
@@ -5579,6 +6293,50 @@ public class Unit implements ITechnology, ILocation {
     }
 
     /**
+     * Puts a battle armor unit's troopers in its suits. Each person keeps the suit they wear while it can still be
+     * worn, anyone else takes the free suit with the most armor, and temporary troopers fill the suits left over. Any
+     * other suit that can be worn is left empty.
+     *
+     * @param battleArmor the unit's entity
+     * @param trooperIds  the people able to fight, in the order they choose a suit
+     *
+     * @return how many temporary troopers were put in suits
+     */
+    private int seatBattleArmorTroopers(BattleArmor battleArmor, List<UUID> trooperIds) {
+        List<Integer> usableSlots = new ArrayList<>();
+        for (int slot = BattleArmor.LOC_TROOPER_1; slot <= battleArmor.getSquadSize(); slot++) {
+            if (isBattleArmorSuitOperable(slot)) {
+                usableSlots.add(slot);
+            }
+        }
+        // the suits with the most armor first, so nobody is put in a stripped suit while a good one is free
+        usableSlots.sort(Comparator.comparingInt((Integer slot) -> battleArmor.getArmorForReal(slot)).reversed());
+
+        List<Integer> wornSlots = trooperSlots.seat(trooperIds, usableSlots);
+        int tempTroopersLeft = getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)
+                                     ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
+        int tempTroopersSeated = 0;
+        for (int slot : usableSlots) {
+            if (wornSlots.contains(slot)) {
+                battleArmor.setInternal(1, slot);
+            } else if (tempTroopersSeated < tempTroopersLeft) {
+                battleArmor.setInternal(1, slot);
+                tempTroopersSeated++;
+            } else {
+                battleArmor.setInternal(0, slot);
+            }
+        }
+        return tempTroopersSeated;
+    }
+
+    /**
+     * @return which person wears which suit, for a battle armor unit
+     */
+    public TrooperSlots getTrooperSlots() {
+        return trooperSlots;
+    }
+
+    /**
      * LAMs require a pilot that is cross-trained for meks and fighters
      */
     private void refreshLAMPilot() {
@@ -5586,10 +6344,18 @@ public class Unit implements ITechnology, ILocation {
         if (null == pilot) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
+            if (entity.getCrew() instanceof LAMPilot lamPilot) {
+                lamPilot.setHasNaturalAptitudeGunneryAero(false);
+                lamPilot.setHasNaturalAptitudePilotingAero(false);
+            }
             return;
         }
 
         SkillModifierData skillModifierData = pilot.getSkillModifierData();
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityBonusPiloting = pilot.getChassisFamiliarityCombatBonus(familiarity, false);
+        int familiarityBonusGunnery = pilot.getChassisFamiliarityCombatBonus(familiarity, true);
 
         int pilotingMek = 13;
         int gunneryMek = 13;
@@ -5598,19 +6364,24 @@ public class Unit implements ITechnology, ILocation {
         int artillery = 13;
 
         if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
-            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue(skillModifierData);
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK)
+                                .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
         if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
-            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue(skillModifierData);
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK)
+                               .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
-            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue(skillModifierData);
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO)
+                                 .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
-        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue(skillModifierData);
+        if (pilot.hasSkill(S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(S_GUN_AERO)
+                                .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
-            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY)
+                              .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -5628,6 +6399,9 @@ public class Unit implements ITechnology, ILocation {
         entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
+
+        crew.setHasNaturalAptitudeGunneryAero(hasNaturalAptitude(pilot, S_GUN_AERO));
+        crew.setHasNaturalAptitudePilotingAero(hasNaturalAptitude(pilot, S_PILOT_AERO));
     }
 
     /**
@@ -5636,27 +6410,39 @@ public class Unit implements ITechnology, ILocation {
     private void assignToCrewSlot(Person person, int slot, String gunType, String driveType) {
         SkillModifierData skillModifierData = person.getSkillModifierData();
 
+        Familiarity familiarity = getCampaign().getCampaignOptions()
+                                        .get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        int familiarityBonusPiloting = person.getChassisFamiliarityCombatBonus(familiarity, false);
+        int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
+
         entity.getCrew().setName(person.getFullTitle(), slot);
         entity.getCrew().setNickname(person.getCallsign(), slot);
         entity.getCrew().setGender(person.getGender(), slot);
         entity.getCrew().setClanPilot(person.isClanPersonnel(), slot);
+        if (ArmorKitCatalog.canWearIssuedKit(entity)) {
+            entity.getCrew().setArmorKitName(person.getArmorKitName(), slot);
+        }
         entity.getCrew().setPortrait(person.getPortrait().clone(), slot);
-        entity.getCrew().setHits(person.getHits(), slot);
+        entity.getCrew().setHits(person.getTotalInjurySeverity(), slot);
         int gunnery = 7;
         int artillery = 7;
         int piloting = 8;
         if (person.hasSkill(gunType)) {
-            gunnery = person.getSkill(gunType).getFinalSkillValue(skillModifierData);
+            gunnery = person.getSkill(gunType)
+                            .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
             gunnery += person.getInjuryModifiers(false);
         }
         if (person.hasSkill(driveType)) {
-            piloting = person.getSkill(driveType).getFinalSkillValue(skillModifierData);
+            piloting = person.getSkill(driveType)
+                             .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
         if (person.hasSkill(SkillType.S_ARTILLERY) &&
-                  person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData) < artillery) {
-            artillery = person.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue(skillModifierData);
+                  person.getSkill(SkillType.S_ARTILLERY)
+                        .getFinalSkillValue(skillModifierData, familiarityBonusGunnery) < artillery) {
+            artillery = person.getSkill(SkillType.S_ARTILLERY)
+                              .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         entity.getCrew().setPiloting(Math.clamp(piloting, 0, 8), slot);
         entity.getCrew().setGunnery(Math.clamp(gunnery, 0, 8), slot);
@@ -5666,6 +6452,8 @@ public class Unit implements ITechnology, ILocation {
         entity.getCrew().setGunneryB(Math.clamp(gunnery, 0, 8), slot);
         entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), slot);
         entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
+        updateCrewNaturalAptitudes(entity.getCrew(), slot, person, gunType, driveType);
+        updateCrewSmallArms(entity.getCrew(), slot, person);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
@@ -5711,6 +6499,9 @@ public class Unit implements ITechnology, ILocation {
      */
     public void resetEngineer() {
         if (!isSelfCrewed()) {
+            // A unit that is not self-crewed has no engineer. This matters for conventional infantry, which may have
+            // picked one up while they were maintaining themselves before Techs were made responsible for them
+            clearEngineer();
             return;
         }
 
@@ -5744,6 +6535,11 @@ public class Unit implements ITechnology, ILocation {
                 if (part.isBeingWorkedOn()) {
                     part.setTech(engineer);
                 }
+            }
+            // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
+            // the new engineer is refused as "another team"
+            if (refit != null) {
+                refit.setTech(engineer);
             }
         } else {
             // cancel any mothballing if this happens
@@ -5838,8 +6634,9 @@ public class Unit implements ITechnology, ILocation {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
-        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
-            return SkillType.S_TECH_MECHANIC;
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity
+                         || (isConventionalInfantry() && !isSelfMaintainedInfantry())) {
+            return SkillType.S_TECH_VEHICLE;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
         } else if ((entity instanceof Aero)) {
@@ -5912,6 +6709,26 @@ public class Unit implements ITechnology, ILocation {
                     person.getHyperlinkedFullTitle(), role, getName()));
     }
 
+    /**
+     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} is assigned to fill
+     * that slot, then refreshes the unit's crew state.
+     *
+     * <p>This mirrors the temp crew handling already performed by {@link #addPilotOrSoldier(Person, Unit, boolean)}
+     * for infantry and solo-piloted units.</p>
+     *
+     * @param role the temp crew role to release; when {@code null} or when no temp crew of that role is present, the
+     *             crew state is simply refreshed
+     */
+    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role) {
+        final int currentTempCrew = (role == null) ? 0 : getTempCrewByPersonnelRole(role);
+        if (currentTempCrew > 0) {
+            // setTempCrew() also refreshes the unit's crew state via resetPilotAndEntity()
+            setTempCrew(role, currentTempCrew - 1);
+        } else {
+            resetPilotAndEntity();
+        }
+    }
+
     public void addDriver(Person p) {
         addDriver(p, false);
     }
@@ -5926,12 +6743,13 @@ public class Unit implements ITechnology, ILocation {
         ensurePersonIsRegistered(person);
         drivers.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        releaseTempCrewForAssignedRole(getDriverRole());
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -5949,12 +6767,13 @@ public class Unit implements ITechnology, ILocation {
         ensurePersonIsRegistered(person);
         gunners.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        releaseTempCrewForAssignedRole(getGunnerRole());
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -5972,12 +6791,16 @@ public class Unit implements ITechnology, ILocation {
         ensurePersonIsRegistered(person);
         vesselCrew.add(person);
         person.setUnit(this);
-        resetPilotAndEntity();
+        final PersonnelRole crewRole = (entity instanceof Aero && !(entity instanceof ConvFighter)) ?
+                                             PersonnelRole.VESSEL_CREW :
+                                             getDriverRole();
+        releaseTempCrewForAssignedRole(crewRole);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6001,6 +6824,7 @@ public class Unit implements ITechnology, ILocation {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6028,6 +6852,7 @@ public class Unit implements ITechnology, ILocation {
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6045,22 +6870,40 @@ public class Unit implements ITechnology, ILocation {
         tech = person;
         person.addTechUnit(this);
         AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+        UnitLogger.assignedTech(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(person, this));
     }
 
     public void removeTech() {
+        removeTech(true);
+    }
+
+    /**
+     * Removes this unit's assigned technician, if it has one.
+     *
+     * @param log whether to record the removal in the technician's own assignment log. Pass {@code false} where the
+     *            caller records the person's side of the move itself, such as {@link #remove(Person, boolean)}, so that
+     *            the removal is not logged twice. The unit's own crew log records the removal either way.
+     */
+    public void removeTech(final boolean log) {
         if (tech != null) {
             Person originalTech = tech;
             tech.removeTechUnit(this);
             tech = null;
+            UnitLogger.removedTech(this, getCampaign().getLocalDate(), originalTech.getFullName());
+            if (log) {
+                AssignmentLogger.removedFrom(originalTech, getCampaign().getLocalDate(), getName());
+            }
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(originalTech, null));
         }
     }
 
     private void ensurePersonIsRegistered(final Person person) {
         Objects.requireNonNull(person);
-        if (getCampaign().getPerson(person.getId()) == null) {
-            getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, true);
+        Campaign campaign1 = getCampaign();
+        final UUID id1 = person.getId();
+        if (campaign1.getPlayerForce().getHumanResources().getPerson(id1) == null) {
+            getCampaign().getPlayerForce().getHumanResources().recruitPerson(getCampaign(), person, person.getPrisonerStatus(), true, false, true);
             LOGGER.debug("The person {} added this unit {}, was not in the campaign.", person.getFullName(), getName());
         }
     }
@@ -6099,18 +6942,22 @@ public class Unit implements ITechnology, ILocation {
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
+            Campaign campaign2 = getCampaign();
             AssignmentLogger.reassignedTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(oldUnit),
-                  getCampaign().getFormationFor(this));
+                  campaign2.getPlayerForce().getFormationFor(oldUnit),
+                  campaign1.getPlayerForce().getFormationFor(this));
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
             AssignmentLogger.addedToTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(this));
+                  campaign1.getPlayerForce().getFormationFor(this));
         }
+        UnitLogger.assignedCrew(this, getCampaign().getLocalDate(), person.getFullName());
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
@@ -6125,7 +6972,8 @@ public class Unit implements ITechnology, ILocation {
 
         ensurePersonIsRegistered(person);
         if (person.equals(tech)) {
-            removeTech();
+            // the trailing 'log' block below records this person's side of the removal, so do not log it twice
+            removeTech(false);
         }
 
         boolean wasCrew = false;
@@ -6153,16 +7001,21 @@ public class Unit implements ITechnology, ILocation {
         }
 
         if (wasCrew) {
+            trooperSlots.release(person.getId());
             resetPilotAndEntity();
+            // the departure is part of the unit's service history whether or not the person's own logs record it, as
+            // a transfer still leaves this unit without that crew member
+            UnitLogger.removedCrew(this, getCampaign().getLocalDate(), person.getFullName());
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }
 
         if (log) {
             AssignmentLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
             AssignmentLogger.removedFromTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(this));
+                  campaign1.getPlayerForce().getFormationFor(this));
         }
     }
 
@@ -6213,6 +7066,8 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public void setScenarioId(int i) {
+        // Note: assigning a unit to a scenario is only a plan, and can be undone before the scenario is played, so no
+        // deployment is logged here. ResolveScenarioTracker logs the deployment once the scenario is actually resolved.
         this.scenarioId = i;
     }
 
@@ -6312,6 +7167,19 @@ public class Unit implements ITechnology, ILocation {
     }
 
     /**
+     * Whether this unit still holds the crew and formation it had before mothballing, waiting to be put back.
+     *
+     * <p>Set when mothballing starts and cleared only after activation has restored everything, so it stays
+     * {@code true} through the window where the unit is no longer mothballed but not yet re-crewed or re-filed.
+     * Always {@code false} when the save-mothball-state option is off.</p>
+     *
+     * @return {@code true} while a pre-mothball restore is pending
+     */
+    public boolean hasPendingMothballRestore() {
+        return mothballInfo != null;
+    }
+
+    /**
      * Gets the time (in minutes) remaining to mothball or activate the unit.
      *
      * @return The time (in minutes) remaining to mothball or activate the unit.
@@ -6387,14 +7255,15 @@ public class Unit implements ITechnology, ILocation {
         }
 
         // set this person as tech
-        if (!isSelfCrewed() && (tech != null) && !tech.equals(mothballTech)) {
+        if ((!isSelfCrewed() || isSelfMaintainedInfantry()) && (tech != null) && !tech.equals(mothballTech)) {
             remove(tech, true);
         }
         tech = mothballTech;
 
         // don't remove personnel yet, because self crewed units need their crews to
         // mothball
-        getCampaign().removeUnitFromFormation(this);
+        Campaign campaign1 = getCampaign();
+        campaign1.getPlayerForce().removeUnitFromFormation(this, campaign1);
 
         // clear any assigned tasks
         for (Part p : getParts()) {
@@ -6423,7 +7292,7 @@ public class Unit implements ITechnology, ILocation {
             // if it is self crewed AND is mothballed and has a mothball info, get the tech
             if (isSelfCrewed() && isMothballed() && (this.mothballInfo != null)) {
                 UUID previousTechId = this.mothballInfo.getTechId();
-                var previousTech = campaign.getPerson(previousTechId);
+                var previousTech = campaign.getPlayerForce().getHumanResources().getPerson(previousTechId);
                 var previousTechExists = previousTech != null;
                 var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
                 if (previousTechIsActive) {
@@ -6449,12 +7318,10 @@ public class Unit implements ITechnology, ILocation {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(CampaignTransportType.TACTICAL_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().removeCampaignTransporter(campaignTransportType, this);
+                }
             }
         }
     }
@@ -6533,16 +7400,10 @@ public class Unit implements ITechnology, ILocation {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TACTICAL_TRANSPORT, this);
-            }
-
-            if (!getTransportCapabilities(CampaignTransportType.TOW_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(CampaignTransportType.TOW_TRANSPORT, this);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    getCampaign().addCampaignTransport(campaignTransportType, this);
+                }
             }
         }
     }
@@ -6597,7 +7458,7 @@ public class Unit implements ITechnology, ILocation {
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
-            if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
+            if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                 continue;
             }
             crew.add(p);
@@ -6605,7 +7466,7 @@ public class Unit implements ITechnology, ILocation {
 
         if (!usesSoloPilot() && !usesSoldiers()) {
             for (Person p : gunners) {
-                if ((p.getHits() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
+                if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
                     continue;
                 }
                 crew.add(p);
@@ -6623,6 +7484,44 @@ public class Unit implements ITechnology, ILocation {
 
     public int getTempCrewByPersonnelRole(PersonnelRole personnelRole) {
         return tempPersonnelRoleMap.getOrDefault(personnelRole, 0);
+    }
+
+    /**
+     * Reports whether this unit has at least one real (non-temp) crew member filling the given vessel role.
+     *
+     * <p>Aero vessels (small craft, dropships, jumpships, warships, and space stations) require a real crew member in
+     * a role before temporary ("blob") crew may fill the remaining slots of that role. An assigned-but-injured person
+     * still counts as filling the role. The rule only covers the vessel blob roles ({@link PersonnelRole#VESSEL_PILOT},
+     * {@link PersonnelRole#VESSEL_GUNNER}, {@link PersonnelRole#VESSEL_CREW}); every other role returns {@code true} so
+     * callers are unaffected by it.</p>
+     *
+     * @param role the role to check
+     *
+     * @return {@code true} if the role is unaffected by the rule, or if it contains at least one real crew member
+     */
+    public boolean hasRealCrewInVesselRole(final PersonnelRole role) {
+        return switch (role) {
+            case VESSEL_PILOT -> !getDrivers().isEmpty();
+            case VESSEL_GUNNER -> !getGunners().isEmpty();
+            case VESSEL_CREW -> !getVesselCrew().isEmpty();
+            default -> true;
+        };
+    }
+
+    /**
+     * Returns the temp ("blob") crew count for the given role that is actually usable.
+     *
+     * <p>This honors the vessel rule that a role must contain at least one real crew member before its temp crew
+     * counts (see {@link #hasRealCrewInVesselRole(PersonnelRole)}): temp crew of a vessel role with no real crew member
+     * is reported as {@code 0}. For every other role this is identical to
+     * {@link #getTempCrewByPersonnelRole(PersonnelRole)}.</p>
+     *
+     * @param personnelRole the role to query
+     *
+     * @return the usable temp crew count for the role
+     */
+    public int getEffectiveTempCrewByPersonnelRole(final PersonnelRole personnelRole) {
+        return hasRealCrewInVesselRole(personnelRole) ? getTempCrewByPersonnelRole(personnelRole) : 0;
     }
 
     /**
@@ -6778,7 +7677,53 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public Person getEngineer() {
-        return engineer;
+        // Guards against a stale engineer on conventional infantry now maintained by Techs, which would otherwise be
+        // returned by getTech() in place of the assigned Mechanic
+        return isSelfCrewed() ? engineer : null;
+    }
+
+    /**
+     * Drops this unit's engineer, cancelling any tasks scheduled to them. Unlike {@link #resetEngineer()} this never
+     * cancels mothballing, as a unit that is not self-crewed mothballs with its assigned Tech instead.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void clearEngineer() {
+        if (engineer == null) {
+            return;
+        }
+
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
+                part.cancelAssignment(true);
+            }
+        }
+
+        engineer = null;
+    }
+
+    /**
+     * Brings a conventional infantry unit's Tech and engineer in line with the current
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} setting, for use after that option changes
+     * mid-campaign. Self-maintaining infantry lose any assigned Tech and have their ranking soldier made engineer
+     * again; Tech-maintained infantry lose their engineer so that their assigned Mechanic is used instead.
+     *
+     * <p>Does nothing for any other unit type, or for units that are deployed.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void reconcileInfantryMaintenance() {
+        if (!isConventionalInfantry() || isDeployed()) {
+            return;
+        }
+
+        if (isSelfMaintainedInfantry() && (tech != null)) {
+            removeTech();
+        }
+
+        resetEngineer();
     }
 
     public @Nullable Part getPartForEquipmentNum(int index, int loc) {
@@ -6799,7 +7744,7 @@ public class Unit implements ITechnology, ILocation {
             // as many probably outlive the production of parts it would be better to just use the unit extinction
             // date itself, but given that there are no canon extinction/re-intro dates for units, we will use this
             // instead
-            if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getFaction().isClan())) {
+            if (p.isExtinct(getCampaign().getGameYear(), getCampaign().getPlayerForce().getFaction().isClan())) {
                 newAvailability = AvailabilityValue.X;
             }
             if (newAvailability.isBetterThan(availability)) {
@@ -6978,14 +7923,13 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        List<Mission> activeMissions = campaign.getActiveMissions(false);
+        List<AbstractContract> activeMissions = campaign.getActiveContracts();
         double timeIncrease = 0.25;
 
-        for (Mission mission : activeMissions) {
-            if (mission instanceof AtBContract atBContract) {
-                if (atBContract.getContractType().isGarrisonDuty() || atBContract.getContractType().isRetainer()) {
-                    continue;
-                }
+        for (AbstractContract mission : activeMissions) {
+            ContractObjectiveType objectiveType = mission.getObjectiveType();
+            if (objectiveType.isGarrisonDuty() || objectiveType.isRetainer()) {
+                continue;
             }
 
             timeIncrease = 1;
@@ -7110,14 +8054,14 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public String getQualityName() {
-        return getQuality().toName(getCampaign().getCampaignOptions().isReverseQualityNames());
+        return getQuality().toName(getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES));
     }
 
     public boolean requiresMaintenance() {
         if (!isAvailable()) {
             return false;
         }
-        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
+        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor || !isSelfMaintainedInfantry();
     }
 
     /**
@@ -7163,7 +8107,7 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isConventionalInfantry();
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isSelfMaintainedInfantry();
     }
 
     public boolean isUnderRepair() {
@@ -7224,6 +8168,60 @@ public class Unit implements ITechnology, ILocation {
     }
 
     /**
+     * @return {@code true} if this unit is a support carrier holding support personnel in the TOE rather than a
+     *       fighting unit
+     */
+    public boolean isCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(boolean carrier) {
+        this.carrier = carrier;
+    }
+
+    /**
+     * The armor kit issued to this unit where the kit belongs to the unit rather than a crew member — a conventional
+     * infantry platoon's field armor. {@code null} means no kit has been issued and the platoon's designed armor
+     * stands.
+     *
+     * @return the issued kit's internal name, or {@code null}
+     */
+    public @Nullable String getArmorKitName() {
+        return armorKitName;
+    }
+
+    public void setArmorKitName(@Nullable String armorKitName) {
+        this.armorKitName = armorKitName;
+    }
+
+    /**
+     * The platoon's designed (original) armor kit, captured before the first issued kit overrode it, so it can be
+     * restored. {@code null} until captured.
+     *
+     * @return the designed kit's internal name, or {@code null}
+     */
+    public @Nullable String getDesignedInfantryKitName() {
+        return designedInfantryKitName;
+    }
+
+    public void setDesignedInfantryKitName(@Nullable String designedInfantryKitName) {
+        this.designedInfantryKitName = designedInfantryKitName;
+    }
+
+    /**
+     * A kit the platoon is waiting on — ordered because local stores were short — to be issued once enough arrive.
+     *
+     * @return the awaited kit's internal name, or {@code null} if nothing is pending
+     */
+    public @Nullable String getIntendedArmorKitName() {
+        return intendedArmorKitName;
+    }
+
+    public void setIntendedArmorKitName(@Nullable String intendedArmorKitName) {
+        this.intendedArmorKitName = intendedArmorKitName;
+    }
+
+    /**
      * Checks to see if a particular BA suit on BA is currently operable This requires the suit to not be destroyed and
      * to have not missing equipment parts
      */
@@ -7248,6 +8246,27 @@ public class Unit implements ITechnology, ILocation {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * Whether this unit is conventional infantry that repairs and maintains itself, using its own soldiers rather than
+     * an assigned Tech. This is the default behavior; when
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} is enabled, conventional infantry are instead
+     * maintained and repaired by Mechanics like any other non-self-crewed unit.
+     *
+     * @return {@code true} if this is conventional infantry that looks after itself
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSelfMaintainedInfantry() {
+        if (!isConventionalInfantry()) {
+            return false;
+        }
+
+        Campaign unitCampaign = getCampaign();
+        return (unitCampaign == null)
+                     || !unitCampaign.getCampaignOptions().get(CampaignOption.TECHS_MAINTAIN_CONVENTIONAL_INFANTRY);
     }
 
     /**
@@ -7341,27 +8360,23 @@ public class Unit implements ITechnology, ILocation {
             }
         }
 
-        // Handle cost for quirks if used
-        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(0.8);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(1.25);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_NON_STANDARD)) {
-            partsCost = partsCost.multipliedBy(2.0);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_POS_UBIQUITOUS_IS)) {
-            partsCost = partsCost.multipliedBy(0.75);
+        // Quirks multiply the spare parts cost in turn (CO p.24), when the campaign uses quirks
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS)) {
+            partsCost = partsCost.multipliedBy(SparePartsQuirkMultiplier.find(entity, getCampaign().getGameYear()));
         }
-        // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
-        if (getCampaign().getCampaignOptions().isUseExtendedPartsModifier()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER)) {
             Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
             TechRating rating = getTechRating();
-            if (((currentYear > 2859) && (currentYear < 3040)) &&
-                      (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
-                if (rating.isBetterThan(TechRating.D)) {
-                    partsCost = partsCost.multipliedBy(5.0);
+            if (((currentYear > 2859) && (currentYear < 3040))) {
+                if (!getCampaign().getPlayerForce().getFaction().isClan()) {
+                    if (!getCampaign().getPlayerForce().getFaction().isComStar()) {
+                        if (rating.isBetterThan(TechRating.D)) {
+                            partsCost = partsCost.multipliedBy(5.0);
+                        }
+                    }
                 }
             }
 
@@ -7785,7 +8800,7 @@ public class Unit implements ITechnology, ILocation {
     public void fixReferences(Campaign campaign) {
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
-            tech = campaign.getPerson(id);
+            tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (tech == null) {
                 LOGGER.error("Unit {} ('{}') references missing tech {}", getId(), getName(), id);
             }
@@ -7793,7 +8808,8 @@ public class Unit implements ITechnology, ILocation {
         for (int ii = drivers.size() - 1; ii >= 0; --ii) {
             Person driver = drivers.get(ii);
             if (driver instanceof UnitPersonRef) {
-                drivers.set(ii, campaign.getPerson(driver.getId()));
+                final UUID id1 = driver.getId();
+                drivers.set(ii, campaign.getPlayerForce().getHumanResources().getPerson(id1));
                 if (drivers.get(ii) == null) {
                     LOGGER.error("Unit {} ('{}') references missing driver {}", getId(), getName(), driver.getId());
                     drivers.remove(ii);
@@ -7802,7 +8818,8 @@ public class Unit implements ITechnology, ILocation {
         }
         for (Person gunner : new HashSet<>(gunners)) {
             if (gunner instanceof UnitPersonRef) {
-                Person updatedGunner = campaign.getPerson(gunner.getId());
+                final UUID id1 = gunner.getId();
+                Person updatedGunner = campaign.getPlayerForce().getHumanResources().getPerson(id1);
                 if (updatedGunner != null) {
                     if (!gunners.remove(gunner)) { // Remove gunner person ref & log if it fails
                         LOGGER.warn("Unit {} ('{}') could not remove person ref {}",
@@ -7826,7 +8843,8 @@ public class Unit implements ITechnology, ILocation {
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {
-                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
+                final UUID id1 = crew.getId();
+                vesselCrew.set(ii, campaign.getPlayerForce().getHumanResources().getPerson(id1));
                 if (vesselCrew.get(ii) == null) {
                     LOGGER.error("Unit {} ('{}') references missing vessel crew {}", getId(), getName(), crew.getId());
                     vesselCrew.remove(ii);
@@ -7836,7 +8854,7 @@ public class Unit implements ITechnology, ILocation {
 
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
-            engineer = campaign.getPerson(id);
+            engineer = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (engineer == null) {
                 LOGGER.error("Unit {} ('{}') references missing engineer {}", getId(), getName(), id);
             }
@@ -7844,7 +8862,7 @@ public class Unit implements ITechnology, ILocation {
 
         if (navigator instanceof UnitPersonRef) {
             UUID id = navigator.getId();
-            navigator = campaign.getPerson(id);
+            navigator = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (navigator == null) {
                 LOGGER.error("Unit {} ('{}') references missing navigator {}", getId(), getName(), id);
             }
@@ -7852,7 +8870,7 @@ public class Unit implements ITechnology, ILocation {
 
         if (getTechOfficer() instanceof UnitPersonRef) {
             final UUID id = getTechOfficer().getId();
-            techOfficer = campaign.getPerson(id);
+            techOfficer = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (getTechOfficer() == null) {
                 LOGGER.error("Unit {} ('{}') references missing tech officer {}", getId(), getName(), id);
             }
@@ -7869,6 +8887,16 @@ public class Unit implements ITechnology, ILocation {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             if (hasTransportedUnits(campaignTransportType)) {
                 getTransportedUnitsSummary(campaignTransportType).fixReferences(campaign, this);
+
+                if (campaignTransportType == CampaignTransportType.SHIP_TRANSPORT) {
+                    for (Unit transportedUnit : getTransportedUnitsSummary(campaignTransportType)
+                                                      .getTransportedUnits()) {
+                        if (transportedUnit.hasTransportShipAssignment()) {
+                            transportedUnit.getTransportShipAssignment().fixReferences(campaign, transportedUnit);
+                        }
+                    }
+                }
+
                 initializeTransportSpace(campaignTransportType);
             }
         }
@@ -7971,7 +8999,8 @@ public class Unit implements ITechnology, ILocation {
         if (!isMek) {
             boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
             boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
-            canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
+            boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
+            canSalvage = hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
         }
 
         return canSalvage && isFullyCrewed();
@@ -8009,7 +9038,9 @@ public class Unit implements ITechnology, ILocation {
             }
         } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (getEntity().isLargeCraft()) {
+        } else if ((getEntity() instanceof SmallCraft) || (getEntity() instanceof Jumpship)) {
+            // Small craft fly on Piloting/Spacecraft like DropShips do, so they take a vessel pilot;
+            // Person.canDrive asks for the same, and the two must agree or the seat can never be filled.
             return PersonnelRole.VESSEL_PILOT;
         } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
@@ -8057,7 +9088,7 @@ public class Unit implements ITechnology, ILocation {
             }
         } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (getEntity().isSmallCraft() || entity.isLargeCraft()) {
+        } else if ((getEntity() instanceof SmallCraft) || (getEntity() instanceof Jumpship)) {
             return PersonnelRole.VESSEL_GUNNER;
         } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;

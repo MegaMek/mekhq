@@ -35,14 +35,17 @@ package mekhq.utilities;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.Sensor;
+import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
+import megamek.common.units.IBomber;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -56,13 +59,13 @@ public class EntityUtilities {
      * unit ID. If the unit exists, the method returns the associated {@link Entity}. If the unit does not exist or has
      * no associated entity, the method returns {@code null}.
      *
-     * @param hangar The {@link Hangar} instance from which to retrieve the {@link Unit}.
+     * @param hangar The {@link LocalHangar} instance from which to retrieve the {@link Unit}.
      * @param unitID The {@link UUID} of the unit for which the associated {@link Entity} is requested.
      *
      * @return The {@link Entity} associated with the specified unit ID, or {@code null} if the unit is not found or has
      *       no associated entity.
      */
-    public static @Nullable Entity getEntityFromUnitId(Hangar hangar, UUID unitID) {
+    public static @Nullable Entity getEntityFromUnitId(mekhq.campaign.LocalHangar hangar, UUID unitID) {
         Unit unit = hangar.getUnit(unitID);
 
         if (unit == null) {
@@ -98,16 +101,13 @@ public class EntityUtilities {
      * @param entity the {@link Entity} to check for improved sensors. They are also checked for
      * the Improved Sensors quirk.
      *
-     * @return {@code true} if the entity has Improved Sensors
+     * @return {@code true} if the entity has working Improved Sensors
      */
     public static boolean hasImprovedSensors(Entity entity) {
         for (Mounted<?> equip : entity.getMisc()) {
-            if (equip.getType().hasFlag(MiscType.F_BAP)) {
-                if (equip.getType().getInternalName().equals(Sensor.IS_IMPROVED)
-                          || equip.getType().getInternalName()
-                                   .equals(Sensor.CL_IMPROVED)) {
-                    return true;
-                }
+            EquipmentType type = equip.getType();
+            if (type != null && type.hasFlag(MiscType.F_BAP) && equip.isOperable() && isImprovedSensors(type)) {
+                return true;
             }
         }
         return entity.hasQuirk(OptionsConstants.QUIRK_POS_IMPROVED_SENSORS);
@@ -122,18 +122,54 @@ public class EntityUtilities {
      *
      * @param entity the {@link Entity} to check for an active probe
      *
-     * @return {@code true} if the entity has a standard active probe (but not Improved Sensors)
+     * @return {@code true} if the entity has a working standard active probe (but not Improved Sensors)
      */
     public static boolean hasActiveProbe(Entity entity) {
         for (Mounted<?> equip : entity.getMisc()) {
-            if (equip.getType().hasFlag(MiscType.F_BAP)
-                      && !(equip.getType().getInternalName()
-                                 .equals(Sensor.IS_IMPROVED)
-                                 || equip.getType()
-                                          .getInternalName().equals(Sensor.CL_IMPROVED))) {
+            EquipmentType type = equip.getType();
+            if (type != null && type.hasFlag(MiscType.F_BAP) && equip.isOperable() && !isImprovedSensors(type)) {
                 return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Checks whether the given equipment type is Improved Sensors, rather than a standard active probe.
+     *
+     * @param type the equipment type to check
+     *
+     * @return {@code true} if the type is Inner Sphere or Clan Improved Sensors
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isImprovedSensors(EquipmentType type) {
+        String internalName = type.getInternalName();
+        return Sensor.IS_IMPROVED.equals(internalName) || Sensor.CL_IMPROVED.equals(internalName);
+    }
+
+    /**
+     * Determines whether the given {@link Entity} carries a working Recon Camera (TO:AUE p.150), either mounted as
+     * equipment or loaded as a Recon Camera Pod in its bomb bays.
+     *
+     * @param entity the {@link Entity} to check for a recon camera
+     *
+     * @return {@code true} if the entity has a Recon Camera or carries a Recon Camera Pod
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasReconCamera(Entity entity) {
+        if (entity.hasWorkingMisc(MiscType.F_RECON_CAMERA)) {
+            return true;
+        }
+
+        // A pod only becomes mounted equipment once a game starts, so between battles it is found in the bomb loadout
+        if (entity instanceof IBomber bomber) {
+            return bomber.getBombChoices().getCount(BombTypeEnum.RECON_CAMERA) > 0;
+        }
+
         return false;
     }
 }

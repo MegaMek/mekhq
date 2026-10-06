@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.CombatInformationCenter;
 import mekhq.campaign.parts.Part;
@@ -66,7 +67,7 @@ public class MissingCIC extends MissingPart {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             time = 1200;
             if (unit != null && unit.getEntity().hasNavalC3()) {
@@ -95,7 +96,7 @@ public class MissingCIC extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof CombatInformationCenter && cost == part.getStickerPrice();
+        return part instanceof CombatInformationCenter && cost.equals(part.getStickerPrice());
     }
 
     @Override

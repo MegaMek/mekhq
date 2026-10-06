@@ -1,0 +1,15 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: contained-faction variants. The LA/MH entry omits fraction and opponents
+# (fraction resolves to the 0.0 "no split" sentinel; any opponent except itself is allowed).
+# The CGB/CBS entry uses fraction 1.0 (whole border to the contained faction).
+
+containedFactions:
+  - host: LA
+    contained: MH
+    start: 3040-01-01
+  - host: CGB
+    contained: CBS
+    start: 3060-01-01
+    fraction: 1.0

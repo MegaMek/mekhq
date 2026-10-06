@@ -1383,7 +1383,7 @@
 				—From the personal journal of Precentor Berith</desc>
 			<id>1</id>
 			<scenarios>
-				<scenario id="2" type="mekhq.campaign.mission.Scenario">
+				<scenario id="2" type="mekhq.campaign.mission.scenarios.Scenario">
 					<name>Touchpoint:Liberty</name>
 					<desc>Not two weeks out and we’re directed to Liberty to provide “assistance.” Only when
 						we land do I find out that the ragged

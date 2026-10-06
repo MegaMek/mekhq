@@ -98,6 +98,15 @@ public enum ForceNamingMethod {
         };
     }
 
+    /**
+     * Returns a short preview of the first few names this method will produce. Used by dropdowns to
+     * surface the format inline rather than burying it in a tooltip — e.g. {@code "Able, Baker, Charlie"}
+     * for {@link #CCB_1943} or {@code "Alpha, Beta, Gamma"} for {@link #GREEK_ALPHABET}.
+     */
+    public String getExample() {
+        return getValue(Alphabet.A) + ", " + getValue(Alphabet.B) + ", " + getValue(Alphabet.C);
+    }
+
     @Override
     public String toString() {
         return name;

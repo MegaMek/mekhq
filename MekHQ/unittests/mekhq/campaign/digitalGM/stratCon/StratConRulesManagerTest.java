@@ -1,0 +1,2120 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import static mekhq.campaign.personnel.skills.SkillType.S_SENSOR_OPERATIONS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.util.*;
+
+import megamek.common.TargetRollModifier;
+import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioType;
+import mekhq.campaign.mission.utilities.CombatRole;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.gui.dialog.StratConAmbushedDialog;
+import mekhq.utilities.EntityUtilities;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedConstruction;
+import org.mockito.MockedStatic;
+import testUtilities.MHQTestUtilities;
+
+/**
+ * Tests for {@link StratConRulesManager}
+ */
+class StratConRulesManagerTest {
+
+    private static void initializeObjectiveScenarios(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, List<String> objectiveScenarios) throws Exception {
+        Method method = StratConContractInitializer.class.getDeclaredMethod("initializeObjectiveScenarios",
+              Campaign.class,
+              AbstractContract.class,
+              StratConTrackState.class,
+              int.class,
+              List.class,
+              List.class);
+        method.setAccessible(true);
+        method.invoke(null, campaign, contract, track, 1, objectiveScenarios, null);
+    }
+
+    @Test
+    void addStrategicObjective_updatesLookupAfterCacheWasBuilt() {
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        assertTrue(track.getObjectivesByCoords().isEmpty());
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveCoords(coords);
+        objective.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+
+        track.addStrategicObjective(objective);
+
+        assertSame(objective, track.getObjectivesByCoords().get(coords));
+    }
+
+    @Test
+    void addStrategicObjective_doesNotCacheCoordinateLessObjectives() {
+        StratConTrackState track = new StratConTrackState();
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+
+        track.addStrategicObjective(objective);
+
+        assertFalse(track.getObjectivesByCoords().containsKey(null));
+
+        StratConStrategicObjective laterObjective = new StratConStrategicObjective();
+        laterObjective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+
+        track.addStrategicObjective(laterObjective);
+
+        assertFalse(track.getObjectivesByCoords().containsKey(null));
+    }
+
+    @Test
+    void initializeObjectiveScenarios_skipsMissingTemplateWithoutAddingObjective() throws Exception {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = new StratConTrackState();
+        track.setWidth(1);
+        track.setHeight(1);
+
+        initializeObjectiveScenarios(campaign, contract, track, List.of("missing-objective-template.xml"));
+
+        assertTrue(track.getScenarios().isEmpty());
+        assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void initializeObjectiveScenarios_doesNotAddObjectiveWhenScenarioGenerationFails() throws Exception {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = new StratConTrackState();
+        track.setWidth(1);
+        track.setHeight(1);
+        ScenarioTemplate template = mock(ScenarioTemplate.class);
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing,
+              FacilityType.MekBase,
+              new LocalModifiersEffect(List.of("MekGarrison.json")));
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConFacilityFactory> facilityFactory = mockStatic(StratConFacilityFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            scenarioFactory.when(() -> StratConScenarioFactory.getSpecificScenario("objective-template.xml"))
+                  .thenReturn(template);
+            when(template.isFacilityScenario()).thenReturn(true);
+            when(template.isHostileFacility()).thenReturn(true);
+            facilityFactory.when(StratConFacilityFactory::getRandomHostileFacility).thenReturn(facility);
+            rulesManager.when(() -> StratConRulesManager.generateScenario(any(Campaign.class),
+                        any(AbstractContract.class),
+                        any(StratConTrackState.class),
+                        any(),
+                        any(StratConCoords.class),
+                        any(ScenarioTemplate.class),
+                        any()))
+                  .thenReturn(null);
+
+            initializeObjectiveScenarios(campaign, contract, track, List.of("objective-template.xml"));
+        }
+
+        assertTrue(track.getScenarios().isEmpty());
+        assertTrue(track.getFacilities().isEmpty());
+        assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void processIgnoredStratConScenario_failsObjectiveBeforeScenarioRemoval() {
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getId()).thenReturn(231);
+        when(backingScenario.getForceIDs()).thenReturn(new ArrayList<>());
+
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(coords);
+        scenario.setBackingScenario(backingScenario);
+        track.addScenario(scenario);
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveCoords(coords);
+        objective.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+        objective.setDesiredObjectiveCount(1);
+        track.addStrategicObjective(objective);
+
+        StratConRulesManager.processIgnoredStratConScenario(scenario, track, new StratConCampaignState());
+
+        assertFalse(track.getScenarios().containsKey(coords));
+        assertSame(objective, track.getObjectivesByCoords().get(coords));
+        assertEquals(StratConStrategicObjective.OBJECTIVE_FAILED, objective.getCurrentObjectiveCount());
+    }
+
+    @Test
+    void setupScenario_existingFacilitySkipsGenerationWhenFacilityTemplateMissing() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = new StratConTrackState();
+        StratConCoords coords = new StratConCoords(2, 6);
+
+        StratConFacility facility = new StratConFacility();
+        facility.setOwner(ScenarioForceTemplate.ForceAlignment.Allied);
+        track.addFacility(coords, facility);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            scenarioFactory.when(() -> StratConScenarioFactory.getFacilityScenario(true)).thenReturn(null);
+
+            StratConScenario scenario = StratConRulesManager.setupScenario(coords,
+                  null,
+                  campaign,
+                  contract,
+                  track,
+                  null,
+                  false,
+                  null);
+
+            assertNull(scenario);
+            rulesManager.verify(() -> StratConRulesManager.generateScenario(any(Campaign.class),
+                  any(AbstractContract.class),
+                  any(StratConTrackState.class),
+                  any(),
+                  any(StratConCoords.class),
+                  any(ScenarioTemplate.class),
+                  any()), never());
+        }
+    }
+
+    /**
+     * Creates the common mock infrastructure needed for deployForceToCoords tests. processForceDeployment ->
+     * scanNeighboringCoords touches many objects.
+     */
+    private void setupProcessForceDeploymentMocks(Campaign campaign, CampaignOptions options,
+          StratConTrackState track, int forceID) {
+        // scanNeighboringCoords needs revealed coords set
+        when(track.getRevealedCoords()).thenReturn(new HashSet<>());
+        when(track.getScanRangeIncrease()).thenReturn(0);
+
+        // increaseFatigue needs Formation -> Units -> Crew
+        Formation formation = mock(Formation.class);
+        when(campaign.getPlayerForce().getFormation(forceID)).thenReturn(formation);
+
+        UUID unitId = UUID.randomUUID();
+        Vector<UUID> unitIds = new Vector<>();
+        unitIds.add(unitId);
+        when(formation.getAllUnits(false)).thenReturn(unitIds);
+
+        Unit unit = mock(Unit.class);
+        when(campaign.getUnit(unitId)).thenReturn(unit);
+        when(unit.getCrew()).thenReturn(List.of(mock(Person.class)));
+
+        // CampaignOptions needed by scanNeighboringCoords
+        when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+        when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(0);
+        // Read only when a deployment reaches an empty hex and may roll a random encounter; not every caller gets there.
+        lenient().when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(false);
+
+        // processForceDeployment needs LocalDate and Hangar
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+        when(campaign.getPlayerForce().getHangar()).thenReturn(mock(mekhq.campaign.LocalHangar.class));
+
+        // Track setup for processForceDeployment
+        when(track.getAssignedCoordForces()).thenReturn(new HashMap<>());
+    }
+
+    /**
+     * Verifies that coordinate deployment does not auto-assign Official Challenge scenarios, while explicit player
+     * assignment still commits the selected force.
+     *
+     * <p>Regression coverage for
+     * <a href="https://github.com/MegaMek/mekhq/issues/8612">issue #8612</a> and
+     * <a href="https://github.com/MegaMek/mekhq/issues/8867">issue #8867</a>.
+     */
+    @Test
+    void officialChallenge_deployToCoordsDoesNotAutoAssign_assignForceToScenarioCommits() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario challengeScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.OFFICIAL_CHALLENGE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(challengeScenario.getBackingScenario()).thenReturn(backingScenario);
+        when(challengeScenario.getPrimaryForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(challengeScenario.getPlayerTemplateForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(challengeScenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(false);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, false);
+
+        verify(challengeScenario, never()).addPrimaryForce(anyInt());
+
+        StratConRulesManager.assignForceToScenario(coords, forceID, campaign, contract, track, false);
+
+        verify(challengeScenario).addPrimaryForce(forceID);
+        verify(challengeScenario).commitPrimaryForces();
+    }
+
+    /**
+     * Verifies that when a force deploys to coordinates containing a non-challenge scenario (e.g., a fixed objective),
+     * the force IS auto-assigned as before.
+     */
+    @Test
+    void deployForceToCoords_nonChallengeScenario_autoAssignsForce() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        // Create a regular scenario at the target coords
+        StratConScenario regularScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(regularScenario.getBackingScenario()).thenReturn(backingScenario);
+        when(regularScenario.getPrimaryForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(regularScenario.getPlayerTemplateForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(regularScenario);
+
+        // Setup combat team
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(false);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        // Act
+        StratConRulesManager.deployForceToCoords(coords, forceID, campaign, contract, track, false);
+
+        // Assert: force SHOULD be added to the regular scenario
+        verify(regularScenario).addPrimaryForce(forceID);
+    }
+
+    /**
+     * Bundles the mocks a {@link StratConRulesManager#deployForceToCoords} ambush test needs.
+     */
+    private record AmbushFixture(Campaign campaign, AbstractContract contract, StratConTrackState track,
+          StratConCoords coords, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a deployment that trips a randomly-spawned scenario on an empty hex.
+     *
+     * @param isPatrol whether the deploying force is on a patrol role
+     * @param explored whether the target hex has already been revealed (an explored hex is never an ambush)
+     */
+    private AmbushFixture buildAmbushFixture(boolean isPatrol, boolean explored) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        // No fixed scenario or facility at the target hex, so a random scenario may spawn there.
+        when(track.getScenario(coords)).thenReturn(null);
+        when(track.getFacility(coords)).thenReturn(null);
+
+        // Revealed state decides whether the deployment is "blind" (into an unexplored hex).
+        Set<StratConCoords> revealed = new HashSet<>();
+        if (explored) {
+            revealed.add(coords);
+        }
+        when(track.getRevealedCoords()).thenReturn(revealed);
+        when(track.getAssignedForceCoords()).thenReturn(new HashMap<>());
+
+        // The deploying force is present at the hex it deployed into, so the "existing forces" branch is taken.
+        Map<StratConCoords, Set<Integer>> assignedCoordForces = new HashMap<>();
+        assignedCoordForces.put(coords, new HashSet<>(Set.of(forceID)));
+        when(track.getAssignedCoordForces()).thenReturn(assignedCoordForces);
+
+        return new AmbushFixture(campaign, contract, track, coords, forceID);
+    }
+
+    /**
+     * Stubs the scenario-generation collaborators so {@code deployForceToCoords} runs to completion: a scenario always
+     * spawns ({@code calculateScenarioOdds} returns 100), and template selection, existing-force generation, and
+     * finalization are neutralized so only the ambush decision logic is exercised.
+     */
+    private void stubScenarioGeneration(MockedStatic<StratConScenarioFactory> scenarioFactory,
+          MockedStatic<StratConRulesManager> rulesManager) {
+        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean(), any()))
+              .thenReturn(mock(ScenarioTemplate.class));
+        rulesManager.when(() -> StratConRulesManager.calculateScenarioOdds(any(), any(), anyBoolean()))
+              .thenReturn(100);
+        // The ambush branch marks the generated scenario as a crisis via its backing scenario, so it must be present.
+        StratConScenario generatedScenario = mock(StratConScenario.class);
+        when(generatedScenario.getBackingScenario()).thenReturn(mock(AtBDynamicScenario.class));
+        rulesManager.when(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(), any(),
+              any(), any(), any())).thenReturn(generatedScenario);
+        rulesManager.when(() -> StratConRulesManager.finalizeBackingScenario(any(), any(), any(), anyBoolean(),
+              any())).thenAnswer(invocation -> null);
+    }
+
+    /**
+     * A non-patrol force that deploys blind into an unexplored hex and trips a scenario is ambushed: the scenario is
+     * restricted to ambush-suited templates and the player is notified. It is not a bungled patrol.
+     */
+    @Test
+    void deployForceToCoords_blindDeployment_isAmbush() {
+        AmbushFixture fixture = buildAmbushFixture(false, false);
+        List<Boolean> dialogBungledArgs = new ArrayList<>();
+
+        try (MockedConstruction<StratConAmbushedDialog> dialogs = mockConstruction(StratConAmbushedDialog.class,
+              (dialog, context) -> dialogBungledArgs.add((Boolean) context.arguments().get(2)));
+              MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            stubScenarioGeneration(scenarioFactory, rulesManager);
+
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false), any()));
+            assertEquals(List.of(false), dialogBungledArgs);
+        }
+    }
+
+    /**
+     * A patrol force that deploys blind into an unexplored hex bungles the patrol: the scenario is restricted to
+     * bungled-patrol templates, is pinned to the deployed hex (not migrated to an adjacent hex), and the player is
+     * notified that it was a bungled patrol.
+     */
+    @Test
+    void deployForceToCoords_blindPatrolDeployment_isBungledPatrolPinnedToHex() {
+        AmbushFixture fixture = buildAmbushFixture(true, false);
+        List<Boolean> dialogBungledArgs = new ArrayList<>();
+
+        try (MockedConstruction<StratConAmbushedDialog> dialogs = mockConstruction(StratConAmbushedDialog.class,
+              (dialog, context) -> dialogBungledArgs.add((Boolean) context.arguments().get(2)));
+              MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            stubScenarioGeneration(scenarioFactory, rulesManager);
+
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true), any()));
+            assertEquals(List.of(true), dialogBungledArgs);
+            // Pinned to the deployed hex: the scenario is built for the force already there, not migrated away.
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
+                  any(), any(), any(), any(), any(), any()));
+        }
+    }
+
+    /**
+     * A patrol force deploying into an already-explored hex is never ambushed or bungled: no ambush template is
+     * requested and the player is not notified.
+     */
+    @Test
+    void deployForceToCoords_deploymentIntoExploredHex_isNotAmbush() {
+        AmbushFixture fixture = buildAmbushFixture(true, true);
+        List<Boolean> dialogBungledArgs = new ArrayList<>();
+
+        try (MockedConstruction<StratConAmbushedDialog> dialogs = mockConstruction(StratConAmbushedDialog.class,
+              (dialog, context) -> dialogBungledArgs.add((Boolean) context.arguments().get(2)));
+              MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            stubScenarioGeneration(scenarioFactory, rulesManager);
+
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean(), any()),
+                  never());
+            assertTrue(dialogBungledArgs.isEmpty());
+        }
+    }
+
+    /**
+     * Bundles the mocks a patrol-familiarity test needs.
+     */
+    private record FamiliarityFixture(Campaign campaign, AbstractContract contract, StratConTrackState track,
+          StratConCoords coords, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a deployment onto a hex that already holds an ordinary scenario, so that both
+     * {@link StratConRulesManager#deployForceToCoords} and {@link StratConRulesManager#assignForceToScenario} run to
+     * completion without generating a scenario of their own.
+     *
+     * @param isPatrol whether the deploying force is on a patrol role
+     */
+    private FamiliarityFixture buildFamiliarityFixture(boolean isPatrol) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.NORMAL);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario scenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getBackingScenario()).thenReturn(backingScenario);
+        when(scenario.getPrimaryForceIDs()).thenReturn(new ArrayList<>());
+        when(scenario.getPlayerTemplateForceIDs()).thenReturn(new ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(scenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatRole.isTraining()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        return new FamiliarityFixture(campaign, contract, track, coords, forceID);
+    }
+
+    /**
+     * A patrol deployment earns the patrol familiarity award, and earns it exactly once for the deployment.
+     */
+    @Test
+    void deployForceToCoords_patrolForce_awardsPatrolFamiliarityOnce() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(eq(fixture.campaign()), any(),
+                  eq(FamiliarityGainType.D3)), times(1));
+        }
+    }
+
+    /**
+     * The award is Patrol-only: every other combat role deploys without earning it.
+     */
+    @Test
+    void deployForceToCoords_nonPatrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(false);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * Assigning a force to an existing scenario is not a patrol sweep, so it earns nothing here - the scenario grants
+     * its own award at resolution. This holds even for a force on a patrol role.
+     */
+    @Test
+    void assignForceToScenario_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.assignForceToScenario(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.contract(), fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * The award hangs off the deployment decision, not off the hex-revealing pass. Every route that commits a force to
+     * a scenario re-runs {@code processForceDeployment}, so an award made there would land more than once per
+     * deployment.
+     */
+    @Test
+    void processForceDeployment_patrolForce_awardsNoFamiliarity() {
+        FamiliarityFixture fixture = buildFamiliarityFixture(true);
+
+        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
+            StratConRulesManager.processForceDeployment(fixture.coords(), fixture.forceID(), fixture.campaign(),
+                  fixture.track(), false);
+
+            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * Bundles the mocks a {@link StratConRulesManager#generateDailyScenariosForTrack} ambush test needs.
+     */
+    private record DailyAmbushFixture(Campaign campaign, StratConCampaignState campaignState, AbstractContract contract,
+          StratConTrackState track, StratConCoords coords, Set<Integer> assignedForceIDs, int forceID) {}
+
+    /**
+     * Builds the mock infrastructure for a daily-generated scenario whose target hex is selected by
+     * {@code getUnoccupiedCoords}. Whether that hex already holds a deployed force is controlled by
+     * {@code hasAssignedForce}.
+     *
+     * @param hasAssignedForce whether the target hex already has a player force assigned (the spawn-on-force path)
+     * @param isPatrol         whether the force sitting on the hex is on a patrol role (a bungled patrol)
+     */
+    private DailyAmbushFixture buildDailyAmbushFixture(boolean hasAssignedForce, boolean isPatrol) {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getEndingDate()).thenReturn(LocalDate.of(3025, 2, 1));
+
+        StratConCampaignState campaignState = mock(StratConCampaignState.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        when(campaignState.getTracks()).thenReturn(List.of(track));
+        when(campaignState.getContract()).thenReturn(contract);
+        when(track.getDeploymentTime()).thenReturn(1);
+
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 7;
+
+        // The force sitting on the hex determines the ambush template's unit type and bungled-patrol flag.
+        Formation formation = mock(Formation.class);
+        when(formation.getPrimaryUnitType(campaign)).thenReturn(UnitType.TANK);
+        when(campaign.getPlayerForce().getFormation(forceID)).thenReturn(formation);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(isPatrol);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        Set<Integer> assignedForceIDs = new LinkedHashSet<>(Set.of(forceID));
+        Map<StratConCoords, Set<Integer>> assignedCoordForces = new HashMap<>();
+        if (hasAssignedForce) {
+            assignedCoordForces.put(coords, assignedForceIDs);
+        }
+        when(track.getAssignedCoordForces()).thenReturn(assignedCoordForces);
+        when(track.getScenarios()).thenReturn(new HashMap<>());
+
+        return new DailyAmbushFixture(campaign, campaignState, contract, track, coords, assignedForceIDs, forceID);
+    }
+
+    /**
+     * Stubs the collaborators so {@code generateDailyScenariosForTrack} runs to the point where it decides the scenario
+     * template: {@code getUnoccupiedCoords} returns the fixture hex, force lookups return empty, and existing-force
+     * generation is neutralized so only the template-selection logic is exercised.
+     *
+     * @return the ambush template that {@code getRandomScenario} is stubbed to return
+     */
+    private ScenarioTemplate stubDailyGeneration(MockedStatic<StratConScenarioFactory> scenarioFactory,
+          MockedStatic<StratConRulesManager> rulesManager,
+          MockedStatic<StratConContractInitializer> contractInitializer, StratConCoords coords) {
+        ScenarioTemplate ambushTemplate = mock(ScenarioTemplate.class);
+        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean(), any()))
+              .thenReturn(ambushTemplate);
+        rulesManager.when(() -> StratConRulesManager.getAvailableForceIDs(any(), any(), anyBoolean()))
+              .thenReturn(new ArrayList<>());
+        rulesManager.when(() -> StratConRulesManager.sortForcesByMapType(any(), any(), any()))
+              .thenReturn(new HashMap<>());
+        rulesManager.when(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(), any(),
+              any(), any(), any())).thenReturn(null);
+        contractInitializer.when(() -> StratConContractInitializer.getUnoccupiedCoords(any(), anyBoolean(),
+              anyBoolean(), anyBoolean())).thenReturn(coords);
+        return ambushTemplate;
+    }
+
+    /**
+     * A daily-generated scenario that spawns on top of an already-deployed (non-patrol) force is an ambush: template
+     * selection is restricted to ambush-suited templates, and that template is passed through to the existing-forces
+     * generation for the occupied hex.
+     */
+    @Test
+    void generateDailyScenariosForTrack_spawnOnDeployedForce_usesAmbushTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(true, false);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            ScenarioTemplate ambushTemplate = stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer,
+                  fixture.coords());
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            // Ambush template requested for the deployed force (non-patrol, so not a bungled patrol) ...
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false), any()));
+            // ... and passed through to the existing-forces generation for the occupied hex.
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
+                  eq(fixture.assignedForceIDs()), eq(fixture.contract()), eq(fixture.campaign()), eq(fixture.track()),
+                  eq(ambushTemplate), isNull()));
+        }
+    }
+
+    /**
+     * A daily-generated scenario that spawns on top of a deployed patrol is a bungled patrol: template selection is
+     * restricted to bungled-patrol-suited templates.
+     */
+    @Test
+    void generateDailyScenariosForTrack_spawnOnDeployedPatrol_usesBungledPatrolTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(true, true);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            ScenarioTemplate ambushTemplate = stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer,
+                  fixture.coords());
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true), any()));
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
+                  any(), any(), any(), any(), eq(ambushTemplate), isNull()));
+        }
+    }
+
+    /**
+     * A daily-generated scenario on an empty hex (no already-deployed force) is not an ambush: no ambush template is
+     * requested and the existing-forces generation path is not taken.
+     */
+    @Test
+    void generateDailyScenariosForTrack_emptyHex_doesNotUseAmbushTemplate() {
+        DailyAmbushFixture fixture = buildDailyAmbushFixture(false, false);
+
+        try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
+              MockedStatic<StratConContractInitializer> contractInitializer =
+                    mockStatic(StratConContractInitializer.class);
+              MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                    CALLS_REAL_METHODS)) {
+            stubDailyGeneration(scenarioFactory, rulesManager, contractInitializer, fixture.coords());
+            // The empty-hex branch generates a fresh scenario; neutralize it so only the ambush decision matters.
+            rulesManager.when(() -> StratConRulesManager.setupScenario(any(), any(), any(), any(), any()))
+                  .thenReturn(null);
+
+            StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
+                  fixture.contract(), 1);
+
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean(), any()),
+                  never());
+            rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(),
+                  any(), any(), any(), any()), never());
+        }
+    }
+
+    /**
+     * Verifies that explicit player assignment to a non-challenge scenario commits the selected force.
+     */
+    @Test
+    void assignForceToScenario_nonChallengeScenario_commitsSelectedForce() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+        int forceID = 1;
+
+        StratConScenario regularScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(backingScenario.isFinalized()).thenReturn(true);
+        when(backingScenario.isCloaked()).thenReturn(false);
+        when(backingScenario.getForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(regularScenario.getBackingScenario()).thenReturn(backingScenario);
+        when(regularScenario.getPrimaryForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(regularScenario.getPlayerTemplateForceIDs()).thenReturn(new java.util.ArrayList<>());
+        when(track.getScenario(coords)).thenReturn(regularScenario);
+
+        CombatTeam combatTeam = mock(CombatTeam.class);
+        CombatRole combatRole = mock(CombatRole.class);
+        when(combatRole.isPatrol()).thenReturn(false);
+        when(combatTeam.getRole()).thenReturn(combatRole);
+        var combatTeamsMap = new Hashtable<Integer, CombatTeam>();
+        combatTeamsMap.put(forceID, combatTeam);
+        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+        setupProcessForceDeploymentMocks(campaign, options, track, forceID);
+
+        StratConRulesManager.assignForceToScenario(coords, forceID, campaign, contract, track, false);
+
+        verify(regularScenario).addPrimaryForce(forceID);
+        verify(regularScenario).commitPrimaryForces();
+    }
+
+    /**
+     * Verifies that when an Official Challenge scenario spawns on a hex that already has a deployed force (the
+     * {@code generateScenarioForExistingForces} path), the scenario does NOT override force auto-assignment. This means
+     * {@code finalizeBackingScenario} (called with {@code autoAssignLances=false} in
+     * {@code generateDailyScenariosForTrack}) will remove the forces from the backing scenario and set the scenario to
+     * UNRESOLVED, preventing auto-assignment.
+     *
+     * <p>Regression test for
+     * <a href="https://github.com/MegaMek/mekhq/issues/8612">issue #8612</a>
+     * — spawn-on-existing-force path.
+     */
+    @Test
+    void generateScenarioForExistingForces_officialChallenge_doesNotOverrideAutoAssignment() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.isUseStratConMaplessMode()).thenReturn(false);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+
+        // Create a mock scenario whose backing scenario is an Official Challenge
+        StratConScenario mockScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.OFFICIAL_CHALLENGE);
+        when(mockScenario.getBackingScenario()).thenReturn(backingScenario);
+
+        Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
+
+        try (MockedStatic<StratConRulesManager> mockedManager =
+                   mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+            // Mock setupScenario to return our controlled Official Challenge scenario
+            mockedManager.when(() -> StratConRulesManager.setupScenario(
+                  any(), any(), any(), any(), any(), any(), anyBoolean(), any()
+            )).thenReturn(mockScenario);
+
+            // Act
+            StratConScenario result = StratConRulesManager.generateScenarioForExistingForces(
+                  coords, forceIDs, contract, campaign, track, null, null);
+
+            // Assert
+            assertNotNull(result);
+            // overrideForceAutoAssignment must be false for Official Challenge,
+            // so finalizeBackingScenario will remove formations instead of committing them
+            verify(mockScenario).setOverrideForceAutoAssignment(false);
+        }
+    }
+
+    /**
+     * Verifies that when a non-challenge scenario spawns on a hex with an existing force, the scenario DOES override
+     * force auto-assignment (so forces are committed as usual).
+     */
+    @Test
+    void generateScenarioForExistingForces_nonChallenge_overridesAutoAssignment() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(options.isUseStratConMaplessMode()).thenReturn(false);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        StratConTrackState track = mock(StratConTrackState.class);
+        StratConCoords coords = new StratConCoords(2, 3);
+
+        // Create a mock scenario whose backing scenario is NOT an Official Challenge
+        StratConScenario mockScenario = mock(StratConScenario.class);
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(mockScenario.getBackingScenario()).thenReturn(backingScenario);
+
+        Set<Integer> forceIDs = new LinkedHashSet<>(List.of(42));
+
+        try (MockedStatic<StratConRulesManager> mockedManager =
+                   mockStatic(StratConRulesManager.class, CALLS_REAL_METHODS)) {
+            mockedManager.when(() -> StratConRulesManager.setupScenario(
+                  any(), any(), any(), any(), any(), any(), anyBoolean(), any()
+            )).thenReturn(mockScenario);
+
+            // Act
+            StratConScenario result = StratConRulesManager.generateScenarioForExistingForces(
+                  coords, forceIDs, contract, campaign, track, null, null);
+
+            // Assert
+            assertNotNull(result);
+            // overrideForceAutoAssignment must be true for non-challenge scenarios,
+            // so finalizeBackingScenario will commit forces as normal
+            verify(mockScenario).setOverrideForceAutoAssignment(true);
+        }
+    }
+
+    // -- isValidUnitForScenario tests --
+
+    /**
+     * Creates common mock infrastructure for isValidUnitForScenario tests.
+     *
+     * @param unitType              the unit type to return from the entity
+     * @param hasUnstreamlinedQuirk whether the entity has the unstreamlined quirk
+     * @param atmosphere            the planet's atmosphere (null to simulate missing planet data)
+     * @param isUseDropShips        whether campaign options allow player dropships
+     * @param allowedUnitType       the allowed unit type on the scenario force template (-2 for ATB_MIX)
+     *
+     * @return an Object array: [Unit, ScenarioForceTemplate, Campaign]
+     */
+    private Object[] setupIsValidUnitMocks(int unitType, boolean hasUnstreamlinedQuirk,
+          Atmosphere pressure, boolean isUseDropShips, int allowedUnitType) {
+        Entity entity = mock(Entity.class);
+        when(entity.getUnitType()).thenReturn(unitType);
+        when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(hasUnstreamlinedQuirk);
+        when(entity.doomedOnGround()).thenReturn(false);
+        when(entity.doomedInAtmosphere()).thenReturn(false);
+        when(entity.doomedInSpace()).thenReturn(false);
+
+        Unit unit = mock(Unit.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.isAvailable()).thenReturn(true);
+        when(unit.isFunctional()).thenReturn(true);
+
+        ScenarioForceTemplate template = mock(ScenarioForceTemplate.class);
+        when(template.getAllowedUnitType()).thenReturn(allowedUnitType);
+
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(isUseDropShips);
+
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+
+        CurrentLocation location = mock(CurrentLocation.class);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
+
+        if (pressure != null) {
+            Planet planet = mock(Planet.class);
+            when(planet.getPressure(any())).thenReturn(pressure);
+            when(location.getPlanet()).thenReturn(planet);
+        } else {
+            when(location.getPlanet()).thenReturn(null);
+        }
+
+        return new Object[] { unit, template, campaign };
+    }
+
+    @Test
+    void isValidUnitForScenario_normalDropshipOnGround_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithAtmosphere_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnGroundWithVacuum_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.VACUUM, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipInSpace_allowed() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.Space);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipOnLowAtmosphereWithAtmosphere_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.LowAtmosphere);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_unstreamlinedDropshipNullPlanet_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, true,
+              null, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_dropshipWhenDropShipsDisabled_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.DROPSHIP, false,
+              Atmosphere.STANDARD, false, UnitType.DROPSHIP);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isValidUnitForScenario_doomedOnGround_rejected() {
+        Object[] mocks = setupIsValidUnitMocks(UnitType.JUMPSHIP, false,
+              Atmosphere.STANDARD, true, ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+        Entity entity = ((Unit) mocks[0]).getEntity();
+        when(entity.doomedOnGround()).thenReturn(true);
+
+        boolean result = StratConRulesManager.isValidUnitForScenario(
+              (Unit) mocks[0], (ScenarioForceTemplate) mocks[1],
+              (Campaign) mocks[2], MapLocation.AllGroundTerrain);
+
+        assertFalse(result);
+    }
+
+    @Nested
+    class ScoutingRules {
+
+        @BeforeAll
+        static void beforeAll() {
+            SkillType.initializeTypes();
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "20.0, 0", "55.0, 0", "55.1, 2", "75.0, 2", "75.1, 4", "100.0, 4", "100.1, 6", "150.0, 6" })
+        void testGetUnitWeightModifier(double weight, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitWeightModifier(weight);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Weight Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "0, 1", "3, 1", "4, 0", "7, 0", "8, -1", "15, -1" })
+        void testGetUnitSpeedModifier(int speed, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitSpeedModifier(speed);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Speed Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true, -1", "false, 0" })
+        void testGetUnitEquipmentModifier(boolean hasSensorEquipment, int expectedModifier) {
+            TargetRollModifier modifier = StratConRulesManager.getUnitEquipmentModifier(hasSensorEquipment);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Unit Sensor Equipment Modifier", modifier.description());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "false, false, 0", "true, false, -1", "false, true, 0", "true, true, 0" })
+        void testGetScoutComplementarySPAModifier(boolean hasEagleEyes, boolean hasSensorEquipment,
+              int expectedModifier) {
+            TargetRollModifier modifier =
+                  StratConRulesManager.getScoutComplementarySPAModifier(hasEagleEyes, hasSensorEquipment);
+            assertEquals(expectedModifier, modifier.value());
+            assertEquals("Scout Complementary SPA Modifier", modifier.description());
+        }
+
+        @Test
+        void testGetAllScoutRollModifiers() {
+            // 60t (weight mod: 2), speed 8 (speed mod: -1)
+            // has sensor quipment (equip mod: -1), Eagle Eyes (SPA mod: 0 since it doesn't stack)
+            List<TargetRollModifier> modifiers = StratConRulesManager.getAllScoutRollModifiers(60, 8, true, true);
+
+            assertEquals(4, modifiers.size());
+            assertEquals(2, modifiers.get(0).value());  // weight
+            assertEquals(-1, modifiers.get(1).value()); // speed
+            assertEquals(-1, modifiers.get(2).value()); // equipment
+            assertEquals(0, modifiers.get(3).value());  // SPA
+        }
+
+        private static Campaign mockCampaign(boolean useAgingEffects, boolean isClanCampaign) {
+            Campaign campaign = MHQTestUtilities.mockCampaign();
+            when(campaign.getPlayerForce().isClanForce()).thenReturn(isClanCampaign);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(useAgingEffects);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            lenient().when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+            return campaign;
+        }
+
+        @Test
+        void testBuildScoutMap_SingleCrewMember() {
+            Person person = mockPerson(4, true);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, true, false);
+            SkillCheck skillCheck = bestScout.skillCheck();
+
+            assertEquals(person, bestScout.scout());
+            assertEquals(S_SENSOR_OPERATIONS, skillCheck.getSkillType().getName());
+            assertEquals(3, skillCheck.getTargetNumber().getValue());
+            assertEquals(45.0, bestScout.unitWeight());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true", "false" })
+        void testBuildScoutMap_UseAgingModifiers(boolean useAgingEffects) {
+            Person person = mockPerson(4, true);
+            getBestScoutForUnit(List.of(person), 45, 5, true, false, useAgingEffects, false);
+            verify(person).getSkillModifierData(eq(useAgingEffects), eq(false), any(LocalDate.class));
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true", "false" })
+        void testBuildScoutMap_IsClanCampaign(boolean isClanCampaign) {
+            Person person = mockPerson(4, true);
+            getBestScoutForUnit(List.of(person), 45, 5, true, false, false, isClanCampaign);
+            verify(person).getSkillModifierData(eq(false), eq(isClanCampaign), any(LocalDate.class));
+        }
+
+        @Test
+        void testBuildScoutMap_Unskilled() {
+            Person person = mockPerson(null, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, false, false);
+            assertEquals(person, bestScout.scout());
+            assertEquals(S_SENSOR_OPERATIONS, bestScout.skillCheck().getSkillType().getName());
+            assertEquals(12, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_Sorting_EqualTN() {
+            Person person1 = mockPerson(1, false);
+            Person person2 = mockPerson(1, false);
+            Person person3 = mockPerson(1, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person1, person2, person3), 45, 5, false, false);
+            assertEquals(person1, bestScout.scout()); // choose first
+        }
+
+        @Test
+        void testBuildScoutMap_Sorting_DifferentTNs() {
+            Person person1 = mockPerson(3, false);
+            Person person2 = mockPerson(2, false);
+            Person person3 = mockPerson(1, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person1, person2, person3), 45, 5, false, false);
+            assertEquals(person3, bestScout.scout()); // choose highest
+        }
+
+        @Test
+        void testBuildScoutMap_UnitSorting() {
+            Person person1 = mockPerson(3, false);
+            Person person2 = mockPerson(1, false);
+            Person person3 = mockPerson(2, false);
+            List<ScoutRecord> bestScouts = getBestScoutsForUnits(List.of(person1, person2, person3), false, false);
+            // sort according to TNs
+            assertEquals(3, bestScouts.size());
+            assertEquals(person2, bestScouts.get(0).scout());
+            assertEquals(person3, bestScouts.get(1).scout());
+            assertEquals(person1, bestScouts.get(2).scout());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_NoEagleEyes() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, false);
+            assertEquals(4, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_AP() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, true);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_IS() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_IS_AP() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, true);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_UnitSpeed() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 9, false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_UnitWeight() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 95, 5, false, false);
+            assertEquals(8, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_ReconCamera() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, false, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_ReconCamera_AP_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, true, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_ReconCamera_IS_AP_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, true, true, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_ReconCamera_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, false, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_AllModifiersCombined() {
+            // skill 4, 60t (+2), speed 8 (-1), sensors (-1), Eagle Eyes blocked by sensors (0)
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 60, 8, false, true);
+            assertEquals(4, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_NullEntityUsesWorstCaseDefaults() {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+            Person person = mockPerson(4, false);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(List.of(person));
+            when(unit.getEntity()).thenReturn(null);
+
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar,
+                  mockCampaign(false, false));
+
+            // skill 4, 200t default (+6), speed 0 default (+1), no sensors
+            assertEquals(1, scouts.size());
+            assertEquals(200.0, scouts.getFirst().unitWeight());
+            assertEquals(11, scouts.getFirst().skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_OnlyCommandersMatter_UsesCommander() {
+            Person betterCrewMember = mockPerson(1, false);
+            Person commander = mockPerson(4, false);
+            List<ScoutRecord> scouts = getScoutsForCommanderOnlyUnit(List.of(betterCrewMember, commander),
+                  commander);
+
+            assertEquals(1, scouts.size());
+            assertEquals(commander, scouts.getFirst().scout());
+        }
+
+        @Test
+        void testBuildScoutMap_OnlyCommandersMatter_NoCommanderSkipsUnit() {
+            List<ScoutRecord> scouts = getScoutsForCommanderOnlyUnit(List.of(mockPerson(1, false)), null);
+            assertTrue(scouts.isEmpty());
+        }
+
+        private List<ScoutRecord> getScoutsForCommanderOnlyUnit(List<Person> crew, Person commander) {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            Campaign campaign = mockCampaign(false, false);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(crew);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.isOnlyCommandersMatter(campaign.getCampaignOptions())).thenReturn(true);
+            when(unit.getCommander()).thenReturn(commander);
+            when(entity.getWeight()).thenReturn(45.0);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> ignored = mockStatic(EntityUtilities.class)) {
+                scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(5);
+                return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
+            }
+        }
+
+        @Test
+        void testBuildScoutMap_NullFormation() {
+            List<ScoutRecord> scouts =
+                  StratConRulesManager.buildScoutMap(null,
+                        mock(mekhq.campaign.LocalHangar.class),
+                        MHQTestUtilities.mockCampaign());
+            assertNotNull(scouts);
+            assertTrue(scouts.isEmpty());
+        }
+
+        private Person mockPerson(Integer sensorOperationsSkill, boolean hasEagleEye) {
+            Person person = new Person("GivenName", "Surname", null, "Faction");
+            if (sensorOperationsSkill != null) {
+                Skill skill = mock(Skill.class);
+                when(skill.getFinalSkillValue(any(SkillModifierData.class))).thenReturn(sensorOperationsSkill);
+                person.addSkill(S_SENSOR_OPERATIONS, skill);
+            }
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            when(options.booleanOption(OptionsConstants.MISC_EAGLE_EYES)).thenReturn(hasEagleEye);
+            person.setOptions(options);
+            return spy(person);
+        }
+
+        @Test
+        void testBuildScoutMap_EmptyCrewSkipsUnit() {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(new ArrayList<>());
+
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation,
+                  hangar,
+                  MHQTestUtilities.mockCampaign());
+            assertTrue(scouts.isEmpty());
+        }
+
+        private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
+              boolean hasImprovedSensors, boolean hasActiveProbe) {
+            return getBestScoutForUnit(crew, unitWeight, unitSpeed, hasImprovedSensors, hasActiveProbe, false, false);
+        }
+
+        private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
+              boolean hasImprovedSensors, boolean hasActiveProbe, boolean useAgingEffects, boolean isClanCampaign) {
+            return getBestScoutForUnit(crew, unitWeight, unitSpeed, hasImprovedSensors, hasActiveProbe, false,
+                  useAgingEffects, isClanCampaign);
+        }
+
+        /**
+         * Mocks a single unit with multiple crew members and gets the best scout
+         */
+        private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
+              boolean hasImprovedSensors, boolean hasActiveProbe, boolean hasReconCamera, boolean useAgingEffects,
+              boolean isClanCampaign) {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(crew);
+            when(unit.getEntity()).thenReturn(entity);
+            when(entity.getWeight()).thenReturn(unitWeight);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class)) {
+
+                scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(unitSpeed);
+                entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
+                entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
+                entityUtils.when(() -> EntityUtilities.hasReconCamera(entity)).thenReturn(hasReconCamera);
+
+                Campaign campaign = mockCampaign(useAgingEffects, isClanCampaign);
+                List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar, campaign);
+                assertEquals(1, scouts.size());
+
+                return scouts.getFirst();
+            }
+        }
+
+        /**
+         * Mocks multiple units with a single crew member each and gets the best scouts
+         */
+        private List<ScoutRecord> getBestScoutsForUnits(List<Person> crews,
+              boolean hasImprovedSensors, boolean hasActiveProbe) {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class);
+                  MockedStatic<ScoutingSkills> scoutingSkills = mockStatic(ScoutingSkills.class)) {
+
+                List<Unit> units = crews.stream().map(crew -> {
+                    Unit unit = mock(Unit.class);
+                    Entity entity = mock(Entity.class);
+                    when(unit.getCrew()).thenReturn(List.of(crew));
+                    when(unit.getEntity()).thenReturn(entity);
+                    when(entity.getWeight()).thenReturn(45.0);
+                    scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(5);
+                    entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
+                    entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
+                    scoutingSkills.when(() -> ScoutingSkills.getBestScoutingSkill(crew))
+                          .thenReturn(S_SENSOR_OPERATIONS);
+                    return unit;
+                }).toList();
+                when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(units);
+
+                Campaign campaign = mockCampaign(false, false);
+
+                return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
+            }
+        }
+    }
+
+    /**
+     * Covers how a deployed force scans the hexes around it: scan range, the advanced scouting single roll per scout,
+     * light scouts' extra range, failed rolls, already-revealed hexes, and the early exit when the deployment hex holds
+     * a scenario.
+     */
+    @Nested
+    class ScanNeighboringCoords {
+        private static final int FORCE_ID = 1;
+        private static final StratConCoords CENTER = new StratConCoords(5, 5);
+
+        private static final int HEAVY_SCOUT_WEIGHT = 50;
+        private static final int LIGHT_SCOUT_WEIGHT = 35;
+
+        private Campaign campaign;
+        private CampaignOptions campaignOptions;
+        private StratConTrackState track;
+        private final Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
+
+        @BeforeAll
+        static void beforeAll() {
+            SkillType.initializeTypes();
+        }
+
+        private void setUp(boolean useAdvancedScouting, int trackScanRangeIncrease) {
+            campaign = MHQTestUtilities.mockCampaign();
+            campaignOptions = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(useAdvancedScouting);
+            lenient().when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(1);
+
+            Formation formation = mock(Formation.class);
+            lenient().when(formation.getAllUnits(false)).thenReturn(new Vector<>());
+            when(campaign.getPlayerForce().getFormation(FORCE_ID)).thenReturn(formation);
+            when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeams);
+
+            track = spy(new StratConTrackState());
+            track.setWidth(11);
+            track.setHeight(11);
+            doReturn(trackScanRangeIncrease).when(track).getScanRangeIncrease();
+        }
+
+        private void setPatrol() {
+            CombatTeam combatTeam = mock(CombatTeam.class);
+            CombatRole combatRole = mock(CombatRole.class);
+            when(combatRole.isPatrol()).thenReturn(true);
+            when(combatTeam.getRole()).thenReturn(combatRole);
+            combatTeams.put(FORCE_ID, combatTeam);
+        }
+
+        private ScoutRecord mockScout(double unitWeight, Boolean... rollResults) {
+            Person person = mock(Person.class);
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            lenient().when(person.getOptions()).thenReturn(options);
+
+            SkillCheck skillCheck = mock(SkillCheck.class);
+            if (rollResults.length > 0) {
+                ActionCheckResult first = mockResult(rollResults[0]);
+                ActionCheckResult[] rest = new ActionCheckResult[rollResults.length - 1];
+                for (int index = 1; index < rollResults.length; index++) {
+                    rest[index - 1] = mockResult(rollResults[index]);
+                }
+                lenient().when(skillCheck.resolve(anyBoolean(), any())).thenReturn(first, rest);
+            }
+            return new ScoutRecord(person, skillCheck, unitWeight);
+        }
+
+        private static ActionCheckResult mockResult(boolean isSuccess) {
+            ActionCheckResult result = mock(ActionCheckResult.class);
+            when(result.isSuccess()).thenReturn(isSuccess);
+            return result;
+        }
+
+        /**
+         * Runs the private scan with the given scouts standing in for the ones {@code buildScoutMap} would find.
+         */
+        private void scan(ScoutRecord... scouts) throws Exception {
+            Method scanMethod = StratConRulesManager.class.getDeclaredMethod("scanNeighboringCoords",
+                  StratConCoords.class, int.class, Campaign.class, StratConTrackState.class);
+            scanMethod.setAccessible(true);
+
+            try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                  CALLS_REAL_METHODS);
+                  MockedStatic<StratConPointOfInterestRules> ignored = mockStatic(StratConPointOfInterestRules.class)) {
+                rulesManager.when(() -> StratConRulesManager.buildScoutMap(any(), any(), any()))
+                      .thenReturn(new ArrayList<>(List.of(scouts)));
+                scanMethod.invoke(null, CENTER, FORCE_ID, campaign, track);
+            }
+        }
+
+        private int revealedCount() {
+            return track.getRevealedCoords().size();
+        }
+
+        @Test
+        void standardScouting_rangeOne_revealsWholeFirstRingWithoutRolling() throws Exception {
+            setUp(false, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT);
+            scan(scout);
+
+            assertEquals(7, revealedCount());
+            verify(scout.skillCheck(), never()).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void standardScouting_rangeTwo_revealsTwoRings() throws Exception {
+            setUp(false, 2);
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+            assertEquals(19, revealedCount());
+        }
+
+        @Test
+        void standardScouting_rangeZero_revealsOnlyDeploymentHex() throws Exception {
+            setUp(false, 0);
+            scan(mockScout(LIGHT_SCOUT_WEIGHT));
+
+            // light scouts only get extra range under advanced scouting
+            assertEquals(1, revealedCount());
+            assertTrue(track.getRevealedCoords().contains(CENTER));
+        }
+
+        @Test
+        void standardScouting_patrolRoleAddsOneRange() throws Exception {
+            setUp(false, 0);
+            setPatrol();
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+            assertEquals(7, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_successfulRoll_revealsOneHex() throws Exception {
+            setUp(true, 2);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            assertEquals(2, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_failedRoll_revealsNothingBeyondDeploymentHex() throws Exception {
+            setUp(true, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, false);
+            scan(scout);
+
+            assertEquals(1, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_eachScoutRollsOnce() throws Exception {
+            setUp(true, 1);
+            ScoutRecord firstScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            ScoutRecord secondScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            ScoutRecord thirdScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(firstScout, secondScout, thirdScout);
+
+            assertEquals(4, revealedCount());
+            verify(firstScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+            verify(secondScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+            verify(thirdScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_laterScoutCanTryHexAnEarlierScoutFailed() throws Exception {
+            setUp(true, 1);
+            ScoutRecord failingScout = mockScout(HEAVY_SCOUT_WEIGHT, false);
+            ScoutRecord succeedingScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(failingScout, succeedingScout);
+
+            assertEquals(2, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_heavyScoutWithNoRange_doesNotRoll() throws Exception {
+            setUp(true, 0);
+            ScoutRecord scout = mockScout(LIGHT_SCOUT_WEIGHT + 1, true);
+            scan(scout);
+
+            assertEquals(1, revealedCount());
+            verify(scout.skillCheck(), never()).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_lightScoutGetsOneExtraRange() throws Exception {
+            setUp(true, 0);
+            ScoutRecord scout = mockScout(LIGHT_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            assertEquals(2, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_patrolAndLightScoutRangeStack() throws Exception {
+            setUp(true, 0);
+            setPatrol();
+            // Pre-reveal the first ring so the only unexplored hexes are two away
+            for (int direction = 0; direction < 6; direction++) {
+                track.getRevealedCoords().add(CENTER.translate(direction));
+            }
+            scan(mockScout(LIGHT_SCOUT_WEIGHT, true));
+
+            assertEquals(8, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_alreadyRevealedHexesCostNoRoll() throws Exception {
+            setUp(true, 2);
+            for (int direction = 0; direction < 6; direction++) {
+                track.getRevealedCoords().add(CENTER.translate(direction));
+            }
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            // the whole first ring plus one hex from the second ring
+            assertEquals(8, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_edgeIsOfferedOnlyWhenEnabledAndScoutHasTrigger() throws Exception {
+            setUp(true, 1);
+            when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(true);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            when(scout.scout().getOptions().booleanOption(PersonnelOptions.EDGE_RECON_FAIL)).thenReturn(true);
+            scan(scout);
+
+            verify(scout.skillCheck()).resolve(eq(true), any());
+        }
+
+        @Test
+        void advancedScouting_edgeNotOfferedWhenCampaignOptionDisabled() throws Exception {
+            setUp(true, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            lenient().when(scout.scout().getOptions().booleanOption(PersonnelOptions.EDGE_RECON_FAIL))
+                  .thenReturn(true);
+            scan(scout);
+
+            verify(scout.skillCheck()).resolve(eq(false), any());
+        }
+
+        @Test
+        void scouting_neverRevealsOffTrackHexes() throws Exception {
+            setUp(false, 2);
+            track.setWidth(1);
+            track.setHeight(1);
+            Method scanMethod = StratConRulesManager.class.getDeclaredMethod("scanNeighboringCoords",
+                  StratConCoords.class, int.class, Campaign.class, StratConTrackState.class);
+            scanMethod.setAccessible(true);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT);
+
+            try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                  CALLS_REAL_METHODS);
+                  MockedStatic<StratConPointOfInterestRules> ignored = mockStatic(StratConPointOfInterestRules.class)) {
+                rulesManager.when(() -> StratConRulesManager.buildScoutMap(any(), any(), any()))
+                      .thenReturn(new ArrayList<>(List.of(scout)));
+                scanMethod.invoke(null, new StratConCoords(0, 0), FORCE_ID, campaign, track);
+            }
+
+            assertEquals(1, revealedCount());
+        }
+
+        @Test
+        void scenarioOnDeploymentHex_stopsScanningNeighbors() throws Exception {
+            setUp(false, 2);
+            StratConScenario scenario = mock(StratConScenario.class);
+            doReturn(scenario).when(track).getScenario(CENTER);
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+
+            assertEquals(1, revealedCount());
+        }
+    }
+
+    // -- DropShip substitution (issue #9790) --
+
+    /**
+     * Coverage for <a href="https://github.com/MegaMek/mekhq/issues/9790">issue #9790</a> - "Isolated DropShip Defense
+     * only uses One DropShip".
+     *
+     * <p>A {@code PlayerOrFixedUnitCount} allied force (such as the defended DropShip in that scenario) is filled by
+     * swapping in one of the player's own units, drawn at random from every eligible unit in the TO&amp;E. Players
+     * reported the same hull being used every time. These tests pin two things:</p>
+     * <ul>
+     *   <li>the candidate pool contains every eligible DropShip, regardless of the combat role or formation type it is
+     *       parked in (the pool must not collapse to a single hull); and</li>
+     *   <li>the draw over that pool is genuinely random, so with two or more eligible DropShips the selection varies
+     *       across runs and never fixates on one - while correctly excluding units that cannot serve.</li>
+     * </ul>
+     */
+    @Nested
+    class DropShipSelection {
+
+        private static final String DROP_SHIP_FORCE = "DropShip";
+
+        private Method swapMethod;
+
+        private Method swapMethod() throws NoSuchMethodException {
+            if (swapMethod == null) {
+                swapMethod = StratConRulesManager.class.getDeclaredMethod("swapInPlayerUnits",
+                      StratConScenario.class, Campaign.class, int.class);
+                swapMethod.setAccessible(true);
+            }
+            return swapMethod;
+        }
+
+        /**
+         * Builds a mocked unit of the given type and status.
+         */
+        private Unit makeUnit(int unitType, boolean available, boolean functional) {
+            Entity entity = mock(Entity.class);
+            when(entity.getUnitType()).thenReturn(unitType);
+            lenient().when(entity.doomedOnGround()).thenReturn(false);
+            lenient().when(entity.doomedInAtmosphere()).thenReturn(false);
+            lenient().when(entity.doomedInSpace()).thenReturn(false);
+            lenient().when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(false);
+
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getId()).thenReturn(UUID.randomUUID());
+            lenient().when(unit.isAvailable()).thenReturn(available);
+            lenient().when(unit.isFunctional()).thenReturn(functional);
+            return unit;
+        }
+
+        private Unit availableDropShip() {
+            return makeUnit(UnitType.DROPSHIP, true, true);
+        }
+
+        /**
+         * A scenario whose template holds a single {@code PlayerOrFixedUnitCount} DropShip force, backed by one
+         * generated placeholder unit for that force (so exactly one player DropShip is swapped in per run). Every unit
+         * added to the DropShip force is recorded into {@code selectionSink}.
+         */
+        private StratConScenario buildScenario(List<Unit> selectionSink) {
+            ScenarioForceTemplate dropShipForce = new ScenarioForceTemplate();
+            dropShipForce.setForceName(DROP_SHIP_FORCE);
+            dropShipForce.setGenerationMethod(
+                  ScenarioForceTemplate.ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal());
+            dropShipForce.setAllowedUnitType(UnitType.DROPSHIP);
+            dropShipForce.setForceAlignment(ScenarioForceTemplate.ForceAlignment.Allied.ordinal());
+
+            ScenarioTemplate template = new ScenarioTemplate();
+            template.mapParameters.setMapLocation(MapLocation.SpecificGroundTerrain);
+            template.getScenarioForces().put(DROP_SHIP_FORCE, dropShipForce);
+
+            // A single generated placeholder for the DropShip force means calculateUnitCount() == 1: one substitution.
+            Map<UUID, ScenarioForceTemplate> botUnitTemplates = new HashMap<>();
+            botUnitTemplates.put(UUID.randomUUID(), dropShipForce);
+
+            AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+            when(backingScenario.getBotUnitTemplates()).thenReturn(botUnitTemplates);
+            when(backingScenario.getBotForceTemplates()).thenReturn(new HashMap<>());
+
+            StratConScenario scenario = mock(StratConScenario.class);
+            when(scenario.getScenarioTemplate()).thenReturn(template);
+            when(scenario.getBackingScenario()).thenReturn(backingScenario);
+            doAnswer(invocation -> {
+                selectionSink.add(invocation.getArgument(0));
+                return null;
+            }).when(scenario).addUnit(any(), eq(DROP_SHIP_FORCE), anyBoolean());
+            return scenario;
+        }
+
+        private Campaign buildCampaign(List<Unit> toe, boolean useDropShips) {
+            Campaign campaign = MHQTestUtilities.mockCampaign();
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(options);
+            when(options.get(CampaignOption.USE_DROP_SHIPS)).thenReturn(useDropShips);
+            lenient().when(options.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(false);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3061, 1, 1));
+
+            List<UUID> toeIds = new ArrayList<>();
+            for (Unit unit : toe) {
+                UUID id = unit.getId();
+                toeIds.add(id);
+                when(campaign.getUnit(id)).thenReturn(unit);
+            }
+            when(campaign.getPlayerForce().getAllUnitsInTheTOE(false)).thenReturn(toeIds);
+            return campaign;
+        }
+
+        /**
+         * Runs the substitution {@code iterations} times over one fresh scenario and campaign, returning every unit
+         * that was swapped into the DropShip force (one per run, unless nothing was eligible).
+         */
+        private List<Unit> runSelections(List<Unit> toe, boolean useDropShips, int iterations) throws Exception {
+            List<Unit> selections = new ArrayList<>();
+            StratConScenario scenario = buildScenario(selections);
+            Campaign campaign = buildCampaign(toe, useDropShips);
+            Method swap = swapMethod();
+            try (MockedStatic<AtBDynamicScenarioFactory> ignored = mockStatic(AtBDynamicScenarioFactory.class)) {
+                for (int i = 0; i < iterations; i++) {
+                    swap.invoke(null, scenario, campaign, Formation.FORMATION_NONE);
+                }
+            }
+            return selections;
+        }
+
+        private Map<Unit, Integer> tally(List<Unit> selections) {
+            Map<Unit, Integer> counts = new HashMap<>();
+            for (Unit unit : selections) {
+                counts.merge(unit, 1, Integer::sum);
+            }
+            return counts;
+        }
+
+        /**
+         * The reported fleet: four fully-eligible DropShips (one "support" hull plus three others). Over many runs
+         * every one must be chosen at least once - the selection must not fixate on a single hull.
+         */
+        @Test
+        void multipleAvailableDropShips_everyOneIsSelectedAcrossRuns() throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 3000;
+            List<Unit> selections = runSelections(fleet, true, iterations);
+
+            assertEquals(iterations, selections.size(), "exactly one DropShip should be swapped in per run");
+            Map<Unit, Integer> counts = tally(selections);
+            assertEquals(fleet.size(), counts.size(),
+                  "every available DropShip should be selected at least once, not just one");
+            for (Unit dropShip : fleet) {
+                assertTrue(counts.getOrDefault(dropShip, 0) > 0,
+                      "a DropShip was never selected across " + iterations + " runs");
+            }
+        }
+
+        /**
+         * The draw is not merely non-constant but roughly uniform: with four equally-eligible DropShips no hull should
+         * hog the rotation. Bounds are deliberately generous (half to 1.5x the fair share) so the test is not flaky.
+         */
+        @Test
+        void selectionIsApproximatelyUniformAcrossDropShips() throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 4000;
+            Map<Unit, Integer> counts = tally(runSelections(fleet, true, iterations));
+
+            int fairShare = iterations / fleet.size();
+            int low = fairShare / 2;
+            int high = fairShare * 3 / 2;
+            for (Unit dropShip : fleet) {
+                int seen = counts.getOrDefault(dropShip, 0);
+                assertTrue(seen >= low && seen <= high,
+                      "DropShip selected " + seen + " times, expected within [" + low + ", " + high + ']');
+            }
+        }
+
+        /**
+         * The guarantee holds regardless of how many DropShips the player fields: every eligible hull rotates in.
+         */
+        @ParameterizedTest
+        @ValueSource(ints = { 2, 3, 5, 8 })
+        void variedFleetSizes_everyAvailableDropShipRotatesIn(int fleetSize) throws Exception {
+            List<Unit> fleet = new ArrayList<>();
+            for (int i = 0; i < fleetSize; i++) {
+                fleet.add(availableDropShip());
+            }
+
+            int iterations = 400 * fleetSize;
+            Map<Unit, Integer> counts = tally(runSelections(fleet, true, iterations));
+
+            assertEquals(fleetSize, counts.size(),
+                  "every one of the " + fleetSize + " available DropShips should be selected");
+        }
+
+        /**
+         * Only DropShips are eligible for a DropShip force: Meks, tanks, fighters, and infantry in the same TO&amp;E
+         * are never swapped in, while both DropShips still rotate.
+         */
+        @Test
+        void mixedTableOfOrganization_onlyDropShipsAreSelected() throws Exception {
+            Unit dropShipA = availableDropShip();
+            Unit dropShipB = availableDropShip();
+            List<Unit> toe = new ArrayList<>(List.of(dropShipA,
+                  makeUnit(UnitType.MEK, true, true),
+                  makeUnit(UnitType.TANK, true, true),
+                  makeUnit(UnitType.AEROSPACE_FIGHTER, true, true),
+                  makeUnit(UnitType.INFANTRY, true, true),
+                  dropShipB));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 2000));
+
+            assertEquals(2, counts.size(), "only the two DropShips are eligible");
+            assertTrue(counts.getOrDefault(dropShipA, 0) > 0);
+            assertTrue(counts.getOrDefault(dropShipB, 0) > 0);
+        }
+
+        /**
+         * DropShips that cannot serve - deployed, in transit, refitting, mothballed - are excluded ({@code isAvailable}
+         * is false), but the remaining available DropShips still rotate rather than the pool collapsing to one.
+         */
+        @Test
+        void unavailableDropShipsAreExcluded_availableOnesStillRotate() throws Exception {
+            Unit availableA = availableDropShip();
+            Unit availableB = availableDropShip();
+            Unit unavailableA = makeUnit(UnitType.DROPSHIP, false, true);
+            Unit unavailableB = makeUnit(UnitType.DROPSHIP, false, true);
+            List<Unit> toe = new ArrayList<>(List.of(availableA, unavailableA, unavailableB, availableB));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 2000));
+
+            assertEquals(2, counts.size(), "only the two available DropShips are eligible");
+            assertTrue(counts.getOrDefault(availableA, 0) > 0);
+            assertTrue(counts.getOrDefault(availableB, 0) > 0);
+            assertEquals(0, counts.getOrDefault(unavailableA, 0));
+            assertEquals(0, counts.getOrDefault(unavailableB, 0));
+        }
+
+        /**
+         * A crippled (non-functional) DropShip is never chosen, even though it is a DropShip and available.
+         */
+        @Test
+        void nonFunctionalDropShipsAreExcluded() throws Exception {
+            Unit healthy = availableDropShip();
+            Unit wrecked = makeUnit(UnitType.DROPSHIP, true, false);
+            List<Unit> toe = new ArrayList<>(List.of(healthy, wrecked));
+
+            Map<Unit, Integer> counts = tally(runSelections(toe, true, 1000));
+
+            assertEquals(1, counts.size());
+            assertTrue(counts.getOrDefault(healthy, 0) > 0);
+            assertEquals(0, counts.getOrDefault(wrecked, 0));
+        }
+
+        /**
+         * When player DropShips are disabled in the campaign options, no player hull is substituted at all.
+         */
+        @Test
+        void playerDropShipsDisabled_nothingIsSubstituted() throws Exception {
+            List<Unit> fleet = new ArrayList<>(List.of(availableDropShip(), availableDropShip()));
+
+            List<Unit> selections = runSelections(fleet, false, 500);
+
+            assertTrue(selections.isEmpty(), "no player DropShip may be swapped in when DropShips are disabled");
+        }
+
+        /**
+         * The degenerate case at the heart of issue #9790: with exactly one eligible DropShip there is nothing to
+         * randomize over, so the same hull is returned every run. Variety requires the player to field two or more
+         * eligible DropShips - which the tests above confirm does produce variety.
+         */
+        @Test
+        void singleEligibleDropShip_isAlwaysSelected() throws Exception {
+            Unit onlyEligible = availableDropShip();
+            List<Unit> toe = new ArrayList<>(List.of(onlyEligible,
+                  makeUnit(UnitType.DROPSHIP, false, true),
+                  makeUnit(UnitType.MEK, true, true)));
+
+            int iterations = 500;
+            List<Unit> selections = runSelections(toe, true, iterations);
+
+            assertEquals(iterations, selections.size());
+            Map<Unit, Integer> counts = tally(selections);
+            assertEquals(1, counts.size());
+            assertEquals(iterations, counts.getOrDefault(onlyEligible, 0));
+        }
+
+        /**
+         * The candidate pool is built from {@code getAllUnitsInTheTOE(false)}, which flattens every formation
+         * regardless of its combat role or whether it is a support formation. This pins that a DropShip parked in a
+         * Reserve or Support bucket is just as much a candidate as one in a frontline formation - the root cause of
+         * issue #9790 was the pool narrowing to a single hull, not the random draw. The standard-only view (which the
+         * swap deliberately does not use) would drop the support hull; the swap must never narrow that way.
+         */
+        @Test
+        void candidatePool_includesDropShipsFromEveryCombatRoleAndFormationType() {
+            UUID frontlineDropShip = UUID.randomUUID();
+            UUID reserveDropShip = UUID.randomUUID();
+            UUID supportDropShip = UUID.randomUUID();
+
+            Formation reserve = new Formation("Reserve");
+            reserve.setFormationType(FormationType.STANDARD, false);
+            reserve.setCombatRoleInMemory(CombatRole.RESERVE);
+            reserve.addUnit(reserveDropShip);
+
+            Formation support = new Formation("Support");
+            support.setFormationType(FormationType.SUPPORT, false);
+            support.setCombatRoleInMemory(CombatRole.AUXILIARY);
+            support.addUnit(supportDropShip);
+
+            Formation topLevel = new Formation("TO&E");
+            topLevel.setFormationType(FormationType.STANDARD, false);
+            topLevel.setCombatRoleInMemory(CombatRole.FRONTLINE);
+            topLevel.addUnit(frontlineDropShip);
+            topLevel.addSubFormation(reserve, true);
+            topLevel.addSubFormation(support, true);
+
+            // The swap path passes false: frontline, reserve, and support DropShips are all candidates.
+            List<UUID> pool = topLevel.getAllUnits(false);
+            assertTrue(pool.contains(frontlineDropShip));
+            assertTrue(pool.contains(reserveDropShip));
+            assertTrue(pool.contains(supportDropShip));
+
+            // Sanity: the standard-only view (not used by the swap) drops the support hull - the exact kind of narrowing
+            // that must never reach DropShip selection.
+            List<UUID> standardOnly = topLevel.getAllUnits(true);
+            assertTrue(standardOnly.contains(frontlineDropShip));
+            assertTrue(standardOnly.contains(reserveDropShip));
+            assertFalse(standardOnly.contains(supportDropShip));
+        }
+    }
+}

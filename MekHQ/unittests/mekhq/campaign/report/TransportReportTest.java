@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
@@ -46,7 +47,7 @@ import org.junit.jupiter.api.Test;
 class TransportReportTest {
     @Test
     void getTransportDetailsShowsColumnHeaders() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
 
@@ -62,7 +63,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsHeavyVehiclesPlacedInSuperHeavyBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK)).thenReturn(2);
@@ -85,7 +86,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsSeparatesSuperHeavyOccupantsFromHeavyOverflow() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK)).thenReturn(2);
@@ -104,7 +105,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsLightBeforeHeavyInSuperHeavyBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)).thenReturn(1);
@@ -119,7 +120,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsLightVehiclesPlacedInHeavyBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)).thenReturn(2);
@@ -139,7 +140,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsLightVehiclesPlacedInSuperHeavyBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)).thenReturn(3);
@@ -157,7 +158,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsFightersPlacedInSmallCraftBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER)).thenReturn(2);
@@ -175,7 +176,7 @@ class TransportReportTest {
 
     @Test
     void getTransportDetailsShowsSuperHeavyVehiclesInSuperHeavyBays() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         HangarStatistics hangarStatistics = mock(HangarStatistics.class);
         when(campaign.getHangarStatistics()).thenReturn(hangarStatistics);
         when(hangarStatistics.getNumberOfSuperHeavyVehicles()).thenReturn(1);

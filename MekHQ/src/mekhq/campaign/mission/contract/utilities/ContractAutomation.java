@@ -1,0 +1,379 @@
+/*
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.mission.contract.utilities;
+
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
+import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.ActivateUnitAction;
+import mekhq.campaign.unit.actions.MothballUnitAction;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.JumpBlockers;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+
+/**
+ * The {@link ContractAutomation} class provides a suite of methods used in automating actions when a contract starts.
+ *
+ * <p>This includes actions like mothballing of units, transit to mission location and the automated activation of
+ * units when arriving in the system.</p>
+ */
+public class ContractAutomation {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractAutomation";
+    private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
+
+    private static final int DIALOG_CONFIRM_OPTION = 0;
+
+    /**
+     * Runs the contract-start automation directly from pre-made choices instead of prompting the player, because the
+     * market dialog has already captured those choices as checkboxes.
+     *
+     * <p>Regardless of the transit choice the contract is dated to <b>start on the day the force should arrive</b> at
+     * the target system (today plus the computed travel time; today if already there). When {@code mothball} is set,
+     * eligible units are GM-mothballed first. When {@code travel} is set and a jump path exists, the jump is plotted
+     * and the journey is charged; if it is not set, the player is left to make the trip themselves but the contract
+     * still starts on the projected arrival day.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being started
+     * @param mothball {@code true} to GM-mothball eligible units before departure
+     * @param travel   {@code true} to plot and charge the jump to the target system now
+     */
+    public static void performContractStart(Campaign campaign, AbstractContract contract, boolean mothball,
+          boolean travel) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        AbstractLocation currentLocation = playerForce.getForceDetachment().getCurrentLocation();
+
+        // Work out the journey. If we have already arrived at the contract location there is no jump and travel time is
+        // zero. This is judged on the system first (and the world only when both worlds are known), so a save predating
+        // planet tracking - where the current world is unknown - is not treated as "not arrived" and needlessly
+        // mothballed.
+        boolean alreadyAtTarget = ContractUtilities.hasArrivedAtContractLocation(currentLocation, contract);
+
+        // Only mothball when there is actually a journey ahead.
+        if (mothball && !alreadyAtTarget) {
+            performAutomatedMothballing(campaign, playerForce.getForceDetachment());
+        }
+
+        JumpPath jumpPath = alreadyAtTarget ? null : ContractUtilities.getJumpPath(campaign, contract, currentLocation);
+        int travelDays = (jumpPath == null) ? 0
+                               : ContractUtilities.getTravelDays(campaign, contract, currentLocation,
+              playerForce.isOverridingCommandCircuitRequirements(),
+              playerForce.getFactionStandings());
+
+        // The contract starts on the day the force should arrive, whether or not transit is automated here.
+        contract.setStartAndEndDate(campaign.getLocalDate().plusDays(travelDays));
+
+        if (!travel || (jumpPath == null)) {
+            return;
+        }
+
+        if (!JumpBlockers.areAllUnitsJumpCapable(campaign)) {
+            return;
+        }
+
+            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
+            campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+            campaign.getGUI().refreshAllTabs();
+
+        Detachment detachment = playerForce.getForceDetachment();
+        TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),
+              playerForce.getWarehouse().getSpareParts(),
+              detachment.getPersonnel().values(),
+              EXP_REGULAR);
+        Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
+
+        // Hyperlinked so the player can jump straight to the destination on the interstellar map.
+        PlanetarySystem targetPlanetarySystem = contract.getTargetSystem();
+        String targetSystem = (targetPlanetarySystem == null) ?
+                                    contract.getTargetSystemName(campaign.getLocalDate()) :
+                                    targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
+        // performJumpTransaction returns an empty string when the charge succeeded.
+        String jumpReport = TransportCostCalculations.performJumpTransaction(playerForce.getFinances(),
+              jumpPath,
+              campaign.getLocalDate(),
+              cost,
+              campaign.getCurrentSystem());
+        if (jumpReport.isBlank()) {
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "transitDescription.report",
+                  targetSystem, travelDays));
+        } else {
+            campaign.addReport(GENERAL, jumpReport);
+        }
+
+        campaign.getGUI().refreshAllTabs();
+    }
+
+    /**
+     * Identifies the non-mothballed units of the given {@link Detachment} that are currently assigned to a
+     * {@link Formation}, GM-mothballs them, and records them on that detachment for automated activation when it next
+     * arrives. Only units belonging to {@code detachment} are affected; other detachments of the same force are left
+     * untouched.
+     *
+     * @param campaign   The current campaign.
+     * @param detachment The detachment whose units are being mothballed.
+     */
+    public static void performAutomatedMothballing(Campaign campaign, Detachment detachment) {
+        List<UUID> mothballTargets = new ArrayList<>();
+        MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
+
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        // Null during unit tests
+        final boolean skipUnitsInBays = (mhqOptions != null) && mhqOptions.getDoNotMothballUnitsInBays();
+        final boolean skipSalvage = (mhqOptions != null) && mhqOptions.getDoNotMothballSalvage();
+
+        Set<UUID> detachmentUnitIds = detachment.getHangar().getUnits().stream()
+                                            .map(Unit::getId)
+                                            .collect(Collectors.toSet());
+
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
+
+            for (UUID unitId : iterationSafeUnitIds) {
+                if (!detachmentUnitIds.contains(unitId)) {
+                    continue;
+                }
+
+                Unit unit = campaign.getUnit(unitId);
+
+                if (unit == null) {
+                    logger.error("Failed to get unit for unit ID {}", unitId);
+                    continue;
+                }
+
+                if (skipUnitsInBays && unit.hasTransportShipAssignment()) {
+                    continue;
+                }
+
+                if (skipSalvage && unit.isSalvage()) {
+                    continue;
+                }
+
+                try {
+                    Entity entity = unit.getEntity();
+
+                    if (entity.isLargeCraft()) {
+                        continue;
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to get entity for {}", unit.getName());
+                    continue;
+                }
+
+                if (unit.isAvailable(false) && !unit.isUnderRepair()) {
+                    mothballTargets.add(unitId);
+
+                    mothballUnitAction.execute(campaign, unit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                } else {
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "mothballingFailed.text",
+                          unit.getHyperlinkedName()));
+                }
+            }
+        }
+
+        detachment.setAutomatedMothballUnits(mothballTargets);
+    }
+
+    /**
+     * Performs automated activation of the units the given {@link Detachment} previously auto-mothballed. The activation
+     * action is executed for each, and the detachment's pending list is cleared afterward. Only this detachment's units
+     * are affected.
+     *
+     * @param campaign   The current campaign.
+     * @param detachment The detachment whose mothballed units are being activated.
+     */
+    public static void performAutomatedActivation(Campaign campaign, Detachment detachment) {
+        ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
+
+        List<UUID> unitIds = detachment.getAutomatedMothballUnits();
+        for (UUID unitId : unitIds) {
+            Unit unit = campaign.getUnit(unitId);
+
+            if (unit == null) {
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.uuid",
+                      unitId.toString()));
+                continue;
+            }
+
+            if (unit.isMothballed()) {
+                activateUnitAction.execute(campaign, unit);
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+
+                if (unit.isMothballed()) {
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "activationFailed.text"),
+                          unit.getHyperlinkedName());
+                }
+            }
+        }
+
+        fillTempPools(campaign);
+
+        // We still want to clear out any units
+        detachment.setAutomatedMothballUnits(new ArrayList<>());
+    }
+
+    private static void fillTempPools(Campaign campaign) {
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions == null) { // This makes unit testing easier
+            return;
+        }
+
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+
+        if (mhqOptions.getNewDaySoldierPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.SOLDIER);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.SOLDIER);
+        }
+
+        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.BATTLE_ARMOUR);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.BATTLE_ARMOUR);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_GROUND);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_VTOL);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_NAVAL);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+
+        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.VESSEL_PILOT);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_PILOT);
+        }
+
+        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_GUNNER);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_GUNNER);
+        }
+
+        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.VESSEL_CREW);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_CREW);
+        }
+    }
+
+    public static void outOfContractMothballAutomation(Campaign campaign) {
+        final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
+              getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
+
+        final Person speaker = campaign.getPlayerForce().getHumanResources()
+                                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                           campaign.getPlayerForce().isClanForce(),
+                                           campaign.getLocalDate());
+
+        final String commanderAddress = campaign.getCommanderAddress();
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.text.noContract",
+              commanderAddress);
+
+        String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
+              "mothballDescription.addendum.noContract");
+
+        ImmersiveDialogSimple mothballDialog = new ImmersiveDialogSimple(campaign,
+              speaker,
+              null,
+              inCharacterMessage,
+              buttonLabels,
+              outOfCharacterMessage,
+              null,
+              false);
+
+        if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
+            performAutomatedMothballing(campaign, campaign.getPlayerForce().getForceDetachment());
+        }
+    }
+}

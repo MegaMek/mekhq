@@ -32,22 +32,29 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.TechTaskEstimate;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * A table model for displaying work items
@@ -57,11 +64,13 @@ public class TechTableModel extends DataTableModel<Person> {
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
           SkillType.S_TECH_MEK,
-          SkillType.S_TECH_MECHANIC,
+          SkillType.S_TECH_VEHICLE,
           SkillType.S_TECH_BA,
           SkillType.S_TECH_AERO,
           SkillType.S_TECH_VESSEL,
           };
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private final CampaignGUI tab;
     private final ITechWorkPanel panel;
@@ -148,27 +157,29 @@ public class TechTableModel extends DataTableModel<Person> {
         }
         toReturn.append(tech.getFullTitle()).append("</b><br/>");
 
-        boolean first = true;
-        for (String skillName : DISPLAYED_SKILL_LEVELS) {
-            Skill skill = tech.getSkill(skillName);
-            if (null == skill) {
-                continue;
-            } else if (!first) {
-                toReturn.append("; ");
+        SkillModifierData skillModifierData = tech.getSkillModifierData();
+        Skill taskSkill = (null == part) ? null : tech.getSkillForWorkingOn(part);
+        if (null != taskSkill) {
+            // With a task selected, only show the skill that will actually be used for it
+            appendSkillLevel(toReturn, taskSkill, skillModifierData);
+        } else {
+            boolean first = true;
+            for (String skillName : DISPLAYED_SKILL_LEVELS) {
+                Skill skill = tech.getSkill(skillName);
+                if (null == skill) {
+                    continue;
+                } else if (!first) {
+                    toReturn.append("; ");
+                }
+
+                appendSkillLevel(toReturn, skill, skillModifierData);
+                first = false;
             }
-
-            SkillModifierData skillModifierData = tech.getSkillModifierData();
-            int experienceLevel = skill.getExperienceLevel(skillModifierData);
-
-            toReturn.append("<b>")
-                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
-                  .append("</b> ").append(skillName);
-            first = false;
         }
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseEdge() &&
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EDGE) &&
                   tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {
@@ -177,10 +188,14 @@ public class TechTableModel extends DataTableModel<Person> {
         toReturn.append("<br/>");
 
         toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().isTechsUseAdministration())));
+              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                   .get(CampaignOption.TECHS_USE_ADMINISTRATION))));
 
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
+        }
+        if (null != part) {
+            toReturn.append("<br/>").append(describeEstimate(TechTaskEstimate.estimate(getCampaign(), part, tech)));
         }
 
         if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
@@ -204,11 +219,53 @@ public class TechTableModel extends DataTableModel<Person> {
         if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
             toReturn.append(", <i>Gremlins</i>");
         }
-        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
+        if (tech.getOptions().booleanOption(PersonnelOptions.ATOW_TECH_EMPATHY)) {
             toReturn.append(", <i>Tech Empathy</i>");
         }
 
         toReturn.append("</font></html>");
         return toReturn.toString();
+    }
+
+    /**
+     * @param estimate the tech's estimate for a task
+     *
+     * @return one line with what the tech can expect from the task: target number, chance of success, minutes needed
+     *       and when it would be done, or why the tech cannot do it
+     */
+    public static String describeEstimate(TechTaskEstimate estimate) {
+        if (estimate.isImpossible()) {
+            // The reason can name a unit, so it is escaped before it goes into the row's HTML
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible",
+                  StringEscapeUtils.escapeHtml4(estimate.targetDetails()));
+        }
+        String targetNumber = (estimate.targetNumber() == TargetRoll.AUTOMATIC_SUCCESS)
+                                    ? getTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.automatic")
+                                    : String.valueOf(estimate.targetNumber());
+        String successPercent = String.valueOf(estimate.successPercent());
+        String minutesNeeded = String.valueOf(estimate.minutesNeeded());
+        if (estimate.daysToFinish() == 0) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.today", targetNumber, successPercent,
+                  minutesNeeded);
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.days", targetNumber, successPercent,
+              minutesNeeded, String.valueOf(estimate.daysToFinish()));
+    }
+
+    /**
+     * Appends a skill's colored experience level and name (e.g. "<b>Veteran</b> Tech/Aeronautics") to the builder.
+     *
+     * @param builder           the description being built
+     * @param skill             the skill to describe
+     * @param skillModifierData the tech's skill modifiers, used to determine the effective experience level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void appendSkillLevel(StringBuilder builder, Skill skill, SkillModifierData skillModifierData) {
+        int experienceLevel = skill.getExperienceLevel(skillModifierData);
+        builder.append("<b>")
+              .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+              .append("</b> ").append(skill.getType().getName());
     }
 }

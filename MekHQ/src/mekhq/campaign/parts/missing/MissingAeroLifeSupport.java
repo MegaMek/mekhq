@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.Part;
@@ -75,7 +76,7 @@ public class MissingAeroLifeSupport extends MissingPart {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
@@ -116,8 +117,12 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
-                     && (cost.equals(part.getStickerPrice()));
+        if (!(part instanceof AeroLifeSupport lifeSupport) || (fighter != lifeSupport.isForFighter())) {
+            return false;
+        }
+        // A fighter's life support has one flat price, so one that went missing while saved at the old price still
+        // takes a new one
+        return fighter || cost.equals(lifeSupport.getStickerPrice());
     }
 
     @Override

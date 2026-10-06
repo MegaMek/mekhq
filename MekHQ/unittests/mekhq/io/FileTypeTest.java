@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,7 @@
  */
 package mekhq.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,5 +67,18 @@ public class FileTypeTest {
               "file.xmlabc",
               "file.abcxml"
         ).forEach(fn -> assertFalse(FileType.CPNX.getNameFilter().test(fn), fn + " was not refused"));
+    }
+
+    /**
+     * Scenario templates are written and read as JSON. XML support was dropped with the JSON migration, so the file
+     * filter offers JSON only and no longer lists the (now unreadable) legacy XML extension.
+     */
+    @Test
+    public void testScenarioTemplateFormats() {
+        assertEquals("json", FileType.SCENARIO_TEMPLATE.getRecommendedExtension());
+        assertTrue(FileType.SCENARIO_TEMPLATE.getExtensions().contains("json"),
+              "Scenario templates must be selectable as JSON");
+        assertFalse(FileType.SCENARIO_TEMPLATE.getExtensions().contains("xml"),
+              "Legacy XML templates are no longer readable, so they must not be offered");
     }
 }

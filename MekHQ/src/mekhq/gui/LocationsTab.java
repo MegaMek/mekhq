@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
@@ -50,11 +51,12 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationEvent;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
@@ -240,7 +242,7 @@ public class LocationsTab extends CampaignGuiTab {
         }
 
         private static String resolveType(IPlace place) {
-            if (place instanceof Campaign) {
+            if (place instanceof Detachment) {
                 return getText("LocationPlacePanel.type.mainForce");
             }
             if (place instanceof AbstractBase base) {
@@ -309,7 +311,7 @@ public class LocationsTab extends CampaignGuiTab {
 
         @FunctionalInterface
         private interface TransitCounter {
-            int count(CurrentLocation node);
+            int count(AbstractMobileLocation node);
         }
 
         private static int countInTransit(IPlace place, TransitCounter counter) {
@@ -318,7 +320,9 @@ public class LocationsTab extends CampaignGuiTab {
             }
             int total = 0;
             for (ILocation child : place.getChildLocations()) {
-                if (child instanceof CurrentLocation travel && !travel.isOnPlanet()) {
+                // getTransitTime() > 0 covers both an interplanetary jump ship (equivalent to its former
+                // !isOnPlanet() check, including while recharging at a jump point) and an on-planet convoy.
+                if (child instanceof AbstractMobileLocation travel && travel.getTransitTime() > 0) {
                     total += counter.count(travel);
                 }
             }
@@ -420,6 +424,10 @@ public class LocationsTab extends CampaignGuiTab {
                           getText("LocationsTab.menu.configureBase"));
                     configItem.addActionListener(ev -> openBaseConfig(base));
                     menu.add(configItem);
+                    JMenuItem deleteItem = new JMenuItem(
+                          getText("LocationsTab.menu.deleteBase"));
+                    deleteItem.addActionListener(ev -> deleteBase(base));
+                    menu.add(deleteItem);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
 
@@ -431,13 +439,41 @@ public class LocationsTab extends CampaignGuiTab {
                     JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(view.getTable());
                     new BaseSettingsDialog(frame, campaign, base).setVisible(true);
                 }
+
+                private void deleteBase(PlayerBase base) {
+                    Campaign campaign = model.getCampaign();
+                    if (campaign == null) {
+                        return;
+                    }
+                    JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(view.getTable());
+                    if (!base.isEmpty(campaign)) {
+                        JOptionPane.showMessageDialog(frame,
+                              getText("LocationsTab.deleteBase.notEmpty.message"),
+                              getText("LocationsTab.deleteBase.notEmpty.title"),
+                              JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    int choice = JOptionPane.showConfirmDialog(frame,
+                          getFormattedText("LocationsTab.deleteBase.confirm.message", base.getDisplayName()),
+                          getText("LocationsTab.deleteBase.confirm.title"),
+                          JOptionPane.YES_NO_OPTION,
+                          JOptionPane.WARNING_MESSAGE);
+                    if (choice != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                    // Detach the base from its anchoring FixedLocation so the now-empty location can be pruned,
+                    // then drop it from the manager. Removal fires a LocationRemovedEvent, which refreshes the tab.
+                    base.setParent(null);
+                    campaign.getCampaignLocationManager().removePlayerBase(base);
+                    view.getDetailScrollPane().setViewportView(null);
+                }
             });
         }
 
         void refresh(Campaign campaign) {
             List<IPlace> places = new ArrayList<>();
-            places.add(campaign);
-            places.addAll(campaign.getPlayerBases());
+            places.add(campaign.getPlayerForce().getForceDetachment());
+            places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
             model.setData(places, campaign);
         }
 

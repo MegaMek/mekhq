@@ -87,8 +87,8 @@ public class FactionJudgmentSceneDialog {
           FactionJudgmentSceneType sceneType, Faction judgingFaction) {
         LocalDate today = campaign.getLocalDate();
         String factionName = judgingFaction.getFullName(today.getYear());
-        String campaignName = campaign.getName();
-        AbstractLocation location = campaign.getCurrentLocation();
+        String campaignName = campaign.getPlayerForce().getName();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         boolean isPlanetside = location.isOnPlanet();
         String locationName = isPlanetside
                                     ? location.getPlanet().getName(today)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -92,7 +92,10 @@ public class FactionAccoladeConfirmationDialog {
     public FactionAccoladeConfirmationDialog(Campaign campaign, FactionAccoladeLevel accoladeLevel) {
         this.campaign = campaign;
 
-        Person speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(
               campaign,
               speaker,

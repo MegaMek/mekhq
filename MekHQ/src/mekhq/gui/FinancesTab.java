@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -58,6 +59,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -71,7 +73,6 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.WeeklyNetWorth;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -119,6 +120,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private boolean chartsInitialized = false;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FinancesTab";
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
           MekHQ.getMHQOptions().getLocale());
 
@@ -276,7 +278,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private XYDataset setupFinanceDataset() {
         TimeSeries timeSeries = new TimeSeries("C-Bills");
-        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
+        List<Transaction> transactions = getCampaign().getPlayerForce().getFinances().getTransactions();
 
         Money balance = Money.zero();
         for (Transaction transaction : transactions) {
@@ -299,7 +301,7 @@ public final class FinancesTab extends CampaignGuiTab {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
                                            .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
+        List<Transaction> transactions = getCampaign().getPlayerForce().getFinances().getTransactions();
 
         String pastMonthYear = "";
         Money monthlyRevenue = Money.zero();
@@ -350,7 +352,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private XYDataset setupNetWorthDataset() {
         TimeSeries timeSeries = new TimeSeries("Net Worth");
         Campaign campaign = getCampaign();
-        List<WeeklyNetWorth> netWorthRecords = campaign.getFinances().getNetWorthOverTime();
+        List<WeeklyNetWorth> netWorthRecords = campaign.getPlayerForce().getFinances().getNetWorthOverTime();
         for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
             LocalDate date = weeklyNetWorth.getDate();
             timeSeries.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
@@ -489,14 +491,21 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialTransactions() {
         SwingUtilities.invokeLater(() -> {
-            financeModel.setData(getCampaign().getFinances().getTransactions());
-            loanModel.setData(getCampaign().getFinances().getLoans());
+            financeModel.setData(getCampaign().getPlayerForce().getFinances().getTransactions());
+            loanModel.setData(getCampaign().getPlayerForce().getFinances().getLoans());
             refreshFinancialReport();
         });
     }
 
     public void refreshFinancialReport() {
         SwingUtilities.invokeLater(() -> {
+            // While a bulk generation is adding personnel off the EDT, skip this refresh: the payroll
+            // walks the personnel roster, and copying that roster while the worker grows it threw
+            // ArrayIndexOutOfBoundsException out of ArrayList's constructor. The generation fires an
+            // event when it completes, which reschedules this against the finished campaign.
+            if (getCampaign().isBulkGenerationInProgress()) {
+                return;
+            }
             areaNetWorth.setText(getFormattedFinancialReport());
             areaNetWorth.setCaretPosition(0);
         });
@@ -601,8 +610,8 @@ public final class FinancesTab extends CampaignGuiTab {
         financialLine.append('\n');
 
 
-        if (!getCampaign().getFinances().getAssets().isEmpty()) {
-            for (Asset asset : getCampaign().getFinances().getAssets()) {
+        if (!getCampaign().getPlayerForce().getFinances().getAssets().isEmpty()) {
+            for (Asset asset : getCampaign().getPlayerForce().getFinances().getAssets()) {
                 StringBuilder assetName = new StringBuilder(asset.getName());
                 if (assetName.length() > 18) {
                     assetName = new StringBuilder(assetName.substring(0, 17));
@@ -656,19 +665,30 @@ public final class FinancesTab extends CampaignGuiTab {
                   String.format(formatted, report.getOverheadCosts().toAmountAndSymbolString())));
         }
 
+        if (!report.getHotSpotsUpkeepCosts().isZero()) {
+            financialLine.append(formattingFinancialReport(getTextAt(RESOURCE_BUNDLE, "hotSpotsUpkeep.text"), 2,
+                  String.format(formatted, report.getHotSpotsUpkeepCosts().toAmountAndSymbolString())));
+        }
+
         Money rentals = report.getRentals();
         if (!rentals.isZero()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("rentalFacilities.text"), 2,
                   String.format(formatted, rentals.toAmountAndSymbolString())));
         }
 
-        if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
+        if (getCampaign().getCampaignOptions().isChargingPeacetimeCost()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
                   String.format(formatted, report.getMonthlySparePartCosts().toAmountAndSymbolString())));
             financialLine.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,
                   String.format(formatted, report.getMonthlyAmmoCosts().toAmountAndSymbolString())));
             financialLine.append(formattingFinancialReport(resourceMap.getString("fuel.text"), 2,
                   String.format(formatted, report.getMonthlyFuelCosts().toAmountAndSymbolString())));
+        }
+
+        Money foodAndHousing = report.getFoodAndHousing();
+        if (!foodAndHousing.isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("foodAndHousing.text"), 2,
+                  String.format(formatted, foodAndHousing.toAmountAndSymbolString())));
         }
 
         return financialLine.toString();
@@ -690,16 +710,12 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionNewEvent ev) {
-        if (ev.getMission() instanceof Contract) {
-            financialReportScheduler.schedule();
-        }
+        financialReportScheduler.schedule();
     }
 
     @Subscribe
     public void handle(MissionChangedEvent ev) {
-        if (ev.getMission() instanceof Contract) {
-            financialReportScheduler.schedule();
-        }
+        financialReportScheduler.schedule();
     }
 
     @Subscribe
@@ -709,6 +725,20 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(TransactionEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+
+    /**
+     * The starting simulation books ten years of pay and expenses while {@link Campaign#isBulkGenerationInProgress()}
+     * is true, so the {@link TransactionEvent}s it raises are all dropped by the guard in
+     * {@link #refreshFinancialReport()}. Generation signs off with this event and nothing else, so without this handler
+     * the ledger and the net worth both keep their pre-simulation figures.
+     *
+     * <p>Scheduling the transactions refresh covers both: {@link #refreshFinancialTransactions()} ends by calling
+     * {@link #refreshFinancialReport()}.</p>
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 

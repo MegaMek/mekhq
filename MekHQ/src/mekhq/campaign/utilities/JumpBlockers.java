@@ -49,9 +49,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
 import mekhq.campaign.base.PlayerBase;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -114,6 +112,12 @@ public class JumpBlockers {
         Set<Unit> nonJumpCapableUnits = new HashSet<>();
 
         for (Unit unit : campaign.getUnits()) {
+            // Units already queued to travel to a base have been handled by an earlier blocker prompt this day;
+            // they only leave the hangar when the queue is dispatched on the next new day.
+            if (campaign.getCampaignLocationManager().isQueuedForTravel(unit)) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
             // Buildings are, by their nature, not able to leave the planet they're on.
             if (entity instanceof BuildingEntity) {
@@ -196,7 +200,10 @@ public class JumpBlockers {
         boolean wasOverallConfirmed = false;
         while (!wasOverallConfirmed) {
             ImmersiveDialogSimple notice = new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce().isClanForce(),
+                              campaign.getLocalDate()),
                   null,
                   centerMessage,
                   List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon, buttonLeaveAtNewBase),
@@ -217,7 +224,7 @@ public class JumpBlockers {
 
             if (choiceIndex == leaveAtNewBase) {
                 PlanetarySystem currentSystem = campaign.getCurrentSystem();
-                Planet currentPlanet = campaign.getPlanet();
+                Planet currentPlanet = campaign.getPlayerForce().getForceDetachment().getPlanet();
                 BaseSettingsDialog baseDialog = new BaseSettingsDialog(null, campaign,
                       currentSystem, currentPlanet, true);
                 baseDialog.setVisible(true);
@@ -227,9 +234,9 @@ public class JumpBlockers {
                 }
                 PlayerBase newBase = baseResult.get();
                 for (Unit unit : nonJumpCapableUnits) {
-                    campaign.removeUnitFromFormation(unit);
+                    campaign.getPlayerForce().removeUnitFromFormation(unit, campaign);
                 }
-                LocationDispatch.dispatchUnitsToLocation(nonJumpCapableUnits, newBase, campaign);
+                campaign.getCampaignLocationManager().queueTravel(nonJumpCapableUnits, newBase);
                 wasOverallConfirmed = true;
                 continue;
             }
@@ -241,7 +248,7 @@ public class JumpBlockers {
             case gmOverrideChoiceIndex -> true;
             case leaveAtNewBase -> true; // units dispatched to base in loop above
             case sellUnits -> {
-                Quartermaster quartermaster = campaign.getQuartermaster();
+                mekhq.campaign.ForceQuartermaster quartermaster = campaign.getQuartermaster();
                 for (Unit unit : nonJumpCapableUnits) {
                     quartermaster.sellUnit(unit);
                 }

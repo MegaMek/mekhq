@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,6 +66,7 @@ import javax.swing.border.EmptyBorder;
 
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -96,7 +97,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     private ImageIcon campaignIcon;
     private final Campaign campaign;
 
-    private JCheckBox chkInjuryTransferral;
+    private JCheckBox chkInjuryTransferal;
     private JCheckBox chkProtoMekPilots;
 
     public AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
@@ -187,17 +188,17 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
 
-        chkInjuryTransferral = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
+        chkInjuryTransferal = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.injuries"));
-        chkInjuryTransferral.setAlignmentX(Component.LEFT_ALIGNMENT);
-        chkInjuryTransferral.setSelected(true);
+        chkInjuryTransferal.setAlignmentX(Component.LEFT_ALIGNMENT);
+        chkInjuryTransferal.setSelected(true);
 
         chkProtoMekPilots = new JCheckBox(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.checkbox.enhancedImaging"));
         chkProtoMekPilots.setAlignmentX(Component.LEFT_ALIGNMENT);
         chkProtoMekPilots.setSelected(true);
 
-        pnlCenter.add(chkInjuryTransferral);
+        pnlCenter.add(chkInjuryTransferal);
         pnlCenter.add(chkProtoMekPilots);
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
@@ -214,8 +215,8 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            if (chkInjuryTransferral.isSelected()) {
-                processInjuryTransferral(campaign);
+            if (chkInjuryTransferal.isSelected()) {
+                processInjuryTransferal(campaign);
             }
             if (chkProtoMekPilots.isSelected()) {
                 processFreeEnhancedImaging(campaign);
@@ -229,11 +230,11 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
     }
 
     public static void processFreeEnhancedImaging(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseImplants()) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             return;
         }
 
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
         for (Person person : personnel) {
             if (!person.getPrimaryRole().isProtoMekPilot() && !person.getSecondaryRole().isProtoMekPilot()) {
                 continue;
@@ -241,13 +242,13 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
 
             AdvancedMedicalAlternateImplants.giveEIImplant(campaign, person);
 
-            campaign.personUpdated(person);
+            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
         }
     }
 
-    public static void processInjuryTransferral(Campaign campaign) {
+    public static void processInjuryTransferal(Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
         for (Person person : personnel) {
             // First, Total Warfare-scale 'Hits'
             int hits = person.getHits();

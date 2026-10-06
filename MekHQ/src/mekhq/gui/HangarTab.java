@@ -67,6 +67,7 @@ import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -77,6 +78,7 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
@@ -124,6 +126,12 @@ public final class HangarTab extends CampaignGuiTab {
     private JCheckBox chkHideMothballed;
     private JButton btnAssignTechs;
     private JScrollPane scrollUnitView;
+
+    /**
+     * A unit shown in the detail panel while not present in the grid, e.g. when a link targets a unit outside the
+     * active location scope. Kept so table refreshes that clear the grid selection do not blank the detail panel.
+     */
+    private Unit pinnedUnit;
 
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
@@ -314,7 +322,7 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitTable.setFocusable(false);
         scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab.keyText");
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
         tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);
@@ -576,7 +584,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS),
-                  getCampaign().getCampaignOptions().isUseQuirks());
+                  getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
@@ -604,9 +612,9 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
-                  getCampaign().getCampaignOptions().isPayForMaintain());
+                  getCampaign().getCampaignOptions().isChargingMaintenance());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE),
-                  getCampaign().getCampaignOptions().isCheckMaintenance());
+                  getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -715,15 +723,30 @@ public final class HangarTab extends CampaignGuiTab {
         if (row != -1) {
             unitTable.setRowSelectionInterval(row, row);
             unitTable.scrollRectToVisible(unitTable.getCellRect(row, 0, true));
+            return;
+        }
+        // The unit is outside the active location scope, so the grid does not contain it. Pin it to the detail panel
+        // so it shows without forcing it onto the grid, surviving later table refreshes.
+        Unit unit = getCampaign().getUnit(id);
+        if (unit != null) {
+            pinnedUnit = unit;
+            unitTable.clearSelection();
+            refreshUnitView();
         }
     }
 
     public void refreshUnitView() {
         int row = unitTable.getSelectedRow();
         if (row < 0) {
-            scrollUnitView.setViewportView(null);
+            if (pinnedUnit != null) {
+                scrollUnitView.setViewportView(new UnitViewPanel(pinnedUnit, getCampaign()));
+                SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
+            } else {
+                scrollUnitView.setViewportView(null);
+            }
             return;
         }
+        pinnedUnit = null;
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
         scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign()));
         // This odd code is to make sure that the scrollbar stays at the top
@@ -782,8 +805,17 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     @Subscribe
+    public void handle(UnitLogEvent ev) {
+        refreshUnitView();
+    }
+
+    @Subscribe
     public void handle(UnitNewEvent ev) {
-        unitListScheduler.schedule();
+        // Force EDT dispatch so the underlying javax.swing.Timer.restart() in ActionScheduler runs
+        // on the EDT regardless of caller thread. Defensive pairing with the ReportEvent handler:
+        // both events can now fire from a SwingWorker (force generation), and the unit-table refresh
+        // chain ultimately touches Swing component state we don't want racing with the EDT.
+        SwingUtilities.invokeLater(unitListScheduler::schedule);
     }
 
     @Subscribe

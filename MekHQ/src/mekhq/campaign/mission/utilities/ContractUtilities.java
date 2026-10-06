@@ -36,13 +36,23 @@ package mekhq.campaign.mission.utilities;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
+import java.time.LocalDate;
+import java.util.Objects;
+
+import jakarta.annotation.Nullable;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public class ContractUtilities {
     /**
@@ -64,7 +74,7 @@ public class ContractUtilities {
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign, boolean isCadreDuty,
           boolean bypassVariance, double varianceFactor) {
         int combatForceCount = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (0 >= combatTeam.getSize(campaign)) { // Don't count empty combat teams (or warship-only)
                 continue;
             }
@@ -118,7 +128,7 @@ public class ContractUtilities {
      */
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             Formation formation = combatTeam.getFormation(campaign);
 
             if (formation == null) {
@@ -136,41 +146,95 @@ public class ContractUtilities {
     }
 
     /**
-     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
+     * Whether a force at {@code location} has arrived at where {@code contract} is fought.
      *
-     * <p>
-     * The variance factor is determined by applying a multiplier to the fixed formation size divisor. The multiplier
-     * varies based on the roll value:
-     * <ul>
-     *   <li><b>Roll 2:</b> Multiplier is 0.575.</li>
-     *   <li><b>Roll 3:</b> Multiplier is 0.6.</li>
-     *   <li><b>Roll 4:</b> Multiplier is 0.625</li>
-     *   <li><b>Roll 5:</b> Multiplier is 0.65.</li>
-     *   <li><b>Roll 6:</b> Multiplier is 0.675.</li>
-     *   <li><b>Roll 7:</b> Multiplier is 0.7.</li>
-     *   <li><b>Roll 8:</b> Multiplier is 0.725.</li>
-     *   <li><b>Roll 9:</b> Multiplier is 0.75.</li>
-     *   <li><b>Roll 10:</b> Multiplier is 0.775.</li>
-     *   <li><b>Roll 11:</b> Multiplier is 0.8.</li>
-     *   <li><b>Roll 12:</b> Multiplier is 0.825.</li>
-     * </ul>
+     * <p>Arrival is judged on the system first, since that is what the location model has always tracked, and then on
+     * the world - but only when both worlds are known. A location from a save predating planet tracking knows only its
+     * system, and {@link AbstractLocation#getPlanet()} would report the system's primary world; comparing that against
+     * a contract targeting some other world would say "not arrived" forever.</p>
      *
-     * @return the calculated variance factor as a double
+     * @param location the force's location
+     * @param contract the contract whose target is being tested against
+     *
+     * @return {@code true} when the force is in the contract's target system, out of transit, and - where known - at
+     *       its target world
      */
-    public static double calculateVarianceFactor() {
-        int roll = d6(2);
-        return switch (roll) {
-            case 2 -> BASE_VARIANCE_FACTOR - 0.125;
-            case 3 -> BASE_VARIANCE_FACTOR - 0.1;
-            case 4 -> BASE_VARIANCE_FACTOR - 0.075;
-            case 5 -> BASE_VARIANCE_FACTOR - 0.05;
-            case 6 -> BASE_VARIANCE_FACTOR - 0.025;
-            case 8 -> BASE_VARIANCE_FACTOR + 0.025;
-            case 9 -> BASE_VARIANCE_FACTOR + 0.05;
-            case 10 -> BASE_VARIANCE_FACTOR + 0.075;
-            case 11 -> BASE_VARIANCE_FACTOR + 0.1;
-            case 12 -> BASE_VARIANCE_FACTOR + 0.125;
-            default -> BASE_VARIANCE_FACTOR; // 0.7
-        };
+    public static boolean hasArrivedAtContractLocation(AbstractLocation location, AbstractContract contract) {
+        if (!Objects.equals(location.getCurrentSystem(), contract.getTargetSystem()) || !location.isOnPlanet()) {
+            return false;
+        }
+
+        Planet knownPlanet = location.getCurrentPlanetDirect();
+        Planet targetPlanet = contract.getTargetPlanet();
+        return (knownPlanet == null) || (targetPlanet == null) || Objects.equals(knownPlanet, targetPlanet);
+    }
+
+    public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
+          AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
+          FactionStandings factionStandings) {
+        boolean isGM = campaign.isGM();
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
+              isOverridingCommandCircuitRequirements,
+              isGM,
+              factionStandings,
+              abstractContract.getEmployerFactionCode());
+
+        JumpPath jumpPath = getJumpPath(campaign, abstractContract, currentLocation);
+
+        if (jumpPath != null) {
+            LocalDate currentDate = campaign.getLocalDate();
+            double transitTime = currentLocation.getTransitTime();
+            return (int) ceil(jumpPath.getTotalTime(currentDate, transitTime, isUseCommandCircuit,
+                  campaign.getJumpDriveProfile(currentLocation)));
+        }
+
+        return 0;
+    }
+
+    public static @Nullable JumpPath getJumpPath(Campaign campaign, AbstractContract abstractContract,
+          AbstractLocation currentLocation) {
+        // if we don't have a cached jump path, or if the jump path's starting/ending point no longer match the
+        // campaign's current location or contract's destination
+        JumpPath cachedJumpPath = abstractContract.getCachedJumpPathDirect();
+        PlanetarySystem targetSystem = abstractContract.getTargetSystem();
+        PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        if (targetSystem == null) {
+            return refreshJumpPath(campaign, abstractContract, currentSystem, null, null);
+        }
+
+        Planet targetPlanet = abstractContract.getTargetPlanet();
+
+        if (cachedJumpPath == null ||
+                  cachedJumpPath.isEmpty() ||
+                  !Objects.equals(cachedJumpPath.getFirstSystem(), currentSystem) ||
+                  !Objects.equals(cachedJumpPath.getTargetPlanet(), targetPlanet)) {
+            return refreshJumpPath(campaign, abstractContract, currentSystem, targetSystem, targetPlanet);
+        }
+
+        return cachedJumpPath;
+    }
+
+    private static JumpPath refreshJumpPath(Campaign campaign, AbstractContract abstractContract,
+          PlanetarySystem currentSystem, PlanetarySystem targetSystem, @Nullable Planet targetPlanet) {
+        JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
+
+        if (jumpPath != null) {
+            jumpPath.setTargetPlanet(targetPlanet);
+        }
+
+        abstractContract.setCachedJumpPath(jumpPath);
+
+        return jumpPath;
+    }
+
+
+    public static String getEnemyDisplayNameIncludingFaction(Faction enemyFaction, String enemyDisplayName,
+          int gameYear) {
+        String factionFullName = enemyFaction.getFullName(gameYear);
+        if (!factionFullName.equals(enemyDisplayName)) {
+            return enemyDisplayName + " (" + factionFullName + ")";
+        }
+
+        return enemyDisplayName;
     }
 }

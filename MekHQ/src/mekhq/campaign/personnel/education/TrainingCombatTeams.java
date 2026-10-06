@@ -42,8 +42,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -64,14 +62,18 @@ import java.util.Vector;
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
@@ -79,7 +81,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
@@ -96,12 +97,11 @@ import org.jspecify.annotations.NonNull;
  * <ol>
  *   <li>The combat team's commander makes a {@link SkillType#S_TRAINING}
  *       skill check. The raw margin of success drives the amount of XP awarded this session.</li>
- *   <li>A margin at or below {@link MarginOfSuccess#BARELY_MADE_IT}
- *       produces no XP for any trainee.</li>
+ *   <li>A failed skill check produces no XP for any trainee.</li>
  *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
  *       Accumulated XP persists across sessions until the improvement cost is met.</li>
  *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
- *       {@link CampaignOptions#getXpCostMultiplier()} and optional
+ *       {@code CampaignOptions#getXpCostMultiplier()} and optional
  *       reasoning-based adjustments), the skill advances one level and veterancy awards are evaluated.</li>
  * </ol>
  *
@@ -119,6 +119,7 @@ public class TrainingCombatTeams {
 
     private static final int EXPERIENCE_LEVEL_REDUCTION = -1;
     static final int XP_RATE_BASE_LINE = 1;
+    static final int XP_GAIN_MAX = 6;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -132,7 +133,7 @@ public class TrainingCombatTeams {
      */
     public static void processTrainingCombatTeams(final Campaign campaign) {
         final LocalDate today = campaign.getLocalDate();
-        final List<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
+        final List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUsingStratCon = campaignOptions.isUseStratCon();
@@ -143,8 +144,8 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            AtBContract contract = combatTeam.getContract(campaign);
-            if (contract == null || !contract.isActiveOn(today, false)) {
+            AbstractContract contract = combatTeam.getContract(campaign);
+            if (contract == null || !contract.isActiveOn(today)) {
                 continue;
             }
 
@@ -186,13 +187,13 @@ public class TrainingCombatTeams {
         // If the force is empty, we skip it
         Vector<UUID> units = formation.getUnits(); // We only want units in the direct force, not child forces
         if (units.isEmpty()) {
-            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getName());
+            LOGGER.info("No units in force '{}' for campaign '{}'", formation.getName(), campaign.getPlayerForce().getName());
             return;
         }
 
         // Identify the Combat Team's commander (i.e., the Trainer)
         UUID commanderID = formation.getFormationCommanderID();
-        Person commander = campaign.getPerson(commanderID);
+        Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderID);
 
         if (commander == null) {
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "noCommander.text", formation.getName(),
@@ -208,9 +209,13 @@ public class TrainingCombatTeams {
         // Then build a set of their skills
         Map<String, Integer> educatorSkills = createSkillsList(campaign, educators);
 
-        int marginOfSuccess = performTrainingSkillCheck(campaign, commander);
+        int formationSize = formation.getUnits().size();
+        int standardLanceSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        int classSizeModifier = max(0, standardLanceSize - formationSize);
 
-        performTraining(campaign, formation, commander, educatorSkills, marginOfSuccess);
+        ActionCheckResult actionCheckResult = performTrainingSkillCheck(campaign, commander, classSizeModifier);
+
+        performTraining(campaign, formation, commander, educatorSkills, actionCheckResult);
     }
 
     /**
@@ -229,21 +234,31 @@ public class TrainingCombatTeams {
      * {@code processEducationTime} helper method, using the result of the training check's {@code marginOfSuccess} to
      * determine training time awarded and progress.</p>
      *
-     * @param campaign        the current {@link Campaign} in which training is occurring
-     * @param formation       the {@link Formation} containing the units and trainees to train
-     * @param commander       the {@link Person} acting as the educator/commander providing the training
-     * @param educatorSkills  a map containing all skills and their experience levels available for teaching by the
-     *                        educator(s)
-     * @param marginOfSuccess the margin of success for the training check, as an integer (affects training
-     *                        speed/progress)
+     * @param campaign          the current {@link Campaign} in which training is occurring
+     * @param formation         the {@link Formation} containing the units and trainees to train
+     * @param commander         the {@link Person} acting as the educator/commander providing the training
+     * @param educatorSkills    a map containing all skills and their experience levels available for teaching by the
+     *                          educator(s)
+     * @param actionCheckResult the result of the training check
      */
     private static void performTraining(Campaign campaign, Formation formation, Person commander,
-          Map<String, Integer> educatorSkills, int marginOfSuccess) {
+          Map<String, Integer> educatorSkills, ActionCheckResult actionCheckResult) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useReasoningXPChanges = campaignOptions.isUseReasoningXpMultiplier();
-        boolean isUseFatigue = campaignOptions.isUseFatigue();
-        int fatigueRate = campaignOptions.getFatigueRate();
-        double xpCostMultiplier = campaignOptions.getXpCostMultiplier();
+        boolean useReasoningXPChanges = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
+        double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
+
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (familiarityMode.isEnabled()) {
+            int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+
+            Familiarity.assignFamiliarity(campaign,
+                  commander.getUnit(),
+                  familiarityMode.getFamiliarityCap(),
+                  familiaritySpeed,
+                  FamiliarityGainType.SINGLE);
+        }
 
         List<Person> educatorCrew = commander.getUnit().getActiveCrew();
         for (UUID unitId : formation.getUnits()) {
@@ -293,11 +308,11 @@ public class TrainingCombatTeams {
                     continue;
                 }
 
-                String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, marginOfSuccess,
-                      xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
+                String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, actionCheckResult,
+                      xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN),
                       campaign.getLocalDate());
 
-                campaign.personUpdated(trainee);
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, trainee);
 
                 if (!StringUtility.isNullOrBlank(report)) {
                     campaign.addReport(PERSONNEL, report);
@@ -328,8 +343,7 @@ public class TrainingCombatTeams {
      *
      * <p>The method follows this sequence:</p>
      * <ol>
-     *   <li>Returns early with an empty string if training is impossible (skill check not cleared above {@link
-     *   MarginOfSuccess#BARELY_MADE_IT}, or no skills queued).</li>
+     *   <li>Returns early with an empty string if training is impossible (skill check failed, or no skills queued).</li>
      *   <li>Sorts {@code skillsBeingTrained} ascending by level and targets the lowest-level skill for improvement.</li>
      *   <li>Calculates the base XP cost to reach the next level of the target skill, applying
      *       {@code xpCostMultiplier} and optional reasoning-based adjustments.</li>
@@ -353,9 +367,8 @@ public class TrainingCombatTeams {
      *                              improvement occurs
      * @param skillsBeingTrained    the list of {@link Skill}s queued for training; sorted ascending by level in-place;
      *                              must not be {@code null}
-     * @param marginOfSuccess       the margin by which the skill check was passed; values at or below
-     *                              {@link MarginOfSuccess#BARELY_MADE_IT} immediately abort training with no XP
-     *                              applied; higher values yield proportionally more XP progress
+     * @param actionCheckResult     the result of the training check; failed skill checks immediately abort training
+     *                              with no XP applied; higher values yield proportionally more XP progress
      * @param xpCostMultiplier      a multiplier applied to the raw XP improvement cost before comparing against
      *                              progress; values below {@code 1.0} reduce the cost, values above {@code 1.0}
      *                              increase it
@@ -373,9 +386,9 @@ public class TrainingCombatTeams {
      * @since 0.51.01
      */
     private static String processTrainingTime(Campaign campaign, Person educator, Person trainee,
-          List<Skill> skillsBeingTrained, int marginOfSuccess, double xpCostMultiplier, boolean useReasoningXPChanges,
-          boolean isLogSkillChange, LocalDate today) {
-        if (isTrainingImpossible(skillsBeingTrained, marginOfSuccess)) {
+          List<Skill> skillsBeingTrained, ActionCheckResult actionCheckResult, double xpCostMultiplier,
+          boolean useReasoningXPChanges, boolean isLogSkillChange, LocalDate today) {
+        if (isTrainingImpossible(skillsBeingTrained, actionCheckResult)) {
             return "";
         }
 
@@ -388,7 +401,20 @@ public class TrainingCombatTeams {
         int baseCostToImprove = getBaseCostToImprove(trainee, xpCostMultiplier, useReasoningXPChanges,
               skillName, targetSkillLevel);
 
-        int finalXPProgress = getFinalXPProgress(marginOfSuccess, targetSkill);
+        int trainingMarginOfSuccess = actionCheckResult.getMarginOfSuccess();
+        int finalXPProgress = getFinalXPProgress(trainingMarginOfSuccess, targetSkill);
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (familiarityMode.isEnabled()) {
+            int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+            improveFamiliarityForTrainees(campaign,
+                  educator,
+                  trainee,
+                  familiaritySpeed,
+                  trainingMarginOfSuccess,
+                  familiarityMode);
+        }
 
         boolean wasTrainingCompleted = isWasTrainingCompleted(baseCostToImprove, finalXPProgress);
 
@@ -398,6 +424,43 @@ public class TrainingCombatTeams {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Awards this session's training familiarity to a single trainee: the full gain for their own chassis, and half of
+     * it for the educator's chassis at half the cap.
+     *
+     * <p>Both grants are person-scoped. The caller already runs once per trainee, so awarding the whole crew of either
+     * unit would multiply the session's grants by the crew size and would push the educator's crew - rather than the
+     * trainee - up the cross-chassis track.</p>
+     *
+     * @param campaign                the current {@link Campaign} context
+     * @param educator                the {@link Person} teaching this session; only their unit's chassis is used
+     * @param trainee                 the {@link Person} being taught, and the only person awarded here
+     * @param familiaritySpeed        the campaign's configured familiarity speed
+     * @param trainingMarginOfSuccess the margin of success of the educator's training check
+     * @param familiarityMode         the active {@link Familiarity} mode, supplying the training cap
+     */
+    static void improveFamiliarityForTrainees(Campaign campaign, Person educator, Person trainee,
+          int familiaritySpeed, int trainingMarginOfSuccess, Familiarity familiarityMode) {
+        int familiarityProgressOwnChassisSpeed = familiaritySpeed * trainingMarginOfSuccess;
+
+        int familiarityCap = familiarityMode.getTrainingCap();
+        Familiarity.assignFamiliarityToPerson(campaign,
+              trainee,
+              trainee.getUnit(),
+              familiarityCap,
+              familiarityProgressOwnChassisSpeed,
+              FamiliarityGainType.SINGLE);
+
+        int familiarityEducatorChassisSpeed = (int) round(familiarityProgressOwnChassisSpeed * 0.5);
+        int trainerFamiliarityCap = (int) round(familiarityCap * 0.5);
+        Familiarity.assignFamiliarityToPerson(campaign,
+              trainee,
+              educator.getUnit(),
+              trainerFamiliarityCap,
+              familiarityEducatorChassisSpeed,
+              FamiliarityGainType.SINGLE);
     }
 
     /**
@@ -483,16 +546,16 @@ public class TrainingCombatTeams {
      * <p>Progress is at minimum 1 XP, scaled by the margin of success. Returns the skill's total accumulated XP
      * progress after applying this session's gain.</p>
      *
-     * @param marginOfSuccess the margin by which the skill check was passed, used to scale XP gain
-     * @param targetSkill     the {@link Skill} receiving the XP progress; its progress is mutated in-place
+     * @param trainingMarginOfSuccess the training skill check result, used to scale XP gain
+     * @param targetSkill             the {@link Skill} receiving the XP progress; its progress is mutated in-place
      *
      * @return the skill's total accumulated XP progress after this session's contribution is applied
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static int getFinalXPProgress(int marginOfSuccess, Skill targetSkill) {
-        int actualXPProgress = max(XP_RATE_BASE_LINE, (XP_RATE_BASE_LINE * marginOfSuccess));
+    public static int getFinalXPProgress(int trainingMarginOfSuccess, Skill targetSkill) {
+        int actualXPProgress = Math.clamp(XP_RATE_BASE_LINE * trainingMarginOfSuccess, XP_RATE_BASE_LINE, XP_GAIN_MAX);
         targetSkill.changeXpProgress(actualXPProgress);
 
         return targetSkill.getXpProgress();
@@ -540,38 +603,37 @@ public class TrainingCombatTeams {
      * queued for training.</p>
      *
      * @param skillsBeingTrained the list of {@link Skill}s queued for training
-     * @param marginOfSuccess    the margin by which the skill check was passed; must equal or exceed
-     *                           {@link MarginOfSuccess#BARELY_MADE_IT} for training to be possible
+     * @param actionCheckResult  the result of the training skill check; must succeed for training to be possible
      *
      * @return {@code true} if training cannot proceed; {@code false} if it can
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
-        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getValue();
+    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, ActionCheckResult actionCheckResult) {
         boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
-
-        return isSkillCheckFailed || isNothingBeingTrained;
+        return !actionCheckResult.isSuccess() || isNothingBeingTrained;
     }
 
-    private static int performTrainingSkillCheck(Campaign campaign, Person educator) {
+    private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator,
+          int classSizeModifier) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseEdge = campaignOptions.isUseEdge();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
 
         ActionCheckResult actionCheckResult =
               educator.checkSkill(S_TRAINING, campaign)
-                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"), true);
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+                    .withMiscModifier(classSizeModifier)
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
-        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(actionCheckResult.marginOfSuccess());
+        MarginOfSuccess reportMargin = actionCheckResult.getReportMargin();
         String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
-              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
-              marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
+              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(reportMargin.getColor()),
+              reportMargin.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(PERSONNEL, personnelReport);
 
-        return actionCheckResult.marginOfSuccess();
+        return actionCheckResult;
     }
 
     /**
@@ -587,8 +649,8 @@ public class TrainingCombatTeams {
      */
     private static Map<String, Integer> createSkillsList(Campaign campaign, Set<Person> educators) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean isUseArtillery = campaignOptions.isUseArtillery();
-        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().isUseAdvancedScouting();
+        final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
+        final boolean isUseAdvancedScouting = campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING);
 
         Set<String> professionSkills = new HashSet<>();
         for (Person educator : educators) {
@@ -808,11 +870,9 @@ public class TrainingCombatTeams {
     private static void getSkillsForProfession(PersonnelRole primaryRole, Set<String> professionSkills,
           boolean isUseArtillery, PersonnelRole secondaryRole, boolean isUseAdvancedScouting) {
         if (primaryRole.isCombat()) {
-            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false,
-                  isUseArtillery, true));
+            professionSkills.addAll(primaryRole.getSkillsForProfession(false, false, false, isUseArtillery, true));
         } else if (secondaryRole.isCombat()) { // Primary overrides secondary, so no double-dipping
-            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false,
-                  isUseArtillery, true));
+            professionSkills.addAll(secondaryRole.getSkillsForProfession(false, false, false, isUseArtillery, true));
         } else {
             // support professions cannot teach skills through training forces
             return;

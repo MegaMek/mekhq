@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.campaignOptions.CampaignOptions.EDGE_AWARD_REPLACEMENT_XP;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -383,10 +386,11 @@ public class Award implements Comparable<Award> {
      * @return the tooltip for an award.
      */
     public String getTooltip(CampaignOptions campaignOptions, Person person) {
-        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) ||
-                                (campaignOptions.getAwardBonusStyle().isXP());
-        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) ||
-                                  (campaignOptions.getAwardBonusStyle().isEdge());
+        boolean awardXP = (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isBoth()) ||
+                                (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isXP());
+        boolean awardEdge = (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isBoth()) ||
+                                  (campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE).isEdge());
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
 
         int issueCount = person.getAwardController().getNumberOfAwards(this);
 
@@ -405,10 +409,18 @@ public class Award implements Comparable<Award> {
         }
 
         if ((awardEdge) && (edge > 0)) {
-            tooltip.append("Edge: +").append(edge);
+            if (isReplaceEdgeAwards) {
+                tooltip.append("XP (from Edge): +").append(edge * EDGE_AWARD_REPLACEMENT_XP);
 
-            if (issueCount > 1) {
-                tooltip.append(" (+").append(edge * issueCount).append(')');
+                if (issueCount > 1) {
+                    tooltip.append(" (+").append(edge * issueCount * EDGE_AWARD_REPLACEMENT_XP).append(')');
+                }
+            } else {
+                tooltip.append("Edge: +").append(edge);
+
+                if (issueCount > 1) {
+                    tooltip.append(" (+").append(edge * issueCount).append(')');
+                }
             }
 
             tooltip.append("<br>");

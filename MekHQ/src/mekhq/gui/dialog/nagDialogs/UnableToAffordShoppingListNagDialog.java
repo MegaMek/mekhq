@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordShoppingListNag.unableToAffordShoppingList;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -68,15 +68,15 @@ public class UnableToAffordShoppingListNagDialog extends ImmersiveDialogNag {
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordShoppingListNagDialog(final Campaign campaign) {
-        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_SHOPPING_LIST, "UnableToAffordShoppingListNagDialog");
+        super(campaign, NAG_UNABLE_TO_AFFORD_SHOPPING_LIST, "UnableToAffordShoppingListNagDialog");
     }
 
     @Override
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
-        Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
-        Money currentFunds = campaign.getFunds();
+        Money totalBuyCost = campaign.getPlayerForce().getShoppingList().getTotalBuyCost();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = totalBuyCost.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

@@ -34,15 +34,7 @@ package mekhq.campaign.personnel.autoAwards;
 
 import java.awt.Dialog.ModalityType;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
@@ -51,9 +43,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
@@ -61,7 +52,7 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 
 public class AutoAwardsController {
     private Campaign campaign;
-    private Mission mission;
+    private AbstractContract mission;
 
     final private List<Award> contractAwards = new ArrayList<>();
     final private List<Award> factionHunterAwards = new ArrayList<>();
@@ -148,7 +139,7 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
-    public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful,
+    public void PostMissionController(Campaign campaign, AbstractContract mission, Boolean missionWasSuccessful,
           @Nullable List<Person> POWPersonnel) {
         logger.info("autoAwards (Mission Conclusion) has started");
 
@@ -270,13 +261,13 @@ public class AutoAwardsController {
      */
     private List<UUID> getPersonnel() {
         // Get whether to issue posthumous awards from campaign options.
-        boolean issuePosthumous = campaign.getCampaignOptions().isIssuePosthumousAwards();
+        boolean issuePosthumous = campaign.getCampaignOptions().get(CampaignOption.ISSUE_POSTHUMOUS_AWARDS);
 
         // Get the last mission end date.
         LocalDate lastMissionEndDate = getLastMissionEndDate();
 
         // Fetch all personnel in the campaign.
-        Collection<Person> rawPersonnel = campaign.getAllPersonnel();
+        Collection<Person> rawPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         // Create a list to store Ids of qualifying personnel.
         List<UUID> personnel = new ArrayList<>();
 
@@ -323,7 +314,7 @@ public class AutoAwardsController {
         LocalDate today = campaign.getLocalDate();
 
         // Get the list of completed contracts from the campaign object.
-        List<AtBContract> completedContracts = campaign.getCompletedAtBContracts();
+        List<AbstractContract> completedContracts = campaign.getCompletedContracts();
 
         // If there are no completed contracts, return the current date.
         if (completedContracts.isEmpty()) {
@@ -336,11 +327,11 @@ public class AutoAwardsController {
         return getLastContractEndingDate(completedContracts);
     }
 
-    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
+    private static LocalDate getLastContractEndingDate(List<AbstractContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
-        for (AtBContract contract : completedContracts) {
+        for (AbstractContract contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
 
@@ -368,12 +359,12 @@ public class AutoAwardsController {
         ArrayList<Award> awards = new ArrayList<>();
         List<String> allSetNames = AwardsFactory.getInstance().getAllSetNames();
 
-        if (campaign.getCampaignOptions().isIgnoreStandardSet()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.IGNORE_STANDARD_SET)) {
             allSetNames.removeIf(setName -> setName.equalsIgnoreCase("standard"));
             logger.info("Ignoring the Standard Set");
         }
 
-        String[] filterList = campaign.getCampaignOptions().getAwardSetFilterList().split(",");
+        String[] filterList = campaign.getCampaignOptions().get(CampaignOption.AWARD_SET_FILTER_LIST).split(",");
 
         // we start by building a primary list of all awards
         logger.info("Getting all Award Sets");
@@ -407,7 +398,7 @@ public class AutoAwardsController {
                         case "kill":
                             if ((!award.getRange().equalsIgnoreCase("scenario"))
                                       && (!award.getRange().equalsIgnoreCase("mission"))) {
-                                if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
+                                if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -417,35 +408,35 @@ public class AutoAwardsController {
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "skill":
-                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SKILL_AWARDS)) {
                                 skillAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "time":
-                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TIME_AWARDS)) {
                                 timeAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -481,14 +472,14 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "contract":
-                            if (campaign.getCampaignOptions().isEnableContractAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_CONTRACT_AWARDS)) {
                                 contractAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "factionhunter":
-                            if (campaign.getCampaignOptions().isEnableFactionHunterAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FACTION_HUNTER_AWARDS)) {
                                 factionHunterAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -501,8 +492,8 @@ public class AutoAwardsController {
                         case "kill":
                             // Scenario Kill Awards are handled by the post-scenario controller
                             if (!award.getRange().equalsIgnoreCase("scenario")) {
-                                if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
-                                          || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
+                                if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS))
+                                          || (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS))) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -512,42 +503,42 @@ public class AutoAwardsController {
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "skill":
-                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SKILL_AWARDS)) {
                                 skillAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "theatreofwar":
-                            if (campaign.getCampaignOptions().isEnableTheatreOfWarAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_THEATRE_OF_WAR_AWARDS)) {
                                 theatreOfWarAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "time":
-                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TIME_AWARDS)) {
                                 timeAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -580,27 +571,27 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "kill":
-                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) &&
+                            if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS)) &&
                                       (award.getRange().equalsIgnoreCase("scenario"))) {
 
                                 killAwards.add(award);
                             }
                             break;
                         case "injury":
-                            if (campaign.getCampaignOptions().isEnableInjuryAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_INJURY_AWARDS)) {
 
                                 injuryAwards.add(award);
                             }
                             break;
                         case "misc":
-                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_MISC_AWARDS)) {
                                 miscAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
                             }
                             break;
                         case "scenario":
-                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_SCENARIO_AWARDS)) {
                                 scenarioAwards.add(award);
                             } else {
                                 ignoredAwards.add(award);
@@ -626,7 +617,7 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "training":
-                            if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_TRAINING_AWARDS)) {
                                 trainingAwards.add(award);
                             }
                             break;
@@ -646,7 +637,7 @@ public class AutoAwardsController {
                         case "divider":
                             break;
                         case "rank":
-                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                            if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_RANK_AWARDS)) {
                                 rankAwards.add(award);
                             }
                             break;
@@ -693,7 +684,7 @@ public class AutoAwardsController {
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
 
-        if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!contractAwards.isEmpty()) {
             processedData = ContractAwardsManager(personnel);
 
             // if processedData == null, nobody was eligible for this type of award, so they should be skipped
@@ -703,9 +694,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!factionHunterAwards.isEmpty()) &&
-                  (campaign.getCampaignOptions().isUseStratCon()) &&
-                  (mission instanceof AtBContract)) {
+        if (!factionHunterAwards.isEmpty() && campaign.getCampaignOptions().isUseStratCon()) {
             processedData = FactionHunterAwardsManager(personnel);
 
             if (processedData != null) {
@@ -769,7 +758,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        if (!theatreOfWarAwards.isEmpty()) {
             processedData = TheatreOfWarAwardsManager(personnel);
 
             if (processedData != null) {
@@ -831,7 +820,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Contract Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -870,7 +859,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Faction Hunter Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -905,7 +894,8 @@ public class AutoAwardsController {
                 data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, personnel.get(person));
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Injury Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -934,7 +924,8 @@ public class AutoAwardsController {
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                                                          .flatMap(person -> campaign.getKillsFor(person).stream())
                                                          .filter(kill -> mission != null &&
-                                                                               (kill.getMissionId() == mission.getId()))
+                                                                               (Objects.equals(kill.getMissionId(),
+                                                                                     mission.getId())))
                                                          .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
@@ -948,7 +939,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Kill Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -993,7 +984,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Scenario Kill Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1059,7 +1050,7 @@ public class AutoAwardsController {
             // we do everybody here, as we want to capture personnel who were support personnel,
             // even if they're not current support personnel
             for (UUID person : temporaryPersonnelList) {
-                Person p = campaign.getPerson(person);
+                Person p = campaign.getPlayerForce().getHumanResources().getPerson(person);
 
                 if (p.getAutoAwardSupportPoints() > supportPoints) {
                     supportPersonOfTheYear = person;
@@ -1099,7 +1090,8 @@ public class AutoAwardsController {
                 );
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Misc Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1133,7 +1125,8 @@ public class AutoAwardsController {
                 data = RankAwards.RankAwardsProcessor(campaign, person, rankAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Rank Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Rank Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1167,7 +1160,8 @@ public class AutoAwardsController {
                 data = ScenarioAwards.ScenarioAwardsProcessor(campaign, person, scenarioAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Scenario Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Scenario Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1201,7 +1195,8 @@ public class AutoAwardsController {
                 data = SkillAwards.SkillAwardsProcessor(campaign, person, skillAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Skill Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Skill Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1236,7 +1231,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Theatre of War Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1270,7 +1265,8 @@ public class AutoAwardsController {
                 data = TimeAwards.TimeAwardsProcessor(campaign, person, timeAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Time Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Time Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1309,7 +1305,8 @@ public class AutoAwardsController {
                       trainingAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Training Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {

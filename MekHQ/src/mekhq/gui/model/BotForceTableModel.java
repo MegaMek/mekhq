@@ -42,7 +42,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.scenarios.BotForce;
 
 public class BotForceTableModel extends AbstractTableModel {
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -75,7 +76,7 @@ public class MASC extends EquipmentPart {
     public void setUnit(Unit u) {
         super.setUnit(u);
         if (null != unit && null != unit.getEntity().getEngine()) {
-            engineRating = unit.getEntity().getEngine().getRating();
+            engineRating = (int) Math.floor(unit.getEntity().getEngine().getRating(unit.getEntity()));
         }
     }
 
@@ -107,15 +108,30 @@ public class MASC extends EquipmentPart {
         return type.hasFlag(MiscTypeFlag.S_SUPERCHARGER);
     }
 
+    /**
+     * A MASC is the same part type as another when the equipment checks every {@link EquipmentPart} makes pass and
+     * both were built for the same engine rating.
+     */
+    @Override
+    public boolean isSamePartType(Part part) {
+        if (!(part instanceof MASC otherMasc)) {
+            return false;
+        }
+        boolean isSameEquipment = super.isSamePartType(part);
+        boolean isSameEngineRating = getEngineRating() == otherMasc.getEngineRating();
+        return isSameEquipment && isSameEngineRating;
+    }
+
+    /**
+     * A damaged MASC never shares a warehouse stack. Otherwise two MASC share a stack under the same rules as every
+     * other part: the same part type, and the same status (quality, damage, delivery and reservation).
+     */
     @Override
     public boolean isSamePartTypeAndStatus(Part part) {
         if (needsFixing() || part.needsFixing()) {
             return false;
         }
-        return part instanceof MASC
-                     && getType().equals(((EquipmentPart) part).getType())
-                     && getTonnage() == part.getTonnage()
-                     && getEngineRating() == ((MASC) part).getEngineRating();
+        return super.isSamePartTypeAndStatus(part);
     }
 
     @Override
@@ -182,6 +198,11 @@ public class MASC extends EquipmentPart {
         details.append(getEngineRating())
               .append(" rating");
         return details.toString();
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MYOMER);
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1003,7 +1003,7 @@ public class HangarReport extends AbstractReport {
 
         //region UnitList Processing
         // Gather data and load it into the tree
-        List<Unit> unitList = new ArrayList<>(getCampaign().getHangar().getUnits());
+        List<Unit> unitList = new ArrayList<>(getCampaign().getPlayerForce().getHangar().getUnits());
         unitList.sort(Comparator.comparing(Unit::getName, new NaturalOrderComparator()));
         for (Unit u : unitList) {
             Entity e = u.getEntity();

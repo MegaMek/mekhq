@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_AS_TECHS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechsNagLogic.hasAsTechsNeeded;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -43,7 +41,6 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -62,14 +59,14 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      *
      * <p>This constructor initializes the dialog with preconfigured parameters, such as the
      * {@code NAG_INSUFFICIENT_AS_TECHS} constant, to manage dialog suppression and the
-     * {@code "InsufficientAsTechsNagDialog"} message key for retrieving localized dialog content. No specialized
+     * {@code "InsufficientAstechsNagDialog"} message key for retrieving localized dialog content. No specialized
      * speaker is provided, triggering the fallback logic to determine the appropriate speaker for the dialog.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
      *                 settings required for constructing the dialog.
      */
     public InsufficientAsTechsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_AS_TECHS, "InsufficientAsTechsNagDialog");
+        super(campaign, NAG_INSUFFICIENT_AS_TECHS, "InsufficientAstechsNagDialog");
     }
 
     /**
@@ -84,15 +81,14 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      * employed to determine the speaker based on senior administrators.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
-     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
      *
      * @return The {@link Person} designated as the speaker, prioritizing technical specialists, then senior
      *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+    protected @Nullable Person getSpeaker(Campaign campaign) {
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -135,10 +131,16 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }
@@ -153,7 +155,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
         int count = 0;
 
         if (campaign != null) {
-            count = campaign.getAsTechNeed();
+            count = campaign.getPlayerForce().getHumanResources().getAsTechNeed(campaign.getCampaignOptions());
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);
@@ -173,6 +175,8 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_AS_TECHS) && hasAsTechsNeeded(asTechsNeeded);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_AS_TECHS) &&
+                     !MekHQ.getMHQOptions().getNewDayAsTechPoolFill() &&
+                     hasAsTechsNeeded(asTechsNeeded);
     }
 }

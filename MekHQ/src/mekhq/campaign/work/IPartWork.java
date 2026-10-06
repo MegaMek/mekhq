@@ -161,22 +161,35 @@ public interface IPartWork extends IWork {
         }
     }
 
+    /** The share of a part's undamaged value that a paid repair costs. */
+    double REPAIR_COST_SHARE_OF_VALUE = 0.2;
+
     static PartRepairType findCorrectMRMSType(IPartWork part) {
-        if ((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) {
+        if (isWeaponWork(part)) {
             return PartRepairType.WEAPON;
         } else {
             return part.getMRMSOptionType();
         }
     }
 
+    /**
+     * @return {@code true} if the task is on a weapon, whether the weapon is damaged or destroyed. Mass Repair and the
+     *       repair categories both use this, so a weapon falls under Weapons in every case.
+     */
+    private static boolean isWeaponWork(IPartWork part) {
+        boolean isDamagedWeapon = (part instanceof EquipmentPart equipmentPart)
+                                        && (equipmentPart.getType() instanceof WeaponType);
+        boolean isDestroyedWeapon = (part instanceof MissingEquipmentPart missingEquipmentPart)
+                                          && (missingEquipmentPart.getType() instanceof WeaponType);
+        return isDamagedWeapon || isDestroyedWeapon;
+    }
+
     static PartRepairType findCorrectRepairType(IPartWork part) {
-        if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
-                  ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
-                         (missingEquipmentPart.getType() instanceof WeaponType))) {
+        if (isWeaponWork(part)) {
             return PartRepairType.WEAPON;
         } else if ((part instanceof EquipmentPart equipmentPart) &&
                          (equipmentPart.getType() instanceof MiscType miscType) &&
-                         miscType.hasFlag(MiscType.F_CLUB)) {
+                         (miscType.hasFlag(MiscType.F_CLUB) || miscType.hasFlag(MiscType.F_SHIELD))) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();
@@ -205,6 +218,16 @@ public interface IPartWork extends IWork {
      * @return the part's actual value if it wasn't damaged
      */
     Money getUndamagedValue();
+
+    /**
+     * The cost of repairing this part when the campaign pays for repairs: a fifth of its undamaged value. The task
+     * list quotes this figure and a successful repair charges it, so the two always agree.
+     *
+     * @return the cost of the repair
+     */
+    default Money getRepairCost() {
+        return getUndamagedValue().multipliedBy(REPAIR_COST_SHARE_OF_VALUE);
+    }
 
 
     boolean isPriceAdjustedForAmount();

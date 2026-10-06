@@ -1,0 +1,57 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+#
+# StratCon improved-sector-generation shape profiles. A sector's AREA is decided before this file is consulted - it
+# comes from the scouting budget, the planet's size, and how much of the world is ocean. These profiles only decide how
+# that area is laid out: how wide the sector is relative to how tall.
+#
+# 'aspectRatio' is width divided by height. Above 1.0 is wider than tall; below 1.0 is taller than wide. It is clamped
+# to 0.4 - 2.5, because a sector far outside that stops being a map and becomes a corridor a couple of hexes thick.
+#
+# 'weight' is the relative chance of being picked, rolled against the other profiles. There is deliberately no planetary
+# weighting here: shape exists for variety, so that two contracts on similar worlds don't produce identically
+# proportioned maps. Wide shapes are favored because the sector map pane is itself wider than it is tall, so a wide
+# sector uses the available space better and needs less scrolling.
+#
+# 'type' must match a SectorShapeProfileType constant.
+
+profiles:
+  # As tall as it is wide. The historical shape, kept common so sectors still often read as a plain block of country.
+  - type: SQUARE
+    aspectRatio: 1.0
+    weight: 4
+
+  # Modestly wider than tall - the workhorse shape, and the best fit for the map pane.
+  - type: BROAD
+    aspectRatio: 1.35
+    weight: 5
+
+  # Clearly wider than tall.
+  - type: WIDE
+    aspectRatio: 1.7
+    weight: 3
+
+  # A long east-west belt: a river valley, a coastal strip, a front line.
+  - type: CORRIDOR
+    aspectRatio: 2.2
+    weight: 2
+
+  # Taller than wide. Uncommon, because it fights the shape of the map pane - but without it every sector leans the
+  # same way and the variety is only ever "how wide".
+  - type: DEEP
+    aspectRatio: 0.7
+    weight: 2

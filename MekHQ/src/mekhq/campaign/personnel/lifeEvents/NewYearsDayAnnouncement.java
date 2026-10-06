@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -91,7 +92,7 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogCelebrations(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS, false);
         }
     }
 
@@ -114,9 +115,12 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
      * @return the selected {@link Person}, or {@code null} if no suitable speaker is found
      */
     private @Nullable Person getSpeaker() {
-        List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
+        List<Person> activePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.getPlayerForce().isClanForce(),
+                                       campaign.getLocalDate());
         if (commander != null) {
             activePersonnel.remove(commander);
         }

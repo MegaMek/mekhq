@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,7 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
@@ -51,6 +51,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -94,6 +95,7 @@ public class SkillType {
     public static final String S_PILOT_VTOL = "Piloting/VTOL";
     public static final String S_PILOT_NVEE = "Piloting/Naval";
     public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
+    public static final String S_PILOT_PROTO = "Piloting/ProtoMek";
     public static final String S_GUN_MEK = "Gunnery/Mek";
     public static final String S_GUN_AERO = "Gunnery/Aerospace";
     public static final String S_GUN_JET = "Gunnery/Aircraft";
@@ -113,10 +115,20 @@ public class SkillType {
 
     // support skills
     public static final String S_TECH_MEK = "Tech/Mek";
-    public static final String S_TECH_MECHANIC = "Tech/Mechanic";
-    public static final String S_TECH_AERO = "Tech/Aero";
+    public static final String S_TECH_VEHICLE = "Tech/Vehicle";
+    public static final String S_TECH_AERO = "Tech/Aerospace";
     public static final String S_TECH_BA = "Tech/BattleArmor";
     public static final String S_TECH_VESSEL = "Tech/Vessel";
+    public static final String S_TECH_MILITARY = "Tech/Military";
+    public static final String S_TECH_CIVILIAN = "Tech/Civilian";
+    public static final String S_TECH_ELECTRONIC = "Tech/Electronic";
+    public static final String S_TECH_NUCLEAR = "Tech/Nuclear";
+    public static final String S_TECH_AERONAUTICS = "Tech/Aeronautics";
+    public static final String S_TECH_MECHANICAL = "Tech/Mechanical";
+    public static final String S_TECH_MYOMER = "Tech/Myomer";
+    public static final String S_TECH_JETS = "Tech/Jets";
+    public static final String S_TECH_WEAPONS = "Tech/Weapons";
+    public static final String S_TECH_CYBERNETICS = "Tech/Cybernetics";
     public static final String S_ASTECH = "Astech";
     public static final String S_SURGERY = "Surgery/Any";
     public static final String S_MEDTECH = "MedTech/Any";
@@ -207,14 +219,17 @@ public class SkillType {
     public static final String[] skillList = { S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO, S_PILOT_GVEE,
                                                S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE, S_PILOT_JET, S_GUN_JET,
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
-                                               S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
-                                               S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
-                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_ACROBATICS,
-                                               S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_COOKING,
-                                               S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING, S_ART_POETRY,
-                                               S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING, S_ART_WRITING,
-                                               S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
-                                               S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
+                                               S_PILOT_PROTO, S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_VEHICLE,
+                                               S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL, S_TECH_MILITARY, S_TECH_CIVILIAN,
+                                               S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS, S_TECH_MECHANICAL,
+                                               S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS,
+                                               S_ASTECH, S_SURGERY, S_MEDTECH,
+                                               S_NAVIGATION, S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER,
+                                               S_ACROBATICS, S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY,
+                                               S_ART_COOKING, S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING,
+                                               S_ART_POETRY, S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING,
+                                               S_ART_WRITING, S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS,
+                                               S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
                                                S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
                                                S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
                                                S_INTEREST_MILITARY, S_INTEREST_ANTIQUES, S_INTEREST_THEOLOGY,
@@ -233,11 +248,40 @@ public class SkillType {
                                                S_CAREER_ANY, S_SWIMMING, S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING,
                                                S_MELEE_WEAPONS, S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
+    /**
+     * The technician skills usable for repairing, maintaining, and replacing unit parts, ordered from the legacy
+     * "global" skills (used only when no more specific skill applies to a part) to the granular specialist skills. This
+     * deliberately excludes {@link #S_ASTECH} (an assistant-only skill) and {@link #S_TECH_MILITARY}/
+     * {@link #S_TECH_CIVILIAN} (broad groupings that do not correspond to any component subskill), none of which are
+     * ever returned by a part's {@link mekhq.campaign.parts.Part#isRightTechType(String)}.
+     */
+    public static final String[] techSkillList = { S_TECH_MEK, S_TECH_VEHICLE, S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL,
+                                                   S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS,
+                                                   S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS,
+                                                   S_TECH_CYBERNETICS };
+
+    /**
+     * @return the technician skills used for repairing, maintaining, and replacing unit parts. See
+     *       {@link #techSkillList} for what is included and excluded.
+     */
+    public static String[] getTechSkills() {
+        return techSkillList;
+    }
 
     public static Map<String, SkillType> lookupHash;
 
     public static final int SKILL_NONE = 0;
     public static final int DISABLED_SKILL_LEVEL = -1;
+    /**
+     * The default XP cost of buying a Natural Aptitude in a Basic skill (A Time of War complexity SB or CB), before the
+     * campaign's XP cost multiplier. Campaigns can set a different cost per skill.
+     */
+    public static final int BASIC_NATURAL_APTITUDE_COST = 300;
+    /**
+     * The default XP cost of buying a Natural Aptitude in an Advanced skill (A Time of War complexity SA or CA), before
+     * the campaign's XP cost multiplier. Campaigns can set a different cost per skill.
+     */
+    public static final int ADVANCED_NATURAL_APTITUDE_COST = 500;
 
     public static final int EXP_NONE = -1;
     public static final int EXP_ULTRA_GREEN = 0;
@@ -261,6 +305,7 @@ public class SkillType {
     private int heroicLvl;
     private int legendaryLvl;
     private Integer[] costs;
+    private int naturalAptitudeCost = BASIC_NATURAL_APTITUDE_COST;
 
     /**
      * @param level skill level integer to get name for
@@ -371,17 +416,28 @@ public class SkillType {
      * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
      *
      * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     * @param treatAllTechSkillsAsTech Whether to treat all tech skills as tech skills, instead of their individual
+     *                                 classifications
      *
      * @return A list of unique skill names that belong to one of the specified skill subtypes.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes,
+          boolean treatAllTechSkillsAsTech) {
+        // Certain tech skills are marked as utility or roleplay so would not normally be included. However, they are
+        // still tech skills.
+        boolean isTechSubType = treatAllTechSkillsAsTech && skillSubTypes.contains(SUPPORT_TECHNICIAN);
+        List<String> specialTechSkills = List.of(S_TECH_MILITARY, S_TECH_CIVILIAN, S_TECH_ELECTRONIC, S_TECH_NUCLEAR,
+              S_TECH_AERONAUTICS, S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS);
+
         List<String> relevantSkills = new ArrayList<>();
         for (SkillType skillType : lookupHash.values()) {
+            boolean isSpecialTech = isTechSubType && specialTechSkills.contains(skillType.getName());
+
             SkillSubType subType = skillType.getSubType();
-            if (skillSubTypes.contains(subType)) {
+            if (isSpecialTech || skillSubTypes.contains(subType)) {
                 if (!relevantSkills.contains(skillType.name)) {
                     relevantSkills.add(skillType.name);
                 }
@@ -494,7 +550,7 @@ public class SkillType {
      * @param firstAttribute  The primary {@link SkillAttribute} associated with the skill, influencing its calculation
      *                        or behavior. <b>Cannot</b> be {@code null}.
      * @param secondAttribute The secondary {@link SkillAttribute} associated with the skill. If {@code null}, the
-     *                        default value is {@link SkillAttribute#NONE}.
+     *                        default value is {@link SkillAttribute#NO_ATTRIBUTE}.
      * @param greenLvl        The value representing the skill's "Green" proficiency level. If {@code null}, the default
      *                        value is {@code 1}.
      * @param regLvl          The value representing the skill's "Regular" proficiency level. If {@code null}, the
@@ -521,13 +577,14 @@ public class SkillType {
         this.countUp = isCountUp != null && isCountUp;
         this.subType = subType;
         this.firstAttribute = firstAttribute;
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? NO_ATTRIBUTE : secondAttribute;
         this.greenLvl = greenLvl == null ? 1 : greenLvl;
         this.regLvl = regLvl == null ? 3 : regLvl;
         this.vetLvl = vetLvl == null ? 4 : vetLvl;
         this.eliteLvl = eliteLvl == null ? 5 : eliteLvl;
         this.heroicLvl = heroicLvl == null ? 6 : heroicLvl;
         this.legendaryLvl = legendaryLvl == null ? 7 : legendaryLvl;
+        this.naturalAptitudeCost = getDefaultNaturalAptitudeCost(name);
 
         // This validates the length of costs to ensure that valid entries exist for all possible skill levels (0-10,
         // inclusive)
@@ -598,7 +655,7 @@ public class SkillType {
 
         String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
 
-        if (secondAttribute != NONE) {
+        if (secondAttribute != NO_ATTRIBUTE) {
             flavorText += ", " + secondAttribute.getLabel() + ')';
         } else {
             flavorText += ")";
@@ -654,7 +711,6 @@ public class SkillType {
      * @author Illiani
      * @since 0.50.06
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCombatSkill() {
         return this.subType == COMBAT_GUNNERY || this.subType == COMBAT_PILOTING;
     }
@@ -699,9 +755,19 @@ public class SkillType {
     public boolean isAffectedByGremlinsOrTechEmpathy() {
         return Objects.equals(this.name, S_TECH_BA) ||
                      Objects.equals(this.name, S_TECH_AERO) ||
-                     Objects.equals(this.name, S_TECH_MECHANIC) ||
+                     Objects.equals(this.name, S_TECH_VEHICLE) ||
                      Objects.equals(this.name, S_TECH_MEK) ||
                      Objects.equals(this.name, S_TECH_VESSEL) ||
+                     Objects.equals(this.name, S_TECH_MILITARY) ||
+                     Objects.equals(this.name, S_TECH_CIVILIAN) ||
+                     Objects.equals(this.name, S_TECH_ELECTRONIC) ||
+                     Objects.equals(this.name, S_TECH_NUCLEAR) ||
+                     Objects.equals(this.name, S_TECH_AERONAUTICS) ||
+                     Objects.equals(this.name, S_TECH_MECHANICAL) ||
+                     Objects.equals(this.name, S_TECH_MYOMER) ||
+                     Objects.equals(this.name, S_TECH_JETS) ||
+                     Objects.equals(this.name, S_TECH_WEAPONS) ||
+                     Objects.equals(this.name, S_TECH_CYBERNETICS) ||
                      Objects.equals(this.name, S_COMPUTERS) ||
                      Objects.equals(this.name, S_COMMUNICATIONS) ||
                      Objects.equals(this.name, S_SECURITY_SYSTEMS_ELECTRONIC);
@@ -779,8 +845,8 @@ public class SkillType {
      */
     public int getLinkedAttributeCount() {
         int count = 0;
-        count += (firstAttribute != null && firstAttribute != NONE) ? 1 : 0;
-        count += (secondAttribute != null && secondAttribute != NONE) ? 1 : 0;
+        count += (firstAttribute != null && firstAttribute != NO_ATTRIBUTE) ? 1 : 0;
+        count += (secondAttribute != null && secondAttribute != NO_ATTRIBUTE) ? 1 : 0;
         return count;
     }
 
@@ -848,6 +914,82 @@ public class SkillType {
     }
 
     /**
+     * @return the XP cost of buying a Natural Aptitude in this skill, before the campaign's XP cost multiplier, or
+     *       {@link #DISABLED_SKILL_LEVEL} if it can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getNaturalAptitudeCost() {
+        return naturalAptitudeCost;
+    }
+
+    /**
+     * @param naturalAptitudeCost the XP cost of buying a Natural Aptitude in this skill, before the campaign's XP cost
+     *                            multiplier, or {@link #DISABLED_SKILL_LEVEL} if it can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setNaturalAptitudeCost(int naturalAptitudeCost) {
+        this.naturalAptitudeCost = naturalAptitudeCost;
+    }
+
+    /**
+     * @return {@code true} if a Natural Aptitude in this skill can be bought with XP
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isNaturalAptitudePurchasable() {
+        return naturalAptitudeCost != DISABLED_SKILL_LEVEL;
+    }
+
+    /**
+     * Skill groups whose every specialty is an Advanced skill in A Time of War. Matched by the prefix before the
+     * specialty, e.g. {@code "Science/"}.
+     */
+    private static final List<String> ADVANCED_SKILL_GROUPS = List.of("Piloting/", "Gunnery/", "Tech/", "Art/",
+          "Interest/", "Science/", "Security Systems/");
+
+    /** Individual skills that are Advanced in A Time of War. */
+    private static final Set<String> ADVANCED_SKILLS = Set.of(S_ARTILLERY, S_DEMOLITIONS, S_MARTIAL_ARTS,
+          S_MELEE_WEAPONS, S_SURGERY, S_ADMIN, S_LEADER, S_STRATEGY, S_TACTICS, S_TRAINING, S_ESCAPE_ARTIST,
+          S_FORGERY, S_SENSOR_OPERATIONS, S_STEALTH, S_TRACKING, S_SLEIGHT_OF_HAND, S_COMPUTERS, S_CRYPTOGRAPHY,
+          S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES, S_PROTOCOLS, S_SURVIVAL);
+
+    /**
+     * The default XP cost of buying a Natural Aptitude in a skill, based on its complexity in the A Time of War Master
+     * Skills List: {@link #ADVANCED_NATURAL_APTITUDE_COST} for Advanced skills (SA and CA) and
+     * {@link #BASIC_NATURAL_APTITUDE_COST} for Basic skills (SB and CB). Skills with no A Time of War equivalent, such
+     * as Astech, count as Basic.
+     *
+     * @param skillName the name of the skill
+     *
+     * @return the default cost, before the campaign's XP cost multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getDefaultNaturalAptitudeCost(@Nullable String skillName) {
+        if (skillName == null) {
+            return BASIC_NATURAL_APTITUDE_COST;
+        }
+
+        if (ADVANCED_SKILLS.contains(skillName)) {
+            return ADVANCED_NATURAL_APTITUDE_COST;
+        }
+
+        for (String skillGroup : ADVANCED_SKILL_GROUPS) {
+            if (skillName.startsWith(skillGroup)) {
+                return ADVANCED_NATURAL_APTITUDE_COST;
+            }
+        }
+
+        return BASIC_NATURAL_APTITUDE_COST;
+    }
+
+    /**
      * Sets the first {@link SkillAttribute} associated with the skill type.
      *
      * <p>If {@code firstAttribute} is {@code null}, no action is taken, and the current value of the first attribute
@@ -860,7 +1002,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setFirstAttribute(@Nullable SkillAttribute firstAttribute) {
-        this.firstAttribute = firstAttribute == null ? NONE : firstAttribute;
+        this.firstAttribute = firstAttribute == null ? NO_ATTRIBUTE : firstAttribute;
     }
 
     /**
@@ -876,7 +1018,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setSecondAttribute(@Nullable SkillAttribute secondAttribute) {
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? NO_ATTRIBUTE : secondAttribute;
     }
 
     public int getCost(int lvl) {
@@ -956,116 +1098,141 @@ public class SkillType {
     }
 
     public static void initializeTypes() {
-        lookupHash = new Hashtable<>();
-        lookupHash.put(S_PILOT_MEK, createPilotingMek());
-        lookupHash.put(S_GUN_MEK, createGunneryMek());
-        lookupHash.put(S_PILOT_AERO, createPilotingAero());
-        lookupHash.put(S_GUN_AERO, createGunneryAero());
-        lookupHash.put(S_PILOT_JET, createPilotingJet());
-        lookupHash.put(S_GUN_JET, createGunneryJet());
-        lookupHash.put(S_PILOT_SPACE, createPilotingSpace());
-        lookupHash.put(S_GUN_SPACE, createGunnerySpace());
-        lookupHash.put(S_PILOT_GVEE, createPilotingGroundVee());
-        lookupHash.put(S_PILOT_NVEE, createPilotingNavalVee());
-        lookupHash.put(S_PILOT_VTOL, createPilotingVTOL());
-        lookupHash.put(S_GUN_VEE, createGunneryVehicle());
-        lookupHash.put(S_ARTILLERY, createArtillery());
-        lookupHash.put(S_GUN_BA, createGunneryBA());
-        lookupHash.put(S_GUN_PROTO, createGunneryProto());
-        lookupHash.put(S_SMALL_ARMS, createSmallArms());
-        lookupHash.put(S_ANTI_MEK, createAntiMek());
-        lookupHash.put(S_TECH_MEK, createTechMek());
-        lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
-        lookupHash.put(S_TECH_AERO, createTechAero());
-        lookupHash.put(S_TECH_BA, createTechBA());
-        lookupHash.put(S_TECH_VESSEL, createTechVessel());
-        lookupHash.put(S_ASTECH, createAstech());
-        lookupHash.put(S_SURGERY, createSurgery());
-        lookupHash.put(S_MEDTECH, createMedTech());
-        lookupHash.put(S_NAVIGATION, createNavigation());
-        lookupHash.put(S_TACTICS, createTactics());
-        lookupHash.put(S_STRATEGY, createStrategy());
-        lookupHash.put(S_ADMIN, createAdmin());
-        lookupHash.put(S_LEADER, createLeadership());
-        lookupHash.put(S_NEGOTIATION, createNegotiation());
-        lookupHash.put(S_ACROBATICS, createAcrobatics());
-        lookupHash.put(S_ACTING, createActing());
-        lookupHash.put(S_ANIMAL_HANDLING, createAnimalHandling());
-        lookupHash.put(S_APPRAISAL, createAppraisal());
-        lookupHash.put(S_ARCHERY, createArchery());
-        lookupHash.put(S_ART_DANCING, createArtDancing());
-        lookupHash.put(S_ART_DRAWING, createArtDrawing());
-        lookupHash.put(S_ART_PAINTING, createArtPainting());
-        lookupHash.put(S_ART_WRITING, createArtWriting());
-        lookupHash.put(S_ART_POETRY, createArtPoetry());
-        lookupHash.put(S_ART_SCULPTURE, createArtSculpture());
-        lookupHash.put(S_ART_INSTRUMENT, createArtInstrument());
-        lookupHash.put(S_ART_COOKING, createArtCooking());
-        lookupHash.put(S_ART_SINGING, createArtSinging());
-        lookupHash.put(S_ART_OTHER, createArtOther());
-        lookupHash.put(S_COMMUNICATIONS, createCommunications());
-        lookupHash.put(S_COMPUTERS, createComputers());
-        lookupHash.put(S_CRYPTOGRAPHY, createCryptography());
-        lookupHash.put(S_DEMOLITIONS, createDemolitions());
-        lookupHash.put(S_DISGUISE, createDisguise());
-        lookupHash.put(S_ESCAPE_ARTIST, createEscapeArtist());
-        lookupHash.put(S_FORGERY, createForgery());
-        lookupHash.put(S_INTEREST_SPORTS, createInterestSports());
-        lookupHash.put(S_INTEREST_HISTORY, createInterestHistory());
-        lookupHash.put(S_INTEREST_LITERATURE, createInterestLiterature());
-        lookupHash.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
-        lookupHash.put(S_INTEREST_FASHION, createInterestFashion());
-        lookupHash.put(S_INTEREST_MUSIC, createInterestMusic());
-        lookupHash.put(S_INTEREST_MILITARY, createInterestMilitary());
-        lookupHash.put(S_INTEREST_ANTIQUES, createInterestAntiques());
-        lookupHash.put(S_INTEREST_THEOLOGY, createInterestTheology());
-        lookupHash.put(S_INTEREST_GAMBLING, createInterestGambling());
-        lookupHash.put(S_INTEREST_POLITICS, createInterestPolitics());
-        lookupHash.put(S_INTEREST_PHILOSOPHY, createInterestPhilosophy());
-        lookupHash.put(S_INTEREST_ECONOMICS, createInterestEconomics());
-        lookupHash.put(S_INTEREST_POP_CULTURE, createInterestPopCulture());
-        lookupHash.put(S_INTEREST_ASTROLOGY, createInterestAstrology());
-        lookupHash.put(S_INTEREST_FISHING, createInterestFishing());
-        lookupHash.put(S_INTEREST_MYTHOLOGY, createInterestMythology());
-        lookupHash.put(S_INTEREST_CARTOGRAPHY, createInterestCartography());
-        lookupHash.put(S_INTEREST_ARCHEOLOGY, createInterestArcheology());
-        lookupHash.put(S_INTEREST_HOLO_CINEMA, createInterestHoloCinema());
-        lookupHash.put(S_INTEREST_EXOTIC_ANIMALS, createInterestExoticAnimals());
-        lookupHash.put(S_INTEREST_LAW, createInterestLaw());
-        lookupHash.put(S_INTEREST_OTHER, createInterestOther());
-        lookupHash.put(S_INTERROGATION, createInterrogation());
-        lookupHash.put(S_INVESTIGATION, createInvestigation());
-        lookupHash.put(S_LANGUAGES, createLanguage());
-        lookupHash.put(S_MARTIAL_ARTS, createMartialArts());
-        lookupHash.put(S_PERCEPTION, createPerception());
-        lookupHash.put(S_SLEIGHT_OF_HAND, createSleightOfHand());
-        lookupHash.put(S_PROTOCOLS, createProtocols());
-        lookupHash.put(S_SCIENCE_BIOLOGY, createScienceBiology());
-        lookupHash.put(S_SCIENCE_CHEMISTRY, createScienceChemistry());
-        lookupHash.put(S_SCIENCE_MATHEMATICS, createScienceMathematics());
-        lookupHash.put(S_SCIENCE_PHYSICS, createSciencePhysics());
-        lookupHash.put(S_SCIENCE_MILITARY, createScienceMilitary());
-        lookupHash.put(S_SCIENCE_GEOLOGY, createScienceGeology());
-        lookupHash.put(S_SCIENCE_XENOBIOLOGY, createScienceXenobiology());
-        lookupHash.put(S_SCIENCE_PHARMACOLOGY, createSciencePharmacology());
-        lookupHash.put(S_SCIENCE_GENETICS, createScienceGenetics());
-        lookupHash.put(S_SCIENCE_PSYCHOLOGY, createSciencePsychology());
-        lookupHash.put(S_SCIENCE_OTHER, createScienceOther());
-        lookupHash.put(S_SECURITY_SYSTEMS_ELECTRONIC, createSecuritySystemsElectronic());
-        lookupHash.put(S_SECURITY_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
-        lookupHash.put(S_SENSOR_OPERATIONS, createSensorOperations());
-        lookupHash.put(S_STEALTH, createStealth());
-        lookupHash.put(S_STREETWISE, createStreetwise());
-        lookupHash.put(S_SURVIVAL, createSurvival());
-        lookupHash.put(S_TRACKING, createTracking());
-        lookupHash.put(S_TRAINING, createTraining());
-        lookupHash.put(S_CAREER_ANY, createCareer());
-        lookupHash.put(S_SWIMMING, createSwimming());
-        lookupHash.put(S_RUNNING, createRunning());
-        lookupHash.put(S_ZERO_G_OPERATIONS, createZeroGOperations());
-        lookupHash.put(S_MELEE_WEAPONS, createMeleeWeapons());
-        lookupHash.put(S_THROWN_WEAPONS, createThrownWeapons());
-        lookupHash.put(S_SUPPORT_WEAPONS, createSupportWeapons());
+        lookupHash = createDefaultTypes();
+    }
+
+    /**
+     * Builds a fresh map of every skill type at its default values. Each call returns new instances, so the result can
+     * be edited without touching the active skill types.
+     *
+     * @return a new map of skill name to default {@link SkillType}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Map<String, SkillType> createDefaultTypes() {
+        Map<String, SkillType> defaultTypes = new Hashtable<>();
+        defaultTypes.put(S_PILOT_MEK, createPilotingMek());
+        defaultTypes.put(S_GUN_MEK, createGunneryMek());
+        defaultTypes.put(S_PILOT_AERO, createPilotingAero());
+        defaultTypes.put(S_GUN_AERO, createGunneryAero());
+        defaultTypes.put(S_PILOT_JET, createPilotingJet());
+        defaultTypes.put(S_GUN_JET, createGunneryJet());
+        defaultTypes.put(S_PILOT_SPACE, createPilotingSpace());
+        defaultTypes.put(S_GUN_SPACE, createGunnerySpace());
+        defaultTypes.put(S_PILOT_GVEE, createPilotingGroundVee());
+        defaultTypes.put(S_PILOT_NVEE, createPilotingNavalVee());
+        defaultTypes.put(S_PILOT_VTOL, createPilotingVTOL());
+        defaultTypes.put(S_GUN_VEE, createGunneryVehicle());
+        defaultTypes.put(S_ARTILLERY, createArtillery());
+        defaultTypes.put(S_GUN_BA, createGunneryBA());
+        defaultTypes.put(S_GUN_PROTO, createGunneryProto());
+        defaultTypes.put(S_PILOT_PROTO, createPilotingProto());
+        defaultTypes.put(S_SMALL_ARMS, createSmallArms());
+        defaultTypes.put(S_ANTI_MEK, createAntiMek());
+        defaultTypes.put(S_TECH_MEK, createTechMek());
+        defaultTypes.put(S_TECH_VEHICLE, createTechVehicle());
+        defaultTypes.put(S_TECH_AERO, createTechAero());
+        defaultTypes.put(S_TECH_BA, createTechBA());
+        defaultTypes.put(S_TECH_VESSEL, createTechVessel());
+        defaultTypes.put(S_TECH_MILITARY, createTechMilitary());
+        defaultTypes.put(S_TECH_CIVILIAN, createTechCivilian());
+        defaultTypes.put(S_TECH_ELECTRONIC, createTechElectronic());
+        defaultTypes.put(S_TECH_NUCLEAR, createTechNuclear());
+        defaultTypes.put(S_TECH_AERONAUTICS, createTechAeronautics());
+        defaultTypes.put(S_TECH_MECHANICAL, createTechMechanical());
+        defaultTypes.put(S_TECH_MYOMER, createTechMyomer());
+        defaultTypes.put(S_TECH_JETS, createTechJets());
+        defaultTypes.put(S_TECH_WEAPONS, createTechWeapons());
+        defaultTypes.put(S_TECH_CYBERNETICS, createTechCybernetics());
+        defaultTypes.put(S_ASTECH, createAstech());
+        defaultTypes.put(S_SURGERY, createSurgery());
+        defaultTypes.put(S_MEDTECH, createMedTech());
+        defaultTypes.put(S_NAVIGATION, createNavigation());
+        defaultTypes.put(S_TACTICS, createTactics());
+        defaultTypes.put(S_STRATEGY, createStrategy());
+        defaultTypes.put(S_ADMIN, createAdmin());
+        defaultTypes.put(S_LEADER, createLeadership());
+        defaultTypes.put(S_NEGOTIATION, createNegotiation());
+        defaultTypes.put(S_ACROBATICS, createAcrobatics());
+        defaultTypes.put(S_ACTING, createActing());
+        defaultTypes.put(S_ANIMAL_HANDLING, createAnimalHandling());
+        defaultTypes.put(S_APPRAISAL, createAppraisal());
+        defaultTypes.put(S_ARCHERY, createArchery());
+        defaultTypes.put(S_ART_DANCING, createArtDancing());
+        defaultTypes.put(S_ART_DRAWING, createArtDrawing());
+        defaultTypes.put(S_ART_PAINTING, createArtPainting());
+        defaultTypes.put(S_ART_WRITING, createArtWriting());
+        defaultTypes.put(S_ART_POETRY, createArtPoetry());
+        defaultTypes.put(S_ART_SCULPTURE, createArtSculpture());
+        defaultTypes.put(S_ART_INSTRUMENT, createArtInstrument());
+        defaultTypes.put(S_ART_COOKING, createArtCooking());
+        defaultTypes.put(S_ART_SINGING, createArtSinging());
+        defaultTypes.put(S_ART_OTHER, createArtOther());
+        defaultTypes.put(S_COMMUNICATIONS, createCommunications());
+        defaultTypes.put(S_COMPUTERS, createComputers());
+        defaultTypes.put(S_CRYPTOGRAPHY, createCryptography());
+        defaultTypes.put(S_DEMOLITIONS, createDemolitions());
+        defaultTypes.put(S_DISGUISE, createDisguise());
+        defaultTypes.put(S_ESCAPE_ARTIST, createEscapeArtist());
+        defaultTypes.put(S_FORGERY, createForgery());
+        defaultTypes.put(S_INTEREST_SPORTS, createInterestSports());
+        defaultTypes.put(S_INTEREST_HISTORY, createInterestHistory());
+        defaultTypes.put(S_INTEREST_LITERATURE, createInterestLiterature());
+        defaultTypes.put(S_INTEREST_HOLO_GAMES, createInterestHoloGames());
+        defaultTypes.put(S_INTEREST_FASHION, createInterestFashion());
+        defaultTypes.put(S_INTEREST_MUSIC, createInterestMusic());
+        defaultTypes.put(S_INTEREST_MILITARY, createInterestMilitary());
+        defaultTypes.put(S_INTEREST_ANTIQUES, createInterestAntiques());
+        defaultTypes.put(S_INTEREST_THEOLOGY, createInterestTheology());
+        defaultTypes.put(S_INTEREST_GAMBLING, createInterestGambling());
+        defaultTypes.put(S_INTEREST_POLITICS, createInterestPolitics());
+        defaultTypes.put(S_INTEREST_PHILOSOPHY, createInterestPhilosophy());
+        defaultTypes.put(S_INTEREST_ECONOMICS, createInterestEconomics());
+        defaultTypes.put(S_INTEREST_POP_CULTURE, createInterestPopCulture());
+        defaultTypes.put(S_INTEREST_ASTROLOGY, createInterestAstrology());
+        defaultTypes.put(S_INTEREST_FISHING, createInterestFishing());
+        defaultTypes.put(S_INTEREST_MYTHOLOGY, createInterestMythology());
+        defaultTypes.put(S_INTEREST_CARTOGRAPHY, createInterestCartography());
+        defaultTypes.put(S_INTEREST_ARCHEOLOGY, createInterestArcheology());
+        defaultTypes.put(S_INTEREST_HOLO_CINEMA, createInterestHoloCinema());
+        defaultTypes.put(S_INTEREST_EXOTIC_ANIMALS, createInterestExoticAnimals());
+        defaultTypes.put(S_INTEREST_LAW, createInterestLaw());
+        defaultTypes.put(S_INTEREST_OTHER, createInterestOther());
+        defaultTypes.put(S_INTERROGATION, createInterrogation());
+        defaultTypes.put(S_INVESTIGATION, createInvestigation());
+        defaultTypes.put(S_LANGUAGES, createLanguage());
+        defaultTypes.put(S_MARTIAL_ARTS, createMartialArts());
+        defaultTypes.put(S_PERCEPTION, createPerception());
+        defaultTypes.put(S_SLEIGHT_OF_HAND, createSleightOfHand());
+        defaultTypes.put(S_PROTOCOLS, createProtocols());
+        defaultTypes.put(S_SCIENCE_BIOLOGY, createScienceBiology());
+        defaultTypes.put(S_SCIENCE_CHEMISTRY, createScienceChemistry());
+        defaultTypes.put(S_SCIENCE_MATHEMATICS, createScienceMathematics());
+        defaultTypes.put(S_SCIENCE_PHYSICS, createSciencePhysics());
+        defaultTypes.put(S_SCIENCE_MILITARY, createScienceMilitary());
+        defaultTypes.put(S_SCIENCE_GEOLOGY, createScienceGeology());
+        defaultTypes.put(S_SCIENCE_XENOBIOLOGY, createScienceXenobiology());
+        defaultTypes.put(S_SCIENCE_PHARMACOLOGY, createSciencePharmacology());
+        defaultTypes.put(S_SCIENCE_GENETICS, createScienceGenetics());
+        defaultTypes.put(S_SCIENCE_PSYCHOLOGY, createSciencePsychology());
+        defaultTypes.put(S_SCIENCE_OTHER, createScienceOther());
+        defaultTypes.put(S_SECURITY_SYSTEMS_ELECTRONIC, createSecuritySystemsElectronic());
+        defaultTypes.put(S_SECURITY_SYSTEMS_MECHANICAL, createSecuritySystemsMechanical());
+        defaultTypes.put(S_SENSOR_OPERATIONS, createSensorOperations());
+        defaultTypes.put(S_STEALTH, createStealth());
+        defaultTypes.put(S_STREETWISE, createStreetwise());
+        defaultTypes.put(S_SURVIVAL, createSurvival());
+        defaultTypes.put(S_TRACKING, createTracking());
+        defaultTypes.put(S_TRAINING, createTraining());
+        defaultTypes.put(S_CAREER_ANY, createCareer());
+        defaultTypes.put(S_SWIMMING, createSwimming());
+        defaultTypes.put(S_RUNNING, createRunning());
+        defaultTypes.put(S_ZERO_G_OPERATIONS, createZeroGOperations());
+        defaultTypes.put(S_MELEE_WEAPONS, createMeleeWeapons());
+        defaultTypes.put(S_THROWN_WEAPONS, createThrownWeapons());
+        defaultTypes.put(S_SUPPORT_WEAPONS, createSupportWeapons());
+        return defaultTypes;
     }
 
     public static @Nullable SkillType getType(String skillName) {
@@ -1165,6 +1332,12 @@ public class SkillType {
             case "Career/Any" + RP_ONLY_TAG -> "Career/Any";
             case "Running" + RP_ONLY_TAG -> "Running";
             case "Swimming" + RP_ONLY_TAG -> "Swimming";
+            // Anti-Mek gained its ATOW "(Climbing)" alias in its canonical name; map the legacy
+            // bare name (from older saves and infantry crew-skill data) to the current one.
+            case "Anti-Mek" -> S_ANTI_MEK;
+            // <50.01 compatibility handler
+            case "Tech/Mechanic" -> S_TECH_VEHICLE;
+            case "Tech/Aero" -> S_TECH_AERO;
             default -> skillName;
         };
         return skillName;
@@ -1186,7 +1359,7 @@ public class SkillType {
         } else if (en instanceof Infantry) {
             return S_ANTI_MEK;
         } else if (en instanceof ProtoMek) {
-            return S_GUN_PROTO;
+            return S_PILOT_PROTO;
         } else {
             return S_PILOT_MEK;
         }
@@ -1300,6 +1473,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heroicLvl", heroicLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "legendaryLvl", legendaryLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalAptitudeCost", naturalAptitudeCost);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
@@ -1313,6 +1487,7 @@ public class SkillType {
         try {
             SkillType skillType = new SkillType();
             NodeList nodeList = workingNode.getChildNodes();
+            boolean hasNaturalAptitudeCost = false;
 
             for (int x = 0; x < nodeList.getLength(); x++) {
                 Node wn2 = nodeList.item(x);
@@ -1357,7 +1532,16 @@ public class SkillType {
                     for (int i = 0; i < values.length; i++) {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
+                    skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
+                          skillType.naturalAptitudeCost);
+                    hasNaturalAptitudeCost = true;
                 }
+            }
+
+            // Saves and presets from before Natural Aptitude costs existed get the default for the skill
+            if (!hasNaturalAptitudeCost) {
+                skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
 
             lookupHash.put(skillType.name, skillType);
@@ -1372,6 +1556,7 @@ public class SkillType {
         try {
             SkillType skillType = new SkillType();
             NodeList nl = wn.getChildNodes();
+            boolean hasNaturalAptitudeCost = false;
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -1404,7 +1589,16 @@ public class SkillType {
                     for (int i = 0; i < values.length; i++) {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
+                    skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
+                          skillType.naturalAptitudeCost);
+                    hasNaturalAptitudeCost = true;
                 }
+            }
+
+            // Saves and presets from before Natural Aptitude costs existed get the default for the skill
+            if (!hasNaturalAptitudeCost) {
+                skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
 
             hash.put(skillType.name, skillType);
@@ -1427,25 +1621,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryMek() {
         return new SkillType(S_GUN_MEK,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1462,25 +1655,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryAero() {
         return new SkillType(S_GUN_AERO,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1497,25 +1689,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryJet() {
         return new SkillType(S_GUN_JET,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1532,25 +1723,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunnerySpace() {
         return new SkillType(S_GUN_SPACE,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1567,7 +1757,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1584,7 +1774,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1601,96 +1791,109 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createPilotingProto() {
+        return new SkillType(S_PILOT_PROTO,
+              7, // Not a typo
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryVehicle() {
         return new SkillType(S_GUN_VEE,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createArtillery() {
         return new SkillType(S_ARTILLERY,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               INTELLIGENCE,
               WILLPOWER,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryBA() {
         return new SkillType(S_GUN_BA,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryProto() {
         return new SkillType(S_GUN_PROTO,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createSmallArms() {
         return new SkillType(S_SMALL_ARMS,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1701,21 +1904,21 @@ public class SkillType {
               false,
               COMBAT_PILOTING,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               2,
               null,
               null,
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechMek() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_MEK,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1726,15 +1929,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
-    public static SkillType createTechMechanic() {
+    public static SkillType createTechVehicle() {
         // This skill corresponds to the ATOW skill 'Technician'
-        return new SkillType(S_TECH_MECHANIC,
-              10,
+        return new SkillType(S_TECH_VEHICLE,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1745,15 +1947,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechAero() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_AERO,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1764,15 +1965,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechBA() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_BA,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1783,15 +1983,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechVessel() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_VESSEL,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1802,28 +2001,205 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechMilitary() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MILITARY,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechCivilian() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_CIVILIAN,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechElectronic() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_ELECTRONIC,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechNuclear() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_NUCLEAR,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechAeronautics() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_AERONAUTICS,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechMechanical() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MECHANICAL,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechMyomer() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MYOMER,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechJets() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_JETS,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechWeapons() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_WEAPONS,
+              9,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
+        );
+    }
+
+    public static SkillType createTechCybernetics() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_CYBERNETICS,
+              9,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createAstech() {
         // This doesn't correspond to an ATOW skill, so we went with INTELLIGENCE as the tech equivalent of MedTech
         return new SkillType(S_ASTECH,
-              10,
+              7,
               false,
               SUPPORT_TECHNICIAN,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
               null,
               null,
               null,
-              new Integer[] { 12, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1841,8 +2217,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 16, 8, 0, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1852,16 +2227,14 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
               null,
               null,
               null,
-              new Integer[] { 16, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1872,14 +2245,14 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1896,7 +2269,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1913,13 +2286,13 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createAdmin() {
         return new SkillType(S_ADMIN,
-              10,
+              8,
               false,
               SUPPORT,
               INTELLIGENCE,
@@ -1930,8 +2303,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 0, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1948,7 +2320,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1958,14 +2330,14 @@ public class SkillType {
               false,
               SUPPORT,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1975,7 +2347,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1992,7 +2364,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2009,7 +2381,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               WILLPOWER,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2026,7 +2398,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2039,17 +2411,17 @@ public class SkillType {
 
     public static SkillType createArchery() {
         return new SkillType(S_ARCHERY,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              NO_ATTRIBUTE,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -2232,7 +2604,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2249,7 +2621,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2284,12 +2656,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               INTELLIGENCE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -2300,7 +2672,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2794,12 +3166,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -2810,7 +3182,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3118,7 +3490,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3186,7 +3558,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3203,7 +3575,7 @@ public class SkillType {
               false,
               UTILITY,
               REFLEXES,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3221,12 +3593,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3237,13 +3609,13 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              NO_ATTRIBUTE,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3254,13 +3626,13 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              NO_ATTRIBUTE,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3271,7 +3643,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               STRENGTH,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3297,5 +3669,28 @@ public class SkillType {
               null,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
+    }
+
+    /**
+     * Converts an experience level to its corresponding skill level.
+     *
+     * @param experienceLevel an integer representing the experience level.
+     *
+     * @return the corresponding {@code SkillLevel} value based on the given experience level.
+     *
+     * @throws IllegalStateException if the experience level does not match any predefined constants.
+     */
+    public static SkillLevel skillLevelFromExperienceLevel(int experienceLevel) {
+        return switch (experienceLevel) {
+            case EXP_NONE -> SkillLevel.NONE;
+            case EXP_ULTRA_GREEN -> SkillLevel.ULTRA_GREEN;
+            case EXP_GREEN -> SkillLevel.GREEN;
+            case EXP_REGULAR -> SkillLevel.REGULAR;
+            case EXP_VETERAN -> SkillLevel.VETERAN;
+            case EXP_ELITE -> SkillLevel.ELITE;
+            case EXP_HEROIC -> SkillLevel.HEROIC;
+            case EXP_LEGENDARY -> SkillLevel.LEGENDARY;
+            default -> throw new IllegalStateException("Unexpected value: " + experienceLevel);
+        };
     }
 }

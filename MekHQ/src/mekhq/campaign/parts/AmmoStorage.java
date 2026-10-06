@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.Objects;
+import java.util.UUID;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
@@ -44,10 +45,13 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -64,6 +68,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     private static final MMLogger LOGGER = MMLogger.create(AmmoStorage.class);
 
     protected int shots;
+    /** The unit this ammunition is bought for, whose warehouse receives it; {@code null} for the main stock */
+    private UUID deliveryUnitId;
 
     public AmmoStorage() {
         this(0, null, 0, null);
@@ -78,7 +84,39 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public AmmoStorage clone() {
         AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
+        storage.deliveryUnitId = deliveryUnitId;
         return storage;
+    }
+
+    /**
+     * Marks this as ammunition bought for a unit's bin, so it is delivered to the warehouse that unit is kept in,
+     * which may be a base's, rather than to the main force's.
+     *
+     * @param deliveryUnitId the unit the ammunition is for, or {@code null} for the main force's stock
+     */
+    public void setDeliveryUnitId(@Nullable UUID deliveryUnitId) {
+        this.deliveryUnitId = deliveryUnitId;
+    }
+
+    /**
+     * @return the unit this ammunition is bought for, or {@code null} if it is bought for the main force's stock
+     */
+    public @Nullable UUID getDeliveryUnitId() {
+        return deliveryUnitId;
+    }
+
+    /**
+     * The warehouse a purchase of this ammunition is delivered to: the one kept with the unit it is bought for, if
+     * that unit is still in the campaign, else this order's own.
+     */
+    private @Nullable LocalWarehouse deliveryWarehouse() {
+        Unit deliveryUnit = (deliveryUnitId == null) ? null : campaign.getUnit(deliveryUnitId);
+        LocalWarehouse unitWarehouse = (deliveryUnit == null) ? null : deliveryUnit.getWarehouse();
+        if ((deliveryUnitId != null) && (unitWarehouse == null)) {
+            LOGGER.debug("[BaseAmmo] Unit {} is no longer in the campaign; ammunition goes to the main stock",
+                  deliveryUnitId);
+        }
+        return (unitWarehouse != null) ? unitWarehouse : getWarehouse();
     }
 
     @Override
@@ -88,10 +126,22 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-        if (getType().getKgPerShot() > 0) {
-            return getType().getKgPerShot() * (shots / 1000.0);
+        AmmoType type = getType();
+        // Prefer the per-shot weight when a real one is available. getKgPerShot() falls back to
+        // 1000.0 / getShots() when no explicit weight is set, so for ammo with no per-ton shot capacity
+        // (notably infantry ammo, getShots() == 0) it returns Infinity - guard against that non-finite
+        // value here rather than letting it propagate.
+        double kgPerShot = type.getKgPerShot();
+        if (Double.isFinite(kgPerShot) && kgPerShot > 0) {
+            return kgPerShot * (shots / 1000.0);
         }
-        return ((double) shots / getType().getShots());
+        // Fall back to shots-per-ton, but only when there is a per-ton capacity to divide by. Otherwise a
+        // non-finite tonnage would poison cargo/warehouse totals and crash the Command Center when handed to
+        // BigDecimal (see MekHQ issue #9616). Treat such ammo as weightless.
+        if (type.getShots() > 0) {
+            return (double) shots / type.getShots();
+        }
+        return 0.0;
     }
 
     @Override
@@ -194,6 +244,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", getType().getInternalName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shots", shots);
+        if (deliveryUnitId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deliveryUnitId", deliveryUnitId);
+        }
         writeToXMLEnd(pw, indent);
     }
 
@@ -208,6 +261,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                     typeName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
                     shots = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deliveryUnitId")) {
+                    deliveryUnitId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
                 LOGGER.error("", ex);
@@ -294,7 +349,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays, double valueMultiplier) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
-        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
+        // Deliver to the warehouse kept with the unit the ammunition is for, which may be a base's
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, deliveryWarehouse())) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
                          + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
@@ -361,10 +417,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        if (isClanTechBase() && (campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0)) {
-            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        if (isClanTechBase() && (campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > 0)) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY), "clan-tech");
+        } else if (campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY), "Inner Sphere tech");
         }
         // availability mod
         AvailabilityValue avail = getAvailability();

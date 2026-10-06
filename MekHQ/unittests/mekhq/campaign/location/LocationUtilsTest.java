@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -100,6 +101,20 @@ public class LocationUtilsTest {
 
             travelNode.setParent(base);
             assertFalse(LocationUtils.isInTransit(travelNode));
+        }
+
+        @Test
+        void locationUnderTravellingGroundTransitNode_returnsTrue() {
+            GroundTransitLocation groundNode = new GroundTransitLocation(mock(PlanetarySystem.class), 2.0);
+            base.setParent(groundNode);
+            assertTrue(LocationUtils.isInTransit(base.getBaseHangar()));
+        }
+
+        @Test
+        void locationUnderArrivedGroundTransitNode_returnsFalse() {
+            GroundTransitLocation groundNode = new GroundTransitLocation(mock(PlanetarySystem.class), 0.0);
+            base.setParent(groundNode);
+            assertFalse(LocationUtils.isInTransit(base.getBaseHangar()));
         }
     }
 

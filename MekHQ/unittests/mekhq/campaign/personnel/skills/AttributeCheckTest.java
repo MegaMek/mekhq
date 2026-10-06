@@ -110,7 +110,7 @@ class AttributeCheckTest {
     @Test
     void testConstructor_NoneFirstAttribute() {
         Person person = mock(Person.class);
-        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, SkillAttribute.NONE));
+        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, SkillAttribute.NO_ATTRIBUTE));
     }
 
     @Test

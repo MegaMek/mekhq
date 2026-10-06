@@ -168,17 +168,7 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.loadFonts();
         LOGGER.info("Starting MegaMekLab version: {}", MMLConstants.VERSION);
         btnRefit = new JButton("Begin Refit");
-        btnRefit.addActionListener(evt -> {
-            Entity entity = labPanel.getEntity();
-            if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
-                int response = JOptionPane.showConfirmDialog(null, "This unit is underweight. Do you want to continue?",
-                      "Underweight Unit", JOptionPane.YES_NO_OPTION);
-                if (response == JOptionPane.NO_OPTION) {
-                    return;
-                }
-            }
-            campaignGUI.refitUnit(refit, true);
-        });
+        btnRefit.addActionListener(evt -> beginRefit());
         btnSaveForLater = new JButton("Save For Later");
         btnSaveForLater.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -336,6 +326,33 @@ public class MekLabTab extends CampaignGuiTab {
         labPanel.refreshAll();
     }
 
+    /**
+     * Starts the refit of the design in the lab. The refit is rebuilt from the lab's current design first, so it never
+     * starts from a stale copy, and nothing starts while the unit already has a refit in progress.
+     */
+    private void beginRefit() {
+        if (unit.isRefitting()) {
+            LOGGER.debug("[Refit] Begin Refit refused for {}: a refit is already in progress", unit.getName());
+            JOptionPane.showMessageDialog(null, resources.getString("refitInProgress.text"),
+                  resources.getString("refitInProgress.title"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        refreshRefitSummary();
+        if (!btnRefit.isEnabled()) {
+            LOGGER.debug("[Refit] Begin Refit refused for {}: {}", unit.getName(), btnRefit.getToolTipText());
+            return;
+        }
+        Entity entity = labPanel.getEntity();
+        if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
+            int response = JOptionPane.showConfirmDialog(null, "This unit is underweight. Do you want to continue?",
+                  "Underweight Unit", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.NO_OPTION) {
+                return;
+            }
+        }
+        campaignGUI.refitUnit(refit, true);
+    }
+
     public void refreshRefitSummary() {
         if (null == labPanel) {
             return;
@@ -391,7 +408,8 @@ public class MekLabTab extends CampaignGuiTab {
         int heat = entity.getHeatCapacity();
 
         double totalHeat = calculateTotalHeat();
-        int bvDiff = entity.calculateBattleValue(true, true) - unit.getEntity().calculateBattleValue(true, true);
+        int bvDiff = entity.calculateBattleValue(true, true, true)
+                           - unit.getEntity().calculateBattleValue(true, true, true);
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
@@ -401,7 +419,11 @@ public class MekLabTab extends CampaignGuiTab {
 
         String refitCheckFixable = refit.checkFixable();
 
-        if (tonnage < testEntity.calculateWeight()) {
+        if (unit.isRefitting()) {
+            btnRefit.setEnabled(false);
+            btnRefit.setToolTipText(resources.getString("refitInProgress.text"));
+            btnSaveForLater.setEnabled(true);
+        } else if (tonnage < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Unit is overweight.");
             btnSaveForLater.setEnabled(true);
@@ -435,15 +457,15 @@ public class MekLabTab extends CampaignGuiTab {
         lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (<font color='"
                                 + ReportingUtilities.getPositiveColor() + "'>+"
                                 + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (<font color='"
                                 + ReportingUtilities.getNegativeColor() + "'>" + bvDiff
                                 + "</font>)</html>");
         } else {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true, true) + " (+" + bvDiff + ")</html>");
         }
 
         if (currentTonnage != tonnage) {

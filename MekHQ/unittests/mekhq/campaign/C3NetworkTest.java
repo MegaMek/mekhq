@@ -43,6 +43,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.units.Entity;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,21 +56,21 @@ import org.junit.jupiter.api.Test;
  */
 class C3NetworkTest {
 
-    private Campaign campaign;
+    private PlayerForce force;
     private List<Unit> units;
 
     @BeforeEach
     void setUp() {
-        campaign = mock(Campaign.class);
+        force = mock(PlayerForce.class);
         units = new ArrayList<>();
 
-        // Configure mock to call real methods for the network methods we're testing
-        doCallRealMethod().when(campaign).getAvailableC3iNetworks();
-        doCallRealMethod().when(campaign).getAvailableNC3Networks();
-        doCallRealMethod().when(campaign).getAvailableNovaCEWSNetworks();
+        // The C3 network query logic lives on the force; call the real methods under test.
+        doCallRealMethod().when(force).getAvailableC3iNetworks();
+        doCallRealMethod().when(force).getAvailableNC3Networks();
+        doCallRealMethod().when(force).getAvailableNovaCEWSNetworks();
 
-        // Return our test units list
-        when(campaign.getUnits()).thenReturn(units);
+        // Those methods aggregate over the force's detachments via allUnits(); return our test units list.
+        when(force.allUnits()).thenReturn(units);
     }
 
     /**
@@ -149,7 +150,7 @@ class C3NetworkTest {
             units.add(unnetworkedUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert - should find the network with 5 free nodes
             assertEquals(1, networks.size(), "Should find one available C3i network");
@@ -165,7 +166,7 @@ class C3NetworkTest {
             units.add(partialUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert
             assertEquals(1, networks.size());
@@ -180,7 +181,7 @@ class C3NetworkTest {
             units.add(fullUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert - should not find full networks
             assertEquals(0, networks.size(), "Should not include full networks");
@@ -194,7 +195,7 @@ class C3NetworkTest {
             units.add(unassignedUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert
             assertEquals(0, networks.size(), "Should not include units not in TO&E");
@@ -208,7 +209,7 @@ class C3NetworkTest {
             units.add(nonC3iUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert
             assertEquals(0, networks.size(), "Should not include non-C3i units");
@@ -224,7 +225,7 @@ class C3NetworkTest {
             units.add(unit2);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableC3iNetworks();
+            Vector<String[]> networks = force.getAvailableC3iNetworks();
 
             // Assert - should only return one network entry
             assertEquals(1, networks.size(), "Should return unique networks only");
@@ -243,7 +244,7 @@ class C3NetworkTest {
             units.add(unnetworkedUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNC3Networks();
+            Vector<String[]> networks = force.getAvailableNC3Networks();
 
             // Assert
             assertEquals(1, networks.size(), "Should find one available NC3 network");
@@ -258,7 +259,7 @@ class C3NetworkTest {
             units.add(fullUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNC3Networks();
+            Vector<String[]> networks = force.getAvailableNC3Networks();
 
             // Assert
             assertEquals(0, networks.size());
@@ -277,7 +278,7 @@ class C3NetworkTest {
             units.add(unnetworkedUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert
             assertEquals(1, networks.size(), "Should find one available Nova CEWS network");
@@ -293,7 +294,7 @@ class C3NetworkTest {
             units.add(partialUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert
             assertEquals(1, networks.size());
@@ -308,7 +309,7 @@ class C3NetworkTest {
             units.add(fullUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert
             assertEquals(0, networks.size(), "Should not include full Nova CEWS networks");
@@ -322,7 +323,7 @@ class C3NetworkTest {
             units.add(unassignedUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert
             assertEquals(0, networks.size(), "Should not include units not in TO&E");
@@ -336,7 +337,7 @@ class C3NetworkTest {
             units.add(nonNovaUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert
             assertEquals(0, networks.size(), "Should not include non-Nova CEWS units");
@@ -350,7 +351,7 @@ class C3NetworkTest {
             units.add(invalidUnit);
 
             // Act
-            Vector<String[]> networks = campaign.getAvailableNovaCEWSNetworks();
+            Vector<String[]> networks = force.getAvailableNovaCEWSNetworks();
 
             // Assert - condition is <= 2, so 3 should be excluded
             assertEquals(0, networks.size(), "Should not include invalid free node counts");

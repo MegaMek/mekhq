@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,7 +48,7 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
     //region Constructors
 
     /**
-     * Creates a new DefaultFactionSelector class which uses {@link Campaign#getFaction()} to select the faction.
+     * Creates a new DefaultFactionSelector class which uses {@code Campaign#getFaction()} to select the faction.
      *
      * @param options the {@link RandomOriginOptions} to use in faction selection
      */
@@ -80,6 +80,6 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     @Override
     public @Nullable Faction selectFaction(final Campaign campaign) {
-        return (getFaction() == null) ? campaign.getFaction() : getFaction();
+        if ((getFaction() == null)) {return campaign.getPlayerForce().getFaction();} else {return getFaction();}
     }
 }

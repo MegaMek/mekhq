@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import java.util.List;
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -506,7 +507,7 @@ public enum FactionStandingLevel {
         }
 
         if (unitMarketRarityModifier != 0
-                  && !campaignOptions.getUnitMarketMethod().isNone()
+                  && !campaignOptions.get(CampaignOption.UNIT_MARKET_METHOD).isNone()
                   && campaignOptions.isUseFactionStandingUnitMarketSafe()) {
             effects.add(getFormattedTextAt(RESOURCE_BUNDLE, "factionStandingLevel.unitMarket",
                   getPolarityOfModifier(unitMarketRarityModifier)));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,11 +50,14 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import megamek.common.util.IssueReportUrl;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.utilities.EasyBugReport;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
@@ -83,6 +87,11 @@ public class EasyBugReportDialog extends ImmersiveDialogCore {
     private static final String REPORT_LINK_MML = "https://github.com/MegaMek/megameklab/issues/new/choose";
     private static final String REPORT_LINK_MHQ = "https://github.com/MegaMek/mekhq/issues/new/choose";
     private static final String REPORT_LINK_MM_DATA = "https://github.com/MegaMek/mm-data/issues/new";
+
+    /** Size and font of the Save Campaign button, matching the main button of MegaMek's bug report dialog. */
+    private static final int UNSCALED_SAVE_BUTTON_WIDTH = 260;
+    private static final int UNSCALED_SAVE_BUTTON_HEIGHT = 48;
+    private static final float SAVE_BUTTON_FONT_FACTOR = 1.4f;
 
     private static final Map<String, String> URI_LABELS = new LinkedHashMap<>();
 
@@ -167,8 +176,12 @@ public class EasyBugReportDialog extends ImmersiveDialogCore {
         row1.add(btnDiscord);
 
         String lblPackageBundle = getTextAt(RESOURCE_BUNDLE, "EasyBugReport.dialog.button.build");
-        RoundedJButton btnPackage = new RoundedJButton(lblPackageBundle);
+        // Sized and coloured as the main thing to press: every other button here only opens a link.
+        AccentRoundedJButton btnPackage = new AccentRoundedJButton(lblPackageBundle, Accent.HAZARD);
         btnPackage.setName(lblPackageBundle);
+        btnPackage.setFont(btnPackage.getFont().deriveFont(btnPackage.getFont().getSize2D() * SAVE_BUTTON_FONT_FACTOR));
+        btnPackage.setPreferredSize(new Dimension(scaleForGUI(UNSCALED_SAVE_BUTTON_WIDTH),
+              scaleForGUI(UNSCALED_SAVE_BUTTON_HEIGHT)));
         btnPackage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnPackage.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnPackage.addActionListener(evt -> EasyBugReport.saveCampaignForBugReport(frame, campaign));
@@ -180,7 +193,11 @@ public class EasyBugReportDialog extends ImmersiveDialogCore {
         for (Map.Entry<String, String> entry : URI_LABELS.entrySet()) {
             RoundedJButton btnURL = new RoundedJButton(entry.getKey());
             btnURL.setName(entry.getKey());
-            buildUrlButton(btnURL, entry.getValue());
+            String issuesUrl = entry.getValue();
+            // The issue chooser links are opened as the bug form with the version, OS and Java fields filled in,
+            // as MegaMek does; the tooltip keeps the plain link. mm-data has no form, so its link is unchanged.
+            String target = issuesUrl.equals(REPORT_LINK_MM_DATA) ? issuesUrl : IssueReportUrl.forIssueForm(issuesUrl);
+            buildUrlButton(btnURL, target, issuesUrl);
             row2.add(btnURL);
         }
 
@@ -210,16 +227,28 @@ public class EasyBugReportDialog extends ImmersiveDialogCore {
      * @since 0.50.11
      */
     private static void buildUrlButton(JButton btnURL, String address) {
-        btnURL.setToolTipText(address);
+        buildUrlButton(btnURL, address, address);
+    }
+
+    /**
+     * As {@link #buildUrlButton(JButton, String)}, but with a separate address for the tooltip, for links whose
+     * real target carries a long query string.
+     *
+     * @param btnURL         the button to configure
+     * @param address        the URL opened when the button is pressed
+     * @param displayAddress the URL shown in the tooltip
+     */
+    private static void buildUrlButton(JButton btnURL, String address, String displayAddress) {
+        btnURL.setToolTipText(displayAddress);
         btnURL.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnURL.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnURL.addActionListener(e -> {
+        btnURL.addActionListener(event -> {
             if (Desktop.isDesktopSupported()) {
                 try {
                     URI uri = new URI(address);
                     Desktop.getDesktop().browse(uri);
-                } catch (Exception ex) {
-                    LOGGER.error(ex, "Failed to open URL: {}", address);
+                } catch (Exception exception) {
+                    LOGGER.error(exception, "Failed to open URL: {}", address);
                 }
             }
         });

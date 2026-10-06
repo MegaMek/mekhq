@@ -40,8 +40,10 @@ import java.util.UUID;
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Personnel;
+import mekhq.campaign.AbstractMobileLocation;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.FixedLocation;
+import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
@@ -61,7 +63,7 @@ public class AcademyCampusLocation implements IPlace {
     private static final MMLogger LOGGER = MMLogger.create(AcademyCampusLocation.class);
 
     private final LocationNode locationNode;
-    private final Personnel personnel = new Personnel();
+    private final LocalPersonnel personnel = new LocalPersonnel();
     private final String academySet;
     private final String academyName;
 
@@ -90,7 +92,7 @@ public class AcademyCampusLocation implements IPlace {
     }
 
     @Override
-    public Personnel getPersonnel() {
+    public LocalPersonnel getPersonnel() {
         return personnel;
     }
 
@@ -99,8 +101,8 @@ public class AcademyCampusLocation implements IPlace {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academySet", academySet);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academyName", academyName);
         for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof CurrentLocation currentLocation) {
-                currentLocation.writeToXML(pw, indent);
+            if (child.getLocatable() instanceof AbstractMobileLocation travelNode) {
+                travelNode.writeToXML(pw, indent);
             }
         }
         for (LocationNode child : personnel.getLocationNode().getChildren()) {
@@ -109,6 +111,54 @@ public class AcademyCampusLocation implements IPlace {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "academyCampus");
+    }
+
+    /** Discriminator for a campus anchored to a fixed planetary system, as a serialized {@link ILocation} reference. */
+    public static final String CAMPUS_REFERENCE_TYPE = "campus";
+
+    /**
+     * Discriminator for a local (home-school or unit-education) campus that travels with its parent, as a serialized
+     * {@link ILocation} reference.
+     */
+    public static final String LOCAL_CAMPUS_REFERENCE_TYPE = "localCampus";
+
+    private static final String TAG_CAMPUS_SET = "referenceCampusSet";
+    private static final String TAG_CAMPUS_NAME = "referenceCampusName";
+    private static final String TAG_CAMPUS_SYSTEM_ID = "referenceCampusSystemId";
+
+    @Override
+    public String locationReferenceType() {
+        return (getParentLocation() instanceof FixedLocation) ? CAMPUS_REFERENCE_TYPE : LOCAL_CAMPUS_REFERENCE_TYPE;
+    }
+
+    @Override
+    public void writeReferenceIdentity(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, TAG_CAMPUS_SET, academySet);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, TAG_CAMPUS_NAME, academyName);
+        // A campus anchored to a fixed system records that system; a local (home-school or unit-education) campus
+        // travels with its parent and is resolved on load by academy set and name under the campaign.
+        if (getParentLocation() instanceof FixedLocation fixedLocation) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, TAG_CAMPUS_SYSTEM_ID, fixedLocation.getCurrentSystem().getId());
+        }
+    }
+
+    /** Resolves a {@code "campus"} reference (academy anchored to a fixed planetary system). */
+    public static @Nullable ILocation resolveCampusReference(Campaign campaign, Node node) {
+        String set = ILocation.referenceChildText(node, TAG_CAMPUS_SET);
+        String name = ILocation.referenceChildText(node, TAG_CAMPUS_NAME);
+        String systemId = ILocation.referenceChildText(node, TAG_CAMPUS_SYSTEM_ID);
+        return (set == null || name == null || systemId == null)
+                     ? null
+                     : campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, set, name, systemId);
+    }
+
+    /** Resolves a {@code "localCampus"} reference (home-school or unit-education campus under the campaign). */
+    public static @Nullable ILocation resolveLocalCampusReference(Campaign campaign, Node node) {
+        String set = ILocation.referenceChildText(node, TAG_CAMPUS_SET);
+        String name = ILocation.referenceChildText(node, TAG_CAMPUS_NAME);
+        return (set == null || name == null)
+                     ? null
+                     : campaign.getCampaignLocationManager().getOrCreateLocalCampusLocation(campaign, set, name);
     }
 
     // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.

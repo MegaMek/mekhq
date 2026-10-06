@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -54,9 +55,10 @@ import java.util.UUID;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 
 public class KillAwards {
@@ -71,7 +73,8 @@ public class KillAwards {
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      * @param killData the pre-processed list of kills mapped to Force ID
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person,
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, AbstractContract mission,
+          UUID person,
           List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();
 
@@ -93,7 +96,7 @@ public class KillAwards {
             int killsNeeded;
             String awardScope;
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> validOptions = Arrays.asList("scenario", "mission", "lifetime");
 
                 if (validOptions.contains(award.getRange().toLowerCase())) {
@@ -132,7 +135,8 @@ public class KillAwards {
 
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
-                                                   .filter(kill -> kill.getMissionId() == mission.getId())
+                                                   .filter(kill -> Objects.equals(kill.getMissionId(),
+                                                         mission.getId()))
                                                    .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal
@@ -142,7 +146,7 @@ public class KillAwards {
 
                         // otherwise, we need to identify all relevant kills across the TO&E
                     } else {
-                        FormationLevel maximumDepth = campaign.getFormation(0).getFormationLevel();
+                        FormationLevel maximumDepth = campaign.getPlayerForce().getFormation(0).getFormationLevel();
 
                         // in the event that the depth of the award exceeds the highest depth of the
                         // origin force
@@ -184,7 +188,7 @@ public class KillAwards {
                             // this will fail if the character doesn't have a unit,
                             // but that's ok, in that case we just use a default value
                             try {
-                                originForce = campaign.getPerson(person).getUnit().getFormationId();
+                                originForce = campaign.getPlayerForce().getHumanResources().getPerson(person).getUnit().getFormationId();
                             } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
@@ -199,13 +203,19 @@ public class KillAwards {
 
                                 try {
                                     // Get the current formation depth of the origin force
-                                    int depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
+                                    int depth = campaign.getPlayerForce()
+                                                      .getFormation(originForce)
+                                                      .getFormationLevel()
+                                                      .getDepth();
 
                                     // Continue the loop until the depth of the original force is not smaller than
                                     // the award depth
                                     while (depth < awardDepth.getDepth()) {
                                         // Get the ID of the origin force's parent force
-                                        int parentForce = campaign.getFormation(originForce).getParentFormation().getId();
+                                        int parentForce = campaign.getPlayerForce()
+                                                                .getFormation(originForce)
+                                                                .getParentFormation()
+                                                                .getId();
 
                                         // If the depth is greater or equal to the maximum depth, exit the loop
                                         if (depth >= maximumDepth.getDepth()) {
@@ -215,10 +225,13 @@ public class KillAwards {
                                         // Set the origin force to its parent force
                                         originForce = parentForce;
                                         // Update the depth to the depth of the new origin force
-                                        depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
+                                        depth = campaign.getPlayerForce()
+                                                      .getFormation(originForce)
+                                                      .getFormationLevel()
+                                                      .getDepth();
                                     }
 
-                                    Formation originNode = campaign.getFormation(originForce);
+                                    Formation originNode = campaign.getPlayerForce().getFormation(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
@@ -270,7 +283,7 @@ public class KillAwards {
 
         if (!individualAwards.isEmpty()) {
             // if isIssueBestAwardOnly we need to do some filtering
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 for (Award a : individualAwards) {
                     if (a.getQty() > rollingQty) {
                         rollingQty = a.getQty();
@@ -285,7 +298,7 @@ public class KillAwards {
         }
 
         if (!groupAwards.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 // we need to filter groupAwards into discrete Award Groups.
                 // otherwise, Forces become ineligible for Awards they should be entitled to
                 // if they are eligible for a 'better' Award from another Award Group.

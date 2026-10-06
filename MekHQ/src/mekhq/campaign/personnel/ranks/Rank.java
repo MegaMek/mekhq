@@ -170,7 +170,7 @@ public class Rank {
             String name = getRankNames().get(profession);
             name = (name == null) ? "-" : name;
             if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 1)) {
-                joiner.add(name + getRankLevels().get(profession));
+                joiner.add(name + ":" + getRankLevels().get(profession));
             } else {
                 joiner.add(name);
             }

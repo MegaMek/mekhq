@@ -76,14 +76,14 @@ public class FinanceTableMouseAdapter extends JPopupMenuAdapter {
         if (command.equalsIgnoreCase("DELETE")) {
             gui.getCampaign().addReport(FINANCES, transaction.voidTransaction());
             financeModel.deleteTransaction(row);
-            gui.getCampaign().getFinances().clearCachedBalance();
+            gui.getCampaign().getPlayerForce().getFinances().clearCachedBalance();
             MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
         } else if (command.contains("EDIT")) {
             EditTransactionDialog dialog = new EditTransactionDialog(gui.getFrame(), transaction, true);
             dialog.setVisible(true);
             if (!transaction.equals(dialog.getOldTransaction())) {
                 financeModel.setTransaction(row, transaction);
-                gui.getCampaign().getFinances().clearCachedBalance();
+                gui.getCampaign().getPlayerForce().getFinances().clearCachedBalance();
                 MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
                 gui.getCampaign().addReport(FINANCES, transaction.updateTransaction(dialog.getOldTransaction()));
             }

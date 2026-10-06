@@ -17,6 +17,10 @@
 
 key: CC
 name: Capellan Confederation
+# Synthetic retired faction code, present only so that alias resolution has something to exercise in
+# tests. Mirrors the real CGS faction, which keeps the retired CEI and SE codes as aliases.
+aliases:
+  2367: CAPCON
 capital: Sian
 yearsActive:
   - start: 2367

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.UUID;
 
@@ -48,7 +49,6 @@ import megamek.common.Player;
 import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -60,12 +60,12 @@ import org.junit.jupiter.api.Test;
 public class RestoreUnitActionTest {
     @Test
     public void restoreUnitSwitchesOutEntityAndParts() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Game mockGame = mock(Game.class);
         when(mockCampaign.getGame()).thenReturn(mockGame);
         Player mockPlayer = new Player(1, "Player");
         when(mockCampaign.getPlayer()).thenReturn(mockPlayer);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        mekhq.campaign.ForceQuartermaster mockQuartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
         int entityId = 42;
@@ -112,8 +112,8 @@ public class RestoreUnitActionTest {
     @Test
     public void restoreUnitUsingOldStrategy() {
         IEntityCopyFactory mockEntityCopyFactory = mock(IEntityCopyFactory.class);
-        Campaign mockCampaign = mock(Campaign.class);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
+        Campaign mockCampaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster mockQuartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.getShortNameRaw()).thenReturn("Test Mek TST-01X");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -423,7 +423,6 @@ public class JSuggestField extends JTextField {
      *
      * @param listener ActionListener to use
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void addSelectionListener(ActionListener listener) {
         if (listener != null) {
             listeners.add(listener);

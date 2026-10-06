@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -107,7 +108,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
             boolean wasSiteChangeSuccessful = true;
             Campaign campaign = gui.getCampaign();
             if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
-                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                      campaign.getCampaignOptions().get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS) > 0) {
                 wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
             }
 
@@ -203,7 +204,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                     AmmoType curType = ammo.getType();
                     for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
                           curType,
-                          gui.getCampaign().getCampaignOptions().getTechLevel())) {
+                          gui.getCampaign().getCampaignOptions().get(CampaignOption.TECH_LEVEL))) {
                         cbMenuItem = new JCheckBoxMenuItem(ammoType.getDesc());
                         if (ammoType.equals(curType)) {
                             cbMenuItem.setSelected(true);
@@ -237,7 +238,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (!unit.isSelfCrewed() && unit.isAvailable() && !unit.isDeployed()) {
+            if (MRMSService.isMassRepairableUnit(unit) && unit.isAvailable() && !unit.isDeployed()) {
                 String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
 
                 menuItem = new JMenuItem(title);

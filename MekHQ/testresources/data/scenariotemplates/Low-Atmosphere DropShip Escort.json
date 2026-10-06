@@ -1,0 +1,216 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Low-Atmosphere DropShip Escort",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Escort DropShip, defeat enemy forces.",
+"detailedBriefing": "An allied DropShip is under threat, with enemy air assets moving to intercept before it can reach safety. This vessel is critical to our operations, and its loss is not an option. Your mission is to protect the DropShip and destroy at least 33% of the attacking enemy forces.\n\nExpect aggressive aerial engagements, fast-moving strike craft, and possible long-range missile attacks. Use superior positioning, coordinated fire, and defensive tactics to neutralize threats before they can bring down our DropShip. Every enemy unit destroyed increases the DropShip’s chance of survival—hit them hard and make them pay for their assault.\n\nThe victor will control the battlefield at the end of the engagement, ensuring we hold the airspace and any remaining salvage. Defend the DropShip, eliminate the threat, and dominate the skies.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": true,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "VICTOR",
+"mapParameters": {
+"baseWidth": 50,
+"baseHeight": 17,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 1,
+"additionalMapSheetWide": 2,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "LowAtmosphere",
+"allowedTerrainTypes": []
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+6
+],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": -3,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": -3,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Player",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"INTERCEPTOR"
+]
+},
+"DropShip": {
+"forceAlignment": 1,
+"generationMethod": 4,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": 11,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "DropShip",
+"syncedForceName": "Player",
+"syncDeploymentType": "SameEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 1,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 1,
+"generationOrder": 4,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"MEK_CARRIER",
+"MEK_CARRIER",
+"ASF_CARRIER",
+"VEE_CARRIER",
+"INFANTRY_CARRIER",
+"TROOP_CARRIER",
+"CIVILIAN"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "ForceWithdraw",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+},
+{
+"objectiveCriterion": "ReachMapEdge",
+"description": "",
+"destinationEdge": "NORTH",
+"percentage": 100,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"DropShip"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": [
+"Crippled units do not count towards this objective."
+]
+}
+]
+}

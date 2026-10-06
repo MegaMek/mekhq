@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,7 +80,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (u.hasTransportAssignment(TOW_TRANSPORT)
                       && Objects.equals(transport, u.getTransportAssignment(TOW_TRANSPORT).getTransport())) {
                 u.setTransportAssignment(TOW_TRANSPORT, null);
@@ -128,6 +128,12 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
             otherTrailers.add(towingUnit);
             while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
                 towingUnit = towingUnit.getTransportedUnits(TOW_TRANSPORT).iterator().next();
+                if (otherTrailers.contains(towingUnit)) {
+                    // A looped hitch would keep adding the same trailers forever
+                    LOGGER.error("Unit {} ('{}') is towed twice in the same train",
+                          towingUnit.getId(), towingUnit.getName());
+                    break;
+                }
                 otherTrailers.add(towingUnit);
             }
         }
@@ -155,7 +161,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         clearTransportedUnits();
         for (Unit towTransportedUnit : oldTransportedUnits) {
             if (towTransportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getHangar().getUnit(towTransportedUnit.getId());
+                Unit realUnit = campaign.getPlayerForce().getHangar().getUnit(towTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
                         towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
@@ -195,7 +201,10 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
             oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
             if (oldTractor != null && !oldTractor.equals(transport)) {
-                oldTractor.unloadFromTransport(TOW_TRANSPORT);
+                // Release the trailer from the unit that was pulling it. Unloading the old tractor
+                // itself instead would leave it still listing this trailer as towed, a hitch that
+                // no longer exists on the trailer's side.
+                towedUnit.unloadFromTransport(TOW_TRANSPORT);
             }
         }
         if (transportedLocation != null) {
@@ -212,7 +221,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
 
         // Update Transport Capacities
         if (!Objects.equals(oldTractor, transport)) {
-            if (transport.getEntity() != null & !transport.getEntity().isTrailer() &&
+            if (transport.getEntity() != null && !transport.getEntity().isTrailer() &&
                       transport.getEntity() instanceof Tank tank) {
                 recalculateTransportCapacity(tank);
             } else {
@@ -251,8 +260,10 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
 
         if (transportedUnit.getEntity() != null && transport.getEntity() != null) {
             Unit tractor = getTractor();
+            // Recalculate even when the train is now empty: a tractor that just gave up its last
+            // trailer has its full towing capacity back, and stopping here would leave it stuck at
+            // the reduced figure the campaign transporter map offers the assign menus.
             if (tractor != null &&
-                      tractor.hasTransportedUnits(TOW_TRANSPORT) &&
                       tractor.getEntity() != null &&
                       tractor.getEntity() instanceof Tank tank) {
                 TowTransportedUnitsSummary tractorTransportedUnitsSummary = (TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(
@@ -273,7 +284,17 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
             if (tank.isTrailer()) {
                 if (transport.hasTransportAssignment(TOW_TRANSPORT)) {
                     tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
+
+                    // A hitch that loops back on itself would keep this walk going forever and
+                    // freeze whatever thread asked, so stop and report the broken train instead
+                    Set<Unit> unitsWalked = new HashSet<>();
+                    unitsWalked.add(transport);
                     while (tractor.hasTransportAssignment(TOW_TRANSPORT)) {
+                        if (!unitsWalked.add(tractor)) {
+                            LOGGER.error("Unit {} ('{}') is in a tow train that loops back on itself",
+                                  tractor.getId(), tractor.getName());
+                            break;
+                        }
                         tractor = tractor.getTransportAssignment(TOW_TRANSPORT).getTransport();
                     }
                 } else {

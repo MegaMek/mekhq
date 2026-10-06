@@ -39,9 +39,10 @@ import javax.swing.UIManager;
 
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import megamek.common.enums.NeuralInterfaceMode;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import mekhq.gui.utilities.ComponentColors;
 
 public final class MHQOptions extends SuiteOptions {
     // region Display Tab
@@ -94,21 +95,12 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HISTORICAL_DAILY_LOG, value);
     }
 
-    public boolean getCompanyGeneratorStartup() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE)
-                     .getBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, false);
+    public boolean getShowCommandGenerator() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, true);
     }
 
-    public void setCompanyGeneratorStartup(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMPANY_GENERATOR_STARTUP, value);
-    }
-
-    public boolean getShowCompanyGenerator() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, true);
-    }
-
-    public void setShowCompanyGenerator(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
+    public void setShowCommandGenerator(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, value);
     }
 
     public boolean getShowUnitPicturesOnTOE() {
@@ -118,6 +110,117 @@ public final class MHQOptions extends SuiteOptions {
     public void setShowUnitPicturesOnTOE(final boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
     }
+
+    public boolean getShowWarriorsAlmanac() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, true);
+    }
+
+    public void setShowWarriorsAlmanac(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
+    }
+
+    // region Personnel Record Logs
+    public boolean getDisplayPersonnelLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, false);
+    }
+
+    public void setDisplayPersonnelLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, value);
+    }
+
+    public boolean getDisplayScenarioLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_SCENARIO_LOG, false);
+    }
+
+    public void setDisplayScenarioLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_SCENARIO_LOG, value);
+    }
+
+    public boolean getDisplayKillRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_KILL_RECORD, false);
+    }
+
+    public void setDisplayKillRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_KILL_RECORD, value);
+    }
+
+    public boolean getDisplayMedicalRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_MEDICAL_RECORD, false);
+    }
+
+    public void setDisplayMedicalRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_MEDICAL_RECORD, value);
+    }
+
+    public boolean getDisplayPatientRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PATIENT_RECORD, false);
+    }
+
+    public void setDisplayPatientRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PATIENT_RECORD, value);
+    }
+
+    public boolean getDisplayAssignmentRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_ASSIGNMENT_RECORD, false);
+    }
+
+    public void setDisplayAssignmentRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_ASSIGNMENT_RECORD, value);
+    }
+
+    public boolean getDisplayPerformanceRecord() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_PERFORMANCE_RECORD, false);
+    }
+
+    public void setDisplayPerformanceRecord(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_PERFORMANCE_RECORD, value);
+    }
+    // endregion Personnel Record Logs
+
+    // region Unit Record Logs
+    public boolean getDisplayUnitLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_LOG, false);
+    }
+
+    public void setDisplayUnitLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_LOG, value);
+    }
+
+    public boolean getDisplayUnitKillLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_KILL_LOG, false);
+    }
+
+    public void setDisplayUnitKillLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_KILL_LOG, value);
+    }
+
+    public boolean getDisplayUnitCrewLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_CREW_LOG, false);
+    }
+
+    public void setDisplayUnitCrewLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_CREW_LOG, value);
+    }
+
+    public boolean getDisplayUnitDeploymentLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.DISPLAY_UNIT_DEPLOYMENT_LOG, false);
+    }
+
+    public void setDisplayUnitDeploymentLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_DEPLOYMENT_LOG, value);
+    }
+
+    public boolean getDisplayUnitRepairLog() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_UNIT_REPAIR_LOG, false);
+    }
+
+    public void setDisplayUnitRepairLog(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.DISPLAY_UNIT_REPAIR_LOG, value);
+    }
+    // endregion Unit Record Logs
 
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -258,6 +361,11 @@ public final class MHQOptions extends SuiteOptions {
     // endregion Display Tab
 
     // region Colours
+
+    public ComponentColors getDeployedColors() {
+        return new ComponentColors(getDeployedForeground(), getDeployedBackground());
+    }
+
     public Color getDeployedForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
@@ -313,6 +421,30 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setInTransitBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.IN_TRANSIT_BACKGROUND, value.getRGB());
+    }
+
+    public Color getQueuedForTravelForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.QUEUED_FOR_TRAVEL_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setQueuedForTravelForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.QUEUED_FOR_TRAVEL_FOREGROUND, value.getRGB());
+    }
+
+    public Color getQueuedForTravelBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.QUEUED_FOR_TRAVEL_BACKGROUND, new Color(0xFFB0FF).getRGB()));
+    }
+
+    public void setQueuedForTravelBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.QUEUED_FOR_TRAVEL_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getQueuedForTravelColors() {
+        return new ComponentColors(getQueuedForTravelForeground(), getQueuedForTravelBackground());
     }
 
     public Color getRefittingForeground() {
@@ -479,6 +611,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.LOAN_OVERDUE_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getInjuredColors() {
+        return new ComponentColors(getInjuredForeground(), getInjuredBackground());
+    }
+
     public Color getInjuredForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.INJURED_FOREGROUND, Color.BLACK.getRGB()));
@@ -495,6 +631,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setInjuredBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INJURED_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getHealedInjuriesColors() {
+        return new ComponentColors(getHealedInjuriesForeground(), getHealedInjuriesBackground());
     }
 
     public Color getHealedInjuriesForeground() {
@@ -515,6 +655,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.HEALED_INJURIES_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getPregnantColors() {
+        return new ComponentColors(getPregnantForeground(), getPregnantBackground());
+    }
+
     public Color getPregnantForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.PREGNANT_FOREGROUND, Color.BLACK.getRGB()));
@@ -531,6 +675,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setPregnantBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PREGNANT_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getGoneColors() {
+        return new ComponentColors(getGoneForeground(), getGoneBackground());
     }
 
     public Color getGoneForeground() {
@@ -551,6 +699,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getAbsentColors() {
+        return new ComponentColors(getAbsentForeground(), getAbsentBackground());
+    }
+
     public Color getAbsentForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
@@ -567,6 +719,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setAbsentBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getFatiguedColors() {
+        return new ComponentColors(getFatiguedForeground(), getFatiguedBackground());
     }
 
     public Color getFatiguedForeground() {
@@ -587,6 +743,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getAwayFromMainForceColors() {
+        return new ComponentColors(getAwayFromMainForceForeground(), getAwayFromMainForceBackground());
+    }
+
     public Color getAwayFromMainForceForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.AWAY_FROM_MAIN_FORCE_FOREGROUND, 0x000000));
@@ -605,6 +765,20 @@ public final class MHQOptions extends SuiteOptions {
     public void setAwayFromMainForceBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE)
               .putInt(MHQConstants.AWAY_FROM_MAIN_FORCE_BACKGROUND, value.getRGB());
+    }
+
+    /**
+     * @return whether the StratCon map renders unscouted hexes as heavily faded terrain (25% opacity) rather than under
+     *       the blue fog-of-war layer
+     */
+    public boolean getUseAlternateStratConFogOfWarDisplay() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, true);
+    }
+
+    public void setUseAlternateStratConFogOfWarDisplay(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, value);
     }
 
     public Color getStratConHexCoordForeground() {
@@ -1091,6 +1265,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN, value);
     }
 
+    public boolean getQuickTrainIgnoreTrainingFormations() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, false);
+    }
+
+    public void setQuickTrainIgnoreTrainingFormations(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS, value);
+    }
+
     public int getQuickTrainTarget() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE).getInt(MHQConstants.NEW_DAY_QUICK_TRAIN_TARGET, 5);
     }
@@ -1167,6 +1351,47 @@ public final class MHQOptions extends SuiteOptions {
     public void setSelfCorrectMaintenance(final boolean value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .putBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, value);
+    }
+
+    /**
+     * @return {@code true} if units loaded into a transport's bays should be skipped by the automated travel
+     *       mothballing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getDoNotMothballUnitsInBays() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.DO_NOT_MOTHBALL_UNITS_IN_BAYS, false);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setDoNotMothballUnitsInBays(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.DO_NOT_MOTHBALL_UNITS_IN_BAYS, value);
+    }
+
+    /**
+     * @return {@code true} if salvage units should be skipped by the automated travel mothballing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getDoNotMothballSalvage() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.DO_NOT_MOTHBALL_SALVAGE, false);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setDoNotMothballSalvage(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.DO_NOT_MOTHBALL_SALVAGE, value);
     }
 
     public boolean getNewDayFormationIconOperationalStatus() {
@@ -1310,15 +1535,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setLayeredFormationIconPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.LAYERED_FORCE_ICON_DIRECTORY_PATH, value);
     }
-
-    public String getCompanyGenerationDirectoryPath() {
-        return userPreferences.node(MHQConstants.FILE_PATH_NODE)
-                     .get(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, "mmconf/mhqCompanyGenerationPresets/");
-    }
-
-    public void setCompanyGenerationDirectoryPath(final String value) {
-        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.COMPANY_GENERATION_DIRECTORY_PATH, value);
-    }
     // endregion File Paths
 
     // region Nag Tab
@@ -1332,6 +1548,27 @@ public final class MHQOptions extends SuiteOptions {
     // endregion Nag Tab
 
     // region Miscellaneous Options
+
+    public boolean getEnableAbstractCombatAutoResolve() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE, false);
+    }
+
+    public void setEnableAbstractCombatAutoResolve(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE, value);
+    }
+
+    public boolean getDefaultPlayerForcesOffBoard() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.DEFAULT_PLAYER_FORCES_OFF_BOARD, false);
+    }
+
+    public void setDefaultPlayerForcesOffBoard(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.DEFAULT_PLAYER_FORCES_OFF_BOARD, value);
+    }
+
     public int getStartGameDelay() {
         return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_DELAY, 1000);
     }
@@ -1379,15 +1616,38 @@ public final class MHQOptions extends SuiteOptions {
               .putInt(MHQConstants.START_GAME_BOT_CLIENT_RETRY_COUNT, startGameBotClientRetryCount);
     }
 
-    public CompanyGenerationMethod getDefaultCompanyGenerationMethod() {
-        return CompanyGenerationMethod.valueOf(userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                                                     .get(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD,
-                                                           CompanyGenerationMethod.WINDCHILD.name()));
+    // region Command Generator augmentation
+
+    /**
+     * @return whether the Command Generator last had the campaign tracking cybernetic implants
+     */
+    public boolean getLastUseImplants() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.LAST_USE_IMPLANTS, false);
     }
 
-    public void setDefaultCompanyGenerationMethod(final CompanyGenerationMethod value) {
+    public void setLastUseImplants(final boolean value) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-              .put(MHQConstants.DEFAULT_COMPANY_GENERATION_METHOD, value.name());
+              .putBoolean(MHQConstants.LAST_USE_IMPLANTS, value);
     }
+
+    /**
+     * @return the neural interface setting the Command Generator was last used with, stored by its
+     *       option value so an unreadable entry settles on the rules being off
+     */
+    public NeuralInterfaceMode getLastNeuralInterfaceMode() {
+        return NeuralInterfaceMode.fromOptionValue(
+              userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                    .get(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                          NeuralInterfaceMode.OFF.optionValue()));
+    }
+
+    public void setLastNeuralInterfaceMode(final NeuralInterfaceMode value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .put(MHQConstants.LAST_NEURAL_INTERFACE_MODE,
+                    (value == null) ? NeuralInterfaceMode.OFF.optionValue() : value.optionValue());
+    }
+    // endregion Command Generator augmentation
+
     // endregion Miscellaneous Options
 }

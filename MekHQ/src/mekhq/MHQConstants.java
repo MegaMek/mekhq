@@ -58,7 +58,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance
     // between HL and NC
-    public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
     // endregion Faction Generation Constants
 
     // region GUI Constants
@@ -75,9 +74,27 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
     // also used as a limit in the UI
-    public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
-    public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    // Keeps the key the setting was saved under when the dialog was the Company Generator, so an existing
+    // preferences file still applies; only the constant was renamed.
+    public static final String SHOW_COMMAND_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
+    public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
+
+    // Personnel record logs - controls whether each personnel record section starts expanded
+    public static final String DISPLAY_PERSONNEL_LOG = "displayPersonnelLog";
+    public static final String DISPLAY_SCENARIO_LOG = "displayScenarioLog";
+    public static final String DISPLAY_KILL_RECORD = "displayKillRecord";
+    public static final String DISPLAY_MEDICAL_RECORD = "displayMedicalRecord";
+    public static final String DISPLAY_PATIENT_RECORD = "displayPatientRecord";
+    public static final String DISPLAY_ASSIGNMENT_RECORD = "displayAssignmentRecord";
+    public static final String DISPLAY_PERFORMANCE_RECORD = "displayPerformanceRecord";
+
+    // Unit record logs - controls whether each unit log section starts expanded
+    public static final String DISPLAY_UNIT_LOG = "displayUnitLog";
+    public static final String DISPLAY_UNIT_KILL_LOG = "displayUnitKillLog";
+    public static final String DISPLAY_UNIT_CREW_LOG = "displayUnitCrewLog";
+    public static final String DISPLAY_UNIT_DEPLOYMENT_LOG = "displayUnitDeploymentLog";
+    public static final String DISPLAY_UNIT_REPAIR_LOG = "displayUnitRepairLog";
 
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -112,6 +129,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String BELOW_CONTRACT_MINIMUM_BACKGROUND = "belowContractMinimumBackground";
     public static final String IN_TRANSIT_FOREGROUND = "inTransitForeground";
     public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
+    public static final String QUEUED_FOR_TRAVEL_FOREGROUND = "queuedForTravelForeground";
+    public static final String QUEUED_FOR_TRAVEL_BACKGROUND = "queuedForTravelBackground";
     public static final String REFITTING_FOREGROUND = "refittingForeground";
     public static final String REFITTING_BACKGROUND = "refittingBackground";
     public static final String MOTHBALLING_FOREGROUND = "mothballingForeground";
@@ -145,6 +164,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_FOREGROUND = "awayFromMainForceForeground";
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -201,6 +221,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
+    public static final String NEW_DAY_QUICK_TRAIN_IGNORE_TRAINING_FORMATIONS =
+          "NewDayQuickTrainIgnoreTrainingFormations";
     public static final String NEW_DAY_QUICK_TRAIN_TARGET = "QuickTrainTarget";
     public static final String NEW_DAY_ARTILLERY = "NewDayArtillery";
     public static final String NEW_DAY_SCOUTING = "NewDayScouting";
@@ -209,6 +231,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_TRAINING = "NewDayTraining";
     public static final String NEW_DAY_OTHER_COMMAND = "NewDayOtherCommand";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
+    public static final String DO_NOT_MOTHBALL_UNITS_IN_BAYS = "doNotMothballUnitsInBays";
+    public static final String DO_NOT_MOTHBALL_SALVAGE = "doNotMothballSalvage";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";
     // endregion New Day
@@ -227,7 +251,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
-    public static final String COMPANY_GENERATION_DIRECTORY_PATH = "companyGenerationDirectoryPath";
     public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
@@ -247,10 +270,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
-    public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_COMBAT_CHALLENGE = "nagCombatChallenge";
+    /** The prefix of the per-contract-type special mechanics briefing keys; the contract type's name follows it. */
+    public static final String NAG_CONTRACT_SPECIAL_MECHANICS_PREFIX = "nagContractSpecialMechanics.";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
+    public static final String NAG_STRATCON_FACILITY_BRIEFING = "nagStratConFacilityBriefing";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_EXPIRING_NAV_POINTS = "nagExpiringNavPoints";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     public static final String NAG_UNABLE_TO_AFFORD_EXPENSES = "nagUnableToAffordExpenses";
     public static final String NAG_UNABLE_TO_AFFORD_RENT = "nagUnableToAffordRent";
@@ -263,8 +289,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN = "nagSomeoneRandomlyDiedCivilian";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
+    public static final String NAG_CONTRACT_JOURNAL_PROMPT = "nagContractJournalPrompt";
 
-    public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
+    public static final String CONFIRMATION_ACCEPT_CONTRACT = "confirmationAcceptContract";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
     public static final String CONFIRMATION_RESOLVE_SCENARIO = "confirmationResolveScenario";
@@ -272,6 +299,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
     public static final String CONFIRMATION_ASSIGN_TECHS = "confirmationAssignTechs";
+    public static final String CONFIRMATION_NEW_LIFE_PATH = "confirmationNewLifePath";
+    public static final String CONFIRMATION_REGEN_PATH_ID = "confirmationRegenPathId";
+    public static final String CONFIRMATION_UPGRADE_LIFE_PATHS = "confirmationUpgradeLifePaths";
     // endregion Nag Tab
 
     // region Miscellaneous Options
@@ -281,7 +311,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
-    public static final String DEFAULT_COMPANY_GENERATION_METHOD = "defaultCompanyGenerationMethod";
+    public static final String ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE = "enableAbstractCombatAutoResolve";
+    public static final String DEFAULT_PLAYER_FORCES_OFF_BOARD = "defaultPlayerForcesOffBoard";
+
+    // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
+    // starts from the player's own answer rather than from the all-off defaults every time.
+    public static final String LAST_USE_IMPLANTS = "lastUseImplants";
+    public static final String LAST_NEURAL_INTERFACE_MODE = "lastNeuralInterfaceMode";
     // endregion Miscellaneous Options
     // endregion MHQOptions
 
@@ -294,14 +330,28 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BACKGROUND_PATH = "Pieces/Backgrounds/";
     public static final String LAYERED_FORCE_ICON_FORMATION_PATH = "Pieces/Formations/";
     public static final String LAYERED_FORCE_ICON_FORMATION_CLAN_PATH = "Clan/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_POINT_FILENAME = "(01) Point.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_STAR_FILENAME = "(02) Star.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_NOVA_FILENAME = "(03) Nova.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BINARY_FILENAME = "(04) Binary.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_TRINARY_FILENAME = "(06) Trinary.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_CLUSTER_FILENAME = "(08) Cluster.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_GALAXY_FILENAME = "(09) Galaxy.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_COMSTAR_PATH = "ComStar/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_I_FILENAME = "(01) Level I.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_II_FILENAME = "(02) Level II.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_CHOIR_FILENAME = "(03) Choir.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_III_FILENAME = "(04) Level III.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_IV_FILENAME = "(05) Level IV.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_V_FILENAME = "(06) Level V.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_LEVEL_VI_FILENAME = "(07) Level VI.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH = "Inner Sphere/";
+    public static final String LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME = "(03) Team.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME = "(04) Lance.png";
     public static final String LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME = "(05) Company.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BATTALION_FILENAME = "(06) Battalion.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_REGIMENT_FILENAME = "(07) Regiment.png";
+    public static final String LAYERED_FORCE_ICON_FORMATION_BRIGADE_FILENAME = "(08) Brigade.png";
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
@@ -322,8 +372,19 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWARDS_IMAGE_DIRECTORY_PATH = "data/images/awards";
     public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
     public static final String RAT_INFO_DIR = "data/universe/ratdata/";
+    public static final String LIFE_PATHS_DEFAULT_DIRECTORY_PATH = "data/advancedCharacterBuilder/lifePaths";
+    public static final String LIFE_PATHS_USER_DIRECTORY_PATH = "/advancedCharacterBuilder/lifePaths";
+    /**
+     * Where Life Paths live inside an mm-data checkout, relative to that checkout's root.
+     *
+     * <p>In a development environment mm-data sits beside this build as a sibling directory, and that checkout is the
+     * canonical home of the shipped Life Paths. The copy under {@link #LIFE_PATHS_DEFAULT_DIRECTORY_PATH} is staged
+     * from it on launch and overwritten on the next.</p>
+     */
+    public static final String LIFE_PATHS_MM_DATA_DIRECTORY_PATH = "mm-data/data/advancedCharacterBuilder/lifePaths";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String FACTION_DIPLOMACY_DIRECTORY_PATH = "data/universe/factionDiplomacy";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
     public static final String FINANCIAL_CURRENCIES_FILE_PATH = "data/universe/currencies.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
@@ -341,39 +402,39 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LOGS_PATH = "logs";
 
     // region StratCon
-    public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.xml";
-    public static final String STRAT_CON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.xml";
-    public static final String STRAT_CON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.xml";
-    public static final String STRAT_CON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.xml";
-    public static final String STRAT_CON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.xml";
-    public static final String STRAT_CON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.xml";
-    public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.xml";
-    public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.xml";
+    public static final String STRAT_CON_REQUIRED_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/requiredHostileFacilityModifiers.json";
+    public static final String STRAT_CON_HOSTILE_FACILITY_MODS = "./data/scenariomodifiers/hostileFacilityModifiers.json";
+    public static final String STRAT_CON_ALLIED_FACILITY_MODS = "./data/scenariomodifiers/alliedFacilityModifiers.json";
+    public static final String STRAT_CON_GROUND_MODS = "./data/scenariomodifiers/groundBattleModifiers.json";
+    public static final String STRAT_CON_AIR_MODS = "./data/scenariomodifiers/airBattleModifiers.json";
+    public static final String STRAT_CON_PRIMARY_PLAYER_FORCE_MODS = "./data/scenariomodifiers/primaryPlayerForceModifiers.json";
+    public static final String STRAT_CON_SCENARIO_MANIFEST = "./data/scenariotemplates/ScenarioManifest.json";
+    public static final String STRAT_CON_USER_SCENARIO_MANIFEST = "./data/scenariotemplates/UserScenarioManifest.json";
     public static final String STRAT_CON_SCENARIO_TEMPLATE_PATH = "./data/scenariotemplates/";
-    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.xml";
-    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.xml";
+    public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.json";
+    public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.json";
     public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
-    public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
-    public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
+    public static final String STRAT_CON_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/pointofinterestmanifest.json";
+    public static final String STRAT_CON_USER_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/userpointofinterestmanifest.json";
+    public static final String STRAT_CON_POINT_OF_INTEREST_PATH = "./data/stratconpointsofinterest/";
+    public static final String FACTION_STANDING_ULTIMATUM_MANIFEST = "./data/universe/factionStandingUltimatums/ultimatummanifest.json";
+    public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.json";
+    public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
-    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
-    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
-    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
-    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
-    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
+    public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.json";
+    public static final String STRAT_CON_HYDROLOGY_PROFILES_PATH = "./data/stratconbiomedefinitions/HydrologyProfiles.yaml";
+    public static final String STRAT_CON_OROGENY_PROFILES_PATH = "./data/stratconbiomedefinitions/OrogenyProfiles.yaml";
+    public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
+    public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
+          "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
+    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.yaml";
+    public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
+    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.json";
+    public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.json";
+    public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.json";
+    public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.json";
     // endregion StratCon
 
     // region StoryArcs
@@ -400,11 +461,131 @@ public final class MHQConstants extends SuiteConstants {
           "data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
     public static final String NAME_END_WORD_MERCENARY_USER = Paths.get(
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_END_WORD_REBEL_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordRebel.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_END_WORD_MILITIA_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMilitia.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN = Paths.get(
+          "data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
+    public static final String NAME_END_WORD_CIVILIAN_USER = Paths.get(
+          "userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCivilian.csv").toString();
     public static final String NAME_PRE_FAB = Paths.get(
           "data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     public static final String NAME_PRE_FAB_USER = Paths.get(
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
+
+    // region Oracles
+    public static final String ORACLE_DIRECTORY = Paths.get("data/oracles").toString();
+    public static final String ORACLE_DIRECTORY_USER = Paths.get("userdata/data/oracles").toString();
+    // endregion Oracles
+
+    // region Operation Names
+    public static final String OPERATION_NAME_DESCRIPTOR = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();
+    public static final String OPERATION_NAME_DESCRIPTOR_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ASSASSINATION = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounAssassination.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ASSASSINATION_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounAssassination.csv").toString();
+    public static final String OPERATION_NAME_NOUN_CADRE_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounCadreDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_CADRE_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounCadreDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_DIVERSIONARY_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounDiversionaryRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_DIVERSIONARY_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounDiversionaryRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ESPIONAGE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounEspionage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_ESPIONAGE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounEspionage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_EXTRACTION_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounExtractionRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_EXTRACTION_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounExtractionRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GARRISON_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounGarrisonDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GARRISON_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounGarrisonDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GUERRILLA_WARFARE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounGuerrillaWarfare.csv").toString();
+    public static final String OPERATION_NAME_NOUN_GUERRILLA_WARFARE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounGuerrillaWarfare.csv").toString();
+    public static final String OPERATION_NAME_NOUN_MOLE_HUNTING = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounMoleHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_MOLE_HUNTING_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounMoleHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBJECTIVE_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounObjectiveRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBJECTIVE_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounObjectiveRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBSERVATION_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounObservationRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_OBSERVATION_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounObservationRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RECON_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounReconRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RECON_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounReconRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RELIEF_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounReliefDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RELIEF_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounReliefDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RETAINER = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounRetainer.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RETAINER_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounRetainer.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RIOT_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounRiotDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_RIOT_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounRiotDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SABOTAGE = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounSabotage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SABOTAGE_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounSabotage.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SECURITY_DUTY = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounSecurityDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_SECURITY_DUTY_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounSecurityDuty.csv").toString();
+    public static final String OPERATION_NAME_NOUN_TERRORISM = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounTerrorism.csv").toString();
+    public static final String OPERATION_NAME_NOUN_TERRORISM_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounTerrorism.csv").toString();
+    public static final String OPERATION_NAME_NOUN_UNDEFINED = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounUndefined.csv").toString();
+    public static final String OPERATION_NAME_NOUN_UNDEFINED_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounUndefined.csv").toString();
+    // endregion Operation Names
 
     // endregion File Paths
 
@@ -413,6 +594,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
     public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_START = LocalDate.of(3135, Month.NOVEMBER, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3149, Month.JANUARY, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_TERRA_ONLY_END = LocalDate.of(3151, Month.JANUARY, 1);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_START = LocalDate.of(3060, Month.FEBRUARY, 19);
+    public static final LocalDate IS_INVASION_OF_HUNTRESS_END = LocalDate.of(3060, Month.APRIL, 9);
     /**
      * The invasion of Luthien kicks off the Jihad
      */

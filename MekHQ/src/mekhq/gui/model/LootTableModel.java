@@ -42,7 +42,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.units.Entity;
-import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.parts.Part;
 
 /**

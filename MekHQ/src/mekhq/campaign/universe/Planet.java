@@ -44,16 +44,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
+import jakarta.annotation.Nonnull;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -68,6 +73,13 @@ import mekhq.campaign.universe.enums.PlanetaryType;
 @JsonDeserialize(converter = Planet.PlanetPostLoader.class)
 public class Planet {
     private static final MMLogger logger = MMLogger.create(Planet.class);
+
+    /**
+     * Temperature (in degrees Celsius) reported for a planet that records no temperature for the requested date. A
+     * world the surveys never bothered to log is treated as a barren, uninhabitable rock rather than a temperate one,
+     * so {@link #getTemperature(LocalDate)} never returns {@code null}.
+     */
+    public static final int UNINHABITABLE_TEMPERATURE_CELSIUS = -100;
 
     // Base data
     private String id;
@@ -117,9 +129,9 @@ public class Planet {
     // Atmospheric description
     /** Pressure classification - we use the MegaMek enum here directly */
     @JsonProperty("pressure")
-    private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
+    private SourceableValue<Atmosphere> pressure;
     @JsonProperty("atmosphere")
-    private SourceableValue<Atmosphere> atmosphere;
+    private SourceableValue<AtmosphericTaint> atmosphere;
     @JsonProperty("composition")
     private SourceableValue<String> composition;
     @JsonProperty("temperature")
@@ -165,15 +177,15 @@ public class Planet {
 
     // Constant base data
 
-    public String getId() {
+    public @Nullable String getId() {
         return id;
     }
 
-    public Double getGravity() {
+    public @Nullable Double getGravity() {
         return (null == getSourcedGravity()) ? null : getSourcedGravity().getValue();
     }
 
-    public SourceableValue<Double> getSourcedGravity() {
+    public @Nullable SourceableValue<Double> getSourcedGravity() {
         return gravity;
     }
 
@@ -181,7 +193,7 @@ public class Planet {
      * @deprecated no indicated uses
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public SourceableValue<Double> getSourcedDensity() {
+    public @Nullable SourceableValue<Double> getSourcedDensity() {
         return density;
     }
 
@@ -189,11 +201,11 @@ public class Planet {
         return (null == getSourcedDiameter() ? 0.0 : getSourcedDiameter().getValue());
     }
 
-    public SourceableValue<Double> getSourcedDiameter() {
+    public @Nullable SourceableValue<Double> getSourcedDiameter() {
         return diameter;
     }
 
-    public Double getOrbitRadius() {
+    public @Nullable Double getOrbitRadius() {
         return orbitRadius;
     }
 
@@ -201,7 +213,7 @@ public class Planet {
         parentSystem = system;
     }
 
-    public List<Satellite> getSatellites() {
+    public @Nullable List<Satellite> getSatellites() {
         return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
@@ -213,23 +225,23 @@ public class Planet {
         this.satellites = (satellites == null || satellites.isEmpty()) ? null : new ArrayList<>(satellites);
     }
 
-    public Integer getSmallMoons() {
+    public @Nonnull Integer getSmallMoons() {
         return (null == getSourcedSmallMoons()) ? 0 : getSourcedSmallMoons().getValue();
     }
 
-    public SourceableValue<Integer> getSourcedSmallMoons() {
+    public @Nullable SourceableValue<Integer> getSourcedSmallMoons() {
         return smallMoons;
     }
 
-    public Boolean hasRing() {
+    public @Nonnull Boolean hasRing() {
         return null != getSourcedRing() && getSourcedRing().getValue();
     }
 
-    public SourceableValue<Boolean> getSourcedRing() {
+    public @Nullable SourceableValue<Boolean> getSourcedRing() {
         return ring;
     }
 
-    public List<LandMass> getLandMasses() {
+    public @Nullable List<LandMass> getLandMasses() {
         return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
 
@@ -241,16 +253,16 @@ public class Planet {
         this.landMasses = (landMasses == null || landMasses.isEmpty()) ? null : new ArrayList<>(landMasses);
     }
 
-    public SourceableValue<Double> getSourcedDayLength(LocalDate when) {
+    public @Nullable SourceableValue<Double> getSourcedDayLength(LocalDate when) {
         // yes day length can change because Venus
         return getEventData(when, dayLength, e -> e.dayLength);
     }
 
-    public SourceableValue<Double> getSourcedYearLength() {
+    public @Nullable SourceableValue<Double> getSourcedYearLength() {
         return yearLength;
     }
 
-    public PlanetaryType getPlanetType() {
+    public @Nonnull PlanetaryType getPlanetType() {
         if (null == getSourcedPlanetType()) {
             logger.error("No planetary type for {}. Using Terrestrial", id);
             return PlanetaryType.TERRESTRIAL;
@@ -258,15 +270,15 @@ public class Planet {
         return getSourcedPlanetType().getValue();
     }
 
-    public SourceableValue<PlanetaryType> getSourcedPlanetType() {
+    public @Nullable SourceableValue<PlanetaryType> getSourcedPlanetType() {
         return planetType;
     }
 
-    public Integer getSystemPosition() {
+    public @Nullable Integer getSystemPosition() {
         return (null == sysPos) ? null : getSourcedSystemPosition().getValue();
     }
 
-    public SourceableValue<Integer> getSourcedSystemPosition() {
+    public @Nullable SourceableValue<Integer> getSourcedSystemPosition() {
         return sysPos;
     }
 
@@ -276,7 +288,7 @@ public class Planet {
      *
      * @return String of system position after removing asteroid belts
      */
-    public String getDisplayableSystemPosition() {
+    public @Nonnull String getDisplayableSystemPosition() {
         // We won't give the actual system position here, because we don't want asteroid
         // belts to count for system position
         if ((null == getParentSystem()) || (null == getSystemPosition())) {
@@ -292,11 +304,11 @@ public class Planet {
         return Integer.toString(pos);
     }
 
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return desc;
     }
 
-    public String getIcon() {
+    public @Nullable String getIcon() {
         return icon;
     }
 
@@ -330,11 +342,11 @@ public class Planet {
         this.temperature = temperature;
     }
 
-    public void setSourcedPressure(SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure) {
+    public void setSourcedPressure(SourceableValue<Atmosphere> pressure) {
         this.pressure = pressure;
     }
 
-    public void setSourcedAtmosphere(SourceableValue<Atmosphere> atmosphere) {
+    public void setSourcedAtmosphere(SourceableValue<AtmosphericTaint> atmosphere) {
         this.atmosphere = atmosphere;
     }
 
@@ -368,28 +380,28 @@ public class Planet {
 
     // Constant stellar data (to be moved out later)
 
-    public Double getX() {
+    public @Nonnull Double getX() {
         return null == getParentSystem() ? 0.0 : getParentSystem().getX();
     }
 
-    public Double getY() {
+    public @Nonnull Double getY() {
         return null == getParentSystem() ? 0.0 : getParentSystem().getY();
     }
 
-    public PlanetarySystem getParentSystem() {
+    public @Nullable PlanetarySystem getParentSystem() {
         return parentSystem;
     }
 
     // Date-dependant data
 
-    public PlanetaryEvent getEvent(LocalDate when) {
+    public @Nullable PlanetaryEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
             return null;
         }
         return events.get(when);
     }
 
-    public List<PlanetaryEvent> getEvents() {
+    public @Nullable List<PlanetaryEvent> getEvents() {
         if (null == events) {
             return null;
         }
@@ -489,20 +501,28 @@ public class Planet {
         /**
          * Gets the current {@link PlanetaryEvent} for the time.
          *
+         * <p>{@code planetaryEvent} is a single shared, mutable accumulator: fast-forwarding merges every event up to
+         * {@code now} into it via {@link PlanetaryEvent#copyDataFrom}, and nothing ever unmerges them.
+         * {@code lastUpdated} must therefore track the date this accumulator actually reflects (the most recent
+         * {@code now} resolved, not just the date passed to the original {@link #initialize}), or a later
+         * out-of-order query (e.g., a caller checking a future date) would fast-forward the accumulator past a
+         * subsequent, earlier-dated query without tripping the "went back in time" reset below, silently returning
+         * already-future state for a query that asked about the present or past.</p>
+         *
          * @param now The current time.
          *
          * @return The up-to-date {@link PlanetaryEvent} as of {@code now}.
          */
-        public PlanetaryEvent getCurrentEvent(LocalDate now) {
+        public @Nonnull PlanetaryEvent getCurrentEvent(LocalDate now) {
             if ((lastUpdated == null) || lastUpdated.isAfter(now)) {
-                // initialize ourselves if we're fresh or if we
-                // went back in time (which breaks how the event stream works)
+                // initialize ourselves if we're fresh or if we went back in time (which breaks how the event stream
+                // works)
                 initialize(now);
             }
+            lastUpdated = now;
 
-            // if we have no more events for this planet,
-            // or if our current date is before the next date
-            // return our cached event
+            // if we have no more events for this planet, or if our current date is before the next date, return our
+            // cached event
             if ((nextEvent == null) || now.isBefore(nextEvent.getKey())) {
                 return planetaryEvent;
             }
@@ -522,20 +542,20 @@ public class Planet {
         }
     }
 
-    public String getName(LocalDate when) {
-        return getSourcedName(when).getValue();
+    public @Nonnull String getName(LocalDate when) {
+        return getSourcedName(when) == null ? "?" : getSourcedName(when).getValue();
     }
 
-    public SourceableValue<String> getSourcedName(LocalDate when) {
+    public @Nullable SourceableValue<String> getSourcedName(LocalDate when) {
         return getEventData(when, name, e -> e.name);
     }
 
-    public String getShortName(LocalDate when) {
+    public @Nullable String getShortName(LocalDate when) {
         return getEventData(when, shortName, e -> e.shortName);
     }
 
     /** @return short name if set, else full name, else "unnamed" */
-    public String getPrintableName(LocalDate when) {
+    public @Nonnull String getPrintableName(LocalDate when) {
         String result = getShortName(when);
         if (null == result) {
             result = getName(when);
@@ -543,27 +563,56 @@ public class Planet {
         return null != result ? result : "unnamed";
     }
 
-    public SocioIndustrialData getSocioIndustrial(LocalDate when) {
-        return (null == getSourcedSocioIndustrial(when)) ? null : getSourcedSocioIndustrial(when).getValue();
+    /**
+     * @return the planet's socio-industrial (USILR) ratings for the given date, or {@link SocioIndustrialData#NONE} (a
+     *       Regressed, all-F profile) when no data is recorded for that date. Never {@code null}, mirroring the
+     *       fallbacks returned by sibling getters such as {@link #getHPG(LocalDate)} and
+     *       {@link #getAtmosphere(LocalDate)}. Use {@link #getSourcedSocioIndustrial(LocalDate)} when the caller needs
+     *       to distinguish "no recorded data" from an actual reading.
+     */
+    public @Nonnull SocioIndustrialData getSocioIndustrial(LocalDate when) {
+        SourceableValue<SocioIndustrialData> sourced = getSourcedSocioIndustrial(when);
+        return (sourced == null || sourced.getValue() == null) ? SocioIndustrialData.NONE : sourced.getValue();
     }
 
-    public SourceableValue<SocioIndustrialData> getSourcedSocioIndustrial(LocalDate when) {
+    public @Nullable SourceableValue<SocioIndustrialData> getSourcedSocioIndustrial(LocalDate when) {
         return getEventData(when, null, e -> e.socioIndustrial);
     }
 
-    public HPGRating getHPG(LocalDate when) {
+    /**
+     * @param when the date to check
+     *
+     * @return this planet's administrative capital status on the given date, or {@link CapitalType#NONE} if it is not a
+     *       capital (never {@code null})
+     */
+    public CapitalType getCapitalType(LocalDate when) {
+        return (null == getSourcedCapitalType(when)) ? CapitalType.NONE : getSourcedCapitalType(when).getValue();
+    }
+
+    public SourceableValue<CapitalType> getSourcedCapitalType(LocalDate when) {
+        return getEventData(when, null, planetaryEvent -> planetaryEvent.capitalType);
+    }
+
+    public @Nonnull HPGRating getHPG(LocalDate when) {
         return (null == getSourcedHPG(when)) ? HPGRating.X : getSourcedHPG(when).getValue();
     }
 
-    public SourceableValue<HPGRating> getSourcedHPG(LocalDate when) {
+    public @Nullable SourceableValue<HPGRating> getSourcedHPG(LocalDate when) {
         return getEventData(when, null, e -> e.hpg);
     }
 
-    public Long getPopulation(LocalDate when) {
-        return (null == getSourcedPopulation(when)) ? null : getSourcedPopulation(when).getValue();
+    /**
+     * @return the planet's population for the given date, or {@code 0} when no data is recorded for that date. Never
+     *       {@code null}; every caller already treats an absent or zero population identically (nobody to recruit or
+     *       fight over). Use {@link #getSourcedPopulation(LocalDate)} to distinguish "no recorded data" from a genuine
+     *       zero.
+     */
+    public @Nonnull Long getPopulation(LocalDate when) {
+        SourceableValue<Long> sourced = getSourcedPopulation(when);
+        return (sourced == null || sourced.getValue() == null) ? 0L : sourced.getValue();
     }
 
-    public SourceableValue<Long> getSourcedPopulation(LocalDate when) {
+    public @Nullable SourceableValue<Long> getSourcedPopulation(LocalDate when) {
         return getEventData(when, null, e -> e.population);
     }
 
@@ -571,52 +620,87 @@ public class Planet {
      * @deprecated no indicated uses.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public LifeForm getLifeForm(LocalDate when) {
+    public @Nonnull LifeForm getLifeForm(LocalDate when) {
         return (null == getSourcedLifeForm(when)) ? LifeForm.NONE : getSourcedLifeForm(when).getValue();
     }
 
-    public SourceableValue<LifeForm> getSourcedLifeForm(LocalDate when) {
+    public @Nullable SourceableValue<LifeForm> getSourcedLifeForm(LocalDate when) {
         return getEventData(when, lifeForm, e -> e.lifeForm);
     }
 
-    public SourceableValue<Integer> getSourcedPercentWater(LocalDate when) {
+    public @Nullable SourceableValue<Integer> getSourcedPercentWater(LocalDate when) {
         return getEventData(when, percentWater, e -> e.percentWater);
     }
 
-    public Integer getTemperature(LocalDate when) {
-        return (null == getSourcedTemperature(when)) ? null : getSourcedTemperature(when).getValue();
+    /**
+     * @return the planet's surface temperature (°C) for the given date, or {@link #UNINHABITABLE_TEMPERATURE_CELSIUS}
+     *       when no data is recorded for that date. Never {@code null}. Use {@link #getSourcedTemperature(LocalDate)}
+     *       when the caller needs to distinguish "no recorded data" from an actual reading (for example to substitute a
+     *       temperate default for playability rather than the barren-rock fallback).
+     */
+    public @Nonnull Integer getTemperature(LocalDate when) {
+        SourceableValue<Integer> sourced = getSourcedTemperature(when);
+        return (sourced == null || sourced.getValue() == null) ? UNINHABITABLE_TEMPERATURE_CELSIUS : sourced.getValue();
     }
 
-    public SourceableValue<Integer> getSourcedTemperature(LocalDate when) {
+    public @Nullable SourceableValue<Integer> getSourcedTemperature(LocalDate when) {
         return getEventData(when, temperature, e -> e.temperature);
     }
 
-    public megamek.common.planetaryConditions.Atmosphere getPressure(LocalDate when) {
-        return (null == getSourcedPressure(when)) ? null : getSourcedPressure(when).getValue();
+    /**
+     * @return the planet's atmospheric pressure for the given date, or {@link Atmosphere#STANDARD} when no data is
+     *       recorded for that date. Never {@code null}, mirroring the fallback returned by
+     *       {@link #getAtmosphere(LocalDate)}. Use {@link #getSourcedPressure(LocalDate)} to distinguish "no recorded
+     *       data" from an actual reading.
+     */
+    public @Nonnull Atmosphere getPressure(LocalDate when) {
+        SourceableValue<Atmosphere> sourced = getSourcedPressure(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? Atmosphere.STANDARD : sourced.getValue();
     }
 
-    public SourceableValue<megamek.common.planetaryConditions.Atmosphere> getSourcedPressure(LocalDate when) {
+    public @Nullable SourceableValue<Atmosphere> getSourcedPressure(LocalDate when) {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
-    public Atmosphere getAtmosphere(LocalDate when) {
-        return (null == getSourcedAtmosphere(when)) ? Atmosphere.NONE : getSourcedAtmosphere(when).getValue();
+    /**
+     * @return how safe the planet's air is to breathe on the given date, or {@link AtmosphericTaint#BREATHABLE} when
+     *       no data is recorded for that date. Never {@code null}. Use {@link #getSourcedAtmosphere(LocalDate)} to
+     *       distinguish "no recorded data" from an actual reading.
+     *       <p>
+     *       A world with no atmosphere at all reports {@link AtmosphericTaint#BREATHABLE} too, because an absent
+     *       atmosphere is not a taint: airlessness is recorded on the pressure reading, which says
+     *       {@link Atmosphere#VACUUM} for every such world. Ask {@link #getPressure(LocalDate)} whether a world can
+     *       be breathed at all, and this method only what is wrong with the air where there is some.
+     */
+    public @Nonnull AtmosphericTaint getAtmosphere(LocalDate when) {
+        SourceableValue<AtmosphericTaint> sourced = getSourcedAtmosphere(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? AtmosphericTaint.BREATHABLE :
+                     sourced.getValue();
     }
 
-    public SourceableValue<Atmosphere> getSourcedAtmosphere(LocalDate when) {
+    public @Nullable SourceableValue<AtmosphericTaint> getSourcedAtmosphere(LocalDate when) {
         return getEventData(when, atmosphere, e -> e.atmosphere);
     }
 
-    public SourceableValue<String> getSourcedComposition(LocalDate when) {
+    public @Nullable SourceableValue<String> getSourcedComposition(LocalDate when) {
         return getEventData(when, composition, e -> e.composition);
     }
 
-    public List<String> getFactions(LocalDate when) {
+    public @Nonnull List<String> getFactions(LocalDate when) {
         return (null == getSourcedFactions(when)) ? Collections.emptyList() : getSourcedFactions(when).getValue();
     }
 
-    public SourceableValue<List<String>> getSourcedFactions(LocalDate when) {
+    public @Nullable SourceableValue<List<String>> getSourcedFactions(LocalDate when) {
         return getEventData(when, null, e -> e.faction);
+    }
+
+    public @Nonnull List<String> getAdministration(LocalDate when) {
+        SourceableValue<List<String>> sourced = getSourcedAdministration(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? List.of() : List.copyOf(sourced.getValue());
+    }
+
+    public @Nullable SourceableValue<List<String>> getSourcedAdministration(LocalDate when) {
+        return getEventData(when, null, event -> event.administration);
     }
 
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
@@ -631,12 +715,12 @@ public class Planet {
     }
 
     /** @return set of factions at a given date */
-    public Set<Faction> getFactionSet(LocalDate when) {
+    public @Nonnull Set<Faction> getFactionSet(LocalDate when) {
         List<String> currentFactions = getFactions(when);
         return getFactionsFrom(currentFactions);
     }
 
-    public String getFactionDesc(LocalDate when) {
+    public @Nonnull String getFactionDesc(LocalDate when) {
         String toReturn = Faction.getFactionNames(getFactionSet(when), when.getYear());
         if (toReturn.isEmpty()) {
             toReturn = "Uncolonized";
@@ -653,7 +737,7 @@ public class Planet {
      *
      * @return The hiring hall level on the given date
      */
-    public HiringHallLevel getHiringHallLevel(LocalDate when) {
+    public @Nonnull HiringHallLevel getHiringHallLevel(LocalDate when) {
         HiringHallLevel staticHall = (null == getSourcedHiringHallLevel(when)) ?
                                            HiringHallLevel.NONE :
                                            getSourcedHiringHallLevel(when).getValue();
@@ -678,7 +762,7 @@ public class Planet {
         return resolveHiringHallLevel(score);
     }
 
-    public SourceableValue<HiringHallLevel> getSourcedHiringHallLevel(LocalDate when) {
+    public @Nullable SourceableValue<HiringHallLevel> getSourcedHiringHallLevel(LocalDate when) {
         return getEventData(when, null, e -> e.hiringHall);
     }
 
@@ -791,7 +875,7 @@ public class Planet {
      *
      * @return an updated TargetRoll with planet specific mods
      */
-    public List<TargetRollModifier> getAcquisitionMods(LocalDate when, CampaignOptions options,
+    public @Nonnull List<TargetRollModifier> getAcquisitionMods(LocalDate when, CampaignOptions options,
           Faction faction, boolean clanPart) {
         List<TargetRollModifier> result = new ArrayList<>();
         // check faction limitations
@@ -828,26 +912,26 @@ public class Planet {
                 if (enemies &&
                           !neutrals &&
                           !allies &&
-                          !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
+                          !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnEnemyPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets"));
                 } else if (neutrals &&
                                  !allies &&
-                                 !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
+                                 !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnNeutralPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets"));
-                } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
+                } else if (allies && !options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT).generateOnAlliedPlanets()) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from allied planets"));
-                } else if (clanCrossover && options.isPlanetAcquisitionNoClanCrossover()) {
+                } else if (clanCrossover && options.get(CampaignOption.PLANET_ACQUISITION_NO_CLAN_CROSSOVER)) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                           "The clans and inner sphere do not trade supplies"));
                 }
             }
 
             if (noClansPresent && clanPart) {
-                if (options.isNoClanPartsFromIS()) {
+                if (options.get(CampaignOption.NO_CLAN_PARTS_FROM_IS)) {
                     return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                           "No clan parts from non-clan factions"));
                 }
-                result.add(new TargetRollModifier(options.getPenaltyClanPartsFromIS(),
+                result.add(new TargetRollModifier(options.get(CampaignOption.PENALTY_CLAN_PARTS_FROM_IS),
                       "clan parts from non-clan faction"));
             }
         }
@@ -906,6 +990,8 @@ public class Planet {
 
         @JsonProperty("faction")
         public SourceableValue<List<String>> faction;
+        @JsonProperty("administration")
+        public SourceableValue<List<String>> administration;
         @JsonIgnore
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
@@ -915,14 +1001,16 @@ public class Planet {
         @JsonProperty("temperature")
         public SourceableValue<Integer> temperature;
         public SourceableValue<SocioIndustrialData> socioIndustrial;
+        @JsonProperty("capitalType")
+        public SourceableValue<CapitalType> capitalType;
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
-        private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
+        private SourceableValue<Atmosphere> pressure;
         @JsonProperty("hiringHall")
         private SourceableValue<HiringHallLevel> hiringHall;
         @JsonProperty("atmosphere")
-        private SourceableValue<Atmosphere> atmosphere;
+        private SourceableValue<AtmosphericTaint> atmosphere;
         @JsonProperty("composition")
         public SourceableValue<String> composition;
         @JsonProperty("population")
@@ -936,6 +1024,7 @@ public class Planet {
 
         public void copyDataFrom(PlanetaryEvent other) {
             faction = ObjectUtility.nonNull(other.faction, faction);
+            administration = ObjectUtility.nonNull(other.administration, administration);
             if (null != other.faction) {
                 factions = updateFactions(factions, faction.getValue(), other.faction.getValue());
             }
@@ -946,6 +1035,7 @@ public class Planet {
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             shortName = ObjectUtility.nonNull(other.shortName, shortName);
             socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            capitalType = ObjectUtility.nonNull(other.capitalType, capitalType);
             hiringHall = ObjectUtility.nonNull(other.hiringHall, hiringHall);
             temperature = ObjectUtility.nonNull(other.temperature, temperature);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
@@ -970,12 +1060,14 @@ public class Planet {
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
             return (null == faction) &&
+                         (null == administration) &&
                          (null == hpg) &&
                          (null == lifeForm) &&
                          (null == message) &&
                          (null == name) &&
                          (null == shortName) &&
                          (null == socioIndustrial) &&
+                         (null == capitalType) &&
                          (null == temperature) &&
                          (null == pressure) &&
                          (null == atmosphere) &&
@@ -1007,7 +1099,10 @@ public class Planet {
             if (null != planet.eventList) {
                 for (PlanetaryEvent event : planet.eventList) {
                     if ((null != event) && (null != event.date)) {
-                        planet.events.put(event.date, event);
+                        planet.events.merge(event.date, event, (existing, additional) -> {
+                            existing.copyDataFrom(additional);
+                            return existing;
+                        });
                     }
                 }
                 planet.eventList.clear();

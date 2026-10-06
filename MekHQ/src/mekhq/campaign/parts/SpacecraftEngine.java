@@ -51,6 +51,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -256,7 +257,7 @@ public class SpacecraftEngine extends Part {
             }
             return time;
         }
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             time = 300;
             // Light Damage
@@ -282,7 +283,7 @@ public class SpacecraftEngine extends Part {
         if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return -1;
         }
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times and difficulty
             // Light Damage
             if (hits > 0 && hits < 3) {
@@ -326,7 +327,7 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_NUCLEAR);
     }
 
     @Override

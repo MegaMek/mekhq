@@ -37,10 +37,10 @@ import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -124,7 +124,7 @@ public class VeeSensor extends Part {
             int priorHits = hits;
             hits = ((Tank) unit.getEntity()).getSensorHits();
             if (checkForDestruction && (hits > priorHits)
-                      && (Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget())) {
+                      && (campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET))) {
                 remove(false);
             }
         }
@@ -169,7 +169,7 @@ public class VeeSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANIC);
+        return skillType.equals(SkillType.S_TECH_ELECTRONIC);
     }
 
     @Override

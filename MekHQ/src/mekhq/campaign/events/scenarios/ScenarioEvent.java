@@ -36,7 +36,7 @@ package mekhq.campaign.events.scenarios;
 import java.util.Objects;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 
 /**
  * Abstract base class for all events involving a scenario.

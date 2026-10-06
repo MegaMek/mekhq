@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A StoryTrigger that adds a Unit to the Campaign.
@@ -77,7 +78,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
 
         PartQuality quality = PartQuality.QUALITY_D;
 
-        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             quality = Unit.getRandomUnitQuality(0);
         }
 

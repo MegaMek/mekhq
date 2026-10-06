@@ -96,7 +96,10 @@ public class MaplessStratConForcePicker extends ImmersiveDialogCore {
      */
     public MaplessStratConForcePicker(Campaign campaign, List<Formation> formations) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
+                          campaign.getLocalDate()),
               null,
               getInCharacterMessage(campaign.getCommanderAddress(), !formations.isEmpty()),
               getButtons(!formations.isEmpty()),

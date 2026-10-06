@@ -49,7 +49,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
@@ -61,11 +60,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -89,11 +86,12 @@ public class CombatTeam {
     public static final int LEVEL_II_SIZE = 6;
 
     /** Indicates a lance has no assigned mission */
-    public static final int NO_MISSION = -1;
+    @jakarta.annotation.Nullable
+    public static final UUID NO_MISSION = null;
 
     private int formationId;
-    private int missionId;
-    private CombatRole role;
+    private UUID missionId;
+    private CombatRole role = CombatRole.RESERVE;
     private UUID commanderId;
 
     /**
@@ -134,12 +132,12 @@ public class CombatTeam {
     public CombatTeam(int formationId, Campaign campaign) {
         this.formationId = formationId;
 
-        Formation formation = campaign.getFormation(formationId);
+        Formation formation = campaign.getPlayerForce().getFormation(formationId);
         role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
-        missionId = -1;
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
+        missionId = null;
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            missionId = contract.getId();
         }
         commanderId = findCommander(this.formationId, campaign);
     }
@@ -148,15 +146,19 @@ public class CombatTeam {
         return formationId;
     }
 
-    public int getMissionId() {
+    public @jakarta.annotation.Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public AtBContract getContract(Campaign campaign) {
-        return (AtBContract) campaign.getMission(missionId);
+    public void setMissionId(@jakarta.annotation.Nullable UUID missionId) {
+        this.missionId = missionId;
     }
 
-    public void setContract(AtBContract atBContract) {
+    public AbstractContract getContract(Campaign campaign) {
+        return campaign.getContract(missionId);
+    }
+
+    public void setContract(AbstractContract atBContract) {
         if (null == atBContract) {
             missionId = NO_MISSION;
         } else {
@@ -177,7 +179,7 @@ public class CombatTeam {
     }
 
     public @Nullable Person getCommander(Campaign campaign) {
-        return campaign.getPerson(commanderId);
+        return campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
     }
 
     public void setCommander(UUID id) {
@@ -190,6 +192,141 @@ public class CombatTeam {
 
     public void refreshCommander(Campaign campaign) {
         commanderId = findCommander(formationId, campaign);
+    }
+
+    /* Code to find unit commander from ForceViewPanel */
+    public static @Nullable UUID findCommander(int formationId, Campaign campaign) {
+        return campaign.getPlayerForce().getFormation(formationId).getFormationCommanderID();
+    }
+
+    /**
+     * Worker function that calculates the total weight of a formation with the given ID
+     *
+     * @param campaign    Campaign in which the formation resides
+     * @param formationId Formation for which to calculate weight
+     *
+     * @return Total formation weight
+     */
+    public static double calculateTotalWeight(Campaign campaign, int formationId) {
+        double weight = 0.0;
+
+        for (UUID id : campaign.getPlayerForce().getFormation(formationId).getUnits()) {
+            try {
+                Unit unit = campaign.getUnit(id);
+                Entity entity = unit.getEntity();
+                long entityType = entity.getEntityType();
+
+                boolean isClan = campaign.getPlayerForce().isClanForce();
+
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (!campaignOptions.isUseStratCon()) {
+                    if (entityType == ETYPE_TANK) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if (entityType == ETYPE_AEROSPACE_FIGHTER) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    }
+                } else {
+                    weight += entity.getWeight();
+                }
+            } catch (Exception exception) {
+                LOGGER.error("Failed to parse unit ID {}: {}", formationId, exception);
+            }
+        }
+
+        return weight;
+    }
+
+    /**
+     * This static method updates the combat teams across the campaign. It starts at the top level formation, and
+     * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
+     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
+     *
+     * @param campaign the current campaign.
+     */
+    public static void recalculateCombatTeams(Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+        CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
+        Formation formation = campaign.getPlayerForce().getFormation(0);
+
+        // Does the formation already exist in our hashtable? If so, update it accordingly
+        if (combatTeam != null) {
+            boolean isEligible = combatTeam.isEligible(campaign);
+
+            if (!isEligible) {
+                campaign.getPlayerForce().removeCombatTeam(0);
+            }
+
+            formation.setCombatTeamStatus(isEligible);
+            // Otherwise, create a new formation and then add it to the table, if appropriate
+        } else {
+            combatTeam = new CombatTeam(0, campaign);
+            boolean isEligible = combatTeam.isEligible(campaign);
+
+            if (isEligible) {
+                campaign.getPlayerForce().addCombatTeam(combatTeam);
+            }
+
+            formation.setCombatTeamStatus(isEligible);
+        }
+
+        // Update the TO&E and then begin recursively walking it
+        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+        recalculateSubFormationStrategicStatus(campaign,
+              campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
+    }
+
+    /**
+     * This method is used to update the combat teams for the campaign working downwards from a specified node, through
+     * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
+     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
+     * runs recursively on each sub-formation, effectively traversing the complete TO&E.
+     *
+     * @param campaign    the current {@link Campaign}.
+     * @param workingNode the {@link Formation} node from which the method starts working down through all its
+     *                    sub-formations.
+     */
+    private static void recalculateSubFormationStrategicStatus(Campaign campaign,
+          Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
+
+        for (Formation formation : workingNode.getSubFormations()) {
+            int formationId = formation.getId();
+            CombatTeam combatTeam = combatTeamsTable.get(formationId);
+
+            // Does the formation already exist in our hashtable? If so, update it accordingly
+            if (combatTeam != null) {
+                boolean isEligible = combatTeam.isEligible(campaign);
+
+                if (!isEligible) {
+                    campaign.getPlayerForce().removeCombatTeam(formationId);
+                }
+
+                formation.setCombatTeamStatus(isEligible);
+                // Otherwise, create a new formation and then add it to the table, if appropriate
+            } else {
+                combatTeam = new CombatTeam(formationId, campaign);
+                boolean isEligible = combatTeam.isEligible(campaign);
+
+                if (isEligible) {
+                    campaign.getPlayerForce().addCombatTeam(combatTeam);
+                }
+
+                formation.setCombatTeamStatus(isEligible);
+            }
+
+            // Update the TO&E and then continue recursively walking it
+            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            recalculateSubFormationStrategicStatus(campaign,
+                  campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
+        }
     }
 
     /**
@@ -210,10 +347,10 @@ public class CombatTeam {
      * @return effective size of the combat team
      */
     public int getSize(Campaign campaign) {
-        if (campaign.getFaction().isClan()) {
+        if (campaign.getPlayerForce().getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
         }
-        if (campaign.getFormation(formationId) != null) {
+        if (campaign.getPlayerForce().getFormation(formationId) != null) {
             return (int) Math.ceil(getEffectiveLanceSize(campaign));
         } else {
             return 0;
@@ -251,7 +388,7 @@ public class CombatTeam {
         }
 
         for (UUID unitId : formation.getAllUnits(true)) {
-            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getAllHangar(), unitId);
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getPlayerForce().getHangar(), unitId);
 
             if (entity == null) {
                 continue;
@@ -278,6 +415,77 @@ public class CombatTeam {
         return (int) Math.floor(numUnits);
     }
 
+    public static LocalDate getBattleDate(LocalDate today) {
+        return today.plusDays(Compute.randomInt(7));
+    }
+
+    public AtBScenario checkForBattle(Campaign campaign) {
+        // Old AtB method
+        return null;
+    }
+
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "formationId", formationId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", role.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
+    }
+
+    public static CombatTeam generateInstanceFromXML(Node wn) {
+        CombatTeam retVal = null;
+        try {
+            retVal = new CombatTeam();
+            NodeList nl = wn.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                // forceId is needed for 0.50.11 milestone saves
+                if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
+                          wn2.getNodeName().equalsIgnoreCase("forceId")) {
+                    // We're not using MathUtility here because there is no good fallback value.
+                    // If this breaks, we need it to break loudly so we immediately notice
+                    retVal.formationId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    retVal.missionId = parseMissionId(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
+                    retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
+                    retVal.commanderId = UUID.fromString(wn2.getTextContent());
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
+        }
+        return retVal;
+    }
+
+    /**
+     * Parses a combat team's mission id for backward compatibility.
+     *
+     * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
+     * plain integer, which is not a valid {@link UUID}. Returning {@code null} for such a value (rather than throwing)
+     * keeps the rest of the combat team's parse - including its role - intact; the campaign loader re-hooks the team to
+     * the contract the legacy mission was converted into, so the assignment is not lost.</p>
+     *
+     * @param text the raw {@code missionId} element text
+     *
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value (to be re-hooked on load)
+     */
+    private static @jakarta.annotation.Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
     private double getEffectivePoints(Campaign campaign) {
         /*
          * Used to check against formation size limits; for this purpose we
@@ -289,7 +497,7 @@ public class CombatTeam {
         double armor = 0.0;
         double infantry = 0.0;
         double other = 0.0;
-        for (UUID id : campaign.getFormation(formationId).getAllUnits(true)) {
+        for (UUID id : campaign.getPlayerForce().getFormation(formationId).getAllUnits(true)) {
             Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
@@ -321,7 +529,7 @@ public class CombatTeam {
          */
         double weight = calculateTotalWeight(campaign, formationId);
 
-        Formation originFormation = campaign.getFormation(formationId);
+        Formation originFormation = campaign.getPlayerForce().getFormation(formationId);
 
         if (originFormation == null) {
             return WEIGHT_ULTRA_LIGHT;
@@ -344,7 +552,7 @@ public class CombatTeam {
             weight = weight / subFormationsCount;
         }
 
-        int standardFormationSize = getStandardFormationSize(campaign.getFaction());
+        int standardFormationSize = getStandardFormationSize(campaign.getPlayerForce().getFaction());
 
         weight = weight / standardFormationSize;
 
@@ -374,7 +582,7 @@ public class CombatTeam {
 
     public boolean isEligible(Campaign campaign) {
         // ensure the lance is marked as a combat formation
-        final Formation formation = campaign.getFormation(formationId);
+        final Formation formation = campaign.getPlayerForce().getFormation(formationId);
 
         if (formation == null) {
             return false;
@@ -390,14 +598,14 @@ public class CombatTeam {
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
-            if (size < getStandardFormationSize(campaign.getFaction()) - 1 ||
-                      size > getStandardFormationSize(campaign.getFaction()) + 2) {
+            if (size < getStandardFormationSize(campaign.getPlayerForce().getFaction()) - 1 ||
+                      size > getStandardFormationSize(campaign.getPlayerForce().getFaction()) + 2) {
                 formation.setCombatTeamStatus(false);
                 return false;
             }
         }
 
-        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
+        if (false &&
                   getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
             formation.setCombatTeamStatus(false);
             return false;
@@ -452,429 +660,6 @@ public class CombatTeam {
         return true;
     }
 
-    /* Code to find unit commander from ForceViewPanel */
-    public static @Nullable UUID findCommander(int formationId, Campaign campaign) {
-        return campaign.getFormation(formationId).getFormationCommanderID();
-    }
-
-    public static LocalDate getBattleDate(LocalDate today) {
-        return today.plusDays(Compute.randomInt(7));
-    }
-
-    public AtBScenario checkForBattle(Campaign campaign) {
-        // Make sure there is a battle first
-        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0) ||
-                  (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
-            // No battle
-            return null;
-        }
-
-        // if we are using StratCon, don't *also* generate legacy scenarios
-        if (campaign.getCampaignOptions().isUseStratCon() &&
-                  (getContract(campaign).getStratConCampaignState() != null)) {
-            return null;
-        }
-
-        int roll;
-        // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
-        // adjust 0-based random int
-        int battleTypeMod = 1 +
-                                  (AtBMoraleLevel.STALEMATE.ordinal() -
-                                         getContract(campaign).getMoraleLevel().ordinal()) * 5;
-        battleTypeMod += getContract(campaign).getBattleTypeMod();
-
-        // debugging code that will allow you to force the generation of a particular
-        // scenario.
-        // when generating a lance-based scenario (Standup, Probe, etc.), the second
-        // parameter in
-        // createScenario is "this" (the lance). Otherwise, it should be null.
-
-        /*
-         * if (true) {
-         * AtBScenario scenario = AtBScenarioFactory.createScenario(campaign, this,
-         * AtBScenario.BASE_ATTACK, true, getBattleDate(campaign.getLocalDate()));
-         * scenario.setMissionId(this.getMissionId());
-         * return scenario;
-         * }
-         */
-
-        switch (role) {
-            case MANEUVER: {
-                roll = Compute.randomInt(40) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.STANDUP,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 25) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.STANDUP,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 33) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HOLD_THE_LINE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case PATROL: {
-                roll = Compute.randomInt(60) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 11) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              true,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HIDE_AND_SEEK,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 21) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 31) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.PROBE,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.PROBE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 51) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.EXTRACTION,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.RECON_RAID,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case FRONTLINE: {
-                roll = Compute.randomInt(20) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.RECON_RAID,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 13) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.EXTRACTION,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                }
-            }
-            case TRAINING, CADRE: {
-                roll = Compute.randomInt(10) + battleTypeMod;
-                if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BASE_ATTACK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 3) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HOLD_THE_LINE,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.BREAKTHROUGH,
-                          true,
-                          getBattleDate(campaign.getLocalDate()));
-                } else if (roll < 7) {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              true,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.BREAKTHROUGH,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(campaign,
-                          this,
-                          AtBScenario.HIDE_AND_SEEK,
-                          false,
-                          getBattleDate(campaign.getLocalDate()));
-                } else {
-                    if (campaign.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.CHASE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    } else {
-                        return AtBScenarioFactory.createScenario(campaign,
-                              this,
-                              AtBScenario.HOLD_THE_LINE,
-                              false,
-                              getBattleDate(campaign.getLocalDate()));
-                    }
-                }
-            }
-            default: {
-                return null;
-            }
-        }
-    }
-
-    public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "formationId", formationId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", role.name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
-    }
-
-    public static CombatTeam generateInstanceFromXML(Node wn) {
-        CombatTeam retVal = null;
-        try {
-            retVal = new CombatTeam();
-            NodeList nl = wn.getChildNodes();
-
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                // forceId is needed for 0.50.11 milestone saves
-                if (wn2.getNodeName().equalsIgnoreCase("formationId") ||
-                          wn2.getNodeName().equalsIgnoreCase("forceId")) {
-                    // We're not using MathUtility here because there is no good fallback value.
-                    // If this breaks, we need it to break loudly so we immediately notice
-                    retVal.formationId = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = MathUtility.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
-                    retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
-                    retVal.commanderId = UUID.fromString(wn2.getTextContent());
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-        }
-        return retVal;
-    }
-
-    /**
-     * Worker function that calculates the total weight of a formation with the given ID
-     *
-     * @param campaign    Campaign in which the formation resides
-     * @param formationId Formation for which to calculate weight
-     *
-     * @return Total formation weight
-     */
-    public static double calculateTotalWeight(Campaign campaign, int formationId) {
-        double weight = 0.0;
-
-        for (UUID id : campaign.getFormation(formationId).getUnits()) {
-            try {
-                Unit unit = campaign.getUnit(id);
-                Entity entity = unit.getEntity();
-                long entityType = entity.getEntityType();
-
-                boolean isClan = campaign.isClanCampaign();
-
-                CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                if (!campaignOptions.isUseStratCon()) {
-                    if (entityType == ETYPE_TANK) {
-                        if (isClan) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if (entityType == ETYPE_AEROSPACE_FIGHTER) {
-                        if (isClan) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    }
-                } else {
-                    weight += entity.getWeight();
-                }
-            } catch (Exception exception) {
-                LOGGER.error("Failed to parse unit ID {}: {}", formationId, exception);
-            }
-        }
-
-        return weight;
-    }
-
-    /**
-     * This static method updates the combat teams across the campaign. It starts at the top level formation, and
-     * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
-     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
-     *
-     * @param campaign the current campaign.
-     */
-    public static void recalculateCombatTeams(Campaign campaign) {
-        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
-        CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
-        Formation formation = campaign.getFormation(0);
-
-        // Does the formation already exist in our hashtable? If so, update it accordingly
-        if (combatTeam != null) {
-            boolean isEligible = combatTeam.isEligible(campaign);
-
-            if (!isEligible) {
-                campaign.removeCombatTeam(0);
-            }
-
-            formation.setCombatTeamStatus(isEligible);
-            // Otherwise, create a new formation and then add it to the table, if appropriate
-        } else {
-            combatTeam = new CombatTeam(0, campaign);
-            boolean isEligible = combatTeam.isEligible(campaign);
-
-            if (isEligible) {
-                campaign.addCombatTeam(combatTeam);
-            }
-
-            formation.setCombatTeamStatus(isEligible);
-        }
-
-        // Update the TO&E and then begin recursively walking it
-        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-        recalculateSubFormationStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
-    }
-
-    /**
-     * This method is used to update the combat teams for the campaign working downwards from a specified node, through
-     * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
-     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
-     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
-     * runs recursively on each sub-formation, effectively traversing the complete TO&E.
-     *
-     * @param campaign    the current {@link Campaign}.
-     * @param workingNode the {@link Formation} node from which the method starts working down through all its
-     *                    sub-formations.
-     */
-    private static void recalculateSubFormationStrategicStatus(Campaign campaign,
-          Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
-
-        for (Formation formation : workingNode.getSubFormations()) {
-            int formationId = formation.getId();
-            CombatTeam combatTeam = combatTeamsTable.get(formationId);
-
-            // Does the formation already exist in our hashtable? If so, update it accordingly
-            if (combatTeam != null) {
-                boolean isEligible = combatTeam.isEligible(campaign);
-
-                if (!isEligible) {
-                    campaign.removeCombatTeam(formationId);
-                }
-
-                formation.setCombatTeamStatus(isEligible);
-                // Otherwise, create a new formation and then add it to the table, if appropriate
-            } else {
-                combatTeam = new CombatTeam(formationId, campaign);
-                boolean isEligible = combatTeam.isEligible(campaign);
-
-                if (isEligible) {
-                    campaign.addCombatTeam(combatTeam);
-                }
-
-                formation.setCombatTeamStatus(isEligible);
-            }
-
-            // Update the TO&E and then continue recursively walking it
-            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-            recalculateSubFormationStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
-        }
-    }
-
     /**
      * Retrieves the formation associated with the given campaign using the stored formation ID.
      *
@@ -888,6 +673,6 @@ public class CombatTeam {
      * @return the {@link Formation} object associated with the {@code formationId}, or {@code null} if not found
      */
     public @Nullable Formation getFormation(Campaign campaign) {
-        return campaign.getFormation(formationId);
+        return campaign.getPlayerForce().getFormation(formationId);
     }
 }

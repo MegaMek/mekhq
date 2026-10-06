@@ -46,7 +46,6 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -56,6 +55,7 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -186,8 +186,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     }
 
     @Override
-    public Warehouse getWarehouse() {
-        return getCampaign().getWarehouse();
+    public mekhq.campaign.LocalWarehouse getWarehouse() {
+        return getCampaign().getPlayerForce().getWarehouse();
     }
 
     @Override
@@ -197,7 +197,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public void resetDaysToWait() {
-        this.daysToWait = getCampaign().getCampaignOptions().getWaitingPeriod();
+        this.daysToWait = getCampaign().getCampaignOptions().get(CampaignOption.WAITING_PERIOD);
     }
 
     @Override
@@ -229,10 +229,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
 
-        if (entity.isClan() && getCampaign().getCampaignOptions().getClanAcquisitionPenalty() > 0) {
-            target.addModifier(getCampaign().getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
-        } else if (getCampaign().getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        if (entity.isClan() && getCampaign().getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(getCampaign().getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY), "clan-tech");
+        } else if (getCampaign().getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > 0) {
+            target.addModifier(getCampaign().getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY), "Inner Sphere tech");
         }
         // TODO: Fix weight classes
         // TODO: aero large craft
@@ -409,6 +409,6 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
      */
     @Override
     public int getTechLevel() {
-        return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getFaction().isClan());
+        return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getPlayerForce().getFaction().isClan());
     }
 }

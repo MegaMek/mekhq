@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -53,6 +54,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class PartsTableModel extends DataTableModel<Part> {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PartsTableModel";
+    private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     public final static int COL_QUANTITY = 0;
     public final static int COL_COL_IN_USE = 1;
@@ -91,7 +93,20 @@ public class PartsTableModel extends DataTableModel<Part> {
      */
     public PartsTableModel(@Nullable Set<PartInUse> partsInUse) {
         data = new ArrayList<>();
+        setPartsInUse(partsInUse);
+    }
 
+    /**
+     * Replaces the part-to-use-count map used by the In Use column with the given snapshot. Callers
+     * (notably {@code WarehouseTab.refreshPartsList()}) must invoke this whenever the campaign's
+     * unit roster or installed-part inventory changes; otherwise the column keeps rendering the
+     * counts captured at construction time and a force-generated campaign reads 0 across the board.
+     *
+     * @param partsInUse the latest {@link PartInUse} set from {@code PartsInUseManager.getPartsInUse()},
+     *                   or {@code null} to clear the in-use mapping
+     */
+    public void setPartsInUse(@Nullable Set<PartInUse> partsInUse) {
+        partsUseData.clear();
         if (partsInUse != null) {
             for (PartInUse partInUse : partsInUse) {
                 IAcquisitionWork description = partInUse.getPartToBuy();
@@ -209,6 +224,10 @@ public class PartsTableModel extends DataTableModel<Part> {
     }
 
     public @Nullable String getTooltip(int row, int col) {
+        Part part = getPartAt(row);
+        if (part.isQueuedForTravel(part.getCampaign().getCampaignLocationManager())) {
+            return getFormattedTextAt(GUI_RESOURCE_BUNDLE, "colorReason.part.queuedForTravel");
+        }
         return null;
     }
 
@@ -226,6 +245,14 @@ public class PartsTableModel extends DataTableModel<Part> {
             int actualRow = table.convertRowIndexToModel(row);
             setHorizontalAlignment(getAlignment(actualCol));
             setToolTipText(getTooltip(actualRow, actualCol));
+
+            if (!isSelected) {
+                Part part = getPartAt(actualRow);
+                if (part.isQueuedForTravel(part.getCampaign().getCampaignLocationManager())) {
+                    setForeground(MekHQ.getMHQOptions().getQueuedForTravelForeground());
+                    setBackground(MekHQ.getMHQOptions().getQueuedForTravelBackground());
+                }
+            }
 
             return this;
         }

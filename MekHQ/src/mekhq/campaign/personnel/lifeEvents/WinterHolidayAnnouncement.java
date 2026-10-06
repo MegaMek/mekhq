@@ -33,8 +33,6 @@
 package mekhq.campaign.personnel.lifeEvents;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -45,6 +43,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -97,7 +96,7 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogCelebrations(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS, false);
         }
     }
 
@@ -132,7 +131,7 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
         String commanderAddress = campaign.getCommanderAddress();
 
         // Determine the location context
-        String location = campaign.getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
+        String location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
 
         // Generate each paragraph and concatenate the full message
         StringBuilder messageBuilder = new StringBuilder();
@@ -191,10 +190,16 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
      * @return the {@link Person} representing the speaker, or {@code null} if no suitable person is found
      */
     private @Nullable Person getSpeaker() {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

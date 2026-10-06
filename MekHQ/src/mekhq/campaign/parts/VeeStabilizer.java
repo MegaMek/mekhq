@@ -37,12 +37,12 @@ import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Era;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingVeeStabilizer;
@@ -154,7 +154,7 @@ public class VeeStabilizer extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -233,7 +233,7 @@ public class VeeStabilizer extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANIC);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

@@ -38,7 +38,6 @@ import java.util.StringJoiner;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -46,6 +45,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.missing.MissingKFFieldInitiator;
@@ -86,6 +86,16 @@ public class KFFieldInitiator extends Part {
         return docks;
     }
 
+    /**
+     * Sets how many docking collars this drive supports, used when a refit changes the number of collars on the
+     * ship that keeps this drive.
+     *
+     * @param docks the number of docking collars
+     */
+    public void setDocks(int docks) {
+        this.docks = docks;
+    }
+
     @Deprecated(since = "0.51.0", forRemoval = true)
     public KFFieldInitiator() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
@@ -119,7 +129,7 @@ public class KFFieldInitiator extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -215,17 +225,8 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if ((unit != null) && (unit.getEntity() instanceof Jumpship)) {
-            int cost = (25000000 + (5000000 * unit.getEntity().getDocks()));
-            if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                      && ((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 15;
-            } else if (((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 3;
-            } else if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
-                cost *= 5;
-            }
-            return Money.of(cost);
+        if ((unit != null) && (unit.getEntity() instanceof Jumpship jumpship)) {
+            return KFDrivePrice.onShip(jumpship, 25_000_000.0 + (5_000_000.0 * jumpship.getDocks()));
         }
         return Money.of(25000000);
     }

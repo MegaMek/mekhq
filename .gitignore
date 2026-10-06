@@ -75,3 +75,6 @@ mhq-revision.txt
 /MekHQ/docs/README.md
 /MekHQ/docs/LICENSE*
 /MekHQ/data
+
+# Local per-issue working docs (implementation notes, checklists)
+docs/issues/

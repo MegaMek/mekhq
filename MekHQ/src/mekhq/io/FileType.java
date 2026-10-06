@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -84,7 +84,12 @@ public enum FileType {
     /**
      * Value for campaign files.
      */
-    CPNX("Campaign file", "cpnx", "cpnx.gz", "xml");
+    CPNX("Campaign file", "cpnx", "cpnx.gz", "xml"),
+
+    /**
+     * Value for scenario template files. JSON is the only supported format.
+     */
+    SCENARIO_TEMPLATE("Scenario template", "json");
 
     FileType(String description, String... extensions) {
         this.description = description;

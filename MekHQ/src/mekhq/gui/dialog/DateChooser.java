@@ -759,7 +759,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             }
             case 3 -> {
                 turningPoints = List.of("OperationFreedom");
-                turningPointDates = List.of(LocalDate.of(2866, 1, 1));
+                turningPointDates = List.of(LocalDate.of(2913, 2, 1));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 4 -> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign;
 import java.util.List;
 
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
@@ -82,9 +83,9 @@ public class OptimizeInfirmaryAssignments {
         // Get campaign configuration details
         this.campaign = campaign;
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-        final int maximumPatients = campaignOptions.getMaximumPatients();
-        final int healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
+        final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+        final int maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
+        final int healingWaitingPeriod = campaignOptions.get(CampaignOption.HEAL_WAITING_PERIOD);
 
         // First, order the doctors based on experience level, highest to lowest
         organizeDoctors();
@@ -127,8 +128,11 @@ public class OptimizeInfirmaryAssignments {
     private void assignDoctors(final boolean isDoctorsUseAdministration, final int maximumPatients,
           final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
           final boolean isOnContractAndPlanetside) {
-        boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
-        int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
+        boolean useMASHTheatres = campaign.getCampaignOptions().get(CampaignOption.USE_MASH_THEATRES);
+        int mashTheatreCapacity;
+        mashTheatreCapacity = useMASHTheatres ?
+                                    campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                    Integer.MAX_VALUE;
 
         int totalPatientCounter = 0;
         int patientCounter = 0;
@@ -177,7 +181,7 @@ public class OptimizeInfirmaryAssignments {
      * experience levels so that the most skilled doctors are assigned first.</p>
      */
     private void organizeDoctors() {
-        doctors = campaign.getDoctors();
+        doctors = campaign.getPlayerForce().getHumanResources().getDoctors();
         doctors.sort((doctor1, doctor2) -> Integer.compare(getDoctorExperienceLevel(doctor2),
               getDoctorExperienceLevel(doctor1)));
     }
@@ -190,7 +194,7 @@ public class OptimizeInfirmaryAssignments {
      * severity value of non-prisoners.</p>
      */
     private void organizePatients() {
-        patients = campaign.getPatients();
+        patients = campaign.getPlayerForce().getHumanResources().getPatients();
         patients.sort((patient1, patient2) -> Integer.compare(getSeverity(patient2), getSeverity(patient1)));
     }
 
@@ -206,13 +210,7 @@ public class OptimizeInfirmaryAssignments {
      * @return the severity score of the patient’s medical condition
      */
     private int getSeverity(Person patient) {
-        int severity = 0;
-
-        if (patient.needsAMFixing()) {
-            severity = patient.getInjuries().size(); // Severity based on number of injuries
-        } else if (patient.needsFixing()) {
-            severity = patient.getHits(); // Severity based on number of hits
-        }
+        int severity = patient.getNonPermanentInjurySeverity();
 
         if (patient.getPrisonerStatus().isFreeOrBondsman()) {
             severity *= 10; // Prioritize Non-Prisoners
@@ -233,6 +231,10 @@ public class OptimizeInfirmaryAssignments {
      * @return the experience level of the doctor
      */
     private int getDoctorExperienceLevel(Person doctor) {
-        return doctor.getExperienceLevel(campaign, doctor.getSecondaryRole().isDoctor());
+        return doctor.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              doctor.getSecondaryRole().isDoctor(),
+              false);
     }
 }

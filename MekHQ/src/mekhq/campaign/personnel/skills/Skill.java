@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,8 @@ import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -49,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
@@ -61,7 +64,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -97,8 +100,8 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
-    public static int COUNT_UP_MAX_VALUE = 10;
-    public static int COUNT_DOWN_MIN_VALUE = 0;
+    public static final int COUNT_UP_MAX_VALUE = 10;
+    public static final int COUNT_DOWN_MIN_VALUE = 0;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Skill";
     private static final MMLogger logger = MMLogger.create(Skill.class);
@@ -108,6 +111,8 @@ public class Skill {
     private int bonus;
     private int xpProgress;
     private boolean hasNaturalAptitude;
+    /** XP put towards gaining a Natural Aptitude in this skill, which reduces the cost of buying it. */
+    private int naturalAptitudeXpProgress;
 
     protected Skill() {
 
@@ -127,11 +132,28 @@ public class Skill {
     }
 
     public Skill(SkillType type, int level, int bonus, int xpProgress, boolean hasNaturalAptitude) {
+        this(type, level, bonus, xpProgress, hasNaturalAptitude, 0);
+    }
+
+    /**
+     * @param type                      the skill type
+     * @param level                     the skill level
+     * @param bonus                     the skill bonus
+     * @param xpProgress                XP put towards the next skill level
+     * @param hasNaturalAptitude        whether the character has a Natural Aptitude in this skill
+     * @param naturalAptitudeXpProgress XP put towards gaining a Natural Aptitude in this skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Skill(SkillType type, int level, int bonus, int xpProgress, boolean hasNaturalAptitude,
+          int naturalAptitudeXpProgress) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
         this.xpProgress = xpProgress;
         this.hasNaturalAptitude = hasNaturalAptitude;
+        this.naturalAptitudeXpProgress = max(0, naturalAptitudeXpProgress);
     }
 
     /**
@@ -152,7 +174,7 @@ public class Skill {
     /**
      * @return {@code true} if the progression type is "count up", {@code false} otherwise.
      */
-    private boolean isCountUp() {
+    public boolean isCountUp() {
         return type.isCountUp();
     }
 
@@ -243,9 +265,31 @@ public class Skill {
         return hasNaturalAptitude;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
         this.hasNaturalAptitude = hasNaturalAptitude;
+    }
+
+    /**
+     * @return the XP put towards gaining a Natural Aptitude in this skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getNaturalAptitudeXpProgress() {
+        return naturalAptitudeXpProgress;
+    }
+
+    /**
+     * Adds (or, with a negative delta, removes) XP put towards gaining a Natural Aptitude in this skill. Progress never
+     * drops below zero.
+     *
+     * @param delta the XP to add
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeNaturalAptitudeXpProgress(int delta) {
+        naturalAptitudeXpProgress = max(0, naturalAptitudeXpProgress + delta);
     }
 
     public SkillType getType() {
@@ -273,12 +317,39 @@ public class Skill {
      * @return the calculated final skill value, after applying all modifiers and bounds
      */
     public int getFinalSkillValue(SkillModifierData skillModifierData) {
-        int modifiers = getModifiers(skillModifierData);
+        return getFinalSkillValue(skillModifierData, 0);
+    }
+
+    /**
+     * As {@link #getFinalSkillValue(SkillModifierData)}, but also applies the combat Chassis Familiarity bonus the
+     * caller has already computed for this skill's role (piloting or gunnery) from the crew member's familiarity and
+     * the active {@code FamiliarityMode}. The bonus may be negative (Hard mode). Pass {@code 0} for no bonus.
+     *
+     * @param skillModifierData the modifiers that affect this skill
+     * @param familiarityBonus  the (signed) chassis familiarity bonus for this skill's role
+     *
+     * @return the calculated final skill value, after applying all modifiers and bounds
+     */
+    public int getFinalSkillValue(SkillModifierData skillModifierData, int familiarityBonus) {
+        int modifiers = getModifiers(skillModifierData, familiarityBonus);
+
+        // Equipment-kit bonuses modify the skill check only, never the underlying skill level: they are applied here at
+        // the final skill value but deliberately kept out of getModifiers(), so getTotalSkillLevel()/getExperienceLevel()
+        // (a character's rating) do not pick them up.
+        modifiers += skillModifierData.equipmentKitBonuses().getOrDefault(type.getName(), 0);
 
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
         } else {
             return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - modifiers);
+        }
+    }
+
+    public String getSkillTargetNumber(SkillModifierData skillModifierData, int familiarityBonus) {
+        if (isCountUp()) {
+            return "+" + getFinalSkillValue(skillModifierData, familiarityBonus);
+        } else {
+            return getFinalSkillValue(skillModifierData, familiarityBonus) + "+";
         }
     }
 
@@ -293,6 +364,21 @@ public class Skill {
      * @return The calculated skill modifier for the current skill type.
      */
     public int getSPAModifiers(PersonnelOptions characterOptions, int reputation) {
+        return getSPAModifiers(characterOptions, reputation, 0);
+    }
+
+    /**
+     * As {@link #getSPAModifiers(PersonnelOptions, int)}, but also adds the combat Chassis Familiarity bonus the caller
+     * has already computed for this skill's role (piloting or gunnery); it applies only to combat piloting/gunnery
+     * skills and may be negative (Hard mode). Pass {@code 0} for no bonus.
+     *
+     * @param characterOptions the character's options and special traits
+     * @param reputation       the character's reputation
+     * @param familiarityBonus the (signed) chassis familiarity bonus for this skill's role
+     *
+     * @return the calculated skill modifier for the current skill type
+     */
+    public int getSPAModifiers(PersonnelOptions characterOptions, int reputation, int familiarityBonus) {
         int modifier = 0;
 
         if (characterOptions == null) {
@@ -534,7 +620,60 @@ public class Skill {
             }
         }
 
+        // Tech Specialist SPAs: a technician who specializes in one granular Tech/... discipline gets +1 to it and -1 to
+        // every other specialist discipline. The abilities are mutually exclusive, so at most one is ever set.
+        String techSpecialistSpa = TECH_SPECIALIST_SPA_BY_SKILL.get(name);
+        if (techSpecialistSpa != null) {
+            if (characterOptions.booleanOption(techSpecialistSpa)) {
+                modifier += 1;
+            } else if (hasAnyTechSpecialistSpa(characterOptions)) {
+                modifier -= 1;
+            }
+        }
+
+        // Chassis Familiarity (combat): the caller supplies the bonus already computed for this skill's role (piloting
+        // or gunnery) from the crew member's familiarity and the active FamiliarityMode; it may be negative (Hard
+        // mode). It applies to every skill a unit is driven or fought with - which is exactly the combat
+        // piloting/gunnery subtypes, covering Anti-Mek and Gunnery/ProtoMek alongside Piloting/Mek, the infantry
+        // gunnery skills alongside Small Arms, and Artillery. Support and roleplay skills never receive it.
+        if ((familiarityBonus != 0) && isCombatPilotingOrGunnery()) {
+            modifier += familiarityBonus;
+        }
+
         return modifier;
+    }
+
+    /**
+     * Maps each granular Tech/... specialist skill name to the Tech Specialist SPA that boosts it. A person holding the
+     * SPA for one skill gets +1 to that skill and -1 to every other skill in this map (see
+     * {@link #getSPAModifiers(PersonnelOptions, int, int)}).
+     */
+    private static final Map<String, String> TECH_SPECIALIST_SPA_BY_SKILL = Map.of(
+          S_TECH_ELECTRONIC, TECH_SPECIALIST_ELECTRONIC,
+          S_TECH_NUCLEAR, TECH_SPECIALIST_NUCLEAR,
+          S_TECH_AERONAUTICS, TECH_SPECIALIST_AERONAUTICS,
+          S_TECH_MECHANICAL, TECH_SPECIALIST_MECHANICAL,
+          S_TECH_MYOMER, TECH_SPECIALIST_MYOMER,
+          S_TECH_JETS, TECH_SPECIALIST_JETS,
+          S_TECH_WEAPONS, TECH_SPECIALIST_WEAPONS,
+          S_TECH_CYBERNETICS, TECH_SPECIALIST_CYBERNETICS);
+
+    /** Whether the character holds any Tech Specialist SPA (they are mutually exclusive, so at most one). */
+    private static boolean hasAnyTechSpecialistSpa(PersonnelOptions characterOptions) {
+        for (String spa : TECH_SPECIALIST_SPA_BY_SKILL.values()) {
+            if (characterOptions.booleanOption(spa)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return {@code true} if this skill is one a unit is piloted or shot with, and so is eligible for the combat
+     *       Chassis Familiarity bonus
+     */
+    private boolean isCombatPilotingOrGunnery() {
+        return type.isSubTypeOf(COMBAT_PILOTING) || type.isSubTypeOf(COMBAT_GUNNERY);
     }
 
 
@@ -552,7 +691,7 @@ public class Skill {
      *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
      * </ul>
      *
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NO_ATTRIBUTE} are ignored during this process.</p>
      *
      * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
      * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
@@ -582,7 +721,7 @@ public class Skill {
 
         int totalModifier = 0;
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 
@@ -672,7 +811,8 @@ public class Skill {
                   new Attributes(),
                   0,
                   new ArrayList<>(),
-                  IGNORE_AGE);
+                  IGNORE_AGE,
+                  Map.of());
         }
 
         int baseValue = level + bonus;
@@ -696,12 +836,18 @@ public class Skill {
      * @since 0.50.07
      */
     private int getModifiers(SkillModifierData skillModifierData) {
+        return getModifiers(skillModifierData, 0);
+    }
+
+    private int getModifiers(SkillModifierData skillModifierData, int familiarityBonus) {
         int spaModifiers = getSPAModifiers(skillModifierData.characterOptions(),
-              skillModifierData.adjustedReputation());
+              skillModifierData.adjustedReputation(), familiarityBonus);
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
+        // Equipment-kit bonuses are intentionally NOT summed here: they modify a skill check (the final skill value)
+        // but not the character's skill level or experience rating. See getFinalSkillValue().
         return spaModifiers + attributeModifiers + totalInjuryModifier;
     }
 
@@ -779,8 +925,9 @@ public class Skill {
      * @return the corresponding {@link SkillLevel} for the evaluated experience level
      */
     public SkillLevel getSkillLevel(SkillModifierData skillModifierData) {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
-        return Skills.SKILL_LEVELS[getExperienceLevel(skillModifierData) + 1];
+        int experienceLevel = getExperienceLevel(skillModifierData);
+
+        return SkillType.skillLevelFromExperienceLevel(experienceLevel);
     }
 
     /**
@@ -820,7 +967,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, new ArrayList<>(), IGNORE_AGE);
+              0, new ArrayList<>(), IGNORE_AGE, Map.of());
         return toString(skillModifierData);
     }
 
@@ -887,6 +1034,10 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
+        if (hasNaturalAptitude) {
+            tooltip.append(getTextAt(RESOURCE_BUNDLE, "tooltip.naturalAptitude")).append("<br><br>");
+        }
+
         if (bonus != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.bonus",
@@ -922,7 +1073,7 @@ public class Skill {
               (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
-        if (secondLinkedAttribute != SkillAttribute.NONE) {
+        if (secondLinkedAttribute != SkillAttribute.NO_ATTRIBUTE) {
             int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
                   activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -940,6 +1091,12 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpProgress", xpProgress);
+        if (hasNaturalAptitude) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasNaturalAptitude", true);
+        }
+        if (naturalAptitudeXpProgress > 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalAptitudeXpProgress", naturalAptitudeXpProgress);
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -964,6 +1121,10 @@ public class Skill {
                     retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpProgress")) {
                     retVal.xpProgress = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hasNaturalAptitude")) {
+                    retVal.hasNaturalAptitude = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeXpProgress")) {
+                    retVal.naturalAptitudeXpProgress = max(0, MathUtility.parseInt(wn2.getTextContent()));
                 }
             }
         } catch (Exception ex) {

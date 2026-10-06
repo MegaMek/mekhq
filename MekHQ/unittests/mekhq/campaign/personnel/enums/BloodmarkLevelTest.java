@@ -32,8 +32,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static mekhq.campaign.personnel.Person.MAXIMUM_BLOODMARK;
-import static mekhq.campaign.personnel.Person.MINIMUM_BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.parseBloodmarkLevelFromInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +60,7 @@ class BloodmarkLevelTest {
 
     @Test
     void test_allLevelsAreValid() {
-        for (int level = MINIMUM_BLOODMARK; level < MAXIMUM_BLOODMARK; level++) {
+        for (int level = BLOODMARK.getMinimum(); level < BLOODMARK.getMaximum(); level++) {
             BloodmarkLevel bloodmark = parseBloodmarkLevelFromInt(level);
             int bloodmarkLevel = bloodmark.getLevel();
             assertEquals(level, bloodmarkLevel, "Invalid Bloodmark Level: " + level);

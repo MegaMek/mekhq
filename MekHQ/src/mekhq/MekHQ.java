@@ -34,6 +34,7 @@
 package mekhq;
 
 import static megamek.MMConstants.LOCALHOST_IP;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Desktop;
@@ -106,15 +107,19 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoResolve.MekHQSetupForces;
 import mekhq.campaign.autoResolve.StratConSetupForces;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.IDigitalGM;
+import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.SinglesStratConGM;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConDigitalGM;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -367,9 +372,9 @@ public class MekHQ implements GameListener {
     }
 
     /**
-     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is
-     * linked to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components.
-     * Logs remaining event bus listeners for debug purposes.
+     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is linked
+     * to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components. Logs
+     * remaining event bus listeners for debug purposes.
      */
     private void deactivateCampaign() {
         if (campaignGUI != null) {
@@ -472,7 +477,10 @@ public class MekHQ implements GameListener {
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
-        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getName());
+        // Force down any game left over from a previous scenario
+        stopHost();
+
+        ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getPlayerForce().getName());
         joinGameDialog.setVisible(true);
 
         if (!joinGameDialog.dataValidation("MegaMek.ConnectDialog.title")) {
@@ -523,7 +531,10 @@ public class MekHQ implements GameListener {
      */
     public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
           @Nullable BehaviorSettings autoResolveBehaviorSettings) {
-        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
+        // Force down any game left over from a previous scenario whose hand-off never completed.
+        stopHost();
+
+        HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getPlayerForce().getName());
         hostDialog.setVisible(true);
 
         if (!hostDialog.dataValidation("MegaMek.HostGameAlert.title")) {
@@ -550,7 +561,15 @@ public class MekHQ implements GameListener {
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 if (null != f.getFile()) {
-                    getMyServer().loadGame(new File(f.getDirectory(), f.getFile()));
+                    if (!getMyServer().loadGame(new File(f.getDirectory(), f.getFile()))) {
+                        // loadGame catches its own failures and returns false rather than throwing, so the catch
+                        // blocks below never see them. Stop here instead of letting the game thread start and push the
+                        // campaign's units into a fresh, empty battle in place of the save the player asked to resume.
+                        stopHost();
+                        LOGGER.errorDialog(getText("startHost.saveLoadFailed.title"),
+                              getText("startHost.saveLoadFailed.message"));
+                        return;
+                    }
                 } else {
                     stopHost();
                     return; // exceptions as flow control? no, thanks.
@@ -563,10 +582,13 @@ public class MekHQ implements GameListener {
         } catch (Exception ex) {
             LOGGER.error(ex, "Failed to start up server");
             stopHost();
+            LOGGER.errorDialog(ex,
+                  getFormattedText("startHost.serverStartFailed.message", String.valueOf(port)),
+                  getText("startHost.serverStartFailed.title"));
             return;
         }
         // Refactor this into a factory
-        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
         if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
             client = new HeadlessClient(playerName, LOCALHOST_IP, port);
         } else {
@@ -595,11 +617,41 @@ public class MekHQ implements GameListener {
 
     // Stop & send the close game event to the Server
     public synchronized void stopHost() {
-        if (getMyServer() != null) {
-            getMyServer().die();
-            myServer = null;
-        }
+        // Snapshot and immediately null the fields before we start tearing anything down. Client.die() synchronously
+        // fires CloseClientListener.clientClosed(), which calls back into stopHost() (see GameThread#clientClosed); by
+        // nulling first, that re-entrant call sees a clean state and becomes a no-op instead of recursing.
+        final GameThread stoppingThread = gameThread;
+        final Client stoppingClient = client;
+        final Server stoppingServer = myServer;
+
+        gameThread = null;
+        client = null;
+        myServer = null;
         currentScenario = null;
+
+        // Stop the game thread so its run loop exits and it releases the client GUI and bot clients.
+        if (stoppingThread != null) {
+            stoppingThread.requestStop();
+        }
+
+        // Deregister ourselves as a game listener and close the client connection so no stale listeners linger.
+        if (stoppingClient != null) {
+            try {
+                stoppingClient.getGame().removeGameListener(this);
+                stoppingClient.die();
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to tear down the game client while stopping the host.");
+            }
+        }
+
+        // Finally, kill the server so it releases its port; a lingering server is what blocks the next launch.
+        if (stoppingServer != null) {
+            try {
+                stoppingServer.die();
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to shut down the game server while stopping the host.");
+            }
+        }
     }
 
     @Override
@@ -844,10 +896,10 @@ public class MekHQ implements GameListener {
         SetupForces setupForces = getSetupForces(scenario, units);
 
         PlanetaryConditions planetaryConditions = getCampaign().getCurrentPlanetaryConditions(scenario);
-        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_VICTORY_CHANCE_ENABLED)) {
 
             var proceed = AutoResolveChanceDialog.showDialog(campaignGUI.getFrame(),
-                  getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
+                  getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_NUMBER_OF_SCENARIOS),
                   Runtime.getRuntime().availableProcessors(),
                   1,
                   setupForces,
@@ -923,7 +975,8 @@ public class MekHQ implements GameListener {
         List<Throwable> errors = new ArrayList<>();
         for (var entry : peopleStatus.entrySet()) {
             try {
-                Person person = getCampaign().getPerson(entry.getKey());
+                Campaign campaign = getCampaign();
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson(entry.getKey());
                 Objects.requireNonNull(person, "getPerson() returned null for Person ID=" + entry.getKey() + ".");
                 person.setHits(person.getHitsPrior());
             } catch (Throwable ex) {
@@ -957,9 +1010,13 @@ public class MekHQ implements GameListener {
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
-        StratConRulesManager srm = new StratConRulesManager();
-        srm.startup();
-        EVENT_BUS.register(srm);
+        // Register every digital GM. All receive the new-day event, but only the one matching the campaign's StratCon
+        // play type acts (see DigitalGM#isEnabled); the play types are mutually exclusive, so at most one runs per day.
+        for (IDigitalGM IDigitalGM : List.of(new StratConDigitalGM(),
+              new MaplessStratConGM(),
+              new SinglesStratConGM())) {
+            IDigitalGM.startup();
+        }
     }
 
     private static void setLookAndFeel(String themeName) {

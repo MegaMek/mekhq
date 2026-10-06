@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,6 @@ package mekhq.campaign.personnel.lifeEvents;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.FEMALE;
 import static megamek.common.enums.Gender.MALE;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -49,6 +47,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -97,7 +96,7 @@ public class BirthAnnouncement {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogBirths(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS, false);
         }
     }
 
@@ -122,7 +121,7 @@ public class BirthAnnouncement {
      */
     private String getInCharacterMessage(Gender babyGender, int babyCount, String parentFirstName) {
         // Campaign Data
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
 
         // Parent Data
         Gender parentGender = parent.getGender();
@@ -208,7 +207,7 @@ public class BirthAnnouncement {
      *       found.
      */
     private @Nullable Person getSpeaker(Campaign campaign) {
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -251,10 +250,16 @@ public class BirthAnnouncement {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

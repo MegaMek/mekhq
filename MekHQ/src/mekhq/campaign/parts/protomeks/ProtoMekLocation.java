@@ -51,6 +51,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.ProtoMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -616,7 +617,7 @@ public class ProtoMekLocation extends Part {
         if (isUnitTonnageMatters()) {
             toReturn.append(" (").append(getUnitTonnage()).append(" ton)");
         }
-        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));

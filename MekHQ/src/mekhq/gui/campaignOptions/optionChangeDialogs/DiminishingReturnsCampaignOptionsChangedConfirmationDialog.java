@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class DiminishingReturnsCampaignOptionsChangedConfirmationDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DiminishingReturnsCampaignOptionsChangedConfirmationDialog";
@@ -64,7 +65,7 @@ public class DiminishingReturnsCampaignOptionsChangedConfirmationDialog {
         final int cancelOptionIndex = 0;
 
         if (dialog.getDialogChoice() == cancelOptionIndex) {
-            campaign.getCampaignOptions().setUseDiminishingContractPay(false);
+            campaign.getCampaignOptions().set(CampaignOption.USE_DIMINISHING_CONTRACT_PAY, false);
         }
     }
 }

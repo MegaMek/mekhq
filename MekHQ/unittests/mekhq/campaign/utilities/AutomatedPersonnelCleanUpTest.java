@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDate;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.HumanResources;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -58,7 +57,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_NoDepartedPersons() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person ineligiblePerson = new Person(testCampaign);
             ineligiblePerson.setStatus(PersonnelStatus.ACTIVE);
@@ -79,7 +78,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_DeadPersonsButBeforeDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person ineligibleDeadPerson = new Person(testCampaign);
             ineligibleDeadPerson.setStatus(PersonnelStatus.DISEASE);
@@ -101,7 +100,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_DeadPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleDeadPerson = new Person(testCampaign);
             eligibleDeadPerson.setStatus(PersonnelStatus.DISEASE);
@@ -123,7 +122,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_RelatedExemption_DeadPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleDeadPerson = new Person(testCampaign);
             eligibleDeadPerson.setStatus(PersonnelStatus.DISEASE);
@@ -145,7 +144,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_UnrelatedExemption_DeadPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleDeadPerson = new Person(testCampaign);
             eligibleDeadPerson.setStatus(PersonnelStatus.DISEASE);
@@ -167,7 +166,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_DeadPersonsAfterDateActiveGenealogy() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person personWhoDiedAfterThresholdButActiveGenealogy = new Person(testCampaign);
             personWhoDiedAfterThresholdButActiveGenealogy.setStatus(PersonnelStatus.DISEASE);
@@ -195,7 +194,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_DeadPersonsAfterDateInactiveGenealogy() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person personWhoDiedAfterThresholdAndInactiveGenealogy = new Person(testCampaign);
             personWhoDiedAfterThresholdAndInactiveGenealogy.setStatus(PersonnelStatus.DISEASE);
@@ -223,7 +222,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_RetiredPersonsButBeforeDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person ineligibleRetiredPerson = new Person(testCampaign);
             ineligibleRetiredPerson.setStatus(PersonnelStatus.RETIRED);
@@ -245,7 +244,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_DepartedPersonsAfterDateButNotRetired() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleRetiredPerson = new Person(testCampaign);
             eligibleRetiredPerson.setStatus(PersonnelStatus.LEFT);
@@ -267,7 +266,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_RetiredPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleRetiredPerson = new Person(testCampaign);
             eligibleRetiredPerson.setStatus(PersonnelStatus.LEFT);
@@ -289,7 +288,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_RelatedExemption_RetiredPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleRetiredPerson = new Person(testCampaign);
             eligibleRetiredPerson.setStatus(PersonnelStatus.RETIRED);
@@ -311,7 +310,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_UnrelatedExemption_RetiredPersonsAfterDate() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleRetiredPerson = new Person(testCampaign);
             eligibleRetiredPerson.setStatus(PersonnelStatus.RETIRED);
@@ -333,7 +332,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_RetiredPersonsAfterDateActiveGenealogy() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person personWhoRetiredAfterThresholdButActiveGenealogy = new Person(testCampaign);
             personWhoRetiredAfterThresholdButActiveGenealogy.setStatus(PersonnelStatus.RETIRED);
@@ -361,7 +360,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_RetiredPersonsAfterDateInactiveGenealogy() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person personWhoRetiredAfterThresholdWithInActiveGenealogy = new Person(testCampaign);
             personWhoRetiredAfterThresholdWithInActiveGenealogy.setStatus(PersonnelStatus.RETIRED);
@@ -388,7 +387,7 @@ class AutomatedPersonnelCleanUpTest {
 
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_BackgroundPersonsAfterDate() {
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person eligibleDeadPerson = new Person(testCampaign);
             eligibleDeadPerson.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
@@ -408,7 +407,7 @@ class AutomatedPersonnelCleanUpTest {
     @Test
     void testGetPersonnelToCleanUp_NoExemptions_BackgroundPersonsAfterDateActiveGenealogy() {
         // Setup
-        HumanResources humanResources = testCampaign.getHumanResources();
+        mekhq.campaign.ForceHumanResources humanResources = testCampaign.getPlayerForce().getHumanResources();
         for (int i = 0; i < 10; i++) {
             Person personWhoRetiredAfterThresholdButActiveGenealogy = new Person(testCampaign);
             personWhoRetiredAfterThresholdButActiveGenealogy.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);

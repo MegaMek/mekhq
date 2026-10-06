@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,8 +42,8 @@ import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
@@ -58,14 +58,14 @@ public class ContractAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, AbstractContract mission,
           UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
         long contractDuration = ChronoUnit.MONTHS.between(
-              ((Contract) mission).getStartDate(),
+              mission.getStartDate(),
               campaign.getLocalDate());
 
         // these entries should always be in lower case
@@ -74,7 +74,7 @@ public class ContractAwards {
               "diversionary raid", "objective raid", "recon raid", "extraction raid");
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 if (award.getRange().equalsIgnoreCase("months")) {
                     try {
                         int requiredDuration = award.getQty();
@@ -89,17 +89,17 @@ public class ContractAwards {
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
                     switch (award.getRange().toLowerCase()) {
                         case "duty":
-                            if (mission.getContractTypeName().toLowerCase().contains("duty")) {
+                            if (mission.getObjectiveType().toString().toLowerCase().contains("duty")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         case "raid":
-                            if (mission.getContractTypeName().toLowerCase().contains("raid")) {
+                            if (mission.getObjectiveType().toString().toLowerCase().contains("raid")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         default:
-                            if (mission.getContractTypeName().equalsIgnoreCase(award.getRange())) {
+                            if (mission.getObjectiveType().toString().equalsIgnoreCase(award.getRange())) {
                                 eligibleAwards.add(award);
                             }
                     }
@@ -113,7 +113,7 @@ public class ContractAwards {
         if (!bestEligibleAwards.isEmpty()) {
             int rollingQty = 0;
 
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
                 for (Award award : bestEligibleAwards) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();

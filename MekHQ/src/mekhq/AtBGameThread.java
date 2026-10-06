@@ -67,14 +67,17 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
@@ -90,6 +93,8 @@ import mekhq.utilities.ScenarioUtils;
 @Deprecated(since = "0.51.0", forRemoval = true)
 public class AtBGameThread extends GameThread {
     private static final MMLogger LOGGER = MMLogger.create(AtBGameThread.class);
+
+    private static final String TRANSPORT_RESOURCE_BUNDLE = "mekhq.resources.AssignForceToTransport";
 
     private final AtBScenario scenario;
     private final BehaviorSettings autoResolveBehaviorSettings;
@@ -133,7 +138,10 @@ public class AtBGameThread extends GameThread {
             var acarGui = new CommanderGUI(client, controller);
             localBots = acarGui;
             swingGui = acarGui;
-            acarGui.start();
+            // Give the "Request Victory" button the server password so it authenticates on a passworded server, then
+            // build the window on the EDT. CommanderGUI is no longer a Thread. See issue #8891.
+            acarGui.setServerPassword(password);
+            acarGui.initialize();
         } else {
             var clientGui = new ClientGUI(client, controller);
             localBots = clientGui;
@@ -166,9 +174,9 @@ public class AtBGameThread extends GameThread {
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
                 LOGGER.info("Thread in lounge");
 
-                client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
-                client.getLocalPlayer().setColour(app.getCampaign().getColour());
-                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
+                client.getLocalPlayer().setCamouflage(app.getCampaign().getPlayerForce().getCamouflage().clone());
+                client.getLocalPlayer().setColour(app.getCampaign().getPlayerForce().getColour());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getPlayerForce().getInitiativeBonus());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
@@ -177,6 +185,19 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
+                // StratCon: tune the generated board so it reflects the sector hex being fought on (roads, water,
+                // terrain emphasis, cities), via the active GM's map-generation strategy. Fixed maps are used exactly
+                // as authored, so they are skipped here rather than relying on the generator knobs being ignored
+                // downstream.
+                //
+                // getHasTrack() is what limits this to StratCon. Two things would otherwise pull every AtB scenario in:
+                // AtBScenario.setTerrain() gives each one a random terrainType drawn from the biome map pools, and
+                // StratConGMs falls back to the default StratCon GM even with StratCon switched off - so a plain AtB
+                // board would be handed terrain emphasis and a forced theme chosen from a terrain it never fought on.
+                if (!scenario.isUsingFixedMap() && scenario.getHasTrack()) {
+                    StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
+                          .tuneMapSettings(mapSettings, scenario);
+                }
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
@@ -258,9 +279,12 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    Formation formation = campaign.getFormationFor(unit);
+                    Formation formation = campaign.getPlayerForce().getFormationFor(unit);
                     if (formation != null) {
                         entity.setForceString(formation.getFullMMName());
+                    }
+                    if (scenario instanceof AtBDynamicScenario dynamicScenario) {
+                        AtBDynamicScenarioFactory.applyPlayerOffBoardDeployment(dynamicScenario, unit, entity, campaign);
                     }
                     entities.add(entity);
 
@@ -275,6 +299,7 @@ public class AtBGameThread extends GameThread {
                         copyDeploymentParameters(benchedEntity, entity);
                     }
                 }
+                logPlayerDeployment(entities);
                 client.sendAddEntity(entities);
 
                 // Run through the units again. This time add
@@ -319,6 +344,7 @@ public class AtBGameThread extends GameThread {
                     entity.setDeployRound(deploymentRound);
                     entities.add(entity);
                 }
+                logPlayerDeployment(entities);
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
                 var botClients = new ArrayList<BotClient>();
@@ -527,37 +553,45 @@ public class AtBGameThread extends GameThread {
 
                 // Prompt the player to tow stuff (lowest priority)
                 if (potentialTransports.hasTransports(TOW_TRANSPORT)) {
-                    for (UUID transportId : potentialTransports.getTransports(TOW_TRANSPORT)) {
-                        boolean towUnits = false;
+                    Set<UUID> towTransportIds = potentialTransports.getTransports(TOW_TRANSPORT);
+                    for (UUID transportId : towTransportIds) {
                         Unit transport = campaign.getUnit(transportId);
-
-                        if (transport.hasTransportedUnits(TOW_TRANSPORT)) {
-                            towUnits = (JOptionPane.YES_OPTION ==
-                                              JOptionPane.showConfirmDialog(null,
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text",
-                                                          transport.getName()),
-                                                    MHQInternationalization.getFormattedTextAt(
-                                                          "mekhq.resources.AssignForceToTransport",
-                                                          "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title"),
-                                                    JOptionPane.YES_NO_OPTION));
+                        if ((transport == null) || (transport.getEntity() == null)) {
+                            continue;
                         }
+
+                        // A train is built once, headed by its lead tractor. Skip units that are
+                        // towed by another transport deployed in this scenario - they are middle
+                        // trailers and get hitched as part of the lead tractor's train.
+                        if (transport.hasTransportAssignment(TOW_TRANSPORT) &&
+                                  towTransportIds.contains(transport.getTransportAssignment(TOW_TRANSPORT)
+                                                                 .getTransport()
+                                                                 .getId())) {
+                            continue;
+                        }
+
+                        List<Integer> orderedTrailerIds = orderedTrainTrailerIds(campaign,
+                              potentialTransports, transportId);
+
+                        if (orderedTrailerIds.isEmpty()) {
+                            continue;
+                        }
+
+                        String towPrompt = MHQInternationalization.getFormattedTextAt(TRANSPORT_RESOURCE_BUNDLE,
+                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text", transport.getName());
+                        String towTitle = MHQInternationalization.getTextAt(TRANSPORT_RESOURCE_BUNDLE,
+                              "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title");
+                        boolean towUnits = (JOptionPane.YES_OPTION ==
+                                                  JOptionPane.showConfirmDialog(null, towPrompt, towTitle,
+                                                        JOptionPane.YES_NO_OPTION));
 
                         // Now, send the tow commands
                         if (towUnits) {
-                            // Convert the list of Unit UUIDs to MM EntityIds
-                            Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT,
-                                  transportId).getFirst());
-                            if (towedUnit != null && towedUnit.getEntity() != null) {
-                                // And now tow the units.
-                                Utilities.towPlayerTrailers(transport.getEntity().getId(),
-                                      towedUnit.getEntity().getId(),
-                                      client,
-                                      towUnits,
-                                      alreadyResetTransport.contains(transportId));
-                                alreadyResetTransport.add(transportId);
-                            }
+                            Utilities.towPlayerTrailers(transport.getEntity().getId(),
+                                  orderedTrailerIds,
+                                  client,
+                                  alreadyResetTransport.contains(transportId));
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }
@@ -627,6 +661,74 @@ public class AtBGameThread extends GameThread {
         return useDropship;
     }
 
+    /**
+     * Lists the entity ids of every trailer behind the given lead tractor, in hitch order, ready to hand to a single
+     * {@code sendBuildTrain}. A tow train is stored as a linked list - each unit records only the trailer directly
+     * behind it - so the train is read by following those links hop by hop.
+     *
+     * <p>The walk stops at the first gap (a unit missing from the campaign or with no entity) and at
+     * the first unit it has already seen. That second guard is what bounds the loop: every pass adds a new id to
+     * {@code visitedUnits} or ends the loop, so a save file with a hitch that loops back on itself returns the trailers
+     * it managed to read instead of spinning.</p>
+     *
+     * @param campaign            current campaign
+     * @param potentialTransports transports deployed in this scenario
+     * @param leadTractorId       unit id of the tractor heading the train
+     *
+     * @return trailer entity ids front to back, empty when the tractor is pulling nothing
+     */
+    static List<Integer> orderedTrainTrailerIds(Campaign campaign, PotentialTransportsMap potentialTransports,
+          UUID leadTractorId) {
+        List<Integer> orderedTrailerIds = new ArrayList<>();
+        Set<UUID> visitedUnits = new HashSet<>();
+        visitedUnits.add(leadTractorId);
+
+        for (Unit towedUnit = nextTrailer(campaign, potentialTransports, leadTractorId);
+              (towedUnit != null) && visitedUnits.add(towedUnit.getId());
+              towedUnit = nextTrailer(campaign, potentialTransports, towedUnit.getId())) {
+            orderedTrailerIds.add(towedUnit.getEntity().getId());
+        }
+
+        return orderedTrailerIds;
+    }
+
+    /**
+     * The one trailer hitched directly behind the given unit in this scenario.
+     *
+     * @param campaign            current campaign
+     * @param potentialTransports transports deployed in this scenario
+     * @param unitId              unit whose hitch is being read
+     *
+     * @return the trailer behind it, or null when there is none or it cannot be deployed
+     */
+    private static @Nullable Unit nextTrailer(Campaign campaign, PotentialTransportsMap potentialTransports,
+          UUID unitId) {
+        List<UUID> towedUnitIds = potentialTransports.getTransportedUnits(TOW_TRANSPORT, unitId);
+        if ((towedUnitIds == null) || towedUnitIds.isEmpty()) {
+            return null;
+        }
+        Unit towedUnit = campaign.getUnit(towedUnitIds.getFirst());
+        return ((towedUnit == null) || (towedUnit.getEntity() == null)) ? null : towedUnit;
+    }
+
+    /**
+     * Logs each player entity's owner, start zone and deploy round at INFO before it is sent to the server. In
+     * Commander mode the lobby is skipped, so a misplaced unit (e.g. a reinforcement in the enemy's start zone) can
+     * only be diagnosed from mekhq.log; this makes that possible without a screenshot. See issue #9960.
+     *
+     * @param entities the player entities about to be sent to the server
+     */
+    private void logPlayerDeployment(List<Entity> entities) {
+        for (Entity entity : entities) {
+            Player owner = entity.getOwner();
+            LOGGER.info("[Deployment] {} owner={} startZone={} deployRound={}",
+                  entity.getShortName(),
+                  (owner == null) ? "none" : owner.getName(),
+                  entity.getStartingPos(),
+                  entity.getDeployRound());
+        }
+    }
+
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + "@AI";
 
@@ -666,13 +768,37 @@ public class AtBGameThread extends GameThread {
         botClient.sendPlayerInfo();
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
 
-        var playerEntities = client.getEntitiesVector()
-                                   .stream()
-                                   .filter(entity -> entity.getOwnerId() == player.getId())
-                                   .collect(Collectors.toList());
-        botClient.sendChangeOwner(playerEntities, botClient.getLocalPlayer().getId());
+        handOverPlayerUnitsToBot(client, botClient);
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
         return botClient;
+    }
+
+    /**
+     * Gives every unit the player owns to their auto-resolve bot, asking over the player's own connection.
+     *
+     * <p>The server only lets a sender give away units it already owns (MegaMek issue #8860). The request used to go
+     * out over the bot's connection, so it read as a bot taking a human's units and was refused. The units then stayed
+     * with the Commander window, which never plays a turn, and the game sat at "Preparing..." for good (issue #8989).
+     * Sent by the player, the same request is a player giving their own units to a bot, which is allowed.</p>
+     *
+     * @param playerClient the player's own client, which owns the units being handed over
+     * @param botClient    the bot that is to fight with them
+     */
+    static void handOverPlayerUnitsToBot(Client playerClient, BotClient botClient) {
+        Player player = playerClient.getLocalPlayer();
+        Player botPlayer = botClient.getLocalPlayer();
+        List<Entity> playerEntities = playerClient.getEntitiesVector()
+                                            .stream()
+                                            .filter(entity -> entity.getOwnerId() == player.getId())
+                                            .collect(Collectors.toList());
+        if (playerEntities.isEmpty()) {
+            LOGGER.warn("[AutoResolve] {} has no units to hand to {}; the bot will have nothing to command",
+                  player.getName(), botPlayer.getName());
+            return;
+        }
+        LOGGER.info("[AutoResolve] {} hands {} unit(s) to {} over the player's own connection",
+              player.getName(), playerEntities.size(), botPlayer.getName());
+        playerClient.sendChangeOwner(playerEntities, botPlayer.getId());
     }
 
     /**
@@ -733,11 +859,11 @@ public class AtBGameThread extends GameThread {
         String lanceName = RCG.generate();
         botForce.generateRandomForces(units, campaign);
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
-        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        AbstractContract contract = campaign.getContract(scenario.getMissionId());
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemy());
+            lanceSize = CombatTeam.getStandardFormationSize(contract.getEnemyFaction());
         } else {
             lanceSize = CombatTeam.getStandardFormationSize(contract.getEmployerFaction());
         }

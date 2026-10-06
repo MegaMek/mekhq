@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,20 +33,27 @@
  */
 package mekhq.campaign.parts.missing;
 
+import java.io.PrintWriter;
+
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingAeroHeatSink extends MissingPart {
-    private final int type;
+    private static final MMLogger LOGGER = MMLogger.create(MissingAeroHeatSink.class);
+
+    private int type;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingAeroHeatSink() {
@@ -56,13 +63,16 @@ public class MissingAeroHeatSink extends MissingPart {
     public MissingAeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
         super(tonnage, omniPodded, c);
         this.type = type;
-        this.name = "Aero Heat Sink";
+        this.name = nameFor(type);
+    }
+
+    private static String nameFor(int type) {
         if (type == AeroHeatSink.CLAN_HEAT_DOUBLE) {
-            this.name = "Aero Double Heat Sink (Clan)";
+            return "Aero Double Heat Sink (Clan)";
+        } else if (type == Aero.HEAT_DOUBLE) {
+            return "Aero Double Heat Sink";
         }
-        if (type == Aero.HEAT_DOUBLE) {
-            this.name = "Aero Double Heat Sink";
-        }
+        return "Aero Heat Sink";
     }
 
     @Override
@@ -105,8 +115,29 @@ public class MissingAeroHeatSink extends MissingPart {
     }
 
     @Override
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        // The heat sink type decides which spare replaces this placeholder, so it must survive a save
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
+        writeToXMLEnd(pw, indent);
+    }
+
+    @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-        //nothing to load
+        NodeList childNodes = wn.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if (!childNode.getNodeName().equalsIgnoreCase("type")) {
+                continue;
+            }
+            try {
+                type = Integer.parseInt(childNode.getTextContent().trim());
+                name = nameFor(type);
+            } catch (NumberFormatException exception) {
+                LOGGER.error("Unreadable heat sink type '{}' on a missing aero heat sink; keeping {}",
+                      childNode.getTextContent(), name, exception);
+            }
+        }
     }
 
     @Override

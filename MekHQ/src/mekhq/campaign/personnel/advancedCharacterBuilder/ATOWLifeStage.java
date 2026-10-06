@@ -32,7 +32,12 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import megamek.codeUtilities.MathUtility;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
@@ -50,10 +55,15 @@ import megamek.logging.MMLogger;
  */
 public enum ATOWLifeStage {
     AFFILIATION(0, "AFFILIATION"),
-    EARLY_CHILDHOOD(1, "EARLY_CHILDHOOD"),
-    LATE_CHILDHOOD(2, "LATE_CHILDHOOD"),
-    HIGHER_EDUCATION(3, "HIGHER_EDUCATION"),
-    REAL_LIFE(4, "REAL_LIFE");
+    SUB_AFFILIATION(1, "SUB_AFFILIATION"),
+    CLAN_CASTE(2, "CLAN_CASTE"),
+    SUPPLEMENTAL(3, "SUPPLEMENTAL"),
+    EARLY_CHILDHOOD(4, "EARLY_CHILDHOOD"),
+    LATE_CHILDHOOD(5, "LATE_CHILDHOOD"),
+    HIGHER_EDUCATION(6, "HIGHER_EDUCATION"),
+    REAL_LIFE(7, "REAL_LIFE");
+
+    final static String RESOURCE_BUNDLE = "mekhq.resources.ATOWLifeStage";
 
     private static final MMLogger LOGGER = MMLogger.create(ATOWLifeStage.class);
 
@@ -96,6 +106,47 @@ public enum ATOWLifeStage {
      */
     public String getLookupName() {
         return lookupName;
+    }
+
+    /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
+     * Returns a list of all {@link ATOWLifeStage} values, sorted by their ascending order.
+     *
+     * @return a sorted list of {@link ATOWLifeStage} values by order
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public static List<ATOWLifeStage> getOrderedLifeStages() {
+        List<ATOWLifeStage> stages = Arrays.asList(values());
+        stages.sort(Comparator.comparingInt(ATOWLifeStage::getOrder));
+
+        return stages;
     }
 
     /**
@@ -146,10 +197,15 @@ public enum ATOWLifeStage {
     }
 
     /**
-     * Attempts to look up a life stage from text input, first matching by lookup name, then (if not found) by parsing
-     * the provided text as an integer order.
+     * Attempts to look up a life stage from its lookup name.
      *
-     * @param text the input text, which may be a lookup name or an integer order
+     * <p>The lookup name is the only thing that identifies a stage in stored data. This method used to fall back to
+     * reading the text as an integer {@link #getOrder() order}, which was a trap: {@code order} describes the sequence
+     * a character passes through the stages, and it is renumbered whenever a stage is added or moved. This branch
+     * renumbered every one of them. Anything that had persisted an order would silently resolve to a different stage
+     * afterwards.</p>
+     *
+     * @param text the lookup name to search for
      *
      * @return the matching {@link ATOWLifeStage}, or {@code null} if no match is found
      *
@@ -167,12 +223,12 @@ public enum ATOWLifeStage {
             return stage;
         }
 
-        stage = fromOrder(MathUtility.parseInt(text, -1));
-        if (stage != null) {
-            return stage;
-        }
-
         LOGGER.warn("Unknown ATOWLifeStage: {}", text);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }

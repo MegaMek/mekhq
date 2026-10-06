@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -44,7 +44,7 @@ public class VehicleCrewSkills {
     public static final List<String> VEHICLE_CREW_SKILLS = List.of(
           S_TECH_MEK,
           S_TECH_AERO,
-          S_TECH_MECHANIC,
+          S_TECH_VEHICLE,
           S_TECH_BA,
           S_SURGERY,
           S_MEDTECH,

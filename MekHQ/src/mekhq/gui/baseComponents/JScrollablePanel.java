@@ -38,6 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import megamek.client.ui.util.UIUtil;
+
 /**
  * JScrollablePanel is an extension of JPanel that implements scrollable, so that it can be properly used within a
  * JScrollPane.
@@ -76,7 +78,7 @@ public class JScrollablePanel extends JPanel implements Scrollable {
     @Override
     public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation,
           final int direction) {
-        return 16;
+                return UIUtil.scaleForGUI(16);
     }
 
     @Override

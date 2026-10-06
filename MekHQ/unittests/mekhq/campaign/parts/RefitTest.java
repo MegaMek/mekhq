@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,12 +64,12 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -82,6 +82,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -90,10 +91,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import testUtilities.MHQTestUtilities;
+import testUtilities.parts.RefitKitPricing;
 
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -109,10 +111,10 @@ public class RefitTest {
     private Board mockBoard;
 
     @Mock
-    private Quartermaster mockQuartermaster;
+    private mekhq.campaign.ForceQuartermaster mockQuartermaster;
 
     @Mock
-    private Warehouse mockWarehouse;
+    private LocalWarehouse mockWarehouse;
 
     @BeforeAll
     static void before() {
@@ -122,11 +124,21 @@ public class RefitTest {
     @BeforeEach
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        lenient().when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
-        lenient().when(mockCampaignOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1d);
-        lenient().when(mockCampaignOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ABILITIES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_TACTICS)).thenReturn(false);
+        // Read when a unit's crew gets its Natural Aptitudes and Small Arms skill
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         double[] usedPartMultipliers = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-        lenient().when(mockCampaignOptions.getUsedPartPriceMultipliers()).thenReturn(usedPartMultipliers);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)).thenReturn(usedPartMultipliers);
 
         lenient().when(mockCampaign.getGame()).thenReturn(mockGame);
         lenient().when(mockGame.getBoard()).thenReturn(mockBoard);
@@ -139,7 +151,7 @@ public class RefitTest {
 
         lenient().when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
-        lenient().when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        lenient().when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
     }
 
     @Test
@@ -318,18 +330,18 @@ public class RefitTest {
         assertEquals(refit.getTech(), deserialized.getTech());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
@@ -512,18 +524,18 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
@@ -731,18 +743,18 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
@@ -788,10 +800,10 @@ public class RefitTest {
     @MockitoSettings(strictness = Strictness.LENIENT)
     // Allegedly unnecessary stubbing for the mockHanger & mockShoppingList
     public void heavyTrackedApcMgToStandard() throws EntityLoadingException, IOException {
-        final Hangar mockHangar = mock(Hangar.class);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        final ShoppingList mockShoppingList = mock(ShoppingList.class);
-        when(mockCampaign.getShoppingList()).thenReturn(mockShoppingList);
+        final LocalHangar mockHangar = mock(LocalHangar.class);
+        when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
+        final ForceShoppingList mockShoppingList = mock(ForceShoppingList.class);
+        when(mockCampaign.getPlayerForce().getShoppingList()).thenReturn(mockShoppingList);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getHeavyTrackedApcMg();
@@ -870,9 +882,8 @@ public class RefitTest {
         // Omni reconfig = 120 minutes here
         assertEquals(120.0, refit.getActualTime(), 0.1);
 
-        // Cost?
-        assertEquals(Money.of(316000).multipliedBy(1.1),
-              refit.getCost());
+        // The kit costs its components plus 10 percent (CO p.212)
+        assertEquals(RefitKitPricing.expectedKitPrice(refit), refit.getCost().round());
 
         // We're removing 1 Large Laser and using existing armor in 10 locations
         List<Part> removedParts = refit.getOldUnitParts();

@@ -49,9 +49,9 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
@@ -74,8 +74,8 @@ public final class LocationNewDayUtil {
      * hangar nor a warehouse return immediately.
      */
     public static void processNewDayUnits(IPlace place, Campaign campaign) {
-        Hangar hangar = place.getHangar();
-        Warehouse warehouse = place.getWarehouse();
+        mekhq.campaign.LocalHangar hangar = place.getHangar();
+        LocalWarehouse warehouse = place.getWarehouse();
 
         if (hangar != null) {
             // need to loop through units twice, the first time to do all maintenance and
@@ -88,7 +88,7 @@ public final class LocationNewDayUtil {
                     unit.resetEngineer();
                     if (unit.getEngineer() != null) {
                         unit.getEngineer().resetMinutesLeft(
-                              campaign.getCampaignOptions().isTechsUseAdministration());
+                              campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION));
                     }
                     Maintenance.doMaintenance(campaign, unit);
                 } catch (Exception ex) {
@@ -123,7 +123,7 @@ public final class LocationNewDayUtil {
 
                     // If we're in transit and we don't allow deliveries while in transit the part will remain fixed
                     // with a delivery time of 1 day until we arrive at our destination.
-                    if (campaign.getCampaignOptions().isNoDeliveriesInTransit() &&
+                    if (campaign.getCampaignOptions().get(CampaignOption.NO_DELIVERIES_IN_TRANSIT) &&
                               !place.isOnPlanet() &&
                               newDaysToArrival <= 0) {
                         return;
@@ -199,7 +199,7 @@ public final class LocationNewDayUtil {
 
         if (hangar != null) {
             // ok now we can check for other stuff we might need to do to units
-            int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
+            int defaultRepairSite = ContractRepairLocation.getBestRepairLocation(campaign.getActiveContracts());
             List<UUID> unitsToRemove = new ArrayList<>();
             for (Unit unit : hangar.getUnits()) {
                 if (unit.isRefitting()) {
@@ -210,7 +210,7 @@ public final class LocationNewDayUtil {
                 }
                 if (!unit.isPresent()) {
                     unit.checkArrival(!place.isOnPlanet() &&
-                                            campaign.getCampaignOptions().isNoDeliveriesInTransit());
+                                            campaign.getCampaignOptions().get(CampaignOption.NO_DELIVERIES_IN_TRANSIT));
                     // Has unit just been delivered?
                     if (unit.isPresent()) {
                         campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -241,12 +241,12 @@ public final class LocationNewDayUtil {
     }
 
     /**
-     * Runs {@link #processNewDayUnits(IPlace, Campaign)} for every top-level {@link IPlace} in the campaign. Each
-     * call propagates recursively to child places (e.g., academy campuses hosted under a base or under a fixed planet
+     * Runs {@link #processNewDayUnits(IPlace, Campaign)} for every top-level {@link IPlace} in the campaign. Each call
+     * propagates recursively to child places (e.g., academy campuses hosted under a base or under a fixed planet
      * location).
      */
     public static void processAllLocationUnits(Campaign campaign) {
-        for (AbstractLocation location : campaign.getLocations()) {
+        for (AbstractLocation location : campaign.getCampaignLocationManager().getLocations()) {
             for (ILocation child : location.getChildLocations()) {
                 if (child instanceof IPlace place) {
                     processNewDayUnits(place, campaign);

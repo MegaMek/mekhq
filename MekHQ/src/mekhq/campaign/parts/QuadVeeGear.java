@@ -48,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingQuadVeeGear;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -80,6 +81,11 @@ public class QuadVeeGear extends Part {
     public QuadVeeGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Conversion Gear";
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

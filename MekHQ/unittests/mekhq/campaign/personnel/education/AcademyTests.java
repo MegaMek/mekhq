@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.Arrays;
 import java.util.List;
@@ -146,7 +147,7 @@ class AcademyTests {
         academy.setEducationLevelMax(EducationLevel.POST_GRADUATE);
         Person person = Mockito.mock(Person.class);
         when(person.getEduHighestEducation()).thenReturn(EducationLevel.COLLEGE);
-        assertEquals(3000, academy.getTuitionAdjusted(person));
+        assertEquals(2750, academy.getTuitionAdjusted(person));
     }
 
     @Test
@@ -173,12 +174,12 @@ class AcademyTests {
         academy.setLocationSystems(List.of("Sol"));
         academy.setFactionDiscount(10);
         Person person = Mockito.mock(Person.class);
-        Campaign campaign = Mockito.mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         PlanetarySystem system = Mockito.mock(PlanetarySystem.class);
         when(campaign.getSystemById("Sol")).thenReturn(system);
         when(system.getFactions(Mockito.any())).thenReturn(List.of("Lyr"));
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
-        when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
+        when(campaign.getPlayerForce().getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
     }
 }

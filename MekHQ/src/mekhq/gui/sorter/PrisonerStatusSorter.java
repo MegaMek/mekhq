@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 
 public class PrisonerStatusSorter implements Comparator<PrisonerStatus> {
 

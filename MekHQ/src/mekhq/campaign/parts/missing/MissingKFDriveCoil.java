@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -100,14 +100,16 @@ public class MissingKFDriveCoil extends MissingPart {
         Part replacement = findReplacement(false);
         if (null != replacement) {
             Part actualReplacement = replacement.clone();
-            unit.addPart(actualReplacement);
-            if (null != unit && unit.getEntity() instanceof Jumpship js) {
-                //Also repair your KF Drive integrity - +1 point if you have other components to fix
-                //Otherwise, fix it all.
-                if (js.isKFDriveDamaged()) {
-                    js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
-                } else {
-                    js.setKFIntegrity(js.getOKFIntegrity());
+            if (unit != null) {
+                unit.addPart(actualReplacement);
+                if (unit.getEntity() instanceof Jumpship js) {
+                    //Also repair your KF Drive integrity - +1 point if you have other components to fix
+                    //Otherwise, fix it all.
+                    if (js.isKFDriveDamaged()) {
+                        js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
+                    } else {
+                        js.setKFIntegrity(js.getOKFIntegrity());
+                    }
                 }
             }
             campaign.getQuartermaster().addPart(actualReplacement, 0, false);

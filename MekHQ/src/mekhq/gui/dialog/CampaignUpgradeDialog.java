@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -131,7 +131,10 @@ public class CampaignUpgradeDialog {
         }
 
         ImmersiveDialogCore upgradeDialog = new ImmersiveDialogCore(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
+                campaign.getPlayerForce().getHumanResources()
+                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                campaign.getPlayerForce().isClanForce(),
+                                campaign.getLocalDate()),
               null,
               getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.inCharacter", campaign.getCommanderAddress()),
               BUTTONS,
@@ -199,6 +202,8 @@ public class CampaignUpgradeDialog {
                             LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
                         }
                     }
+
+                    storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
 
                     // Update Skill Milestones
                     storedType.setGreenLevel(presetType.getGreenLevel());

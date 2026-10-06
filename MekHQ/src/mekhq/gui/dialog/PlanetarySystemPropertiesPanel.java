@@ -52,7 +52,8 @@ import javax.swing.table.TableColumn;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
-import mekhq.campaign.universe.Atmosphere;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.LifeForm;
 import mekhq.campaign.universe.Planet;
@@ -89,8 +90,8 @@ final class PlanetarySystemPropertiesPanel extends JPanel {
     private final JTextField txtYearLength = new JTextField(8);
     private final JTextField txtTemperature = new JTextField(8);
     private final JComboBox<Object> cboPressure =
-          makeNullableEnumCombo(megamek.common.planetaryConditions.Atmosphere.values());
-    private final JComboBox<Object> cboAtmosphere = makeNullableEnumCombo(Atmosphere.values());
+          makeNullableEnumCombo(Atmosphere.values());
+    private final JComboBox<Object> cboAtmosphere = makeNullableEnumCombo(AtmosphericTaint.values());
     private final JTextField txtComposition = new JTextField(20);
     private final JTextField txtPercentWater = new JTextField(8);
     private final JComboBox<Object> cboLifeForm = makeNullableEnumCombo(LifeForm.values());

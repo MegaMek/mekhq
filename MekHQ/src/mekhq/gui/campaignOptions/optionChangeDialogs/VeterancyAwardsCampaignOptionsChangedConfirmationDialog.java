@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -187,7 +187,7 @@ public class VeterancyAwardsCampaignOptionsChangedConfirmationDialog extends JDi
     }
 
     private void processAwards() {
-        Collection<Person> personnel = campaign.getAllPersonnel();
+        Collection<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;

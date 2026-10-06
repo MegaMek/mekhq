@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ public class CheckPersonStatusStoryPoint extends StoryPoint {
 
     @Override
     protected String getResult() {
-        Person p = getCampaign().getPerson(personId);
+        Person p = getCampaign().getPlayerForce().getHumanResources().getPerson(personId);
         if (null == p) {
             return "UNKNOWN";
         } else {

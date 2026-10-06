@@ -32,6 +32,8 @@
  */
 package mekhq.gui.handler;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -40,12 +42,14 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
@@ -53,6 +57,8 @@ import mekhq.gui.CampaignGUI;
 
 public class TOETransferHandler extends TransferHandler {
     private static final MMLogger LOGGER = MMLogger.create(TOETransferHandler.class);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.TOETransferHandler";
 
     private final CampaignGUI gui;
 
@@ -82,13 +88,34 @@ public class TOETransferHandler extends TransferHandler {
     protected Transferable createTransferable(JComponent c) {
         JTree tree = (JTree) c;
         Object node = tree.getLastSelectedPathComponent();
-        if (node instanceof Unit) {
-            return new StringSelection("UNIT|" + ((Unit) node).getId().toString());
-        } else if (node instanceof Formation) {
-            return new StringSelection("FORCE|" + ((Formation) node).getId());
+        if (node instanceof Unit unit) {
+            if (unit.isDeployed()) {
+                showCannotMoveDialog(c, unit.getEntity().getShortName());
+                return null;
+            }
+            return new StringSelection("UNIT|" + unit.getId().toString());
+        } else if (node instanceof Formation formation) {
+            if (formation.isDeployed()) {
+                showCannotMoveDialog(c, formation.toString());
+                return null;
+            }
+            return new StringSelection("FORCE|" + formation.getId());
         } else {
             return null;
         }
+    }
+
+    /**
+     * A method that displays a dialog for units or formations that cannot be moved in the
+     * TO&E because they are already deployed.
+     *
+     */
+    private void showCannotMoveDialog(JComponent parent, String unit_formation_string) {
+        JOptionPane.showMessageDialog(
+            parent,
+            getFormattedTextAt(RESOURCE_BUNDLE, "popup.TOETransferHandler.cannotMove", unit_formation_string),
+            getFormattedTextAt(RESOURCE_BUNDLE, "popup.TOETransferHandler.cannotMoveTitle", unit_formation_string),
+            JOptionPane.WARNING_MESSAGE);
     }
 
     @Override
@@ -123,7 +150,9 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
+            Campaign campaign = gui.getCampaign();
+            int id = ((Unit) parent).getFormationId();
+            superFormation = campaign.getPlayerForce().getFormation(id);
         }
 
         // Extract transfer data.
@@ -142,7 +171,8 @@ public class TOETransferHandler extends TransferHandler {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
+                Campaign campaign = gui.getCampaign();
+                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
             LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
@@ -178,7 +208,8 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
+                Campaign campaign = gui.getCampaign();
+                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
                 if (formation == null || formation.isDeployed()) {
                     return false;
                 }
@@ -198,16 +229,21 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
+            Campaign campaign = gui.getCampaign();
+            int id = ((Unit) parent).getFormationId();
+            superFormation = campaign.getPlayerForce().getFormation(id);
         }
 
         if (superFormation != null) {
             if (unit != null) {
-                gui.getCampaign().addUnitToFormation(unit, superFormation.getId());
+                Campaign campaign = gui.getCampaign();
+                int id = superFormation.getId();
+                campaign.getPlayerForce().addUnitToFormation(unit, id, campaign);
                 return true;
             }
             if (formation != null) {
-                gui.getCampaign().moveFormation(formation, superFormation);
+                mekhq.campaign.Campaign campaign = gui.getCampaign();
+                campaign.getPlayerForce().moveFormation(formation, superFormation, campaign);
                 return true;
             }
         }

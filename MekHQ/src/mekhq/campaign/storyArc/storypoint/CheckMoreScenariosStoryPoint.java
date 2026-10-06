@@ -39,7 +39,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -68,8 +68,8 @@ public class CheckMoreScenariosStoryPoint extends StoryPoint {
     protected String getResult() {
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
         if (missionStoryPoint instanceof MissionStoryPoint) {
-            Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
-            if ((null != m) && (m.getCurrentScenarios().isEmpty())) {
+            AbstractContract contract = ((MissionStoryPoint) missionStoryPoint).getMission();
+            if ((null != contract) && (contract.getCurrentScenarios().isEmpty())) {
                 return "false";
             }
         }

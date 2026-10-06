@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
 import java.util.Set;
@@ -62,6 +63,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -75,7 +77,7 @@ public class UnitPersonTest {
     @Test
     public void testGetTechReturnsTech() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -86,7 +88,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -101,7 +103,7 @@ public class UnitPersonTest {
     @Test
     public void testGetTechReturnsEngineerIfPresent() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -112,7 +114,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -133,7 +135,7 @@ public class UnitPersonTest {
     @Test
     public void testNoTechRemoveTech() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -150,7 +152,7 @@ public class UnitPersonTest {
     @Test
     public void testRemoveTech() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -158,7 +160,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
 
         // Set the tech
         unit.setTech(mockTech);
@@ -176,7 +178,7 @@ public class UnitPersonTest {
     @Test
     public void testUnitIsUnmaintained() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -200,7 +202,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
         unit.setTech(mockTech);
 
         // ...then it is no longer unmaintained.
@@ -210,7 +212,7 @@ public class UnitPersonTest {
     @Test
     public void testUnitCompleteActivationRemovesTech() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -218,7 +220,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTech = mock(Person.class);
         when(mockTech.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTech);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTech);
         when(mockTech.getUnit()).thenReturn(null);
 
         // Set the tech
@@ -234,7 +236,7 @@ public class UnitPersonTest {
     @Test
     public void testUnitIsUnmanned() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -255,7 +257,7 @@ public class UnitPersonTest {
     @Test
     public void testDriver() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -268,7 +270,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockDriver = mock(Person.class);
         when(mockDriver.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockDriver);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockDriver);
         when(mockDriver.getUnit()).thenReturn(unit);
 
         // This person is NOT a driver (yet)
@@ -314,7 +316,7 @@ public class UnitPersonTest {
     @Test
     public void testGunner() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -327,7 +329,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockGunner = mock(Person.class);
         when(mockGunner.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockGunner);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockGunner);
         when(mockGunner.getUnit()).thenReturn(unit);
 
         // This person is NOT a gunner (yet)
@@ -373,7 +375,7 @@ public class UnitPersonTest {
     @Test
     public void testVesselCrew() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -386,7 +388,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockVesselCrew = mock(Person.class);
         when(mockVesselCrew.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockVesselCrew);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockVesselCrew);
         when(mockVesselCrew.getUnit()).thenReturn(unit);
 
         // Add the vessel crew
@@ -421,7 +423,7 @@ public class UnitPersonTest {
     @Test
     public void testTechOfficer() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -434,7 +436,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockTechOfficer = mock(Person.class);
         when(mockTechOfficer.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockTechOfficer);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTechOfficer);
         when(mockTechOfficer.getUnit()).thenReturn(unit);
 
         // This person is NOT a tech officer (yet)
@@ -479,7 +481,7 @@ public class UnitPersonTest {
     @Test
     public void testNavigator() {
         Entity mockEntity = mock(Entity.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = spy(new Unit(mockEntity, mockCampaign));
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
@@ -492,7 +494,7 @@ public class UnitPersonTest {
         UUID id = UUID.randomUUID();
         Person mockNavigator = mock(Person.class);
         when(mockNavigator.getId()).thenReturn(id);
-        when(mockCampaign.getPerson(eq(id))).thenReturn(mockNavigator);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockNavigator);
         when(mockNavigator.getUnit()).thenReturn(unit);
 
         // This person is NOT a navigator (yet)
@@ -558,7 +560,12 @@ public class UnitPersonTest {
 
             // Enable blob crew for all roles (required for temp crew to work)
             // Using doReturn for spy to avoid calling real method
-            doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
+            mekhq.campaign.ForceHumanResources spyHumanResources = spy(mockCampaign.getPlayerForce()
+                                                                             .getHumanResources());
+            mockCampaign.getPlayerForce().setHumanResources(spyHumanResources);
+            doReturn(true).when(spyHumanResources)
+                  .isBlobCrewEnabled(any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                        any(mekhq.campaign.campaignOptions.CampaignOptions.class));
 
             mockEntity = mock(Entity.class);
             when(mockEntity.getId()).thenReturn(1);
@@ -1290,6 +1297,7 @@ public class UnitPersonTest {
         when(mockCommander.getCallsign()).thenReturn("TestPilot");
         when(mockCommander.getGender()).thenReturn(megamek.common.enums.Gender.MALE);
         when(mockCommander.isClanPersonnel()).thenReturn(false);
+        when(mockCommander.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER); // Bypass armor kit distribution
 
         // Mock Portrait and make it cloneable
         megamek.common.icons.Portrait mockPortrait = mock(megamek.common.icons.Portrait.class);
@@ -1327,6 +1335,7 @@ public class UnitPersonTest {
         when(mockPlanet.getParentSystem()).thenReturn(mockSystem);
 
         when(mockCommander.getOriginPlanet()).thenReturn(mockPlanet);
+
         return mockCommander;
     }
 }

@@ -47,18 +47,20 @@ import javax.swing.UIManager;
 
 import megamek.common.Configuration;
 import megamek.common.event.Subscribe;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.TransportCostCalculations;
-import mekhq.campaign.universe.Atmosphere;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
@@ -173,7 +175,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     private void refresh() {
         CampaignOptions options = campaign.getCampaignOptions();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem system = location.getCurrentSystem();
         LocalDate date = campaign.getLocalDate();
 
@@ -188,12 +190,15 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         float scale = location.isAtJumpPoint() ? 1 : (float) (location.getPercentageTransit() * 1.3 + 0.1);
         imgLocation.setImage(locationImage, scale);
 
-        if (options.getPersonnelMarketStyle() == PERSONNEL_MARKET_DISABLED) {
+        if (options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED) {
             // keep the legacy recruitment always available
             btnRecruitment.setEnabled(true);
             btnRecruitment.setText(getTextAt("recruitment.legacy"));
         } else {
-            String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
+            String availabilityMessage = campaign.getPlayerForce()
+                                               .getHumanResources()
+                                               .getNewPersonnelMarket()
+                                               .getAvailabilityMessage();
             btnRecruitment.setEnabled(availabilityMessage.isBlank());
 
             HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
@@ -203,7 +208,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
                 btnRecruitment.setText(getTextAt("recruitment.hiringHall.none"));
             } else {
                 btnRecruitment.setText(getFormattedTextAt("recruitment.hiringHall.some",
-                      StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+                      hiringHallLevel.getLabel()));
             }
         }
         if (location.isOnPlanet()) {
@@ -233,7 +238,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getTitle() {
         LocalDate date = campaign.getLocalDate();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         if (location.isOnPlanet()) {
             return getFormattedTextAt("title.onPlanet", location.getPlanet().getPrintableName(date));
@@ -241,7 +246,9 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         String systemName = currentSystem.getPrintableName(date);
         if (location.isAtJumpPoint()) {
             boolean isUseCommandCircuit = campaign.isUseCommandCircuit();
-            double neededRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
+            double neededRechargeTime = campaign.getJumpDriveProfile(location)
+                                              .adjustRechargeTime(currentSystem.getRechargeTime(date,
+                                                    isUseCommandCircuit));
             if (Double.isInfinite(neededRechargeTime)) {
                 return getFormattedTextAt("title.chargingImpossible",
                       systemName, currentSystem.getRechargeTimeText(date, isUseCommandCircuit));
@@ -279,16 +286,16 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      * @return a formatted HTML string representing the planetary conditions
      */
     public String getPlanetaryConditionsInfo() {
-        Planet planet = campaign.getCurrentLocation().getPlanet();
+        Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
 
-        Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-        megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
+        AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
+        Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
 
         String atmosphereColor = getDefaultFontHexColor();
         if (atmosphere.isTainted() || atmosphere.isToxic()) {
             atmosphereColor = ReportingUtilities.getNegativeColor();
         }
-        String atmosphereLabel = atmosphere == Atmosphere.BREATHABLE ? "" : atmosphere.name;
+        String atmosphereLabel = atmosphere.isBreathable() ? "" : atmosphere.toString();
 
         String pressureColor = getDefaultFontHexColor();
         if (pressure.isTrace() || pressure.isVeryHigh()) {
@@ -335,7 +342,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       string if the player is not currently traveling.
      */
     public String getCourseInfo() {
-        JumpPath jumpPath = campaign.getCurrentLocation().getJumpPath();
+        JumpPath jumpPath = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return getTextAt("info.course.notTraveling");
         } else if (jumpPath.getJumps() == 0) {
@@ -352,7 +359,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       information, or an empty string if not traveling
      */
     public String getJumpCostInfo() {
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return "";
@@ -360,7 +367,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         TransportCostCalculations calculation = campaign.getTransportCostCalculation(EXP_REGULAR);
         if (jumpPath.getJumps() > 0) {
             int duration = (int) Math.ceil(jumpPath.getTotalTime(campaign.getLocalDate(), location.getTransitTime(),
-                  campaign.isUseCommandCircuit()));
+                  campaign.isUseCommandCircuit(), campaign.getJumpDriveProfile(location)));
             Money jumpCost = calculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
             return getFormattedTextAt("info.jumpCost.remaining", jumpCost.toAmountString());
         } else {
@@ -388,7 +395,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getSocioIndustrialInfo() {
         LocalDate date = campaign.getLocalDate();
-        Planet planet = campaign.getCurrentLocation().getPlanet();
+        Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
         SocioIndustrialData status = planet.getSocioIndustrial(date);
 
         long population = ObjectUtils.firstNonNull(planet.getPopulation(date), 0L);

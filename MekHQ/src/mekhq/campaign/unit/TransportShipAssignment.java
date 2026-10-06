@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,26 +60,39 @@ public class TransportShipAssignment extends TransportAssignment {
     public TransportShipAssignment(Unit transportShip, int bayNumber) {
         super(transportShip);
         this.bayNumber = bayNumber;
+        resolveTransportedLocation();
+    }
 
-        if (getTransportShip().getEntity() != null) {
-            setTransportedLocation(transportShip.getEntity().getBayById(bayNumber));
+    /**
+     * Looks up the bay (or docking collar) matching {@link #bayNumber} on the transport ship's entity and sets the
+     * transported location and transporter type from it. Does nothing if the transport ship has no entity, as is the
+     * case for a {@link Unit.UnitRef} while a campaign is being loaded.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void resolveTransportedLocation() {
+        if (getTransportShip().getEntity() == null) {
+            return;
+        }
 
-            if (getTransportedLocation() == null) {
-                // If we didn't find a matching bay, maybe it's a docking collar?
-                Vector<DockingCollar> dockingCollars = transportShip.getEntity().getDockingCollars();
-                for (DockingCollar dockingCollar : dockingCollars) {
-                    if (dockingCollar.getCollarNumber() == bayNumber) {
-                        setTransportedLocation(dockingCollar);
-                        break;
-                    }
+        setTransportedLocation(getTransportShip().getEntity().getBayById(bayNumber));
+
+        if (getTransportedLocation() == null) {
+            // If we didn't find a matching bay, maybe it's a docking collar?
+            Vector<DockingCollar> dockingCollars = getTransportShip().getEntity().getDockingCollars();
+            for (DockingCollar dockingCollar : dockingCollars) {
+                if (dockingCollar.getCollarNumber() == bayNumber) {
+                    setTransportedLocation(dockingCollar);
+                    break;
                 }
             }
+        }
 
-            // Okay, now did we find a transport location? Let's set our transporter type if we did.
-            if (getTransportedLocation() != null) {
-                TransporterType transporterType = TransporterType.getTransporterType(getTransportedLocation());
-                setTransporterType(transporterType);
-            }
+        // Okay, now did we find a transport location? Let's set our transporter type if we did.
+        if (getTransportedLocation() != null) {
+            TransporterType transporterType = TransporterType.getTransporterType(getTransportedLocation());
+            setTransporterType(transporterType);
         }
     }
 
@@ -108,9 +121,10 @@ public class TransportShipAssignment extends TransportAssignment {
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
         if (getTransportShip() instanceof Unit.UnitRef) {
-            Unit transportShip = campaign.getHangar().getUnit(getTransportShip().getId());
+            Unit transportShip = campaign.getPlayerForce().getHangar().getUnit(getTransportShip().getId());
             if (transportShip != null) {
                 setTransport(transportShip);
+                resolveTransportedLocation();
             } else {
                 LOGGER.error("Unit {} ('{}') references missing transport ship {}",
                       unit.getId(),

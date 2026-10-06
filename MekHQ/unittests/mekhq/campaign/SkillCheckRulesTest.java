@@ -39,15 +39,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
+
+import java.lang.reflect.Field;
 
 import megamek.common.TechConstants;
 import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -59,8 +63,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.lang.reflect.Field;
 
 
 public class SkillCheckRulesTest {
@@ -74,14 +76,21 @@ public class SkillCheckRulesTest {
         }
 
         private Campaign createCampaignMock(CampaignOptions options) {
-            Campaign campaign = mock(Campaign.class);
+            Campaign campaign = mockCampaign();
             // force calling the actual implementation
             doCallRealMethod().when(campaign).checkAcquisition(any(), any(), anyBoolean());
             Faction faction = new Faction();
             when(campaign.getCampaignOptions()).thenReturn(options);
-            when(campaign.getFaction()).thenReturn(faction);
-            ShoppingList shoppingList = mock(ShoppingList.class);
-            when(campaign.getShoppingList()).thenReturn(shoppingList);
+            lenient().when(options.get(CampaignOption.DISALLOW_EXTINCT_STUFF)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.TECH_LEVEL)).thenReturn(0);
+            lenient().when(options.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.SIMULATE_GRAY_MONDAY)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+            lenient().when(options.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+            when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
+            mekhq.campaign.market.ForceShoppingList shoppingList = mock(mekhq.campaign.market.ForceShoppingList.class);
+            when(campaign.getPlayerForce().getShoppingList()).thenReturn(shoppingList);
             return campaign;
         }
 
@@ -90,7 +99,7 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             Person person = new Person(campaign);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.AUTOMATIC);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.AUTOMATIC);
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), person, false);
 
@@ -103,7 +112,7 @@ public class SkillCheckRulesTest {
         public void testNullPerson() throws NoSuchFieldException, IllegalAccessException {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
 
@@ -113,7 +122,7 @@ public class SkillCheckRulesTest {
             Person extractedPerson = (Person) personField.get(result);
             assertEquals("Unnamed", extractedPerson.getFirstName());
 
-            assertTrue(result.getTargetNumber().isImpossible());
+            assertTrue(result.getTargetNumber().isAutomaticFail());
             assertTrue(result.getTargetNumber().getDesc().contains("used up all their acquisition attempts"));
         }
 
@@ -122,19 +131,19 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
 
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
             assertEquals(SkillType.S_ADMIN, result.getSkillType().getName());
 
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ANY_TECH);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ANY_TECH);
             result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
-            assertEquals(SkillType.S_TECH_MECHANIC, result.getSkillType().getName());
+            assertEquals(SkillType.S_TECH_VEHICLE, result.getSkillType().getName());
 
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.NEGOTIATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.NEGOTIATION);
             result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
             assertEquals(SkillType.S_NEGOTIATION, result.getSkillType().getName());
 
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.AUTOMATIC);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.AUTOMATIC);
             result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
             assertEquals(SkillType.S_ADMIN, result.getSkillType().getName());
         }
@@ -143,7 +152,7 @@ public class SkillCheckRulesTest {
         public void testAutomaticAcquisitionWithNullPerson() {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.AUTOMATIC);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.AUTOMATIC);
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
 
@@ -155,9 +164,9 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            ShoppingList shoppingList = mock(ShoppingList.class);
-            when(campaign.getShoppingList()).thenReturn(shoppingList);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            mekhq.campaign.market.ForceShoppingList shoppingList = mock(mekhq.campaign.market.ForceShoppingList.class);
+            when(campaign.getPlayerForce().getShoppingList()).thenReturn(shoppingList);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
             when(shoppingList.getShoppingItem(any())).thenReturn(mock(IAcquisitionWork.class));
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), true);
@@ -171,9 +180,9 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
             when(acquisition.getTechBase()).thenReturn(TechBase.CLAN);
-            when(options.isAllowClanPurchases()).thenReturn(false);
+            when(options.get(CampaignOption.ALLOW_CLAN_PURCHASES)).thenReturn(false);
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), false);
 
@@ -186,9 +195,9 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
             when(acquisition.getTechBase()).thenReturn(TechBase.IS);
-            when(options.isAllowISPurchases()).thenReturn(false);
+            when(options.get(CampaignOption.ALLOW_IS_PURCHASES)).thenReturn(false);
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), false);
 
@@ -201,11 +210,11 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(options.isAllowISPurchases()).thenReturn(true);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ALLOW_IS_PURCHASES)).thenReturn(true);
             when(acquisition.getTechBase()).thenReturn(TechBase.IS);
             when(acquisition.getTechLevel()).thenReturn(TechConstants.T_IS_ADVANCED);
-            when(options.getTechLevel()).thenReturn(TechConstants.T_INTRO_BOX_SET);
+            when(options.get(CampaignOption.TECH_LEVEL)).thenReturn(TechConstants.T_INTRO_BOX_SET);
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), false);
 
@@ -218,8 +227,8 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(options.isLimitByYear()).thenReturn(true);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.LIMIT_BY_YEAR)).thenReturn(true);
             when(acquisition.isIntroducedBy(anyInt(), anyBoolean(), any())).thenReturn(false);
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), false);
@@ -233,8 +242,8 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(options.isDisallowExtinctStuff()).thenReturn(true);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.DISALLOW_EXTINCT_STUFF)).thenReturn(true);
             when(acquisition.isExtinctIn(anyInt(), anyBoolean(), any())).thenReturn(true);
 
             SkillCheck result = campaign.checkAcquisition(acquisition, new Person(campaign), false);
@@ -247,7 +256,7 @@ public class SkillCheckRulesTest {
         public void testMissingRequiredSkill() {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), new Person(campaign), false);
 
@@ -260,7 +269,7 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ANY_TECH);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ANY_TECH);
             when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll());
 
             Person person = new Person(campaign);
@@ -277,12 +286,12 @@ public class SkillCheckRulesTest {
         public void testAnyTech_NoBestSkill_UsesMechanicFallback() {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.ANY_TECH);
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ANY_TECH);
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), new Person(campaign), false);
 
-            // Fallback to S_TECH_MECHANIC chec even though the person does not have it
-            assertEquals(SkillType.S_TECH_MECHANIC, result.getSkillType().getName());
+            // Fallback to S_TECH_VEHICLE check even though the person does not have it
+            assertEquals(SkillType.S_TECH_VEHICLE, result.getSkillType().getName());
         }
 
         @ParameterizedTest
@@ -291,19 +300,25 @@ public class SkillCheckRulesTest {
             CampaignOptions options = mock(CampaignOptions.class);
             Campaign campaign = createCampaignMock(options);
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
-            when(options.getAcquisitionType()).thenReturn(AcquisitionsType.valueOf(acquisitionType));
+            when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.valueOf(acquisitionType));
 
+            final int skillLevel = 5;
+            final int acquisitionModifier = 2;
             Person person = new Person(campaign);
-            person.addSkill(skillName, 5, 0);
+            person.addSkill(skillName, skillLevel, 0);
             when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll());
 
+            // The target number is the skill's base target minus the skill level. The three skills have different
+            // base targets, so derive the expectation from the skill type instead of hard-coding one number for all.
+            int expectedTargetNumber = SkillType.getType(skillName).getTarget() - skillLevel;
+
             SkillCheck result = campaign.checkAcquisition(acquisition, person, false);
-            assertEquals(5, result.getTargetNumber().getValue());
+            assertEquals(expectedTargetNumber, result.getTargetNumber().getValue());
             assertEquals(skillName, result.getSkillType().getName());
 
-            when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll(2, ""));
+            when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll(acquisitionModifier, ""));
             result = campaign.checkAcquisition(acquisition, person, false);
-            assertEquals(7, result.getTargetNumber().getValue());
+            assertEquals(expectedTargetNumber + acquisitionModifier, result.getTargetNumber().getValue());
         }
 
     }

@@ -1,0 +1,16 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: a three-faction party list (all pairs at war) plus parties that override the
+# war's start or end date.
+
+wars:
+  - name: Override War
+    start: 3070-01-01
+    end: 3071-12-31
+    parties:
+      - factions: [CJF, CSJ, CDS]
+      - factions: [CGB, CSJ]
+        end: 3070-06-30
+      - factions: [CGB, CDS]
+        start: 3070-06-01

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -210,8 +210,8 @@ public class MissingMekLocation extends MissingPart {
         } else if (part instanceof MekLocation mekLoc) {
             return (mekLoc.getLoc() == loc)
                          && (mekLoc.getUnitTonnage() == getUnitTonnage())
-                         && (mekLoc.isTsm() == tsm)
-                         && (mekLoc.isClan() == clan)
+                         && (mekLoc.isTsm() == isTsm())
+                         && (mekLoc.isClan() == isClan())
                          && (mekLoc.getStructureType() == structureType)
                          && (!isArm() || (mekLoc.forQuad() == forQuad));
         } else {
@@ -233,6 +233,14 @@ public class MissingMekLocation extends MissingPart {
                              && unit.getEntity().isLocationBad(Mek.LOC_RIGHT_TORSO)) {
                 return "must replace right torso first";
             }
+        }
+
+        // A location whose internal structure is gone has been blown off or destroyed. Without this guard, stale
+        // critical-slot state on a destroyed location - mounts still flagged repairable, or a LAM's unit-wide
+        // landing gear/avionics still showing as present because they survive elsewhere - would permanently and
+        // incorrectly block replacing the location.
+        if (unit.getEntity().isLocationTrulyDestroyed(loc)) {
+            return null;
         }
 
         // There must be no usable equipment currently in the location

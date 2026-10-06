@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import static mekhq.campaign.stratCon.StratConCampaignState.getStratConScenarioFromAtBScenario;
-import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
+import static mekhq.campaign.digitalGM.stratCon.StratConCampaignState.getStratConScenarioFromAtBScenario;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -41,11 +41,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 
 public class OutstandingScenariosNagLogic {
     final static String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
@@ -81,11 +81,11 @@ public class OutstandingScenariosNagLogic {
      * and others, with additional formatting for StratCon-specific scenarios where applicable.
      */
     public static String getOutstandingScenarios(Campaign campaign) {
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts(true);
+        List<AbstractContract> activeContracts = campaign.getActiveContracts(true);
         LocalDate today = campaign.getLocalDate();
         StringBuilder activeScenarios = new StringBuilder();
 
-        for (AtBContract contract : activeContracts) {
+        for (AbstractContract contract : activeContracts) {
             for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
 

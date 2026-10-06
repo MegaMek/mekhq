@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNMAINTAINED_UNITS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 
 import java.util.Collection;
@@ -43,7 +41,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
@@ -68,7 +66,7 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      *                 required for constructing the nag dialog.
      */
     public UnmaintainedUnitsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_UNMAINTAINED_UNITS, "UnmaintainedUnitsNagDialog");
+        super(campaign, NAG_UNMAINTAINED_UNITS, "UnmaintainedUnitsNagDialog");
     }
 
     /**
@@ -83,20 +81,18 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      * employed to determine the speaker based on senior administrators.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
-     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
      *
      * @return The {@link Person} designated as the speaker, prioritizing technical specialists, then senior
      *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
-          @Nullable Campaign.AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign) {
         if (campaign == null) {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -139,10 +135,16 @@ public class UnmaintainedUnitsNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(LOGISTICS);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

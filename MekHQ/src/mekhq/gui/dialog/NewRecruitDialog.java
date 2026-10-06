@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,10 +63,12 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -168,7 +170,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
+        boolean randomizeOrigin = getCampaign().getCampaignOptions().get(CampaignOption.RANDOM_ORIGIN_OPTIONS).isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
@@ -230,27 +232,31 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void hire() {
-        if (getCampaign().recruitPerson(person, false, true)) {
+        Campaign campaign = getCampaign();
+        if (campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, false, true)) {
             createNewRecruit();
         }
         refreshView();
     }
 
     private void addGM() {
-        if (getCampaign().recruitPerson(person, true, true)) {
+        Campaign campaign = getCampaign();
+        if (campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, true, true)) {
             createNewRecruit();
         }
         refreshView();
     }
 
     private void createNewRecruit() {
-        person = getCampaign().newPerson(person.getPrimaryRole());
+        Campaign campaign = getCampaign();
+        final PersonnelRole role = person.getPrimaryRole();
+        person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
         refreshRanksCombo();
         person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
     }
 
     private void randomName() {
-        String factionCode = getCampaign().getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = getCampaign().getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -264,12 +270,15 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void randomPortrait() {
-        getCampaign().assignRandomPortraitFor(person);
+        mekhq.campaign.Campaign campaign = getCampaign();
+        campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(), person);
         refreshView();
     }
 
     private void randomOrigin() {
-        getCampaign().assignRandomOriginFor(person);
+        Campaign campaign = getCampaign();
+        campaign.getPlayerForce().getHumanResources().assignRandomOriginFor(campaign, campaign.getCampaignOptions(),
+              person);
         refreshView();
     }
 
@@ -293,7 +302,10 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void regenerate() {
-        person = getCampaign().newPerson(person.getPrimaryRole(), person.getSecondaryRole());
+        Campaign campaign = getCampaign();
+        final PersonnelRole primaryRole = person.getPrimaryRole();
+        final PersonnelRole secondaryRole = person.getSecondaryRole();
+        person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, primaryRole, secondaryRole);
         refreshRanksCombo();
         refreshView();
     }

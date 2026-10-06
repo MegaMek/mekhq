@@ -37,6 +37,7 @@ import static megamek.common.equipment.EquipmentType.T_ARMOR_SV_BAR_2;
 import java.io.PrintWriter;
 import java.util.Objects;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.ArmorType;
@@ -91,7 +92,7 @@ public class SVArmor extends Armor {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return techRating;
     }
 

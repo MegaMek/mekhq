@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,15 +34,9 @@ package mekhq;
 
 import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -51,10 +45,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 import megamek.SuiteConstants;
 import megamek.Version;
@@ -76,12 +72,12 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * This is an object which holds a set of objects that collectively define the initial options setup for a campaign.
@@ -104,7 +100,14 @@ public class CampaignPreset {
      */
     private static final Version LAST_COMPATIBLE_VERSION = LAST_MILESTONE;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
     private static final MMLogger LOGGER = MMLogger.create(CampaignPreset.class);
+
+    /**
+     * Streaming XML factory used to read only preset metadata (title and description) for the preset picker. It is
+     * hardened against XML external entity (XXE) attacks because it never needs DTDs or external entities.
+     */
+    private static final XMLInputFactory METADATA_XML_INPUT_FACTORY = createMetadataXmlInputFactory();
 
     // region Variable Declarations
     private final boolean userData;
@@ -112,14 +115,18 @@ public class CampaignPreset {
     private String title;
     private String description;
 
+    /**
+     * The file this preset was read from, if any. Used to fully (lazily) load a preset that was initially read as
+     * lightweight metadata only. This is runtime state and is not written to or read from the preset XML.
+     */
+    private File presetFile;
+
     // Startup
     private LocalDate date;
     private Faction faction;
     private Planet planet;
     private RankSystem rankSystem;
-    private int contractCount;
     private boolean gm;
-    private CompanyGenerationOptions companyGenerationOptions;
 
     // Continuous
     private GameOptions gameOptions;
@@ -142,9 +149,7 @@ public class CampaignPreset {
               null,
               null,
               null,
-              2,
               true,
-              null,
               null,
               null,
               null,
@@ -154,8 +159,8 @@ public class CampaignPreset {
 
     public CampaignPreset(final String title, final String description, final boolean userData,
           final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet,
-          final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm,
-          final @Nullable CompanyGenerationOptions companyGenerationOptions, final @Nullable GameOptions gameOptions,
+          final @Nullable RankSystem rankSystem, final boolean gm,
+          final @Nullable GameOptions gameOptions,
           final @Nullable CampaignOptions campaignOptions,
           final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills,
           final Map<String, SpecialAbility> specialAbilities) {
@@ -169,9 +174,7 @@ public class CampaignPreset {
         setFaction(faction);
         setPlanet(planet);
         setRankSystem(rankSystem);
-        setContractCount(contractCount);
         setGM(gm);
-        setCompanyGenerationOptions(companyGenerationOptions);
 
         // Continuous
         setGameOptions(gameOptions);
@@ -204,6 +207,17 @@ public class CampaignPreset {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the file this preset was read from, or {@code null} if it was not loaded from a file
+     */
+    public @Nullable File getPresetFile() {
+        return presetFile;
+    }
+
+    public void setPresetFile(final @Nullable File presetFile) {
+        this.presetFile = presetFile;
     }
 
     // region Startup
@@ -239,13 +253,7 @@ public class CampaignPreset {
         this.rankSystem = rankSystem;
     }
 
-    public int getContractCount() {
-        return contractCount;
-    }
 
-    public void setContractCount(final int contractCount) {
-        this.contractCount = contractCount;
-    }
 
     public boolean isGM() {
         return gm;
@@ -253,14 +261,6 @@ public class CampaignPreset {
 
     public void setGM(final boolean gm) {
         this.gm = gm;
-    }
-
-    public CompanyGenerationOptions getCompanyGenerationOptions() {
-        return companyGenerationOptions;
-    }
-
-    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        this.companyGenerationOptions = companyGenerationOptions;
     }
     // endregion Startup
 
@@ -308,6 +308,19 @@ public class CampaignPreset {
     // endregion Getters/Setters
 
     /**
+     * Returns the directory where user-created campaign presets should be saved. If a custom user directory is
+     * configured, presets are stored beneath it; otherwise the legacy MekHQ user-data directory is used.
+     *
+     * @return the writable campaign preset directory
+     */
+    public static File getUserCampaignPresetDirectory() {
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        return configuredDirectory == null
+              ? new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)
+              : configuredDirectory;
+    }
+
+    /**
      * Retrieves a combined list of all campaign presets from the default directory, the old user data directory, and
      * the modern (user-defined) user data directory. The campaign presets are sourced, merged, and sorted in natural
      * order before being returned.
@@ -332,9 +345,10 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
 
         // Modern user data directory
-        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-        File presetUserDirectory = new File(userDirectory + '/' + CAMPAIGN_PRESET_DIRECTORY);
-        presets.addAll(loadCampaignPresetsFromDirectory(presetUserDirectory));
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsFromDirectory(configuredDirectory));
+        }
 
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
 
@@ -343,10 +357,46 @@ public class CampaignPreset {
         return presets;
     }
 
+    /**
+     * Retrieves a combined list of lightweight campaign presets, sourced and sorted exactly like
+     * {@link #getCampaignPresets()} but reading only each preset's title and description.
+     *
+     * <p>This skips parsing the large game and campaign option blocks, so it loads dramatically faster and is
+     * intended for the preset picker, where only the title and description are displayed. The returned presets are
+     * <em>not</em> suitable for applying to a campaign; call {@link #parseFromFile(File)} on
+     * {@link #getPresetFile()} to obtain the complete preset once the user commits to a selection.</p>
+     *
+     * @return a {@link List} of metadata-only campaign presets found in the default and user data folders.
+     */
+    public static List<CampaignPreset> getCampaignPresetsMetadata() {
+        // Main directory
+        final List<CampaignPreset> presets = loadCampaignPresetsMetadataFromDirectory(new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
+
+        // Old user data directory
+        presets.addAll(loadCampaignPresetsMetadataFromDirectory(new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
+
+        // Modern user data directory
+        final File configuredDirectory = getConfiguredUserCampaignPresetDirectory();
+        if (configuredDirectory != null) {
+            presets.addAll(loadCampaignPresetsMetadataFromDirectory(configuredDirectory));
+        }
+
+        final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+
+        presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
+
+        return presets;
+    }
+
+    private static @Nullable File getConfiguredUserCampaignPresetDirectory() {
+        final String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        return userDirectory.isBlank() ? null : new File(userDirectory, CAMPAIGN_PRESET_DIRECTORY);
+    }
+
     // region File I/O
-    public void writeToFile(final JFrame frame, @Nullable File file) {
+    public boolean writeToFile(final @Nullable JFrame frame, @Nullable File file) {
         if (file == null) {
-            return;
+            return false;
         }
 
         String path = file.getPath();
@@ -360,14 +410,19 @@ public class CampaignPreset {
               OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
               PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
+            if (pw.checkError()) {
+                throw new IOException("Failed to write campaign preset to " + file);
+            }
+            return true;
         } catch (Exception ex) {
             LOGGER.error("writeToFile() Exception", ex);
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                  MekHQ.getMHQOptions().getLocale());
-            JOptionPane.showMessageDialog(frame,
-                  resources.getString("CampaignPresetSaveFailure.text"),
-                  resources.getString("CampaignPresetSaveFailure.title"),
-                  JOptionPane.ERROR_MESSAGE);
+            if (frame != null) {
+                JOptionPane.showMessageDialog(frame,
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.text"),
+                      getTextAt(RESOURCE_BUNDLE, "CampaignPresetSaveFailure.title"),
+                      JOptionPane.ERROR_MESSAGE);
+            }
+            return false;
         }
     }
 
@@ -400,11 +455,7 @@ public class CampaignPreset {
         if (getRankSystem() != null) {
             getRankSystem().writeToXML(pw, indent, false);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gm", isGM());
-        if (getCompanyGenerationOptions() != null) {
-            getCompanyGenerationOptions().writeToXML(pw, indent, null);
-        }
         // endregion Startup
 
         // region Continuous
@@ -451,6 +502,112 @@ public class CampaignPreset {
                      .map(CampaignPreset::parseFromFile)
                      .filter(Objects::nonNull)
                      .collect(Collectors.toList());
+    }
+
+    /**
+     * Lightweight counterpart to {@link #loadCampaignPresetsFromDirectory(File)} that reads only the title and
+     * description of each preset in the directory via {@link #parseMetadataFromFile(File)}.
+     *
+     * @param directory the directory to scan for preset files
+     *
+     * @return the metadata-only presets found in the directory, or an empty list if the directory is unusable
+     */
+    private static List<CampaignPreset> loadCampaignPresetsMetadataFromDirectory(final @Nullable File directory) {
+        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.stream(Objects.requireNonNull(directory.listFiles()))
+                     .map(CampaignPreset::parseMetadataFromFile)
+                     .filter(Objects::nonNull)
+                     .collect(Collectors.toList());
+    }
+
+    private static XMLInputFactory createMetadataXmlInputFactory() {
+        final XMLInputFactory factory = XMLInputFactory.newInstance();
+        // Harden against XXE attacks: we only read trusted preset metadata and never need DTDs or external entities.
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
+    }
+
+    /**
+     * Reads only the title and description of a campaign preset file, skipping the large game and campaign option
+     * blocks that make up the bulk of a preset.
+     *
+     * <p>To stay fast, the reader stops as soon as it has both a title and a description. Otherwise it continues only
+     * until the end of the root element (that is, until every direct child has been seen), so a preset with no
+     * description is still handled and the scan is always guaranteed to terminate. Only the direct children of the
+     * preset are inspected, so nested elements cannot be mistaken for the title or description. The returned preset
+     * has only its title, description, and {@link #getPresetFile() source file} populated; use
+     * {@link #parseFromFile(File)} to load the full preset.</p>
+     *
+     * @param file the preset file to read
+     *
+     * @return a metadata-only {@link CampaignPreset}, or {@code null} if the file could not be read or has no title
+     */
+    private static @Nullable CampaignPreset parseMetadataFromFile(final @Nullable File file) {
+        if ((file == null) || !file.isFile() || !file.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".xml")) {
+            return null;
+        }
+
+        String title = null;
+        String description = "";
+
+        try (InputStream is = new FileInputStream(file)) {
+            final XMLStreamReader reader = METADATA_XML_INPUT_FACTORY.createXMLStreamReader(is);
+            try {
+                // Depth 1 is the root <campaignPreset>; its direct children (title, description, ...) sit at depth 2.
+                int depth = 0;
+                while (reader.hasNext()) {
+                    final int event = reader.next();
+
+                    if (event == XMLStreamConstants.START_ELEMENT) {
+                        depth++;
+                        // Only inspect direct children of the root, so nested elements can't be mistaken for our
+                        // metadata.
+                        if (depth == 2) {
+                            final String localName = reader.getLocalName();
+                            if ("title".equals(localName)) {
+                                title = reader.getElementText().trim();
+                                depth--; // getElementText() consumes this element's END_ELEMENT
+                            } else if ("description".equals(localName)) {
+                                description = reader.getElementText().trim();
+                                depth--; // getElementText() consumes this element's END_ELEMENT
+                            }
+                        }
+                    } else if (event == XMLStreamConstants.END_ELEMENT) {
+                        depth--;
+                        if (depth == 0) {
+                            // Reached </campaignPreset>: every direct child has been read, so there is nothing left to
+                            // find. This also guarantees the loop always terminates.
+                            break;
+                        }
+                    }
+
+                    // Fast path: stop as soon as we have both, no matter how the children are ordered.
+                    if ((title != null) && !description.isEmpty()) {
+                        break;
+                    }
+                }
+            } finally {
+                reader.close();
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex, "Unable to read campaign preset metadata from file {}", file);
+            return null;
+        }
+
+        if (title == null) {
+            LOGGER.warn("Campaign preset file {} is missing a title; skipping.", file);
+            return null;
+        }
+
+        final CampaignPreset preset = new CampaignPreset();
+        preset.setTitle(title);
+        preset.setDescription(description);
+        preset.setPresetFile(file);
+        return preset;
     }
 
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
@@ -525,15 +682,8 @@ public class CampaignPreset {
                     case "rankSystem":
                         preset.setRankSystem(RankSystem.generateInstanceFromXML(wn.getChildNodes(), version));
                         break;
-                    case "contractCount":
-                        preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
-                        break;
                     case "gm":
                         preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "companyGenerationOptions":
-                        preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(),
-                              version));
                         break;
                     // endregion Startup
 
@@ -597,6 +747,36 @@ public class CampaignPreset {
             return null;
         }
         return preset;
+    }
+    /**
+     * Creates a copy of the given preset that shares no objects with it, by writing it to XML and parsing it back. This
+     * goes through exactly the same IO as a preset file, so the copy holds precisely what saving the source would
+     * store. Use this before editing values that belong to a running campaign (its options, skills and abilities) so
+     * the edits cannot leak back into that campaign.
+     *
+     * @param source the preset to copy
+     *
+     * @return the detached copy, or {@code null} if it could not be round-tripped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable CampaignPreset createDetachedCopy(final CampaignPreset source) {
+        final StringWriter stringWriter = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(stringWriter)) {
+            source.writeToXML(pw, 0);
+        }
+
+        try {
+            final Document xmlDoc = MHQXMLUtility.newSafeDocumentBuilder()
+                                          .parse(new InputSource(new StringReader(stringWriter.toString())));
+            final Element element = xmlDoc.getDocumentElement();
+            element.normalize();
+            return parseFromXML(element.getChildNodes(), new Version(element.getAttribute("version")));
+        } catch (Exception ex) {
+            LOGGER.error("Unable to create a detached copy of a campaign preset", ex);
+            return null;
+        }
     }
     // endregion File I/O
 

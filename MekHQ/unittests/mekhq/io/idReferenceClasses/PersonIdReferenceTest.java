@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,11 +51,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -64,6 +68,17 @@ public class PersonIdReferenceTest {
     @Mock
     private Campaign mockCampaign;
 
+    @BeforeEach
+    void stubPlayerForce() {
+        // getPlayerForce() and getHumanResources() must be non-null for Person construction and the getPersonnel()
+        // lookups, but getPerson(...) must stay a plain mock so unknown ids resolve to null (exercised by the fix*
+        // methods). A deep-stub here would make getPerson(...) return a non-null mock, defeating those tests.
+        PlayerForce playerForce = mock(PlayerForce.class);
+        mekhq.campaign.ForceHumanResources humanResources = mock(mekhq.campaign.ForceHumanResources.class);
+        lenient().when(playerForce.getHumanResources()).thenReturn(humanResources);
+        lenient().when(mockCampaign.getPlayerForce()).thenReturn(playerForce);
+    }
+
     @Test
     public void testFixPersonIdReferences() {
         // This is a smoke test to ensure we don't have an obvious ConMod. Deeper tests to fix each
@@ -71,7 +86,7 @@ public class PersonIdReferenceTest {
         final List<Person> personnel = IntStream.range(0, 100)
                                              .mapToObj(i -> new Person(mockCampaign, "MERC"))
                                              .collect(Collectors.toList());
-        when(mockCampaign.getAllPersonnel()).thenReturn(personnel);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPersonnel()).thenReturn(personnel);
         PersonIdReference.fixPersonIdReferences(mockCampaign);
     }
 
@@ -99,7 +114,7 @@ public class PersonIdReferenceTest {
 
         // Testing Known Spouse
         genealogy.setSpouse(new PersonIdReference(spouse.getId().toString()));
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(spouse, origin.getGenealogy().getSpouse());
@@ -122,7 +137,7 @@ public class PersonIdReferenceTest {
         // Testing Known Former Spouse
         genealogy.addFormerSpouse(new FormerSpouse(new PersonIdReference(formerSpouse.getId().toString()),
               LocalDate.now(), FormerSpouseReason.DIVORCE));
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertEquals(1, origin.getGenealogy().getFormerSpouses().size());
@@ -155,8 +170,8 @@ public class PersonIdReferenceTest {
               .get(FamilialRelationshipType.PARENT)
               .add(new PersonIdReference(parent2.getId().toString()));
 
-        doReturn(null).when(mockCampaign).getPerson(argThat(matchPersonUUID(child.getId())));
-        doReturn(parent2).when(mockCampaign).getPerson(argThat(matchPersonUUID(parent2.getId())));
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(null);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent2.getId())))).willReturn(parent2);
 
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertTrue(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));

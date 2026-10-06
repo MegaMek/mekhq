@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,7 @@ import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -63,7 +63,10 @@ public class MaplessStratConScenarioPicker extends ImmersiveDialogCore {
 
     public MaplessStratConScenarioPicker(Campaign campaign, List<Scenario> scenarios) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
+                          campaign.getLocalDate()),
               null,
               getInCharacterMessage(campaign.getCommanderAddress(), !scenarios.isEmpty()),
               getButtons(!scenarios.isEmpty()),

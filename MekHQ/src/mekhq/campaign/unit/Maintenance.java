@@ -54,20 +54,31 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.ReportingUtilities;
@@ -88,7 +99,7 @@ public class Maintenance {
 
     public static void doMaintenance(Campaign campaign, Unit unit) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!unit.requiresMaintenance() || !campaignOptions.isCheckMaintenance()) {
+        if (!unit.requiresMaintenance() || !campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
             return;
         }
         // let's start by checking times
@@ -108,7 +119,7 @@ public class Maintenance {
             ruggedMultiplier = 3;
         }
 
-        if (unit.getDaysSinceMaintenance() >= (campaignOptions.getMaintenanceCycleDays() * ruggedMultiplier)) {
+        if (unit.getDaysSinceMaintenance() >= (campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier)) {
             Person tech = unit.getTech();
             if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
                 // Tech is at a different location; maintenance cannot be performed this cycle.
@@ -130,16 +141,29 @@ public class Maintenance {
 
                 if (maintained) {
                     tech.setMinutesLeft(availableMinutes - minutesUsed);
-                    asTechsUsed = campaign.getAvailableAsTechs(minutesUsed, false);
-                    campaign.setAsTechPoolMinutes(campaign.getAsTechPoolMinutes() - (asTechsUsed * minutesUsed));
+                    asTechsUsed = campaign.getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
+                          false,
+                          campaign.isOvertimeAllowed(),
+                          campaign.getCampaignOptions());
+                    int minutes = campaign.getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
+                                        (asTechsUsed * minutesUsed);
+                    campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
+                }
+                if (!maintained) {
+                    // A tech who could not do the work does not make the check: the unit is checked as unmaintained
+                    LOGGER.debug("[Maintenance] {}: {} could not maintain it today, checked as unmaintained",
+                          unit.getName(), tech.getFullName());
+                    tech = null;
                 }
             }
 
             // maybe use the money
-            if (campaignOptions.isPayForMaintain()) {
-                if (!(campaign.getFinances().debit(TransactionType.MAINTENANCE,
+            if (campaignOptions.isChargingMaintenance()) {
+                Money maintenanceCost = unit.getMaintenanceCost()
+                                              .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign));
+                if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,
                       campaign.getLocalDate(),
-                      unit.getMaintenanceCost(),
+                      maintenanceCost,
                       "Maintenance for " + unit.getName()))) {
                     campaign.addReport(TECHNICAL, "<font color='" +
                                                         getNegativeColor() +
@@ -147,6 +171,8 @@ public class Maintenance {
                                                         unit.getHyperlinkedName() +
                                                         "!</b></font>");
                     paidMaintenance = false;
+                } else {
+                    ContractSupportPayments.reimburseStraightSupport(campaign, maintenanceCost, unit.getName());
                 }
             }
             // it is time for a maintenance check
@@ -167,7 +193,7 @@ public class Maintenance {
             for (Part part : unit.getParts()) {
                 try {
                     String partReport = doMaintenanceOnUnitPart(campaign,
-                          unit,
+                          tech,
                           part,
                           partsToDamage,
                           paidMaintenance,
@@ -204,13 +230,13 @@ public class Maintenance {
 
             unit.setLastMaintenanceReport(maintenanceReport.toString());
 
-            if (campaignOptions.isLogMaintenance()) {
+            if (campaignOptions.get(CampaignOption.LOG_MAINTENANCE)) {
                 LOGGER.info(maintenanceReport.toString());
             }
 
             PartQuality quality = unit.getQuality();
             String qualityString;
-            boolean reverse = campaignOptions.isReverseQualityNames();
+            boolean reverse = campaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES);
             if (quality.toNumeric() > qualityOrig.toNumeric()) {
                 qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                                                           .getFontColorPositiveHexColor(),
@@ -271,7 +297,11 @@ public class Maintenance {
         return damageString;
     }
 
-    private static String doMaintenanceOnUnitPart(Campaign campaign, Unit unit, Part part,
+    /**
+     * @param maintenanceTech the tech who did the maintenance, or {@code null} when nobody could, in which case the
+     *                        part is checked as unmaintained
+     */
+    private static String doMaintenanceOnUnitPart(Campaign campaign, @Nullable Person maintenanceTech, Part part,
           Map<Part, Integer> partsToDamage,
           boolean paidMaintenance, int asTechsUsed) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -281,23 +311,38 @@ public class Maintenance {
             return null;
         }
         PartQuality oldQuality = part.getQuality();
-        TargetRoll target = getTargetForMaintenance(campaign, part, unit.getTech(), asTechsUsed);
+        TargetRoll target = getTargetForMaintenance(campaign, part, maintenanceTech, asTechsUsed);
         if (!paidMaintenance) {
             // TODO : Make campaign modifier user configurable
             target.addModifier(1, "did not pay for maintenance");
         }
 
-        partReport += ", TN " + target.getValue() + '[' + target.getDesc() + ']';
-        int roll = d6(2);
+        Skill maintenanceSkill = (maintenanceTech == null) ? null : maintenanceTech.getSkillForWorkingOn(part);
+        int roll;
+        if (maintenanceSkill == null) {
+            roll = d6(2);
+            // getValueAsString() renders an IMPOSSIBLE target as a word rather than its Integer.MAX_VALUE sentinel.
+            partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.reportNoSkill",
+                  target.getValueAsString(), target.getDesc(), String.valueOf(roll));
+        } else {
+            // withoutSubject: this report already names the tech; getReport(false): the numeric margin is appended
+            // once, below, so the utility's own margin label is suppressed to avoid printing the margin twice.
+            ActionCheckResult result = new SkillCheck(maintenanceTech, maintenanceSkill.getType(), target)
+                                             .withoutSubject()
+                                             .resolve(false, null);
+            roll = result.getRollResult();
+            partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.report",
+                  result.getReport(false), target.getDesc());
+        }
         int margin = roll - target.getValue();
-        partReport += " rolled a " + roll + ", margin of " + margin;
+        partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.margin", String.valueOf(margin));
 
         switch (part.getQuality()) {
             case QUALITY_A: {
                 if (margin >= 4) {
                     part.improveQuality();
                 }
-                if (!campaignOptions.isUseUnofficialMaintenance()) {
+                if (!campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                     if (margin < -6) {
                         partsToDamage.put(part, 4);
                     } else if (margin < -4) {
@@ -318,7 +363,7 @@ public class Maintenance {
                 } else if (margin < -5) {
                     part.reduceQuality();
                 }
-                if (!campaignOptions.isUseUnofficialMaintenance()) {
+                if (!campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                     if (margin < -6) {
                         partsToDamage.put(part, 2);
                     } else if (margin < -2) {
@@ -333,7 +378,7 @@ public class Maintenance {
                 } else if (margin >= 5) {
                     part.improveQuality();
                 }
-                if (!campaignOptions.isUseUnofficialMaintenance()) {
+                if (!campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                     if (margin < -6) {
                         partsToDamage.put(part, 2);
                     } else if (margin < -3) {
@@ -345,7 +390,7 @@ public class Maintenance {
             case QUALITY_D: {
                 if (margin < -3) {
                     part.reduceQuality();
-                    if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
+                    if ((margin < -4) && !campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                         partsToDamage.put(part, 1);
                     }
                 } else if (margin >= 5) {
@@ -356,7 +401,7 @@ public class Maintenance {
             case QUALITY_E:
                 if (margin < -2) {
                     part.reduceQuality();
-                    if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
+                    if ((margin < -5) && !campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                         partsToDamage.put(part, 1);
                     }
                 } else if (margin >= 6) {
@@ -367,7 +412,7 @@ public class Maintenance {
             default:
                 if (margin < -2) {
                     part.reduceQuality();
-                    if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
+                    if (margin < -6 && !campaignOptions.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE)) {
                         partsToDamage.put(part, 1);
                     }
                 }
@@ -412,7 +457,7 @@ public class Maintenance {
         String skillLevel = "Unmaintained";
         SkillModifierData skillModifierData = null;
         if (null != tech) {
-            Skill skill = tech.getSkillForWorkingOn(partWork);
+            Skill skill = tech.getMaintenanceOrRefitSkill(partWork.getUnit());
             skillModifierData = tech.getSkillModifierData();
             if (null != skill) {
                 value = skill.getFinalSkillValue(skillModifierData);
@@ -427,15 +472,34 @@ public class Maintenance {
 
         target.append(partWork.getAllModsForMaintenance());
 
-        if (campaignOptions.isUseEraMods()) {
-            target.addModifier(campaign.getFaction().getEraMod(campaign.getGameYear()), "era");
+        // A technician with a Descartes diagnostic scanner (or a Deluxe Toolkit) gets a bonus to the maintenance check.
+        int maintenanceKitBonus = EquipmentKitCatalog.maintenanceBonus(tech);
+        if (maintenanceKitBonus != 0) {
+            target.addModifier(-maintenanceKitBonus, "technician kit");
         }
 
-        if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getCurrentLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
-                Planet planet = campaign.getCurrentLocation().getPlanet();
-                Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-                megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
+        Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        Unit partUnit = partWork.getUnit();
+        if (familiarity.isEnabled() && tech != null && partUnit != null) {
+            Entity partEntity = partUnit.getEntity();
+            if (partEntity != null) {
+                int bonus = tech.getChassisFamiliarityTechBonus(familiarity, partEntity, false);
+                if (bonus != 0) {
+                    target.addModifier(-bonus, "Chassis Familiarity");
+                }
+            }
+        }
+
+        if (campaignOptions.get(CampaignOption.USE_ERA_MODS)) {
+            target.addModifier(campaign.getPlayerForce().getFaction().getEraMod(campaign.getGameYear()), "era");
+        }
+
+        if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
+            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
+                      campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
+                Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
+                AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
+                Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());
 
                 Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
@@ -444,15 +508,19 @@ public class Maintenance {
                     zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
                 }
 
-                if (planet.getGravity() < 0.8) {
+                // getGravity() is nullable (a planet may record no gravity); default to standard Terran gravity so
+                // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
+                Double recordedGravity = planet.getGravity();
+                double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
+                if (gravity < 0.8) {
                     int modifier = 2;
                     target.addModifier(modifier, "Low Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (planet.getGravity() >= 2.0) {
+                } else if (gravity >= 2.0) {
                     int modifier = 4;
                     target.addModifier(modifier, "Very High Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (planet.getGravity() > 1.2) {
+                } else if (gravity > 1.2) {
                     int modifier = 1;
                     target.addModifier(modifier, "High Gravity");
                     addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
@@ -474,7 +542,7 @@ public class Maintenance {
             }
         }
 
-        if (null != partWork.getUnit() && null != tech) {
+        if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
             // not maintaining
             // than going it short-handed, but that is just the way it is.
@@ -482,8 +550,8 @@ public class Maintenance {
             // short AsTechs
             // for part of the cycle.
             final int helpMod;
-            if (partWork.getUnit().isSelfCrewed()) {
-                helpMod = campaign.getShorthandedModForCrews(partWork.getUnit().getEntity().getCrew());
+            if (partUnit.isSelfCrewed()) {
+                helpMod = campaign.getShorthandedModForCrews(partUnit.getEntity().getCrew());
             } else {
                 helpMod = campaign.getShorthandedMod(asTechsUsed, false);
             }
@@ -494,8 +562,8 @@ public class Maintenance {
 
             // like repairs, per CamOps page 208 extra time gives a
             // reduction to the TN based on x2, x3, x4
-            if (partWork.getUnit().getMaintenanceMultiplier() > 1) {
-                target.addModifier(-(partWork.getUnit().getMaintenanceMultiplier() - 1), "extra time");
+            if (partUnit.getMaintenanceMultiplier() > 1) {
+                target.addModifier(-(partUnit.getMaintenanceMultiplier() - 1), "extra time");
             }
         }
 
@@ -556,13 +624,22 @@ public class Maintenance {
      */
     public static void checkAndCorrectMaintenanceSchedule(Campaign campaign) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final int maintenanceCycleDuration = campaignOptions.getMaintenanceCycleDays();
-        final boolean techsUseAdmin = campaignOptions.isTechsUseAdministration();
+        if (!campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+            LOGGER.debug("[Maintenance] schedule not checked: maintenance checks are off");
+            return;
+        }
+        final int maintenanceCycleDuration = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
+        final boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
-        final boolean hasActiveMission = !campaign.getActiveMissions(false).isEmpty();
+        final boolean hasActiveMission = !campaign.getActiveContracts().isEmpty();
         final LocalDate today = campaign.getLocalDate();
 
-        List<Person> allTechs = campaign.getTechsExpanded();
+        List<Person> allTechs = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
+                                            campaign.getCampaignOptions(),
+                                            campaign.getPlayerForce().isClanForce(),
+                                            campaign.getLocalDate());
         for (Person tech : allTechs) {
             int dailyWorkMinutes = tech.getDailyAvailableTechTime(techsUseAdmin);
 
@@ -807,6 +884,15 @@ public class Maintenance {
      * @since 0.50.10
      */
     public static void performImmediateMaintenance(Campaign campaign, Unit unit) {
+        // doMaintenance does nothing in either case, so the loop below would never end
+        if (!campaign.getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
+            LOGGER.debug("[Maintenance] {}: no immediate maintenance, maintenance checks are off", unit.getName());
+            return;
+        }
+        if (!unit.requiresMaintenance()) {
+            LOGGER.debug("[Maintenance] {}: no immediate maintenance, the unit does not need it", unit.getName());
+            return;
+        }
         Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate
         if (tech == null) {
             return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.marriage;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 /**
@@ -55,7 +56,7 @@ public class RandomMarriage extends AbstractMarriage {
     public RandomMarriage(final CampaignOptions options) {
         super(RandomMarriageMethod.DICE_ROLL, options);
 
-        setMarriageDiceSize(options.getRandomMarriageDiceSize());
+        setMarriageDiceSize(options.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE));
     }
     //endregion Constructors
 

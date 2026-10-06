@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -118,7 +118,7 @@ public class Personality {
         if (null == personCampaignId) {
             return;
         }
-        Person p = c.getPerson(personCampaignId);
+        Person p = c.getPlayerForce().getHumanResources().getPerson(personCampaignId);
         if (null == p) {
             return;
         }

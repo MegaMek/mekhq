@@ -51,25 +51,25 @@ import megamek.common.autoResolve.converter.FlattenForces;
 import megamek.common.board.Board;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.icons.Camouflage;
+import megamek.common.loaders.MapSettings;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.units.Crew;
 import megamek.common.units.CrewType;
 import megamek.common.units.Entity;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.loaders.MapSettings;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.BeforeAll;
@@ -80,9 +80,9 @@ import org.mockito.MockitoAnnotations;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Tests for {@link ScenarioSetupForces}, specifically verifying that player entities
- * are correctly added to the simulation regardless of their forceString state.
- * Regression tests for <a href="https://github.com/MegaMek/mekhq/issues/8385">#8385</a>.
+ * Tests for {@link ScenarioSetupForces}, specifically verifying that player entities are correctly added to the
+ * simulation regardless of their forceString state. Regression tests for <a
+ * href="https://github.com/MegaMek/mekhq/issues/8385">#8385</a>.
  */
 class ScenarioSetupForcesTest {
 
@@ -105,10 +105,10 @@ class ScenarioSetupForcesTest {
     }
 
     /**
-     * Entities whose forceString starts with an empty root force name (e.g. "|1||Company|29||...")
-     * must still produce player formations in the simulation. This is the primary regression
-     * case for #8385 — the campaign root force has no name, causing Forces.verifyForceName to
-     * reject the top-level force, which silently dropped all player entities.
+     * Entities whose forceString starts with an empty root force name (e.g. "|1||Company|29||...") must still produce
+     * player formations in the simulation. This is the primary regression case for #8385 — the campaign root force has
+     * no name, causing Forces.verifyForceName to reject the top-level force, which silently dropped all player
+     * entities.
      */
     @Test
     void testEntitiesWithEmptyRootForceNameProduceFormations() {
@@ -117,8 +117,8 @@ class ScenarioSetupForcesTest {
     }
 
     /**
-     * Entities with a completely blank forceString (no formation assignment) must still
-     * be added to the simulation with a default force.
+     * Entities with a completely blank forceString (no formation assignment) must still be added to the simulation with
+     * a default force.
      */
     @Test
     void testEntitiesWithBlankForceStringProduceFormations() {
@@ -141,8 +141,8 @@ class ScenarioSetupForcesTest {
               "Player should have at least one formation in the simulation");
 
         var botFormations = context.getActiveFormations().stream()
-              .filter(f -> f.getOwnerId() != 0)
-              .toList();
+                                  .filter(f -> f.getOwnerId() != 0)
+                                  .toList();
         assertFalse(botFormations.isEmpty(),
               "Bot should have at least one formation in the simulation");
 
@@ -168,18 +168,20 @@ class ScenarioSetupForcesTest {
 
     private Campaign createCampaign() {
         var campaign = MHQTestUtilities.getTestCampaign();
-        campaign.setName("Test Player");
-        var reputationController = mock(ReputationController.class);
+        campaign.getPlayerForce().setName("Test Player");
+        var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
-        campaign.setReputation(reputationController);
-        campaign.addFormation(new Formation("Heroes"), campaign.getFormation(0));
+        campaign.getPlayerForce().setCamOpsReputation(reputationController);
+        Formation formation = new Formation("Heroes");
+        Formation superFormation = campaign.getPlayerForce().getFormation(0);
+        campaign.getPlayerForce().addFormation(formation, superFormation, campaign);
         return campaign;
     }
 
     private AtBDynamicScenario createScenario(Campaign campaign) {
-        var contract = mock(AtBContract.class);
-        when(contract.getEnemySkill()).thenReturn(SkillLevel.REGULAR);
-        when(contract.getAllySkill()).thenReturn(SkillLevel.REGULAR);
+        var contract = mock(AbstractContract.class);
+        when(contract.getEnemyForceSkill()).thenReturn(SkillLevel.REGULAR);
+        when(contract.getEmployerForceSkill()).thenReturn(SkillLevel.REGULAR);
 
         var scenario = mock(AtBDynamicScenario.class);
         when(scenario.getContract(any())).thenReturn(contract);
@@ -188,7 +190,7 @@ class ScenarioSetupForcesTest {
         when(scenario.getBotForce(anyInt())).thenReturn(botForce);
         when(scenario.getNumBots()).thenReturn(1);
 
-        for (var force : campaign.getAllFormations()) {
+        for (var force : campaign.getPlayerForce().getAllFormations()) {
             force.setScenarioId(11, campaign);
         }
 

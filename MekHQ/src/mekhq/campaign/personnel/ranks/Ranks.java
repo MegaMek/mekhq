@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -69,7 +69,14 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.Ranks";
+    /**
+     * The bundle holding the MegaMek Data licence header written above exported rank systems.
+     *
+     * <p>Shared with the Life Path exporter. It used to be a bundle of its own, and when that file was renamed the
+     * key here moved but this name did not, so every export threw on the lookup after the XML declaration had gone out
+     * and left the user's file with nothing else in it.</p>
+     */
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Legal";
     private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
@@ -122,6 +129,11 @@ public class Ranks {
             path += ".xml";
             file = new File(path);
         }
+        // Everything that can fail is resolved before the file is opened for writing. Opening it first truncates
+        // it, and a failure part-way through then leaves the user with an empty rank systems file.
+        String year = String.valueOf(LocalDate.now().getYear());
+        String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Legal.legalStatement", year).trim();
+
         int indent = 0;
         try (OutputStream fileOutputStream = new FileOutputStream(file);
               OutputStream outputStream = new BufferedOutputStream(fileOutputStream);
@@ -129,10 +141,7 @@ public class Ranks {
               PrintWriter writer = new PrintWriter(osw)) {
             // Then save it out to that file.
             writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-            String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
-            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
-            writer.println(legalStatement.trim());
+            writer.println(legalStatement);
 
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
@@ -193,7 +202,7 @@ public class Ranks {
         // Then, we need to check and fix any issues that may arise from the file load
         final RankValidator rankValidator = new RankValidator();
         rankValidator.checkAssignedRankSystems(campaign);
-        campaign.getAllPersonnel().forEach(rankValidator::checkPersonRank);
+        campaign.getPlayerForce().getHumanResources().getPersonnel().forEach(rankValidator::checkPersonRank);
     }
 
     public static List<RankSystem> loadRankSystemsFromFile(final @Nullable File file,

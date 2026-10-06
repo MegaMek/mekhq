@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,8 @@ package mekhq.campaign.personnel.skills.enums;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -58,8 +58,8 @@ class AgingMilestoneTest {
 
     @BeforeAll
     static void beforeAll() {
-        mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
+        mockCampaign = mockCampaign();
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
     }
 
     record milestoneRecord(int age, AgingMilestone expected) {

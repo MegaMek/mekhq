@@ -32,16 +32,19 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
 
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -49,6 +52,17 @@ class SkillTypeTest {
 
     static Stream<String> allSkillNames() {
         return Stream.of(SkillType.getSkillList());
+    }
+
+    @Test
+    void legacyAntiMekNameResolvesToClimbingSkill() {
+        SkillType.initializeTypes();
+
+        SkillType canonical = SkillType.getType(SkillType.S_ANTI_MEK);
+        SkillType legacy = SkillType.getType("Anti-Mek");
+
+        assertNotNull(legacy, "Legacy 'Anti-Mek' skill name must resolve after normalization");
+        assertSame(canonical, legacy, "Legacy 'Anti-Mek' must map to the canonical Anti-Mek (Climbing) skill");
     }
 
     @ParameterizedTest
@@ -96,9 +110,9 @@ class SkillTypeTest {
         SkillAttribute attribute = skillType.getFirstAttribute();
 
         // Assert
-        assertNotSame(SkillAttribute.NONE,
+        assertNotSame(SkillAttribute.NO_ATTRIBUTE,
               attribute,
-              "Invalid first attribute for skill: " + skillType.getName() + " cannot be NONE");
+              "Invalid first attribute for skill: " + skillType.getName() + " cannot be NO_ATTRIBUTE");
         assertNotSame(null, attribute, "Invalid first attribute for skill: " + skillType.getName() + " cannot be null");
     }
 
@@ -216,8 +230,10 @@ class SkillTypeTest {
 
         // Assert
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
-        if (firstAttribute != NONE) {
+        assertNotSame(NO_ATTRIBUTE,
+              firstAttribute,
+              "First Attribute is NO_ATTRIBUTE for Skill: " + skillType.getName());
+        if (firstAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
                         firstAttribute +
@@ -226,7 +242,7 @@ class SkillTypeTest {
         }
 
         SkillAttribute secondAttribute = skillType.getSecondAttribute();
-        if (secondAttribute != NONE) {
+        if (secondAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
                         secondAttribute +
@@ -251,8 +267,10 @@ class SkillTypeTest {
         assertTrue(flavorText.contains("</html>"), "Did not include html closing tag: " + skillType.getName());
 
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
-        if (firstAttribute != NONE) {
+        assertNotSame(NO_ATTRIBUTE,
+              firstAttribute,
+              "First Attribute is NO_ATTRIBUTE for Skill: " + skillType.getName());
+        if (firstAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
                         firstAttribute +
@@ -261,7 +279,7 @@ class SkillTypeTest {
         }
 
         SkillAttribute secondAttribute = skillType.getSecondAttribute();
-        if (secondAttribute != NONE) {
+        if (secondAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
                         secondAttribute +

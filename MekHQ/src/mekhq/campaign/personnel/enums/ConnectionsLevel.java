@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -86,7 +86,8 @@ public enum ConnectionsLevel {
      * @param wealth     the wealth or resources represented by this level
      * @param recruits   the maximum number of recruits accessible with this level of connection
      */
-    ConnectionsLevel(int level, int burnChance, Money wealth, int recruits) {
+    ConnectionsLevel(final int level, final int burnChance, final Money wealth,
+          final int recruits) {
         this.level = level;
         this.burnChance = burnChance;
         this.wealth = wealth;

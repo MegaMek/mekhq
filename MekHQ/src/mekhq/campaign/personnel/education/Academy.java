@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,6 +52,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -618,8 +619,7 @@ public class Academy implements Comparable<Academy> {
      * @return the adjusted tuition value as an Integer
      */
     public int getTuitionAdjusted(Person person) {
-        double educationLevel = Math.max(1,
-              getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+        double educationLevel = Math.max(1, getEducationLevel(person) - ((double) educationLevelMin.getLevel() / 4));
 
         return (int) (tuition * educationLevel);
     }
@@ -642,7 +642,7 @@ public class Academy implements Comparable<Academy> {
                                       locationSystems;
 
         Set<String> relevantFactions = new HashSet<>();
-        relevantFactions.add(campaign.getFaction().getShortName());
+        relevantFactions.add(campaign.getPlayerForce().getFaction().getShortName());
         relevantFactions.add(person.getOriginFaction().getShortName());
 
         for (String campus : campuses) {
@@ -673,7 +673,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         Faction originFaction = person.getOriginFaction();
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         FactionHints hints = RandomFactionGenerator.getInstance().getFactionHints();
 
         for (String shortName : factions) {
@@ -773,7 +773,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         String effectiveOrigin = effectiveFactionFor(person, today);
-        String campaignShort = campaign.getFaction().getShortName();
+        String campaignShort = campaign.getPlayerForce().getFaction().getShortName();
         Factions factionsRegistry = Factions.getInstance();
 
         for (String ownerShort : currentOwners) {
@@ -812,7 +812,7 @@ public class Academy implements Comparable<Academy> {
                     return ownerShort;
                 }
             }
-            Faction campaignFaction = campaign.getFaction();
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
             if (campaignFaction != null && !"FC".equals(campaignFaction.getShortName())
                       && campaignFaction.isLineageCompatible(owner)) {
                 return ownerShort;
@@ -937,8 +937,7 @@ public class Academy implements Comparable<Academy> {
      *       required, false otherwise.
      */
     public boolean isQualified(Person person) {
-        return EducationLevel.parseToInt(person.getEduHighestEducation()) >=
-                     EducationLevel.parseToInt(educationLevelMin);
+        return person.getEduHighestEducation().getLevel() >= educationLevelMin.getLevel();
     }
 
     /**
@@ -961,9 +960,9 @@ public class Academy implements Comparable<Academy> {
      * @return The education level of the qualification.
      */
     public int getEducationLevel(Person person) {
-        int currentEducationLevel = EducationLevel.parseToInt(person.getEduHighestEducation());
-        int minimumEducationLevel = EducationLevel.parseToInt(educationLevelMin);
-        int maximumEducationLevel = EducationLevel.parseToInt(educationLevelMax);
+        int currentEducationLevel = person.getEduHighestEducation().getLevel();
+        int minimumEducationLevel = educationLevelMin.getLevel();
+        int maximumEducationLevel = educationLevelMax.getLevel();
 
         int educationLevel;
 
@@ -976,13 +975,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         // this probably isn't necessary, but a little insurance goes a long way
-        if (educationLevel > EducationLevel.values().length - 1) {
-            educationLevel = EducationLevel.values().length - 1;
-        } else if (educationLevel < 0) {
-            educationLevel = 0;
-        }
-
-        return educationLevel;
+        return Math.clamp(educationLevel, EducationLevel.MIN_LEVEL, EducationLevel.MAX_LEVEL);
     }
 
     /**
@@ -998,7 +991,7 @@ public class Academy implements Comparable<Academy> {
         if (isReeducationCamp) {
             return RandomFactionGenerator.getInstance()
                          .getFactionHints()
-                         .isAtWarWith(campaign.getFaction(),
+                         .isAtWarWith(campaign.getPlayerForce().getFaction(),
                                Factions.getInstance().getFaction(person.getEduAcademyFaction()),
                                campaign.getLocalDate());
         }
@@ -1014,7 +1007,7 @@ public class Academy implements Comparable<Academy> {
         } else {
             return RandomFactionGenerator.getInstance()
                          .getFactionHints()
-                         .isAtWarWith(campaign.getFaction(),
+                         .isAtWarWith(campaign.getPlayerForce().getFaction(),
                                Factions.getInstance().getFaction(person.getEduAcademyFaction()),
                                campaign.getLocalDate());
         }
@@ -1088,10 +1081,10 @@ public class Academy implements Comparable<Academy> {
                     if (skillName.equalsIgnoreCase("xp")) {
                         tooltip.append(skillName.toUpperCase()).append(" (");
 
-                        if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
+                        if (person.getEduHighestEducation().getLevel() >= educationLevel) {
                             tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                         } else {
-                            tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
+                            tooltip.append(educationLevel * campaign.getCampaignOptions().get(CampaignOption.CURRICULUM_XP_RATE))
                                   .append(")<br>");
                         }
                     } else if (!skillName.equalsIgnoreCase("none")) {
@@ -1122,7 +1115,7 @@ public class Academy implements Comparable<Academy> {
 
             // with the skill content resolved, we can move onto the rest of the tooltip
             if (!isLocal && !isHomeSchool) {
-                int targetNumber = campaign.getCampaignOptions().getEntranceExamBaseTargetNumber() - facultySkill;
+                int targetNumber = campaign.getCampaignOptions().get(CampaignOption.ENTRANCE_EXAM_BASE_TARGET_NUMBER) - facultySkill;
                 tooltip.append("<b>")
                       .append(resources.getString("entranceExam.text"))
                       .append("</b> ")
@@ -1173,18 +1166,18 @@ public class Academy implements Comparable<Academy> {
 
             // with travel time out the way, all that's left is to add the last couple of
             // entries
-            if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+            if ((isReeducationCamp) && (campaign.getCampaignOptions().get(CampaignOption.USE_REEDUCATION_CAMPS))) {
                 tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
                 if (personnel.size() == 1) {
                     if (!Objects.equals(person.getOriginFaction().getShortName(),
-                          campaign.getFaction().getShortName())) {
-                        tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                          campaign.getPlayerForce().getFaction().getShortName())) {
+                        tooltip.append(campaign.getPlayerForce().getFaction().getFullName(campaign.getGameYear())).append("<br>");
                     } else {
                         tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
                     }
                 } else {
-                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                    tooltip.append(campaign.getPlayerForce().getFaction().getFullName(campaign.getGameYear())).append("<br>");
                 }
 
                 tooltip.append("<br>");
@@ -1201,7 +1194,7 @@ public class Academy implements Comparable<Academy> {
                 tooltip.append("<b>")
                       .append(resources.getString("educationLevel.text"))
                       .append("</b> ")
-                      .append(EducationLevel.fromString(String.valueOf(getEducationLevel(person))))
+                      .append(EducationLevel.fromLevel(getEducationLevel(person)))
                       .append("<br>");
             }
 
@@ -1239,13 +1232,25 @@ public class Academy implements Comparable<Academy> {
             case "artillery" -> SkillType.S_ARTILLERY;
             case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
             case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
+            case "piloting/protomek" -> SkillType.S_PILOT_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
             case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
-            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
-            case "tech/aero" -> SkillType.S_TECH_AERO;
+            // "tech/mechanic" and "tech/aero" are retained as pre-0.51 aliases for the renamed skills.
+            case "tech/vehicle", "tech/mechanic" -> SkillType.S_TECH_VEHICLE;
+            case "tech/aerospace", "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
+            case "tech/military" -> SkillType.S_TECH_MILITARY;
+            case "tech/civilian" -> SkillType.S_TECH_CIVILIAN;
+            case "tech/electronic" -> SkillType.S_TECH_ELECTRONIC;
+            case "tech/nuclear" -> SkillType.S_TECH_NUCLEAR;
+            case "tech/aeronautics" -> SkillType.S_TECH_AERONAUTICS;
+            case "tech/mechanical" -> SkillType.S_TECH_MECHANICAL;
+            case "tech/myomer" -> SkillType.S_TECH_MYOMER;
+            case "tech/jets" -> SkillType.S_TECH_JETS;
+            case "tech/weapons" -> SkillType.S_TECH_WEAPONS;
+            case "tech/cybernetics" -> SkillType.S_TECH_CYBERNETICS;
             case "astech" -> SkillType.S_ASTECH;
             case "doctor", "surgery/any" -> SkillType.S_SURGERY;
             case "medtech" -> SkillType.S_MEDTECH;

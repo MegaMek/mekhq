@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,13 +51,14 @@ import java.util.stream.Stream;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +73,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractMarriageTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -82,15 +85,25 @@ public class AbstractMarriageTest {
     @BeforeEach
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_MARRIAGE_DICE_SIZE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CHECK_MUTUAL_ANCESTORS_DEPTH)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_NEW_DEPENDENT_MARRIAGE)).thenReturn(0);
     }
 
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_MARRIAGES)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_MARRIAGES)).thenReturn(false);
 
         final AbstractMarriage disabledMarriage = new DisabledRandomMarriage(mockCampaignOptions);
 
@@ -461,10 +474,10 @@ public class AbstractMarriageTest {
     public void testMarry() {
         doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
-        when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
+        when(mockCampaign.getPlayerForce().getRankSystem()).thenReturn(mock(RankSystem.class));
         doNothing().when(mockCampaign).addReport(eq(PERSONNEL), any());
 
         final Person origin = new Person("Origin", "Origin", mockCampaign);
@@ -516,7 +529,9 @@ public class AbstractMarriageTest {
 
         final Person mockPerson = mock(Person.class);
         final List<Person> mockPersonnel = new ArrayList<>();
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getActivePersonnel(true, true)).thenReturn(mockPersonnel);
 
         mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
 

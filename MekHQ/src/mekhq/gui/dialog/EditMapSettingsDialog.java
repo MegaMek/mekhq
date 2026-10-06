@@ -69,7 +69,7 @@ import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
 import megamek.server.totalWarfare.TWGameManager;
 import mekhq.MekHQ;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 
 public class EditMapSettingsDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(EditMapSettingsDialog.class);

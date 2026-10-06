@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
@@ -66,14 +67,14 @@ class InvalidFactionNagLogicTest {
     @BeforeEach
     public void setup() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         faction = mock(Faction.class);
 
         dateValid = LocalDate.of(3151, 1, 1);
         dateInvalid = LocalDate.of(1936, 1, 1);
 
         // When the Campaign mock calls 'getFaction()' return the mocked faction
-        when(campaign.getFaction()).thenReturn(faction);
+        when(campaign.getPlayerForce().getFaction()).thenReturn(faction);
     }
 
     // In the following tests, the beginning of the isFactionInvalid() method is called, and its

@@ -37,7 +37,6 @@ import java.io.PrintWriter;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -47,6 +46,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingJumpshipDockingCollar;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -127,7 +127,7 @@ public class JumpshipDockingCollar extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -257,7 +257,7 @@ public class JumpshipDockingCollar extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_VESSEL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

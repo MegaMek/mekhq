@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.stream.Stream;
 
@@ -44,7 +45,6 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.protomeks.ProtoMekArmor;
@@ -66,14 +66,14 @@ public class ArmorTest {
 
     static Campaign mockCampaign;
     static CampaignOptions mockCampaignOptions;
-    Warehouse warehouse;
+    mekhq.campaign.LocalWarehouse warehouse;
 
     @BeforeAll
     static void beforeAll() {
         EquipmentType.initializeTypes();
 
         mockCampaignOptions = mock(CampaignOptions.class);
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
 
@@ -90,8 +90,8 @@ public class ArmorTest {
 
     @BeforeEach
     public void beforeEach() {
-        warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+        warehouse = new mekhq.campaign.LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
     }
 
     @ParameterizedTest

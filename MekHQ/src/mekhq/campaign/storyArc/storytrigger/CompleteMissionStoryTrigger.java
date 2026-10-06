@@ -39,7 +39,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.storyArc.StoryPoint;
 import mekhq.campaign.storyArc.StoryTrigger;
 import mekhq.campaign.storyArc.storypoint.MissionStoryPoint;

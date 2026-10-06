@@ -37,10 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
 import megamek.common.equipment.Mounted;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
@@ -49,7 +50,7 @@ import org.junit.jupiter.api.Test;
 public class SwapAmmoTypeActionTest {
     @Test
     public void swapAmmoTypeSwapsMunitions() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType currentType = getAmmoType("ISSRM6 Ammo");
         AmmoType newAmmoType = getAmmoType("ISSRM6 Inferno Ammo");
@@ -83,7 +84,7 @@ public class SwapAmmoTypeActionTest {
 
     @Test
     public void swapAmmoTypeSwapsMunitionsOnlyForSelectedUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType currentType = getAmmoType("ISSRM6 Ammo");
         AmmoType newAmmoType = getAmmoType("ISSRM6 Inferno Ammo");

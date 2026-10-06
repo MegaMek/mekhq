@@ -86,11 +86,11 @@ class CampaignOptionsUtilitiesTest {
 
         String result = CampaignOptionsUtilities.formatBadges(metadata);
 
-        // Should contain HTML span with color formatting for development badge
+        // Should contain a colored Material Symbols font badge for the development version
         if (!result.isEmpty()) {
-            assertTrue(result.contains("<span"));
-            assertTrue(result.contains("color:"));
-            assertTrue(result.contains("</span>"));
+            assertTrue(result.contains("<font"));
+            assertTrue(result.contains("color="));
+            assertTrue(result.contains("</font>"));
         }
     }
 

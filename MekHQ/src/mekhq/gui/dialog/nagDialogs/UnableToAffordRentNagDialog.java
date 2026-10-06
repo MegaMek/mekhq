@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,14 +33,13 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_RENT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordRentNagLogic.unableToAffordRent;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -48,34 +47,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class UnableToAffordRentNagDialog extends ImmersiveDialogNag {
     public UnableToAffordRentNagDialog(final Campaign campaign) {
-        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_RENT, "UnableToAffordRentNagDialog");
-    }
-
-    @Override
-    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
-        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
-
-        final LocalDate today = campaign.getLocalDate();
-        final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
-        final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
-
-        Money rent = Money.zero();
-        if (isSunday) {
-            rent = rent.plus(FacilityRentals.getTotalRentSumFromRentedBays(campaign, campaign.getFinances()));
-        }
-        if (isLastDayOfMonth) {
-            rent = rent.plus(campaign.getTotalRentFeesExcludingBays());
-        }
-
-        Money currentFunds = campaign.getFunds();
-        Money deficit = rent.minus(currentFunds);
-
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              key + ".ic",
-              commanderAddress,
-              rent.toAmountString(),
-              currentFunds.toAmountString(),
-              deficit.toAmountString());
+        super(campaign, NAG_UNABLE_TO_AFFORD_RENT, "UnableToAffordRentNagDialog");
     }
 
     /**
@@ -93,14 +65,43 @@ public class UnableToAffordRentNagDialog extends ImmersiveDialogNag {
     public static boolean checkNag(Campaign campaign, boolean isSunday, boolean isLastDayOfMonth) {
         Money rent = Money.zero();
         if (isSunday) {
-            rent = rent.plus(FacilityRentals.getTotalRentSumFromRentedBays(campaign, campaign.getFinances()));
+            rent = rent.plus(FacilityRentals.getTotalRentSumFromRentedBays(campaign,
+                  campaign.getPlayerForce().getFinances()));
         }
 
         if (isLastDayOfMonth) {
             rent = rent.plus(campaign.getTotalRentFeesExcludingBays());
         }
 
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_RENT) &&
-                     unableToAffordRent(campaign.getFunds(), rent);
+        return !mekhq.MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNABLE_TO_AFFORD_RENT) &&
+                     unableToAffordRent(campaign.getPlayerForce().getFunds(), rent);
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
+        final LocalDate today = campaign.getLocalDate();
+        final boolean isSunday = today.getDayOfWeek() == DayOfWeek.SUNDAY;
+        final boolean isLastDayOfMonth = today.getDayOfMonth() == today.lengthOfMonth();
+
+        Money rent = Money.zero();
+        if (isSunday) {
+            rent = rent.plus(FacilityRentals.getTotalRentSumFromRentedBays(campaign,
+                  campaign.getPlayerForce().getFinances()));
+        }
+        if (isLastDayOfMonth) {
+            rent = rent.plus(campaign.getTotalRentFeesExcludingBays());
+        }
+
+        Money currentFunds = campaign.getPlayerForce().getFunds();
+        Money deficit = rent.minus(currentFunds);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              key + ".ic",
+              commanderAddress,
+              rent.toAmountString(),
+              currentFunds.toAmountString(),
+              deficit.toAmountString());
     }
 }

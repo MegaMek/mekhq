@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,8 +46,8 @@ import java.util.ResourceBundle;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,9 +70,9 @@ class OutstandingScenariosNagLogicTest {
      */
     @BeforeEach
     void init() {
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
-        AtBContract contract = mock(AtBContract.class);
+        AbstractContract contract = mock(AbstractContract.class);
         scenario1 = mock(AtBScenario.class);
         scenario2 = mock(AtBScenario.class);
         today = LocalDate.of(3025, 1, 1);
@@ -79,7 +80,7 @@ class OutstandingScenariosNagLogicTest {
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaignOptions.isUseStratCon()).thenReturn(false);
 
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
+        when(campaign.getActiveContracts(true)).thenReturn(List.of(contract));
         when(campaign.getLocalDate()).thenReturn(today);
         when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
     }

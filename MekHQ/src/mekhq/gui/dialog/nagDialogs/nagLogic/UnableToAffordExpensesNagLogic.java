@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,7 +50,7 @@ public class UnableToAffordExpensesNagLogic {
      */
     public static boolean unableToAffordExpenses(Campaign campaign) {
         Money monthlyExpenses = getMonthlyExpenses(campaign);
-        return campaign.getFunds().isLessThan(monthlyExpenses);
+        return campaign.getPlayerForce().getFunds().isLessThan(monthlyExpenses);
     }
 
     /**

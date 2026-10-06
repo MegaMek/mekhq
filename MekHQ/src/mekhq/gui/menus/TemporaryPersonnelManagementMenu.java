@@ -157,10 +157,14 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         addMenuListener(menuListenerFor(() -> {
             // For Astech/Medic: need + pool = what would be needed if there were no temp pool at all.
             // resetAsTechPool/resetMedicPool is a no-op only when pool == max(0, real need).
-            int astechPool = getCampaign().getTemporaryAsTechPool();
-            int astechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + astechPool);
-            int medicPool = getCampaign().getTemporaryMedicPool();
-            int medicIdealPool = Math.max(0, getCampaign().getMedicsNeed() + medicPool);
+            int astechPool = getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool();
+            Campaign campaign1 = getCampaign();
+            int astechIdealPool = Math.max(0, campaign1.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getAsTechNeed(campaign1.getCampaignOptions()) + astechPool);
+            int medicPool = getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool();
+            int medicIdealPool = Math.max(0,
+                  getCampaign().getPlayerForce().getHumanResources().getMedicsNeed() + medicPool);
 
             boolean anyNeed = (astechPool != astechIdealPool) || (medicPool != medicIdealPool) || anyBlobRoleHasNeed();
             setMenuItemState(miTempPoolFullStrength, anyNeed, getTextAt("miTempPoolFullStrength.disabledTip"));
@@ -179,8 +183,17 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
               "miHireAstechs.text", "popupHireAstechsNum.text", "miFireAstechs.text", "popupFireAstechsNum.text",
               "miFullStrengthAstechs.text", "miFireAllAstechs.text",
               "miFireAstechs.disabledTip", "miFullStrengthAstechs.disabledTip", "miFireAllAstechs.disabledTip",
-              getCampaign()::getTemporaryAsTechPool, getCampaign()::getAsTechNeed,
-              getCampaign()::increaseAsTechPool, getCampaign()::decreaseAsTechPool,
+              () -> getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool(), () -> {
+                  Campaign campaign1 = getCampaign();
+                  return campaign1.getPlayerForce().getHumanResources().getAsTechNeed(campaign1.getCampaignOptions());
+              },
+              i -> {
+                  Campaign campaign1 = getCampaign();
+                  campaign1.getPlayerForce().getHumanResources().increaseAsTechPool(campaign1, i);
+              }, i1 -> {
+                  Campaign campaign1 = getCampaign();
+                  campaign1.getPlayerForce().getHumanResources().decreaseAsTechPool(campaign1, i1);
+              },
               getCampaign()::resetAsTechPool, getCampaign()::emptyAsTechPool
         );
         add(menuAstechPool);
@@ -189,8 +202,15 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
               "miHireMedics.text", "popupHireMedicsNum.text", "miFireMedics.text", "popupFireMedicsNum.text",
               "miFullStrengthMedics.text", "miFireAllMedics.text",
               "miFireMedics.disabledTip", "miFullStrengthMedics.disabledTip", "miFireAllMedics.disabledTip",
-              getCampaign()::getTemporaryMedicPool, getCampaign()::getMedicsNeed,
-              getCampaign()::increaseMedicPool, getCampaign()::decreaseMedicPool,
+              () -> getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool(),
+              () -> getCampaign().getPlayerForce().getHumanResources().getMedicsNeed(),
+              i -> {
+                  Campaign campaign1 = getCampaign();
+                  campaign1.getPlayerForce().getHumanResources().increaseMedicPool(campaign1, i);
+              }, i1 -> {
+                  Campaign campaign1 = getCampaign();
+                  campaign1.getPlayerForce().getHumanResources().decreaseMedicPool(campaign1, i1);
+              },
               getCampaign()::resetMedicPool, getCampaign()::emptyMedicPool
         );
         add(menuMedicPool);
@@ -294,16 +314,21 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
     private boolean anyBlobRoleHasPool() {
         Campaign c = getCampaign();
-        return BLOB_CREW_ROLES.stream().anyMatch(role -> c.isBlobCrewEnabled(role) && c.getTempCrewPool(role) > 0);
+        return BLOB_CREW_ROLES.stream().anyMatch(role -> c.getPlayerForce()
+                                                               .getHumanResources()
+                                                               .isBlobCrewEnabled(role, c.getCampaignOptions()) &&
+                                                               c.getPlayerForce()
+                                                                     .getHumanResources()
+                                                                     .getTempCrewPool(role) > 0);
     }
 
     private boolean anyBlobRoleHasSurplus() {
         Campaign c = getCampaign();
         for (PersonnelRole role : BLOB_CREW_ROLES) {
-            if (!c.isBlobCrewEnabled(role)) {
+            if (!c.getPlayerForce().getHumanResources().isBlobCrewEnabled(role, c.getCampaignOptions())) {
                 continue;
             }
-            if (c.getAvailableTempCrewPool(role) > 0) {
+            if (c.getPlayerForce().getHumanResources().getAvailableTempCrewPool(c, role) > 0) {
                 return true;
             }
             for (Unit unit : c.getUnits()) {
@@ -321,7 +346,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
     private boolean blobRoleHasUnitsNeedingCrew(PersonnelRole role) {
         Campaign c = getCampaign();
-        if (!c.isBlobCrewEnabled(role)) {
+        if (!c.getPlayerForce().getHumanResources().isBlobCrewEnabled(role, c.getCampaignOptions())) {
             return false;
         }
         for (Unit unit : c.getUnits()) {
@@ -343,7 +368,8 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
     private void updateBlobCrewPoolMenuItems(PersonnelRole role,
           JMenuItem fireItem, JMenuItem fullStrengthItem, JMenuItem fireAllItem) {
-        int pool = getCampaign().getTempCrewPool(role);
+        Campaign campaign1 = getCampaign();
+        int pool = campaign1.getPlayerForce().getHumanResources().getTempCrewPool(role);
         boolean unitsNeedCrew = blobRoleHasUnitsNeedingCrew(role);
 
         setMenuItemState(fireItem, pool > 0, getTextAt("miFireBlobCrew.disabledTip"));
@@ -354,7 +380,10 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
     private JMenu buildBlobCrewPoolSubMenu(BlobCrewConfig config) {
         PersonnelRole role = config.role;
         JMenu menu = new JMenu(getTextAt(config.menuKey));
-        menu.setVisible(getCampaign().isBlobCrewEnabled(role));
+        Campaign campaign2 = getCampaign();
+        menu.setVisible(campaign2.getPlayerForce()
+                              .getHumanResources()
+                              .isBlobCrewEnabled(role, campaign2.getCampaignOptions()));
 
         JMenuItem miHire = createMenuItem(config.hireKey, KeyEvent.VK_UNDEFINED, evt -> {
             int value = getUserIntInput.apply(getTextAt(config.hirePopupKey), MAX_QUANTITY_SPINNER);
@@ -365,7 +394,9 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         menu.add(miHire);
 
         JMenuItem miFireSome = createMenuItem(config.fireKey, KeyEvent.VK_UNDEFINED, evt -> {
-            int value = getUserIntInput.apply(getTextAt(config.firePopupKey), getCampaign().getTempCrewPool(role));
+            Campaign campaign1 = getCampaign();
+            int value = getUserIntInput.apply(getTextAt(config.firePopupKey),
+                  campaign1.getPlayerForce().getHumanResources().getTempCrewPool(role));
             if (value >= 0) {
                 getCampaign().decreaseTempCrewPool(role, value);
             }
@@ -374,12 +405,19 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
         JMenuItem miFullStrength = createMenuItem(config.fullStrengthKey, KeyEvent.VK_UNDEFINED, evt -> {
             getCampaign().resetTempCrewPoolForRole(role);
-            getCampaign().distributeTempCrewPoolToUnits(role);
+            Campaign campaign1 = getCampaign();
+            campaign1.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign1, campaign1.getCampaignOptions(),
+                        role);
         });
         menu.add(miFullStrength);
 
         JMenuItem miFireAll = createMenuItem(config.fireAllKey, KeyEvent.VK_UNDEFINED,
-              evt -> getCampaign().setTempCrewPool(role, 0));
+              evt -> {
+                  Campaign campaign1 = getCampaign();
+                  campaign1.getPlayerForce().getHumanResources().setTempCrewPool(campaign1, role, 0);
+              });
         menu.add(miFireAll);
 
         menu.addMenuListener(menuListenerFor(
@@ -393,9 +431,16 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         getCampaign().resetAsTechPool();
         getCampaign().resetMedicPool();
         for (PersonnelRole role : BLOB_CREW_ROLES) {
-            if (getCampaign().isBlobCrewEnabled(role)) {
+            Campaign campaign1 = getCampaign();
+            if (campaign1.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
                 getCampaign().resetTempCrewPoolForRole(role);
-                getCampaign().distributeTempCrewPoolToUnits(role);
+                Campaign campaign2 = getCampaign();
+                campaign2.getPlayerForce()
+                      .getHumanResources()
+                      .distributeTempCrewPoolToUnits(campaign2, campaign2.getCampaignOptions(),
+                            role);
             }
         }
     }
@@ -404,18 +449,28 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         getCampaign().emptyAsTechPool();
         getCampaign().emptyMedicPool();
         for (PersonnelRole role : BLOB_CREW_ROLES) {
-            if (getCampaign().isBlobCrewEnabled(role)) {
-                getCampaign().clearBlobCrewForRole(role);
+            Campaign campaign1 = getCampaign();
+            if (campaign1.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                Campaign campaign2 = getCampaign();
+                campaign2.getPlayerForce().getHumanResources().clearBlobCrewForRole(campaign2, role);
             }
         }
     }
 
     private void releaseSurplusTempCrews() {
-        getCampaign().releaseSurplusAsTechPool();
-        getCampaign().releaseSurplusMedicPool();
+        Campaign campaign2 = getCampaign();
+        campaign2.getPlayerForce().getHumanResources().releaseSurplusAsTechPool(campaign2);
+        Campaign campaign3 = getCampaign();
+        campaign3.getPlayerForce().getHumanResources().releaseSurplusMedicPool(campaign3);
         for (PersonnelRole role : BLOB_CREW_ROLES) {
-            if (getCampaign().isBlobCrewEnabled(role)) {
-                getCampaign().releaseSurplusBlobCrewForRole(role);
+            Campaign campaign1 = getCampaign();
+            if (campaign1.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                Campaign campaign4 = getCampaign();
+                campaign4.getPlayerForce().getHumanResources().releaseSurplusBlobCrewForRole(campaign4, role);
             }
         }
     }
@@ -488,7 +543,12 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
      */
     @Subscribe
     public void handle(final OptionsChangedEvent event) {
-        blobRoleMenus.forEach((role, menu) -> menu.setVisible(getCampaign().isBlobCrewEnabled(role)));
+        blobRoleMenus.forEach((role, menu) -> {
+            Campaign campaign1 = getCampaign();
+            menu.setVisible(campaign1.getPlayerForce()
+                                  .getHumanResources()
+                                  .isBlobCrewEnabled(role, campaign1.getCampaignOptions()));
+        });
     }
 
 }

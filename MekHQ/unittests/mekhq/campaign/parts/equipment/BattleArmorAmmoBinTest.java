@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,17 +32,25 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -52,13 +60,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.equipment.AmmoType;
 import megamek.common.battleArmor.BattleArmor;
-import megamek.common.equipment.Mounted;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -79,7 +86,7 @@ public class BattleArmorAmmoBinTest {
 
     @Test
     public void canNeverScrapTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
 
         int equipmentNum = 18;
@@ -92,7 +99,7 @@ public class BattleArmorAmmoBinTest {
 
     @Test
     public void needsMaintenanceTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
 
         int equipmentNum = 18;
@@ -105,7 +112,7 @@ public class BattleArmorAmmoBinTest {
 
     @Test
     public void battleArmorAmmoBinCtorTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
 
         int equipmentNum = 18;
@@ -122,7 +129,7 @@ public class BattleArmorAmmoBinTest {
 
     @Test
     public void cloneTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
 
         int equipmentNum = 18;
@@ -143,7 +150,7 @@ public class BattleArmorAmmoBinTest {
     @Test
     public void battleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots() - 1,
               false, mockCampaign);
         ammoBin.setId(25);
@@ -185,7 +192,7 @@ public class BattleArmorAmmoBinTest {
     public void oneShotBattleArmorAmmoBinWriteToXmlTest()
           throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, 0, true, mockCampaign);
         ammoBin.setId(25);
 
@@ -226,7 +233,7 @@ public class BattleArmorAmmoBinTest {
     @Test
     public void fullBattleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, 0, false, mockCampaign);
         ammoBin.setId(25);
 
@@ -266,7 +273,7 @@ public class BattleArmorAmmoBinTest {
     @Test
     public void emptyBattleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(),
               false, mockCampaign);
         ammoBin.setId(25);
@@ -312,20 +319,21 @@ public class BattleArmorAmmoBinTest {
 
         Campaign mockCampaign;
         CampaignOptions mockCampaignOptions;
-        Warehouse warehouse;
-        Quartermaster quartermaster;
+        LocalWarehouse warehouse;
+        mekhq.campaign.ForceQuartermaster quartermaster;
         Unit mockUnit;
         BattleArmor mockEntity;
         AmmoMounted mockMounted;
 
         @BeforeEach
         public void beforeEach() {
-            mockCampaign = mock(Campaign.class);
+            mockCampaign = mockCampaign();
             mockCampaignOptions = mock(CampaignOptions.class);
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-            warehouse = new Warehouse();
-            when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-            quartermaster = new Quartermaster(mockCampaign);
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+            warehouse = new LocalWarehouse();
+            when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+            quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
             when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
             mockUnit = mock(Unit.class);
@@ -472,6 +480,47 @@ public class BattleArmorAmmoBinTest {
 
             // ... and the correct amount of ammo is left
             assertEquals(ammoType.getShots() * SQUAD_SIZE * 9, quartermaster.getAmmoAvailable(ammoType));
+        }
+
+        /**
+         * Fabrication manufactures the squad's ammunition for money, so it must load the bin even though the warehouse
+         * is empty - the stock-limited reload path would otherwise charge the attempt and load nothing.
+         */
+        @Test
+        public void fabricationLoadsTheWholeSquadFromAnEmptyWarehouse() {
+            // ARRANGE
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+
+            int shotsNeeded = ammoType.getShots() * SQUAD_SIZE;
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  false,
+                  mockCampaign);
+
+            ammoBin.setUnit(mockUnit);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+            doAnswer(invocation -> {
+                int shotsLeft = invocation.getArgument(0);
+                when(mockMounted.getBaseShotsLeft()).thenReturn(shotsLeft);
+                return null;
+            }).when(mockMounted).setShotsLeft(anyInt());
+
+            ammoBin.setFabricating(true);
+
+            // ACT
+            // The warehouse is empty, but a fabrication attempt can still be worked on ...
+            assertNull(ammoBin.checkFixable());
+            ammoBin.succeed();
+
+            // ASSERT
+            // ... and it actually loads every trooper ...
+            assertEquals(0, ammoBin.getShotsNeeded());
+            assertEquals(ammoType.getShots(), mockMounted.getBaseShotsLeft());
+
+            // ... without drawing anything from stock.
+            assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
         }
     }
 }

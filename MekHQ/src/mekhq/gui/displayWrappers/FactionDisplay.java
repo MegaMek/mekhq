@@ -65,10 +65,23 @@ public class FactionDisplay {
     }
     //endregion Getters/Setters
 
+    /**
+     * Builds the display list for a faction chooser, dropping factions not valid on the given date and any subordinate
+     * formation declared inside another command's file.
+     *
+     * <p>Subunits are excluded because these lists offer whole commands: including every regiment of every command
+     * would add thousands of entries a player has no use for choosing between here.</p>
+     *
+     * @param factions the factions to offer
+     * @param today    the date the list is being shown for
+     *
+     * @return the sorted display list
+     */
     public static List<FactionDisplay> getSortedValidFactionDisplays(
           final Collection<Faction> factions, final LocalDate today) {
         return getSortedFactionDisplays(factions.stream()
                                               .filter(faction -> faction.validIn(today))
+                                              .filter(faction -> !faction.isSubunit())
                                               .collect(Collectors.toList()), today);
     }
 

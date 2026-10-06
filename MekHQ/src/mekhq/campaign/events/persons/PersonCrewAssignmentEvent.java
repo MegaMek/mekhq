@@ -71,7 +71,7 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
         int forceId = unit.getFormationId();
 
         if (forceId != FORMATION_NONE) {
-            Formation formation = campaign.getFormation(forceId);
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
 
             if (formation != null) {
                 formation.updateCommander(campaign);

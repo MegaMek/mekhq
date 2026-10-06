@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -89,6 +89,16 @@ public enum BloodGroup {
 
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * BloodGroup labels are not unique (e.g., AA_POSITIVE and AO_POSITIVE are both "A+")
+     * so this returns a UI friendly version
+     * 
+     * @return a UI friendly value for showing the detail of the specific blood name and label
+     */
+    public String getDisplayLabel() {
+        return String.format("%s (%s)", getLabel(), name());
     }
 
     /**

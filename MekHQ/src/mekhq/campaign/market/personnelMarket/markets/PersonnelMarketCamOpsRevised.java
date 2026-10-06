@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,8 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.personnel.Person;
@@ -109,20 +109,25 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
      */
     @Override
     public ArrayList<Faction> getApplicantOriginFactions() {
-        Set<Faction> systemFactions = getCurrentSystem().getFactionSet(getToday());
+        // Faction -> tenure weight (years the faction held a world here within living memory). Weighting recruits by
+        // tenure makes long-standing rulers the dominant birth origin while recent or departed rulers still appear.
+        Map<Faction, Integer> systemFactions = getCurrentSystem().getPopulationFactions(getToday());
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
-        if (getCampaign().isClanCampaign()) {
-            interestedFactions.add(getCampaign().getFaction());
+        if (getCampaign().getPlayerForce().isClanForce()) {
+            interestedFactions.add(getCampaign().getPlayerForce().getFaction());
             return interestedFactions;
         }
 
         Factions factions = Factions.getInstance();
         Faction mercenaryFaction = factions.getFaction(MERCENARY_FACTION_CODE);
         Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
-        FactionStandings factionStandings = getCampaign().getFactionStandings();
+        FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
-        for (Faction faction : systemFactions) {
+        for (Map.Entry<Faction, Integer> systemFaction : systemFactions.entrySet()) {
+            Faction faction = systemFaction.getKey();
+            int tenureWeight = systemFaction.getValue();
+
             if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {
                 continue;
             }
@@ -139,7 +144,8 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
                 factionStandingMultiplier *= 3;
             }
 
-            for (int i = 0; i < factionStandingMultiplier; i++) {
+            // Weight the applicant pool by how long the faction held a world here, on top of the standing multiplier.
+            for (int i = 0; i < factionStandingMultiplier * tenureWeight; i++) {
                 interestedFactions.add(faction);
             }
         }
@@ -169,7 +175,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     @Override
     public void generateApplicants() {
         calculateNumberOfRecruitmentRolls();
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -194,7 +200,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
     private void calculateNumberOfRecruitmentRolls() {
         int rolls = getToday().getMonth().length(getToday().isLeapYear());
 
-        if (getCampaign().getCampaignOptions().isAllowMonthlyConnections()) {
+        if (getCampaign().getCampaignOptions().get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
             int additionalRecruits = performConnectionsRecruitsCheck();
             rolls += additionalRecruits;
         }

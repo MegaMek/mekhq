@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,8 +38,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -80,7 +82,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private final BombLoadout maxAvailable = new BombLoadout();
 
     // Maps bomb types to warehouse part IDs
-    private final EnumMap<BombTypeEnum, Integer> bombCatalog = new EnumMap<>(BombTypeEnum.class);
+    private final EnumMap<BombTypeEnum, List<Integer>> bombCatalog = new EnumMap<>(BombTypeEnum.class);
 
     private JButton okayButton;
     private JButton cancelButton;
@@ -126,7 +128,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         bombCatalog.clear();
         availableBombs.clear();
 
-        campaign.getWarehouse().forEachSparePart(spare -> {
+        campaign.getPlayerForce().getWarehouse().forEachSparePart(spare -> {
             if (isBombAmmoStorage(spare)) {
                 AmmoStorage ammoStorage = (AmmoStorage) spare;
                 BombTypeEnum bombType = BombTypeEnum.fromInternalName(
@@ -135,9 +137,10 @@ public class BombsDialog extends JDialog implements ActionListener {
 
                 if ((bombType != null) && (bombType != BombTypeEnum.NONE)) {
                     // Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory and
-                    // for ease of access later
-                    bombCatalog.put(bombType, spare.getId());
-                    availableBombs.put(bombType, ammoStorage.getShots());
+                    // for ease of access later. IMPORTANT: A bomb type may be split across several warehouse stacks
+                    // (e.g. differing quality), so track every stack and total their shots
+                    bombCatalog.computeIfAbsent(bombType, key -> new ArrayList<>()).add(spare.getId());
+                    availableBombs.addBombs(bombType, ammoStorage.getShots());
                 }
             }
         });
@@ -271,11 +274,11 @@ public class BombsDialog extends JDialog implements ActionListener {
      * Updates warehouse for a specific bomb type.
      */
     private void updateWarehouseBombType(BombTypeEnum bombType, int deltaCount) {
-        Integer partId = bombCatalog.get(bombType);
+        List<Integer> partIds = bombCatalog.get(bombType);
 
-        if (partId != null && partId > 0) {
-            // Existing warehouse entry
-            updateExistingWarehouseEntry(partId, deltaCount);
+        if ((partIds != null) && !partIds.isEmpty()) {
+            // Existing warehouse entries
+            updateExistingWarehouseEntries(partIds, deltaCount);
         } else if (deltaCount > 0) {
             // No existing entry but adding bombs - create new warehouse entry
             createNewWarehouseEntry(bombType, deltaCount);
@@ -287,16 +290,46 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     /**
-     * Updates an existing warehouse entry.
+     * Updates existing warehouse entries for a bomb type. Returned bombs go to the first stack; removed bombs are drawn
+     * from each stack in turn until the full amount is taken.
+     *
+     * @param partIds    the warehouse part IDs of every stack holding this bomb type
+     * @param deltaCount positive to return bombs to the warehouse, negative to take them
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private void updateExistingWarehouseEntry(int partId, int deltaCount) {
-        AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(partId);
-        if (storedBombs != null) {
-            storedBombs.changeShots(deltaCount);
+    private void updateExistingWarehouseEntries(List<Integer> partIds, int deltaCount) {
+        if (deltaCount > 0) {
+            AmmoStorage storedBombs = (AmmoStorage) campaign.getPlayerForce().getWarehouse().getPart(partIds.get(0));
+            if (storedBombs != null) {
+                storedBombs.changeShots(deltaCount);
+            }
+            return;
+        }
+
+        int remainingToRemove = -deltaCount;
+        for (int partId : partIds) {
+            if (remainingToRemove <= 0) {
+                break;
+            }
+
+            AmmoStorage storedBombs = (AmmoStorage) campaign.getPlayerForce().getWarehouse().getPart(partId);
+            if (storedBombs == null) {
+                continue;
+            }
+
+            int removedFromStack = Math.min(remainingToRemove, storedBombs.getShots());
+            storedBombs.changeShots(-removedFromStack);
+            remainingToRemove -= removedFromStack;
 
             if (storedBombs.getShots() <= 0) {
-                campaign.getWarehouse().removePart(storedBombs);
+                campaign.getPlayerForce().getWarehouse().removePart(storedBombs);
             }
+        }
+
+        if (remainingToRemove > 0) {
+            LOGGER.warn("Could not remove {} bombs from the warehouse; not enough stock.", remainingToRemove);
         }
     }
 

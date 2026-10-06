@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,7 +54,8 @@ public class AddPersonStoryTrigger extends StoryTrigger {
     @Override
     protected void execute() {
         if (null != person) {
-            getCampaign().recruitPerson(person, true, true);
+            mekhq.campaign.Campaign campaign = getCampaign();
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, true, true);
         }
 
     }

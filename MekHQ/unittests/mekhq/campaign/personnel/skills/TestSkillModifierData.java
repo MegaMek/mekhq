@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import mekhq.campaign.personnel.PersonnelOptions;
 
@@ -45,6 +46,7 @@ public class TestSkillModifierData {
      * <p><b>Warning:</b> this is intended for use in Unit Tests only.</p>
      */
     public static SkillModifierData createDefault() {
-        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, new ArrayList<>(), IGNORE_AGE);
+        return new SkillModifierData(new PersonnelOptions(), new Attributes(), 0, new ArrayList<>(), IGNORE_AGE,
+              Map.of());
     }
 }

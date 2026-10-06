@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,10 @@
  */
 package mekhq.campaign.personnel;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+
+import static org.mockito.Mockito.lenient;
+
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.personnel.RandomDependents.DEPENDENT_CAPACITY_MULTIPLIER;
@@ -40,14 +44,14 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
@@ -60,18 +64,22 @@ class RandomDependentsTest {
         final int NUMBER_OF_DEPENDENTS = 5;
 
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-        Hangar mockHangar = mock(Hangar.class);
-        Warehouse mockWarehouse = mock(Warehouse.class);
+        Campaign mockCampaign = mockCampaign();
+        mekhq.campaign.LocalHangar mockHangar = mock(mekhq.campaign.LocalHangar.class);
+        LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
         LocalDate currentDay = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(currentDay);
@@ -84,7 +92,7 @@ class RandomDependentsTest {
 
             activeDependents.add(dependent);
         }
-        when(mockCampaign.getActiveDependents()).thenReturn(activeDependents);
+        when(mockCampaign.getPlayerForce().getHumanResources().getActiveDependents()).thenReturn(activeDependents);
 
         List<Person> activeNonDependent = new ArrayList<>();
         for (int i = 0; i < NUMBER_OF_NON_DEPENDENTS; i++) {
@@ -94,7 +102,8 @@ class RandomDependentsTest {
             activeNonDependent.add(nonDependent);
         }
         activeNonDependent.addAll(activeDependents);
-        when(mockCampaign.getActivePersonnel(false, true)).thenReturn(activeNonDependent);
+        when(mockCampaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)).thenReturn(
+              activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);
@@ -110,14 +119,18 @@ class RandomDependentsTest {
         final int DEPENDENT_CAPACITY = max(1, (int) round(NUMBER_OF_NON_DEPENDENTS * DEPENDENT_CAPACITY_MULTIPLIER));
 
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
 
         LocalDate currentDay = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(currentDay);
@@ -129,7 +142,8 @@ class RandomDependentsTest {
 
             activeNonDependent.add(nonDependent);
         }
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(activeNonDependent);
+        when(mockCampaign.getPlayerForce().getHumanResources().getActivePersonnel(true, true)).thenReturn(
+              activeNonDependent);
 
         // Act
         RandomDependents randomDependents = new RandomDependents(mockCampaign);

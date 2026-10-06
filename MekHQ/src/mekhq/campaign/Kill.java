@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
@@ -53,7 +54,7 @@ public class Kill {
     private LocalDate date;
     private String killed;
     private String killer;
-    private int missionId = 0;
+    private UUID missionId;
     private int scenarioId = 0;
     private int forceId = 0;
     private long unitType = 0;
@@ -63,7 +64,7 @@ public class Kill {
     public Kill() {
     }
 
-    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId,
+    public Kill(UUID id, String kill, String killer, LocalDate d, UUID missionId, int scenarioId, int forceId,
           long unitType) {
         pilotId = id;
         this.killed = kill;
@@ -107,11 +108,11 @@ public class Kill {
         killer = s;
     }
 
-    public int getMissionId() {
+    public @Nullable UUID getMissionId() {
         return missionId;
     }
 
-    public void setMissionId(int id) {
+    public void setMissionId(@Nullable UUID id) {
         missionId = id;
     }
 
@@ -172,7 +173,7 @@ public class Kill {
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
-                    retVal.missionId = Integer.parseInt(wn2.getTextContent());
+                    retVal.missionId = parseMissionId(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {
@@ -188,6 +189,32 @@ public class Kill {
             logger.error("", ex);
         }
         return retVal;
+    }
+
+    /**
+     * Parses a kill's mission id for backward compatibility.
+     *
+     * <p>Missions are now identified by {@link UUID}. Saves written before that change stored the mission id as a
+     * plain integer, which is not a valid {@link UUID}. Rather than throwing (and aborting the rest of the kill's
+     * parse), a non-UUID value yields {@code null} here; the campaign loader detects that and re-hooks the kill to the
+     * contract the legacy mission was converted into, so no linkage is lost.</p>
+     *
+     * @param text the raw {@code missionId} element text
+     *
+     * @return the parsed {@link UUID}, or {@code null} for a blank or legacy integer value (to be re-hooked on load)
+     */
+    private static @Nullable UUID parseMissionId(final String text) {
+        if ((text == null) || text.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(text.trim());
+        } catch (IllegalArgumentException ex) {
+            // Legacy integer id; the loader re-hooks it to the converted contract. Not logged here to avoid per-kill
+            // noise - the loader reports a single re-hook summary instead.
+            return null;
+        }
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

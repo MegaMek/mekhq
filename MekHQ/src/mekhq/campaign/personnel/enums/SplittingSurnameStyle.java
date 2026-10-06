@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public enum SplittingSurnameStyle {
     // region Enum Declarations
@@ -118,7 +119,7 @@ public enum SplittingSurnameStyle {
         final SplittingSurnameStyle surnameStyle = isWeighted()
                                                          ?
                                                          createWeightedSurnameMap(campaign.getCampaignOptions()
-                                                                                        .getDivorceSurnameWeights()).randomItem()
+                                                                                        .get(CampaignOption.DIVORCE_SURNAME_WEIGHTS)).randomItem()
                                                          :
                                                          this;
 

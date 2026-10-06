@@ -32,7 +32,7 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
+import static mekhq.campaign.mission.utilities.TransportCostCalculations.calculateSpareBayCargoCapacity;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -54,11 +54,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
@@ -84,6 +87,20 @@ public class CampaignSummary {
     private int aeroCount;
     private int infantryCount;
     private int totalUnitCount;
+
+    // unit weight class (canonical class codes from Entity.getWeightClass, averaged within each unit
+    // type so 'Mek thresholds don't get applied to tanks). Gun emplacements and Infantry are
+    // intentionally excluded — they aren't meaningful here.
+    private int mekWeightCodeSum;
+    private int mekWeightCount;
+    private int veeWeightCodeSum;
+    private int veeWeightCount;
+    private int aeroWeightCodeSum;
+    private int aeroWeightCount;
+    private int protoWeightCodeSum;
+    private int protoWeightCount;
+    private int baWeightCodeSum;
+    private int baWeightCount;
 
     // unit damage status
     private int[] countDamageStatus;
@@ -131,7 +148,7 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCombat()) {
                 totalCombatPersonnel++;
             } else if (!person.isDependent()) {
@@ -149,10 +166,22 @@ public class CampaignSummary {
         veeCount = 0;
         aeroCount = 0;
         infantryCount = 0;
+        mekWeightCodeSum = 0;
+        mekWeightCount = 0;
+        veeWeightCodeSum = 0;
+        veeWeightCount = 0;
+        aeroWeightCodeSum = 0;
+        aeroWeightCount = 0;
+        protoWeightCodeSum = 0;
+        protoWeightCount = 0;
+        baWeightCodeSum = 0;
+        baWeightCount = 0;
         int squadCount = 0;
-        for (Unit unit : campaign.getAllHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
             Entity entity = unit.getEntity();
-            if (unit.isUnmanned() ||
+            // Support carriers are an organisational wrapper; their occupants are ordinary support personnel
+            if (unit.isCarrier() ||
+                      unit.isUnmanned() ||
                       unit.isSalvage() ||
                       unit.isMothballed() ||
                       unit.isMothballing() ||
@@ -161,21 +190,37 @@ public class CampaignSummary {
                 continue;
             }
             countDamageStatus[unit.getDamageState()]++;
+            // Per-type weight-class buckets use canonical breakpoints from EntityWeightClass:
+            // 'Mek 35/55/75/100/135, Tank/VTOL 39/59/79/100/300, Aero 45/70/100,
+            // ProtoMek 3/5/7/9/10, BA 0.4/0.75/1/1.5/2 per trooper.
+            // Gun Emplacements and Infantry are deliberately not bucketed.
             switch (entity.getUnitType()) {
                 case UnitType.MEK:
+                    mekCount++;
+                    mekWeightCodeSum += entity.getWeightClass();
+                    mekWeightCount++;
+                    break;
                 case UnitType.PROTOMEK:
                     mekCount++;
+                    protoWeightCodeSum += entity.getWeightClass();
+                    protoWeightCount++;
                     break;
                 case UnitType.VTOL:
                 case UnitType.TANK:
                     veeCount++;
+                    veeWeightCodeSum += entity.getWeightClass();
+                    veeWeightCount++;
                     break;
                 case UnitType.AEROSPACE_FIGHTER:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
+                    aeroWeightCodeSum += entity.getWeightClass();
+                    aeroWeightCount++;
                     break;
                 case UnitType.BATTLE_ARMOR:
                     infantryCount++;
+                    baWeightCodeSum += entity.getWeightClass();
+                    baWeightCount++;
                     break;
                 case UnitType.INFANTRY:
                     Infantry i = (Infantry) entity;
@@ -189,8 +234,13 @@ public class CampaignSummary {
 
         // missions
         countMissionByStatus = new int[MissionStatus.values().length];
-        for (Mission m : campaign.getMissions()) {
-            countMissionByStatus[m.getStatus().ordinal()]++;
+        for (AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
+            // No status-based accessor covers "every status including active", so the raw map is right here - but it
+            // is unfiltered, so a contract without a status has to be skipped rather than indexed on.
+            MissionStatus status = contract.getStatus();
+            if (status != null) {
+                countMissionByStatus[status.ordinal()]++;
+            }
         }
 
         completedMissions = 0;
@@ -202,17 +252,19 @@ public class CampaignSummary {
 
         // cargo capacity
         CargoStatistics cargoStats = campaign.getCargoStatistics();
-        cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
+        cargoCapacity = cargoStats.getTotalCargoCapacity();
 
         double tetrisMasterMultiplier = 1.0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             PersonnelOptions options = person.getOptions();
-            if (options.booleanOption(ADMIN_TETRIS_MASTER)) {
+            if (person.isAdministrator() && options.booleanOption(ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
             }
         }
 
         cargoCapacity = cargoCapacity * tetrisMasterMultiplier;
+        // Unit bays not needed for our units can carry cargo instead
+        cargoCapacity += calculateSpareBayCargoCapacity(campaign.getPlayerForce().getHangar().getUnits());
 
         cargoTons = cargoStats.getCargoTonnage(false);
         double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
@@ -221,25 +273,25 @@ public class CampaignSummary {
         // transport capacity
         HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
         int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int noLV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int noHV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noSH = Math.max(hangarStats.getNumberOfSuperHeavyVehicles() -
-                                    hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
+                                  hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int noInf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+                                   hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) -
-                                    hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
+                                     hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freeHV = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
-                                    0);
+              0);
         int freeSH = Math.max(hangarStats.getTotalSuperHeavyVehicleBays() -
                                     hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
@@ -255,14 +307,14 @@ public class CampaignSummary {
 
         unitsOver = noMek + noSC + noASF + noLV + noHV + noSH + noInf + noBA + noProto;
         int totalBayUnits = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) +
-                                    hangarStats.getNumberOfSuperHeavyVehicles() +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) +
-                                    hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) +
+                                  hangarStats.getNumberOfSuperHeavyVehicles() +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
         unitsTransported = Math.max(totalBayUnits - unitsOver, 0);
 
         nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
@@ -291,6 +343,32 @@ public class CampaignSummary {
                      " heavy, " +
                      countDamageStatus[Entity.DMG_CRIPPLED] +
                      " crippled";
+    }
+
+    /**
+     * Returns the per-unit-type average weight class as a comma-separated string, mirroring the style of
+     * {@link #getForceCompositionReport()}. Each unit's class code comes from {@link Entity#getWeightClass()}
+     * (Mek 35/55/75/100/135, Tank 39/59/79/100/300, Aero 45/70/100, ProtoMek 3/5/7/9/10, BA per-trooper
+     * 0.4/0.75/1/1.5/2), averaged within its own type bucket. Gun Emplacements and Infantry are excluded.
+     *
+     * @return a string such as {@code "Medium Mek, Heavy Armor, Light Aero"} — empty types are omitted
+     */
+    public String getUnitWeightReport() {
+        List<String> segments = new ArrayList<>();
+        appendWeightSegment(segments, mekWeightCodeSum, mekWeightCount, "Mek");
+        appendWeightSegment(segments, veeWeightCodeSum, veeWeightCount, "Armor");
+        appendWeightSegment(segments, aeroWeightCodeSum, aeroWeightCount, "Aero");
+        appendWeightSegment(segments, protoWeightCodeSum, protoWeightCount, "ProtoMek");
+        appendWeightSegment(segments, baWeightCodeSum, baWeightCount, "BA");
+        return String.join(", ", segments);
+    }
+
+    private static void appendWeightSegment(List<String> out, int codeSum, int count, String label) {
+        if (count == 0) {
+            return;
+        }
+        int averaged = (int) Math.round((double) codeSum / count);
+        out.add(EntityWeightClass.getClassName(averaged) + ' ' + label);
     }
 
     /**
@@ -327,8 +405,8 @@ public class CampaignSummary {
     }
 
     /**
-     * Generates a report string with the current and maximum cargo capacity. It is intended to be embedded into
-     * HTML documents.
+     * Generates a report string with the current and maximum cargo capacity. It is intended to be embedded into HTML
+     * documents.
      * <p>The comparison between the current and maximum cargo capacity determines the font's color in the report.</p>
      * <ul>
      *     <li>If the current cargo exceeds the maximum capacity, the color is set to MHQ's defined negative color.</li>
@@ -338,14 +416,18 @@ public class CampaignSummary {
      * <p>The current cargo capacity (cargoTons) and maximum cargo capacity (cargoCapacity) are rounded to 1 decimal
      * place.</p>
      *
-     * @return A string containing the cargo capacity report; may contain HTML tags, but it's not wrapped
-     * into &lt;html&gt;
+     * @return A string containing the cargo capacity report; may contain HTML tags, but it's not wrapped into
+     *       &lt;html&gt;
      */
     public String getCargoCapacityReport() {
-        BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
+        // BigDecimal cannot parse "Infinity"/"NaN", so a non-finite figure here throws a
+        // NumberFormatException that repeats on every Command Center refresh and effectively bricks the
+        // save (see MekHQ issue #9616). Clamp non-finite values to 0 before formatting.
+        BigDecimal roundedCargo = new BigDecimal(Double.toString(Double.isFinite(cargoTons) ? cargoTons : 0.0));
         roundedCargo = roundedCargo.setScale(1, RoundingMode.HALF_UP);
 
-        BigDecimal roundedCapacity = new BigDecimal(Double.toString(cargoCapacity));
+        BigDecimal roundedCapacity = new BigDecimal(
+              Double.toString(Double.isFinite(cargoCapacity) ? cargoCapacity : 0.0));
         roundedCapacity = roundedCapacity.setScale(1, RoundingMode.HALF_UP);
 
         int comparison = roundedCargo.compareTo(roundedCapacity);
@@ -407,7 +489,7 @@ public class CampaignSummary {
         StringBuilder hrCapacityReport = new StringBuilder().append("<html>")
                                                .append(getHRStrain(campaign))
                                                .append(" / ")
-                                               .append(campaign.getCampaignOptions().getHRCapacity() *
+                                               .append(campaign.getCampaignOptions().get(CampaignOption.HR_CAPACITY) *
                                                              combinedSkillValues)
                                                .append(" personnel");
 
@@ -443,14 +525,17 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
-        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(campaign.getAllHangar(), false);
-        if (campaignOptions.isUseFatigue()) {
-            int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
+        List<Unit> unitsInToe = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
+                                      .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.KITCHENS);
 
-            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
+                                                                 .getHumanResources()
+                                                                 .getActivePersonnel(false, true),
+                  campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?
@@ -469,18 +554,21 @@ public class CampaignSummary {
 
         // Hospital Beds
         if (campaignOptions.isUseAdvancedMedical()) {
-            if (campaignOptions.isUseFatigue()) {
+            if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
                 report.append("<br>");
             }
 
-            int injuredPersonnel = campaign.getPatients().size();
-            boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
-            int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
+            int injuredPersonnel = campaign.getPlayerForce().getHumanResources().getPatients().size();
+            boolean useMASHTheatres = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
+            int mashTheatreCapacity;
+            mashTheatreCapacity = useMASHTheatres ?
+                                        campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                        Integer.MAX_VALUE;
 
-            final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
-            final int maximumPatients = campaignOptions.getMaximumPatients();
+            final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
+            final int maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
             int doctorCapacity = 0;
-            for (Person person : campaign.getActivePersonnel(false, false)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 
@@ -519,8 +607,8 @@ public class CampaignSummary {
         }
 
         // Prisoners
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            if (campaignOptions.isUseFatigue() || campaignOptions.isUseAdvancedMedical()) {
+        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
+            if (campaignOptions.get(CampaignOption.USE_FATIGUE) || campaignOptions.isUseAdvancedMedical()) {
                 report.append("<br>");
             }
             int capacityUsage = calculatePrisonerCapacityUsage(campaign);

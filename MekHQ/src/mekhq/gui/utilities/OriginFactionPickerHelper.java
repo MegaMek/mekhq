@@ -119,6 +119,12 @@ public final class OriginFactionPickerHelper {
             if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
                 continue;
             }
+            // A person's origin is a faction or a command, never an individual regiment of one.
+            // Checked after the origin test above so that a character who somehow already has a
+            // subunit origin keeps it, rather than silently losing the assignment on edit.
+            if (faction.isSubunit()) {
+                continue;
+            }
             if (showAllFactions) {
                 factionsModel.addElement(faction);
                 continue;

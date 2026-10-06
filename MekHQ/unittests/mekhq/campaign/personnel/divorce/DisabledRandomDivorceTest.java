@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,12 +50,12 @@ public class DisabledRandomDivorceTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomOppositeSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_OPPOSITE_SEX_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_DIVORCE)).thenReturn(false);
     }
 
     @Test

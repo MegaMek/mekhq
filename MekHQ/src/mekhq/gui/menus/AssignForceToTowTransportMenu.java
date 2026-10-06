@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,9 +37,11 @@ import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -57,6 +59,8 @@ import mekhq.utilities.MHQInternationalization;
  * @see mekhq.campaign.unit.TransportAssignment
  */
 public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AssignForceToTransport";
 
     /**
      * Constructor for a new tow transport Menu
@@ -98,6 +102,76 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     }
 
     /**
+     * Drops tractors whose train a selected unit is already part of. A trailer cannot be hitched
+     * into its own train: the hitch goes onto the last unit of the train, which would be the
+     * trailer itself, leaving it towing itself. This is also why the menu disappears for a trailer
+     * once it is hitched to the only tractor that could pull it.
+     *
+     * @param transports tractors the selection would otherwise be offered
+     * @param units      units being assigned a tractor
+     *
+     * @return tractors that can still take these units
+     */
+    @Override
+    protected Set<Unit> filterTransports(final Set<Unit> transports, final Set<Unit> units) {
+        // Walk each selected unit's train once and collect everything in it. Testing each
+        // tractor against each unit instead would re-walk the same trains for every tractor
+        // offered.
+        Set<Unit> unitsAndTheirTrains = new HashSet<>();
+        for (Unit unit : units) {
+            unitsAndTheirTrains.addAll(TransportAssignmentMenus.trainMembers(unit));
+        }
+
+        Set<Unit> availableTransports = new HashSet<>();
+        for (Unit transport : transports) {
+            if (!unitsAndTheirTrains.contains(transport)) {
+                availableTransports.add(transport);
+            }
+        }
+
+        return availableTransports;
+    }
+
+    /**
+     * Title for the warning dialogs raised by the assign action.
+     */
+    private static String warningTitle() {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
+              "AssignForceToTransportMenu.warning.title");
+    }
+
+    /**
+     * Adds the tractor's current train to the tooltip, so the hitch point is visible before the
+     * click: a trailer goes on the back of whatever this tractor is already pulling, not onto the
+     * tractor itself.
+     *
+     * @param transport tractor being offered
+     *
+     * @return tooltip naming the tractor's formation and the train it heads
+     */
+    @Override
+    protected @Nullable String transportMenuTooltip(Unit transport) {
+        String formationPath = formationFullName(transport);
+        if (formationPath == null) {
+            return null;
+        }
+
+        List<Unit> trailers = TransportAssignmentMenus.trailersBehind(transport);
+        if (trailers.isEmpty()) {
+            return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AssignForceToTransportMenu.towTooltipEmpty.text", formationPath);
+        }
+
+        StringBuilder trainDescription = new StringBuilder(transport.getName());
+        for (Unit trailer : trailers) {
+            trainDescription.append(" -> ").append(trailer.getName());
+        }
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+              "AssignForceToTransportMenu.towTooltipTrain.text", formationPath,
+              trailers.size(), trainDescription.toString());
+    }
+
+    /**
      * Assign a unit to a Tow Transport.
      *
      * @param evt             ActionEvent from the selection happening
@@ -109,12 +183,22 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport,
           Set<Unit> units) {
         for (Unit unit : units) {
+            // A unit already in this train would be hitched to itself, which loops every later
+            // walk along the train. The menu filters these out; a menu built before an earlier
+            // click in the same selection can still get here.
+            if (TransportAssignmentMenus.isInSameTrain(transport, unit)) {
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
+                      "AssignForceToTransportMenu.warningUnitAlreadyInTrain.text",
+                      unit.getName(),
+                      transport.getName()), warningTitle(), JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             if (!transport.getEntity().canTow(unit.getEntity().getId())) {
-                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(
-                      "mekhq.resources.AssignForceToTransport",
+                JOptionPane.showMessageDialog(null, MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
                       "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
                       unit.getName(),
-                      transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
+                      transport.getName()), warningTitle(), JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -125,8 +209,14 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
             // This unit is actually going be towed by the unit at the end of the train - let's find it.
             // We shouldn't actually set towingEnt to null unless "hasTransportedUnits" is lying
+            Set<Unit> walkedTrain = new HashSet<>();
+            walkedTrain.add(towingEnt);
             while (towingEnt != null && towingEnt.hasTransportedUnits(TOW_TRANSPORT)) {
                 towingEnt = towingEnt.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
+                if ((towingEnt != null) && !walkedTrain.add(towingEnt)) {
+                    // A looped hitch would keep this walk going forever
+                    break;
+                }
             }
 
             // Intentionally letting this throw an NPE if towingEnt is null, it
@@ -145,6 +235,9 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
                     campaign.updateTransportInTransports(TOW_TRANSPORT, towingEnt);
                     MekHQ.triggerEvent(new UnitChangedEvent(towingEnt));
                 }
+
+                // A trailer hitched from the Hangar tab follows its tractor into the TO&E
+                TransportAssignmentMenus.moveTrainIntoTractorFormation(campaign, transport);
             }
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
 

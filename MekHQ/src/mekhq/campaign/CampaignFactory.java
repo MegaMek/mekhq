@@ -38,6 +38,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import megamek.Version;
@@ -52,7 +55,6 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
-import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
@@ -60,10 +62,10 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -71,7 +73,8 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -160,9 +163,9 @@ public class CampaignFactory {
      * Creates a partially-configured CampaignConfiguration that is missing: 1. Systems (TestSystems for testing
      * purposes) 2. GameOptions (required for MegaMek, may be candidate for further test class development) 3. Player
      * instance 4. LocalDate for Campaign start day 5. CurrentLocation (created from a PlanetarySystem, which must be
-     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-style recruitment, random
-     * death generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can
-     * be replaced with mocks or lightweight test classes.
+     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-style recruitment, random death
+     * generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can be
+     * replaced with mocks or lightweight test classes.
      *
      * @param options CampaignOptions instance; used in Randomizer construction
      *
@@ -177,7 +180,7 @@ public class CampaignFactory {
 
         megamek.common.enums.Faction techFaction = megamek.common.enums.Faction.MERC;
         CurrencyManager currencyManager = CurrencyManager.getInstance();
-        ReputationController reputationController = new ReputationController();
+        ForceReputationController reputationController = new ForceReputationController();
 
         FactionStandings factionStandings = new FactionStandings();
         RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);
@@ -186,15 +189,13 @@ public class CampaignFactory {
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
+        Map<UUID, LifePath> lifePaths = new HashMap<>();
 
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
         AutosaveService autosave = new AutosaveService();
         BehaviorSettings behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
 
         // Set up markets
-        // TODO: Replace PersonnelMarket due to deprecation
-        PersonnelMarket personnelMarket = new PersonnelMarket();
-        AtbMonthlyContractMarket atbMonthlyContractMarket = new AtbMonthlyContractMarket();
         DisabledUnitMarket disabledUnitMarket = new DisabledUnitMarket();
 
         // Set up Randomizers based on campaignOptions
@@ -224,12 +225,27 @@ public class CampaignFactory {
         }
 
         try {
-            campaignConfig = new CampaignConfiguration(name, date, options,
-                  faction, techFaction, currencyManager, reputationController,
-                  factionStandings, rankSystem, formation, finances, randomEvents, ultimatums,
-                  retirementDefectionTracker, autosave, behaviorSettings,
-                  personnelMarket, atbMonthlyContractMarket, disabledUnitMarket,
-                  disabledRandomDivorce, disabledRandomMarriage, disabledRandomProcreation);
+            campaignConfig = new CampaignConfiguration(name,
+                  date,
+                  options,
+                  faction,
+                  techFaction,
+                  currencyManager,
+                  reputationController,
+                  factionStandings,
+                  rankSystem,
+                  formation,
+                  finances,
+                  randomEvents,
+                  ultimatums,
+                    lifePaths,
+                  retirementDefectionTracker,
+                  autosave,
+                  behaviorSettings,
+                  disabledUnitMarket,
+                  disabledRandomDivorce,
+                  disabledRandomMarriage,
+                  disabledRandomProcreation);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
         }
@@ -315,6 +331,17 @@ public class CampaignFactory {
             campaign = new Campaign(campaignConfig);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
+        }
+
+        if (campaign != null) {
+            try {
+                Map<UUID, LifePath> lifePathLibrary = LifePathIO.loadAllLifePaths(campaign);
+                campaignConfig.setLifePathLibrary(lifePathLibrary);
+                campaign.setLifePathLibrary(lifePathLibrary);
+            } catch (Exception ex) {
+                LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this " +
+                                   "must be investigated.", ex);
+            }
         }
 
         return campaign;

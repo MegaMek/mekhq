@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,12 @@ package mekhq.campaign.personnel.generator;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
@@ -52,6 +57,7 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -60,6 +66,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -114,7 +121,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // roll artillery skill
-        if (campaignOptions.isUseArtillery() &&
+        if (campaignOptions.get(CampaignOption.USE_ARTILLERY) &&
                   (primaryRole.isMekWarrior() ||
                          primaryRole.isVehicleCrewGround() ||
                          primaryRole.isVehicleCrewNaval() ||
@@ -124,22 +131,35 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             generateArtillerySkill(person, bonus);
         }
 
+        // roll Appraisal skill
+        if (campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL) && (primaryRole.isAdministrator())) {
+            addSkill(person, SkillType.S_APPRAISAL, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
         // roll Negotiation skill
-        if (campaignOptions.isAdminsHaveNegotiation() && (primaryRole.isAdministrator())) {
+        if (campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION) && (primaryRole.isAdministrator())) {
             addSkill(person, SkillType.S_NEGOTIATION, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
         // roll Administration skill
-        if (campaignOptions.isTechsUseAdministration() && (person.isTech() || primaryRole.isVesselCrew())) {
+        if (campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION) && (person.isTech() || primaryRole.isVesselCrew())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
-        if (campaignOptions.isDoctorsUseAdministration() && (primaryRole.isDoctor())) {
+        if (campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION) && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
+        // roll supplemental tech skills (skipped when the campaign uses only the global tech skills)
+        if (person.isTechExpanded() && !campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            List<String> supplementalSkills = TechnicianSkills.getTechSupplementalSkills(person, false);
+            for (String skillName : supplementalSkills) {
+                addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            }
         }
 
         // roll Infantry Gunnery Skills
-        if (!campaignOptions.isUseSmallArmsOnly()) {
+        if (!campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)) {
             if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
                 Skills skills = person.getSkills();
                 for (String skillName : INFANTRY_GUNNERY_SKILLS) {
@@ -152,7 +172,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll random secondary skill
         if (Utilities.rollProbability(skillPreferences.getSecondSkillProb())) {
-            boolean isUseArtillery = campaignOptions.isUseArtillery();
+            boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
             List<String> possibleSkills = new ArrayList<>();
             for (String skillType : SkillType.skillList) {
                 SkillType type = SkillType.getType(skillType);
@@ -160,7 +180,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 // We're removing protomek from the pool as only actual protomek pilots should have access to this
                 // skill. Adding it randomly creates some lore inconsistencies. ProtoMek pilots will already have the
                 // skill at this stage
-                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO)) {
+                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO) ||
+                          skillType.equalsIgnoreCase(SkillType.S_PILOT_PROTO)) {
                     continue;
                 }
 
@@ -185,7 +206,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
     private static void generateCommandUtilitySkills(Person person, int expLvl,
           RandomSkillPreferences skillPreferences) {
-        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND))) {
+        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND), false)) {
             if (person.getSkills().hasSkill(skillName)) {
                 continue;
             }
@@ -223,12 +244,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
      * @param person the {@link Person} whose attributes will be generated and assigned
      */
     @Override
-    public void generateAttributes(Person person, boolean isUseEdge) {
+    public void generateAttributes(Person person, CampaignOptions campaignOptions) {
         RandomSkillPreferences skillPreferences = getSkillPreferences();
+        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
+        int maximumEdge = campaignOptions.get(CampaignOption.MAXIMUM_EDGE);
 
         // Reset Attribute Scores to default
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -249,27 +272,31 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         PersonnelRole profession = person.getPrimaryRole();
         Phenotype phenotype = person.getPhenotype();
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
+                continue;
+            }
+            boolean isEdge = attribute == SkillAttribute.EDGE;
+            if (isEdge && !isUseEdge) {
                 continue;
             }
 
             // Profession && Phenotype adjustments
             int baseAttributeScore = profession.getAttributeModifier(attribute);
             int attributeModifier = phenotype.getAttributeModifier(attribute);
-            person.setAttributeScore(attribute, baseAttributeScore + attributeModifier);
+            int generatedScore = baseAttributeScore + attributeModifier;
+            person.setAttributeScore(attribute,
+                  isEdge ? Math.min(generatedScore, maximumEdge) : generatedScore);
 
             // Attribute randomization
             if (randomizeAttributes) {
-                boolean isEdge = attribute == SkillAttribute.EDGE;
-                int delta;
-                if (isEdge && isUseEdge) {
-                    delta = d6(2) == 12 ? 1 : 0;
-                } else {
-                    delta = performTraitRoll();
-                }
+                int delta = isEdge ? (d6(2) == 12 ? 1 : 0) : performTraitRoll();
 
                 if (delta != 0) {
-                    person.changeAttributeScore(attribute, delta);
+                    if (isEdge && delta > 0) {
+                        person.gainEdge(delta, maximumEdge);
+                    } else {
+                        person.changeAttributeScore(attribute, delta);
+                    }
                 }
             }
         }
@@ -309,15 +336,17 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             return;
         }
 
-        person.setConnections(Math.clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        person.setReputation(Math.clamp(performTraitRoll(), MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
-        person.setWealth(Math.clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setConnections(Math.clamp(performTraitRoll(), CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum()));
+        person.setFame(Math.clamp(performTraitRoll(), FAME.getMinimum(), FAME.getMaximum()));
+        person.setWealth(Math.clamp(performTraitRoll(), WEALTH.getMinimum(), WEALTH.getMaximum()));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(),
+              EXTRA_INCOME.getMinimum(),
+              EXTRA_INCOME.getMaximum()));
 
-        int baseUnluckyDiceSize = 5;
+        int baseUnluckyDiceSize = 20;
         int unluckyRoll = randomInt(baseUnluckyDiceSize);
         if (unluckyRoll == 0) { // 5% chance of positive value
-            person.setUnlucky(Math.clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+            person.setUnlucky(Math.clamp(performTraitRoll(), UNLUCKY.getMinimum(), UNLUCKY.getMaximum()));
         }
         // We want the chance of a Bloodmark to be low as it can be quite disruptive
         int baseBloodmarkDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
@@ -325,7 +354,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // non-pirates = approx 1.11% chance of a bloodmark
         int bloodmarkRoll = randomInt(baseBloodmarkDiceSize);
         if (bloodmarkRoll == 0) {
-            person.setBloodmark(Math.clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+            person.setBloodmark(Math.clamp(performBloodmarkRoll(), BLOODMARK.getMinimum(), BLOODMARK.getMaximum()));
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,7 @@ public class OutstandingScenariosNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public OutstandingScenariosNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_OUTSTANDING_SCENARIOS, "OutstandingScenariosNagDialog");
+        super(campaign, NAG_OUTSTANDING_SCENARIOS, "OutstandingScenariosNagDialog");
     }
 
     @Override

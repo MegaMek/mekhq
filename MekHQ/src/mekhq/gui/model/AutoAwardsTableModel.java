@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,9 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.campaign.campaignOptions.CampaignOptions.EDGE_AWARD_REPLACEMENT_XP;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.Component;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +47,8 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -52,6 +57,7 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class AutoAwardsTableModel extends AbstractTableModel {
     private static final MMLogger LOGGER = MMLogger.create(AutoAwardsTableModel.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AutoAwardsTableModel";
 
     public static final int COL_PERSON = 0;
     public static final int COL_NAME = 1;
@@ -144,7 +150,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         List<Object> rowData = data.get(rowIndex);
 
         UUID personUUID = (UUID) rowData.getFirst();
-        Person person = campaign.getPerson(personUUID);
+        Person person = campaign.getPlayerForce().getHumanResources().getPerson(personUUID);
         Award award = (Award) rowData.get(1);
 
         return switch (columnIndex) {
@@ -169,16 +175,45 @@ public class AutoAwardsTableModel extends AbstractTableModel {
      * @return A {@link String} containing the awards based on the style, including XP and Edge rewards if applicable.
      */
     private String getDescriptionString(Award award) {
-        AwardBonus style = campaign.getCampaignOptions().getAwardBonusStyle();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isReplaceEdgeAwards = campaignOptions.get(CampaignOption.USE_REPLACE_EDGE_AWARDS);
+        AwardBonus style = campaignOptions.get(CampaignOption.AWARD_BONUS_STYLE);
         int xpAward = award.getXPReward();
         int edgeAward = award.getEdgeReward();
+        boolean awardXP = style.isBoth() || style.isXP();
+        boolean awardEdge = style.isBoth() || style.isEdge();
 
         String awards = "";
-        if (style.isBoth() || style.isXP()) {
-            awards += (xpAward > 0) ? " (" + xpAward + "XP)" : "";
-        }
-        if (style.isBoth() || style.isEdge()) {
-            awards += (edgeAward > 0) ? " (" + edgeAward + " Edge)" : "";
+        if (awardXP && awardEdge && isReplaceEdgeAwards) {
+            int totalXpAward = 0;
+
+            if (xpAward > 0) {
+                totalXpAward += xpAward;
+            }
+            if (edgeAward > 0) {
+                totalXpAward += edgeAward * EDGE_AWARD_REPLACEMENT_XP;
+            }
+
+            if (totalXpAward > 0) {
+                awards = getFormattedTextAt(RESOURCE_BUNDLE, "AutoAwardsTableModel.award.xp",
+                      awards, totalXpAward);
+            }
+        } else {
+            if (awardXP && xpAward > 0) {
+                awards = getFormattedTextAt(RESOURCE_BUNDLE, "AutoAwardsTableModel.award.xp",
+                      awards, xpAward);
+            }
+
+            if (awardEdge && edgeAward > 0) {
+                if (isReplaceEdgeAwards) {
+                    int adjustedValue = edgeAward * EDGE_AWARD_REPLACEMENT_XP;
+                    awards = getFormattedTextAt(RESOURCE_BUNDLE, "AutoAwardsTableModel.award.xp",
+                          awards, adjustedValue);
+                } else {
+                    awards = getFormattedTextAt(RESOURCE_BUNDLE, "AutoAwardsTableModel.award.edge",
+                          awards, edgeAward);
+                }
+            }
         }
         return awards;
     }
@@ -193,7 +228,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     }
 
     public Person getPerson(int rowIndex) {
-        return campaign.getPerson((UUID) data.get(rowIndex).getFirst());
+        return campaign.getPlayerForce().getHumanResources().getPerson((UUID) data.get(rowIndex).getFirst());
     }
 
     public String getAwardName(int rowIndex) {

@@ -48,7 +48,10 @@ public class InjurySPAUtility {
      * injuries is reduced to 75% (rounded up). If both traits are present, no adjustment is made.</p>
      *
      * <p>If {@code isUseInjuryFatigue} is {@code true}, the method also increases the person's fatigue by {@code
-     * fatigueRate} multiplied by the (possibly modified) number of injuries.</p>
+     * fatigueRate} multiplied by the base (unmodified) number of injuries. The "Glass Jaw" and "Toughness"
+     * adjustments are deliberately excluded from this calculation. Glass Jaw doubles injuries suffered and fatigue
+     * gained, and Toughness reduces injuries suffered and halves fatigue gained, but in both cases the fatigue gained
+     * from sustaining injuries is neither doubled nor halved.</p>
      *
      * @param person             the {@link Person} whose injuries and fatigue are to be adjusted
      * @param isUseInjuryFatigue whether to apply fatigue increase based on injuries
@@ -66,6 +69,10 @@ public class InjurySPAUtility {
         boolean hasToughness = person.getOptions().booleanOption(ATOW_TOUGHNESS);
         boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
 
+        // Capture the base injury count for the fatigue calculation before applying the Glass Jaw doubling or
+        // Toughness reduction.
+        int fatigueInjuries = injuries;
+
         if (hasGlassJaw && !hasGlassJawAndToughness) {
             injuries = injuries * 2;
         } else if (hasToughness && !hasGlassJawAndToughness) {
@@ -73,7 +80,7 @@ public class InjurySPAUtility {
         }
 
         if (isUseInjuryFatigue) {
-            int fatigueIncrease = fatigueRate * injuries;
+            int fatigueIncrease = fatigueRate * fatigueInjuries;
             person.changeFatigue(fatigueIncrease);
         }
 

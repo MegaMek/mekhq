@@ -61,12 +61,24 @@ public class RandomCompanyNameGenerator implements Serializable {
     private static final int NAME_MIDDLE_WORD_MERCENARY = 2;
     private static final int NAME_END_WORD_MERCENARY = 3;
     private static final int NAME_PRE_FAB = 4;
+    private static final int NAME_MIDDLE_WORD_REBEL = 5;
+    private static final int NAME_END_WORD_REBEL = 6;
+    private static final int NAME_MIDDLE_WORD_MILITIA = 7;
+    private static final int NAME_END_WORD_MILITIA = 8;
+    private static final int NAME_MIDDLE_WORD_CIVILIAN = 9;
+    private static final int NAME_END_WORD_CIVILIAN = 10;
 
     private static WeightedIntMap<String> weightedMiddleWordCorporate;
     private static WeightedIntMap<String> weightedEndWordCorporate;
     private static WeightedIntMap<String> weightedMiddleWordMercenary;
     private static WeightedIntMap<String> weightedEndWordMercenary;
     private static WeightedIntMap<String> weightedPreFab;
+    private static WeightedIntMap<String> weightedMiddleWordRebel;
+    private static WeightedIntMap<String> weightedEndWordRebel;
+    private static WeightedIntMap<String> weightedMiddleWordMilitia;
+    private static WeightedIntMap<String> weightedEndWordMilitia;
+    private static WeightedIntMap<String> weightedMiddleWordCivilian;
+    private static WeightedIntMap<String> weightedEndWordCivilian;
 
     private static volatile RandomCompanyNameGenerator randomCompanyNameGenerator;
     private static volatile boolean initialized = false;
@@ -118,6 +130,54 @@ public class RandomCompanyNameGenerator implements Serializable {
     public static void setWeightedPreFab(final WeightedIntMap<String> weightedPreFab) {
         RandomCompanyNameGenerator.weightedPreFab = weightedPreFab;
     }
+
+    public static WeightedIntMap<String> getWeightedMiddleWordRebel() {
+        return weightedMiddleWordRebel;
+    }
+
+    public static void setWeightedMiddleWordRebel(final WeightedIntMap<String> weightedMiddleWordRebel) {
+        RandomCompanyNameGenerator.weightedMiddleWordRebel = weightedMiddleWordRebel;
+    }
+
+    public static WeightedIntMap<String> getWeightedEndWordRebel() {
+        return weightedEndWordRebel;
+    }
+
+    public static void setWeightedEndWordRebel(final WeightedIntMap<String> weightedEndWordRebel) {
+        RandomCompanyNameGenerator.weightedEndWordRebel = weightedEndWordRebel;
+    }
+
+    public static WeightedIntMap<String> getWeightedMiddleWordMilitia() {
+        return weightedMiddleWordMilitia;
+    }
+
+    public static void setWeightedMiddleWordMilitia(final WeightedIntMap<String> weightedMiddleWordMilitia) {
+        RandomCompanyNameGenerator.weightedMiddleWordMilitia = weightedMiddleWordMilitia;
+    }
+
+    public static WeightedIntMap<String> getWeightedEndWordMilitia() {
+        return weightedEndWordMilitia;
+    }
+
+    public static void setWeightedEndWordMilitia(final WeightedIntMap<String> weightedEndWordMilitia) {
+        RandomCompanyNameGenerator.weightedEndWordMilitia = weightedEndWordMilitia;
+    }
+
+    public static WeightedIntMap<String> getWeightedMiddleWordCivilian() {
+        return weightedMiddleWordCivilian;
+    }
+
+    public static void setWeightedMiddleWordCivilian(final WeightedIntMap<String> weightedMiddleWordCivilian) {
+        RandomCompanyNameGenerator.weightedMiddleWordCivilian = weightedMiddleWordCivilian;
+    }
+
+    public static WeightedIntMap<String> getWeightedEndWordCivilian() {
+        return weightedEndWordCivilian;
+    }
+
+    public static void setWeightedEndWordCivilian(final WeightedIntMap<String> weightedEndWordCivilian) {
+        RandomCompanyNameGenerator.weightedEndWordCivilian = weightedEndWordCivilian;
+    }
     //endregion Getters/Setters
 
     /**
@@ -129,19 +189,30 @@ public class RandomCompanyNameGenerator implements Serializable {
      */
     //region Synchronization
     public static RandomCompanyNameGenerator getInstance() {
-        if (randomCompanyNameGenerator == null) { // First check
+        RandomCompanyNameGenerator instance = randomCompanyNameGenerator;
+        if (instance == null) { // First check
             synchronized (RandomCompanyNameGenerator.class) {
-                if (randomCompanyNameGenerator == null) { // Double check
-                    randomCompanyNameGenerator = new RandomCompanyNameGenerator();
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_CORPORATE);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_CORPORATE);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_MIDDLE_WORD_MERCENARY);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_END_WORD_MERCENARY);
-                    randomCompanyNameGenerator.runThreadLoader(NAME_PRE_FAB);
+                instance = randomCompanyNameGenerator;
+                if (instance == null) { // Double check
+                    instance = new RandomCompanyNameGenerator();
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_CORPORATE);
+                    instance.runThreadLoader(NAME_END_WORD_CORPORATE);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_MERCENARY);
+                    instance.runThreadLoader(NAME_END_WORD_MERCENARY);
+                    instance.runThreadLoader(NAME_PRE_FAB);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_REBEL);
+                    instance.runThreadLoader(NAME_END_WORD_REBEL);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_MILITIA);
+                    instance.runThreadLoader(NAME_END_WORD_MILITIA);
+                    instance.runThreadLoader(NAME_MIDDLE_WORD_CIVILIAN);
+                    instance.runThreadLoader(NAME_END_WORD_CIVILIAN);
+                    // Publish only after the fully constructed instance has kicked off initialization,
+                    // so no other thread can observe a partially-initialized instance through the field.
+                    randomCompanyNameGenerator = instance;
                 }
             }
         }
-        return randomCompanyNameGenerator;
+        return instance;
     }
     //endregion Synchronization
 
@@ -166,6 +237,12 @@ public class RandomCompanyNameGenerator implements Serializable {
                 case NAME_MIDDLE_WORD_MERCENARY -> getWeightedMiddleWordMercenary().randomItem();
                 case NAME_END_WORD_MERCENARY -> getWeightedEndWordMercenary().randomItem();
                 case NAME_PRE_FAB -> getWeightedPreFab().randomItem();
+                case NAME_MIDDLE_WORD_REBEL -> getWeightedMiddleWordRebel().randomItem();
+                case NAME_END_WORD_REBEL -> getWeightedEndWordRebel().randomItem();
+                case NAME_MIDDLE_WORD_MILITIA -> getWeightedMiddleWordMilitia().randomItem();
+                case NAME_END_WORD_MILITIA -> getWeightedEndWordMilitia().randomItem();
+                case NAME_MIDDLE_WORD_CIVILIAN -> getWeightedMiddleWordCivilian().randomItem();
+                case NAME_END_WORD_CIVILIAN -> getWeightedEndWordCivilian().randomItem();
                 default -> throw new IllegalStateException("Unexpected value: " + origin);
             };
         } else {
@@ -186,7 +263,7 @@ public class RandomCompanyNameGenerator implements Serializable {
      */
     //region Initialization
     private void runThreadLoader(int origin) {
-        Thread loader = new Thread(() -> randomCompanyNameGenerator.populateCompanyNameSegments(origin),
+        Thread loader = new Thread(() -> populateCompanyNameSegments(origin),
               "Random Company Name Generator initializer");
         loader.setPriority(Thread.NORM_PRIORITY - 1);
         loader.start();
@@ -231,6 +308,36 @@ public class RandomCompanyNameGenerator implements Serializable {
                 filePath = MHQConstants.NAME_PRE_FAB;
                 userFilePath = MHQConstants.NAME_PRE_FAB_USER;
             }
+            case NAME_MIDDLE_WORD_REBEL -> {
+                setWeightedMiddleWordRebel(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_MIDDLE_WORD_REBEL;
+                userFilePath = MHQConstants.NAME_MIDDLE_WORD_REBEL_USER;
+            }
+            case NAME_END_WORD_REBEL -> {
+                setWeightedEndWordRebel(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_END_WORD_REBEL;
+                userFilePath = MHQConstants.NAME_END_WORD_REBEL_USER;
+            }
+            case NAME_MIDDLE_WORD_MILITIA -> {
+                setWeightedMiddleWordMilitia(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_MIDDLE_WORD_MILITIA;
+                userFilePath = MHQConstants.NAME_MIDDLE_WORD_MILITIA_USER;
+            }
+            case NAME_END_WORD_MILITIA -> {
+                setWeightedEndWordMilitia(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_END_WORD_MILITIA;
+                userFilePath = MHQConstants.NAME_END_WORD_MILITIA_USER;
+            }
+            case NAME_MIDDLE_WORD_CIVILIAN -> {
+                setWeightedMiddleWordCivilian(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_MIDDLE_WORD_CIVILIAN;
+                userFilePath = MHQConstants.NAME_MIDDLE_WORD_CIVILIAN_USER;
+            }
+            case NAME_END_WORD_CIVILIAN -> {
+                setWeightedEndWordCivilian(new WeightedIntMap<>());
+                filePath = MHQConstants.NAME_END_WORD_CIVILIAN;
+                userFilePath = MHQConstants.NAME_END_WORD_CIVILIAN_USER;
+            }
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 1 of 2: "
                         + origin);
@@ -249,6 +356,12 @@ public class RandomCompanyNameGenerator implements Serializable {
                       getWeightedMiddleWordMercenary().add(entry.getValue(), entry.getKey());
                 case NAME_END_WORD_MERCENARY -> getWeightedEndWordMercenary().add(entry.getValue(), entry.getKey());
                 case NAME_PRE_FAB -> getWeightedPreFab().add(entry.getValue(), entry.getKey());
+                case NAME_MIDDLE_WORD_REBEL -> getWeightedMiddleWordRebel().add(entry.getValue(), entry.getKey());
+                case NAME_END_WORD_REBEL -> getWeightedEndWordRebel().add(entry.getValue(), entry.getKey());
+                case NAME_MIDDLE_WORD_MILITIA -> getWeightedMiddleWordMilitia().add(entry.getValue(), entry.getKey());
+                case NAME_END_WORD_MILITIA -> getWeightedEndWordMilitia().add(entry.getValue(), entry.getKey());
+                case NAME_MIDDLE_WORD_CIVILIAN -> getWeightedMiddleWordCivilian().add(entry.getValue(), entry.getKey());
+                case NAME_END_WORD_CIVILIAN -> getWeightedEndWordCivilian().add(entry.getValue(), entry.getKey());
                 default -> throw new IllegalStateException(
                       "Unexpected value in mekhq/campaign/personnel/backgrounds/RandomCompanyNameGenerator.java/populateCompanyNameSegments 2 of 2: "
                             + origin);

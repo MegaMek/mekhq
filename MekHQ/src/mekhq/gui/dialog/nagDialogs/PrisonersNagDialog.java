@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PRISONERS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 
@@ -44,14 +42,14 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
+
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 public class PrisonersNagDialog extends ImmersiveDialogNag {
     public PrisonersNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_PRISONERS, "PrisonersNagDialog");
+        super(campaign, NAG_PRISONERS, "PrisonersNagDialog");
     }
 
     /**
@@ -62,23 +60,21 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      * between candidates. If no qualified force commander is found, it falls back to a default speaker mechanism.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to force and personnel data.
-     * @param specialization The {@link AdministratorSpecialization} used as an optional criterion for selecting the
-     *                       speaker (maybe {@code null}).
      *
      * @return The {@link Person} designated as the speaker, favoring commanders from "SECURITY" forces, or a fallback
      *       speaker if no suitable individual is found. Returns {@code null} only if the fallback mechanism cannot
      *       resolve a speaker.
      */
     @Override
-    protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Formation> formations = campaign.getAllFormations();
+    protected @Nullable Person getSpeaker(Campaign campaign) {
+        List<Formation> formations = campaign.getPlayerForce().getAllFormations();
 
 
         Person speaker = null;
         for (Formation formation : formations) {
             if (formation.isFormationType(SECURITY)) {
                 UUID commanderId = formation.getFormationCommanderID();
-                Person commander = campaign.getPerson(commanderId);
+                Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
                 if (commander == null) {
                     continue;
                 }
@@ -113,10 +109,16 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

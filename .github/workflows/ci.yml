@@ -25,10 +25,29 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Find the Right Data Branch
+        id: find_data
+        shell: bash {0}
+        env:
+          DATA_BRANCH: ${{ github.event.pull_request.head.ref }}
+          DATA_REMOTE_URL: ${{ github.event.pull_request.head.repo.owner.html_url }}/mm-data.git
+          DATA_REPO_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
+        run: |
+          if git ls-remote --exit-code --heads \
+            "$DATA_REMOTE_URL" "$DATA_BRANCH" > /dev/null 2>&1
+          then
+            printf 'dataRepo=%s/mm-data\n' "$DATA_REPO_OWNER" >> "$GITHUB_OUTPUT"
+            printf 'dataBranch=%s\n' "$DATA_BRANCH" >> "$GITHUB_OUTPUT"
+          else
+            printf 'dataRepo=MegaMek/mm-data\n' >> "$GITHUB_OUTPUT"
+            printf 'dataBranch=main\n' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout Data Repo
         uses: actions/checkout@v7
         with:
-          repository: megamek/mm-data
+          repository: ${{ steps.find_data.outputs.dataRepo }}
+          ref: ${{ steps.find_data.outputs.dataBranch }}
           path: mm-data
 
       - name: Checkout out MekHQ
@@ -93,13 +112,13 @@ jobs:
           echo "$calculatedSha" >> megameklab/docs/mml-revision.txt
 
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.4.0
         with:
           build-scan-publish: true
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"

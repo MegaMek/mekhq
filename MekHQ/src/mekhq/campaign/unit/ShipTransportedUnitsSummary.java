@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -196,7 +196,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (u.hasTransportShipAssignment()
                       && Objects.equals(transport, u.getTransportShipAssignment().getTransportShip())) {
                 u.setTransportShipAssignment(null);
@@ -215,7 +215,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         Set<Unit> newTransportedUnits = new HashSet<>();
         for (Unit transportedUnit : getTransportedUnits()) {
             if (transportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getHangar().getUnit(transportedUnit.getId());
+                Unit realUnit = campaign.getPlayerForce().getHangar().getUnit(transportedUnit.getId());
                 if (realUnit != null) {
                     newTransportedUnits.add(realUnit);
                 } else {

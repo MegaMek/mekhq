@@ -35,13 +35,17 @@ package mekhq.campaign.parts.meks;
 
 import java.io.PrintWriter;
 
+import megamek.common.Configuration;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.units.Mek;
+import megamek.common.util.fileUtils.MegaMekFile;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -106,6 +110,21 @@ public class MekGyro extends Part {
         return gyroBaseTonnage;
     }
 
+    /**
+     * The weight of a Mek's gyro, as MegaMek's unit verifier works it out: from the engine rating, so a primitive
+     * engine gets the heavier gyro its rating calls for, doubled for a superheavy gyro and nothing for a Mek without a
+     * gyro.
+     *
+     * @param mek the Mek
+     *
+     * @return the gyro's weight in tons
+     */
+    public static double getGyroTonnage(Mek mek) {
+        EntityVerifier verifier = EntityVerifier.getInstance(new MegaMekFile(Configuration.unitsDir(),
+              EntityVerifier.CONFIG_FILENAME).getFile());
+        return new TestMek(mek, verifier.mekOption, null).getWeightGyro();
+    }
+
     @Override
     public double getTonnage() {
         return gyroTonnage;
@@ -117,8 +136,10 @@ public class MekGyro extends Part {
             return Money.of(750000.0 * getTonnage());
         } else if (getType() == Mek.GYRO_COMPACT) {
             return Money.of(400000.0 * getTonnage());
-        } else if (getType() == Mek.GYRO_HEAVY_DUTY) {
+        } else if ((getType() == Mek.GYRO_HEAVY_DUTY) || (getType() == Mek.GYRO_SUPERHEAVY)) {
             return Money.of(500000.0 * getTonnage());
+        } else if (getType() == Mek.GYRO_NONE) {
+            return Money.zero();
         } else {
             return Money.of(300000.0 * getTonnage());
         }
@@ -208,7 +229,7 @@ public class MekGyro extends Part {
             hits = unit.getEntity()
                          .getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CENTER_TORSO);
             if (checkForDestruction && hits > priorHits && hits >= 3
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -265,7 +286,7 @@ public class MekGyro extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

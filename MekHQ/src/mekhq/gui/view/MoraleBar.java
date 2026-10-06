@@ -45,12 +45,12 @@ import javax.swing.SwingConstants;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.gui.baseComponents.SegmentedBar;
 
 /**
- * A compact, segmented gauge that visualizes enemy {@link AtBMoraleLevel}.
+ * A compact, segmented gauge that visualizes enemy {@link ContractMoraleLevel}.
  *
  * <p>
  * The bar has one segment per possible morale level, ordered from the morale scale's minimum to its maximum. The gauge
@@ -97,21 +97,21 @@ public class MoraleBar extends JPanel {
      * @param labelText   the text to show beneath the current level (for example the morale level's name, or a
      *                    contract-specific name such as "Peaceful"). Pass a blank string to show no label.
      */
-    public MoraleBar(@Nonnull final AtBMoraleLevel moraleLevel, @Nonnull final String labelText) {
+    public MoraleBar(@Nonnull final ContractMoraleLevel moraleLevel, @Nonnull final String labelText) {
         // The segments sit at the top of the wrapped bar, so the title is placed directly above them with no extra gap.
         super(new BorderLayout());
         setOpaque(false);
         add(titleLabel, BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
 
-        final AtBMoraleLevel[] levels = AtBMoraleLevel.values();
+        final ContractMoraleLevel[] levels = ContractMoraleLevel.values();
         final String[] tooltips = new String[levels.length];
         for (int i = 0; i < levels.length; i++) {
             tooltips[i] = wordWrap(levels[i] + " \u2014 " + levels[i].getToolTipText());
         }
 
         bar.setSegments(SegmentedBar.gradientSegments(MORALE_GRADIENT, tooltips));
-        bar.setFilledCount(moraleLevel.getLevel() - AtBMoraleLevel.MINIMUM_MORALE_LEVEL + 1);
+        bar.setFilledCount(moraleLevel.getLevel() - ContractMoraleLevel.MINIMUM_MORALE_LEVEL + 1);
         bar.setActiveLabel(labelText);
     }
 
@@ -139,7 +139,7 @@ public class MoraleBar extends JPanel {
      *
      * @return a transparent panel containing the configured morale bar
      */
-    public static @Nonnull JPanel createDialogPanel(@Nonnull final AtBContract contract) {
+    public static @Nonnull JPanel createDialogPanel(@Nonnull final AbstractContract contract) {
         final JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         final int horizontalPadding = UIUtil.scaleForGUI(40);
@@ -172,9 +172,9 @@ public class MoraleBar extends JPanel {
      *
      * @return the label and tooltip to display
      */
-    public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AtBContract contract) {
-        final AtBMoraleLevel level = contract.getMoraleLevel();
-        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
+    public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AbstractContract contract) {
+        final ContractMoraleLevel level = contract.getMoraleLevel();
+        if ((contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) &&
                   level.isRouted()) {
             return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
                   getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));

@@ -35,15 +35,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingAeroHeatSink;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -112,7 +113,7 @@ public class AeroHeatSink extends Part {
 
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -206,7 +207,7 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         if (type == CLAN_HEAT_DOUBLE) {
             return TechRating.F;
         } else if (type == Aero.HEAT_DOUBLE) {
@@ -262,7 +263,7 @@ public class AeroHeatSink extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_AERO);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

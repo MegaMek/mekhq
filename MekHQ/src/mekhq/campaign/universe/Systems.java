@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -108,7 +109,8 @@ public class Systems {
     }
 
     /**
-     * Creates and activates a campaign systems registry by applying campaign-save overrides to the startup systems data.
+     * Creates and activates a campaign systems registry by applying campaign-save overrides to the startup systems
+     * data.
      */
     public static Systems activateCampaignSystems(Collection<PlanetarySystem> overrides) {
         Systems campaignSystems = createCampaignSystems(overrides);
@@ -202,7 +204,7 @@ public class Systems {
         return copy;
     }
 
-    public PlanetarySystem getSystemById(String id) {
+    public @Nullable PlanetarySystem getSystemById(String id) {
         return (null != id ? systemList.get(id) : null);
     }
 
@@ -383,7 +385,8 @@ public class Systems {
                     // connector-ness from the zip's own name; the per-entry check below still catches the
                     // case where a connector entry lives inside a zip that sits elsewhere.
                     boolean zipIsConnector = isConnectorDir
-                          || isConnectorPath(zipFile.getName().replaceFirst("(?i)\\.zip$", ""));
+                                                   || isConnectorPath(zipFile.getName()
+                                                                            .replaceFirst("(?i)\\.zip$", ""));
                     try (ZipFile zip = new ZipFile(zipFile.getPath())) {
                         Enumeration<? extends ZipEntry> entries = zip.entries();
                         while (entries.hasMoreElements()) {
@@ -440,12 +443,12 @@ public class Systems {
     }
 
     /**
-     * @return {@code true} if the path identifies the {@code connector_systems} subtree - either the
-     *       directory itself (as passed to {@link #parsePlanetarySystemFiles} when recursing into it)
-     *       or an entry within it (e.g. a zip entry). {@code connector_systems} must be a full path
-     *       segment, bounded by directory separators or the path ends, so a stray substring match in a
-     *       filename or unrelated directory (e.g. {@code my_connector_systems_notes.yml}) is not flagged.
-     *       Both {@code /} and {@code \} separators are normalized. See issue #8934.
+     * @return {@code true} if the path identifies the {@code connector_systems} subtree - either the directory itself
+     *       (as passed to {@link #parsePlanetarySystemFiles} when recursing into it) or an entry within it (e.g. a zip
+     *       entry). {@code connector_systems} must be a full path segment, bounded by directory separators or the path
+     *       ends, so a stray substring match in a filename or unrelated directory (e.g.
+     *       {@code my_connector_systems_notes.yml}) is not flagged. Both {@code /} and {@code \} separators are
+     *       normalized. See issue #8934.
      */
     private static boolean isConnectorPath(String path) {
         if (path == null) {
@@ -453,9 +456,9 @@ public class Systems {
         }
         String normalized = path.replace('\\', '/');
         return normalized.contains("/connector_systems/")    // an entry inside the subtree
-              || normalized.startsWith("connector_systems/")  // ... at the path root
-              || normalized.endsWith("/connector_systems")    // the directory itself (no trailing slash)
-              || normalized.equals("connector_systems");      // ... at the path root
+                     || normalized.startsWith("connector_systems/")  // ... at the path root
+                     || normalized.endsWith("/connector_systems")    // the directory itself (no trailing slash)
+                     || normalized.equals("connector_systems");      // ... at the path root
     }
 
     private void cleanupSystems() {

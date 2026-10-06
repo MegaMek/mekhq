@@ -33,27 +33,33 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
-import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -91,25 +97,32 @@ class EducationControllerTest {
     }
 
     Campaign buildMinimalCampaignMock() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
+        when(options.get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD)).thenReturn(0);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        Hangar hangar = mock(Hangar.class);
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
-        Warehouse warehouse = mock(Warehouse.class);
+        LocalWarehouse warehouse = mock(LocalWarehouse.class);
         when(warehouse.getParts()).thenReturn(Collections.emptyList());
-        when(campaign.getAllWarehouse()).thenReturn(warehouse);
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+        when(campaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
 
-        when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
+        when(campaign.getPlayerForce().getAllFormations()).thenReturn(Collections.emptyList());
 
         PlanetarySystem currentSystem = mock(PlanetarySystem.class);
         when(currentSystem.getId()).thenReturn("CurrentSystem");
         when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+
+        when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
+
+        PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
 
         return campaign;
     }
@@ -134,11 +147,15 @@ class EducationControllerTest {
             person.setEduAcademyNameInSet(ACADEMY_NAME);
             person.setEduAcademySystem("TestSystem");
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
+            when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             PlanetarySystem destSystem = mock(PlanetarySystem.class);
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(2);
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
@@ -229,10 +246,14 @@ class EducationControllerTest {
             person.setEduAcademySystem("TestSystem");
 
             destSystem = mock(PlanetarySystem.class);
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
+            when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
 
             PlanetarySystem currentSystem = mock(PlanetarySystem.class);
@@ -315,18 +336,18 @@ class EducationControllerTest {
         @BeforeEach
         void setUp() {
             campaign = buildMinimalCampaignMock();
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-            when(campaign.getOrCreateLocalCampusLocation(any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateLocalCampusLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-            when(campaign.getOrCreateCampusUnderLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
         @Test
         void homeSchool_setsStageToEducation() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -356,21 +377,8 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
-                JumpPath mockPath = mock(JumpPath.class);
-                when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
-                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
-                travelLoc.setJumpPath(mockPath);
-
-                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
-                      .thenAnswer(inv -> {
-                          Collection<Person> people = inv.getArgument(0);
-                          people.forEach(p -> p.setParent(travelLoc));
-                          return null;
-                      });
-
-                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
-            }
+            // Travel is now queued rather than dispatched; the stage is set regardless of the planned route.
+            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
 
             assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
         }
@@ -378,7 +386,7 @@ class EducationControllerTest {
         @Test
         void homeSchool_setsAcademyNameToCampaignName() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("My Campaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("My Campaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -408,18 +416,11 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
                 JumpPath mockPath = mock(JumpPath.class);
                 when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
-                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
-                travelLoc.setJumpPath(mockPath);
-
-                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
-                      .thenAnswer(inv -> {
-                          Collection<Person> people = inv.getArgument(0);
-                          people.forEach(p -> p.setParent(travelLoc));
-                          return null;
-                      });
+                mockUtils.when(() -> LocationUtils.planJumpPath(any(), any(), any()))
+                      .thenReturn(mockPath);
 
                 EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
             }
@@ -428,9 +429,22 @@ class EducationControllerTest {
         }
 
         @Test
+        void nonHomeSchoolRemote_unresolvableCampus_abortsEnrollment() {
+            Academy academy = buildAcademy(false, false);
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
+                  .thenReturn(null);
+
+            Person person = buildStudentPerson();
+            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+            assertNotEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+            verify(campaign.getCampaignLocationManager(), never()).queueTravel(any(), any());
+        }
+
+        @Test
         void anyAcademy_setsAcademySetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
@@ -441,7 +455,7 @@ class EducationControllerTest {
         @Test
         void anyAcademy_setsAcademyNameInSetOnPerson() {
             Academy academy = buildAcademy(true, false);
-            when(campaign.getName()).thenReturn("TestCampaign");
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
 
             Person person = buildStudentPerson();
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);

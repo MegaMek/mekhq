@@ -1,0 +1,8 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: deliberately malformed (wars must be a list, and the key below is not
+# part of the schema). The loader must log an error and continue with the other files.
+
+wars: this is not a list
+bogusSection: true

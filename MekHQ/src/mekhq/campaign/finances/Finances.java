@@ -36,6 +36,8 @@ package mekhq.campaign.finances;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.finances.WeeklyNetWorth.parseWeeklyNetWorthFromXML;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -59,13 +61,13 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -81,6 +83,7 @@ import org.w3c.dom.NodeList;
 public class Finances {
     private static final MMLogger LOGGER = MMLogger.create(Finances.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Finances";
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
           MekHQ.getMHQOptions().getLocale());
 
@@ -315,11 +318,11 @@ public class Finances {
      * at the beginning of each new financial term
      */
     public void newFiscalYear(final Campaign campaign) {
-        if (campaign.getCampaignOptions().isNewFinancialYearFinancesToCSVExport()) {
-            final String exportFileName = campaign.getName() +
+        if (campaign.getCampaignOptions().get(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT)) {
+            final String exportFileName = campaign.getPlayerForce().getName() +
                                                 " Finances for " +
                                                 campaign.getCampaignOptions()
-                                                      .getFinancialYearDuration()
+                                                      .get(CampaignOption.FINANCIAL_YEAR_DURATION)
                                                       .getExportFilenameDateString(campaign.getLocalDate()) +
                                                 '.' +
                                                 FileType.CSV.getRecommendedExtension();
@@ -350,7 +353,7 @@ public class Finances {
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
         // Getting frequently used variables to simplify later statements
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isNewYear = campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(today);
+        boolean isNewYear = campaignOptions.get(CampaignOption.FINANCIAL_YEAR_DURATION).isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         Accountant accountant = campaign.getAccountant();
@@ -365,14 +368,14 @@ public class Finances {
             newFiscalYear(campaign);
 
             // pay taxes
-            if ((campaignOptions.isUseTaxes()) && (!profits.isZero())) {
+            if ((campaignOptions.get(CampaignOption.USE_TAXES)) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
         }
 
         // Handle contract payments
         if (isNewMonth) {
-            for (Contract contract : campaign.getActiveContracts()) {
+            for (AbstractContract contract : campaign.getActiveContracts()) {
                 credit(TransactionType.CONTRACT_PAYMENT,
                       today,
                       contract.getMonthlyPayOut(),
@@ -390,8 +393,8 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (isNewMonth) {
-            if (campaignOptions.isUsePeacetimeCost()) {
-                if (!campaignOptions.isShowPeacetimeCost()) {
+            if (campaignOptions.isChargingPeacetimeCost()) {
+                if (!campaignOptions.get(CampaignOption.SHOW_PEACETIME_COST)) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
 
@@ -442,7 +445,7 @@ public class Finances {
                 }
             }
 
-            if (campaignOptions.isPayForSalaries()) {
+            if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
 
                 Money payRollCost = accountant.getPayRoll();
 
@@ -451,15 +454,15 @@ public class Finances {
                       payRollCost,
                       resourceMap.getString("Salaries.title"),
                       accountant.getPayRollSummary(),
-                      campaignOptions.isTrackTotalEarnings())) {
+                      campaignOptions.get(CampaignOption.TRACK_TOTAL_EARNINGS))) {
                     campaign.addReport(FINANCES, String.format(resourceMap.getString("Salaries.text"),
                           payRollCost.toAmountAndSymbolString()));
 
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
-                    if (campaignOptions.isUseLoyaltyModifiers()) {
-                        for (Person person : campaign.getAllPersonnel()) {
+                    if (campaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)) {
+                        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
                             }
@@ -483,7 +486,7 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaignOptions.isPayForOverhead()) {
+            if (campaignOptions.isChargingOverhead()) {
                 Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
@@ -491,6 +494,23 @@ public class Finances {
                           overheadCost.toAmountAndSymbolString()));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
+                }
+            }
+
+            // Handle Hot Spots upkeep
+            // A force with no Scale owes no upkeep, so there is nothing to charge or report
+            Money hotSpotsUpkeepCost = campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)
+                                             ? accountant.getHotSpotsUpkeepCosts()
+                                             : Money.zero();
+            if (hotSpotsUpkeepCost.isPositive()) {
+                if (debit(TransactionType.MAINTENANCE,
+                      today,
+                      hotSpotsUpkeepCost,
+                      getTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeep.title"))) {
+                    campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeep.text",
+                          hotSpotsUpkeepCost.toAmountAndSymbolString()));
+                } else {
+                    addReportInsufficientFunds(campaign, getTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeepCosts.text"));
                 }
             }
 
@@ -577,6 +597,54 @@ public class Finances {
         }
     }
 
+    private void payoutShares(Campaign campaign, AbstractContract contract, LocalDate date) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            return;
+        }
+
+        Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent()).dividedBy(100);
+        if (!shares.isGreaterThan(Money.zero())) {
+            return;
+        }
+
+        if (debit(TransactionType.SALARIES, date, shares,
+              String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
+            campaign.addReport(FINANCES, resourceMap.getString("DistributedShares.text"),
+                  shares.toAmountAndSymbolString());
+
+            payOutSharesToPersonnel(campaign, shares);
+        } else {
+            campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(getNegativeColor(),
+                  String.format(resourceMap.getString("InsufficientFunds.text"),
+                        resourceMap.getString("Shares.text"))));
+            LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
+        }
+    }
+
+    /**
+     * Distributes an already-debited share pot across the personnel holding shares, in proportion to how many each
+     * holds.
+     *
+     * @param campaign where to pull personnel from
+     * @param shares   total value of the shares to pay out
+     */
+    public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
+        boolean sharesForAll = campaign.getCampaignOptions().get(CampaignOption.SHARES_FOR_ALL);
+        List<Person> shareholders = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true);
+
+        int numberOfShares = shareholders.stream()
+                                   .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
+                                   .sum();
+        if (numberOfShares <= 0) {
+            return;
+        }
+
+        Money singleShare = shares.dividedBy(numberOfShares);
+        for (Person person : shareholders) {
+            person.payPersonShares(campaign, singleShare, sharesForAll);
+        }
+    }
+
     /**
      * Calculates and pays the taxes for the given campaign based on the profits.
      *
@@ -584,62 +652,9 @@ public class Finances {
      * @param profits  The profits made by the campaign.
      */
     private void payTaxes(Campaign campaign, Money profits) {
-        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100)
-                                .round();
-
+        Money taxAmount = profits.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.TAXES_PERCENTAGE) *
+                                                     0.01);
         debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
-    }
-
-    private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
-        if (campaign.getCampaignOptions().isUseStratCon() &&
-                  campaign.getCampaignOptions().isUseShareSystem() &&
-                  (contract instanceof AtBContract)) {
-            Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent()).dividedBy(100);
-            if (shares.isGreaterThan(Money.zero())) {
-                if (debit(TransactionType.SALARIES,
-                      date,
-                      shares,
-                      String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
-                    campaign.addReport(FINANCES, resourceMap.getString("DistributedShares.text"),
-                          shares.toAmountAndSymbolString());
-
-                    payOutSharesToPersonnel(campaign, shares);
-                } else {
-                    /*
-                     * This should not happen, as the shares payment should be less than the
-                     * contract payment that has just been made.
-                     */
-                    campaign.addReport(FINANCES, messageSurroundedBySpanWithColor(getNegativeColor(),
-                          String.format(resourceMap.getString("InsufficientFunds.text"), resourceMap.getString(
-                                "Shares.text"))));
-                    LOGGER.error("Attempted to payout share amount larger than the payment of the contract");
-                }
-            }
-        }
-    }
-
-    /**
-     * Shares calculate the amount debited without iterating through all the personnel, so it's not more efficient to
-     * provide that information to debit. Pay out shares manually for now.
-     *
-     * @param campaign where to pull personnel from
-     * @param shares   total value of the shares to pay out
-     */
-    public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
-        if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-            boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
-
-            int numberOfShares = campaign.getActivePersonnel(false, true)
-                                       .stream()
-                                       .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
-                                       .sum();
-
-            Money singleShare = shares.dividedBy(numberOfShares);
-
-            for (Person person : campaign.getActivePersonnel(false, true)) {
-                person.payPersonShares(campaign, singleShare, sharesForAll);
-            }
-        }
     }
 
     public Money checkOverdueLoanPayments(Campaign campaign) {

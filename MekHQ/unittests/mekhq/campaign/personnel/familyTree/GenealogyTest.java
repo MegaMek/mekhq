@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -93,10 +94,10 @@ public class GenealogyTest {
 
     @BeforeAll
     public static void createFamilyTree() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn(MERCENARY_FACTION_CODE);
 
         // Create a bunch of people
@@ -121,25 +122,25 @@ public class GenealogyTest {
         tau = new Person("Tau", "Tau", mockCampaign, MERCENARY_FACTION_CODE);
 
         // Setup the getPerson methods
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(beta.getId())))).willReturn(beta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(gamma.getId())))).willReturn(gamma);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(delta.getId())))).willReturn(delta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(epsilon.getId())))).willReturn(epsilon);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(zeta.getId())))).willReturn(zeta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(eta.getId())))).willReturn(eta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(theta.getId())))).willReturn(theta);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(iota.getId())))).willReturn(iota);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(kappa.getId())))).willReturn(kappa);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(lambda.getId())))).willReturn(lambda);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(mu.getId())))).willReturn(mu);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(nu.getId())))).willReturn(nu);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(xi.getId())))).willReturn(xi);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(omicron.getId())))).willReturn(omicron);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(pi.getId())))).willReturn(pi);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(rho.getId())))).willReturn(rho);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(sigma.getId())))).willReturn(sigma);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(tau.getId())))).willReturn(tau);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(beta.getId())))).willReturn(beta);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(gamma.getId())))).willReturn(gamma);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(delta.getId())))).willReturn(delta);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(epsilon.getId())))).willReturn(epsilon);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(zeta.getId())))).willReturn(zeta);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(eta.getId())))).willReturn(eta);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(theta.getId())))).willReturn(theta);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(iota.getId())))).willReturn(iota);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(kappa.getId())))).willReturn(kappa);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(lambda.getId())))).willReturn(lambda);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(mu.getId())))).willReturn(mu);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(nu.getId())))).willReturn(nu);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(xi.getId())))).willReturn(xi);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(omicron.getId())))).willReturn(omicron);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(pi.getId())))).willReturn(pi);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(rho.getId())))).willReturn(rho);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(sigma.getId())))).willReturn(sigma);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(tau.getId())))).willReturn(tau);
 
         // Setup Gender (where needed)
         alpha.setGender(Gender.FEMALE);
@@ -707,9 +708,9 @@ public class GenealogyTest {
     @Test
     public void testGenerateInstanceFromXMLWithMultipleFamilyRelationships() throws Exception {
         final Person parent = new Person(mockCampaign);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(parent.getId())))).willReturn(parent);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent.getId())))).willReturn(parent);
         final Person child = new Person(mockCampaign);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(child);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(child);
 
         final String text = String.format(
               "<genealogy><family>"

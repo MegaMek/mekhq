@@ -208,6 +208,58 @@ class PlanetarySystemYamlIOTest {
         assertEquals("MekHQ GM", reloadedPlanet.getSourcedFactions(event.date).getSource());
     }
 
+        @Test
+        void administrationPathsAreDatedImmutableAndRequirePlanetaryConsensus() throws Exception {
+                String yaml = String.join("\n",
+                            "id: Administration Test",
+                            "primarySlot: 1",
+                            "planet:",
+                            "  - name: First",
+                            "    sysPos: 1",
+                            "    event:",
+                            "      - date: '3000-01-01'",
+                            "        administration:",
+                            "          - Crucis March",
+                            "          - Coreward PDZ",
+                            "      - date: '3000-01-01'",
+                            "        population: 500",
+                            "      - date: '3010-01-01'",
+                            "        population: 1000",
+                            "  - name: Second",
+                            "    sysPos: 2",
+                            "    event:",
+                            "      - date: '3000-01-01'",
+                            "        administration:",
+                            "          - Crucis March",
+                            "          - Coreward PDZ",
+                            "      - date: '3020-01-01'",
+                            "        administration:",
+                            "          - Draconis March",
+                            "          - Robinson PDZ",
+                            "");
+
+                PlanetarySystem system = readSystem(yaml);
+                LocalDate agreedDate = LocalDate.of(3010, 1, 1);
+                LocalDate conflictDate = LocalDate.of(3020, 1, 1);
+                List<String> expected = List.of("Crucis March", "Coreward PDZ");
+
+                assertEquals(expected, system.getPlanet(1).getAdministration(agreedDate));
+                assertEquals(expected, system.getPlanet(1).getSourcedAdministration(agreedDate).getValue());
+                assertEquals(500L, system.getPlanet(1).getPopulation(LocalDate.of(3000, 1, 1)));
+                assertThrows(UnsupportedOperationException.class,
+                            () -> system.getPlanet(1).getAdministration(agreedDate).add("Illegal mutation"));
+                assertEquals(expected, system.getAdministration(agreedDate));
+                assertEquals(List.of(), system.getAdministration(conflictDate));
+
+                Planet.PlanetaryEvent administrationOnly = new Planet.PlanetaryEvent();
+                administrationOnly.administration = SourceableValue.of(expected);
+                assertFalse(administrationOnly.isEmpty());
+
+                PlanetarySystem reloaded = readSystem(writeSystem(system));
+                assertEquals(expected, reloaded.getAdministration(agreedDate));
+                assertEquals(List.of(), reloaded.getAdministration(conflictDate));
+        }
+
     @Test
     void socioIndustrialDataRoundTripsDisplayNamesThroughYaml() throws Exception {
         PlanetarySystem system = readSystem(VERSIONED_SYSTEM);
@@ -399,5 +451,43 @@ class PlanetarySystemYamlIOTest {
         }
         return output.toString();
     }
-}
 
+    @Test
+    void unknownEventPropertyIsSkippedRatherThanDroppingTheSystem() throws Exception {
+        // A data-ahead-of-code skew: an event carries a field the running build does not know. The system must still
+        // load with its known sibling fields intact rather than being dropped from the universe.
+        String yaml = """
+              id: Unknown Field Test
+              sucsId: 99
+              xcood: 0.0
+              ycood: 0.0
+              primarySlot: 1
+              planet:
+                - name: Unknown Field Prime
+                  type: TERRESTRIAL
+                  orbitalDist: 1.0
+                  sysPos: 1
+                  pressure: STANDARD
+                  atmosphere: BREATHABLE
+                  gravity: 1.0
+                  diameter: 12000
+                  density: 5.5
+                  dayLength: 24
+                  yearLength: 1.0
+                  temperature: 20
+                  water: 70
+                  event:
+                    - date: '3000-01-01'
+                      someFutureFieldTheCodeDoesNotKnow: 42
+                      temperature: 25
+              """;
+
+        PlanetarySystem system = readSystem(yaml);
+
+        assertNotNull(system);
+        LocalDate when = LocalDate.of(3000, 1, 1);
+        assertEquals("Unknown Field Prime", system.getPrimaryPlanet().getName(when));
+        // The known field that follows the unknown one in the same event must still be parsed.
+        assertEquals(25, system.getPrimaryPlanet().getTemperature(when));
+    }
+}

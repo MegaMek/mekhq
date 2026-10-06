@@ -42,6 +42,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingCubicle;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -69,6 +70,11 @@ public class Cubicle extends Part {
 
     public BayType getBayType() {
         return bayType;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override
@@ -184,8 +190,8 @@ public class Cubicle extends Part {
 
     @Override
     public Part clone() {
-        Part part = new Cubicle(getUnitTonnage(), bayType, campaign);
-        copyBaseData(part);
+        Cubicle part = new Cubicle(getUnitTonnage(), bayType, campaign);
+        part.copyBaseData(this);
         return part;
     }
 

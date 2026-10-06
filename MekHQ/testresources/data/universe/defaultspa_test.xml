@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
 # To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 #
 # NOTICE: The MegaMek organization is a non-profit group of volunteers
@@ -439,7 +439,7 @@
         <displayName>Interstellar Negotiator (Unofficial)</displayName>
         <desc><![CDATA[No matter who's in charge, this character always has a way of bringing down the price.
 
-If this character is the senior-most Admin/Transport character, the cost of interstellar travel is reduced by 15%]]></desc>
+If this character is the senior-most Admin character, the cost of interstellar travel is reduced by 15%]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
         <skillPrereq>
@@ -451,7 +451,7 @@ If this character is the senior-most Admin/Transport character, the cost of inte
         <displayName>Networker (Unofficial)</displayName>
         <desc><![CDATA[This character knows people in high places.
 
-If this character is the senior-most Admin/Command character, the number of contracts offered each month is increased by 1 (may still be 0).]]></desc>
+If this character is the senior-most Admin character, the number of contracts offered each month is increased by 1 (may still be 0).]]></desc>
         <xpCost>400</xpCost>
         <weight>1</weight>
         <skillPrereq>
@@ -475,7 +475,7 @@ The campaign's cargo capacity is increased by 5% per character with this SPA.]]>
         <displayName>Coordinator (Unofficial)</displayName>
         <desc><![CDATA[This character is exceptionally skilled at liaising with allied forces, ensuring reinforcements arrive where they're needed.
 
-If this character is the senior Admin/Command character, the reinforcement target number is reduced by 1.]]></desc>
+If this character is the senior Admin character, the reinforcement target number is reduced by 1.]]></desc>
         <xpCost>100</xpCost>
         <weight>1</weight>
         <skillPrereq>

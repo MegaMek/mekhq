@@ -70,7 +70,8 @@ public class RandomPortraitGenerator {
      * <p>Portrait search order:</p>
      * <ol>
      *     <li>{@code /<gender>/<primary role>} (e.g., {@code /Male/MekWarrior}, {@code /Female/Civilian})</li>
-     *     <li>{@code /<gender>/<role group>} (e.g., {@code /Male/Tech}, {@code /Female/Officer})</li>
+     *     <li>{@code /<gender>/<role group>} ({@code Admin}, {@code Vehicle Crew}, {@code Vessel Crew}, {@code Tech}
+     *     or {@code Medical}; roles outside those groups skip this step)</li>
      *     <li>{@code /<gender>/Combat} or {@code /<gender>/Support}</li>
      *     <li>{@code /<gender>} (fallback: any portrait for the correct gender)</li>
      * </ol>
@@ -124,8 +125,9 @@ public class RandomPortraitGenerator {
             if (possiblePortraits.isEmpty()) {
                 String searchCat_RoleGroup = getCatRoleGroup(person);
 
-                // This is a fallback that doesn't match the current portrait directories. It's likely left here for
-                // legacy reasons - Illiani, Nov 21st 2025
+                // The shipped portraits are all filed under their role folder, so this step is for collections that
+                // group portraits by role family instead - most usefully the /<gender>/Admin folder that administrator
+                // portraits shipped in before 0.51.01, which players may still be using.
                 if (!searchCat_RoleGroup.isBlank()) {
                     searchFile = new File(genderFile, searchCat_RoleGroup);
                     possiblePortraits = getPossibleRandomPortraits(existingPortraits, searchFile);
@@ -163,7 +165,7 @@ public class RandomPortraitGenerator {
         String searchCat_RoleGroup = "";
         if (person.getPrimaryRole().isAdministrator()) {
             searchCat_RoleGroup = "Admin";
-        } else if (person.getPrimaryRole().isVesselCrew()) {
+        } else if (person.getPrimaryRole().isVesselCrewMember()) {
             searchCat_RoleGroup = "Vessel Crew";
         } else if (person.getPrimaryRole().isVehicleCrewMember()) {
             searchCat_RoleGroup = "Vehicle Crew";

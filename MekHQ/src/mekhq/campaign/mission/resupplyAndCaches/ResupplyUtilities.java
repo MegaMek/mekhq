@@ -33,25 +33,22 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import static java.lang.Math.max;
-import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.UUID;
 
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
@@ -91,14 +88,14 @@ public class ResupplyUtilities {
      * </ul>
      *
      * @param campaign the {@link Campaign} instance to which the convoy belongs.
-     * @param contract the {@link AtBContract} related to the abandoned convoy scenario.
+     * @param contract the {@link AbstractContract} related to the abandoned convoy scenario.
      * @param scenario the {@link AtBDynamicScenario} containing details of the abandoned convoy event.
      */
-    public static void processAbandonedConvoy(Campaign campaign, AtBContract contract,
+    public static void processAbandonedConvoy(Campaign campaign, AbstractContract contract,
           AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             Formation parentFormation = formation.getParentFormation();
 
             if (parentFormation != null && (formation.getParentFormation().isFormationType(CONVOY))) {
@@ -106,7 +103,7 @@ public class ResupplyUtilities {
             }
 
             if (formation.isFormationType(CONVOY) && formation.getScenarioId() == scenarioId) {
-                Person speaker = campaign.getPerson(formation.getFormationCommanderID());
+                Person speaker = campaign.getPlayerForce().getHumanResources().getPerson(formation.getFormationCommanderID());
 
                 String commanderAddress = campaign.getCommanderAddress();
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -151,11 +148,11 @@ public class ResupplyUtilities {
      * @param campaign the {@link Campaign} instance for date tracking and updating crew member status.
      * @param person   the {@link Person} representing the crew member whose fate is being decided.
      */
-    private static void decideCrewMemberFate(Campaign campaign, AtBContract contract, Person person) {
+    private static void decideCrewMemberFate(Campaign campaign, AbstractContract contract, Person person) {
         PersonnelStatus status = KIA;
 
         if (Compute.d6(2) > 7) {
-            if (contract.getEnemy().isClan()) {
+            if (contract.getEnemyFaction().isClan()) {
                 status = PersonnelStatus.ENEMY_BONDSMAN;
             } else {
                 status = PersonnelStatus.POW;
@@ -171,66 +168,20 @@ public class ResupplyUtilities {
      *
      * <p>This estimation is calculated as follows:
      * <ul>
-     *     <li>Determines the target cargo tonnage using the {@link Campaign} and {@link AtBContract} data.</li>
+     *     <li>Determines the target cargo tonnage using the {@link Campaign} and {@link AbstractContract} data.</li>
      *     <li>Applies a cargo multiplier defined in {@link Resupply#CARGO_MULTIPLIER}.</li>
      * </ul>
      *
      * @param campaign the {@link Campaign} instance to calculate cargo requirements for.
-     * @param contract the {@link AtBContract} defining the parameters of the mission.
+     * @param contract the {@link AbstractContract} defining the parameters of the mission.
      *
      * @return the estimated cargo requirement in tons.
      */
-    public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {
+    public static int estimateCargoRequirements(Campaign campaign, AbstractContract contract) {
         double targetTonnage = calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER;
 
         // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
         // of those blocks
         return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
-    }
-
-    public static int estimateAvailablePlayerCargo(Campaign campaign) {
-        double totalPlayerCargoCapacity = 0;
-
-        for (Formation formation : campaign.getAllFormations()) {
-            if (!formation.isFormationType(CONVOY)) {
-                continue;
-            }
-
-            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
-                continue;
-            }
-
-            double cargoCapacitySubTotal = 0;
-            boolean hasCargo = false;
-            for (UUID unitId : formation.getAllUnits(false)) {
-                try {
-                    Unit unit = campaign.getUnit(unitId);
-                    Entity entity = unit.getEntity();
-
-                    if (unit.isDamaged() || !unit.isFullyCrewed() || isProhibitedUnitType(entity, true, true)) {
-                        continue;
-                    }
-
-                    double individualCargo = unit.getCargoCapacityForConvoy();
-
-                    if (individualCargo > 0) {
-                        hasCargo = true;
-                    }
-
-                    cargoCapacitySubTotal += individualCargo;
-                } catch (Exception ignored) {
-                    // If we run into an exception, it's because we failed to get Unit or Entity.
-                    // In either case, we just ignore that unit.
-                }
-            }
-
-            if (hasCargo) {
-                if (cargoCapacitySubTotal > 0) {
-                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                }
-            }
-        }
-
-        return (int) round(totalPlayerCargoCapacity);
     }
 }

@@ -67,6 +67,9 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -79,17 +82,13 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitEvent;
-import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairTechEligibility;
+import mekhq.campaign.work.RepairTechEligibility.TechListToggles;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -122,6 +121,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable techTable;
     private RoundedJButton btnDoTask;
     private RoundedMMToggleButton btnShowAllTechs;
+    private RoundedMMToggleButton btnShowOnlyUnitTechs;
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
@@ -425,7 +425,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
-        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel);
+        TaskTableMouseAdapter.connect(getCampaignGui(), taskTable, taskModel, this);
         JScrollPane scrollTaskTable = new FastJScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new Dimension(300, 300));
@@ -444,12 +444,24 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
+        btnShowAllTechs.setSelected(true);
         btnShowAllTechs.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(btnShowAllTechs, gridBagConstraints);
+
+        btnShowOnlyUnitTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowOnlyUnitTechs.text"));
+        btnShowOnlyUnitTechs.setToolTipText(resourceMap.getString("btnShowOnlyUnitTechs.toolTipText"));
+        btnShowOnlyUnitTechs.setName("btnShowOnlyUnitTechs");
+        btnShowOnlyUnitTechs.setSelected(false);
+        btnShowOnlyUnitTechs.addActionListener(ev -> filterTechs());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panTechs.add(btnShowOnlyUnitTechs, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -494,7 +506,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         centerPanel.add(panTechs);
         add(centerPanel, BorderLayout.CENTER);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("repairTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("repairTab.keyText");
         add(pnlTutorial, BorderLayout.SOUTH);
 
         filterTechs();
@@ -541,7 +553,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 tech = u.getEngineer();
                 if (null == tech) {
                     target = new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "You must have a crew assigned to large vessels to attempt repairs.");
+                          u.isSelfMaintainedInfantry() ?
+                                "You must have soldiers assigned to this infantry unit to attempt repairs." :
+                                "You must have a crew assigned to large vessels to attempt repairs.");
                 }
             }
             if (null != tech) {
@@ -558,7 +572,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
         }
-        ((TechSorter) techSorter.getComparator(0)).clearPart();
 
         if (null != target) {
             btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
@@ -732,7 +745,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
 
             // If requested, switch to top entry
-            if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
+            if (getCampaignOptions().get(CampaignOption.RESET_TO_FIRST_TECH) && (techTable.getRowCount() > 0)) {
                 techTable.setRowSelectionInterval(0, 0);
             } else {
                 // Or get the selected tech back
@@ -787,54 +800,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void filterTechs() {
         final IPartWork part = getSelectedTask();
         final Unit unit = getSelectedServicedUnit();
+        final TechListToggles toggles = new TechListToggles(btnShowOnlyUnitTechs.isSelected(),
+              btnShowAllTechs.isSelected());
         RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if (part == null) {
                     return false;
-                } else if (!part.needsFixing() && !part.isSalvaging()) {
-                    return false;
                 }
-                TechTableModel techModel = entry.getModel();
-                Person tech = techModel.getTechAt(entry.getIdentifier());
-                // Tech must be at the same location as the unit being repaired
-                ILocation repairTarget = (unit != null) ? unit
-                      : (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ? partWithUnit.getUnit() : (ILocation) part;
-                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                    return false;
-                }
-                if ((unit != null) && unit.isSelfCrewed()) {
-                    if (!tech.getPrimaryRole().isVesselCrew()) {
-                        return false;
-                    }
-                    // check whether the engineer is assigned to the correct unit
-                    return unit.equals(tech.getUnit());
-                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
-                    return false;
-                } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
-                    return false;
-                }
-                Skill skill = tech.getSkillForWorkingOn(part);
-                int modePenalty = part.getMode().expReduction;
-                if (skill == null) {
-                    return false;
-                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
-                    return false;
-                } else if (tech.getMinutesLeft() <= 0) {
-                    return false;
-                } else {
-                    SkillModifierData skillModifierData = tech.getSkillModifierData();
-                    return getCampaign().getCampaignOptions().isDestroyByMargin() ||
-                                 (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(skillModifierData) -
-                                               modePenalty));
-                }
+                Person tech = entry.getModel().getTechAt(entry.getIdentifier());
+                return RepairTechEligibility.findRefusal(getCampaign(), part, unit, tech, toggles) == null;
             }
         };
 
-        if (getCampaignOptions().isAssignedTechFirst()) {
-            ((TechSorter) techSorter.getComparator(0)).setPart(part);
-        }
+        TechSorter sorter = (TechSorter) techSorter.getComparator(0);
+        sorter.setPart(part);
+        sorter.setAssignedFirst(getCampaignOptions().get(CampaignOption.ASSIGNED_TECH_FIRST));
         techSorter.setRowFilter(techTypeFilter);
     }
 
@@ -970,15 +951,24 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     private void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
-        List<Person> techs = getCampaign().getTechs(true);
+        // Offer anyone with a technician repair skill, regardless of their profession, who has more than 0 minutes
+        // free; sorted by skill descending (elites at bottom). The task's required-skill filtering is applied in
+        // filterTechs().
+        Campaign campaign = getCampaign();
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getSkilledTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate(),
+                                         true);
         techsModel.setData(techs);
         filterTechs();
 
         refreshAsTechPool();
 
         // Ensuring valid row selection after refresh
-        if (getCampaignOptions().isResetToFirstTech() && (techTable.getRowCount() > 0)) {
+        if (getCampaignOptions().get(CampaignOption.RESET_TO_FIRST_TECH) && (techTable.getRowCount() > 0)) {
             // Double-check the row count and safely select the first row
             techTable.setRowSelectionInterval(0, 0);
         } else if (selectedTech != null) {
@@ -1007,9 +997,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
      */
     public void refreshAsTechPool() {
-        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " +
+                                    getCampaign().getPlayerForce().getHumanResources().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+            astechString += " [" +
+                                  getCampaign().getPlayerForce().getHumanResources().getAsTechPoolOvertime() +
+                                  " overtime]";
         }
         astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
         asTechPoolLabel.setText(astechString);

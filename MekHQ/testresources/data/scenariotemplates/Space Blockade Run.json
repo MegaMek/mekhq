@@ -1,0 +1,221 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https: //creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https: //www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+"name": "Space Blockade Run",
+"stratConScenarioType": "NONE",
+"shortBriefing": "Break enemy blockade, escort DropShip.",
+"detailedBriefing": "An allied DropShip must bypass an enemy space blockade, and you are its only chance at breaking through. Your mission is to escort the DropShip safely to the far edge of the engagement area, ensuring it can escape enemy interdiction. If a direct escort proves too difficult, an alternative objective is available—destroy at least 33% of the enemy forces to weaken their blockade and force them to disengage.\n\nThe enemy will attempt to intercept, disable, or destroy the DropShip before it can escape. Expect interdiction fighters and AeroSpace superiority craft. Protect the DropShip at all costs—keep the enemy occupied, disrupt their formations, and eliminate high-threat targets before they can close in.\n\nThe enemy will control the battlefield at the end of the engagement, meaning there will be no chance for salvage or recovery. Your priority is to see the DropShip through or cripple enough enemy forces to force a retreat. Ensure the mission succeeds—our strategic mobility depends on it.",
+"isHostileFacility": false,
+"isAlliedFacility": false,
+"isSuitedForAmbushes": true,
+"isSuitedForBungledPatrols": false,
+"battlefieldControl": "ENEMY",
+"mapParameters": {
+"baseWidth": 50,
+"baseHeight": 50,
+"widthScalingIncrement": 5,
+"heightScalingIncrement": 5,
+"additionalMapSheetTall": 2,
+"additionalMapSheetWide": 2,
+"allowRotation": false,
+"useStandardAtBSizing": true,
+"mapLocation": "Space",
+"allowedTerrainTypes": []
+},
+"scenarioModifiers": [
+],
+"scenarioForces": {
+"Player": {
+"forceAlignment": 0,
+"generationMethod": 0,
+"forceMultiplier": 1.0,
+"deploymentZones": [
+6
+],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": 9,
+"canReinforceLinked": true,
+"contributesToBV": true,
+"contributesToUnitCount": true,
+"forceName": "Player",
+"syncedForceName": null,
+"syncDeploymentType": "None",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 0,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 0,
+"generationOrder": 1,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+]
+},
+"OpFor": {
+"forceAlignment": 2,
+"generationMethod": 1,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 5,
+"retreatThreshold": 50,
+"allowedUnitType": 9,
+"canReinforceLinked": true,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "OpFor",
+"syncedForceName": "Player",
+"syncDeploymentType": "OppositeEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 1,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 1,
+"generationOrder": 5,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"INTERCEPTOR"
+]
+},
+"DropShip": {
+"forceAlignment": 1,
+"generationMethod": 4,
+"forceMultiplier": 1.0,
+"deploymentZones": [],
+"destinationZone": 6,
+"retreatThreshold": 50,
+"allowedUnitType": 11,
+"canReinforceLinked": false,
+"contributesToBV": false,
+"contributesToUnitCount": false,
+"forceName": "DropShip",
+"syncedForceName": "Player",
+"syncDeploymentType": "SameEdge",
+"syncRetreatThreshold": false,
+"arrivalTurn": 0,
+"maxWeightClass": 4,
+"minWeightClass": 1,
+"contributesToMapSize": true,
+"actualDeploymentZone": -1,
+"fixedUnitCount": 1,
+"generationOrder": 4,
+"allowAeroBombs": false,
+"startingAltitude": 5,
+"useArtillery": false,
+"deployOffBoard": false,
+"objectiveLinkedForces": [
+],
+"subjectToRandomRemoval": true,
+"fixedMul": null,
+"forceRoleStrings": [
+"MEK_CARRIER",
+"MEK_CARRIER",
+"ASF_CARRIER",
+"VEE_CARRIER",
+"INFANTRY_CARRIER",
+"TROOP_CARRIER",
+"CIVILIAN"
+]
+}
+},
+"scenarioObjectives": [
+{
+"objectiveCriterion": "ReachMapEdge",
+"description": "",
+"destinationEdge": "NORTH",
+"percentage": 100,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"DropShip"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+},
+{
+"effectType": "SupportPointUpdate",
+"effectScaling": "Linear",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": [
+"Crippled units do not count towards this objective."
+]
+},
+{
+"objectiveCriterion": "ForceWithdraw",
+"description": "",
+"destinationEdge": "NONE",
+"percentage": 33,
+"fixedAmount": null,
+"timeLimitType": "None",
+"timeLimitAtMost": true,
+"timeLimit": null,
+"timeLimitScaleFactor": null,
+"associatedForceNames": [
+"OpFor"
+],
+"associatedUnitIDs": [],
+"successEffects": [
+{
+"effectType": "ScenarioVictory",
+"effectScaling": "Fixed",
+"howMuch": 2
+}
+],
+"failureEffects": [
+{
+"effectType": "ScenarioDefeat",
+"effectScaling": "Fixed",
+"howMuch": 1
+}
+],
+"additionalDetails": []
+}
+]
+}

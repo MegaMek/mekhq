@@ -34,6 +34,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -91,7 +92,7 @@ public class SVEnginePart extends Part {
     public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
           FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
-        this.engineTonnage = unitTonnage;
+        this.engineTonnage = engineTonnage;
         this.etype = etype;
         this.techRating = techRating;
         this.fuelType = fuelType;
@@ -116,7 +117,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return techRating;
     }
 
@@ -249,6 +250,7 @@ public class SVEnginePart extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
+            refreshEngineTonnageFromUnit();
             int engineHits = 0;
             int engineCrits = 0;
             if (unit.getEntity() instanceof Tank) {
@@ -297,6 +299,24 @@ public class SVEnginePart extends Part {
         return hits > 0;
     }
 
+    /**
+     * Takes the engine's weight from its vehicle, the way MegaMek weighs it. Saves made before the weight was stored
+     * correctly carry the whole vehicle's weight for the engine, and this puts it right once the engine is on its
+     * vehicle again.
+     */
+    private void refreshEngineTonnageFromUnit() {
+        Entity entity = unit.getEntity();
+        if ((entity == null) || (entity.getEngine() == null)) {
+            return;
+        }
+        double weightFromUnit = entity.getEngine().getWeightEngine(entity);
+        if (weightFromUnit != engineTonnage) {
+            LOGGER.debug("[SVEngine] {}: engine weight corrected from {} to {} tons", unit.getName(), engineTonnage,
+                  weightFromUnit);
+            engineTonnage = weightFromUnit;
+        }
+    }
+
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
@@ -323,17 +343,9 @@ public class SVEnginePart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (null != getUnit()) {
-            if (getUnit().getEntity() instanceof Aero) {
-                return skillType.equals(SkillType.S_TECH_AERO);
-            } else {
-                return skillType.equals(SkillType.S_TECH_MECHANIC);
-            }
-        }
-        // We're not tracking whether parts in the warehouse came from ground or
-        // fixed-wing/airships,
-        // so let either tech repair it.
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_MECHANIC));
+        return skillType.equals(EnginePart.isNuclearEngineType(etype) ?
+                                      SkillType.S_TECH_NUCLEAR :
+                                      SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

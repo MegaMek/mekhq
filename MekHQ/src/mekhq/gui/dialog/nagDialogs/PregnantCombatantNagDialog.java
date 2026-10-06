@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,10 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PREGNANT_COMBATANT;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+
+import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.getPregnantCombatants;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
 
@@ -64,7 +66,22 @@ public class PregnantCombatantNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public PregnantCombatantNagDialog(final Campaign campaign) {
-        super(campaign, HR, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
+        super(campaign, NAG_PREGNANT_COMBATANT, "PregnantCombatantNagDialog");
+    }
+
+    @Override
+    protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
+
+        List<Person> pregnantCombatants = getPregnantCombatants(campaign.hasActiveContract(),
+              campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false));
+
+        StringBuilder pregnantCombatantNames = new StringBuilder();
+        for (Person person : pregnantCombatants) {
+            pregnantCombatantNames.append("<p>- ").append(person.getHyperlinkedFullTitle()).append("</p>");
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, pregnantCombatantNames.toString());
     }
 
     /**

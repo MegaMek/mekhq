@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,9 +33,11 @@
 
 package mekhq.campaign.unit;
 
+import java.util.Collection;
+
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -43,8 +45,8 @@ import mekhq.campaign.parts.Part;
  */
 public record CargoStatistics(Campaign campaign) {
 
-    public Hangar getHangar() {
-        return campaign().getHangar();
+    public mekhq.campaign.LocalHangar getHangar() {
+        return this.campaign().getPlayerForce().getHangar();
     }
 
     public double getTotalInsulatedCargoCapacity() {
@@ -72,44 +74,64 @@ public record CargoStatistics(Campaign campaign) {
     }
 
     public double getTotalCargoCapacity() {
+        return getTotalCargoCapacity(getHangar().getUnits());
+    }
+
+    public static double getTotalCargoCapacity(Collection<Unit> units) {
         // The use of the convoy cargo capacity here is deliberate, we should not be factoring in temporary cargo
         // capacity such as roof racks and lift hoists. Otherwise, every unit added to the campaign roster will
         // increase total cargo capacity exponentially. Cargo units will become redundant, because why would you
         // bother with a cargo unit when every BattleMek adds capacity equal to its weight? - Illiani, December 3rd 2025
-        return getHangar().getUnitsStream()
+        return units.stream()
                      .mapToDouble(Unit::getCargoCapacityForConvoy)
                      .sum();
     }
 
-    // Liquid not included
+    /**
+     * Returns the total cargo capacity across every bay type that can hold general cargo, plus livestock. Liquid cargo
+     * capacity is deliberately excluded.
+     *
+     * <p>Note that {@link #getTotalCargoCapacity()} already folds in refrigerated and insulated bay capacity - the
+     * convoy calculation treats both as usable general cargo space - so they must not be added again here. Only
+     * livestock capacity is added on top; adding refrigerated and insulated would double-count them.</p>
+     */
     public double getTotalCombinedCargoCapacity() {
-        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                     + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
+        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity();
     }
 
     public double getCargoTonnage(boolean inTransit) {
-        return getCargoTonnage(inTransit, false);
+        Collection<Part> parts = campaign.getAllParts();
+        Collection<Part> spareParts = LocalWarehouse.getSpareParts(parts);
+        return getCargoTonnage(campaign.getAllUnits(), spareParts, inTransit, false);
     }
 
-    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
-    public double getCargoTonnage(final boolean inTransit, final boolean mothballed) {
-        HangarStatistics stats = campaign().getHangarStatistics();
+    public double getCargoTonnage(final boolean inTransit,
+          final boolean mothballed) {
+        Collection<Part> parts = campaign.getAllParts();
+        Collection<Part> spareParts = LocalWarehouse.getSpareParts(parts);
+        return getCargoTonnage(campaign.getAllUnits(), spareParts, inTransit, mothballed);
+    }
 
+    // FIXME: This whole method needs re-worked once Dropship Assignments are in
+    public static double getCargoTonnage(final Collection<Unit> hangarContents, final Collection<Part> spareParts,
+          final boolean inTransit, final boolean mothballed) {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
 
         // if we're in transit or the part is present and has a meaningful tonnage, accumulate it
         // not sure what the "in transit" flag is for, but I'm leaving it to retain current behavior
-        for (Part part : campaign().getWarehouse().getSpareParts()) {
-            if ((inTransit || part.isPresent()) && !Double.isNaN(part.getTonnage())) {
-                cargoTonnage += part.getQuantity() * part.getTonnage();
+        // Double.isFinite also rejects Infinity (not just NaN); a single part reporting a non-finite
+        // tonnage must not be allowed to poison the whole cargo total (see MekHQ issue #9616).
+        for (Part part : spareParts) {
+            double partTonnage = part.getTonnage();
+            if ((inTransit || part.isPresent()) && Double.isFinite(partTonnage)) {
+                cargoTonnage += part.getQuantity() * partTonnage;
             }
         }
 
         // place units in bays
-        // FIXME: This has been temporarily disabled. It really needs DropShip assignments done to fix it correctly.
         // Remaining units go into cargo
-        for (Unit unit : getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             if (!inTransit && !unit.isPresent()) {
                 continue;
             }

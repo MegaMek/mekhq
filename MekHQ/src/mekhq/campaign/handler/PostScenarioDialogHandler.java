@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,9 +47,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
@@ -136,9 +137,9 @@ public class PostScenarioDialogHandler {
 
     private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign,
           Scenario currentScenario) {
-        if (!campaign.getRetirementDefectionTracker().getRetirees().isEmpty()) {
+        if (!campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                  campaign.getMission(currentScenario.getMissionId()), false);
+                  campaign.getContract(currentScenario.getMissionId()), false);
 
             if (!rdd.wasAborted()) {
                 campaign.applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
@@ -147,19 +148,19 @@ public class PostScenarioDialogHandler {
     }
 
     private static void postCombatAutoApplyAward(Campaign campaign, ResolveScenarioTracker tracker) {
-        if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
             HashMap<UUID, Integer> personnel = new HashMap<>();
             HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = campaign.getPerson(personId);
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
                 PersonStatus status = tracker.getPeopleStatus().get(personId);
                 int injuryCount = 0;
 
-                if (!person.getStatus().isDead() || campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHitsPrior()) {
-                        injuryCount = status.getHits() - person.getHitsPrior();
-                    }
+                if (!person.getStatus().isDead() || campaign.getCampaignOptions().get(CampaignOption.ISSUE_POSTHUMOUS_AWARDS)) {
+                    // status.getHits() is cumulative and includes any injury severity the person deployed with, so
+                    // we use the hits recorded for this scenario alone.
+                    injuryCount = status.getNewHits();
                 }
 
                 personnel.put(personId, injuryCount);

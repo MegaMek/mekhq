@@ -34,7 +34,6 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
@@ -47,7 +46,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
@@ -61,7 +60,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -86,6 +86,14 @@ public abstract class AbstractLocation implements IPlace {
     @XmlElement(name = "currentSystemId")
     @XmlJavaTypeAdapter(PlanetarySystemAdapter.class)
     protected PlanetarySystem currentSystem;
+
+    /**
+     * The world within {@link #currentSystem} the force is actually at, or {@code null} when that is not known - in
+     * transit between systems, or a save written before locations tracked this. {@link #getPlanet()} falls back to the
+     * system's primary world in that case, which is what every location reported before planets were tracked.
+     */
+    @XmlTransient
+    protected Planet currentPlanet;
 
     @XmlTransient
     protected LocationNode locationNode;
@@ -147,12 +155,29 @@ public abstract class AbstractLocation implements IPlace {
     }
 
     /**
-     * @return the current planet location. This is currently the primary planet of the system, but in the future this
-     *       will not be the case.
+     * @return the world the force is at: the specific planet when one is known, otherwise the system's primary world
      */
     @Override
     public Planet getPlanet() {
-        return getCurrentSystem().getPrimaryPlanet();
+        return (currentPlanet != null) ? currentPlanet : getCurrentSystem().getPrimaryPlanet();
+    }
+
+    /**
+     * @return the world the force is at, or {@code null} when it is not known. Unlike {@link #getPlanet()} this does
+     *       not fall back to the system's primary world, so callers can tell "at the primary world" apart from "world
+     *       not tracked" - a save predating planet tracking knows only the system.
+     */
+    public @Nullable Planet getCurrentPlanetDirect() {
+        return currentPlanet;
+    }
+
+    /**
+     * Records which world within the current system the force is at.
+     *
+     * @param currentPlanet the world, or {@code null} when it is not known (in transit, or at a jump point)
+     */
+    public void setCurrentPlanet(final @Nullable Planet currentPlanet) {
+        this.currentPlanet = currentPlanet;
     }
 
     @Override
@@ -165,13 +190,26 @@ public abstract class AbstractLocation implements IPlace {
         return computeIsUseCommandCircuit(campaign, campaign.getCampaignOptions());
     }
 
-    protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
-        return FactionStandingUtilities.isUseCommandCircuit(
-              campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(),
-              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(),
-              campaign.getFutureAtBContracts());
+    /**
+     * Checks all personnel in the given campaign for the "Transit Disorientation Syndrome" flaw and applies fatigue
+     * adjustments if specified. Personnel without the flaw are ignored.
+     *
+     * @param campaign     The campaign instance containing the personnel to check.
+     * @param isUseFatigue If true, applies fatigue adjustments to affected personnel.
+     * @param fatigueRate  The rate at which fatigue is applied to the affected personnel.
+     */
+    static void checkForTransitDisorientationSyndrome(Campaign campaign, boolean isUseFatigue, int fatigueRate) {
+        if (isUseFatigue) {
+            for (Person person : campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .getPersonnelFilteringOutDepartedAndAbsent()) {
+                if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                    continue;
+                }
+
+                person.changeFatigue(fatigueRate);
+            }
+        }
     }
 
     public double getRechargeTime() {
@@ -192,7 +230,7 @@ public abstract class AbstractLocation implements IPlace {
         if (usedRechargeTime > 0) {
             if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
-                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
+                      Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
             if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
@@ -210,7 +248,16 @@ public abstract class AbstractLocation implements IPlace {
               isSilentProcessing);
     }
 
-    void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
+    protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
+              campaign.isGM(),
+              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+              campaign.getPlayerForce().getFactionStandings(),
+              campaign.getFutureContracts());
+    }
+
+    public void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
         Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(), today, true);
 
         Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
@@ -223,7 +270,10 @@ public abstract class AbstractLocation implements IPlace {
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+            new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                      .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                                                            campaign.getPlayerForce().isClanForce(),
+                                                            campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
 
@@ -237,7 +287,10 @@ public abstract class AbstractLocation implements IPlace {
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+            new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                      .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                                                            campaign.getPlayerForce().isClanForce(),
+                                                            campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
     }
@@ -249,50 +302,26 @@ public abstract class AbstractLocation implements IPlace {
      *
      * @param campaign The {@link Campaign} instance.
      */
-    void testForEarlyArrival(Campaign campaign) {
-        for (Contract contract : campaign.getFutureContracts()) {
-            if (Objects.equals(currentSystem, contract.getSystem())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
+    public void testForEarlyArrival(Campaign campaign) {
+        for (AbstractContract contract : campaign.getFutureContracts()) {
+            if (ContractUtilities.hasArrivedAtContractLocation(this, contract)) {
+                // DAYS.between, not Period.getDays() - the latter yields only the day component, so a start two
+                // months out would report the leftover days rather than the whole wait.
+                long daysTillStart = ChronoUnit.DAYS.between(campaign.getLocalDate(), contract.getStartDate());
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),
                       campaign.getCommanderAddress(),
                       daysTillStart);
 
-                new ImmersiveDialogSimple(campaign, campaign.getSeniorAdminPerson(TRANSPORT), null,
+                new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                                                campaign.getPlayerForce().isClanForce(),
+                                                                campaign.getLocalDate()), null,
                       inCharacterMessage, null,
                       getFormattedTextAt(RESOURCE_BUNDLE, "contract.arrivedEarly.ooc"),
                       null, false);
                 break;
-            }
-        }
-    }
-
-    /**
-     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
-     *
-     * @param campaign        the current campaign
-     * @param campaignOptions the campaign's ruleset and configuration
-     */
-    static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
-        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
-        final boolean useFatigue = campaignOptions.isUseFatigue();
-        final int fatigueRate = campaignOptions.getFatigueRate();
-
-        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
-            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                continue;
-            }
-
-            if (useAdvancedMedical) {
-                person.addInjury(createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical));
-            } else {
-                person.setHits(person.getHits() + 1);
-            }
-
-            if (useFatigue) {
-                person.changeFatigue(fatigueRate);
             }
         }
     }
@@ -316,11 +345,22 @@ public abstract class AbstractLocation implements IPlace {
         return switch (wn.getNodeName().toLowerCase()) {
             case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
             case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
+            case "groundtransitlocation" -> GroundTransitLocation.generateInstanceFromXML(wn, campaign);
             default -> {
                 logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
                 yield null;
             }
         };
+    }
+
+    /**
+     * Returns {@code true} if {@code nodeName} is the XML element name of a serialized travel node — an interplanetary
+     * {@code <location>} ({@link CurrentLocation}) or an on-planet {@code <groundTransitLocation>}
+     * ({@link GroundTransitLocation}). Both deserialize via {@link #generateInstanceFromXML} to an
+     * {@link AbstractMobileLocation}.
+     */
+    public static boolean isTravelNodeTag(String nodeName) {
+        return nodeName.equalsIgnoreCase("location") || nodeName.equalsIgnoreCase("groundTransitLocation");
     }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {

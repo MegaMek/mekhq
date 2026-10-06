@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,10 +36,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
-import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -50,6 +49,7 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 
 /**
@@ -85,8 +85,8 @@ public class RandomDependents {
         this.campaign = campaign;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        this.isUseRandomDependentAddition = campaignOptions.isUseRandomDependentAddition();
-        this.isUseRandomDependentRemoval = campaignOptions.isUseRandomDependentRemoval();
+        this.isUseRandomDependentAddition = campaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION);
+        this.isUseRandomDependentRemoval = campaignOptions.get(CampaignOption.USE_RANDOM_DEPENDENT_REMOVAL);
         currentDay = campaign.getLocalDate();
 
         // Prepare the data
@@ -151,7 +151,7 @@ public class RandomDependents {
     int prepareData() {
         int activeNonDependents = 0;
 
-        for (Person person : campaign.getActivePersonnel(false, true)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)) {
             if (!person.isEmployed() && person.isCivilian()) {
                 activeDependents.add(person);
                 continue;
@@ -263,9 +263,11 @@ public class RandomDependents {
                 }
 
                 if (roll == 0) {
-                    final Person dependent = campaign.newDependent(RANDOMIZE);
+                    final Person dependent = campaign.getPlayerForce()
+                                                   .getHumanResources()
+                                                   .newDependent(campaign, megamek.common.enums.Gender.RANDOMIZE);
 
-                    campaign.recruitPerson(dependent, FREE, true, false, false);
+                    campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, dependent, FREE, true, false, false);
 
                     campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "dependentJoinsForce.report",
                           dependent.getFullName(),

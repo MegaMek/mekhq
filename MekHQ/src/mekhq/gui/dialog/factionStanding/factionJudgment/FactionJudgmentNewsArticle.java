@@ -155,7 +155,7 @@ public class FactionJudgmentNewsArticle {
         String dialogKey = getDialogKey(judgmentType, judgmentLookupName, censuringFaction);
 
         LocalDate today = campaign.getLocalDate();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
         String locationName;
         if (useFactionCapitalAsLocation) {
@@ -171,7 +171,7 @@ public class FactionJudgmentNewsArticle {
         String commanderAddress = campaign.getCommanderAddress(false);
 
         String newsReport = getInCharacterText(RESOURCE_BUNDLE, dialogKey, commander, secondInCommand, factionName,
-              campaign.getName(), locationName, null, commanderAddress);
+              campaign.getPlayerForce().getName(), locationName, null, commanderAddress);
 
         new NewsDialog(campaign, newsReport);
     }

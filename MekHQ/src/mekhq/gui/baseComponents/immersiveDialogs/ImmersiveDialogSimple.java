@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -142,6 +142,37 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
               useVerticalLayout,
               null,
               imageIcon,
+              true);
+    }
+
+    /**
+     * Constructs an {@code ImmersiveDialogSimple} with the specified campaign, message details, and optional speaker
+     * and button configuration. This dialog represents an immersive interaction with optional elements like a speaker
+     * and out-of-character information.
+     *
+     * @param campaign              The current game state, providing relevant campaign data.
+     * @param leftSpeaker           The {@link Person} appearing as the left speaker, or {@code null} if no speaker is
+     *                              displayed on the left side.
+     * @param centerMessage         The primary message to be displayed in the center of the dialog. This typically
+     *                              conveys the main information or narrative of the dialog.
+     * @param buttonLabels          A {@link List} of custom button labels to display in the dialog. If the list is
+     *                              {@code null}, a default "Understood" button is displayed.
+     * @param outOfCharacterMessage An optional out-of-character (OOC) message, or {@code null} if not applicable. This
+     *                              message is displayed outside the dialog's in-character context, usually to provide
+     *                              additional explanation or game-related information to the player.
+     */
+    public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, String centerMessage,
+          @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage) {
+        super(campaign,
+              leftSpeaker,
+              null,
+              centerMessage,
+              createButtons(buttonLabels),
+              outOfCharacterMessage,
+              null,
+              false,
+              null,
+              null,
               true);
     }
 

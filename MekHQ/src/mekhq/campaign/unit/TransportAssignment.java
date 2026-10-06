@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -170,7 +170,7 @@ public class TransportAssignment implements ITransportAssignment {
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
         if (getTransport() instanceof Unit.UnitRef) {
-            Unit transport = campaign.getHangar().getUnit(getTransport().getId());
+            Unit transport = campaign.getPlayerForce().getHangar().getUnit(getTransport().getId());
             if (transport != null) {
                 if (hasTransportedLocation()) {
                     setTransport(transport);

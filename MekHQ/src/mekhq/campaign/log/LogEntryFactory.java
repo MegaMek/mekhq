@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,6 +79,7 @@ public class LogEntryFactory {
             case HISTORICAL -> new HistoricalLogEntry(date, desc);
             case ASSIGNMENT -> new AssignmentLogEntry(date, desc);
             case PERFORMANCE -> new PerformanceLogEntry(date, desc);
+            case UNIT -> new UnitLogEntry(date, desc);
             default -> new CustomLogEntry(date, desc);
         };
     }

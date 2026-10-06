@@ -53,15 +53,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -92,7 +95,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public class Resupply {
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final AbstractContract contract;
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
@@ -117,6 +120,18 @@ public class Resupply {
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
 
+    // Need-based weighting: how heavily each demand signal counts toward how many of a part are stocked.
+    private static final int MISSING_PART_WEIGHT_MULTIPLIER = 4;
+    private static final int SHOPPING_LIST_WEIGHT_MULTIPLIER = 3;
+
+    // Part-type multipliers (a rebalanced Mishra Method). Scarce, expensive components are favored rather than
+    // penalized, so a player is more likely to be resupplied the parts they cannot easily self-supply.
+    private static final double DEFAULT_PART_MULTIPLIER = 1.0;
+    private static final double HEAT_SINK_MULTIPLIER = 2.5;
+    private static final double MEK_HEAD_MULTIPLIER = 2.0;
+    private static final double CRITICAL_COMPONENT_MULTIPLIER = 1.5;
+    private static final double ARMOR_AND_AMMO_MULTIPLIER = 5.0;
+
     /**
      * Enum representing the various types of resupply methods available during a campaign.
      */
@@ -131,7 +146,7 @@ public class Resupply {
      * @param campaign The current campaign.
      * @param contract The specific contract under which the resupply process is conducted.
      */
-    public Resupply(Campaign campaign, AtBContract contract, ResupplyType resupplyType) {
+    public Resupply(Campaign campaign, AbstractContract contract, ResupplyType resupplyType) {
         this.campaign = campaign;
         this.contract = contract;
         this.resupplyType = resupplyType;
@@ -168,9 +183,9 @@ public class Resupply {
     /**
      * Retrieves the current contract associated with the resupply operation.
      *
-     * @return An {@link AtBContract} representing the current contract.
+     * @return An {@link AbstractContract} representing the current contract.
      */
-    public AtBContract getContract() {
+    public AbstractContract getContract() {
         return contract;
     }
 
@@ -402,14 +417,15 @@ public class Resupply {
         this.usePlayerConvoy = usePlayerConvoy;
     }
 
-    static int calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
+    static int calculateTargetCargoTonnage(Campaign campaign, AbstractContract contract) {
         double unitTonnage = 0;
 
         // First, calculate the total tonnage across all combat units in the campaign.
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
-        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
-            Formation force = campaign.getFormation(formation.getFormationId());
+        for (CombatTeam formation : campaign.getPlayerForce().getCombatTeamsAsMap(campaign).values()) {
+            int id = formation.getFormationId();
+            Formation force = campaign.getPlayerForce().getFormation(id);
 
             if (force == null) {
                 continue;
@@ -420,7 +436,7 @@ public class Resupply {
             }
 
             for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getAllHangar(), unitId);
+                Entity entity = getEntityFromUnitId(campaign.getPlayerForce().getHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -435,11 +451,13 @@ public class Resupply {
         }
 
         // Next, we determine the tonnage cap. This is the maximum tonnage the employer is willing to support.
-        double dropSize = getDropSize(contract, unitTonnage);
+        boolean includeBSPInScale = campaign.getCampaignOptions()
+                                          .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        double dropSize = getDropSize(contract, unitTonnage, includeBSPInScale);
 
         if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
-            FactionStandings standings = campaign.getFactionStandings();
-            double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
+            FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
+            double regard = standings.getRegardForFaction(contract.getEmployerFactionCode(), true);
             double resupplyMultiplier = FactionStandingUtilities.getResupplyWeightModifier(regard);
             dropSize *= resupplyMultiplier;
         }
@@ -447,9 +465,9 @@ public class Resupply {
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
-    private static double getDropSize(AtBContract contract, double unitTonnage) {
-        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
-        final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
+    private static double getDropSize(AbstractContract contract, double unitTonnage, boolean isIncludeBSP) {
+        final int INDIVIDUAL_TONNAGE_ALLOWANCE = isIncludeBSP ? 80 * 12 : 80 * 4;
+        final int tonnageCap = contract.getScale() * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
         // Then we determine the size of each individual 'drop'. This uses the lowest of
         // unitTonnage and tonnageCap and divides that by 100
@@ -462,16 +480,19 @@ public class Resupply {
     /**
      * Determines if the given entity is a prohibited unit type based on specific criteria.
      *
-     * @param entity                       the entity to check for prohibited unit type
-     * @param excludeDropShipsFromCheck    if true, DropShip entities are excluded from being considered prohibited
-     * @param excludeSuperHeaviesFromCheck if true, Super Heavy entities are excluded from being considered prohibited
+     * @param entity                                 the entity to check for prohibited unit type
+     * @param excludeSmallCraftAndDropShipsFromCheck if true, Small Craft and DropShip entities are excluded from being
+     *                                               considered prohibited
+     * @param excludeSuperHeaviesFromCheck           if true, Super Heavy entities are excluded from being considered
+     *                                               prohibited
      *
      * @return {@code true} if the entity is a prohibited unit type such as Small Craft, Large Craft, or Conventional
      *       Infantry, and not excluded by the specified parameters; {@code false} otherwise
      */
-    public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck,
+    public static boolean isProhibitedUnitType(Entity entity, boolean excludeSmallCraftAndDropShipsFromCheck,
           boolean excludeSuperHeaviesFromCheck) {
-        if (entity.isDropShip() && excludeDropShipsFromCheck) {
+        boolean isSmallCraftOrDropShip = entity.isSmallCraft() || entity.isDropShip();
+        if (isSmallCraftOrDropShip && excludeSmallCraftAndDropShipsFromCheck) {
             return false;
         }
 
@@ -479,7 +500,7 @@ public class Resupply {
             return false;
         }
 
-        return entity.isSmallCraft() || entity.isLargeCraft() || entity.isConventionalInfantry();
+        return entity.isLargeCraft() || entity.isConventionalInfantry();
     }
 
     /**
@@ -553,15 +574,22 @@ public class Resupply {
      */
 
     private Map<Part, PartDetails> collectParts() {
-        PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
-        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A);
+        Set<PartInUse> partsInUse = collectPartsInUseAcrossLocations();
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate today = campaign.getLocalDate();
         boolean removeClan = !campaignFaction.isClan() && today.isBefore(BATTLE_OF_TUKAYYID);
 
         Set<PartInUse> partsToRemove = new HashSet<>();
         for (PartInUse partInUse : partsInUse) {
+            // Only resupply parts the player actually needs. A use count of zero with nothing on the shopping
+            // list means the part is not mounted on any active unit and is only present as warehouse salvage.
+            // Parts on the shopping list are kept even when not currently fielded, as they are explicit demand.
+            if (partInUse.getUseCount() == 0 && partInUse.getPlannedCount() == 0) {
+                partsToRemove.add(partInUse);
+                continue;
+            }
+
             Part part = partInUse.getPartToBuy().getAcquisitionPart();
             if (removeClan && (part.isClan() || part.isMixedTech())) {
                 partsToRemove.add(partInUse);
@@ -576,6 +604,43 @@ public class Resupply {
         partsInUse.removeAll(partsToRemove);
 
         return applyWarehouseWeightModifiers(partsInUse);
+    }
+
+    /**
+     * Gathers the parts in use from the main force and every base into a single set, accumulating the per-location
+     * counts for parts that appear in more than one location.
+     */
+    private Set<PartInUse> collectPartsInUseAcrossLocations() {
+        List<IPlace> places = new ArrayList<>();
+        places.add(campaign.getPlayerForce().getForceDetachment());
+        places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
+
+        Map<PartInUse, PartInUse> merged = new HashMap<>();
+        for (IPlace place : places) {
+            PartsInUseManager partsInUseManager = new PartsInUseManager(campaign, place);
+            for (PartInUse partInUse : partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A)) {
+                mergePartInUse(merged, partInUse);
+            }
+        }
+        return new HashSet<>(merged.values());
+    }
+
+    /**
+     * Adds {@code incoming} to {@code merged}, or accumulates its per-location counts onto the existing entry for the
+     * same part. The shopping list is filtered per location, so each location contributes its own planned count and the
+     * counts are summed alongside the use, store, transfer, and missing counts.
+     */
+    private static void mergePartInUse(Map<PartInUse, PartInUse> merged, PartInUse incoming) {
+        PartInUse existing = merged.get(incoming);
+        if (existing == null) {
+            merged.put(incoming, incoming);
+            return;
+        }
+        existing.setUseCount(existing.getUseCount() + incoming.getUseCount());
+        existing.setStoreCount(existing.getStoreCount() + incoming.getStoreCount());
+        existing.setTransferCount(existing.getTransferCount() + incoming.getTransferCount());
+        existing.setPlannedCount(existing.getPlannedCount() + incoming.getPlannedCount());
+        existing.setMissingCount(existing.getMissingCount() + incoming.getMissingCount());
     }
 
     /**
@@ -603,8 +668,11 @@ public class Resupply {
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
-        if (part instanceof EquipmentPart equipmentPart) {
-            return equipmentPart.getType().hasFlag(F_SPONSON_TURRET);
+        // F_SPONSON_TURRET is a MiscType flag, so only check it when the underlying type is actually a
+        // MiscType. This correctly excludes EquipmentParts backed by other types (AmmoType, WeaponType, etc.).
+        if (part instanceof EquipmentPart equipmentPart &&
+                  equipmentPart.getType() instanceof MiscType miscType) {
+            return miscType.hasFlag(F_SPONSON_TURRET);
         }
         return false;
     }
@@ -659,8 +727,9 @@ public class Resupply {
     /**
      * Applies warehouse-based weight modifiers to a set of parts currently in use.
      *
-     * <p>Each part will be assigned a weight representing its resupply priority or need, based on its usage count,
-     * the current store's supply, and any applicable multipliers.</p>
+     * <p>Each part will be assigned a weight representing its resupply priority or need, based on its battle damage,
+     * shopping-list demand, and stock shortfall (see {@link #calculateBaseWeight(PartInUse)}), modulated by a
+     * part-type multiplier.</p>
      *
      * <p>Parts always have a minimum weight of 1, ensuring resupply requests are never empty. If a part cannot be
      * acquired or is invalid, it will be skipped.</p>
@@ -708,14 +777,43 @@ public class Resupply {
     }
 
     /**
-     * Calculates the base weight for a given PartInUse, applying a minimum of 1.
+     * Calculates the need-based weight for a given {@link PartInUse}, expressing how much the player actually needs a
+     * part rather than simply how many they field.
+     *
+     * <p>The weight combines three demand signals:</p>
+     * <ul>
+     *     <li><b>Battle damage</b> - parts currently destroyed or missing on fielded units. Weighted most heavily, as
+     *     each one is an immediate hole in a unit.</li>
+     *     <li><b>Shopping list demand</b> - parts the player has explicitly queued to acquire.</li>
+     *     <li><b>Stock shortfall</b> - how far the on-hand, inbound, and on-order supply falls below the
+     *     auto-logistics target stock level for the part.</li>
+     * </ul>
+     *
+     * <p>A minimum of 1 is always applied so that a fully-stocked, undamaged force still receives a representative
+     * spread of parts rather than an empty resupply.</p>
      *
      * @author Illiani
      * @since 0.50.07
      */
     private int calculateBaseWeight(PartInUse partInUse) {
+        int missingCount = partInUse.getMissingCount();
+        int plannedCount = partInUse.getPlannedCount();
+
+        // Stock the player already holds, has inbound, or has on order. This mirrors how auto-logistics measures
+        // inventory against its target, so a gap already on the shopping list is weighted once (as shopping-list
+        // demand below) rather than again as a shortfall.
+        int suppliedCount = partInUse.getStoreCount() + partInUse.getTransferCount() + plannedCount;
+
+        // The auto-logistics target buffer for a fielded part, as a percentage of how many are in use.
+        int targetStock = (int) Math.ceil(partInUse.getRequestedStock() / 100.0 * partInUse.getUseCount());
+        int stockShortfall = Math.max(0, targetStock - suppliedCount);
+
+        int needScore = (MISSING_PART_WEIGHT_MULTIPLIER * missingCount) +
+                              (SHOPPING_LIST_WEIGHT_MULTIPLIER * plannedCount) +
+                              stockShortfall;
+
         // Always at least 1 to avoid empty resupplies
-        return Math.max(1, partInUse.getUseCount() - partInUse.getStoreCount());
+        return Math.max(1, needScore);
     }
 
     /**
@@ -739,22 +837,24 @@ public class Resupply {
      * @return A multiplier value for the given part type.
      */
     private static double getPartMultiplier(Part part) {
-        double multiplier = 1;
+        double multiplier = DEFAULT_PART_MULTIPLIER;
 
-        // This is based on the Mishra Method, found in the Company Generator
+        // This is based on the Mishra Method, found in the Company Generator, rebalanced so that scarce, expensive
+        // components the player cannot easily self-supply (engines, gyros, MASC, weapons and other equipment) are
+        // favored rather than penalized.
         if (part instanceof HeatSink) {
-            multiplier = 2.5;
+            multiplier = HEAT_SINK_MULTIPLIER;
         } else if (part instanceof MekLocation) {
             if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
-                multiplier = 2;
+                multiplier = MEK_HEAD_MULTIPLIER;
             }
         } else if (part instanceof MASC ||
                          part instanceof MekGyro ||
                          part instanceof EnginePart ||
                          checkEquipmentSubType(part)) {
-            multiplier = 0.5;
+            multiplier = CRITICAL_COMPONENT_MULTIPLIER;
         } else if (part instanceof AmmoBin || part instanceof Armor) {
-            multiplier = 5;
+            multiplier = ARMOR_AND_AMMO_MULTIPLIER;
         }
 
         return multiplier;
@@ -786,20 +886,23 @@ public class Resupply {
     /**
      * Calculates the negotiation skill level by selecting the most qualified negotiator in the current campaign. If the
      * contract type is classified as guerrilla warfare, the flagged commander is prioritized. Otherwise,
-     * Admin/Logistics personnel are evaluated.
+     * Admin personnel are evaluated.
      */
     private void calculateNegotiationSkill() {
         Person negotiator;
         negotiatorSkill = NONE.ordinal();
 
-        if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
-            negotiator = campaign.getCommander();
+        if (contract.getObjectiveType().isGuerrillaType() ||
+                  PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode())) {
+            negotiator = campaign.getPlayerForce().getHumanResources()
+                               .getCommander(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
         } else {
             negotiator = null;
 
-            for (Person admin : campaign.getAdmins()) {
-                if (admin.getPrimaryRole().isAdministratorLogistics() ||
-                          admin.getSecondaryRole().isAdministratorLogistics()) {
+            for (Person admin : campaign.getPlayerForce().getHumanResources().getAdmins()) {
+                if (admin.isAdministrator()) {
                     if (negotiator == null || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
                         negotiator = admin;
                     }
@@ -812,8 +915,8 @@ public class Resupply {
 
             if (skill != null) {
                 SkillModifierData skillModifierData = negotiator.getSkillModifierData(campaign.getCampaignOptions()
-                                                                                            .isUseAgeEffects(),
-                      campaign.isClanCampaign(), campaign.getLocalDate());
+                                                                                            .get(CampaignOption.USE_AGE_EFFECTS),
+                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
                 int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
@@ -828,7 +931,7 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (!formation.isFormationType(CONVOY)) {
                 continue;
             }

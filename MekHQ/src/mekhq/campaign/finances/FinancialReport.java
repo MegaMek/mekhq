@@ -43,8 +43,9 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 public class FinancialReport {
     private Money assets = Money.zero();
@@ -65,8 +66,10 @@ public class FinancialReport {
     private Money maintenance = Money.zero();
     private Money salaries = Money.zero();
     private Money overhead = Money.zero();
+    private Money hotSpotsUpkeep = Money.zero();
     private Money contracts = Money.zero();
     private Money rentals = Money.zero();
+    private Money foodAndHousing = Money.zero();
 
     public Money getNetWorth() {
         return getTotalAssets().minus(getTotalLiabilities());
@@ -86,7 +89,14 @@ public class FinancialReport {
     }
 
     public Money getMonthlyExpenses() {
-        return maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel).plus(rentals);
+        return maintenance.plus(salaries)
+                     .plus(overhead)
+                     .plus(hotSpotsUpkeep)
+                     .plus(coSpareParts)
+                     .plus(coAmmo)
+                     .plus(coFuel)
+                     .plus(rentals)
+                     .plus(foodAndHousing);
     }
 
     public Money getCash() {
@@ -103,6 +113,16 @@ public class FinancialReport {
 
     public Money getOverheadCosts() {
         return overhead;
+    }
+
+    /**
+     * @return the monthly Hot Spots upkeep cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getHotSpotsUpkeepCosts() {
+        return hotSpotsUpkeep;
     }
 
     public Money getSalaries() {
@@ -161,15 +181,17 @@ public class FinancialReport {
         return rentals;
     }
 
+    public Money getFoodAndHousing() {return foodAndHousing;}
+
     public static FinancialReport calculate(Campaign campaign) {
         FinancialReport financialReport = new FinancialReport();
 
-        financialReport.cash = campaign.getFinances().getBalance();
-        financialReport.loans = campaign.getFinances().getLoanBalance();
-        financialReport.assets = campaign.getFinances().getTotalAssetValue();
+        financialReport.cash = campaign.getPlayerForce().getFinances().getBalance();
+        financialReport.loans = campaign.getPlayerForce().getFinances().getLoanBalance();
+        financialReport.assets = campaign.getPlayerForce().getFinances().getTotalAssetValue();
         financialReport.rentals = campaign.getTotalRentFeesExcludingBays();
 
-        campaign.getAllHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mek) {
                 financialReport.mek = financialReport.mek.plus(value);
@@ -189,24 +211,28 @@ public class FinancialReport {
             }
         });
 
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         financialReport.spareParts = financialReport.spareParts.plus(
-              campaign.getAllWarehouse().streamSpareParts()
+              campaign.getPlayerForce().getWarehouse().streamSpareParts()
                     .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();
 
-        if (campaignOptions.isPayForMaintain()) {
+        if (campaignOptions.isChargingMaintenance()) {
             financialReport.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
-        if (campaignOptions.isPayForSalaries()) {
+        if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
             financialReport.salaries = accountant.getPayRoll();
         }
-        if (campaignOptions.isPayForOverhead()) {
+        if (campaignOptions.isChargingOverhead()) {
             financialReport.overhead = accountant.getOverheadExpenses();
         }
-        if (campaignOptions.isUsePeacetimeCost()) {
+        if (campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+            financialReport.hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts();
+        }
+        if (campaignOptions.isChargingPeacetimeCost()) {
             financialReport.coSpareParts = accountant.getMonthlySpareParts();
             financialReport.coAmmo = accountant.getMonthlyAmmo();
             financialReport.coFuel = accountant.getMonthlyFuel();
@@ -214,8 +240,12 @@ public class FinancialReport {
 
         financialReport.contracts = financialReport.contracts.plus(
               campaign.getActiveContracts()
-                    .stream().map(Contract::getMonthlyPayOut)
+                    .stream().map(AbstractContract::getMonthlyPayOut)
                     .collect(Collectors.toList()));
+
+        if (campaignOptions.get(CampaignOption.PAY_FOR_FOOD) || campaignOptions.get(CampaignOption.PAY_FOR_HOUSING)) {
+            financialReport.foodAndHousing = accountant.getMonthlyFoodAndHousingExpenses();
+        }
 
         return financialReport;
     }

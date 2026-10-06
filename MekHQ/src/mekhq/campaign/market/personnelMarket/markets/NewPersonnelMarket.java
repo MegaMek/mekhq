@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS_TARGET_NUMBER;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
@@ -68,10 +68,10 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -103,8 +103,8 @@ public class NewPersonnelMarket {
 
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int RARE_PROFESSION_WEIGHT = 20;
-    private static int LOW_POPULATION_RECRUITMENT_DIVIDER = 1;
-    private static int UNIT_REPUTATION_RECRUITMENT_CUTOFF = Integer.MIN_VALUE;
+    private static int lowPopulationRecruitmentDivider = 1;
+    private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
 
@@ -243,7 +243,7 @@ public class NewPersonnelMarket {
         } else {
             logger.debug("Generated {} applicants for the campaign.", currentApplicants.size());
 
-            if (campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH)) {
                 campaign.addReport(GENERAL, generatePersonnelReport(campaign));
             }
 
@@ -266,7 +266,7 @@ public class NewPersonnelMarket {
      * @return a {@link Person}, or {@code null} if no applicant exists
      */
     public @Nullable Person getSingleApplicant() {
-        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().isClanCampaign() ?
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = getCampaign().getPlayerForce().isClanForce() ?
                                                                                 getClanMarketEntries() :
                                                                                 getInnerSphereMarketEntries();
         unorderedMarketEntries = sanitizeMarketEntries(unorderedMarketEntries);
@@ -289,7 +289,10 @@ public class NewPersonnelMarket {
      * @since 0.50.07
      */
     int performConnectionsRecruitsCheck() {
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.getPlayerForce().isClanForce(),
+                                       campaign.getLocalDate());
         if (commander == null) {
             return 0;
         }
@@ -411,20 +414,20 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getLowPopulationRecruitmentDivider() {
-        return LOW_POPULATION_RECRUITMENT_DIVIDER;
+    public static int getLowPopulationRecruitmentDivider() {
+        return lowPopulationRecruitmentDivider;
     }
 
     /**
      * Sets the recruitment divider for low population systems.
      *
-     * @param lowPopulationRecruitmentDivider recruitment divider to set
+     * @param divider recruitment divider to set
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setLowPopulationRecruitmentDivider(int lowPopulationRecruitmentDivider) {
-        LOW_POPULATION_RECRUITMENT_DIVIDER = lowPopulationRecruitmentDivider;
+    public static void setLowPopulationRecruitmentDivider(int divider) {
+        lowPopulationRecruitmentDivider = divider;
     }
 
     /**
@@ -435,20 +438,20 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
-    public int getUnitReputationRecruitmentCutoff() {
-        return UNIT_REPUTATION_RECRUITMENT_CUTOFF;
+    public static int getUnitReputationRecruitmentCutoff() {
+        return unitReputationRecruitmentCutoff;
     }
 
     /**
      * Sets the cutoff value for unit reputation in recruitment eligibility.
      *
-     * @param unitReputationRecruitmentCutoff reputation cutoff to set
+     * @param cutoff reputation cutoff to set
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setUnitReputationRecruitmentCutoff(int unitReputationRecruitmentCutoff) {
-        UNIT_REPUTATION_RECRUITMENT_CUTOFF = unitReputationRecruitmentCutoff;
+    public static void setUnitReputationRecruitmentCutoff(int cutoff) {
+        unitReputationRecruitmentCutoff = cutoff;
     }
 
     /**
@@ -528,7 +531,7 @@ public class NewPersonnelMarket {
      */
     public Faction getCampaignFaction() {
         if (campaignFaction == null) {
-            campaignFaction = campaign.getFaction();
+            campaignFaction = campaign.getPlayerForce().getFaction();
         }
         return campaignFaction;
     }
@@ -891,7 +894,7 @@ public class NewPersonnelMarket {
      * @since 0.50.06
      */
     void reinitializeKeyData() {
-        campaignFaction = campaign.getFaction();
+        campaignFaction = campaign.getPlayerForce().getFaction();
         today = campaign.getLocalDate();
         gameYear = today.getYear();
         currentSystem = campaign.getCurrentSystem();
@@ -1006,7 +1009,12 @@ public class NewPersonnelMarket {
         }
         String originFactionCode = applicantOriginFaction.getShortName();
 
-        Person applicant = campaign.newPerson(entry.profession(), originFactionCode, Gender.RANDOMIZE);
+        Person applicant = campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .newPerson(campaign,
+                                       entry.profession(),
+                                       originFactionCode,
+                                       megamek.common.enums.Gender.RANDOMIZE);
         if (applicant == null) {
             logger.warn("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),
@@ -1117,7 +1125,11 @@ public class NewPersonnelMarket {
                 continue;
             }
 
-            int experienceLevel = applicant.getExperienceLevel(campaign, false);
+            int experienceLevel = applicant.getExperienceLevel(campaign.getCampaignOptions(),
+                  campaign.getPlayerForce().isClanForce(),
+                  campaign.getLocalDate(),
+                  false,
+                  false);
             for (int i = 0; i < expLevels.length; i++) {
                 if (experienceLevel == expLevels[i]) {
                     applicantCounts[i]++;

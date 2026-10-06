@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq.campaign.randomEvents.prisoners;
 import static megamek.common.equipment.MiscType.createBeagleActiveProbe;
 import static megamek.common.equipment.MiscType.createCLImprovedSensors;
 import static megamek.common.equipment.MiscType.createISImprovedSensors;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
@@ -44,9 +43,9 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.MIA;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.SEPPUKU;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.BECOMING_BONDSMAN;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER_DEFECTOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -66,10 +65,9 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.HonorRating;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -227,13 +225,13 @@ public class CapturePrisoners {
      * @param prisoner The {@link Person} object representing the captured NPC.
      */
     public void processCaptureOfNPC(Person prisoner) {
-        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
 
         if (prisonerCaptureStyle.isNone()) {
             return;
         }
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         processPrisoner(prisoner, campaignFaction, prisonerCaptureStyle.isMekHQ(), true);
 
         // Have they been removed via Bondsref or Seppuku?
@@ -263,7 +261,10 @@ public class CapturePrisoners {
 
                 boolean isBondsman = prisoner.isClanPersonnel();
                 new ImmersiveDialogSimple(campaign,
-                      campaign.getSeniorAdminPerson(HR),
+                      campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate()),
                       null,
                       createInCharacterMessage(prisoner, isBondsman),
                       null,
@@ -421,7 +422,7 @@ public class CapturePrisoners {
 
         if (potentialDefector.isClanPersonnel()) {
             if (isNPC) {
-                Faction campaignFaction = campaign.getFaction();
+                Faction campaignFaction = campaign.getPlayerForce().getFaction();
                 if (campaignFaction.isPirate() || campaignFaction.isMercenary()) {
                     adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
                 }
@@ -467,7 +468,7 @@ public class CapturePrisoners {
             return;
         }
 
-        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
 
         if (prisonerCaptureStyle.isNone()) {
             prisoner.changeStatus(campaign, campaign.getLocalDate(), MIA);
@@ -537,7 +538,8 @@ public class CapturePrisoners {
 
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
-        campaign.recruitPerson(prisoner, prisonerStatus, false, true, true);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, prisoner, prisonerStatus, false, true,
+              true);
 
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(PERSONNEL,

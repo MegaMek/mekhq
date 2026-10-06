@@ -33,11 +33,16 @@
 package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
+import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -58,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -81,6 +87,7 @@ import megamek.common.units.Crew;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -90,12 +97,12 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -671,7 +678,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textToughness.setText(Integer.toString(person.getDirectToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -733,7 +740,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblReputation.setText(resourceMap.getString("lblReputation.text"));
         lblReputation.setName("lblReputation");
 
-        textReputation.setText(Integer.toString(person.getReputation()));
+        textReputation.setText(Integer.toString(person.getFame()));
         textReputation.setName("textReputation");
 
         gridBagConstraints = new GridBagConstraints();
@@ -823,7 +830,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         textEducationLevel.setName("textEducationLevel");
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -846,8 +853,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textLoyalty.setText(Integer.toString(person.getBaseLoyalty()));
         textLoyalty.setName("textLoyalty");
 
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+        if ((campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS)) &&
+                  (!campaign.getCampaignOptions().get(CampaignOption.USE_HIDE_LOYALTY))) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -865,7 +872,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //region random personality
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             JLabel labelAggression = new JLabel();
             labelAggression.setText("Aggression:");
             labelAggression.setName("labelAggression");
@@ -1015,7 +1022,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(spnPersonalityQuirk, gridBagConstraints);
+        }
+        //endregion random personality
 
+        //region random talent
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             JLabel labelReasoning = new JLabel();
             labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
@@ -1036,6 +1047,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demographicPanel.add(comboReasoning, gridBagConstraints);
         }
+        //endregion random talent
 
         y++;
 
@@ -1108,7 +1120,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
-        if (campaign.getCampaignOptions().isUseAbilities() || campaign.getCampaignOptions().isUseImplants()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES) || campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
 
@@ -1152,11 +1164,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. If there was no current selection (or the previously
-     * selected faction has been filtered out by the new model), the index is explicitly set to
-     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
-     * would silently assign an unintended origin when OK is clicked.
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the current selection
+     * across the swap. If there was no current selection (or the previously selected faction has been filtered out by
+     * the new model), the index is explicitly set to {@code -1} — otherwise Swing's combobox auto-selects the first
+     * item on a model swap, which would silently assign an unintended origin when OK is clicked.
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
@@ -1171,14 +1182,46 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel() {
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
+        // A world is a valid birthworld if it either has a real owner faction at the character's date of birth OR
+        // still had a recorded population then. The population fallback admits ABN (Abandoned) systems that retained
+        // inhabitants — a character can be born on a world that no faction claims, so long as someone lived there.
+        LocalDate birthDate = person.getDateOfBirth();
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
+                                                     .filter(a -> !a.isConnector())
+                                                     .filter(a -> isSelectableBirthworld(a, birthDate))
                                                      .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
         return model;
+    }
+
+    /**
+     * @return {@code true} if {@code system} is a valid birthworld at {@code when} — it either has a real (non-ABN)
+     *       owner faction then, or still had a recorded population then. The population fallback admits abandoned
+     *       (ABN-only) worlds that retained inhabitants: a character can be born on a world no faction claims, so long
+     *       as people were living there. A {@code null} date is treated as selectable rather than over-filtering.
+     */
+    private static boolean isSelectableBirthworld(PlanetarySystem system, LocalDate when) {
+        if (when == null) {
+            return true;
+        }
+        if (system.getPopulation(when) > 0) {
+            return true;
+        }
+        // getFactionSet already drops the ABN marker when other factions are present, so an ABN-only world comes back
+        // as a single ABN entry; reject that case explicitly.
+        Set<Faction> owners = system.getFactionSet(when);
+        if (owners.isEmpty()) {
+            return false;
+        }
+        if (owners.size() == 1) {
+            Faction only = owners.iterator().next();
+            return only != null && !"ABN".equals(only.getShortName());
+        }
+        return true;
     }
 
     private DefaultComboBoxModel<PlanetarySystem> getPlanetarySystemsComboBoxModel(Faction faction) {
@@ -1256,7 +1299,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         List<String> sortedSkillNames = SkillType.getSortedSkillNames();
 
         SkillModifierData skillModifierData = person.getSkillModifierData(
-              campaign.getCampaignOptions().isUseAgeEffects(), campaign.isClanCampaign(), campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(),
               true);
         SkillType skillType;
         for (int index = 0; index < sortedSkillNames.size(); index++) {
@@ -1337,7 +1380,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             if (skillChecks.get(type).isSelected()) {
                 int lvl = (Integer) skillLvls.get(type).getModel().getValue();
                 int b = (Integer) skillBonus.get(type).getModel().getValue();
-                person.addSkill(type, lvl, b);
+                // Keep the existing skill's Natural Aptitude and progress towards both the next level and a Natural
+                // Aptitude, which rebuilding the skill would otherwise throw away
+                Skill existingSkill = person.getSkill(type);
+                int xpProgress = (existingSkill == null) ? 0 : existingSkill.getXpProgress();
+                boolean hasNaturalAptitude = (existingSkill != null) && existingSkill.getHasNaturalAptitude();
+                int naturalAptitudeXpProgress = (existingSkill == null) ? 0 :
+                                                      existingSkill.getNaturalAptitudeXpProgress();
+                person.addSkill(type, new Skill(SkillType.getType(type), lvl, b, xpProgress, hasNaturalAptitude,
+                      naturalAptitudeXpProgress));
             } else {
                 person.removeSkill(type);
             }
@@ -1371,7 +1422,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseAbilities()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
                 continue;
             }
 
@@ -1380,7 +1431,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES) &&
-                      !campaign.getCampaignOptions().isUseImplants()) {
+                      !campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS)) {
                 continue;
             }
 
@@ -1555,8 +1606,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             return;
         }
 
-        boolean isClanCampaign = campaign.isClanCampaign();
-        boolean isUseAgeEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        boolean isUseAgeEffects = campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS);
         LocalDate today = campaign.getLocalDate();
 
         int level = (Integer) skillLvls.get(type).getModel().getValue();
@@ -1614,6 +1665,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         break;
                     case PROTOMEK:
                         decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_PROTO);
                         break;
                     case NAVAL:
                         decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
@@ -1648,6 +1700,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                         break;
                     case PROTOMEK:
                         increasePhenotypeBonus(SkillType.S_GUN_PROTO);
+                        increasePhenotypeBonus(SkillType.S_PILOT_PROTO);
                         break;
                     case NAVAL:
                         increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
@@ -1669,7 +1722,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomName() {
-        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames() ?
+        String factionCode = campaign.getCampaignOptions().get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES) ?
                                    person.getOriginFaction().getShortName() :
                                    RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -1682,9 +1735,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomBloodname() {
-        Faction faction = campaign.getFaction().isClan() ?
-                                campaign.getFaction() :
-                                (Faction) choiceFaction.getSelectedItem();
+        Faction faction;
+        if (campaign.getPlayerForce().getFaction().isClan()) {
+            faction = campaign.getPlayerForce().getFaction();
+        } else {
+            faction = (mekhq.campaign.universe.Faction) choiceFaction.getSelectedItem();
+        }
         faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
         Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(),
               selectedPhenotype,
@@ -1715,35 +1771,35 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_TOUGHNESS)) {
             person.setToughness(MathUtility.parseInt(textToughness.getText(), person.getDirectToughness()));
         }
 
         int newValue = MathUtility.parseInt(textConnections.getText(), person.getConnections());
-        person.setConnections(Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setConnections(Math.clamp(newValue, CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum()));
 
         newValue = MathUtility.parseInt(textWealth.getText(), person.getWealth());
-        person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setWealth(Math.clamp(newValue, WEALTH.getMinimum(), WEALTH.getMaximum()));
 
-        newValue = MathUtility.parseInt(textReputation.getText(), person.getReputation());
-        person.setReputation(Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION));
+        newValue = MathUtility.parseInt(textReputation.getText(), person.getFame());
+        person.setFame(Math.clamp(newValue, FAME.getMinimum(), FAME.getMaximum()));
 
         newValue = MathUtility.parseInt(textUnlucky.getText(), person.getUnlucky());
-        person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        person.setUnlucky(Math.clamp(newValue, UNLUCKY.getMinimum(), UNLUCKY.getMaximum()));
 
         newValue = MathUtility.parseInt(textBloodmark.getText(), person.getBloodmark());
-        person.setBloodmark(Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+        person.setBloodmark(Math.clamp(newValue, BLOODMARK.getMinimum(), BLOODMARK.getMaximum()));
 
         newValue = MathUtility.parseInt(textExtraIncome.getText(), person.getExtraIncomeTraitLevel());
-        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, EXTRA_INCOME.getMinimum(), EXTRA_INCOME.getMaximum()));
 
         person.setLoyalty(MathUtility.parseInt(textLoyalty.getText(), person.getBaseLoyalty()));
 
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
             person.setAggression(comboAggression.getSelectedItem());
             person.setAggressionDescriptionIndex((int) spnAggression.getValue());
 
@@ -1759,10 +1815,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
 
-            person.setReasoning(comboReasoning.getSelectedItem());
-
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
+            person.setReasoning(comboReasoning.getSelectedItem());
         }
 
         person.setPortrait(portrait);

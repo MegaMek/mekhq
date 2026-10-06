@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import static org.mockito.Mockito.when;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,13 +60,13 @@ public class RandomProcreationTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
-        when(mockOptions.getRandomProcreationRelationshipDiceSize()).thenReturn(5);
-        when(mockOptions.getRandomProcreationRelationshiplessDiceSize()).thenReturn(5);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE)).thenReturn(5);
+        when(mockOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE)).thenReturn(5);
     }
 
     @Test

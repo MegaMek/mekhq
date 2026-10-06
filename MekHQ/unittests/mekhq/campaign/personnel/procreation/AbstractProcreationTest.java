@@ -45,20 +45,25 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -66,7 +71,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractProcreationTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -78,16 +83,27 @@ public class AbstractProcreationTest {
     @BeforeEach
     public void beforeEach() {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.MULTIPLE_PREGNANCY_OCCURRENCES)).thenReturn(0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(false);
     }
 
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_PRISONER_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RELATIONSHIPLESS_RANDOM_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION)).thenReturn(false);
 
         final AbstractProcreation disabledProcreation = new DisabledRandomProcreation(mockCampaignOptions);
 
@@ -141,21 +157,21 @@ public class AbstractProcreationTest {
     public void testDetermineFather() {
         when(mockProcreation.determineFather(any(), any())).thenCallRealMethod();
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
 
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(false);
         assertNull(mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, father.getId().toString());
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(true);
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getGenealogy().setSpouse(father);
@@ -705,7 +721,7 @@ public class AbstractProcreationTest {
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), eq(false));
         doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt(), eq(false));
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
@@ -717,7 +733,7 @@ public class AbstractProcreationTest {
         assertNull(mother.getDueDate());
         assertTrue(mother.getExtraData().isEmpty());
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
@@ -726,7 +742,7 @@ public class AbstractProcreationTest {
         assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
         assertEquals(1, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(true);
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
@@ -750,7 +766,7 @@ public class AbstractProcreationTest {
     public void testRemovePregnancy() {
         doCallRealMethod().when(mockProcreation).removePregnancy(any());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person mother = new Person(mockCampaign);
@@ -861,7 +877,7 @@ public class AbstractProcreationTest {
     public void testRandomlyProcreates() {
         doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person person = new Person(mockCampaign);
@@ -883,5 +899,46 @@ public class AbstractProcreationTest {
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
         when(mockProcreation.procreation(any())).thenReturn(true);
         assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+    }
+
+    /**
+     * Regression test for 'Dr Baby': background (historic) births used to keep whatever education and titles the
+     * personnel generator rolled for the dependent's random adult age, so newborns could arrive with doctorates.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirthHistoric_babiesHaveNoEducationOrTitles() {
+        when(mockCampaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)).thenReturn(BabySurnameStyle.MOTHERS);
+        when(mockCampaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
+
+        // Simulate the generator handing back a dependent that was rolled as a highly educated adult
+        when(mockCampaign.getPlayerForce().getHumanResources().newDependent(any(), any(), any(), any()))
+              .thenAnswer(invocation -> {
+                  Person generatedDependent = new Person(mockCampaign);
+                  generatedDependent.setDateOfBirth(LocalDate.of(2990, 1, 1));
+                  generatedDependent.setEduHighestEducation(EducationLevel.DOCTORATE);
+                  generatedDependent.setPreNominal("Dr");
+                  generatedDependent.setPostNominal("PhD");
+                  return generatedDependent;
+              });
+
+        final LocalDate dueDate = LocalDate.of(3025, 6, 1);
+        final Person mother = new Person(mockCampaign);
+        mother.setDueDate(dueDate);
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 3);
+
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+        final List<Person> babies = procreation.birthHistoric(mockCampaign, dueDate, mother, null);
+
+        assertEquals(3, babies.size());
+        for (Person baby : babies) {
+            assertEquals(dueDate, baby.getDateOfBirth());
+            assertEquals(EducationLevel.EARLY_CHILDHOOD, baby.getEduHighestEducation());
+            assertEquals("", baby.getPreNominal());
+            assertEquals("", baby.getPostNominal());
+        }
     }
 }

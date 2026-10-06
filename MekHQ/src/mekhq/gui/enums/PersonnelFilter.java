@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,7 +39,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -86,14 +88,11 @@ public enum PersonnelFilter {
     MEDICAL("PersonnelFilter.MEDICAL.text", "PersonnelFilter.MEDICAL.toolTipText", true, false),
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
     MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
-    ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", true, false),
-    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text",
-          "PersonnelFilter.ADMINISTRATOR_COMMAND.toolTipText", false, true),
-    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text",
-          "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
-    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text",
-          "PersonnelFilter.ADMINISTRATOR_TRANSPORT.toolTipText", false, true),
-    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false,
+    ADMINISTRATOR_GLOBAL("PersonnelFilter.ADMINISTRATOR.text",
+          "PersonnelFilter.ADMINISTRATOR.toolTipText",
+          true,
+          false),
+    ADMINISTRATOR_SINGLE("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", false,
           true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
     CAMP_FOLLOWER("PersonnelFilter.CAMP_FOLLOWER.text", "PersonnelFilter.CAMP_FOLLOWER.toolTipText"),
@@ -101,6 +100,7 @@ public enum PersonnelFilter {
 
     // region Expanded Personnel Tab Filters
     FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
+    BLOODNAMED("PersonnelFilter.BLOODNAMED.text", "PersonnelFilter.BLOODNAMED.toolTipText", false, false),
     KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
     INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
@@ -289,23 +289,7 @@ public enum PersonnelFilter {
     }
 
     public boolean isAdministrator() {
-        return this == ADMINISTRATOR;
-    }
-
-    public boolean isAdministratorCommand() {
-        return this == ADMINISTRATOR_COMMAND;
-    }
-
-    public boolean isAdministratorLogistics() {
-        return this == ADMINISTRATOR_LOGISTICS;
-    }
-
-    public boolean isAdministratorTransport() {
-        return this == ADMINISTRATOR_TRANSPORT;
-    }
-
-    public boolean isAdministratorHR() {
-        return this == ADMINISTRATOR_HR;
+        return this == ADMINISTRATOR_GLOBAL;
     }
 
     public boolean isDependent() {
@@ -356,7 +340,36 @@ public enum PersonnelFilter {
     public boolean isDead() {
         return this == DEAD;
     }
+
+    /**
+     * @return {@code true} if this filter only makes sense for a Clan command
+     */
+    public boolean isClanOnly() {
+        return this == BLOODNAMED;
+    }
     // endregion Boolean Comparison Methods
+
+    /**
+     * Drops filters that do not apply to the given command.
+     *
+     * <p>Only the Clans award Bloodnames, so an Inner Sphere command is not offered a filter that
+     * could only ever come back empty.</p>
+     *
+     * @param filters  the filters the user's chosen style offers
+     * @param campaign the campaign the list is being built for; may be {@code null}, which is
+     *                 treated as not a Clan command
+     *
+     * @return the filters that apply to this command
+     */
+    public static List<PersonnelFilter> applicableTo(final List<PersonnelFilter> filters,
+          final @Nullable Campaign campaign) {
+        boolean isClanCommand = (campaign != null) && campaign.getPlayerForce().getFaction().isClan();
+        if (isClanCommand) {
+            return filters;
+        }
+
+        return filters.stream().filter(filter -> !filter.isClanOnly()).toList();
+    }
 
     public static List<PersonnelFilter> getStandardPersonnelFilters() {
         return Stream.of(values()).filter(filter -> filter.isBaseline() || filter.isStandard())
@@ -481,25 +494,15 @@ public enum PersonnelFilter {
                                             person.getPrimaryRole().isDoctor() : person.hasRole(PersonnelRole.DOCTOR));
             case MEDIC -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                            person.getPrimaryRole().isMedic() : person.hasRole(PersonnelRole.MEDIC));
-            case ADMINISTRATOR -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
+            case ADMINISTRATOR_GLOBAL -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                                                    person.getPrimaryRole().isAdministrator() :
                                                    person.isAdministrator());
-            case ADMINISTRATOR_COMMAND -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                           person.getPrimaryRole().isAdministratorCommand() :
-                                                           person.hasRole(PersonnelRole.ADMINISTRATOR_COMMAND));
-            case ADMINISTRATOR_LOGISTICS -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                             person.getPrimaryRole().isAdministratorLogistics() :
-                                                             person.hasRole(PersonnelRole.ADMINISTRATOR_LOGISTICS));
-            case ADMINISTRATOR_TRANSPORT -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                             person.getPrimaryRole().isAdministratorTransport() :
-                                                             person.hasRole(PersonnelRole.ADMINISTRATOR_TRANSPORT));
-            case ADMINISTRATOR_HR -> active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                                                      person.getPrimaryRole().isAdministratorHR() :
-                                                      person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
+            case ADMINISTRATOR_SINGLE -> active && person.hasRole(PersonnelRole.ADMINISTRATOR);
             case DEPENDENT -> ((!dead) && (active && person.getPrimaryRole().isCivilian()));
             case CAMP_FOLLOWER -> ((!dead) && (active && person.getStatus().isCampFollower()));
             case BACKGROUND_CHARACTER -> person.getStatus().isBackground();
             case FOUNDER -> ((!dead) && (person.isFounder()));
+            case BLOODNAMED -> ((!dead) && (person.getBloodname() != null) && !person.getBloodname().isBlank());
             case KIDS -> ((!dead) && (!status.isLeft()) && (person.isChild(currentDate)));
             case PRISONER -> ((!dead) &&
                                     ((person.getPrisonerStatus().isCurrentPrisoner()) ||

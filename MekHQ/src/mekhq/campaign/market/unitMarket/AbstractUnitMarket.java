@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,6 +57,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public abstract class AbstractUnitMarket {
     private static final MMLogger LOGGER = MMLogger.create(AbstractUnitMarket.class);
@@ -196,14 +197,14 @@ public abstract class AbstractUnitMarket {
                                                   quality,
                                                   movementModes,
                                                   missionRoles,
-                                                  ms -> (!campaign.getCampaignOptions().isLimitByYear() ||
+                                                  ms -> (!campaign.getCampaignOptions().get(CampaignOption.LIMIT_BY_YEAR) ||
                                                                (campaign.getGameYear() > ms.getYear())) &&
                                                               (!ms.isClan() ||
                                                                      campaign.getCampaignOptions()
-                                                                           .isAllowClanPurchases()) &&
+                                                                           .get(CampaignOption.ALLOW_CLAN_PURCHASES)) &&
                                                               (ms.isClan() ||
                                                                      campaign.getCampaignOptions()
-                                                                           .isAllowISPurchases()));
+                                                                           .get(CampaignOption.ALLOW_IS_PURCHASES)));
         LOGGER.debug("Adding unit to market: {} {} {}", unitType, mekSummary, percent);
         return (mekSummary == null) ? null : addSingleUnit(campaign, market, unitType, mekSummary, percent);
     }
@@ -220,7 +221,7 @@ public abstract class AbstractUnitMarket {
     public String addSingleUnit(final Campaign campaign, final UnitMarketType market, final int unitType,
           final MekSummary mekSummary, final int percent) {
 
-        Faction campaignFaction = campaign.getFaction();
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.isClan()) {
@@ -250,7 +251,7 @@ public abstract class AbstractUnitMarket {
      * @return the generated transit duration
      */
     protected int generateTransitDuration(final Campaign campaign) {
-        if (campaign.getCampaignOptions().isInstantUnitMarketDelivery()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.INSTANT_UNIT_MARKET_DELIVERY)) {
             return 0;
         }
         return campaign.calculatePartTransitTime(Compute.d6(2) - 2);
@@ -260,7 +261,7 @@ public abstract class AbstractUnitMarket {
      * @param campaign the campaign to write the refresh report to
      */
     protected void writeRefreshReport(final Campaign campaign) {
-        if (campaign.getCampaignOptions().isUnitMarketReportRefresh()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_REPORT_REFRESH)) {
             campaign.addReport(GENERAL, resources.getString("AbstractUnitMarket.RefreshReport.report"));
         }
     }

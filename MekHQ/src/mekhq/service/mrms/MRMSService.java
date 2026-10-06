@@ -34,11 +34,11 @@ package mekhq.service.mrms;
 
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -48,9 +48,12 @@ import java.util.ResourceBundle;
 
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.HandheldWeapon;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
+import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -65,11 +68,13 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
@@ -88,16 +93,34 @@ public class MRMSService {
     }
 
     public static boolean isValidMRMSUnit(Unit unit, MRMSConfiguredOptions configuredOptions) {
-        if (unit.isSelfCrewed() ||
-                  (!unit.isSalvage() && !configuredOptions.useRepair()) ||
-                  (unit.isSalvage() && !configuredOptions.useSalvage())) {
+        boolean isRepairOff = !unit.isSalvage() && !configuredOptions.useRepair();
+        boolean isSalvageOff = unit.isSalvage() && !configuredOptions.useSalvage();
+        if (isRepairOff || isSalvageOff) {
             return false;
         }
+        return isMassRepairableUnit(unit);
+    }
 
-        return (unit.getEntity() instanceof Tank) ||
-                     (unit.getEntity() instanceof Aero) ||
-                     (unit.getEntity() instanceof Mek) ||
-                     (unit.getEntity() instanceof BattleArmor);
+    /**
+     * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
+     * right-click menu all ask this, so they offer the same units. A self-crewed unit looks after itself; any other
+     * unit qualifies when it is a type a tech can be assigned to, the same types {@link Person#canTech} accepts.
+     *
+     * @param unit the unit
+     *
+     * @return {@code true} if Mass Repair can work on the unit
+     */
+    public static boolean isMassRepairableUnit(Unit unit) {
+        if (unit.isSelfCrewed()) {
+            return false;
+        }
+        Entity entity = unit.getEntity();
+        boolean isMekTechWork = (entity instanceof Mek) || (entity instanceof ProtoMek)
+                                      || (entity instanceof HandheldWeapon);
+        boolean isOtherTechWork = (entity instanceof Aero) || (entity instanceof BattleArmor)
+                                        || (entity instanceof Tank);
+        boolean isTechMaintainedInfantry = (entity != null) && entity.isConventionalInfantry();
+        return isMekTechWork || isOtherTechWork || isTechMaintainedInfantry;
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
@@ -108,7 +131,13 @@ public class MRMSService {
         }
         campaign.addReport(TECHNICAL, resources.getString("MRMS.StartWarehouse.report"));
 
-        List<Person> techs = campaign.getTechs(true);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate(),
+                                         true);
 
         MRMSPartSet partSet = new MRMSPartSet();
 
@@ -131,11 +160,13 @@ public class MRMSService {
             if (!parts.isEmpty()) {
                 for (IPartWork partWork : parts) {
                     Part part = (Part) partWork;
+                    WorkTime playerChosenMode = part.getMode();
                     part.resetModeToNormal();
 
-                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, true, campaign);
+                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
                     if (validTechs.isEmpty()) {
+                        restorePlayerChosenMode(part, playerChosenMode);
                         continue;
                     }
 
@@ -165,11 +196,13 @@ public class MRMSService {
             return msg;
         } else if ((!unit.isSalvage() && !configuredOptions.useRepair()) ||
                          (unit.isSalvage() && !configuredOptions.useSalvage())) {
-            String msg = MessageFormat.format(resources.getString("MRMS.CompleteTypeDisabled.report"),
-                  unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair"));
-            campaign.addReport(TECHNICAL, msg);
-            return msg;
-        } else if (campaign.requiresAdditionalAsTechs()) {
+            String message = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
+                  unit.isSalvage() ? getTextAt(RESOURCE_BUNDLE, "Salvage") : getTextAt(RESOURCE_BUNDLE, "Repair"));
+            campaign.addReport(TECHNICAL, message);
+            return message;
+        } else if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
             campaign.addReport(TECHNICAL, message);
             return message;
@@ -213,7 +246,12 @@ public class MRMSService {
 
         campaign.addReport(TECHNICAL, msg);
 
-        List<Person> techs = campaign.getTechs();
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate());
 
         if (!techs.isEmpty()) {
             List<IPartWork> parts = unit.getPartsNeedingService(true);
@@ -235,12 +273,64 @@ public class MRMSService {
         return String.format("Mass %s complete on %s.", actionDescriptor, unit.getName());
     }
 
+    public static void performSingleLocationMRMS(Campaign campaign, Unit unit, IPartWork part) {
+        MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate(),
+                                         true);
+        // Quick Strip is a direct order on one location, so the force-wide Use Repair and Use Salvage switches do not
+        // apply to it
+        LOGGER.debug("[MRMS] Quick Strip of {} on {}", part.getPartName(), unit.getName());
+        if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
+            String message = getTextAt(RESOURCE_BUNDLE, "MRMS.InsufficientAstechs.report");
+            campaign.addReport(TECHNICAL, message);
+            return;
+        }
+
+        for (int i = techs.size() - 1; i >= 0; i--) {
+            Person tech = techs.get(i);
+
+            if (!tech.canTech(unit.getEntity())) {
+                techs.remove(i);
+            }
+        }
+
+        List<MRMSOption> mrmsOptions = configuredOptions.getActiveMRMSOptions();
+        Map<PartRepairType, MRMSOption> mrmsOptionsByType = new HashMap<>();
+        for (MRMSOption mrmsOption : mrmsOptions) {
+            mrmsOptionsByType.put(mrmsOption.getType(), mrmsOption);
+        }
+
+        boolean performMoreRepairs = true;
+        while (performMoreRepairs) {
+            List<IPartWork> partsList = new ArrayList<>();
+            partsList.add(part);
+
+            MRMSUnitAction currentUnitAction = scrapLocationAndRemoveEquipment(campaign,
+                  unit,
+                  techs,
+                  mrmsOptionsByType,
+                  configuredOptions,
+                  partsList);
+
+            performMoreRepairs = currentUnitAction.getPartSet().isHasRepairs();
+        }
+    }
+
     public static void mrmsAllUnits(Campaign campaign) {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteDisabled.report"));
             return;
-        } else if (campaign.requiresAdditionalAsTechs()) {
+        } else if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             campaign.addReport(TECHNICAL, resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }
@@ -359,7 +449,12 @@ public class MRMSService {
               campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
-            List<Person> techs = campaign.getTechs();
+            List<Person> techs = campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                             campaign.getCampaignOptions(),
+                                             campaign.getPlayerForce().isClanForce(),
+                                             campaign.getLocalDate());
 
             if (!techs.isEmpty()) {
                 int count = 0;
@@ -434,7 +529,13 @@ public class MRMSService {
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
           List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
-        List<Person> techs = campaign.getTechs(true);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate(),
+                                         true);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
@@ -490,6 +591,33 @@ public class MRMSService {
     private static MRMSUnitAction performUnitMassTechAction(Campaign campaign, Unit unit, List<Person> techs,
           Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
           MRMSConfiguredOptions configuredOptions) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return performUnitMassTechActionOnce(campaign, unit, techs, mrmsOptionsByType, salvaging,
+                  configuredOptions);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    /**
+     * Stripping a limb with a broken hip or shoulder switches the unit to salvage mode and turns carryover off for a
+     * while. Both go back to how they were whatever happens, so an early return or an error cannot leave the unit in
+     * salvage mode or carryover off for every later unit in the batch.
+     */
+    private static void restoreAfterLimbStripping(Unit unit, boolean wasSalvaging,
+          MRMSConfiguredOptions configuredOptions, boolean allowedCarryover) {
+        if (unit.isSalvage() != wasSalvaging) {
+            LOGGER.debug("[MRMS] {}: salvage mode put back to {}", unit.getName(), wasSalvaging);
+            unit.setSalvage(wasSalvaging);
+        }
+        configuredOptions.setAllowCarryover(allowedCarryover);
+    }
+
+    private static MRMSUnitAction performUnitMassTechActionOnce(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
+          MRMSConfiguredOptions configuredOptions) {
         List<IPartWork> parts = unit.getPartsNeedingService(true);
 
         if (parts.isEmpty()) {
@@ -500,12 +628,6 @@ public class MRMSService {
             }
 
             return new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.NO_PARTS);
-        }
-
-        for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
-            }
         }
 
         // If we're performing an action on a unit, and we allow auto-scrapping of parts
@@ -531,25 +653,16 @@ public class MRMSService {
                 ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
             }
 
-            // If we're replacing damaged parts, we want to remove any that have an
-            // available
-            // replacement from the list since the pod space repair will cover it.
-            List<IPartWork> temp = new ArrayList<>();
-
-            for (IPartWork p : parts) {
-                if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
-                    if (!(p instanceof AmmoBin) || salvaging) {
-                        MissingPart m = p.getMissingPart();
-                        if ((m != null) && m.isReplacementAvailable()) {
-                            continue;
-                        }
-                    }
-                }
-
-                temp.add(p);
+            // Damaged pod equipment with a spare in stock is left to the pod swap, but only when the swap will
+            // run; otherwise nothing would ever repair it
+            boolean willPodSpacesSwapParts = configuredOptions.isReplacePodParts()
+                                                   && mrmsOptionsByType.containsKey(PartRepairType.POD_SPACE);
+            if (willPodSpacesSwapParts) {
+                parts = withoutPodPartsTheSwapWillReplace(parts, salvaging);
+            } else {
+                LOGGER.debug("[MRMS] {}: pod equipment is repaired in place; the OmniPod swap will not run",
+                      unit.getName());
             }
-
-            parts = temp;
         }
 
         if (techs.isEmpty()) {
@@ -625,53 +738,10 @@ public class MRMSService {
                 }
 
                 if (partsToBeRemoved.isEmpty()) {
-                    /*
-                     * We have no parts left on our unfixable locations, so
-                     * we'll just scrap those locations and rebuild the parts
-                     * list and reset back our normal repair mode
-                     */
-
-                    for (Part part : locationMap.values()) {
-                        if (part instanceof MekLocation) {
-                            campaign.addReport(TECHNICAL, part.scrap());
-                        }
-                    }
-
-                    scrappingLimbMode = false;
-
-                    if (!salvaging) {
-                        unit.setSalvage(false);
-                    }
-
+                    scrappingLimbMode = scrapEmptyLimb(locationMap, campaign, scrappingLimbMode, salvaging, unit);
                     parts = unit.getPartsNeedingService(true);
                 } else {
-                    for (int locId : countOfPartsPerLocation.keySet()) {
-                        boolean unfixable = false;
-                        Part loc = null;
-
-                        if (locationMap.containsKey(locId)) {
-                            loc = locationMap.get(locId);
-                            unfixable = (loc instanceof MekLocation);
-                        }
-
-                        if (unfixable) {
-                            campaign.addReport(TECHNICAL, String.format(
-                                  "<font color='" +
-                                        getWarningColor()
-                                        +
-                                        "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
-                                  loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
-                        } else {
-                            campaign.addReport(TECHNICAL, String.format(
-                                  "<font color='" +
-                                        getWarningColor()
-                                        +
-                                        "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
-                                  loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
-                                  countOfPartsPerLocation.get(locId)));
-                        }
-                    }
-
+                    processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
                     parts = partsToBeRemoved;
                 }
             }
@@ -707,24 +777,7 @@ public class MRMSService {
         MRMSUnitAction unitAction = new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
 
         for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
-            }
-
-            List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
-
-            if (validTechs.isEmpty()) {
-                unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
-                continue;
-            }
-
-            unitAction.addPartAction(repairPart(campaign,
-                  partWork,
-                  unit,
-                  validTechs,
-                  mrmsOptionsByType,
-                  configuredOptions,
-                  false));
+            performPartWork(campaign, unit, techs, mrmsOptionsByType, configuredOptions, partWork, unitAction);
         }
 
         if (scrappingLimbMode) {
@@ -738,6 +791,248 @@ public class MRMSService {
         }
 
         return unitAction;
+    }
+
+    private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
+          MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return scrapLocationAndRemoveEquipmentOnce(campaign, unit, techs, mrmsOptionsByType, configuredOptions,
+                  parts);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    private static MRMSUnitAction scrapLocationAndRemoveEquipmentOnce(Campaign campaign, Unit unit,
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
+          MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
+
+        if (parts.isEmpty()) {
+            return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
+        }
+
+        if (techs.isEmpty()) {
+            return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.NO_TECHS);
+        }
+
+        // If we're a mek and we have a limb with a bad shoulder/hip, we're going to try to flip it to salvageable
+        // and remove all the parts so that we can nuke the limb. If we do this, when we're finally done we need to
+        // flip the mek back to repairable so that we don't accidentally strip everything off it.
+        boolean scrappingLimbMode = false;
+
+        // Pre-checking for hips/shoulders on repairable meks. If we have a bad hip or shoulder, we're not going to
+        // do anything until we get those parts out of the location and scrap it. Once we're at a happy place, we'll proceed.
+        boolean isSalvaging = unit.isSalvage();
+        if ((unit.getEntity() instanceof Mek)) {
+            Map<Integer, Part> locationMap = new HashMap<>();
+
+            for (IPartWork partWork : parts) {
+                if ((partWork instanceof MekLocation) && ((MekLocation) partWork).onBadHipOrShoulder()) {
+                    locationMap.put(((MekLocation) partWork).getLoc(), (MekLocation) partWork);
+                }
+            }
+
+            if (!locationMap.isEmpty()) {
+                // Find our parts in our bad locations. If we don't actually have, just scrap the limbs and move on
+                // with our normal work
+                scrappingLimbMode = true;
+
+                if (!isSalvaging) {
+                    unit.setSalvage(true);
+                }
+
+                List<IPartWork> partsTemp = unit.getPartsNeedingService(true);
+                List<IPartWork> partsToBeRemoved = new ArrayList<>();
+                Map<Integer, Integer> countOfPartsPerLocation = new HashMap<>();
+
+                for (IPartWork partWork : partsTemp) {
+                    if (!(partWork instanceof MekLocation) &&
+                              locationMap.containsKey(partWork.getLocation()) &&
+                              partWork.isSalvaging()) {
+                        partsToBeRemoved.add(partWork);
+
+                        int count = 0;
+
+                        if (countOfPartsPerLocation.containsKey(partWork.getLocation())) {
+                            count = countOfPartsPerLocation.get(partWork.getLocation());
+                        }
+
+                        count++;
+
+                        countOfPartsPerLocation.put(partWork.getLocation(), count);
+                    }
+                }
+
+                if (partsToBeRemoved.isEmpty()) {
+                    scrapEmptyLimb(locationMap, campaign, scrappingLimbMode, isSalvaging, unit);
+                    // The limb is gone, so there is nothing left to strip; carrying on would work on the scrapped limb
+                    LOGGER.debug("[MRMS] {}: Quick Strip finished, the empty limb was scrapped", unit.getName());
+                    return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
+                } else {
+                    processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
+
+                    parts = partsToBeRemoved;
+                }
+            }
+        }
+
+        boolean originalAllowCarryover = configuredOptions.isAllowCarryover();
+
+        // If we're scrapping limbs, we don't want salvage repairs to go into a new day otherwise it can be confusing
+        // when trying to figure why a unit can't be repaired because 'salvage' repairs don't show up on the task
+        // list as scheduled if we're in 'repair' mode.
+        if (scrappingLimbMode) {
+            configuredOptions.setAllowCarryover(false);
+        }
+
+        // Filter our parts list to only those that aren't being worked on or those that meet our criteria as defined
+        // in the campaign configurations
+        parts = filterParts(parts, mrmsOptionsByType, techs, campaign);
+
+        if (parts.isEmpty()) {
+            if (scrappingLimbMode) {
+                unit.setSalvage(false);
+                configuredOptions.setAllowCarryover(originalAllowCarryover);
+            }
+
+            return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.NO_PARTS);
+        }
+
+        MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
+
+        for (IPartWork partWork : parts) {
+            performPartWork(campaign, unit, techs, mrmsOptionsByType, configuredOptions, partWork, unitAction);
+        }
+
+        if (scrappingLimbMode) {
+            unit.setSalvage(false);
+            configuredOptions.setAllowCarryover(originalAllowCarryover);
+        }
+
+        if (unitAction.getPartSet().isOnlyNoTechs()) {
+            unitAction.resetPartSet();
+            unitAction.setStatus(STATUS.NO_TECHS);
+        }
+
+        return unitAction;
+    }
+
+    private static void performPartWork(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, MRMSConfiguredOptions configuredOptions,
+          IPartWork partWork, MRMSUnitAction unitAction) {
+        WorkTime playerChosenMode = partWork.getMode();
+        if (partWork instanceof Part) {
+            ((Part) partWork).resetModeToNormal();
+        }
+
+        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
+
+        if (validTechs.isEmpty()) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
+            unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
+            return;
+        }
+
+        MRMSPartAction partAction = repairPart(campaign,
+              partWork,
+              unit,
+              validTechs,
+              mrmsOptionsByType,
+              configuredOptions,
+              false);
+        boolean isAssigned = partAction.getStatus() == MRMSPartAction.STATUS.REPAIRED;
+        if (!isAssigned) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
+        }
+        unitAction.addPartAction(partAction);
+    }
+
+    private static void processPartsInLocation(Campaign campaign, Unit unit,
+          Map<Integer, Integer> countOfPartsPerLocation,
+          Map<Integer, Part> locationMap) {
+        for (int locId : countOfPartsPerLocation.keySet()) {
+            boolean unfixable = false;
+            Part loc = null;
+
+            if (locationMap.containsKey(locId)) {
+                loc = locationMap.get(locId);
+                unfixable = (loc instanceof MekLocation);
+            }
+
+            if (unfixable) {
+                campaign.addReport(TECHNICAL, String.format(
+                      "<font color='" +
+                            getWarningColor()
+                            +
+                            "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
+                      loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
+            } else {
+                campaign.addReport(TECHNICAL, String.format(
+                      "<font color='" +
+                            getWarningColor()
+                            +
+                            "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
+                      loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
+                      countOfPartsPerLocation.get(locId)));
+            }
+        }
+    }
+
+    /*
+     * We have no parts left on our unfixable locations, so we'll just scrap those locations and
+     * rebuild the parts list and reset back our normal repair mode
+     */
+    private static boolean scrapEmptyLimb(Map<Integer, Part> locationMap, Campaign campaign,
+          boolean scrappingLimbMode, boolean isSalvaging, Unit unit) {
+        for (Part part : locationMap.values()) {
+            if (part instanceof MekLocation) {
+                campaign.addReport(TECHNICAL, part.scrap());
+            }
+        }
+
+        scrappingLimbMode = false;
+
+        if (!isSalvaging) {
+            unit.setSalvage(false);
+        }
+
+        return scrappingLimbMode;
+    }
+
+    /**
+     * @return the tasks without the damaged pod-mounted equipment that has a spare in stock, which the pod swap
+     *       replaces instead
+     */
+    private static List<IPartWork> withoutPodPartsTheSwapWillReplace(List<IPartWork> parts, boolean salvaging) {
+        List<IPartWork> remainingParts = new ArrayList<>();
+        for (IPartWork partWork : parts) {
+            boolean isPodMounted = (partWork instanceof Part part) && part.isOmniPodded();
+            // Ammunition is reloaded in place when repairing; only salvage swaps it out
+            boolean isSwappedOut = !(partWork instanceof AmmoBin) || salvaging;
+            boolean isReplacedBySwap = isPodMounted && isSwappedOut && hasSpareInStock(partWork);
+            if (!isReplacedBySwap) {
+                remainingParts.add(partWork);
+            }
+        }
+        return remainingParts;
+    }
+
+    private static boolean hasSpareInStock(IPartWork partWork) {
+        MissingPart missingPart = partWork.getMissingPart();
+        return (missingPart != null) && missingPart.isReplacementAvailable();
+    }
+
+    /**
+     * Mass Repair tries out work times on a task while it looks for a tech. A task it does not end up assigning gets
+     * back the work time the player chose for it.
+     */
+    private static void restorePlayerChosenMode(IPartWork partWork, WorkTime playerChosenMode) {
+        if (partWork instanceof Part part) {
+            part.setMode(playerChosenMode);
+        }
     }
 
     private static MRMSPartAction repairPart(Campaign campaign, IPartWork partWork, Unit unit, List<Person> techs,
@@ -885,7 +1180,8 @@ public class MRMSService {
             boolean assigned = false;
 
             if ((unit != null) && configuredOptions.isUseAssignedTechsFirst()) {
-                Formation formation = campaign.getFormation(unit.getFormationId());
+                int id = unit.getFormationId();
+                Formation formation = campaign.getPlayerForce().getFormation(id);
 
                 if ((formation != null) && (formation.getTechID()) != null) {
                     assigned = formation.getTechID().toString().equals(tech.getId().toString());
@@ -1033,8 +1329,16 @@ public class MRMSService {
                 continue;
             }
 
-            if ((partWork instanceof MissingPart) && !((MissingPart) partWork).isReplacementAvailable()) {
-                continue;
+            if (partWork instanceof MissingPart missingPart) {
+                // A part the player has queued for fabrication is being built from scratch on purpose; MRMS must
+                // leave it alone rather than replace it from warehouse stock and undo that choice.
+                if (missingPart.isFabricating()) {
+                    continue;
+                }
+
+                if (!missingPart.isReplacementAvailable()) {
+                    continue;
+                }
             }
 
             if (mrmsOptionsByType != null) {
@@ -1084,6 +1388,10 @@ public class MRMSService {
                 tech = new Person("Temp", String.format("Tech (%s)", skillName), campaign);
                 tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
                 tech.setMinutesLeft(1);
+                // This placeholder represents an idealized, fully equipped tech for the feasibility check. When the
+                // "Techs Need a Tool Kit" campaign option is enabled, getTargetFor treats any kit-less tech as unable to
+                // work, so the placeholder must carry a tool kit, or every part would be wrongly reported as impossible.
+                tech.setRepairKitName(EquipmentKitCatalog.KIT_BASIC_TOOLKIT);
 
                 techCache.put(skillName, tech);
             }
@@ -1103,7 +1411,7 @@ public class MRMSService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean warehouseMode, Campaign campaign) {
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 
         if (techs.isEmpty()) {
@@ -1116,6 +1424,7 @@ public class MRMSService {
             return validTechs;
         }
 
+        int techsElsewhere = 0;
         for (int i = techs.size() - 1; i >= 0; i--) {
             Person tech = techs.get(i);
 
@@ -1123,7 +1432,16 @@ public class MRMSService {
                 continue;
             }
 
-            if (warehouseMode && !tech.isRightTechTypeFor(partWork)) {
+            // The repair refuses a tech who is not where the task is; picking one anyway would repeat forever
+            if (!RepairLocationCheck.isTechAtTask(tech, partWork)) {
+                techsElsewhere++;
+                continue;
+            }
+
+            // Only techs with the skill the task requires may be assigned; with granular tech skills a tech lacking
+            // the specialist skill would otherwise fall back to an unrelated skill and trigger the wrong-tech-type
+            // warning
+            if (!tech.isRightTechTypeFor(partWork)) {
                 continue;
             }
 
@@ -1157,6 +1475,10 @@ public class MRMSService {
             validTechs.add(tech);
         }
 
+        if (techsElsewhere > 0) {
+            LOGGER.debug("[MRMS] {}: {} techs skipped because they are at a different location", partWork.getPartName(),
+                  techsElsewhere);
+        }
         return validTechs;
     }
 
@@ -1247,17 +1569,19 @@ public class MRMSService {
 
                 targetRoll = campaign.getTargetFor(partWork, tech);
 
-                WorkTimeCalculation wtc = new WorkTimeCalculation(null);
-                if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
-                    wtc.setWorkTime(previousNewWorkTime);
+                WorkTimeCalculation workTimeCalculation = new WorkTimeCalculation(null);
+                int targetNumberLimit = increaseTime ? mrmsOption.getTargetNumberMax()
+                      : getRushTargetNumberLimit(mrmsOption);
+                if (targetRoll.getValue() <= targetNumberLimit) {
+                    workTimeCalculation.setWorkTime(previousNewWorkTime);
                 }
 
                 if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
-                    wtc.setReachedMaxSkill(true);
+                    workTimeCalculation.setReachedMaxSkill(true);
                 }
 
-                return wtc;
+                return workTimeCalculation;
             }
 
             // Set our new workTime and calculate the new targetRoll
@@ -1290,7 +1614,8 @@ public class MRMSService {
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
-                if (targetRoll.getValue() > mrmsOption.getTargetNumberMax()) {
+                // Rushing trades a harder roll for time, but never past the preferred target number
+                if (targetRoll.getValue() > getRushTargetNumberLimit(mrmsOption)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1302,6 +1627,14 @@ public class MRMSService {
         }
 
         return new WorkTimeCalculation();
+    }
+
+    /**
+     * @return the highest target number a Rush Job may push a task to: the preferred target number, or the maximum if
+     *       that is lower
+     */
+    private static int getRushTargetNumberLimit(MRMSOption mrmsOption) {
+        return Math.min(mrmsOption.getTargetNumberPreferred(), mrmsOption.getTargetNumberMax());
     }
 
     private static void debugLog(String msg, String methodName, Object... replacements) {
@@ -1354,7 +1687,7 @@ public class MRMSService {
 
             // Nulls at the end
             if (skill1 == null && skill2 == null) {
-                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+                return compareMostTimeFirst(tech1, tech2);
             }
             if (skill1 == null) {
                 return 1;
@@ -1372,7 +1705,12 @@ public class MRMSService {
                 return experienceCompare;
             }
 
-            return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+            return compareMostTimeFirst(tech1, tech2);
+        }
+
+        /** Puts the tech with more minutes left first, so the job is most likely to be finished today. */
+        private static int compareMostTimeFirst(Person tech1, Person tech2) {
+            return Integer.compare(tech2.getMinutesLeft(), tech1.getMinutesLeft());
         }
     }
 
@@ -1412,27 +1750,22 @@ public class MRMSService {
             this.status = status;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusRepaired() {
             return status == STATUS.REPAIRED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusMaxSkillReached() {
             return status == STATUS.MAX_SKILL_REACHED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusOptionDisabled() {
             return status == STATUS.MRO_DISABLED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getMaxTechSkill() {
             return maxTechSkill;
         }
@@ -1441,7 +1774,6 @@ public class MRMSService {
             this.maxTechSkill = maxTechSkill;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getConfiguredTargetNumberPreferred() {
             return configuredTargetNumberPreferred;
         }
@@ -1538,7 +1870,6 @@ public class MRMSService {
             return partSet;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setPartSet(MRMSPartSet partSet) {
             this.partSet = partSet;
         }
@@ -1563,22 +1894,18 @@ public class MRMSService {
             return status == STATUS.NO_ACTIONS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusActionsPerformed() {
             return status == STATUS.ACTIONS_PERFORMED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusUnfixableLimb() {
             return status == STATUS.UNFIXABLE_LIMB;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoParts() {
             return status == STATUS.NO_PARTS;
         }

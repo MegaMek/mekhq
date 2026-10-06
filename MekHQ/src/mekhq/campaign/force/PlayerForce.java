@@ -1,0 +1,133 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.force;
+
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
+
+/**
+ * The human player's active force: the single {@link AbstractForce} a {@link mekhq.campaign.Campaign} is played
+ * through.
+ *
+ * <p>For now a player force owns exactly one {@link Detachment} — hence it implements
+ * {@link SingleDetachmentForce}, which supplies the located-resource passthroughs (hangar, warehouse, personnel, …).
+ * Multiple detachments per force is a later refactor, at which point a multi-detachment variant will simply not
+ * implement {@code SingleDetachmentForce} and the compiler will flag every single-detachment assumption.</p>
+ */
+public class PlayerForce extends AbstractForce implements SingleDetachmentForce {
+
+    private final Detachment forceDetachment = new Detachment();
+
+    /** The force's contract market: the currently available offers, split by {@code ContractSearchType}. */
+    private final ContractMarket contractMarket = new ContractMarket();
+
+    /**
+     * @param faction                 the force's starting faction
+     * @param techFaction             the resolved MegaMek tech faction
+     * @param rankSystem              the force's rank system
+     * @param finances                the force's finances ledger
+     * @param reputationController    the force's reputation controller
+     * @param chaosCampaignReputation the force's overall reputation
+     * @param factionStandings        the force's standings with the wider universe
+     * @param campaignOptions         the campaign options the force's {@link ForceOptions} passes through to
+     */
+    public PlayerForce(Faction faction, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
+          Finances finances, ForceReputationController reputationController, int chaosCampaignReputation,
+          FactionStandings factionStandings, CampaignOptions campaignOptions) {
+        super(new ForceOptions(campaignOptions, faction),
+              techFaction,
+              rankSystem,
+              finances,
+              reputationController,
+              chaosCampaignReputation,
+              factionStandings);
+    }
+
+    @Override
+    public Detachment getForceDetachment() {
+        return forceDetachment;
+    }
+
+    @Override
+    public Collection<Detachment> getDetachments() {
+        return new ArrayList<>(List.of(forceDetachment));
+    }
+
+    // region Contracts
+
+    /**
+     * @return this force's contract market: the pool of currently available offers, split by search type
+     */
+    public ContractMarket getContractMarket() {
+        return contractMarket;
+    }
+
+    /**
+     * Returns the purchase cost multiplier imposed by the given active contracts.
+     *
+     * <p>When at least one of the supplied active contracts carries the
+     * {@link mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules#DOUBLE_ALL_COSTS} special rule,
+     * the cost of purchasing units and parts is doubled for the duration of that contract; otherwise costs are
+     * unchanged.</p>
+     *
+     * @param activeContracts the campaign's currently active contracts
+     *
+     * @return {@code 2.0} while a {@code DOUBLE_ALL_COSTS} contract is active, otherwise {@code 1.0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getPurchaseCostMultiplier(Collection<AbstractContract> activeContracts) {
+        for (AbstractContract contract : activeContracts) {
+            if (contract.usesSpecialRule(DOUBLE_ALL_COSTS)) {
+                return 2.0;
+            }
+        }
+
+        return 1.0;
+    }
+
+    // endregion Contracts
+}

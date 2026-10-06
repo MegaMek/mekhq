@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,7 +70,7 @@ public class SkillAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 // this allows the user to specify multiple skills to be checked against,
                 // where all skill levels need to be met.
                 // if the user puts two ',' next to each other (creating an empty skill) the
@@ -121,7 +121,8 @@ public class SkillAwards {
                       SkillType.S_PILOT_VTOL,
                       SkillType.S_PILOT_NVEE,
                       SkillType.S_PILOT_JET,
-                      SkillType.S_PILOT_SPACE);
+                      SkillType.S_PILOT_SPACE,
+                      SkillType.S_PILOT_PROTO);
                 break;
 
             case "accuracy":
@@ -148,7 +149,7 @@ public class SkillAwards {
             case "techwithmedical":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
                       SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_VEHICLE,
                       SkillType.S_TECH_VESSEL,
                       SkillType.S_TECH_BA,
                       SkillType.S_ASTECH,
@@ -159,7 +160,7 @@ public class SkillAwards {
             case "tech":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
                       SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_VEHICLE,
                       SkillType.S_TECH_VESSEL,
                       SkillType.S_TECH_BA,
                       SkillType.S_ASTECH);
@@ -201,6 +202,10 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
                 break;
 
+            case "piloting/protomek":
+                relevantSkills = List.of(SkillType.S_PILOT_PROTO);
+                break;
+
             case "gunnery/mek":
                 relevantSkills = List.of(SkillType.S_GUN_MEK);
                 break;
@@ -234,7 +239,7 @@ public class SkillAwards {
                 break;
 
             case "tech/mechanic":
-                relevantSkills = List.of(SkillType.S_TECH_MECHANIC);
+                relevantSkills = List.of(SkillType.S_TECH_VEHICLE);
                 break;
 
             case "tech/aero":
@@ -315,7 +320,7 @@ public class SkillAwards {
      * @param personId       the person whose Skill Levels are being checked
      */
     private static int getSkillLevel(Campaign campaign, List<String> relevantSkills, UUID personId) {
-        Person person = campaign.getPerson(personId);
+        Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
 
         int[] skillLevels = new int[relevantSkills.size()];
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public enum UnitMarketType {
     // region Enum Declarations
@@ -165,7 +166,7 @@ public enum UnitMarketType {
      */
     public static PartQuality getQuality(Campaign campaign, UnitMarketType market) {
 
-        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
             return Unit.getRandomUnitQuality(switch (market) {
                 case OPEN, MERCENARY -> 0;
                 case EMPLOYER -> -1;

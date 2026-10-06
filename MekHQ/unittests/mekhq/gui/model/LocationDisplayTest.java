@@ -48,6 +48,7 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationNode;
@@ -108,6 +109,17 @@ public class LocationDisplayTest {
             Person person = buildTravelingPerson(List.of(academySys), 3.5);
 
             assertEquals(getFormattedText("LocationDisplay.inTransit.toPlanet.text", 4),
+                  LocationDisplay.getLocationName(person, mock(Campaign.class, RETURNS_DEEP_STUBS), LocalDate.EPOCH));
+        }
+
+        @Test
+        void locationName_overland() {
+            GroundTransitLocation ground = new GroundTransitLocation(mock(PlanetarySystem.class), 1.5);
+            LocationNode.LocationManager.setLocation(ground, new AcademyCampusLocation("Set", "Name"));
+            Person person = new Person("GivenName", "Surname", null, "Faction");
+            LocationNode.LocationManager.setLocation(person, ground);
+
+            assertEquals(getFormattedText("LocationDisplay.inTransit.overland.text", 2),
                   LocationDisplay.getLocationName(person, mock(Campaign.class, RETURNS_DEEP_STUBS), LocalDate.EPOCH));
         }
     }

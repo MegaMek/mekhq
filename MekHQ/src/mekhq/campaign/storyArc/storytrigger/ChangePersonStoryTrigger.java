@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -99,7 +99,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
 
     @Override
     protected void execute() {
-        Person p = getCampaign().getPerson(personId);
+        Person p = getCampaign().getPlayerForce().getHumanResources().getPerson(personId);
         if (null != p) {
             Unit u = p.getUnit();
             if (null != status) {

@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +47,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.mission.enums.CombatRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -61,14 +61,14 @@ public class ContractUtilitiesTest {
 
     @BeforeAll
     static void beforeAll() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
     }
 
     @BeforeEach
     void beforeEach() {
         mockCombatTeams = new ArrayList<>();
 
-        when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockCombatTeams);
+        when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockCombatTeams);
     }
 
     @Nested

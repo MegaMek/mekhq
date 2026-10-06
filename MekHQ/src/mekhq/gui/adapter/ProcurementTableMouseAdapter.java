@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,11 +50,13 @@ import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger LOGGER = MMLogger.create(ProcurementTableMouseAdapter.class);
@@ -257,13 +259,13 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         } else if (equipment instanceof Entity) {
             PartQuality quality;
 
-            if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            if (gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
                 quality = PartQuality.QUALITY_D;
             }
 
-            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality, UnitAcquisitionType.PURCHASED);
         } else {
             LOGGER.error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
             return;

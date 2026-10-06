@@ -57,6 +57,7 @@ import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
@@ -159,9 +160,9 @@ public class RandomDeath {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
-        enabledAgeGroups = campaignOptions.getEnabledRandomDeathAgeGroups();
-        enableRandomDeathSuicideCause = campaignOptions.isUseRandomDeathSuicideCause();
-        randomDeathMultiplier = campaignOptions.getRandomDeathMultiplier();
+        enabledAgeGroups = campaignOptions.get(CampaignOption.ENABLED_RANDOM_DEATH_AGE_GROUPS);
+        enableRandomDeathSuicideCause = campaignOptions.get(CampaignOption.USE_RANDOM_DEATH_SUICIDE_CAUSE);
+        randomDeathMultiplier = campaignOptions.get(CampaignOption.RANDOM_DEATH_MULTIPLIER);
 
         initializeCauses();
     }
@@ -347,7 +348,7 @@ public class RandomDeath {
         }
 
         Era era = campaign.getEra();
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
 
         // Determine base chance
         double randomDeathChance = getBaseDeathChance(person);
@@ -540,7 +541,11 @@ public class RandomDeath {
      * @return the HPG access multiplier, or 0 if no modifier is required.
      */
     private double getHpgAccessMultiplier() {
-        HPGRating hpgRating = campaign.getCurrentLocation().getPlanet().getHPG(campaign.getLocalDate());
+        HPGRating hpgRating = campaign.getPlayerForce()
+                                    .getForceDetachment()
+                                    .getCurrentLocation()
+                                    .getPlanet()
+                                    .getHPG(campaign.getLocalDate());
         if (hpgRating != null && hpgRating.compareTo(HPGRating.B) >= 0) {
             return MEDICAL_MULTIPLIER_HPG_ACCESS;
         }
@@ -669,14 +674,21 @@ public class RandomDeath {
         }
 
         if (randomlyDies(person)) {
+            PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
+
+            // This has to be attempted before any death is announced
+            if (person.attemptToCheatDeath(campaign, causeOfDeath)) {
+                return false;
+            }
+
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = ReportingUtilities.getNegativeColor();
             String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
 
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            boolean isReportRetireeDeaths = campaignOptions.isAnnounceRetireeDeath();
-            boolean isReportMostDeaths = campaignOptions.isAnnounceRetireeDeathExpanded();
+            boolean isReportRetireeDeaths = campaignOptions.get(CampaignOption.ANNOUNCE_RETIREE_DEATH);
+            boolean isReportMostDeaths = campaignOptions.get(CampaignOption.ANNOUNCE_RETIREE_DEATH_EXPANDED);
 
             PersonnelStatus status = person.getStatus();
             boolean isRetiredOrBackground = status.isRetired() || status.isBackground();
@@ -692,15 +704,13 @@ public class RandomDeath {
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
             }
 
-            PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
-
             // Announce death if applicable, needs to be before we change the status
             String deathAnnouncementNagConstant = RandomDeathAnnouncement.getRandomDeathAnnouncementNagConstant(person);
             if (RandomDeathAnnouncement.checkNag(deathAnnouncementNagConstant)) {
                 new RandomDeathAnnouncement(campaign, person, causeOfDeath, deathAnnouncementNagConstant);
             }
 
-            person.changeStatus(campaign, today, causeOfDeath);
+            person.changeStatus(campaign, today, causeOfDeath, false);
 
             return true;
         } else {

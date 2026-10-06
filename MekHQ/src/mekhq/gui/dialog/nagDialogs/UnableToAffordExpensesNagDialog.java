@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
+
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.getMonthlyExpenses;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.unableToAffordExpenses;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -68,7 +68,7 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
      *                 required for constructing the nag dialog.
      */
     public UnableToAffordExpensesNagDialog(final Campaign campaign) {
-        super(campaign, LOGISTICS, NAG_UNABLE_TO_AFFORD_EXPENSES, "UnableToAffordExpensesNagDialog");
+        super(campaign, NAG_UNABLE_TO_AFFORD_EXPENSES, "UnableToAffordExpensesNagDialog");
     }
 
     @Override
@@ -76,7 +76,7 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money monthlyExpenses = getMonthlyExpenses(campaign);
-        Money currentFunds = campaign.getFunds();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = monthlyExpenses.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

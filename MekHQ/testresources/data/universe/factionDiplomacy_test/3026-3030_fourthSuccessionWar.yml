@@ -1,0 +1,14 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: mirrors the war in factionhints_test.xml.
+
+wars:
+  - name: Fourth Succession War
+    start: 3026-01-01
+    end: 3030-12-31
+    parties:
+      - factions: [FS, CC]
+      - factions: [FS, DC]
+      - factions: [LA, CC]
+      - factions: [LA, DC]

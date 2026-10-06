@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,12 +38,12 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FAST_LEARNER;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SLOW_LEARNER;
-import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_REPUTATION_MULTIPLIER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.CLAN_FAME_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.NONE;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_FAME_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_RANK_INDEX;
-import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_CAPTAIN_REPUTATION_MULTIPLIER;
+import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_FAME_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_RANK_INDEX;
-import static mekhq.campaign.personnel.skills.enums.AgingMilestone.STAR_COLONEL_REPUTATION_MULTIPLIER;
 import static mekhq.campaign.personnel.skills.enums.AgingMilestone.TWENTY_FIVE;
 
 import mekhq.campaign.personnel.Person;
@@ -86,46 +86,46 @@ public class Aging {
     }
 
     /**
-     * Calculates the reputation age modifier for a character based on their age, clan affiliation, blood name status,
-     * and military rank.
+     * Calculates the fame age modifier for a character based on their age, clan affiliation, blood name status, and
+     * military rank.
      *
-     * <p>This method determines a character's reputation age modifier by evaluating their age against a predefined
+     * <p>This method determines a character's fame age modifier by evaluating their age against a predefined
      * aging milestone, their clan affiliation, their possession of a blood name, and their rank in the clan hierarchy.
      * If the character meets specific conditions, such as holding a high enough rank or possessing a blood name, the
-     * reputation multiplier is adjusted. The final result is scaled by a clan-specific reputation multiplier.</p>
+     * fame multiplier is adjusted. The final result is scaled by a clan-specific fame multiplier.</p>
      *
-     * @param characterAge The age of the character for which the reputation modifier is being calculated.
+     * @param characterAge The age of the character for which the fame modifier is being calculated.
      * @param isClan       Indicates whether the character is part of a clan. If {@code false}, the method returns 0.
-     * @param hasBloodName Indicates whether the character possesses a blood name, which can decrease the reputation
+     * @param hasBloodName Indicates whether the character possesses a blood name, which can decrease the fame
      *                     multiplier under certain conditions.
      * @param rankIndex    The rank index of the character, used to determine if they meet rank-specific milestone
-     *                     conditions for reputation adjustment.
+     *                     conditions for fame adjustment.
      *
-     * @return The calculated reputation age modifier. Returns 0 if the character is not a clan member.
+     * @return The calculated fame age modifier. Returns 0 if the character is not a clan member.
      *
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getReputationAgeModifier(int characterAge, boolean isClan, boolean hasBloodName, int rankIndex) {
+    public static int getFameAgeModifier(int characterAge, boolean isClan, boolean hasBloodName, int rankIndex) {
         if (!isClan) {
             return 0;
         }
 
         AgingMilestone milestone = getMilestone(characterAge);
 
-        int reputationMultiplier = milestone.getReputation();
-        boolean hasHitRankTarget = reputationMultiplier == STAR_CAPTAIN_REPUTATION_MULTIPLIER &&
+        int fameMultiplier = milestone.getFame();
+        boolean hasHitRankTarget = fameMultiplier == STAR_CAPTAIN_FAME_MULTIPLIER &&
                                          rankIndex >= STAR_CAPTAIN_RANK_INDEX;
 
-        if (reputationMultiplier == STAR_COLONEL_REPUTATION_MULTIPLIER && rankIndex >= STAR_COLONEL_RANK_INDEX) {
+        if (fameMultiplier == STAR_COLONEL_FAME_MULTIPLIER && rankIndex >= STAR_COLONEL_RANK_INDEX) {
             hasHitRankTarget = true;
         }
 
         if (hasHitRankTarget || hasBloodName) {
-            reputationMultiplier--;
+            fameMultiplier--;
         }
 
-        int modifier = reputationMultiplier * CLAN_REPUTATION_MULTIPLIER;
+        int modifier = fameMultiplier * CLAN_FAME_MULTIPLIER;
         double totalModifier = (double) modifier / AGING_SKILL_MODIFIER_DIVIDER;
         return (int) round(totalModifier);
     }

@@ -45,8 +45,8 @@ import megamek.common.loaders.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 
 /**
  * @author Luana Coppio

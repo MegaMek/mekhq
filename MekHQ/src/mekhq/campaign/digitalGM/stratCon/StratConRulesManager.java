@@ -1,0 +1,4907 @@
+/*
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static megamek.codeUtilities.ObjectUtility.getRandomItem;
+import static megamek.common.board.Coords.ALL_DIRECTIONS;
+import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
+import static megamek.common.units.UnitType.CONV_FIGHTER;
+import static megamek.common.units.UnitType.DROPSHIP;
+import static megamek.common.units.UnitType.JUMPSHIP;
+import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType.AUXILIARY;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.INTERCEPTED;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.SUCCESS;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory.convertSpecificUnitTypeToGeneral;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment.Opposing;
+import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation.AllGroundTerrain;
+import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation.LowAtmosphere;
+import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation.Space;
+import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
+import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
+import static mekhq.utilities.EntityUtilities.hasActiveProbe;
+import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
+import static mekhq.utilities.EntityUtilities.hasReconCamera;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.TargetRollModifier;
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.Minefield;
+import megamek.common.options.OptionsConstants;
+import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySynergies;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
+import mekhq.campaign.events.StratConDeploymentEvent;
+import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
+import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioStatus;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioType;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.utilities.CombatRole;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.unit.ITransportAssignment;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
+import mekhq.gui.dialog.StratConAmbushedDialog;
+import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
+import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.math3.util.Pair;
+import org.jspecify.annotations.NonNull;
+
+/**
+ * This class contains "rules" logic for the AtB-StratCon state
+ *
+ * @author NickAragua
+ */
+public class StratConRulesManager {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
+    public final static int BASE_LEADERSHIP_BUDGET = 500;
+
+    private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
+
+    private static final int NO_FACILITY_MODIFIER = 0;
+    private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
+    public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
+    // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
+    private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
+          "Hold Until Relief.json");
+    // what an Interdict Supply order is fought in; see startInterdictionScenario
+    private static final String INTERDICTION_SCENARIO_TEMPLATE = "Convoy Interdiction.json";
+    // what an enemy relief force against besiegers is fought in; see startSiegeScenario
+    private static final String SIEGE_RELIEF_SCENARIO_TEMPLATE = "Hold Until Relief.json";
+
+    /**
+     * What makes a particular lance eligible to be reinforcements for a scenario
+     */
+    public enum ReinforcementEligibilityType {
+        /**
+         * Nothing
+         */
+        NONE,
+
+        /**
+         * Combat Team is already deployed to the track
+         */
+        CHAINED_SCENARIO,
+
+        /**
+         * We pay a support point and make a regular roll
+         */
+        REGULAR,
+
+        /**
+         * The Combat Team's deployment orders are "Frontline" or "Auxiliary". We pay a support point and make an
+         * enhanced roll
+         */
+        AUXILIARY
+    }
+
+    /**
+     * What were the results of the reinforcement roll?
+     */
+    public enum ReinforcementResultsType {
+        /**
+         * The reinforcement attempt was successful.
+         */
+        SUCCESS,
+
+        /**
+         * The reinforcements arrive later than normal.
+         */
+        DELAYED,
+
+        /**
+         * The reinforcements arrive instantly.
+         */
+        INSTANT,
+
+        /**
+         * The attempt failed, nothing else happens.
+         */
+        FAILED,
+
+        /**
+         * The reinforcements were intercepted.
+         */
+        INTERCEPTED
+    }
+
+    /**
+     * Schedules the coming week's scenario in Single Drop play: one scenario, on a random day within the week.
+     *
+     * <p>Other play schedules its ordinary scenarios up front, across the whole contract, so this does nothing for it
+     * (see {@link StratConScenarioTempo}).</p>
+     *
+     * @param campaign             The campaign.
+     * @param campaignState        The state of the StratCon campaign.
+     * @param contract             The AbstractContract for the campaign.
+     * @param track                The StratCon campaign track.
+     * @param isUseStratConSingles If {@code true} a single scenario is scheduled; otherwise nothing is
+     */
+    public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
+          AbstractContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+        // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
+        // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
+        // scheduled.
+        if (!isUseStratConSingles) {
+            return;
+        }
+
+        LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
+        campaignState.addScheduledScenarioDate(scenarioDate);
+        LOGGER.info("StratCon Single Drop scenario scheduled for {}", scenarioDate);
+    }
+
+    /**
+     * This method generates a weekly scenario for a specific track.
+     * <p>
+     * First, it initializes empty collections for generated scenarios and available forces, and determines whether
+     * lances are auto-assigned.
+     * <p>
+     * Then it generates a requested number of scenarios. If auto-assign is enabled and there are no available forces,
+     * it breaks from the scenario generation loop.
+     * <p>
+     * For each scenario, it first tries to create a scenario for existing forces on the track. If that is not possible,
+     * it selects random force, removes it from available forces, and creates a scenario for it. For any scenario, if it
+     * is under liaison command, it may set the scenario as required and attaches the liaison.
+     * <p>
+     * After scenarios are generated, OpFors, events, etc. are finalized for each scenario.
+     *
+     * @param campaign      The current campaign.
+     * @param campaignState The relevant StratCon campaign state.
+     * @param contract      The relevant contract.
+     * @param scenarioCount The number of scenarios to generate.
+     */
+    public static void generateDailyScenariosForTrack(Campaign campaign, StratConCampaignState campaignState,
+          AbstractContract contract, int scenarioCount) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // get this list just so we have it available
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
+
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+              campaign.getPlayerForce().getHangar(),
+              campaign.getPlayerForce().getAllFormations());
+
+        for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
+            List<StratConTrackState> tracks = campaignState.getTracks();
+            StratConTrackState track = campaignState.getTracks().getFirst();
+
+            if (tracks.size() > 1) {
+                track = getRandomItem(tracks);
+            }
+
+            final int deploymentDelay = track.getDeploymentTime();
+            final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
+            final LocalDate contractEnd = campaignState.getContract().getEndingDate();
+
+            if ((contractEnd != null) && !scenarioTargetDate.isBefore(contractEnd)) {
+                LOGGER.info("Skipping scenario because it is on or after the contract end date.");
+                return;
+            }
+
+            StratConCoords scenarioCoords = StratConGMs.opForDeployment(campaignOptions)
+                                                  .getUnoccupiedCoords(track, true, true, true);
+
+            if (scenarioCoords == null) {
+                LOGGER.warn("Target track is full, skipping scenario generation");
+                continue;
+            }
+
+            // if forces are already assigned to these coordinates, use those instead of randomly
+            // selected ones
+            StratConScenario scenario;
+            // A scenario spawning on top of an already-deployed force is an ambush; restrict template selection
+            // to templates flagged as suitable for that context.
+            ScenarioTemplate ambushTemplate = null;
+            if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
+                Set<Integer> assignedForceIDs = track.getAssignedCoordForces().get(scenarioCoords);
+
+                if (!assignedForceIDs.isEmpty()) {
+                    ambushTemplate = getAmbushTemplateForForce(campaign, track, assignedForceIDs.iterator().next());
+                }
+
+                scenario = generateScenarioForExistingForces(scenarioCoords,
+                      assignedForceIDs,
+                      contract,
+                      campaign,
+                      track,
+                      ambushTemplate,
+                      null);
+                // otherwise, pick a random force from the avail
+            } else {
+                Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
+
+                // two scenarios on the same coordinates wind up increasing in size
+                if (track.getScenarios().containsKey(scenarioCoords)) {
+                    track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
+                    assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords),
+                          sortedAvailableForceIDs);
+                    continue;
+                }
+
+                scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
+            }
+
+            if (scenario != null) {
+                finalizeBackingScenario(campaign, contract, track, false, scenario);
+
+                if (ambushTemplate != null) {
+                    // Ambushes are always Crisis scenarios, never Turning Points; mirror the manual-deployment
+                    // path in deployForceToCoords so auto-generated ambushes get the same post-finalization state.
+                    scenario.getBackingScenario().setIsCrisis(true);
+                    scenario.setTurningPoint(false);
+                }
+            }
+        }
+    }
+
+    /**
+     * Builds a scenario template appropriate for ambushing an already-deployed force.
+     *
+     * <p>A scenario that spawns on top of a deployed force is, by definition, an ambush - or a bungled patrol, if the
+     * force is patrolling. Template selection is therefore restricted to templates flagged as suitable for that context
+     * (see {@link ScenarioTemplate#isSuitedForAmbushes()} and {@link ScenarioTemplate#isSuitedForBungledPatrols()}),
+     * using the force's primary unit type.</p>
+     *
+     * @param campaign the current {@link Campaign} context
+     * @param track    the track the ambush happens on; one that prevents aerospace rules out air and space templates
+     * @param forceID  the ID of the force being ambushed; used to determine unit type and role
+     *
+     * @return a suitable ambush {@link ScenarioTemplate}, or {@code null} if none is configured for the unit type
+     */
+    private static @Nullable ScenarioTemplate getAmbushTemplateForForce(Campaign campaign, StratConTrackState track,
+          int forceID) {
+        int unitType = MEK;
+        Formation formation = campaign.getPlayerForce().getFormation(forceID);
+        if (formation != null) {
+            unitType = formation.getPrimaryUnitType(campaign);
+        }
+
+        boolean isBungledPatrol = false;
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+        if (combatTeam != null) {
+            CombatRole role = combatTeam.getRole();
+            isBungledPatrol = (role != null) && role.isPatrol();
+        }
+
+        return getRandomScenarioForTrack(track, unitType, true, isBungledPatrol);
+    }
+
+    /**
+     * Generates a new StratCon scenario with default behavior.
+     *
+     * <p>This is a simplified utility method that generates a scenario without requiring detailed configuration of the
+     * track or scenario template.</p>
+     *
+     * <p>This method delegates to the more advanced
+     * {@link #generateExternalScenario(Campaign, AbstractContract, StratConTrackState, StratConCoords,
+     * ScenarioTemplate, boolean, boolean, boolean, Integer)} method with default parameters, selecting a random track
+     * and scenario configurations automatically.</p>
+     *
+     * <p><b>Note:</b> When using this method scenarios cannot spawn on top of player forces or facilities.</p>
+     *
+     * @param campaign The current {@link Campaign} for which to generate the scenario.
+     * @param contract The {@link AbstractContract} associated with the scenario.
+     *
+     * @return A newly generated {@link StratConScenario}, or {@code null} if scenario creation fails due to constraints
+     *       such as no available tracks or valid coordinates.
+     */
+    public static @Nullable StratConScenario generateExternalScenario(Campaign campaign, AbstractContract contract) {
+        return generateExternalScenario(campaign, contract, null, null, null, false, false, false, null);
+    }
+
+    /**
+     * Generates a new StratCon scenario using advanced configuration options.
+     *
+     * <p>Supports detailed control over various aspects of the scenario, including placement on a specific track,
+     * selection of coordinates, use of specific templates, and strategic constraints.</p>
+     *
+     * <p>The method performs the following steps:</p>
+     * <ol>
+     *   <li>If no track is specified, selects a random track for the scenario.</li>
+     *   <li>Determines target coordinates based on availability and input parameters:
+     *       <ul>
+     *         <li>If coordinates are provided, validates their availability.</li>
+     *         <li>If coordinates are {@code null}, searches for unoccupied coordinates based on track status,
+     *             facility ownership, player-assigned forces, and strategic weighting.</li>
+     *       </ul>
+     *   </li>
+     *   <li>Selects available forces for the scenario:
+     *       <ul>
+     *         <li>If forces are already assigned to the target coordinates, uses them for scenario creation.</li>
+     *         <li>Otherwise, selects random forces based on availability and optional constraints set by the
+     *             scenario's template.</li>
+     *       </ul>
+     *   </li>
+     *   <li>Finalizes the scenario, integrating it into the campaign and contract settings.</li>
+     * </ol>
+     *
+     * <p>During scenario generation, constraints are applied based on the input parameters to ensure valid
+     * placement and force selection. If no valid setup is found or the track is already full, the scenario
+     * generation will fail, returning {@code null}.</p>
+     *
+     * @param campaign                  The current {@link Campaign} under which the scenario is generated.
+     * @param contract                  The {@link AbstractContract} associated with the scenario.
+     * @param track                     The specific {@link StratConTrackState} where the scenario should be placed, or
+     *                                  {@code null} to allow selection of a random track.
+     * @param scenarioCoords            The target {@link StratConCoords} for placing the scenario, or {@code null} to
+     *                                  select a random, unoccupied coordinate. If specified, {@code track} must not be
+     *                                  {@code null}.
+     * @param template                  The {@link ScenarioTemplate} to use for scenario configuration, or {@code null}
+     *                                  to select one randomly.
+     * @param allowPlayerFacilities     A {@code boolean} indicating whether the scenario can be placed on top of
+     *                                  player-occupied facilities.
+     * @param allowPlayerForces         A {@code boolean} indicating whether coordinates hosting player forces are
+     *                                  considered valid for scenario placement.
+     * @param emphasizeStrategicTargets A {@code boolean} that increases the likelihood of selecting strategic targets,
+     *                                  such as <b>PLAYER</b>-held facilities, for scenario placement.
+     * @param daysTilDeployment         An {@link Integer} specifying the number of days until the scenario occurs, or
+     *                                  {@code null} to select a random date within the next 7 days.
+     *
+     * @return A newly created {@link StratConScenario}, or {@code null} if scenario generation fails due to invalid
+     *       configurations, insufficient forces, or a lack of valid coordinates.
+     *
+     * @throws IllegalArgumentException If {@code scenarioCoords} is specified while {@code track} is {@code null}.
+     */
+    public static @Nullable StratConScenario generateExternalScenario(Campaign campaign, AbstractContract contract,
+          @Nullable StratConTrackState track, @Nullable StratConCoords scenarioCoords,
+          @Nullable ScenarioTemplate template, boolean allowPlayerFacilities, boolean allowPlayerForces,
+          boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // If we're not generating for a specific track, randomly pick one.
+        if (track == null) {
+            track = getRandomTrack(contract);
+
+            if (track == null) {
+                LOGGER.error("Failed to generate a random track, aborting scenario generation.");
+                return null;
+            }
+        }
+
+        // Grab the available lances and sort them by map type
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
+              campaign.getPlayerForce().getHangar(),
+              campaign.getPlayerForce().getAllFormations());
+
+        // Select the target coords.
+        if (scenarioCoords == null) {
+            scenarioCoords = StratConGMs.opForDeployment(campaignOptions)
+                                   .getUnoccupiedCoords(track,
+                                         allowPlayerFacilities,
+                                         allowPlayerForces,
+                                         emphasizeStrategicTargets);
+        }
+
+        if (scenarioCoords == null) {
+            LOGGER.warn("Target track is full, aborting scenario generation.");
+            return null;
+        }
+
+        // If forces are already assigned to the target coordinates, use those instead of randomly
+        // selected a new force
+        StratConScenario scenario = null;
+        if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
+            scenario = generateScenarioForExistingForces(scenarioCoords,
+                  track.getAssignedCoordForces().get(scenarioCoords),
+                  contract,
+                  campaign,
+                  track,
+                  template,
+                  daysTilDeployment);
+        }
+
+        // Otherwise, pick a random force from those available
+        // If a template has been specified, remove forces that aren't appropriate for the
+        // template.
+        if (template != null) {
+            MapLocation location = template.mapParameters.getMapLocation();
+
+            switch (location) {
+                case AllGroundTerrain, SpecificGroundTerrain -> {
+                    sortedAvailableForceIDs.get(LowAtmosphere).clear();
+                    sortedAvailableForceIDs.get(Space).clear();
+                }
+                case LowAtmosphere -> {
+                    sortedAvailableForceIDs.get(AllGroundTerrain).clear();
+                    sortedAvailableForceIDs.get(Space).clear();
+                }
+                case Space -> {
+                    sortedAvailableForceIDs.get(AllGroundTerrain).clear();
+                    sortedAvailableForceIDs.get(LowAtmosphere).clear();
+                }
+            }
+        }
+
+        // If we haven't generated a scenario yet, it's because we need to pick a random force.
+        if (scenario == null) {
+            int availableForces = availableForceIDs.size();
+            int randomForceID = FORMATION_NONE;
+
+            if (availableForces > 0) {
+                int randomForceIndex = randomInt(availableForces);
+                randomForceID = availableForceIDs.get(randomForceIndex);
+            }
+
+
+            scenario = setupScenario(scenarioCoords,
+                  randomForceID,
+                  campaign,
+                  contract,
+                  track,
+                  template,
+                  campaign.getCampaignOptions().isUseStratConMaplessMode(),
+                  daysTilDeployment);
+        }
+
+        if (scenario == null) {
+            return null;
+        }
+
+        // We end by finalizing the scenario
+        finalizeBackingScenario(campaign, contract, track, false, scenario);
+
+        // We return the scenario in case we want to make specific changes.
+        return scenario;
+    }
+
+    /**
+     * Generates a reinforcement interception scenario for a given StratCon track. An interception scenario is set up at
+     * unoccupied coordinates on the track. If the scenario setup is successful, it is finalized and the deployment date
+     * for the scenario is set as the current date.
+     *
+     * @param campaign             the current campaign
+     * @param contract             the {@link AbstractContract} for which the scenario is created
+     * @param track                the {@link StratConTrackState} where the scenario is located, or {@code null} if not
+     *                             located on a track
+     * @param template             the {@link ScenarioTemplate} used to create the scenario
+     * @param interceptedFormation the {@link Formation} that's being intercepted in the scenario
+     */
+    public static @Nullable void generateReinforcementInterceptionScenario(Campaign campaign,
+          StratConScenario linkedScenario, AbstractContract contract, StratConTrackState track,
+          ScenarioTemplate template, Formation interceptedFormation) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        StratConCoords scenarioCoords = StratConGMs.opForDeployment(campaignOptions).getUnoccupiedCoords(track);
+
+        StratConScenario scenario = setupScenario(scenarioCoords,
+              interceptedFormation.getId(),
+              campaign,
+              contract,
+              track,
+              template,
+              true,
+              0);
+
+        if (scenario == null) {
+            LOGGER.error("Failed to generate a random interception scenario, aborting scenario generation.");
+            return;
+        }
+
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        scenario.setActionDate(campaign.getLocalDate());
+        scenario.getBackingScenario().setStatus(ScenarioStatus.CURRENT);
+        scenario.getBackingScenario().setLinkedScenarioID(linkedScenario.getBackingScenario().getId());
+    }
+
+    /**
+     * Fetches a random {@link StratConTrackState} from the {@link StratConCampaignState}. If no tracks are present, it
+     * logs an error message and returns {@code null}.
+     *
+     * @param contract The {@link AbstractContract} from which the track state will be fetched.
+     *
+     * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
+     */
+    public static @Nullable StratConTrackState getRandomTrack(AbstractContract contract) {
+        if (contract.getStratConCampaignState() == null) {
+            return null; // The contract is not running StratCon, so it has no tracks.
+        }
+
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
+
+        if (tracks.isEmpty()) {
+            LOGGER.error("No tracks available. Unable to fetch random track");
+            return null;
+        }
+
+        return getRandomItem(tracks);
+    }
+
+    /**
+     * Finalizes the backing scenario, setting up the OpFor, scenario parameters, and other necessary steps.
+     *
+     * @param campaign         The current campaign.
+     * @param contract         The contract associated with the scenario.
+     * @param track            The relevant {@link StratConTrackState}.
+     * @param autoAssignLances Flag indicating whether lances are to be auto-assigned.
+     * @param scenario         The {@link StratConScenario} scenario to be finalized.
+     */
+    public static void finalizeBackingScenario(Campaign campaign, AbstractContract contract,
+          @Nullable StratConTrackState track, boolean autoAssignLances, StratConScenario scenario) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+        // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isCombatChallenge = scenarioType.isOfficialChallenge();
+        boolean showNag = !MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE);
+        if (isCombatChallenge && showNag) {
+            new CombatChallengeNagDialog(campaign);
+        }
+
+        determineIfTurningPointScenario(contract, scenario, isCombatChallenge);
+        if (!scenario.isTurningPoint()) {
+            determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario, isCombatChallenge);
+        }
+
+        // Finally, finish scenario set up
+        StratConGMs.mapGeneration(campaignOptions)
+              .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
+        StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
+        swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
+
+        if (!autoAssignLances && !scenario.overrideForceAutoAssignment()) {
+            for (int forceID : scenario.getPlayerTemplateForceIDs()) {
+                backingScenario.removeFormation(forceID);
+            }
+
+            scenario.setCurrentState(ScenarioState.UNRESOLVED);
+            track.addScenario(scenario);
+        } else {
+            commitPrimaryForces(campaign, scenario, track);
+            // if we're auto-assigning lances, deploy all assigned forces to the track as well
+            for (int forceID : scenario.getPrimaryForceIDs()) {
+                processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+            }
+        }
+    }
+
+    /**
+     * Determines if a given StratCon scenario should be marked as critical within the context of a contract.
+     * <p>
+     * This method evaluates the scenario's template, type, and the contract's command rights to decide if the scenario
+     * should be flagged as a "turning point." Turning Point scenarios can cause CVP to be increased or decreased.
+     * </p>
+     *
+     * @param contract          The {@link AbstractContract} representing the current contract.
+     * @param scenario          The {@link StratConScenario} being evaluated to determine if it is a Turning Point.
+     * @param isCombatChallenge {@code true} if attached units should be skipped, and if the scenario is barred from
+     *                          being a Turning Point
+     */
+    private static void determineIfTurningPointScenario(AbstractContract contract, StratConScenario scenario,
+          boolean isCombatChallenge) {
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isObjective = scenario.isStrategicObjective();
+        boolean isSpecial = scenarioType.isSpecial();
+
+        if (isSpecial || isObjective || isCombatChallenge) {
+            scenario.setTurningPoint(false);
+            return;
+        }
+
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> scenario.setTurningPoint(true);
+            case HOUSE -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
+                    setAttachedUnitsModifier(scenario, contract);
+                }
+            }
+            case LIAISON -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
+                }
+            }
+            case INDEPENDENT -> {
+                // Victory points only exist on a StratCon campaign state; treat a non-StratCon contract as having
+                // none, so it still qualifies as a turning point.
+                StratConCampaignState campaignState = contract.getStratConCampaignState();
+                int victoryPoints = (campaignState == null) ? 0 : campaignState.getVictoryPoints();
+                if (victoryPoints < INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
+                    scenario.setTurningPoint(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines whether a scenario should be marked as a crisis scenario based on morale level and random chance.
+     *
+     * <p>This method evaluates whether a given scenario should be flagged as a "crisis" by performing a random roll
+     * based on the current morale level. Crisis scenarios represent critical situations that require immediate
+     * attention and may have significant consequences.</p>
+     *
+     * <p>The determination follows these rules:</p>
+     * <ul>
+     *   <li>If the scenario is already marked as a "special" scenario type (via {@link ScenarioType#isSpecial()}),
+     *       the method returns immediately without making any changes. Special scenarios cannot be crisis scenarios.</li>
+     *   <li>Otherwise, a random roll is performed using a die size determined by the current morale level
+     *       (via {@link ContractMoraleLevel#getCrisisDieSize()}).</li>
+     *   <li>If the roll results in {@code 0} (the minimum value), the scenario is marked as a crisis scenario.</li>
+     *   <li>If the roll results in any other value, the scenario is not marked as a crisis.</li>
+     * </ul>
+     *  @param morale          The {@link ContractMoraleLevel} representing the current morale state, which determines the
+     *                        size of the die used for the crisis check.
+     *
+     * @param backingScenario   The {@link AtBDynamicScenario} being evaluated. This scenario will be marked as a crisis
+     *                          if the conditions are met.
+     * @param isCombatChallenge {@code true} if the scenario is barred from being a Crisis
+     */
+    private static void determineIfCrisisScenario(ContractMoraleLevel morale, AtBDynamicScenario backingScenario,
+          boolean isCombatChallenge) {
+        ScenarioType scenarioType = backingScenario.getStratConScenarioType();
+        boolean isSpecial = scenarioType.isSpecial();
+        if (isSpecial || isCombatChallenge) {
+            return;
+        }
+
+        int crisisDieSize = morale.getCrisisDieSize();
+        int roll = randomInt(crisisDieSize);
+        backingScenario.setIsCrisis(roll == 0);
+    }
+
+    /**
+     * Picks the scenario terrain based on the scenario coordinates' biome Note that "finalizeScenario" currently wipes
+     * out temperature/map info so this method must be called afterward.
+     */
+    public static void setScenarioParametersFromBiome(StratConTrackState track, StratConScenario scenario,
+          boolean isNoTornadoes) {
+        StratConCoords coords = scenario.getCoords();
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
+
+        // Take the sector's average temperature shifted by the local terrain climate, so a volcano hex fights hot and a
+        // glacier hex fights cold. Only space is exempt: a low-atmosphere fight is still happening over that hex, and
+        // takes its map and light from the hex below, so it should take its temperature from there too. (Wind and
+        // precipitation are a separate matter - AtBScenario skips those in atmosphere regardless.)
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
+            backingScenario.setTemperature(track.getTemperature() +
+                                                 StratConBiomeManifest.terrainTemperatureOffset(track.getTerrainTile(
+                                                       coords)));
+        }
+
+        StratConFacility facility = track.getFacility(scenario.getCoords());
+        String terrainType;
+
+        // facilities have their own terrain lists
+        if (facility != null) {
+            // A base belongs on ground that matches the hex it occupies, so prefer the facility pool declared for this
+            // terrain (terrain names already carry their climate). Only when the terrain declares no facility pool do
+            // we fall back to the generic temperature-banded facility biome below.
+            String hexTerrain = track.getTerrainTile(coords);
+            String facilityPoolKey = biomeManifest.getFacilityPoolKey(hexTerrain);
+
+            if (facilityPoolKey != null) {
+                terrainType = facilityPoolKey;
+            } else {
+                // Band on the hex's own temperature, not the sector average, so a volcano hex is treated as hot and a
+                // glacier hex as frozen - matching the scenario temperature set above.
+                int kelvinTemp = track.getTemperature() +
+                                       StratConBiomeManifest.terrainTemperatureOffset(hexTerrain) +
+                                       StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+                StratConBiome facilityBiome;
+
+                // if facility doesn't have a biome temp map or no entry for the current
+                // temperature, use the default one
+                if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
+                    var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+                    var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
+                    if (biomeEntry == null) {
+                        biomeEntry = defaultTempMap.firstEntry();
+                    }
+                    facilityBiome = biomeEntry.getValue();
+                } else {
+                    facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+                }
+                terrainType = facilityBiome.allowedTerrainTypes.get(randomInt(facilityBiome.allowedTerrainTypes.size()));
+            }
+        } else {
+            terrainType = track.getTerrainTile(coords);
+        }
+
+        // Resolve the battle-map pool: an exact terrain-name pool, else the terrain's category fallback pool, so
+        // terrains without their own pool (and any added later) still land on an appropriate board. If neither exists,
+        // leave the map alone.
+        StratConBiomeManifest.MapTypeList mapPool = biomeManifest.getMapTypesForTerrain(terrainType);
+        if (mapPool == null) {
+            return;
+        }
+
+        // if we are in space, do not update the map; note that it's ok to do so in low
+        // atmosphere
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
+            var mapTypeList = mapPool.mapTypes;
+            backingScenario.setHasTrack(true);
+            backingScenario.setTerrainType(terrainType);
+            // Record which sector-road edges cross this hex, so the launched board can trace matching roads onto it.
+            backingScenario.setStratConRoadEntryEdges(StratConRoadPlacer.roadEntryEdges(track, coords));
+            // Record whether the hex borders water, so the launched board can be biased toward including some.
+            backingScenario.setStratConWaterAdjacent(StratConOceanPlacer.isWaterAdjacent(track, coords));
+            // Record whether the hex holds a city, so the launched board can lay an urban area onto any base terrain,
+            // and how built-up the sector is so the city scales appropriately.
+            backingScenario.setStratConUrban(track.isCity(coords));
+            backingScenario.setStratConUrbanization(track.getUrbanizationLevel());
+            // for now, if we're using a fixed map or in a facility, don't replace the
+            // scenario
+            // TODO: facility spaces will always have a relevant biome
+            if (!backingScenario.isUsingFixedMap()) {
+                backingScenario.setMap(mapTypeList.get(randomInt(mapTypeList.size())));
+            }
+            backingScenario.setLightConditions();
+            backingScenario.setWeatherConditions(isNoTornadoes);
+        }
+    }
+
+    /**
+     * Worker function that swaps in player units for "player or allied force" templates in a scenario. Looks through
+     * the scenario's templates and replaces bot units with player units based on the provided force information and
+     * validation rules.
+     *
+     * @param scenario        The scenario in which player units are to be swapped.
+     * @param campaign        The player's campaign containing available units and forces.
+     * @param explicitForceID The ID of an explicitly selected force. If {@code FORCE_NONE}, all units in the campaign's
+     *                        TO&E are considered.
+     */
+    private static void swapInPlayerUnits(StratConScenario scenario, Campaign campaign, int explicitForceID) {
+        for (ScenarioForceTemplate scenarioForceTemplate : scenario.getScenarioTemplate().getAllScenarioForces()) {
+            if (scenarioForceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
+                continue;
+            }
+
+            // Calculate unit count based on bot unit templates and bot force templates
+            int unitCount = calculateUnitCount(scenario, campaign, scenarioForceTemplate);
+
+            // Skip if there are no units to substitute
+            if (unitCount == 0) {
+                continue;
+            }
+
+            // Find potential units to substitute based on the explicitForceID
+            Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
+
+            // Iterate through the potential units and vet based on scenario eligibility
+            List<Unit> vettedUnits = getVettedUnits(scenario, campaign, scenarioForceTemplate, potentialUnits);
+
+            while (unitCount > 0 && !(vettedUnits.isEmpty())) {
+                unitCount--;
+
+                substituteUnit(scenario, scenarioForceTemplate, vettedUnits);
+            }
+        }
+    }
+
+    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+          ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
+        List<Unit> vettedUnits = new ArrayList<>();
+        MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+        for (Unit potentialUnit : potentialUnits) {
+            if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
+                vettedUnits.add(potentialUnit);
+            }
+        }
+        return vettedUnits;
+    }
+
+    private static void substituteUnit(StratConScenario scenario, ScenarioForceTemplate scenarioForceTemplate,
+          List<Unit> vettedUnits) {
+        int selectedIndex = randomInt(vettedUnits.size());
+        Unit selectedUnit = vettedUnits.remove(selectedIndex);
+
+        scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
+
+        AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
+              scenarioForceTemplate.getForceName(),
+              scenario.getBackingScenario());
+    }
+
+    /**
+     * Calculates the total unit count for a given scenario force template. This includes counting bots generated via
+     * unit templates and bot forces that are linked to the specific template.
+     *
+     * @param scenario              The scenario containing the bot data and force templates.
+     * @param campaign              The player's campaign, used to access bot unit details.
+     * @param scenarioForceTemplate The template for which the unit count is being calculated.
+     *
+     * @return The total count of units (both bot and custom bot forces) linked to the template.
+     */
+    private static int calculateUnitCount(StratConScenario scenario, Campaign campaign,
+          ScenarioForceTemplate scenarioForceTemplate) {
+        int unitCount = 0;
+
+        // Count bot unit templates that match the force name
+        for (ScenarioForceTemplate template : scenario.getBackingScenario().getBotUnitTemplates().values()) {
+            if (template.getForceName().equals(scenarioForceTemplate.getForceName())) {
+                unitCount++;
+            }
+        }
+
+        // Add bot force units that match the force name
+        for (Entry<BotForce, ScenarioForceTemplate> entry : scenario.getBackingScenario()
+                                                                  .getBotForceTemplates()
+                                                                  .entrySet()) {
+            BotForce key = entry.getKey();
+            ScenarioForceTemplate value = entry.getValue();
+
+            if (value.getForceName().equals(scenarioForceTemplate.getForceName())) {
+                unitCount += key.getFullEntityList(campaign).size();
+            }
+        }
+
+        return unitCount;
+    }
+
+    /**
+     * Retrieves a collection of potential units from the player's campaign for use in substitution. If
+     * {@code explicitForceID} is {@code FORCE_NONE}, all units from the campaign's TO&E are considered. Otherwise, the
+     * units in the specified force's transport ships are included.
+     *
+     * @param campaign        The player's campaign containing potential units for substitution.
+     * @param explicitForceID The ID of the force the player is explicitly using for substitution. If
+     *                        {@code FORCE_NONE}, the entire TO&E is considered.
+     *
+     * @return A collection of units that are eligible for substitution into the scenario.
+     */
+    private static Collection<Unit> findPotentialUnits(Campaign campaign, int explicitForceID) {
+        Collection<Unit> potentialUnits = new HashSet<>();
+
+        if (explicitForceID == FORMATION_NONE) {
+            // Include all units in the campaign's TO&E
+            List<UUID> allUnits = campaign.getPlayerForce().getAllUnitsInTheTOE(false);
+            // We need to shuffle the list, otherwise the same unit will always be selected
+            Collections.shuffle(allUnits);
+
+            for (UUID unitId : allUnits) {
+                try {
+                    potentialUnits.add(campaign.getUnit(unitId));
+                } catch (Exception exception) {
+                    LOGGER.error("Error retrieving unit ({}): {}", unitId, exception.getMessage());
+                }
+            }
+        } else {
+            // Include only those units transporting the seed force
+            Formation formation = campaign.getPlayerForce().getFormation(explicitForceID);
+
+            if (formation == null) {
+                return Collections.emptyList();
+            }
+
+            for (UUID unitID : formation.getUnits()) {
+                Unit unit = campaign.getUnit(unitID);
+
+                if (unit == null) {
+                    continue;
+                }
+
+                if (unit.getTransportShipAssignment() != null) {
+                    potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                }
+            }
+        }
+
+        return potentialUnits;
+    }
+
+    /**
+     * Validates if a given unit can be included in the scenario based on the template's rules and restrictions. It
+     * checks unit type, availability, functionality, and specific conditions such as DropShip usage and map
+     * compatibility.
+     *
+     * @param unit                  The unit to validate.
+     * @param scenarioForceTemplate The force template containing the rules for unit validation.
+     * @param campaign              The current campaign, used to check campaign options and planetary conditions.
+     * @param mapLocation           The map location type of the scenario, used to check if the unit can operate there.
+     *
+     * @return {@code true} if the unit matches the template's requirements and can be included in the scenario,
+     *       {@code false} otherwise.
+     */
+    static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
+          Campaign campaign, MapLocation mapLocation) {
+        return isValidUnitForScenario(unit, scenarioForceTemplate.getAllowedUnitType(), campaign, mapLocation);
+    }
+
+    /**
+     * Validates if a given unit can be included in a scenario that allows the given unit type. See
+     * {@link #isValidUnitForScenario(Unit, ScenarioForceTemplate, Campaign, MapLocation)}.
+     *
+     * @param unit            The unit to validate.
+     * @param allowedUnitType The unit type (or special unit type) the scenario allows.
+     * @param campaign        The current campaign, used to check campaign options and planetary conditions.
+     * @param mapLocation     The map location type of the scenario, used to check if the unit can operate there.
+     *
+     * @return {@code true} if the unit can be included in the scenario, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isValidUnitForScenario(Unit unit, int allowedUnitType, Campaign campaign,
+          MapLocation mapLocation) {
+        // Check if the unit is a DropShip and player DropShips are disabled
+        Entity entity = unit.getEntity();
+        if (entity == null) {
+            return false;
+        }
+
+        if (entity.getUnitType() == DROPSHIP && !campaign.getCampaignOptions().get(CampaignOption.USE_DROP_SHIPS)) {
+            return false;
+        }
+
+        boolean isGround = (mapLocation == AllGroundTerrain) || (mapLocation == SpecificGroundTerrain);
+        boolean isAtmospheric = isGround || (mapLocation == LowAtmosphere);
+
+        if ((isGround && entity.doomedOnGround())
+                  || (mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+                  || (mapLocation == Space && entity.doomedInSpace())) {
+            return false;
+        }
+
+        // Unstreamlined units (e.g. Behemoth) cannot operate in atmosphere or on the ground,
+        // but they can operate on airless worlds (vacuum)
+        if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
+            Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
+            if (planet == null || !planet.getPressure(campaign.getLocalDate()).isVacuum()) {
+                return false;
+            }
+        }
+
+        // Validate the unit type, availability, and functionality
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(), allowedUnitType)
+                     && unit.isAvailable() && unit.isFunctional();
+    }
+
+    /**
+     * Generates a StratCon scenario for forces already existing at the given coordinates on the provided track.
+     *
+     * @param scenarioCoords The coordinates where the scenario will be placed on the track.
+     * @param forceIDs       The set of force IDs (ideally for the forces already at the specified location).
+     * @param contract       The contract associated with the current scenario.
+     * @param campaign       The current campaign.
+     * @param track          The relevant StratCon track.
+     *
+     * @return The newly generated {@link StratConScenario}.
+     */
+    public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
+          Set<Integer> forceIDs, AbstractContract contract, Campaign campaign, StratConTrackState track) {
+        return generateScenarioForExistingForces(scenarioCoords, forceIDs, contract, campaign, track, null, null);
+    }
+
+    /**
+     * Generates a StratCon scenario for forces already existing at the given coordinates on the provided track. This
+     * method allows us to specify a specific scenario template.
+     *
+     * @param scenarioCoords    The coordinates where the scenario will be placed on the track.
+     * @param forceIDs          The set of force IDs (ideally for the forces already at the specified location).
+     * @param contract          The contract associated with the current scenario.
+     * @param campaign          The current campaign.
+     * @param track             The relevant StratCon track.
+     * @param template          A specific {@link ScenarioTemplate} to use, or {@code null} to select a random
+     *                          template.
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
+     *                          within the next 7 days.
+     *
+     * @return The newly generated {@link StratConScenario}.
+     */
+    public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
+          Set<Integer> forceIDs, AbstractContract contract, Campaign campaign, StratConTrackState track,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+        boolean firstForce = true;
+        StratConScenario scenario = null;
+
+        for (int forceID : forceIDs) {
+            if (firstForce) {
+                scenario = setupScenario(scenarioCoords,
+                      forceID,
+                      campaign,
+                      contract,
+                      track,
+                      template,
+                      campaign.getCampaignOptions().isUseStratConMaplessMode(),
+                      daysTilDeployment);
+                firstForce = false;
+
+                if (scenario == null) {
+                    return null;
+                }
+            } else {
+                scenario.incrementRequiredPlayerLances();
+                scenario.addPrimaryForce(forceID);
+            }
+        }
+
+        // this is theoretically possible if forceIDs is empty - not likely in practice
+        // but might as well, to future-proof.
+        if (scenario != null) {
+            // Don't auto-assign forces for Official Challenge scenarios - the player should choose their force
+            boolean isOfficialChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+            scenario.setOverrideForceAutoAssignment(!isOfficialChallenge);
+        }
+
+        return scenario;
+    }
+
+    /**
+     * Deploys a combat team (force) to a specified coordinate within the strategic track and performs the associated
+     * deployment activities, including handling scenarios, facilities, scouting behavior, and fog of war updates.
+     *
+     * <p>The method processes the deployment as follows:
+     * <ol>
+     *     <li>Reveals the fog of war at or near the deployment coordinates based on the force's role, using
+     *     {@code processForceDeployment}.</li>
+     *     <li>If the deployment coordinates contain an existing hostile facility, a scenario involving
+     *     that facility is created.</li>
+     *     <li>If the deployment coordinates are empty, a chance-based scenario may be created depending
+     *     on the scenario odds.</li>
+     *     <li>If a scenario is revealed (either from the facility or randomly):</li>
+     *         <li>- The deployed force is assigned to that scenario.</li>
+     *         <li>- The scenario is finalized and parameters are adjusted accordingly.</li>
+     *     <li>If a deploying force is performing a scouting mission:</li>
+     *         <li>- The target coordinates may be shifted to an unoccupied adjacent coordinate if available.</li>
+     *     <li>If the coordinates contain a non-allied facility or qualify for a new scenario, a
+     *     scenario is generated:</li>
+     *         <li>- If forces are already deployed at the location, generate a scenario involving
+     *         these forces.</li>
+     *         <li>- If no forces are present, assign available forces from the campaign or randomly
+     *         select a suitable combat team for the scenario.</li>
+     *         <li>- If applicable, determine whether the scenario is under liaison command based on
+     *             contract command rights, and update the scenario requirements.</li>
+     * </ol>
+     *
+     * @param coords   the {@link StratConCoords} representing the deployment coordinates.
+     * @param forceID  the unique identifier of the combat team (force) being deployed.
+     * @param campaign the current {@link Campaign} context, which provides access to combat teams, facilities, and
+     *                 other campaign-level data.
+     * @param contract the {@link AbstractContract} associated with the campaign, which determines rules and command
+     *                 rights for the deployment.
+     * @param track    the {@link StratConTrackState} representing the strategic track, including details about
+     *                 scenarios, facilities, and force assignments.
+     * @param sticky   a {@code boolean} flag indicating whether the deployment is "sticky," meaning the forces remain
+     *                 at the deployment location without automatically updating their position.
+     */
+    public static void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign,
+          AbstractContract contract, StratConTrackState track, boolean sticky) {
+        // Ocean hexes are barred entirely - a force cannot deploy there, so no scenario can spawn there.
+        if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+            return;
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+
+        // This shouldn't be possible, but never hurts to have a little insurance
+        if (combatTeam == null) {
+            return;
+        }
+
+        CombatRole combatRole = combatTeam.getRole();
+        boolean isPatrol = combatRole.isPatrol();
+        boolean isTraining = combatRole.isTraining();
+
+        // A patrol spends its deployment riding the sector, so the patrolling force earns a little familiarity with
+        // their own chassis. No other role earns it. The award sits here rather than in processForceDeployment: that
+        // runs again whenever a force is committed to a scenario - both from the branches below and from
+        // assignForceToScenario - and a scenario grants its own, larger award at resolution.
+        if (isPatrol) {
+            Familiarity.assignFamiliarityToCombatTeam(campaign, combatTeam, FamiliarityGainType.D3);
+        }
+
+        // A force that deploys into an unexplored hex is walking in blind. If that deployment trips a scenario, the
+        // force is caught off-guard: the scenario is pinned to the deployed hex (bypassing the patrol adjacent-shift)
+        // and counts as an ambush - or a bungled patrol, if the force was on patrol. This must be captured *before*
+        // processForceDeployment, which reveals the hex.
+        boolean deployedToUnexploredHex = !track.getRevealedCoords().contains(coords);
+
+        // Whether the hex holds nothing at all - no scenario, facility, or point of interest still in play - for
+        // Escalation. Captured before the points of interest react to the deployment, since one may take itself off
+        // the map.
+        boolean deployedToEmptyHex = (track.getScenario(coords) == null)
+                                           && (track.getFacility(coords) == null)
+                                           && !StratConPointOfInterestRules.hasActivePointOfInterest(track, coords);
+
+        // the following things should happen:
+        // 1. call to "process force deployment", which reveals fog of war in or around the coords,
+        // depending on force role
+        // 2. if coords are a hostile facility, we get a facility scenario
+        // 3. if coords are empty, we *may* get a scenario
+        processForceDeployment(coords, forceID, campaign, track, sticky);
+
+        // Points of interest on the hex react to the formation arriving. One may shape the random scenario roll below,
+        // or place a scenario of its own on the hex - which the check just after this then assigns the force to.
+        PointOfInterestDeploymentOutcome pointOfInterestOutcome =
+              StratConPointOfInterestRules.processFormationDeployment(track, coords, forceID, campaign);
+
+        // we may stumble on a fixed objective scenario - in that case assign the force
+        // to it and finalize we also will not be encountering any of the other stuff so bug out
+        // afterward. Official Challenge scenarios should not auto-assign forces.
+        StratConScenario revealedScenario = track.getScenario(coords);
+        if (revealedScenario != null) {
+            if (!revealedScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+                revealedScenario.addPrimaryForce(forceID);
+                commitPrimaryForces(campaign, revealedScenario, track);
+                if (!revealedScenario.getBackingScenario().isFinalized()) {
+                    StratConGMs.mapGeneration(campaignOptions)
+                          .setScenarioTerrain(track,
+                                revealedScenario,
+                                campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
+                    StratConGMs.opForGeneration(campaignOptions)
+                          .generateOpFor(revealedScenario.getBackingScenario(), contract, campaign);
+                }
+            }
+            return;
+        }
+
+        StratConFacility facility = track.getFacility(coords);
+        boolean isNonAlliedFacility = isDeploymentAnAssault(campaign, facility);
+
+        int targetNum = calculateScenarioOdds(track, contract, true);
+        // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
+        // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
+        boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+        // Only a forced scenario needs to ask whether the enemy is routed: the usual roll already accounts for it, as
+        // calculateScenarioOdds returns odds no roll can meet against a routed enemy.
+        boolean enemyRouted = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
+                                    contract.getMoraleLevel().isRouted();
+        // A point of interest still holding the hex - one this formation could not follow up - keeps the usual roll
+        // off it, as a facility does; only one that asks for a scenario gets one there.
+        boolean isHeldByPointOfInterest = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.NO_EFFECT) &&
+                                                (track.getOccupyingPointOfInterest(coords) != null);
+        boolean spawnScenario = rollsRandomScenario(pointOfInterestOutcome,
+              essentialScenariosOnly,
+              (facility != null) || isHeldByPointOfInterest,
+              enemyRouted,
+              targetNum);
+
+        if (isNonAlliedFacility || spawnScenario) {
+            StratConScenario scenario;
+
+            // A blind deployment into an unexplored, empty hex is an ambush (a bungled patrol, if the force was
+            // patrolling). Facility scenarios are never ambushes.
+            boolean isAmbushed = spawnScenario && deployedToUnexploredHex;
+            boolean isBungledPatrol = isAmbushed && isPatrol;
+
+            // If we're not deploying on top of an enemy facility, migrate the scenario. An ambush/bungled patrol
+            // pins the scenario to the deployed hex, so it is not migrated.
+            if (!isNonAlliedFacility && isPatrol && !isAmbushed) {
+                StratConCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+
+                if (newCoords != null) {
+                    coords = newCoords;
+                }
+            }
+
+            // Patrols only get autoAssigned to the scenario if they're dropped on top of a non-allied facility, or
+            // if they bungled a patrol into an ambush.
+            boolean autoAssignLances = !isPatrol || isNonAlliedFacility || isAmbushed;
+
+            // An ambush restricts the scenario to templates flagged as suitable for that context; the deploying force
+            // is always pinned to (and present at) the deployed hex, so template selection uses its unit type.
+            ScenarioTemplate ambushTemplate = null;
+            if (isAmbushed) {
+                ambushTemplate = getAmbushTemplateForForce(campaign, track, forceID);
+            }
+
+            // Do we already have forces deployed to the target coordinates?
+            // If so, assign them to the scenario.
+            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
+
+            if (preDeployedForce != null && !preDeployedForce.isEmpty()) {
+                scenario = generateScenarioForExistingForces(coords,
+                      track.getAssignedCoordForces().get(coords),
+                      contract,
+                      campaign,
+                      track,
+                      ambushTemplate,
+                      null);
+                // Otherwise, pick a random force from those available
+            } else {
+                List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
+                Collections.shuffle(availableForceIDs);
+
+                // If the player doesn't have any available forces, we grab a force at random to
+                // seed the scenario
+                if (availableForceIDs.isEmpty()) {
+                    List<CombatTeam> combatTeams = new ArrayList<>();
+                    for (CombatTeam candidate : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
+                        Formation candidateFormation = candidate.getFormation(campaign);
+                        if ((candidateFormation != null)
+                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)) {
+                            combatTeams.add(candidate);
+                        }
+                    }
+                    if (!combatTeams.isEmpty()) {
+                        combatTeam = getRandomItem(combatTeams);
+
+                        forceID = combatTeam.getFormationId();
+                    } else {
+                        // If the player doesn't have any combat teams (somehow), they get a free pass
+                        return;
+                    }
+                }
+
+                scenario = setupScenario(coords, forceID, campaign, contract, track);
+            }
+
+            if (scenario != null) {
+                finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+
+                if (isAmbushed) {
+                    // Ambushes are always Crisis scenarios, this stop
+                    scenario.getBackingScenario().setIsCrisis(true);
+                    scenario.setTurningPoint(false);
+
+                    new StratConAmbushedDialog(campaign, forceID, isBungledPatrol);
+                }
+            }
+
+            return;
+        }
+
+        // If we didn't trip a scenario or facility, Training forces should deploy 'sticky'
+        if (isTraining) {
+            track.addStickyForce(forceID);
+        }
+
+        // A deployment to an empty hex that met no scenario escalates the contract's hostilities.
+        if (deployedToEmptyHex) {
+            StratConEscalation.onEmptyHexDeployment(campaign, contract);
+        }
+    }
+
+    /**
+     * Explicitly assigns a player-selected force to an existing StratCon scenario.
+     *
+     * @param coords   the {@link StratConCoords} containing the scenario.
+     * @param forceID  the unique ID of the combat team being assigned.
+     * @param campaign the current {@link Campaign} context.
+     * @param contract the {@link AbstractContract} associated with the scenario.
+     * @param track    the {@link StratConTrackState} containing the scenario.
+     * @param sticky   whether the force should remain persistently assigned to this track.
+     */
+    public static void assignForceToScenario(StratConCoords coords, int forceID, Campaign campaign,
+          AbstractContract contract, StratConTrackState track, boolean sticky) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+
+        if (combatTeam == null) {
+            return;
+        }
+
+        processForceDeployment(coords, forceID, campaign, track, sticky);
+
+        StratConScenario scenario = track.getScenario(coords);
+        if (scenario == null) {
+            return;
+        }
+
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        if (!backingScenario.getForceIDs().contains(forceID)) {
+            scenario.addPrimaryForce(forceID);
+        }
+
+        commitPrimaryForces(campaign, scenario, track);
+        if (!backingScenario.isFinalized()) {
+            StratConGMs.mapGeneration(campaignOptions)
+                  .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
+            StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
+        } else {
+            // The OpFor was already generated (typically against the primary auto-assigned at scenario generation), so
+            // its objectives still name that force. Rebuild them against the primary the player actually committed.
+            AtBDynamicScenarioFactory.translateTemplateObjectives(backingScenario, campaign);
+            AtBDynamicScenarioFactory.scaleObjectiveTimeLimits(backingScenario, campaign);
+        }
+    }
+
+    /**
+     * Finds an unoccupied coordinate adjacent to the given origin coordinate.
+     *
+     * <p>This method examines all directions defined by {@code ALL_DIRECTIONS} around {@code originCoords} and
+     * evaluates each for suitability as an unoccupied adjacent coordinate. A coordinate is considered "unoccupied" if
+     * it meets all of the following conditions:</p>
+     *
+     * <ul>
+     *     <li>The coordinate holds no scenario, facility, or point of interest that occupies it (via
+     *     {@link StratConTrackState#isHexOccupied})</li>
+     *     <li>The coordinate is not occupied by any assigned forces (via {@link StratConTrackState#getAssignedForceCoords})</li>
+     *     <li>The coordinate is within the boundaries of the map</li>
+     *     <li>The coordinate is among the set of revealed coordinates (via {@link StratConTrackState#getRevealedCoords})</li>
+     * </ul>
+     *
+     * <p>If multiple suitable coordinates are found, one is selected at random and returned. If no such coordinates
+     * are available, {@code originCoords} is returned.</p>
+     *
+     * @param originCoords the starting coordinate to search around
+     * @param trackState   the track state holding map, facility, scenario, and force assignment data
+     *
+     * @return a randomly selected unoccupied and revealed adjacent coordinate, or {@code originCoords} if none are
+     *       available
+     */
+    private static StratConCoords getUnoccupiedAdjacentCoords(StratConCoords originCoords,
+          StratConTrackState trackState) {
+
+        Set<StratConCoords> revealedCoords = trackState.getRevealedCoords();
+        List<StratConCoords> suitableCoords = new ArrayList<>();
+        for (int direction : ALL_DIRECTIONS) {
+            StratConCoords newCoords = originCoords.translate(direction);
+
+            // Ocean hexes never host scenarios.
+            if (StratConBiomeManifest.isOceanTerrain(trackState.getTerrainTile(newCoords))) {
+                continue;
+            }
+
+            // A scenario, facility, or occupying point of interest already holds the hex.
+            if (trackState.isHexOccupied(newCoords)) {
+                continue;
+            }
+
+            if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
+                continue;
+            }
+
+            // This is to ensure we're not trying to place a scenario off the map
+            if (trackState.isOffTrack(newCoords)) {
+                continue;
+            }
+
+            if (revealedCoords.contains(newCoords)) {
+                suitableCoords.add(newCoords);
+            }
+        }
+
+        if (suitableCoords.isEmpty()) {
+            return originCoords;
+        }
+
+        return getRandomItem(suitableCoords);
+    }
+
+    /**
+     * Sets up a StratCon scenario with the given parameters.
+     *
+     * @param coords   The coordinates where the scenario is to be placed on the track.
+     * @param forceID  The ID of the forces involved in the scenario.
+     * @param campaign The current campaign.
+     * @param contract The contract associated with the current scenario.
+     * @param track    The relevant StratCon track.
+     *
+     * @return The newly set up {@link StratConScenario}.
+     */
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AbstractContract contract, StratConTrackState track) {
+        return setupScenario(coords,
+              forceID,
+              campaign,
+              contract,
+              track,
+              null,
+              campaign.getCampaignOptions().isUseStratConMaplessMode(),
+              null);
+    }
+
+    /**
+     * Sets up a Stratcon scenario with the given parameters optionally allowing use a specific scenario template.
+     * <p>
+     * If a facility is already present at the provided coordinates, the scenario will be setup for that facility. If
+     * there is no facility, a new scenario will be generated; if the ScenarioTemplate argument provided was non-null,
+     * it will be used, else a randomly selected scenario will be generated. In case the generated scenario turns out to
+     * be a facility scenario, a new facility will be added to the track at the provided coordinates and setup for that
+     * facility.
+     *
+     * @param coords            The coordinates where the scenario is to be placed on the track.
+     * @param forceID           The ID of the forces involved in the scenario.
+     * @param campaign          The current campaign.
+     * @param contract          The contract associated with the current scenario.
+     * @param track             The relevant StratCon track.
+     * @param template          A specific {@link ScenarioTemplate} to use for scenario setup, or {@code null} to select
+     *                          the scenario template randomly.
+     * @param ignoreFacilities  Whether we should ignore any facilities at the selected location
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
+     *                          within the next 7 days.
+     *
+     * @return The newly set up {@link StratConScenario}.
+     */
+    public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
+          Campaign campaign, AbstractContract contract, StratConTrackState track, @Nullable ScenarioTemplate template,
+          boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
+        StratConScenario scenario;
+
+        if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
+            StratConFacility facility = track.getFacility(coords);
+            boolean alliedFacility = facility.isOwnerAlliedToPlayer();
+            template = StratConScenarioFactory.getFacilityScenario(alliedFacility);
+            if (template == null) {
+                return null;
+            }
+
+            scenario = generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment);
+            if (scenario == null) {
+                return null;
+            }
+
+            setupFacilityScenario(scenario, facility);
+        } else {
+            if (template != null) {
+                scenario = generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment);
+            } else {
+                scenario = generateScenario(campaign, contract, track, forceID, coords, daysTilDeployment);
+            }
+
+            if (scenario == null) {
+                return null;
+            }
+
+            // we may generate a facility scenario randomly - if so, do the facility-related
+            // stuff and add a new facility to the track
+            if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+                if (scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
+                    // Made like the facilities placed at contract start: the contract's profile picks the type
+                    // and tier, and it rolls traits.
+                    ForceAlignment owner = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
+                                                 ForceAlignment.Opposing :
+                                                 ForceAlignment.Allied;
+                    StratConFacility facility = StratConContractInitializer.createMidContractFacility(campaign,
+                          contract,
+                          owner);
+                    if (facility == null) {
+                        // Without a facility to sit on, a facility scenario has nothing to fight over; discard it
+                        // rather than leave an orphan on the map.
+                        LOGGER.warn("No facility for facility scenario {} at {} on track {}; discarding it.",
+                              scenario.getName(),
+                              coords,
+                              track.getDisplayableName());
+                        campaign.removeScenario(scenario.getBackingScenario());
+                        return null;
+                    }
+                    facility.setVisible(true);
+                    track.addFacility(coords, facility);
+                    setupFacilityScenario(scenario, facility);
+                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
+                    // contract start.
+                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
+                }
+            }
+        }
+
+        return scenario;
+    }
+
+    /**
+     * carries out tasks relevant to facility scenarios
+     */
+    private static void setupFacilityScenario(StratConScenario scenario, StratConFacility facility) {
+        setupFacilityScenario(scenario, facility, null);
+    }
+
+    /**
+     * Gives a facility scenario its objectives.
+     *
+     * <p>With no order behind it, the objective is rolled at random, as it always was: a defend or evacuate objective
+     * for a facility on the player's side, or one of the hostile facility objectives for an enemy one. An enemy
+     * facility then also always gets the objectives to capture or destroy it.</p>
+     *
+     * <p>A scenario started by an order gets the objective that order calls for instead:</p>
+     * <ul>
+     *     <li>{@link FacilityOperation#ASSAULT}: capture, plus the usual capture and destroy objectives.</li>
+     *     <li>{@link FacilityOperation#RAID}: extract supplies, with no capture or destroy objective.</li>
+     *     <li>{@link FacilityOperation#RECON}: the recon objective, fought when a recon went wrong.</li>
+     *     <li>{@link FacilityOperation#SABOTAGE}: engage, with the enemy's forces enlarged, fought when saboteurs
+     *     were caught.</li>
+     * </ul>
+     *
+     * @param scenario  the scenario, set up but not yet finalized
+     * @param facility  the facility it is fought on
+     * @param operation the order that started it, or {@code null} for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void setupFacilityScenario(StratConScenario scenario, StratConFacility facility,
+          @Nullable FacilityOperation operation) {
+        boolean alliedFacility = facility.isOwnerAlliedToPlayer();
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+        AtBScenarioModifier objectiveModifier;
+        if (operation == null) {
+            objectiveModifier = alliedFacility ?
+                                      AtBScenarioModifier.getRandomAlliedFacilityModifier() :
+                                      AtBScenarioModifier.getRandomHostileFacilityModifier();
+        } else {
+            objectiveModifier = AtBScenarioModifier.getScenarioModifier(
+                  StratConFacilityOperations.getObjectiveModifierId(operation));
+        }
+
+        if (objectiveModifier != null) {
+            backingScenario.addScenarioModifier(objectiveModifier);
+            backingScenario.setName(String.format("%s - %s - %s",
+                  facility.getFacilityType(),
+                  alliedFacility ? "Allied" : "Hostile",
+                  objectiveModifier.getModifierName()));
+        }
+
+        if (operation == FacilityOperation.SABOTAGE) {
+            AtBScenarioModifier disadvantage = AtBScenarioModifier.getScenarioModifier(
+                  StratConFacilityOperations.SABOTAGE_CAUGHT_MODIFIER);
+            if ((disadvantage != null) && !backingScenario.alreadyHasModifier(disadvantage)) {
+                backingScenario.addScenarioModifier(disadvantage);
+            }
+        }
+
+        // add the "fixed" hostile facility modifiers after the primary ones; only an assault, or a fight no order
+        // started, can take or level the facility
+        boolean isCaptureOrDestroyPossible = (operation == null) || (operation == FacilityOperation.ASSAULT);
+        if (!alliedFacility && isCaptureOrDestroyPossible) {
+            for (AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
+                if (!backingScenario.alreadyHasModifier(modifier)) {
+                    backingScenario.addScenarioModifier(modifier);
+                }
+            }
+        }
+    }
+
+    /**
+     * Starts the scenario an order calls for on a facility, with the ordered formation assigned to it. The formation
+     * moves onto the facility's hex if it was next to it.
+     *
+     * @param campaign       the current campaign
+     * @param contract       the contract whose map holds the sector
+     * @param track          the sector
+     * @param facilityCoords the facility's hex
+     * @param formationId    the ID of the ordered formation
+     * @param operation      the order
+     *
+     * @return the scenario, or {@code null} if there is no facility there, a scenario is already there, or none could
+     *       be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startFacilityOperationScenario(Campaign campaign,
+          AbstractContract contract, StratConTrackState track, StratConCoords facilityCoords, int formationId,
+          FacilityOperation operation) {
+        StratConFacility facility = track.getFacility(facilityCoords);
+        if ((facility == null) || (track.getScenario(facilityCoords) != null)) {
+            return null;
+        }
+
+        ScenarioTemplate template = StratConScenarioFactory.getFacilityScenario(facility.isOwnerAlliedToPlayer());
+        if (template == null) {
+            return null;
+        }
+
+        StratConScenario scenario = generateScenario(campaign,
+              contract,
+              track,
+              formationId,
+              facilityCoords,
+              template,
+              null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(operation);
+        setupFacilityScenario(scenario, facility, operation);
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        return scenario;
+    }
+
+    /**
+     * Starts the fight an Interdict Supply order calls for on a road hex: a Convoy Interdiction scenario, with the
+     * ordered formation assigned to it. Winning it cuts the enemy's supply through the hex (see
+     * {@link StratConFacilitySupply#cutRoad}).
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract whose map holds the sector
+     * @param track       the sector
+     * @param coords      the road hex
+     * @param formationId the ID of the ordered formation
+     *
+     * @return the scenario, or {@code null} if a scenario is already there or none could be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startInterdictionScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords coords, int formationId) {
+        if (track.getScenario(coords) != null) {
+            return null;
+        }
+
+        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(INTERDICTION_SCENARIO_TEMPLATE);
+        if (template == null) {
+            return null;
+        }
+
+        StratConScenario scenario = generateScenario(campaign, contract, track, formationId, coords, template, null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(FacilityOperation.INTERDICT);
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        return scenario;
+    }
+
+    /**
+     * Starts a fight over a siege on the besieging formation's hex, with that formation assigned to it.
+     *
+     * <ul>
+     *     <li>A <b>sortie</b> is the garrison striking at the besiegers, in a template suited to the formation's unit
+     *     type.</li>
+     *     <li>A <b>relief</b> force is an enemy counterattack brought forward against the besiegers: a Crisis, never a
+     *     Turning Point, fought in the Hold Until Relief template.</li>
+     * </ul>
+     *
+     * <p>Either way, a loss breaks the siege (see {@link StratConFacilitySiege#resolveSiegeScenario}).</p>
+     *
+     * @param campaign        the current campaign
+     * @param contract        the contract whose map holds the sector
+     * @param track           the sector
+     * @param formationCoords the besieging formation's hex, where the fight is
+     * @param formationId     the ID of the besieging formation
+     * @param facilityCoords  the besieged facility's hex
+     * @param isSortie        {@code true} for a sortie, {@code false} for a relief force
+     *
+     * @return the scenario, or {@code null} if a scenario is already on the formation's hex or none could be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startSiegeScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords formationCoords, int formationId, StratConCoords facilityCoords,
+          boolean isSortie) {
+        if (track.getScenario(formationCoords) != null) {
+            return null;
+        }
+
+        ScenarioTemplate template = isSortie ?
+                                          null :
+                                          StratConScenarioFactory.getSpecificScenario(SIEGE_RELIEF_SCENARIO_TEMPLATE);
+        StratConScenario scenario = (template == null) ?
+                                          generateScenario(campaign, contract, track, formationId, formationCoords,
+                                                null) :
+                                          generateScenario(campaign, contract, track, formationId, formationCoords,
+                                                template, null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(FacilityOperation.SIEGE);
+        scenario.setSiegeCoords(facilityCoords);
+        scenario.setSiegeSortie(isSortie);
+
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        StratConFacility facility = track.getFacility(facilityCoords);
+        if (facility != null) {
+            backingScenario.setName(String.format("%s - %s",
+                  facility.getDisplayableName(),
+                  isSortie ? "Sortie" : "Relief"));
+        }
+
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        if (!isSortie) {
+            backingScenario.setIsCrisis(true);
+            scenario.setTurningPoint(false);
+        }
+        return scenario;
+    }
+
+    /**
+     * Starts an enemy counterattack on a facility held by the player or their employer: a Crisis, never a Turning
+     * Point, fought in the Base Defense or Hold Until Relief template. Formations already on the facility's hex are
+     * committed to it at once, as they would be to any scenario arising on their hex; otherwise the player has until
+     * the deployment deadline to send one. The templates' own objectives decide the fight: the facility's fate follows
+     * from the result (see {@code StratConFacilityOperations}), never from a facility-removing objective.
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract whose map holds the sector
+     * @param track       the sector
+     * @param coords      the facility's hex
+     * @param warningDays how many days the player has to deploy
+     *
+     * @return the scenario, or {@code null} if there is no facility there, a scenario is already there, or none could
+     *       be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startCounterattackScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords coords, int warningDays) {
+        StratConFacility facility = track.getFacility(coords);
+        if ((facility == null) || (track.getScenario(coords) != null)) {
+            return null;
+        }
+
+        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(
+              getRandomItem(COUNTERATTACK_SCENARIO_TEMPLATES));
+        if (template == null) {
+            template = StratConScenarioFactory.getFacilityScenario(true);
+        }
+        if (template == null) {
+            return null;
+        }
+
+        // Formations already standing on the facility meet the attack where they are.
+        Set<Integer> defenderIds = track.getAssignedCoordForces().get(coords);
+        List<Integer> defenders = (defenderIds == null) ? new ArrayList<>() : new ArrayList<>(defenderIds);
+        Collections.sort(defenders);
+        Integer firstDefenderId = defenders.isEmpty() ? null : defenders.get(0);
+
+        StratConScenario scenario = generateScenario(campaign,
+              contract,
+              track,
+              firstDefenderId,
+              coords,
+              template,
+              warningDays);
+        if (scenario == null) {
+            return null;
+        }
+
+        for (int index = 1; index < defenders.size(); index++) {
+            scenario.incrementRequiredPlayerLances();
+            scenario.addPrimaryForce(defenders.get(index));
+        }
+        if (!defenders.isEmpty()) {
+            scenario.setOverrideForceAutoAssignment(true);
+        }
+
+        scenario.setCounterattack(true);
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        backingScenario.setName(String.format("%s - Counterattack", facility.getDisplayableName()));
+
+        track.getRevealedCoords().add(coords);
+        finalizeBackingScenario(campaign, contract, track, false, scenario);
+        backingScenario.setIsCrisis(true);
+        scenario.setTurningPoint(false);
+        return scenario;
+    }
+
+    /**
+     * With Facility Operations, arriving at an enemy facility starts nothing on its own: the player orders what the
+     * formation does there. Without it, deploying onto one starts an assault, as it always has.
+     *
+     * @param campaign the current campaign
+     * @param facility the facility on the hex a formation is deploying to, or {@code null} if there is none
+     *
+     * @return {@code true} if the deployment starts an assault on the facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isDeploymentAnAssault(Campaign campaign, @Nullable StratConFacility facility) {
+        return (facility != null)
+                     && !facility.isOwnerAlliedToPlayer()
+                     && !StratConFacilityOperations.isEnabled(campaign);
+    }
+
+    /**
+     * @param campaign   the current campaign
+     * @param wasHostile whether the facility was the enemy's before the fight
+     * @param facility   the facility after the fight
+     *
+     * @return {@code true} if the player has just taken an enemy facility and, with Facility Operations, chooses its
+     *       fate; without them, a captured facility is simply held, as it always was
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isCaptureChoiceOffered(Campaign campaign, boolean wasHostile, StratConFacility facility) {
+        return wasHostile && facility.isOwnerAlliedToPlayer() && StratConFacilityOperations.isEnabled(campaign);
+    }
+
+    /**
+     * Applies time-sensitive facility effects.
+     */
+    public static void processFacilityEffects(StratConTrackState track, StratConCampaignState campaignState,
+          boolean isStartOfMonth) {
+        for (StratConFacility facility : track.getFacilities().values()) {
+            if (isStartOfMonth) {
+                campaignState.changeSupportPoints(facility.getMonthlySupportPoints());
+            }
+        }
+    }
+
+    /**
+     * Processes the deployment of a combat force to a specified location on a track in the campaign.
+     *
+     * <p>This method handles actions related to force deployment, including:</p>
+     * <ul>
+     *   <li>Revealing the deployed coordinates and all adjacent coordinates within the force's scan range.</li>
+     *   <li>Updating the visibility of facilities and scenarios in the affected area.</li>
+     *   <li>Assigning the force to the specified deployment coordinates and clearing previous track assignments.</li>
+     *   <li>Triggering any necessary events, such as deployment event handling or scenario updates.</li>
+     * </ul>
+     *
+     * <p>Patrol and scouting roles may extend the scan range, and fatigue is increased only once
+     * if the deployment reveals previously unrevealed coordinates.</p>
+     *
+     * @param coords   The {@link StratConCoords} where the combat force is being deployed.
+     * @param forceID  The unique ID of the combat force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratConTrackState} where the force is being deployed.
+     * @param sticky   Whether the force should remain persistently assigned to this track.
+     */
+    public static void processForceDeployment(StratConCoords coords, int forceID, Campaign campaign,
+          StratConTrackState track, boolean sticky) {
+        scanNeighboringCoords(coords, forceID, campaign, track);
+        StratConReconnaissance.updateObjectives(track);
+
+        // the force may be located in other places on the track - clear it out
+        track.unassignFormation(forceID);
+        track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        MekHQ.triggerEvent(new StratConDeploymentEvent(campaign.getPlayerForce().getFormation(forceID)));
+    }
+
+    /**
+     * Decides whether a formation deploying onto a hex runs into a random scenario.
+     *
+     * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
+     * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of
+     * interest on the hex may rule the roll out, or make it certain - but not against a routed enemy, which fields no
+     * scenarios at all. Without a point of interest's say, it is the usual roll against the sector's scenario
+     * odds.</p>
+     *
+     * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
+     * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on
+     * @param isHexHeld              whether the hex is held by a facility, or by a point of interest occupying it
+     * @param enemyRouted            whether the contract's enemy is routed
+     * @param targetNumber           the sector's scenario odds, out of 100
+     *
+     * @return {@code true} if a random scenario spawns
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
+          boolean essentialScenariosOnly, boolean isHexHeld, boolean enemyRouted, int targetNumber) {
+        if (essentialScenariosOnly || isHexHeld) {
+            return false;
+        }
+
+        return switch (pointOfInterestOutcome) {
+            case SUPPRESS_SCENARIO -> false;
+            case FORCE_SCENARIO -> !enemyRouted;
+            case NO_EFFECT -> randomInt(100) <= targetNumber;
+        };
+    }
+
+    /**
+     * Scans neighboring coordinates around the deployment location to reveal facilities, scenarios, points of interest,
+     * and coordinates within the force's scan range. Updates campaign and track states as needed.
+     *
+     * <p>This method uses a breadth-first search (BFS) approach to efficiently traverse the hex grid,
+     * marking which coordinates have been visited and ensuring no redundant operations occur. It also increases
+     * fatigue, reveals cloaked scenarios, and activates facilities or scenarios in the affected area.</p>
+     *
+     * @param coords   The {@link StratConCoords} of the initial deployment location.
+     * @param forceID  The unique ID of the force being deployed.
+     * @param campaign The current {@link Campaign} instance representing the game's state.
+     * @param track    The {@link StratConTrackState} where the deployment and scanning are being tracked.
+     */
+    private static void scanNeighboringCoords(StratConCoords coords, int forceID, Campaign campaign,
+          StratConTrackState track) {
+        // we want to ensure we only increase Fatigue once
+        boolean hasFatigueIncreased = false;
+
+        int scanRangeIncrease = track.getScanRangeIncrease();
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+        if (combatTeam != null) {
+            boolean isPatrol = combatTeam.getRole().isPatrol();
+            if (isPatrol) {
+                scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
+            }
+        }
+
+        // Process starting point
+        if (!track.getRevealedCoords().contains(coords)) {
+            increaseFatigue(forceID, campaign);
+            hasFatigueIncreased = true;
+        }
+
+        track.getRevealedCoords().add(coords);
+        StratConPointOfInterestRules.revealPointsOfInterest(track, coords, campaign);
+
+        StratConFacility targetFacility = track.getFacility(coords);
+        if (targetFacility != null) {
+            targetFacility.setVisible(true);
+        }
+
+        StratConScenario scenario = track.getScenario(coords);
+
+        if (scenario != null) {
+            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+            if (backingScenario != null) {
+                if (backingScenario.isCloaked()) {
+                    backingScenario.setCloaked(false);
+                }
+
+                if (backingScenario.getDate() == null) {
+                    setScenarioDates(0, track, campaign, scenario);
+                }
+
+                MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
+            }
+        }
+
+        if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
+            return;
+        }
+
+        // Build a map of scouts and their information
+        List<ScoutRecord> scouts = buildScoutMap(campaign.getPlayerForce().getFormation(forceID),
+              campaign.getPlayerForce().getHangar(), campaign);
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useAdvancedScouting = campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING);
+        // Each scout may scan up to scanMultiplier hexes
+        // Each scout may scan up to a radius of individualScanRange hexes
+        for (ScoutRecord scoutData : scouts) {
+            int individualScanRange = useAdvancedScouting && scoutData.unitWeight() <= 35 ?
+                                            scanRangeIncrease + 1 :
+                                            scanRangeIncrease;
+            int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
+
+            Person scout = scoutData.scout();
+
+            // Per-scout BFS structures
+            Queue<Pair<StratConCoords, Integer>> scoutQueue = new LinkedList<>();
+            Set<StratConCoords> scoutVisited = new HashSet<>();
+
+            scoutQueue.add(new Pair<>(coords, 0));
+            scoutVisited.add(coords); // starting hex is already processed separately
+
+            while (!scoutQueue.isEmpty() && remainingScans > 0) {
+                Pair<StratConCoords, Integer> current = scoutQueue.poll();
+                StratConCoords currentCoords = current.getKey();
+                int distance = current.getValue();
+
+                // Do not expand beyond this scout's radius
+                if (distance >= individualScanRange) {
+                    continue;
+                }
+
+                boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
+                for (int direction = 0; direction < 6; direction++) {
+                    StratConCoords checkCoords = currentCoords.translate(direction);
+
+                    //ensure we are scouting on the StratCon track
+                    if (track.isOffTrack(checkCoords)) {
+                        continue;
+                    }
+
+                    if (remainingScans == 0) {
+                        break;
+                    }
+
+                    // Per-scout: don't re-visit the same hex for this scout
+                    if (scoutVisited.contains(checkCoords)) {
+                        continue;
+                    }
+                    scoutVisited.add(checkCoords);
+
+                    int nextDistance = distance + 1;
+                    if (nextDistance <= individualScanRange) {
+                        // Always enqueue so we can reach further rings,
+                        // even through already-revealed hexes.
+                        scoutQueue.add(new Pair<>(checkCoords, nextDistance));
+                    }
+
+                    // Only roll if this hex is still unexplored in the global track. A hex scouted earlier still
+                    // shows up any point of interest placed on it since, without a roll or any fatigue.
+                    if (track.getRevealedCoords().contains(checkCoords)) {
+                        StratConPointOfInterestRules.revealPointsOfInterest(track, checkCoords, campaign);
+                        continue;
+                    }
+
+                    ActionCheckResult actionCheckResult = null;
+                    if (useAdvancedScouting) {
+                        actionCheckResult = scoutData.skillCheck().resolve(
+                              isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"));
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+                    }
+
+                    remainingScans--;
+
+                    if (!hasFatigueIncreased) {
+                        increaseFatigue(forceID, campaign);
+                        hasFatigueIncreased = true;
+                    }
+
+                    boolean wasScoutingSuccessful = actionCheckResult == null || actionCheckResult.isSuccess();
+                    if (!wasScoutingSuccessful) {
+                        // Failed check: hex remains unrevealed, but future scouts may still try it
+                        continue;
+                    }
+
+                    // Success: reveal the hex globally
+                    StratConFacility neighborFacility = track.getFacility(checkCoords);
+                    if (neighborFacility != null) {
+                        neighborFacility.setVisible(true);
+                    }
+
+                    StratConScenario neighborScenario = track.getScenario(checkCoords);
+                    if (neighborScenario != null) {
+                        AtBDynamicScenario backingScenario = neighborScenario.getBackingScenario();
+                        if (backingScenario != null) {
+                            if (backingScenario.isCloaked()) {
+                                backingScenario.setCloaked(false);
+                            }
+                            if (backingScenario.getDate() == null) {
+                                setScenarioDates(0, track, campaign, neighborScenario);
+                            }
+                            MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
+                        }
+                    }
+
+                    track.getRevealedCoords().add(checkCoords);
+                    StratConPointOfInterestRules.revealPointsOfInterest(track, checkCoords, campaign);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a TargetRollModifier based on the provided unit weight. Lighter units gain bonuses, heavier units gain
+     * penalties.
+     *
+     * @param unitWeight the unit's weight in tons
+     *
+     * @return appropriate TargetRollModifier for the weight bracket
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static TargetRollModifier getUnitWeightModifier(double unitWeight) {
+        int modifier = 6; // default for anything greater than 100t
+
+        if (unitWeight <= 55) {
+            modifier = 0;
+        } else if (unitWeight <= 75) {
+            modifier = 2;
+        } else if (unitWeight <= 100) {
+            modifier = 4;
+        }
+
+        return new TargetRollModifier(modifier, "Unit Weight Modifier");
+    }
+
+    /**
+     * Determines the target roll modifier based on the given unit's speed value.
+     *
+     * <p>This method evaluates {@code unitSpeed} and assigns a modifier as follows (all ranges are inclusive):</p>
+     * <ul>
+     *     <li>Speed ≤ 3: modifier = 1</li>
+     *     <li>Speed 4–7 (inclusive): modifier = 0</li>
+     *     <li>Speed ≥ 8: modifier = -1</li>
+     * </ul>
+     *
+     * <p>The returned {@link TargetRollModifier} includes the computed modifier and the description "Unit Speed
+     * Modifier".</p>
+     *
+     * @param unitSpeed the speed of the unit to evaluate
+     *
+     * @return a {@link TargetRollModifier} representing the speed-based modifier
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
+        int modifier;
+        if (unitSpeed <= 3) {
+            modifier = 1;
+        } else if (unitSpeed <= 7) {
+            modifier = 0;
+        } else { // speed 8+
+            modifier = -1;
+        }
+
+        return new TargetRollModifier(modifier, "Unit Speed Modifier");
+    }
+
+    /**
+     * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
+     *
+     * <p>Improved Sensors, Active Probes, and Recon Cameras (mounted or carried as a pod) all count as sensor
+     * equipment. They do not stack.</p>
+     *
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
+     *
+     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier value of
+     *       0 if no qualifying equipment is present
+     */
+    static TargetRollModifier getUnitEquipmentModifier(boolean unitHasSensorEquipment) {
+        int modifier = unitHasSensorEquipment ? -1 : 0;
+        return new TargetRollModifier(modifier, "Unit Sensor Equipment Modifier");
+    }
+
+    /**
+     * Generates a {@link TargetRollModifier} representing the effect of complementary SPAs skills for a given scout.
+     *
+     * @param scoutHasEagleEyes      flag signifying if the scout has Eagle Eyes SPA
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
+     *
+     * @return a {@link TargetRollModifier} reflecting bonuses from complementary scouting skills; will have a modifier
+     *       value of 0 if no qualifying skills are present
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    static TargetRollModifier getScoutComplementarySPAModifier(boolean scoutHasEagleEyes,
+          boolean unitHasSensorEquipment) {
+        // Eagle Eyes adds +1 to the effective scout skill but does not stack with sensor equipment
+        int modifier = (scoutHasEagleEyes && !unitHasSensorEquipment) ? -1 : 0;
+        return new TargetRollModifier(modifier, "Scout Complementary SPA Modifier");
+    }
+
+    /**
+     * Returns the full list of {@link TargetRollModifier}s for a given scout.
+     *
+     * @param unitWeight             the unit's weight in tons
+     * @param unitSpeed              the unit's speed
+     * @param scoutHasEagleEyes      flag signifying if the scout has Eagle Eyes SPA
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
+     *
+     * @return a list of {@link TargetRollModifier} reflecting all bonuses scout has
+     */
+    static List<TargetRollModifier> getAllScoutRollModifiers(double unitWeight, int unitSpeed,
+          boolean scoutHasEagleEyes, boolean unitHasSensorEquipment) {
+        TargetRollModifier weightModifier = getUnitWeightModifier(unitWeight);
+        TargetRollModifier speedModifier = getUnitSpeedModifier(unitSpeed);
+        TargetRollModifier sensorEquipmentModifier = getUnitEquipmentModifier(unitHasSensorEquipment);
+        TargetRollModifier scoutModifier =
+              getScoutComplementarySPAModifier(scoutHasEagleEyes, unitHasSensorEquipment);
+        return List.of(weightModifier, speedModifier, sensorEquipmentModifier, scoutModifier);
+    }
+
+    /**
+     * Builds and returns a list of {@link ScoutRecord} instances representing the best scout for each unit in the given
+     * force.
+     *
+     * <p>For each unit retrieved from the {@code Force}, this method examines all crew members to determine which
+     * has the highest scouting-related skill (as evaluated by {@link ScoutingSkills#getBestScoutingSkill(Person)}) in
+     * combination with scouting roll modifiers</p>
+     *
+     * <p>The crew member with the highest skill level becomes the designated scout for that unit. The method also
+     * determines whether each unit is a "light unit" based on its weight class.</p>
+     *
+     * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
+     * returned as a list. Units with no crew are logged and skipped.</p>
+     *
+     * @param formation the {@link Formation} containing units to evaluate
+     * @param hangar    the {@link LocalHangar} used to help retrieve units from the force
+     * @param campaign  the {@link Campaign} context
+     *
+     * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
+     *       unit, sorted from the highest to lowest scout skill level
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    static List<ScoutRecord> buildScoutMap(Formation formation, LocalHangar hangar, Campaign campaign) {
+        if (formation == null) {
+            return new ArrayList<>();
+        }
+
+        List<ScoutRecord> scouts = new ArrayList<>();
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
+            List<Person> unitCrew = unit.getCrew();
+            if (unitCrew.isEmpty()) {
+                LOGGER.info("No crew for unit: {} {}", unit.getName(), unit.getId());
+                continue;
+            }
+
+            // defaults
+            double unitWeight = 200.0;
+            int unitSpeed = 0;
+            boolean hasSensorEquipment = false;
+
+            Entity entity = unit.getEntity();
+            if (entity != null) {
+                unitWeight = entity.getWeight();
+                unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
+                hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity) || hasReconCamera(entity);
+
+                if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
+                    Person commander = unit.getCommander();
+                    if (commander == null) {
+                        LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
+                        continue; // skip unit, because commander-only is enforced but no commander exists
+                    }
+                    unitCrew = Collections.singletonList(commander);
+                }
+            }
+
+            // Find the best scout in this unit, if any
+            ScoutRecord bestScout = null;
+            for (Person crewMember : unitCrew) {
+                boolean hasEagleEyes = crewMember.getOptions().booleanOption(OptionsConstants.MISC_EAGLE_EYES);
+                String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
+                if (scoutSkillName == null) {
+                    // default to unskilled check
+                    scoutSkillName = ScoutingSkills.DEFAULT_UNSKILLED_CHECK;
+                }
+
+                List<TargetRollModifier> mods = getAllScoutRollModifiers(
+                      unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment);
+                SkillCheck skillCheck = crewMember.checkSkill(scoutSkillName, campaign).withExternalModifiers(mods);
+
+                if (bestScout == null || skillCheck.isEasierThan(bestScout.skillCheck())) {
+                    bestScout = new ScoutRecord(crewMember, skillCheck, unitWeight);
+                }
+            }
+
+            if (bestScout == null) {
+                continue;
+            }
+
+            LOGGER.info("Unit {} (weight: {}t, speed: {}) has best scout: {} with skill {} at TN {}",
+                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(),
+                  bestScout.skillCheck().getSkillType().getName(), bestScout.skillCheck().getTargetNumber().getValue());
+            scouts.add(bestScout);
+        }
+
+        // Sort scouts by the target number of their best scout skill, the lowest first
+        scouts.sort(Comparator.comparingInt(a -> a.skillCheck().getTargetNumber().getValue()));
+        return scouts;
+    }
+
+    /**
+     * Increases the fatigue for all crew members per Unit in a force.
+     *
+     * @param forceID  the ID of the force
+     * @param campaign the campaign
+     */
+    public static void increaseFatigue(int forceID, Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
+        for (UUID unit : campaign.getPlayerForce().getFormation(forceID).getAllUnits(false)) {
+            for (Person person : campaign.getUnit(unit).getCrew()) {
+                person.changeFatigue(fatigueRate);
+
+                if (isUseFatigue) {
+                    Fatigue.processFatigueActions(campaign, person);
+                }
+            }
+        }
+    }
+
+    /**
+     * Use
+     * {@link #processReinforcementDeployment(Formation, ReinforcementEligibilityType, StratConCampaignState,
+     * StratConScenario, Campaign, int, boolean, boolean)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static ReinforcementResultsType processReinforcementDeployment(Formation formation,
+          ReinforcementEligibilityType reinforcementType, StratConCampaignState campaignState,
+          StratConScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement) {
+        return processReinforcementDeployment(formation, reinforcementType, campaignState, scenario, campaign,
+              reinforcementTargetNumber, isGMReinforcement, false);
+    }
+
+    /**
+     * Processes the effects of deploying a reinforcement force to a scenario. Based on the reinforcement type, the
+     * campaign state, and the results dice rolls, skills, and intercept odds, this method determines whether the
+     * reinforcement deployment succeeds, fails, is delayed, or is intercepted.
+     *
+     * <p>Key steps include:
+     * <ul>
+     *   <li>Checking if the reinforcement type is {@link ReinforcementEligibilityType#CHAINED_SCENARIO},
+     *   which automatically succeeds.</li>
+     *   <li>Calculating the results of dice rolls, optionally adjusted for skills such as Tactics,
+     *       and comparing it against the target number to determine success or failure.</li>
+     *   <li>Handling critical failures, interception attempts, and enemy routing.</li>
+     *   <li>Generating follow-up scenarios for intercepted reinforcements or handling delays.</li>
+     * </ul>
+     *
+     * @param formation                 the {@link Formation} being deployed as a reinforcement
+     * @param reinforcementType         the type of reinforcement (e.g., auxiliary or chained scenario)
+     * @param campaignState             the current state of the campaign
+     * @param scenario                  the scenario to which the reinforcements are being deployed
+     * @param campaign                  the overarching campaign instance managing the scenario
+     * @param reinforcementTargetNumber the target number that the reinforcement roll must meet or exceed
+     * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the reinforcement check,
+     *                                  {@code false} otherwise.
+     * @param isInstantlyDeployed       {@code true} if the player is deploying instantly
+     *
+     * @return a {@link ReinforcementResultsType} indicating the result of the reinforcement deployment:
+     *       <ul>
+     *           <li>{@link ReinforcementResultsType#SUCCESS} - The reinforcement is deployed successfully.</li>
+     *           <li>{@link ReinforcementResultsType#FAILED} - The reinforcement deployment fails.</li>
+     *           <li>{@link ReinforcementResultsType#DELAYED} - The reinforcement is delayed.</li>
+     *           <li>{@link ReinforcementResultsType#INTERCEPTED} - The reinforcement is intercepted,
+     *           possibly resulting in a new scenario.</li>
+     *       </ul>
+     */
+    public static ReinforcementResultsType processReinforcementDeployment(Formation formation,
+          ReinforcementEligibilityType reinforcementType, StratConCampaignState campaignState,
+          StratConScenario scenario, Campaign campaign, int reinforcementTargetNumber, boolean isGMReinforcement,
+          boolean isInstantlyDeployed) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+              MekHQ.getMHQOptions().getLocale());
+
+        if (reinforcementType.equals(ReinforcementEligibilityType.CHAINED_SCENARIO)) {
+            return INSTANT;
+        }
+
+        AbstractContract contract = campaignState.getContract();
+
+        // Determine StratCon Track and other context for recalculation
+        StratConTrackState track = null;
+        for (StratConTrackState trackState : campaignState.getTracks()) {
+            if (trackState.getScenarios().containsValue(scenario)) {
+                track = trackState;
+                break;
+            }
+        }
+
+        // Make the roll
+        int roll = d6(2);
+
+        // If the formation is set to Maneuver or Auxiliary, use the highest of two rolls
+        String maneuverRoleReport = "";
+        if (reinforcementType == AUXILIARY) {
+            int secondRoll = d6(2);
+            maneuverRoleReport = String.format(" (%s,%s)", roll, secondRoll);
+            roll = max(roll, secondRoll);
+        }
+
+        StringBuilder reportStatus = new StringBuilder();
+
+        if (isGMReinforcement) {
+            reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
+                  scenario.getHyperlinkedName()));
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+
+            return isInstantlyDeployed ? INSTANT : SUCCESS;
+        } else {
+            reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
+                  scenario.getHyperlinkedName(),
+                  roll,
+                  maneuverRoleReport,
+                  reinforcementTargetNumber));
+        }
+
+        // Critical Failure
+        if (roll == 2) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+            return FAILED;
+        }
+
+        // Reinforcement successful
+        if (roll >= reinforcementTargetNumber) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+
+            return isInstantlyDeployed ? INSTANT : SUCCESS;
+        }
+
+        // Reinforcement roll failed, make interception check
+        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
+        int interceptionRoll = randomInt(100);
+
+        // Check passed
+        if (interceptionRoll >= interceptionOdds || contract.getMoraleLevel().isRouted()) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+            return DELAYED;
+        }
+
+        // Check failed, enemy attempt interception
+        reportStatus.append(' ');
+        reportStatus.append(String.format(resources.getString("reinforcementsInterceptionAttempt.text"),
+              spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+              CLOSING_SPAN_TAG));
+
+        UUID commanderId = formation.getFormationCommanderID();
+
+        if (commanderId == null) {
+            LOGGER.error("Force Commander ID is null.");
+
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+            return FAILED;
+        }
+
+        Person commander = campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
+
+        if (commander == null) {
+            LOGGER.error("Failed to fetch commander from ID.");
+
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
+                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  CLOSING_SPAN_TAG));
+            campaign.addReport(BATTLE, reportStatus.toString());
+            return FAILED;
+        }
+
+        campaign.addReport(BATTLE, reportStatus.toString());
+
+        ActionCheckResult actionCheckResult =
+              commander.checkSkill(S_TACTICS, campaign)
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"));
+
+        if (actionCheckResult.isSuccess()) {
+            String reportString = commander.getSkill(S_TACTICS) != null ?
+                                        resources.getString("reinforcementEvasionSuccessful.text") :
+                                        resources.getString("reinforcementEvasionSuccessful.noSkill");
+            campaign.addReport(BATTLE, String.format(reportString,
+                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                  CLOSING_SPAN_TAG));
+
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+                increaseFatigue(formation.getId(), campaign);
+            }
+
+            return DELAYED;
+        }
+
+        campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+              CLOSING_SPAN_TAG,
+              actionCheckResult.getRollResult(),
+              9));
+
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
+              campaign.getPlayerForce().getHangar());
+
+        generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
+
+        return INTERCEPTED;
+    }
+
+    /**
+     * Retrieves the appropriate {@link ScenarioTemplate} for an interception scenario based on the provided
+     * {@link Formation} and {@link Campaign}.
+     *
+     * <p>This method determines the correct scenario template file to use by analyzing the composition
+     * of the {@link Formation} within the context of the given {@link Campaign}. The selected template file is then
+     * deserialized into a {@link ScenarioTemplate} object.</p>
+     *
+     * <p><strong>Special Cases:</strong></p>
+     * <ul>
+     *     <li>A "Space" template is chosen if all units are aerospace and a random condition is met
+     *             (1 in 3 chance).</li>
+     *     <li>A "Low-Atmosphere" template is selected if the {@link Formation} contains only airborne
+     *             units but does not meet the criteria for a "Space" template.</li>
+     *     <li>A default ground template is selected if no specific cases are matched.</li>
+     * </ul>
+     *
+     * @param formation The {@link Formation} instance that the scenario is based on. The force composition is used to
+     *                  determine the appropriate scenario template.
+     * @param hangar    The {@link LocalHangar} instance from which to retrieve the {@link Unit}.
+     *
+     * @return A {@link ScenarioTemplate} instance representing the chosen scenario template file based on the logic
+     *       described, or a default template if no special conditions are satisfied.
+     */
+    private static ScenarioTemplate getInterceptionScenarioTemplate(Formation formation, LocalHangar hangar) {
+        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.json";
+
+        ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
+
+        boolean airborneOnly = formation.formationContainsOnlyAerialForces(hangar, false, false);
+
+        boolean aerospaceOnly = false;
+        if (airborneOnly) {
+            aerospaceOnly = formation.formationContainsOnlyAerialForces(hangar, false, true);
+        }
+
+        if (aerospaceOnly && (randomInt(3) == 0)) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        } else if (airborneOnly) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        }
+
+        return scenarioTemplate;
+    }
+
+    /**
+     * Calculates the target roll required for determining reinforcements in a specific campaign scenario.
+     *
+     * <p>This method evaluates the reinforcement target number by considering various factors
+     * such as the administrative skill of the command liaison, facility ownership influence, contract-related skill
+     * levels, and command rights configurations. Multiple modifiers are applied step-by-step to generate the final
+     * {@link TargetRoll}.</p>
+     *
+     * <strong>Steps in Calculation:</strong>
+     * <ol>
+     *     <li><b>Base Target Number:</b></li>
+     *             <li>-- If the {@code commandLiaison} is provided and has administrative skill,
+     *             it replaces the default base target number with their skill value.</li>
+     *             <li>-- If no liaison is provided, or they lack administrative skill, the base target
+     *             number remains at the default value.</li>
+     *     <li><b>Facilities Modifier:</b></li>
+     *             <li>-- Iterates through the facilities in the relevant track to determine their
+     *             ownership.</li>
+     *             <li>-- If a facility is owned by the player or allied forces, a negative modifier
+     *             is applied, reducing the target number.</li>
+     *             <li>-- If a facility is owned by non-allied forces, a positive modifier is applied,
+     *             increasing the target number.</li>
+     *     <li><b>Skill Modifier:</b></li>
+     *             <li>-- The skill modifier reflects the ally and enemy skill adjustments from the contract.</li>
+     *             <li>-- If the campaign is operating under an "Independent" rights condition, additional
+     *             checks and adjustments are made based on ally and enemy skill levels.</li>
+     *     <li><b>Liaison Command Modifier:</b></li>
+     *             <li>-- If command rights indicate that a liaison is required, the modifier is adjusted.</li>
+     * </ol>
+     *
+     * @param commandLiaison   the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
+     * @param contract         the {@link AbstractContract} defining the terms of the contract for this scenario.
+     * @param baseTargetNumber the starting target number before adjustments
+     *
+     * @return a {@link TargetRoll} object representing the calculated reinforcement target number, with appropriate
+     *       modifiers applied.
+     */
+    public static TargetRoll calculateReinforcementTargetNumber(@Nullable Person commandLiaison,
+          AbstractContract contract,
+          int baseTargetNumber) {
+        // Create Target Roll
+        TargetRoll reinforcementTargetNumber = new TargetRoll(baseTargetNumber, "Base Target Number");
+
+        // Base Target Number
+        Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
+        int skillModifier;
+        if (skill == null) {
+            skillModifier = 0;
+        } else {
+            SkillModifierData skillModifierData = commandLiaison.getSkillModifierData();
+            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(skillModifierData);
+        }
+
+        // Admin Skill Modifier
+        reinforcementTargetNumber.addModifier(skillModifier, "Administration Skill");
+
+        // Enemy Morale Modifier
+        reinforcementTargetNumber.addModifier(contract.getMoraleLevel().getLevel() - STALEMATE.getLevel(),
+              "Enemy Morale");
+
+        // Skill Modifier
+        int enemySkillModifier = contract.getEnemyForceSkill().getAdjustedValue() - REGULAR.getAdjustedValue();
+        reinforcementTargetNumber.addModifier(enemySkillModifier, "Enemy Skill Modifier");
+
+        // Liaison Modifier
+        ContractCommandRights commandRights = contract.getCommandRights();
+        if (commandRights.isLiaison()) {
+            int liaisonModifier = -1;
+            reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
+        }
+
+        // Liaison SPA
+        if (commandLiaison != null) {
+            PersonnelOptions options = commandLiaison.getOptions();
+            if (options.booleanOption(ADMIN_COORDINATOR)) {
+                int liaisonModifier = -1;
+                reinforcementTargetNumber.addModifier(liaisonModifier, "Coordinator SPA");
+            }
+        }
+
+        // Return final value
+        return reinforcementTargetNumber;
+    }
+
+    /**
+     * Assigns a force to the scenario such that the majority of the force can be deployed
+     */
+    private static void assignAppropriateExtraForceToScenario(StratConScenario scenario,
+          Map<MapLocation, List<Integer>> sortedAvailableForceIDs) {
+        // the goal of this function is to avoid assigning ground units to air battles
+        // and ground units/conventional fighters to space battle
+
+        List<MapLocation> mapLocations = new ArrayList<>();
+        mapLocations.add(Space); // can always add ASFs
+
+        MapLocation scenarioMapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+
+        if (scenarioMapLocation == LowAtmosphere) {
+            mapLocations.add(LowAtmosphere); // can add conventional fighters to ground or low atmosphere battles
+        }
+
+        if ((scenarioMapLocation == AllGroundTerrain) || (scenarioMapLocation == SpecificGroundTerrain)) {
+            mapLocations.add(AllGroundTerrain); // can only add ground units to ground battles
+        }
+
+        MapLocation selectedLocation = mapLocations.get(randomInt(mapLocations.size()));
+        List<Integer> forceIDs = sortedAvailableForceIDs.get(selectedLocation);
+        int forceIndex = randomInt(forceIDs.size());
+        int forceID = forceIDs.get(forceIndex);
+        forceIDs.remove(forceIndex);
+
+        scenario.addPrimaryForce(forceID);
+    }
+
+    /**
+     * Worker function that "locks in" a scenario - Adds it to the campaign so it's visible in the briefing room, adds
+     * it to the track
+     */
+    public static void commitPrimaryForces(Campaign campaign, StratConScenario scenario,
+          StratConTrackState trackState) {
+        trackState.addScenario(scenario);
+
+        // set up dates for the scenario if it doesn't have them already
+        if (scenario.getDeploymentDate() == null) {
+            scenario.setDeploymentDate(campaign.getLocalDate());
+        }
+
+        if (scenario.getActionDate() == null) {
+            scenario.setActionDate(campaign.getLocalDate());
+        }
+
+        if (scenario.getReturnDate() == null) {
+            scenario.setReturnDate(campaign.getLocalDate().plusDays(trackState.getDeploymentTime()));
+        }
+
+        // set the # of rerolls based on the actual lance assigned.
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        int tactics = backingScenario.getLanceCommanderSkill(S_TACTICS, campaign);
+        backingScenario.setRerolls(tactics);
+        // The number of defensive points available to a force entering a scenario is
+        // 2 x tactics. By default, those points are spent on conventional minefields.
+        if (commanderLanceHasDefensiveAssignment(backingScenario, campaign) &&
+                  // No minefields or bonus units during official challenges.
+                  !backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+            scenario.setNumDefensivePoints(tactics * 2);
+            scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, tactics * 2);
+        }
+
+        for (int forceID : scenario.getPlayerTemplateForceIDs()) {
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            formation.clearScenarioIds(campaign, true);
+            formation.setScenarioId(scenario.getBackingScenarioID(), campaign);
+        }
+
+        scenario.commitPrimaryForces();
+    }
+
+    /**
+     * Utility method to determine if the current scenario's force commander's force is on defence
+     */
+    public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
+        Person lanceCommander = scenario.getLanceCommander(campaign);
+        if (lanceCommander != null) {
+            Unit commanderUnit = lanceCommander.getUnit();
+            if (commanderUnit != null) {
+                CombatTeam lance = campaign.getPlayerForce()
+                                         .getCombatTeamsAsMap(campaign)
+                                         .get(commanderUnit.getFormationId());
+
+                return (lance != null) && lance.getRole().isFrontline();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Categorizes a list of force IDs into groups based on the type of map they can primarily support.
+     *
+     * <p>This overloaded method analyzes each force associated with the given force IDs in the context of
+     * the provided {@link LocalHangar} and a pre-resolved list of {@link Formation} objects. It determines whether each
+     * force is suited for ground, atmospheric, or space maps, assigning them to the appropriate map types. Forces may
+     * belong to multiple map types based on their composition.</p>
+     *
+     * <p><strong>Behavior:</strong></p>
+     * <ul>
+     *   <li>Forces are classified into the following map types:
+     *       <ul>
+     *         <li><strong>AllGroundTerrain</strong>: Includes all forces.</li>
+     *         <li><strong>LowAtmosphere</strong>: Forces that only contain airborne units.</li>
+     *         <li><strong>Space</strong>: Forces that exclusively contain aerospace-capable units.</li>
+     *       </ul>
+     *   </li>
+     *   <li>A force can appear in multiple map types, such as both "LowAtmosphere" and "Space" for
+     *       aerospace-only forces.</li>
+     *   <li>Logs an error and continues processing if any force associated with a given ID cannot
+     *       be found in the provided list of forces.</li>
+     * </ul>
+     *
+     * @param forceIDs      A list of force IDs to classify.
+     * @param hangar        The {@link LocalHangar} instance containing aerial or aerospace-related information about
+     *                      forces.
+     * @param allFormations A pre-resolved list of {@link Formation} objects. Forces are accessed using their IDs as
+     *                      indices, providing performance benefits when compared to fetching forces on demand.
+     *
+     * @return A {@link Map} where each {@link MapLocation} key corresponds to a map type, and the value is a list of
+     *       force IDs that can operate in that map type.
+     */
+    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, LocalHangar hangar,
+          List<Formation> allFormations) {
+        boolean airborneOnly;
+        boolean aerospaceOnly;
+
+        Map<MapLocation, List<Integer>> retVal = new HashMap<>();
+
+        retVal.put(AllGroundTerrain, new ArrayList<>());
+        retVal.put(LowAtmosphere, new ArrayList<>());
+        retVal.put(Space, new ArrayList<>());
+
+        for (int forceID : forceIDs) {
+            Formation formation = null;
+            for (Formation individualFormation : allFormations) {
+                if (individualFormation.getId() == forceID) {
+                    formation = individualFormation;
+                    break;
+                }
+            }
+
+            if (formation == null) {
+                LOGGER.error("Force ID {} is null in sortForcesByMapType", forceID);
+                continue;
+            }
+
+            airborneOnly = formation.formationContainsOnlyAerialForces(hangar, false, false);
+
+            aerospaceOnly = false;
+            if (airborneOnly) {
+                aerospaceOnly = formation.formationContainsOnlyAerialForces(hangar, false, true);
+            }
+
+            if (aerospaceOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+                retVal.get(Space).add(forceID);
+            } else if (airborneOnly) {
+                retVal.get(LowAtmosphere).add(forceID);
+            }
+
+            retVal.get(AllGroundTerrain).add(forceID);
+        }
+        return retVal;
+    }
+
+    /**
+     * Determines the set of {@link MapLocation map locations} that StratCon is allowed to generate scenarios in, given
+     * the composition of the campaign's fleet.
+     *
+     * <p>This implements the {@link CampaignOption#RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY} option: an aerospace
+     * outfit should not be handed ground battles it has no units to fight. The rules are:</p>
+     *
+     * <ul>
+     *   <li>If the option is disabled, the campaign has no units, or it fields any ground-capable unit (a 'Mek,
+     *       vehicle, infantry, and so on), no restriction is applied and {@code null} is returned - the full range of
+     *       ground, low-atmosphere, and space scenarios remains available.</li>
+     *   <li>If every unit is airborne and at least one is space-capable (an aerospace fighter, small craft, DropShip,
+     *       and so on), scenarios are restricted to space and low atmosphere.</li>
+     *   <li>If every unit is airborne but none is space-capable (only conventional fighters), scenarios are restricted
+     *       to low atmosphere.</li>
+     * </ul>
+     *
+     * <p>This reads the player force's {@link mekhq.campaign.force.FleetAltitudeCapability}, a cached summary
+     * refreshed once per day in {@code CampaignNewDayManager} (before scenario generation), so this method is O(1) and
+     * safe to call for every scenario generated in a batch rather than rescanning the roster each time.</p>
+     *
+     * @param campaign the current {@link Campaign}
+     *
+     * @return a fresh {@link Set} of the allowed {@link MapLocation}s, or {@code null} if scenario generation should
+     *       not be restricted
+     */
+    public static @Nullable Set<MapLocation> getFleetRestrictedMapLocations(Campaign campaign) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY)) {
+            return null;
+        }
+
+        return switch (campaign.getPlayerForce().getFleetAltitudeCapability()) {
+            case UNRESTRICTED -> null;
+            case ATMOSPHERE_ONLY -> EnumSet.of(LowAtmosphere);
+            case SPACE_AND_ATMOSPHERE -> EnumSet.of(Space, LowAtmosphere);
+        };
+    }
+
+    /**
+     * Selects a random, non-ambush scenario template for the given unit type, honoring the campaign's
+     * {@link CampaignOption#RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY fleet-capability restriction}.
+     *
+     * <p>When the campaign is restricted to aerospace altitudes but the resolved {@code unitType} would only pull
+     * ground templates - most commonly because no deploying force was supplied, so it defaulted to
+     * {@link megamek.common.units.UnitType#MEK} - a representative aerospace unit type is substituted so a suitable
+     * scenario is still found instead of coming up empty.</p>
+     *
+     * <p>A track holding a facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()})
+     * also rules out air and space templates.</p>
+     *
+     * @param campaign the current {@link Campaign}
+     * @param track    the track the scenario is for
+     * @param unitType the primary unit type of the deploying force, or {@code MEK} if none is available
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none could be selected
+     */
+    private static @Nullable ScenarioTemplate getFleetAppropriateRandomScenario(Campaign campaign,
+          StratConTrackState track, int unitType) {
+        Set<MapLocation> allowedLocations = restrictMapLocationsForTrack(getFleetRestrictedMapLocations(campaign),
+              track);
+        return StratConScenarioFactory.getRandomScenario(adjustUnitTypeForMapLocations(unitType, allowedLocations),
+              false,
+              false,
+              allowedLocations);
+    }
+
+    /**
+     * Selects a random scenario template for the given unit type that is allowed on the given track: a track holding a
+     * facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()}) never gets an air or
+     * space template. Unlike {@link #getFleetAppropriateRandomScenario}, this does not apply the fleet-capability
+     * restriction.
+     *
+     * @param track           the track the scenario is for
+     * @param unitType        the primary unit type of the force involved
+     * @param isAmbushed      whether the scenario is an ambush
+     * @param isBungledPatrol whether the scenario is a bungled patrol
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none could be selected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable ScenarioTemplate getRandomScenarioForTrack(StratConTrackState track, int unitType,
+          boolean isAmbushed, boolean isBungledPatrol) {
+        Set<MapLocation> allowedLocations = restrictMapLocationsForTrack(null, track);
+        return StratConScenarioFactory.getRandomScenario(adjustUnitTypeForMapLocations(unitType, allowedLocations),
+              isAmbushed,
+              isBungledPatrol,
+              allowedLocations);
+    }
+
+    /**
+     * Narrows a set of allowed map locations to what the given track permits. A track holding a facility that prevents
+     * aerospace permits no air or space scenarios.
+     *
+     * @param allowedLocations the locations already allowed, or {@code null} for no restriction
+     * @param track            the track the scenario is for, or {@code null} to add no restriction
+     *
+     * @return the allowed locations, or {@code null} if there is no restriction at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable Set<MapLocation> restrictMapLocationsForTrack(@Nullable Set<MapLocation> allowedLocations,
+          @Nullable StratConTrackState track) {
+        if ((track == null) || !track.isAerospacePrevented()) {
+            return allowedLocations;
+        }
+
+        Set<MapLocation> restrictedLocations = (allowedLocations == null) ?
+                                                     EnumSet.allOf(MapLocation.class) :
+                                                     EnumSet.copyOf(allowedLocations);
+        restrictedLocations.remove(LowAtmosphere);
+        restrictedLocations.remove(Space);
+        return restrictedLocations;
+    }
+
+    /**
+     * Substitutes a representative unit type when the given one would only pull templates from locations that are not
+     * allowed: an aerospace type when no ground location is allowed (most commonly because no deploying force was
+     * supplied, so the type defaulted to {@link megamek.common.units.UnitType#MEK}), or a Mek when no air or space
+     * location is allowed. This way a suitable scenario is still found instead of coming up empty.
+     *
+     * @param unitType         the primary unit type of the force involved
+     * @param allowedLocations the allowed locations, or {@code null} for no restriction
+     *
+     * @return the unit type to select templates for
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int adjustUnitTypeForMapLocations(int unitType, @Nullable Set<MapLocation> allowedLocations) {
+        if (allowedLocations == null) {
+            return unitType;
+        }
+
+        boolean isAerospaceUnitType = convertSpecificUnitTypeToGeneral(unitType) ==
+                                            ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
+        boolean isGroundAllowed = allowedLocations.contains(AllGroundTerrain) ||
+                                        allowedLocations.contains(SpecificGroundTerrain);
+        boolean isAirAllowed = allowedLocations.contains(LowAtmosphere) || allowedLocations.contains(Space);
+
+        if (!isAerospaceUnitType && !isGroundAllowed && isAirAllowed) {
+            return allowedLocations.contains(Space) ? AEROSPACE_FIGHTER : CONV_FIGHTER;
+        }
+
+        if (isAerospaceUnitType && !isAirAllowed && isGroundAllowed) {
+            return MEK;
+        }
+
+        return unitType;
+    }
+
+    /**
+     * Generates a StratCon scenario at the specified coordinates for the given force on the specified track. The
+     * scenario is determined based on a random template suitable for the unit type of the specified force, and it is
+     * optionally configured with a deployment delay.
+     *
+     * <p>This method selects a random scenario template based on the primary unit type of the force,
+     * then delegates the scenario creation and configuration to another overloaded {@code generateScenario} method
+     * which handles specific template-based scenario generation.</p>
+     *
+     * @param campaign          the {@link Campaign} managing the overall gameplay state
+     * @param contract          the {@link AbstractContract} governing the StratCon campaign
+     * @param track             the {@link StratConTrackState} where the scenario is placed
+     * @param forceID           the ID of the force for which the scenario is generated
+     * @param scenarioCoords    the {@link StratConCoords} specifying where the scenario will be generated
+     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, deployment dates are
+     *                          determined dynamically
+     *
+     * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
+     */
+    private static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords scenarioCoords,
+          @Nullable Integer daysTilDeployment) {
+        int unitType = MEK;
+
+        if (forceID != null) {
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            if (formation != null) {
+                unitType = formation.getPrimaryUnitType(campaign);
+            }
+        }
+
+        // This random-template path is only reached when no force is pre-deployed at the coords, so it never
+        // produces an ambush. Ambushes (a scenario spawning on top of an already-deployed force) are handled up
+        // front by generateScenarioForExistingForces in deployForceToCoords and generateDailyScenariosForTrack,
+        // which pass an explicit ambush template instead of the random one selected here.
+        ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, track, unitType);
+        // useful for debugging specific scenario types
+        // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
+        // Dropship.xml");
+
+        return generateScenario(campaign, contract, track, forceID, scenarioCoords, template, daysTilDeployment);
+    }
+
+    /**
+     * Generates a StratCon scenario at the specified coordinates for the given force on the specified track, using the
+     * provided scenario template. The scenario is customized and registered with the campaign.
+     *
+     * <p>The generated scenario is configured as follows:
+     * <ul>
+     *     <li>If no template is provided, a random template is chosen based on the unit type of the given force.</li>
+     *     <li>If provided, deployment dates are explicitly set. Otherwise, dates are determined dynamically.</li>
+     *     <li>Global modifiers, facility modifiers, attached unit modifiers, and allied force modifiers
+     *         are applied as appropriate.</li>
+     *     <li>The scenario is marked as unresolved and is registered with the campaign and track.</li>
+     * </ul>
+     * This method also handles special conditions:
+     * <ul>
+     *     <li>Forces with specific command rights (House or Integrated) will mark the scenario as required.</li>
+     *     <li>If no force is provided, the scenario is treated as part of contract initialization (e.g., allied forces).</li>
+     * </ul>
+     *
+     * @param campaign          the {@link Campaign} managing the gameplay state
+     * @param contract          the {@link AbstractContract} governing the StratCon campaign
+     * @param track             the {@link StratConTrackState} to which the scenario belongs
+     * @param forceID           the ID of the force for which the scenario is generated, or
+     *                          {@link Formation#FORMATION_NONE} if none
+     * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
+     * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
+     *                          one is selected
+     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, dates will be
+     *                          dynamically set
+     *
+     * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
+     */
+    static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+        StratConScenario scenario = new StratConScenario();
+
+        if (forceID == null) {
+            forceID = FORMATION_NONE;
+        }
+
+        if (template == null) {
+            int unitType = MEK;
+
+            try {
+                unitType = campaign.getPlayerForce().getFormation(forceID).getPrimaryUnitType(campaign);
+            } catch (NullPointerException ignored) {
+                // This just means the player has no units
+            }
+
+            template = getFleetAppropriateRandomScenario(campaign, track, unitType);
+        }
+
+        if (template == null) {
+            LOGGER.error("Failed to fetch random scenario template. Aborting scenario generation.");
+            return null;
+        }
+
+        AtBDynamicScenario backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template,
+              contract,
+              campaign);
+        scenario.setBackingScenario(backingScenario);
+        scenario.setCoords(coords);
+
+        // A scenario sitting on a strategic-objective facility - one the player must retain, capture, or destroy - is
+        // itself Essential: its outcome decides that facility's fate. Flag it so it is treated like any other
+        // strategic-objective scenario (Essential marker, combat bonus on victory, barred from being a Turning Point).
+        StratConFacility facilityAtCoords = (coords == null) ? null : track.getFacility(coords);
+        if ((facilityAtCoords != null) && facilityAtCoords.isStrategicObjective()) {
+            scenario.setStrategicObjective(true);
+        }
+
+        // by default, certain conditions may make this bigger
+        scenario.setRequiredPlayerLances(1);
+
+        // do any facility or global modifiers
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isClansObeyBiddingRules = campaignOptions.get(CampaignOption.CLANS_OBEY_BIDDING_RULES);
+        boolean isBatchallAccepted = contract.isBatchallAccepted();
+
+        boolean restrictAlliedModifiers = isClansObeyBiddingRules &&
+                                                isBatchallAccepted &&
+                                                contract.getEmployerFaction().isClan();
+        boolean restrictEnemyModifiers = isClansObeyBiddingRules &&
+                                               isBatchallAccepted &&
+                                               contract.getEnemyFaction().isClan();
+
+        if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            int alliedFacilityModifierChance = campaignOptions.get(CampaignOption.ALLIED_FACILITY_MODIFIER_DIE_SIZE);
+            int enemyFacilityModifierChance = campaignOptions.get(CampaignOption.ENEMY_FACILITY_MODIFIER_DIE_SIZE);
+
+            applyFacilityModifiers(scenario,
+                  track,
+                  coords,
+                  alliedFacilityModifierChance,
+                  enemyFacilityModifierChance,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
+        }
+
+        applyGlobalModifiers(scenario,
+              contract.getStratConCampaignState(),
+              restrictAlliedModifiers,
+              restrictEnemyModifiers);
+
+        AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario(),
+              restrictAlliedModifiers, restrictEnemyModifiers);
+        scenario.setCurrentState(ScenarioState.UNRESOLVED);
+
+        if (daysTilDeployment == null) {
+            setScenarioDates(track, campaign, scenario);
+        } else {
+            setScenarioDates(daysTilDeployment, track, campaign, scenario);
+        }
+
+        // the backing scenario ID must be updated after registering the backing
+        // scenario
+        // with the campaign, so that the stratcon - backing scenario association is
+        // maintained
+        // registering the scenario with the campaign should be done after setting
+        // dates, otherwise, the report messages for new scenarios look weird
+        // also, suppress the "new scenario" report if not generating a scenario
+        // for a specific force, as this indicates a contract initialization
+        campaign.addScenario(backingScenario, contract, forceID == FORMATION_NONE);
+        scenario.setBackingScenarioID(backingScenario.getId());
+
+        if (forceID > FORMATION_NONE) {
+            scenario.addPrimaryForce(forceID);
+        }
+
+        return scenario;
+    }
+
+    /**
+     * Applies global scenario modifiers from the campaign state to the given scenario, with optional restrictions on
+     * modifiers for allied and enemy forces.
+     *
+     * <p>Iterates over all global scenario modifiers defined in the campaign state. For each modifier, if it
+     * includes a force definition, it is subject to modifier restrictions: allied force modifiers are skipped if
+     * {@code restrictAlliedModifiers} is {@code true}, and enemy force modifiers are skipped if
+     * {@code restrictEnemyModifiers} is {@code true}. Modifiers that are not found in the registry are logged as errors
+     * and skipped.</p>
+     *
+     * @param scenario                the {@link StratConScenario} to which modifiers will be applied
+     * @param campaignState           the {@link StratConCampaignState} providing the list of global scenario modifier
+     *                                names
+     * @param restrictAlliedModifiers if {@code true}, skips any modifier that has a force definition and benefits the
+     *                                player (allied)
+     * @param restrictEnemyModifiers  if {@code true}, skips any modifier that has a force definition and does not
+     *                                benefit the player (enemy)
+     */
+    private static void applyGlobalModifiers(StratConScenario scenario, StratConCampaignState campaignState,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
+        for (String modifierName : campaignState.getGlobalScenarioModifiers()) {
+            AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierName);
+
+            if (modifier == null) {
+                LOGGER.error("Modifier {} not found; ignoring", modifierName);
+                continue;
+            }
+
+            if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
+                continue;
+            }
+
+            scenario.getBackingScenario().addScenarioModifier(modifier);
+        }
+    }
+
+    /**
+     * Determines whether a scenario modifier should be blocked based on facility modifier restrictions and which side
+     * the modifier benefits.
+     *
+     * <p>A modifier is only subject to blocking if it includes a force definition. In that case, modifiers
+     * benefiting the player are blocked by {@code restrictAlliedModifiers}, and modifiers benefiting the enemy are
+     * blocked by {@code restrictEnemyModifiers}. Modifiers without a force definition are never blocked.</p>
+     *
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
+     * @param modifier                the {@link AtBScenarioModifier} to evaluate, if {@code null}, returns
+     *                                {@code true}
+     *
+     * @return {@code true} if the modifier should be blocked, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public static boolean scenarioModifierShouldBeBlocked(boolean restrictAlliedModifiers,
+          boolean restrictEnemyModifiers, @Nullable AtBScenarioModifier modifier) {
+        if (modifier == null) {
+            return true;
+        }
+
+        if (modifier.getForceDefinition() != null) {
+            if (modifier.getBenefitsPlayer()) {
+                return restrictAlliedModifiers;
+            } else {
+                return restrictEnemyModifiers;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Applies scenario modifiers provided by facilities on the track.
+     *
+     * <p>If the scenario is located directly on a facility, that facility's local or shared modifiers are applied and
+     * no additional modifier is rolled for facilities with the same ownership alignment. The method may then roll once
+     * for an available allied facility and once for an available enemy facility, allowing remote facilities to
+     * contribute shared modifiers to the scenario.</p>
+     *
+     * <p>Facilities that provide modifiers are marked unavailable by
+     * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean, boolean, boolean)} and will not be
+     * selected again until made available elsewhere.</p>
+     *
+     * @param scenario                     the scenario receiving facility-provided modifiers
+     * @param track                        the track containing facilities that may influence the scenario
+     * @param coords                       the coordinates where the scenario is being generated
+     * @param alliedFacilityModifierChance the 1-in-n chance an allied facility will add a modifier
+     * @param enemyFacilityModifierChance  the 1-in-n chance an enemy facility will add a modifier
+     * @param restrictAlliedModifiers      {@code true} if facility modifiers which add forces that benefit the player
+     *                                     should be blocked
+     * @param restrictEnemyModifiers       {@code true} if facility modifiers which add forces that benefit the enemy
+     *                                     should be blocked
+     */
+    private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
+          StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
+        Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
+
+        boolean rollForAllied = true;
+        boolean rollForEnemy = true;
+
+        StratConFacility localFacility = allFacilities.get(coords);
+        boolean scenarioAtFacility = localFacility != null;
+        if (scenarioAtFacility) {
+            final boolean isLocalFacility = true;
+            getFacilityModifiers(scenario,
+                  localFacility,
+                  isLocalFacility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
+
+            // A facility's synergy partners lend their shared modifiers to fights at it.
+            for (StratConFacility partner : StratConFacilitySynergies.getPartners(track, coords)) {
+                // A partner with nothing to lend, such as a damaged one, keeps its weekly lend for elsewhere.
+                if (partner.getSharedModifiers().isEmpty()) {
+                    continue;
+                }
+                getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers);
+            }
+
+            if (localFacility.isOwnerAlliedToPlayer()) {
+                rollForAllied = false;
+            } else {
+                rollForEnemy = false;
+            }
+        }
+
+        Map<StratConCoords, StratConFacility> availableAlliedFacilities = new HashMap<>();
+        Map<StratConCoords, StratConFacility> availableEnemyFacilities = new HashMap<>();
+        filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
+
+        if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
+            rollForFacilityModifier(scenario,
+                  alliedFacilityModifierChance,
+                  availableAlliedFacilities,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
+        }
+
+        if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
+            rollForFacilityModifier(scenario,
+                  enemyFacilityModifierChance,
+                  availableEnemyFacilities,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
+        }
+    }
+
+    /**
+     * Rolls to determine whether one of the supplied facilities contributes modifiers to the scenario.
+     *
+     * <p>A chance value of {@code 0} always fails, a value of {@code 1} always succeeds, and any higher value gives a
+     * {@code 1 / facilityModifierChance} chance of success. On success, one facility is selected at random from
+     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
+     *
+     * @param scenario                the scenario receiving the facility modifiers
+     * @param facilityModifierChance  the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
+     *                                success, and values greater than {@code 1} succeed when a random roll returns
+     *                                {@code 0}
+     * @param availableFacilities     facilities eligible to provide remote shared modifiers
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
+     */
+    private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
+          Map<StratConCoords, StratConFacility> availableFacilities, boolean restrictAlliedModifiers,
+          boolean restrictEnemyModifiers) {
+        boolean autoFailRoll = facilityModifierChance == NO_FACILITY_MODIFIER;
+        if (autoFailRoll) {
+            return;
+        }
+
+        boolean autoSuccess = facilityModifierChance == AUTOMATIC_FACILITY_MODIFIER;
+        boolean successfullyRolledForFacility = autoSuccess || randomInt(facilityModifierChance) == 0;
+
+        if (successfullyRolledForFacility) {
+            final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
+            if (randomFacility == null) {
+                return;
+            }
+
+            final boolean isLocalFacility = false;
+            getFacilityModifiers(scenario,
+                  randomFacility,
+                  isLocalFacility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers);
+        }
+    }
+
+    /**
+     * Applies the relevant modifiers from a facility to the provided scenario.
+     *
+     * <p>Local modifiers are used when the scenario occurs directly at the facility. Otherwise, if the scenario does
+     * not occur at the facility, its shared modifiers are applied.</p>
+     *
+     * <p>Then, the facility is marked as unavailable.</p>
+     *
+     * @param scenario                the scenario receiving the modifiers
+     * @param facility                the facility providing modifier effects
+     * @param isLocal                 {@code true} if the scenario occurs at the facility location; {@code false} if the
+     *                                facility is being used remotely for shared modifiers
+     * @param restrictAlliedModifiers {@code true} if facility modifiers which add forces that benefit the player should
+     *                                be blocked
+     * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
+     *                                be blocked
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
+          boolean isLocal, boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
+        List<String> relevantModifiers = new ArrayList<>();
+        List<String> localModifiers = facility.getLocalModifiers();
+        List<String> globalModifiers = facility.getSharedModifiers();
+
+        if (isLocal) {
+            relevantModifiers.addAll(localModifiers);
+        } else {
+            relevantModifiers.addAll(globalModifiers);
+        }
+
+        for (String modifierID : relevantModifiers) {
+            AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+            if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
+                continue;
+            }
+
+            applyModifierToScenario(scenario, facility, modifierID);
+        }
+
+        facility.setIsAvailable(false);
+    }
+
+    /**
+     * Resolves a scenario modifier by identifier and applies it to the scenario.
+     *
+     * <p>The modifier briefing text is prefixed with the facility display name to indicate the source of the effect
+     * before being attached to the backing scenario.</p>
+     *
+     * <p>If the modifier identifier cannot be resolved, an error is logged and no modifier is applied.</p>
+     *
+     * @param scenario   the scenario receiving the modifier
+     * @param facility   the facility responsible for the modifier effect
+     * @param modifierID the identifier of the modifier to resolve and apply
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    private static void applyModifierToScenario(StratConScenario scenario, StratConFacility facility,
+          String modifierID) {
+        AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+        if (modifier == null) {
+            LOGGER.error("Modifier {} not found for facility {}",
+                  modifierID,
+                  facility.getFormattedDisplayableName());
+            return;
+        }
+
+        modifier.setAdditionalBriefingText('(' +
+                                                 facility.getDisplayableName() +
+                                                 ") " +
+                                                 modifier.getAdditionalBriefingText());
+        scenario.getBackingScenario().addScenarioModifier(modifier);
+    }
+
+    /**
+     * Creates a map containing only facilities that are currently available for use.
+     *
+     * <p>Facilities marked as unavailable are excluded from the returned maps. The filtered maps preserve the
+     * original coordinate-to-facility associations.</p>
+     *
+     * @param allFacilities             the complete map of facilities indexed by their coordinates
+     * @param availableAlliedFacilities an array of all allied facilities that are available
+     * @param availableEnemyFacilities  an array of all enemy facilities that are available
+     */
+    private static void filterAvailableFacilities(
+          Map<StratConCoords, StratConFacility> allFacilities,
+          Map<StratConCoords, StratConFacility> availableAlliedFacilities,
+          Map<StratConCoords, StratConFacility> availableEnemyFacilities) {
+        for (Entry<StratConCoords, StratConFacility> facilityEntry : allFacilities.entrySet()) {
+            StratConFacility facility = facilityEntry.getValue();
+            StratConCoords facilityCoords = facilityEntry.getKey();
+
+            if (facility.isAvailable()) {
+                if (facility.isOwnerAlliedToPlayer()) {
+                    availableAlliedFacilities.put(facilityCoords, facility);
+                } else {
+                    availableEnemyFacilities.put(facilityCoords, facility);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Sets the attached units modifier for the specified scenario based on the contract's type and map location of the
+     * backing scenario.
+     *
+     * @param scenario The strategic scenario to which the modifier will be applied. This scenario includes details
+     *                 about the current operation.
+     * @param contract The AtB (Against the Bot) contract which defines the command rights and governs how the scenario
+     *                 should be modified.
+     */
+    public static void setAttachedUnitsModifier(StratConScenario scenario, AbstractContract contract) {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere) ||
+                                  (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);
+
+        if (contract.getCommandRights().isHouse()) {
+            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle ?
+                                                                                              MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR :
+                                                                                              MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
+        }
+    }
+
+    /**
+     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
+     * campaign date
+     */
+    private static void setScenarioDates(StratConTrackState track, Campaign campaign, StratConScenario scenario) {
+        int deploymentDay = track.getDeploymentTime() < 7 ? randomInt(7 - track.getDeploymentTime()) : 0;
+        setScenarioDates(deploymentDay, track, campaign, scenario);
+    }
+
+    /**
+     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
+     * campaign date. Takes a fixed deployment day of X days from campaign's today date.
+     */
+    private static void setScenarioDates(int deploymentDelay, StratConTrackState track, Campaign campaign,
+          StratConScenario scenario) {
+        // set up deployment day, battle day, return day here
+        // safety code to prevent attempts to generate random int with upper bound of 0
+        // which is apparently illegal
+        int battleDay = deploymentDelay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
+        int returnDay = deploymentDelay + track.getDeploymentTime();
+
+        LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
+        LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
+
+        scenario.setDeploymentDate(battleDate);
+        scenario.setActionDate(battleDate);
+        scenario.setReturnDate(returnDate);
+    }
+
+    /**
+     * Determines whether the force in question has the same primary unit type as the force template.
+     *
+     * @return Whether the unit types match.
+     */
+    public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType) {
+        // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
+        if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            return primaryUnitType < JUMPSHIP;
+        } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+            return primaryUnitType >= CONV_FIGHTER;
+        } else {
+            return primaryUnitType == unitType;
+        }
+    }
+
+    /**
+     * Retrieves a list of force IDs corresponding to combat teams that are eligible for deployment under a specific
+     * contract. The eligibility is determined based on various criteria such as assignment to the current contract,
+     * deployment status, and combat role restrictions.
+     *
+     * <p>The method identifies suitable combat teams for deployment by:
+     * <ul>
+     *   <li>Filtering combat teams assigned to the specified contract.</li>
+     *   <li>Excluding combat teams that are already actively deployed.</li>
+     *   <li>Ensuring that combat teams have roles other than "In Reserve" or "Auxiliary"
+     *       (unless role restrictions are bypassed).</li>
+     * </ul>
+     *
+     * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
+     *                               statuses.
+     * @param contract               The {@link AbstractContract} contract for which combat teams are evaluated based on
+     *                               their eligibility.
+     * @param bypassRoleRestrictions A boolean flag to indicate whether restrictions based on combat roles should be
+     *                               ignored. If {@code true}, all combat teams assigned to the contract are considered
+     *                               eligible.
+     *
+     * @return A {@link List} of {@link Integer} force IDs representing combat teams that are ready and suitable for
+     *       deployment.
+     */
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, AbstractContract contract,
+          boolean bypassRoleRestrictions) {
+        // First, build a list of all combat teams in the campaign
+        List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+
+        if (combatTeams.isEmpty()) {
+            // If we don't have any combat teams, there is no point in continuing, so we exit early
+            return Collections.emptyList();
+        }
+
+        // Finally, loop through the available combat teams adding those found to be suitable to
+        // the appropriate list.
+        List<Integer> suitableForces = new ArrayList<>();
+        for (CombatTeam combatTeam : combatTeams) {
+            // If the combat team isn't assigned to the current contract, it isn't eligible to be deployed
+            if (!contract.equals(combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            // If the combat team doesn't have a valid force (somehow), skip it.
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation == null) {
+                continue;
+            }
+
+            // Skip any that are already assigned to a scenario.
+            if (formation.isDeployed()) {
+                continue;
+            }
+
+            // A support company holds only carriers, which never deploy, so StratCon must not generate a scenario
+            // for it. It can sit in the combat-team list between a load and the next recalculation.
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+                continue;
+            }
+
+            // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
+            CombatRole combatRole = combatTeam.getRole();
+            if (bypassRoleRestrictions) {
+                suitableForces.add(combatTeam.getFormationId());
+            } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
+                if (!combatRole.isTraining()) {
+                    suitableForces.add(combatTeam.getFormationId());
+                }
+            }
+        }
+
+        if (suitableForces.isEmpty()) {
+            if (!bypassRoleRestrictions) {
+                LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
+                suitableForces = getAvailableForceIDs(campaign, contract, true);
+            } else {
+                LOGGER.info("No suitable combat teams found for contract {} despite relaxed restrictions." +
+                                  " Scenario generation will likely be skipped.", contract.getId());
+            }
+        }
+
+        return suitableForces;
+    }
+
+    /**
+     * Retrieves a list of all force IDs eligible for deployment to a scenario.
+     * <p>
+     * This method evaluates all forces in the specified {@link Campaign} and identifies those that meet the criteria
+     * for deployment.
+     * <p>
+     * The criteria ensure that the forces:
+     * <ul>
+     *   <li>Are combat-capable (i.e., not auxiliary or in reserve).</li>
+     *   <li>Are not currently assigned to a track (except for the current track if deploying as
+     *   reinforcements).</li>
+     *   <li>Are not already deployed to a scenario.</li>
+     *   <li>Have not previously failed to deploy (if deploying as reinforcements).</li>
+     *   <li>Match the specified unit type.</li>
+     * </ul>
+     * Forces that meet all conditions are returned as a list of unique force IDs.
+     *
+     * @param unitType          the desired type of unit to evaluate for deployment eligibility.
+     * @param campaign          the {@link Campaign} containing the forces to evaluate.
+     * @param currentTrack      the {@link StratConTrackState} representing the current track, used to filter eligible
+     *                          forces.
+     * @param reinforcements    {@code true} if the forces are being deployed as reinforcements; otherwise
+     *                          {@code false}.
+     * @param currentScenario   the current {@link StratConScenario}, if any, used to exclude failed reinforcements. Can
+     *                          be {@code null}.
+     * @param campaignState     the current {@link StratConCampaignState} representing the campaign state for further
+     *                          filtering of eligible forces.
+     * @param isCombatChallenge {@code true} to restrict the player to deploying a single formation of ground units.
+     *
+     * @return a {@link List} of unique force IDs that meet all deployment criteria.
+     */
+    public static List<Integer> getAvailableForceIDsForManualDeployment(int unitType, Campaign campaign,
+          StratConTrackState currentTrack, boolean reinforcements, @Nullable StratConScenario currentScenario,
+          StratConCampaignState campaignState, boolean isCombatChallenge) {
+        List<Integer> retVal = new ArrayList<>();
+
+        // assemble a set of all force IDs that are currently assigned to tracks
+        Set<Integer> forcesInTracks = new HashSet<>();
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            StratConCampaignState state = contract.getStratConCampaignState();
+            if (state == null) {
+                continue;
+            }
+
+            for (StratConTrackState track : state.getTracks()) {
+                forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
+            }
+        }
+
+        // if there's an existing scenario, and we're doing reinforcements,
+        // prevent forces that failed to deploy from trying to deploy again
+        if (reinforcements && (currentScenario != null)) {
+            forcesInTracks.addAll(currentScenario.getFailedReinforcements());
+        }
+
+        for (CombatTeam formation : campaign.getPlayerForce().getCombatTeamsAsMap(campaign).values()) {
+            int id = formation.getFormationId();
+            Formation force = campaign.getPlayerForce().getFormation(id);
+
+            if (force == null) {
+                continue;
+            }
+
+            if (force.isDeployed()) {
+                continue;
+            }
+
+            // A support company holds only carriers, which stay home; offering it would assign a formation that
+            // sends nothing.
+            if (SupportCarrierDeployment.deploysNothing(campaign, force,
+                  (currentScenario == null) ? null : currentScenario.getBackingScenario())) {
+                continue;
+            }
+
+            if (formation.getRole().isReserve()) {
+                continue;
+            }
+
+            if (formation.getRole().isAuxiliary() && !reinforcements) {
+                continue;
+            }
+
+            int primaryUnitType = force.getPrimaryUnitType(campaign);
+            boolean noReinforcementRestriction = !reinforcements ||
+                                                       (getReinforcementType(force.getId(),
+                                                             currentTrack,
+                                                             campaign,
+                                                             campaignState) != ReinforcementEligibilityType.NONE);
+
+            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
+
+            // In low altitude and space scenarios we need to verify that any units that can't deploy are carried by
+            // a unit that can.
+            MapLocation mapLocation = (currentScenario == null) ?
+                                            null :
+                                            currentScenario.getScenarioTemplate().mapParameters.getMapLocation();
+            boolean compositionMatches;
+            if (mapLocation == LowAtmosphere || mapLocation == Space) {
+                compositionMatches = isFormationDeployableToAirOrSpace(allUnits, unitType, campaign, mapLocation);
+            } else {
+                compositionMatches = forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType);
+            }
+
+            if ((force.getScenarioId() <= 0) &&
+                      !allUnits.isEmpty() &&
+                      !forcesInTracks.contains(force.getId()) &&
+                      compositionMatches &&
+                      noReinforcementRestriction &&
+                      !subElementsOrSelfDeployed(force, campaign)) {
+                if (isCombatChallenge) {
+                    boolean hasOnlyGroundUnits = true;
+                    for (Unit unit : allUnits) {
+                        Entity entity = unit.getEntity();
+                        if (entity != null && entity.isAerospace()) {
+                            hasOnlyGroundUnits = false;
+                            break;
+                        }
+                    }
+
+                    if (!hasOnlyGroundUnits) {
+                        continue;
+                    }
+
+                    int standardForceSize = CombatTeam.getStandardFormationSize(campaign.getPlayerForce().getFaction());
+                    int formationSize = formation.getSize(campaign);
+                    if (formationSize <= standardForceSize) {
+                        retVal.add(force.getId());
+                    }
+                } else {
+                    retVal.add(force.getId());
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Checks whether an entire formation can take part in a low altitude or space scenario. Every unit must either be
+     * able to deploy there itself (an aerospace unit that passes the normal scenario unit vetting), or be loaded aboard
+     * - via ship or tactical transport - a unit in the same formation that can.
+     *
+     * @param units       the formation's units
+     * @param unitType    the template's allowed unit type
+     * @param campaign    the current campaign
+     * @param mapLocation the scenario's map location; expected to be {@link MapLocation#LowAtmosphere} or
+     *                    {@link MapLocation#Space}
+     *
+     * @return {@code true} if every unit in the formation can reach the scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFormationDeployableToAirOrSpace(List<Unit> units, int unitType, Campaign campaign,
+          MapLocation mapLocation) {
+        if (units.isEmpty()) {
+            return false;
+        }
+
+        Set<UUID> deployableUnitIds = new HashSet<>();
+        for (Unit unit : units) {
+            if (isUnitDeployableToAirOrSpace(unit, unitType, campaign, mapLocation)) {
+                deployableUnitIds.add(unit.getId());
+            }
+        }
+
+        for (Unit unit : units) {
+            if (deployableUnitIds.contains(unit.getId())) {
+                continue;
+            }
+
+            if (!isCarriedByDeployableUnit(unit.getTransportShipAssignment(), deployableUnitIds)
+                      && !isCarriedByDeployableUnit(unit.getTacticalTransportAssignment(), deployableUnitIds)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isCarriedByDeployableUnit(@Nullable ITransportAssignment transportAssignment,
+          Set<UUID> deployableUnitIds) {
+        if (transportAssignment == null) {
+            return false;
+        }
+
+        Unit transport = transportAssignment.getTransport();
+        return (transport != null) && deployableUnitIds.contains(transport.getId());
+    }
+
+    private static boolean isUnitDeployableToAirOrSpace(@Nullable Unit unit, int unitType, Campaign campaign,
+          MapLocation mapLocation) {
+        if (unit == null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        if (entity == null || !entity.isAerospace()) {
+            return false;
+        }
+
+        // Use the same vetting as actual scenario deployment, so we never count a transport here that would later be
+        // rejected (DropShips disabled, unstreamlined in atmosphere, unavailable, non-functional, etc.)
+        return isValidUnitForScenario(unit, unitType, campaign, mapLocation);
+    }
+
+    /**
+     * Returns true if any sub-element (unit or sub-force) of this force is deployed.
+     */
+    private static boolean subElementsOrSelfDeployed(Formation formation, Campaign campaign) {
+        if (formation.isDeployed()) {
+            return true;
+        }
+
+        if (formation.getUnits().stream().map(campaign::getUnit).anyMatch(Unit::isDeployed)) {
+            return true;
+        }
+
+        return formation.getSubFormations().stream().anyMatch(child -> subElementsOrSelfDeployed(child, campaign));
+    }
+
+    /**
+     * Retrieves a list of units that are eligible for deployment in support of a Frontline force.
+     *
+     * <p>A unit is considered eligible if:</p>
+     * <ul>
+     *   <li>It is valid (available, properly deployed, and of a suitable type i.e., conventional
+     *   infantry or battle armor).</li>
+     *   <li>The force to which it belongs is valid (not deployed, part of a combat team, and not in
+     *   reserve).</li>
+     * </ul>
+     *
+     * @param campaign The campaign instance holding the units and forces involved.
+     *
+     * @return A list of {@code Unit} objects that meet the requirements for deployment in support of a Frontline force.
+     */
+    public static List<Unit> getEligibleFrontlineUnits(Campaign campaign, StratConScenario currentScenario) {
+        List<Unit> defensiveUnits = new ArrayList<>();
+
+        // Retrieve the list of units from force 0
+        List<UUID> unitIDs = campaign.getPlayerForce().getAllUnitsInTheTOE(true);
+
+        for (UUID unitId : unitIDs) {
+            Unit unit = campaign.getUnit(unitId);
+
+            // Validate the unit
+            if (!isUnitValidForFrontlineDeployment(unit)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
+                continue;
+            }
+
+            // Validate the force associated with the unit
+            if (!isForceEligible(unit, campaign, currentScenario)) {
+                continue;
+            }
+
+            defensiveUnits.add(unit);
+        }
+
+        return defensiveUnits;
+    }
+
+    /**
+     * Checks if a unit is valid for deployment in support of a Frontline force.
+     *
+     * <p>A unit is considered valid if:</p>
+     * <ul>
+     *   <li>The unit is not null.</li>
+     *   <li>The unit is available for deployment.</li>
+     *   <li>The unit's deployment checks return no errors.</li>
+     *   <li>The unit's entity is of type conventional infantry or battle armor.</li>
+     * </ul>
+     *
+     * @param unit The {@code Unit} object to validate.
+     *
+     * @return {@code true} if the unit is valid; {@code false} otherwise.
+     */
+    private static boolean isUnitValidForFrontlineDeployment(@Nullable Unit unit) {
+        if (unit == null) {
+            return false;
+        }
+
+        if (!unit.isAvailable()) {
+            return false;
+        }
+
+        if (unit.checkDeployment() != null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        return entity != null && (unit.isConventionalInfantry() || unit.isBattleArmor());
+    }
+
+    /**
+     * Checks if the force associated with a unit is eligible for deployment in support of a Frontline force.
+     *
+     * <p>A force is considered eligible if:</p>
+     * <ul>
+     *   <li>The force is not null.</li>
+     *   <li>The force has not already been deployed.</li>
+     *   <li>The force is part of a combat team.</li>
+     *   <li>The combat team is not assigned a reserve role.</li>
+     * </ul>
+     *
+     * @param unit     The {@code Unit} whose associated force is being validated.
+     * @param campaign The {@code Campaign} object used to retrieve information about the force.
+     *
+     * @return {@code true} if the associated force is eligible; {@code false} otherwise.
+     */
+    private static boolean isForceEligible(Unit unit, Campaign campaign, StratConScenario currentScenario) {
+        int forceId = unit.getFormationId();
+        Formation formation = campaign.getPlayerForce().getFormation(forceId);
+
+        // If the force is deployed, skip; added check for insurance
+        if (formation == null || formation.isDeployed()) {
+            return false;
+        }
+
+        // Check the associated combat team and its role. The combat team may be the unit's own formation or one of
+        // its parent formations, so we walk up the hierarchy to find it; otherwise units belonging to child
+        // formations of a combat team would be incorrectly treated as ineligible.
+        CombatTeam combatTeam = resolveCombatTeam(formation, campaign);
+
+        if (combatTeam == null) {
+            return false;
+        }
+
+        if (combatTeam.getRole().isReserve()) {
+            return false;
+        }
+
+        AbstractContract forceContract = combatTeam.getContract(campaign);
+        AbstractContract scenarioContract = currentScenario.getBackingContract(campaign);
+
+        return forceContract.equals(scenarioContract);
+    }
+
+    /**
+     * Resolves the {@link CombatTeam} that governs the supplied formation.
+     *
+     * <p>A combat team may be assigned to a formation at any point in the hierarchy. When the combat team tag sits on
+     * a parent formation, the units themselves belong to child formations that are not, in isolation, combat teams.
+     * This method therefore checks the supplied formation first and then walks up its parent formations until a
+     * formation flagged as a combat team is found, so that units in child formations are correctly attributed to the
+     * governing combat team.</p>
+     *
+     * @param formation the formation whose governing combat team should be located
+     * @param campaign  the {@link Campaign} used to resolve the combat team map
+     *
+     * @return the governing {@link CombatTeam}, or {@code null} if no combat team exists in the hierarchy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable CombatTeam resolveCombatTeam(Formation formation, Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+
+        if (formation.isCombatTeam()) {
+            return combatTeams.get(formation.getId());
+        }
+
+        for (Formation parentFormation : formation.getAllParents()) {
+            if (parentFormation.isCombatTeam()) {
+                return combatTeams.get(parentFormation.getId());
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieves a list of units that are eligible for leadership deployment.
+     *
+     * <p>A unit is considered eligible for leadership deployment if:</p>
+     * <ul>
+     *   <li>There is sufficient leadership skill to justify leadership deployment.</li>
+     *   <li>The total leadership budget (based on leadership skill) is greater than 0.</li>
+     *   <li>The unit matches the general unit type of the primary force in the scenario.</li>
+     *   <li>The unit's battle value is within the computed budget.</li>
+     *   <li>The unit and its associated force are valid for deployment.</li>
+     * </ul>
+     *
+     * @param campaign        The campaign instance holding the units and forces involved.
+     * @param currentScenario The current StratCon scenario being processed.
+     * @param leadershipSkill The leadership skill value used to calculate budget.
+     *
+     * @return A list of {@code Unit} objects eligible for deployment as leadership units.
+     */
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratConScenario currentScenario,
+          int leadershipSkill) {
+        List<Integer> forceIds = currentScenario.getPrimaryForceIDs();
+        List<Unit> leadershipUnits = new ArrayList<>();
+
+        // If there is no leadership skill, we shouldn't continue
+        if (leadershipSkill <= 0) {
+            return leadershipUnits;
+        }
+
+        int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
+
+        int primaryUnitType = getPrimaryUnitType(campaign, forceIds);
+
+        // If there are no units (somehow), we've no reason to continue
+        if (primaryUnitType == -1) {
+            return leadershipUnits;
+        }
+
+        int generalUnitType = convertSpecificUnitTypeToGeneral(primaryUnitType);
+
+
+        // Retrieve the list of units from force 0
+        List<UUID> unitIDs = campaign.getPlayerForce().getAllUnitsInTheTOE(true);
+
+        for (UUID unitId : unitIDs) {
+            Unit unit = campaign.getUnit(unitId);
+
+            // Validate the unit
+            if (!isUnitValidForLeadershipDeployment(unit, generalUnitType, totalBudget)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
+                continue;
+            }
+
+            // Validate the force associated with the unit
+            if (!isForceEligible(unit, campaign, currentScenario)) {
+                continue;
+            }
+
+            leadershipUnits.add(unit);
+        }
+
+        return leadershipUnits;
+    }
+
+    /**
+     * Checks if a unit is valid for leadership deployment.
+     *
+     * <p>A unit is considered valid for leadership deployment if:</p>
+     * <ul>
+     *   <li>The unit is not null.</li>
+     *   <li>The unit is available for deployment.</li>
+     *   <li>The unit has no existing deployment records (i.e., not already deployed).</li>
+     *   <li>The unit's entity is valid and has a battle value within the provided leadership budget.</li>
+     *   <li>The unit matches the general unit type required for the deployment.</li>
+     * </ul>
+     *
+     * @param unit            The {@code Unit} object to validate for leadership deployment.
+     * @param generalUnitType The general unit type required for this deployment.
+     * @param totalBudget     The total battle value budget available for leadership deployment.
+     *
+     * @return {@code true} if the unit is valid for leadership deployment; {@code false} otherwise.
+     */
+    private static boolean isUnitValidForLeadershipDeployment(@Nullable Unit unit, int generalUnitType,
+          int totalBudget) {
+        if (unit == null) {
+            return false;
+        }
+
+        if (!unit.isAvailable()) {
+            return false;
+        }
+
+        if (unit.checkDeployment() != null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+
+        if (entity == null) {
+            return false;
+        }
+
+        if (entity.calculateBattleValue(true, true) > totalBudget) {
+            return false;
+        }
+
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(), generalUnitType);
+    }
+
+    /**
+     * Check if the unit's force (if one exists) has been deployed to a StratCon track
+     */
+    public static boolean isUnitDeployedToStratCon(Unit unit) {
+        if (!unit.getCampaign().getCampaignOptions().isUseStratCon()) {
+            return false;
+        }
+
+        // this is a little inefficient, but probably there aren't too many active AtB
+        // contracts at a time
+        return unit.getCampaign()
+                     .getActiveContracts()
+                     .stream()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
+                                                       .isForceDeployedHere(unit.getFormationId()));
+    }
+
+    public static boolean isForceDeployedToStratCon(List<AbstractContract> activeAtBContracts, int forceId) {
+        return activeAtBContracts
+                     .stream()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
+                                                       .isForceDeployedHere(forceId));
+    }
+
+    /**
+     * Calculates the majority unit type for the forces given the IDs.
+     */
+    private static int getPrimaryUnitType(Campaign campaign, List<Integer> forceIDs) {
+        Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
+        int biggestBucketID = -1;
+        int biggestBucketCount = 0;
+
+        for (int forceID : forceIDs) {
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            if (formation == null) {
+                continue;
+            }
+
+            for (UUID id : formation.getAllUnits(true)) {
+                Unit unit = campaign.getUnit(id);
+                if ((unit == null) || (unit.getEntity() == null)) {
+                    continue;
+                }
+
+                int unitType = unit.getEntity().getUnitType();
+
+                unitTypeBuckets.merge(unitType, 1, Integer::sum);
+
+                if (unitTypeBuckets.get(unitType) > biggestBucketCount) {
+                    biggestBucketCount = unitTypeBuckets.get(unitType);
+                    biggestBucketID = unitType;
+                }
+            }
+        }
+
+        return biggestBucketID;
+    }
+
+    /**
+     * Determines what rules to use when deploying a force for reinforcements to the given track.
+     */
+    public static ReinforcementEligibilityType getReinforcementType(int forceID, StratConTrackState trackState,
+          Campaign campaign, StratConCampaignState campaignState) {
+        // if the force is deployed elsewhere, it cannot be deployed as reinforcements
+        if (campaign.getActiveContracts()
+                  .stream()
+                  // Not every active contract runs StratCon (the player can opt out per contract), so skip those.
+                  .filter(contract -> contract.getStratConCampaignState() != null)
+                  .flatMap(contract -> contract.getStratConCampaignState().getTracks().stream())
+                  .anyMatch(track -> !Objects.equals(track, trackState) &&
+                                           track.getAssignedForceCoords().containsKey(forceID))) {
+            return ReinforcementEligibilityType.NONE;
+        }
+
+        // TODO: If the force has completed a scenario which allows it,
+        // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
+
+        // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
+        if (campaign.getPlayerForce().getCombatTeamsAsMap(campaign).containsKey(forceID)) {
+            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+            CombatTeam formation = combatTeamsTable.get(forceID);
+
+            if (formation == null) {
+                return ReinforcementEligibilityType.NONE;
+            }
+
+            if (campaignState.getSupportPoints() > 0 || campaign.isGM()) {
+                if (formation.getRole().isManeuver() || formation.getRole().isAuxiliary()) {
+                    return AUXILIARY;
+                } else {
+                    return ReinforcementEligibilityType.REGULAR;
+                }
+            }
+        }
+
+        return ReinforcementEligibilityType.NONE;
+    }
+
+    /**
+     * Can any force be manually deployed to the given coordinates on the given track for the given contract?
+     */
+    public static boolean canManuallyDeployAnyForce(StratConCoords coords, StratConTrackState track) {
+        // Ocean hexes are barred entirely - forces can never be deployed onto open water.
+        // TODO if we ever add ocean battles to the scenario generator we should consider retiring this conditional
+        if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+            return false;
+        }
+
+        // Rules: can't manually deploy if there's already a force deployed there
+        // exception: on allied facilities
+        // can't manually deploy if there's a non-cloaked scenario
+        StratConScenario scenario = track.getScenario(coords);
+        boolean nonCloakedOrNoScenario = (scenario == null) || scenario.getBackingScenario().isCloaked();
+
+        StratConFacility facility = track.getFacility(coords);
+        boolean alliedFacility = (facility != null) && facility.isOwnerAlliedToPlayer();
+
+        return (!track.areAnyForceDeployedTo(coords) || alliedFacility) && nonCloakedOrNoScenario;
+    }
+
+    /**
+     * Calculates the scenario odds for a given StratCon track and contract.
+     *
+     * <p>This method computes the likelihood of a scenario occurring by combining the base scenario odds from the
+     * track with modifiers based on the contract's morale level and data center adjustments.</p>
+     *
+     * <p>The calculation follows these rules:</p>
+     * <ul>
+     *   <li>If the contract's morale level is {@link ContractMoraleLevel#ROUTED}, the method immediately returns {@code
+     *   -1}, indicating that no scenarios can occur.</li>
+     *   <li>If {@code isReinforcements} is {@code true}, a morale-based modifier is applied:
+     *       <ul>
+     *         <li>{@link ContractMoraleLevel#CRITICAL}: -10 penalty</li>
+     *         <li>{@link ContractMoraleLevel#WEAKENED}: -5 penalty</li>
+     *         <li>{@link ContractMoraleLevel#ADVANCING}: +5 bonus</li>
+     *         <li>{@link ContractMoraleLevel#DOMINATING}: +20 bonus</li>
+     *         <li>{@link ContractMoraleLevel#OVERWHELMING}: +50 bonus</li>
+     *         <li>All other morale levels: no modifier</li>
+     *       </ul>
+     *   </li>
+     *   <li>The track's data center modifier is retrieved and applied to the final calculation.</li>
+     * </ul>
+     *
+     * <p>The final scenario odds value is calculated as:</p>
+     * <pre>
+     *     base scenario odds + morale modifier + data center modifier
+     * </pre>
+     *
+     * @param track            The {@link StratConTrackState} containing the base scenario odds and data center modifier
+     *                         information.
+     * @param contract         The {@link AbstractContract} containing the morale level information that affects
+     *                         scenario odds.
+     * @param isReinforcements A flag indicating whether this calculation is for reinforcement scenarios. When
+     *                         {@code true}, morale modifiers are applied; when {@code false}, morale has no effect on
+     *                         the calculation.
+     *
+     * @return The calculated scenario odds value. Returns {@code -1} if the contract's morale level is
+     *       {@link ContractMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the
+     *       base scenario odds, morale modifier (if applicable), and data center modifier.
+     */
+    public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
+          boolean isReinforcements) {
+        return calculateScenarioOdds(track, contract, isReinforcements, false);
+    }
+
+    /**
+     * Calculates the scenario odds as {@link #calculateScenarioOdds(StratConTrackState, AbstractContract, boolean)}
+     * does, optionally ignoring a rout: for scenarios that break out whatever state the enemy is in, such as civil
+     * unrest.
+     *
+     * @param track            the sector
+     * @param contract         the contract
+     * @param isReinforcements whether morale modifiers apply
+     * @param isIgnoringRout   whether a routed enemy still leaves the usual odds, rather than none at all
+     *
+     * @return the scenario odds; {@code -1} against a routed enemy unless the rout is ignored
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
+          boolean isReinforcements, boolean isIgnoringRout) {
+        if (contract.getMoraleLevel().isRouted() && !isIgnoringRout) {
+            return -1;
+        }
+
+        int moraleModifier = 0;
+
+        if (isReinforcements) {
+            moraleModifier += switch (contract.getMoraleLevel()) {
+                case CRITICAL -> -10;
+                case WEAKENED -> -5;
+                case ADVANCING -> 5;
+                case DOMINATING -> 20;
+                case OVERWHELMING -> 50;
+                default -> 0;
+            };
+        }
+
+        int dataCenterModifier = track.getScenarioOddsAdjustment();
+
+        return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
+    }
+
+    /**
+     * Removes the facility associated with the given scenario from the relevant track
+     */
+    public static void updateFacilityForScenario(AtBScenario scenario, AbstractContract contract, boolean destroy,
+          boolean capture) {
+        if (contract.getStratConCampaignState() == null) {
+            return;
+        }
+
+        // this is kind of kludgy, but there's currently no way to link a scenario back
+        // to its backing scenario
+        // TODO: introduce mapping in contract or at least track state
+        // basically, we're looping through all scenarios on all the contract's tracks
+        // if we find one with the same ID as the one being resolved, that's our
+        // facility: get rid of it.
+        for (StratConTrackState trackState : contract.getStratConCampaignState().getTracks()) {
+            for (StratConCoords coords : trackState.getScenarios().keySet()) {
+                StratConScenario potentialScenario = trackState.getScenario(coords);
+                if (potentialScenario.getBackingScenarioID() == scenario.getId()) {
+                    if (destroy) {
+                        trackState.removeFacility(coords);
+                    } else {
+                        StratConFacility facility = trackState.getFacility(coords);
+
+                        if (facility == null) {
+                            continue;
+                        }
+
+                        if (capture) {
+                            facility.incrementOwnershipChangeScore();
+                        } else {
+                            facility.decrementOwnershipChangeScore();
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes completion of a StratCon scenario, if the given tracker is associated with a StratCon-enabled mission.
+     * Intended to be called after ResolveScenarioTracker.finish() has been invoked.
+     */
+    public static void processScenarioCompletion(ResolveScenarioTracker tracker) {
+        Campaign campaign = tracker.getCampaign();
+        AbstractContract mission = tracker.getMission();
+
+        if (mission == null) {
+            LOGGER.error("Attempted to process scenario completion for a mission with no contract");
+            return;
+        }
+
+        StratConCampaignState campaignState = mission.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        Scenario backingScenario = tracker.getScenario();
+
+        boolean victory = backingScenario.getStatus().isOverallVictory();
+
+        for (StratConTrackState track : campaignState.getTracks()) {
+            if (track.getBackingScenariosMap().containsKey(backingScenario.getId())) {
+                // things that may potentially happen:
+                // scenario is removed from track - implemented
+                // track gets remaining forces added to reinforcement pool
+                // facility gets remaining forces stored in reinforcement pool
+                // process VP and SO
+
+                StratConScenario scenario = track.getBackingScenariosMap().get(backingScenario.getId());
+
+                StratConFacility facility = track.getFacility(scenario.getCoords());
+
+                if (scenario.isTurningPoint() && !backingScenario.getStatus().isDraw()) {
+                    campaignState.changeVictoryPoints(victory ? 1 : -1);
+                }
+
+                ScenarioType scenarioType = backingScenario.getStratConScenarioType();
+                if (scenarioType.isSpecial() || backingScenario.isCrisis()) {
+                    if (!backingScenario.getStatus().isOverallVictory()) {
+                        // If the player loses this scenario, they lose -1 CVP. This represents the importance of
+                        // the crisis.
+                        campaignState.changeVictoryPoints(-1);
+                    }
+                }
+
+                // this must be done before removing the scenario from the track
+                // in case any objectives are linked to the scenario's coordinates
+                updateStrategicObjectives(victory, scenario, track);
+
+                // Winning an Essential (strategic-objective) scenario pays the contract's combat bonus. Combat pay is a
+                // per-battle figure set at negotiation (and divided by scale when track intensity is multiplied by
+                // scale), so the player earns it each time they secure one of these objectives.
+                if (victory && scenario.isStrategicObjective()) {
+                    awardCombatBonus(campaign, mission);
+                }
+
+                // Winning, or fighting at a hostile facility, escalates the contract's hostilities. The template, not
+                // the hex, marks a facility fight: a destroyed facility is already gone from the map by now.
+                AtBDynamicScenario dynamicScenario = scenario.getBackingScenario();
+                boolean isHostileFacilityScenario = (dynamicScenario != null)
+                                                          && (dynamicScenario.getTemplate() != null)
+                                                          && dynamicScenario.getTemplate().isHostileFacility();
+                StratConEscalation.onScenarioCompleted(campaign, mission, victory, isHostileFacilityScenario);
+
+                // A fight over a siege is on the besiegers' hex, and leaves any facility standing there alone.
+                boolean isSiegeScenario = scenario.getFacilityOperation() == FacilityOperation.SIEGE;
+                if ((facility != null) && !isSiegeScenario) {
+                    boolean isDraw = backingScenario.getStatus().isDraw();
+                    boolean wasHostile = !facility.isOwnerAlliedToPlayer();
+                    if (StratConFacilityOperations.isEnabled(campaign)) {
+                        processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
+                    } else {
+                        processLegacyFacilityAftermath(facility);
+                    }
+
+                    if (victory && wasHostile && (scenario.getFacilityOperation() == FacilityOperation.RAID)) {
+                        StratConFacilityOperations.resolveRaidLoot(campaign, mission, facility);
+                    }
+
+                    // A counterattack lost outright costs the facility.
+                    if (scenario.isCounterattack() && !victory && !isDraw) {
+                        StratConEnemyFacilityActivity.resolveLostCounterattack(campaign,
+                              track,
+                              scenario.getCoords(),
+                              facility);
+                    }
+
+                    // The player has just taken an enemy facility: with Facility Operations, they decide its fate.
+                    if (isCaptureChoiceOffered(campaign, wasHostile, facility)) {
+                        StratConFacilityOperations.resolveCapture(campaign,
+                              mission,
+                              track,
+                              scenario.getCoords(),
+                              StratConFacilityOperations.askCaptureChoice(campaign,
+                                    facility,
+                                    StratConFacilityOperations.canRaze(track, scenario.getCoords())));
+                    }
+                }
+
+                // A won convoy interdiction cuts the enemy's supply through the hex.
+                if (victory && (scenario.getFacilityOperation() == FacilityOperation.INTERDICT)) {
+                    StratConFacilitySupply.cutRoad(campaign, track, scenario.getCoords());
+                }
+
+                // A fight over a siege keeps or breaks it.
+                if (isSiegeScenario && (scenario.getSiegeCoords() != null)) {
+                    StratConFacilitySiege.resolveSiegeScenario(campaign,
+                          mission,
+                          track,
+                          scenario.getSiegeCoords(),
+                          scenario.isSiegeSortie(),
+                          victory,
+                          backingScenario.getStatus().isDraw());
+                }
+
+                // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
+                // afterwards only when a GM edits the map - adding or removing a city or a facility. Resolving a
+                // scenario is playing on the map, not editing it: taking a base, or losing one, changes who holds
+                // the ground at the end of a road, not whether the road was ever built.
+
+                processTrackForceReturnDates(track, campaign);
+
+                // Any point of interest whose fate rested on this scenario learns how it went, while the scenario is
+                // still on the track.
+                StratConPointOfInterestRules.processScenarioEnded(track, backingScenario.getId(), victory, campaign);
+
+                track.removeScenario(scenario);
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * Processes completion of a StratCon scenario that is linked to another scenario pulls force off completed
+     * scenario, checks to see if entire force is moving on or subset of units
+     * <p>
+     * Should only be used after a scenario is resolved
+     */
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker,
+          HashMap<Integer, List<UUID>> linkedForces) {
+        Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
+        Campaign campaign = tracker.getCampaign();
+
+        if (nextScenario instanceof AtBScenario nextAtBScenario) {
+
+            StratConCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratConCampaignState();
+            if (campaignState == null) {
+                return;
+            }
+
+            for (StratConTrackState track : campaignState.getTracks()) {
+                if (track.getBackingScenariosMap().containsKey(nextScenario.getId())) {
+                    StratConScenario scenario = track.getBackingScenariosMap().get(nextScenario.getId());
+                    //Go through each force that was in previous scenario undeploy it and check to see if entire force is moving on
+                    //if so deploy whole force.  Otherwise, just deploy selected units.
+                    for (int forceId : linkedForces.keySet()) {
+                        track.unassignFormation(forceId);
+
+                        if (linkedForces.get(forceId).size() ==
+                                  campaign.getPlayerForce().getFormation(forceId).getAllUnits(false).size()) {
+                            scenario.addForce(campaign.getPlayerForce().getFormation(forceId),
+                                  ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID,
+                                  campaign);
+                        } else {
+                            for (UUID unitId : linkedForces.get(forceId)) {
+                                scenario.addUnit(campaign.getUnit(unitId),
+                                      ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID,
+                                      false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario, or
+     * for another achievement a contract's special mechanics reward the same way (such as recovering a data cache).
+     *
+     * <p>Combat pay is the per-battle bonus agreed during contract negotiation; it is paid out here, once per secured
+     * Essential objective, rather than as a lump sum. Does nothing when the contract carries no positive combat
+     * pay.</p>
+     *
+     * @param campaign the campaign whose finances receive the bonus
+     * @param contract the contract supplying the combat-pay figure
+     */
+    public static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
+        ContractFinanceData financeData = contract.getContractFinanceData();
+        Money combatPay = (financeData == null) ? null : financeData.combatPay();
+        if ((combatPay == null) || !combatPay.isPositive()) {
+            return;
+        }
+
+        campaign.getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+              combatPay,
+              getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.reason", contract.getName()));
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.report",
+              combatPay.toAmountAndSymbolString()));
+    }
+
+    /**
+     * Worker function that updates strategic objectives relevant to the passed in scenario, track and campaign state.
+     * For example, "win scenario A" or "win X scenarios".
+     */
+    private static void updateStrategicObjectives(boolean victory, StratConScenario scenario,
+          StratConTrackState track) {
+
+        // first, we check if this scenario is associated with any specific scenario
+        // objectives
+        StratConStrategicObjective specificObjective = track.getObjectivesByCoords().get(scenario.getCoords());
+        if ((specificObjective != null) &&
+                  (specificObjective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory)) {
+
+            if (victory) {
+                specificObjective.incrementCurrentObjectiveCount();
+            } else if (!specificObjective.isObjectiveCompleted(track)) {
+                // Only fail the objective if it hasn't already been completed
+                specificObjective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            }
+        }
+
+        // "any scenario victory" is not linked to any specific coordinates, so we have
+        // to
+        // search through the track's objectives and update those.
+        for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
+            if ((objective.getObjectiveType() == StrategicObjectiveType.AnyScenarioVictory) && victory) {
+                objective.incrementCurrentObjectiveCount();
+            }
+        }
+    }
+
+    /**
+     * Settles what a finished scenario fought on a facility did to it, if the facility is still there.
+     *
+     * <ul>
+     *     <li>If the scenario's objectives earned a capture, the facility changes hands.</li>
+     *     <li>Otherwise, if the side attacking the facility won, the facility is damaged one step and loses one
+     *     garrison step. The player attacks a hostile facility and wins with an overall victory; the enemy attacks an
+     *     allied one and wins when the player loses outright.</li>
+     *     <li>Otherwise the defender held, at the cost of one garrison step.</li>
+     * </ul>
+     *
+     * <p>Either way, the player now knows everything about the facility, having fought over it.</p>
+     *
+     * @param facility the facility the scenario was fought on
+     * @param victory  whether the player won an overall victory
+     * @param isDraw   whether the scenario was a draw
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processFacilityAftermath(StratConFacility facility, boolean victory, boolean isDraw) {
+        processFacilityAftermath(facility, victory, isDraw, null);
+    }
+
+    /**
+     * As {@link #processFacilityAftermath(StratConFacility, boolean, boolean)}, except that a fight begun because a
+     * {@link FacilityOperation#RECON} or {@link FacilityOperation#SABOTAGE} order went wrong leaves the facility's
+     * condition and garrison alone: the formation was fighting its way clear, not attacking the facility.
+     *
+     * @param facility  the facility the scenario was fought on
+     * @param victory   whether the player won an overall victory
+     * @param isDraw    whether the scenario was a draw
+     * @param operation the order that started the scenario, or {@code null} for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processFacilityAftermath(StratConFacility facility, boolean victory, boolean isDraw,
+          @Nullable FacilityOperation operation) {
+        boolean isEscapeFight = (operation == FacilityOperation.RECON) || (operation == FacilityOperation.SABOTAGE);
+        if (facility.getOwnershipChangeScore() > 0) {
+            switchFacilityOwner(facility);
+        } else if (!isEscapeFight) {
+            boolean isAttackerVictory = facility.isOwnerAlliedToPlayer() ? (!victory && !isDraw) : victory;
+            if (isAttackerVictory) {
+                facility.applyAttackerVictory();
+            } else {
+                facility.applyDefenderHeld();
+            }
+        }
+
+        facility.clearOwnershipChangeScore();
+        facility.raiseIntel(FacilityIntel.DETAILED);
+    }
+
+    /**
+     * What a fight on a facility does to it with Facility Operations off, as before they were added: the facility
+     * changes hands if its objectives say so, and nothing else - no condition or garrison loss, and no intel gained.
+     *
+     * @param facility the facility the scenario was fought on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processLegacyFacilityAftermath(StratConFacility facility) {
+        if (facility.getOwnershipChangeScore() > 0) {
+            switchFacilityOwner(facility);
+        }
+        // Cleared so one fight's result can't carry into the next fight on the same facility.
+        facility.clearOwnershipChangeScore();
+    }
+
+    /**
+     * Hands a facility to the other side. Its effects follow from its definition's profile for the new owner, so only
+     * the owner changes. The player keeps what they knew: the player knows everything about their own side's
+     * facilities, so one taken by the enemy stays fully known rather than vanishing.
+     */
+    public static void switchFacilityOwner(StratConFacility facility) {
+        facility.setIntel(facility.getIntel());
+
+        if (facility.isOwnerAlliedToPlayer()) {
+            facility.setOwner(Opposing);
+        } else {
+            facility.setOwner(Allied);
+        }
+    }
+
+    /**
+     * Worker function that goes through a track and undeploys any forces where the return date is on or before the
+     * given date.
+     */
+    public static void processTrackForceReturnDates(StratConTrackState track, Campaign campaign) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+              MekHQ.getMHQOptions().getLocale());
+
+        List<Integer> forcesToUndeploy = new ArrayList<>();
+        LocalDate date = campaign.getLocalDate();
+
+        // for each force on the track, if the return date is today or in the past,
+        // and the scenario has not yet occurred, undeploy it.
+        // "return to base", unless it's been told to stay in the field
+        for (int forceID : track.getAssignedForceReturnDates().keySet()) {
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            if (formation == null) {
+                continue;
+            }
+
+            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId()) ||
+                      track.getStickyForces().contains(forceID)) {
+                continue;
+            }
+
+            if (formation.getCombatRoleInMemory().isPatrol()) {
+                boolean allLightUnits = true;
+                for (Unit unit : formation.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false)) {
+                    if (unit.getEntity() != null && unit.getEntity().getWeight() > 35) {
+                        allLightUnits = false;
+                        break;
+                    }
+                }
+
+                int roll = d6();
+                if (allLightUnits && roll == 6) {
+                    forcesToUndeploy.add(forceID);
+                    campaign.addReport(BATTLE,
+                          String.format(resources.getString("patrol.undeployed"), formation.getName()));
+                    continue;
+                }
+            }
+
+            if ((track.getAssignedForceReturnDates().get(forceID).equals(date) ||
+                       track.getAssignedForceReturnDates().get(forceID).isBefore(date))) {
+                forcesToUndeploy.add(forceID);
+                campaign.addReport(BATTLE, String.format(resources.getString("formation.undeployed"),
+                      formation.getName()));
+            }
+        }
+
+        for (int forceID : forcesToUndeploy) {
+            track.unassignFormation(forceID);
+        }
+    }
+
+    /**
+     * Processes an ignored dynamic scenario by locating it on one of the tracks and invoking the standard 'ignored
+     * scenario' routine for additional processing.
+     *
+     * <p>This method iterates over the tracks in the campaign state to find the specified scenario by its ID. Once
+     * located, it processes the scenario using the appropriate logic to handle ignored scenarios.</p>
+     *
+     * @param scenarioId    The ID of the dynamic scenario to be processed.
+     * @param campaignState The state of the current campaign, used to access tracks and scenarios.
+     */
+    public static void processIgnoredDynamicScenario(int scenarioId, StratConCampaignState campaignState,
+          @Nullable Campaign campaign) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            Map<Integer, StratConScenario> backingScenarios = track.getBackingScenariosMap();
+            StratConScenario stratConScenario = backingScenarios.get(scenarioId);
+
+            if (stratConScenario != null) {
+                processIgnoredStratConScenario(stratConScenario, track, campaignState, campaign);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Processes an ignored StratCon scenario by updating related state variables (victory points, facility ownership,
+     * and objectives) and then removing it from the campaign state.
+     *
+     * <p>This method is called when a StratCon scenario is ignored, and it ensures that the state of the campaign is
+     * updated accordingly. The following operations are performed, in order:</p>
+     *
+     * <ol>
+     *   <li><b>Victory Points Adjustment:</b>
+     *       If the scenario is marked as "special" or a "turning point," the campaign's victory points are reduced by 1
+     *       to reflect a penalty.</li>
+     *   <li><b>Facility Ownership and Objective Status:</b>
+     *       <ul>
+     *         <li>If no facility is associated with the scenario's coordinates, the objective tied to the scenario's
+     *         location is marked as failed.</li>
+     *         <li>If the scenario is a counterattack on a facility held by the player or their employer, the
+     *         facility is lost, or for an employer's facility fought over off-screen (see
+     *         {@link StratConEnemyFacilityActivity#resolveIgnoredCounterattack}). A held facility refunds the Crisis
+     *         victory point.</li>
+     *       </ul>
+     *       These ignored-scenario consequences are applied before removal so {@code removeScenario} only has to unlink
+     *       scenario state.</li>
+     *   <li><b>Scenario Removal:</b>
+     *       The ignored scenario is removed from its associated track.</li>
+     * </ol>
+     *
+     * @param scenario      The {@link StratConScenario} that is being ignored and processed for removal. This includes
+     *                      information such as the scenario type and coordinates.
+     * @param track         The {@link StratConTrackState} representing the track the scenario is located on, which will
+     *                      be updated to reflect scenario removal and any resulting state changes.
+     * @param campaignState The {@link StratConCampaignState} representing the overall state of the campaign, which will
+     *                      be updated during the processing (e.g., victory points adjustments).
+     */
+    public static void processIgnoredStratConScenario(StratConScenario scenario, StratConTrackState track,
+          StratConCampaignState campaignState) {
+        processIgnoredStratConScenario(scenario, track, campaignState, null);
+    }
+
+    /**
+     * As {@link #processIgnoredStratConScenario(StratConScenario, StratConTrackState, StratConCampaignState)}, with
+     * the campaign to report to and read options from. Without the enemy facility activity this PR adds (Facility
+     * Operations off, or Enemy Facility Activity at 0), an ordinary scenario left unplayed on an employer's facility
+     * still costs it, as before; with it, only counterattacks do.
+     *
+     * @param scenario      the ignored scenario
+     * @param track         its sector
+     * @param campaignState the contract's StratCon campaign state
+     * @param campaign      the current campaign, or {@code null} to neither report nor read options
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processIgnoredStratConScenario(StratConScenario scenario, StratConTrackState track,
+          StratConCampaignState campaignState, @Nullable Campaign campaign) {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        boolean isCrisis = backingScenario != null && backingScenario.isCrisis();
+        StratConFacility localFacility = track.getFacility(scenario.getCoords());
+
+        // An ignored counterattack on a facility the employer holds is fought off-screen, and costs the Crisis
+        // victory point only if the facility falls.
+        boolean isFacilityLost = true;
+        if (scenario.isCounterattack() && (localFacility != null)) {
+            isFacilityLost = StratConEnemyFacilityActivity.resolveIgnoredCounterattack(track,
+                  localFacility,
+                  campaignState);
+            // Reported here, as this is reached from the end of the day, the contract's end and a lost planet alike.
+            if (campaign != null) {
+                StratConEnemyFacilityActivity.reportIgnoredCounterattack(campaign,
+                      track,
+                      scenario.getCoords(),
+                      localFacility);
+            }
+        } else if ((localFacility != null)
+                         && (localFacility.getOwner() == Allied)
+                         && (scenario.getFacilityOperation() != FacilityOperation.SIEGE)
+                         && (campaign != null)
+                         && (StratConEnemyFacilityActivity.getActivity(campaign) <= 0)) {
+            // Without counterattacks to take them, an employer's facility falls when a fight on it goes unplayed.
+            localFacility.setOwner(Opposing);
+        }
+
+        // Update victory points if the scenario is marked as "special" or "turning point"
+        if ((scenario.isSpecial() || scenario.isTurningPoint() || isCrisis) && isFacilityLost) {
+            campaignState.changeVictoryPoints(-1);
+        }
+
+        // A fight over a siege left unplayed breaks the siege, as losing it would.
+        if ((scenario.getFacilityOperation() == FacilityOperation.SIEGE) && (scenario.getSiegeCoords() != null)) {
+            StratConFacilitySiege.endSieges(track, scenario.getSiegeCoords());
+        }
+
+        // Fail the objective if no facility is found. Only a counterattack, handled above, costs a facility: an
+        // ordinary scenario left unplayed on one no longer does. A siege fight is on the besiegers' hex, and stands
+        // for no objective there.
+        if ((localFacility == null) && (scenario.getFacilityOperation() != FacilityOperation.SIEGE)) {
+            track.failObjective(scenario.getCoords());
+        }
+
+        // Remove the scenario from the track
+        track.removeScenario(scenario);
+    }
+}

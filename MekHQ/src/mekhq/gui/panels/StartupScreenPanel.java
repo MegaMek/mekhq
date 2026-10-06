@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
-import mekhq.gui.dialog.MHQOptionsDialog;
+import mekhq.gui.dialog.MHQOptionsTreeDialog;
 import mekhq.gui.dialog.NewPlayerQuickstartDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
@@ -86,7 +86,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     private BufferedImage backgroundIcon;
 
     // Save file filtering needs to avoid loading some special files
-    public static FilenameFilter saveFilter = (dir, name) -> {
+    public static final FilenameFilter saveFilter = (dir, name) -> {
         // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
         // files
         List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
@@ -219,7 +219,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         MegaMekButton btnMHQOptions = new MegaMekButton(resources.getString("MHQOptions.text"),
               UIComponents.MainMenuButton.getComp(),
               true);
-        btnMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        btnMHQOptions.addActionListener(evt -> new MHQOptionsTreeDialog(getFrame()).setVisible(true));
 
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
               UIComponents.MainMenuButton.getComp(),

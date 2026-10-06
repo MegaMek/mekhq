@@ -38,7 +38,6 @@ import java.io.PrintWriter;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
@@ -47,6 +46,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingAeroSensor;
@@ -97,8 +97,8 @@ public class AeroSensor extends Part {
             hits = ((Aero) unit.getEntity()).getSensorHits();
             if (checkForDestruction
                       && hits > priorHits
-                      && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && (hits < 3 && !campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS))
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);
@@ -109,7 +109,7 @@ public class AeroSensor extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
@@ -142,7 +142,7 @@ public class AeroSensor extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) {
             // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;
@@ -266,7 +266,7 @@ public class AeroSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_ELECTRONIC);
     }
 
     @Override

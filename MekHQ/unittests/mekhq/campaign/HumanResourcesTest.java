@@ -41,8 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
@@ -58,15 +60,16 @@ import megamek.Version;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.utilities.MHQXMLUtility;
@@ -93,12 +96,13 @@ public class HumanResourcesTest {
     @BeforeEach
     void setup() {
         campaignOptions = mock(CampaignOptions.class);
+        lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         today = LocalDate.of(3067, 1, 1);
         campaign = MHQTestUtilities.getTestCampaign();
     }
 
     /**
-     * Tests for {@link HumanResources#getDoctors(Collection)}
+     * Tests for {@link ForceHumanResources#getDoctors(Collection)}
      */
     @Nested
     class GetDoctors {
@@ -109,7 +113,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getDoctors(people);
+            List<Person> result = ForceHumanResources.getDoctors(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -122,7 +126,7 @@ public class HumanResourcesTest {
             when(doctor.isDoctor()).thenReturn(true);
 
             // Act
-            List<Person> result = HumanResources.getDoctors(List.of(doctor));
+            List<Person> result = ForceHumanResources.getDoctors(List.of(doctor));
 
             // Assert
             assertEquals(List.of(doctor), result);
@@ -135,7 +139,7 @@ public class HumanResourcesTest {
             when(nonDoctor.isDoctor()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getDoctors(List.of(nonDoctor));
+            List<Person> result = ForceHumanResources.getDoctors(List.of(nonDoctor));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -154,7 +158,7 @@ public class HumanResourcesTest {
             when(tech.isDoctor()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getDoctors(List.of(doctor, mekwarrior, tech));
+            List<Person> result = ForceHumanResources.getDoctors(List.of(doctor, mekwarrior, tech));
 
             // Assert
             assertEquals(List.of(doctor), result);
@@ -162,7 +166,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getPatients(Collection)}
+     * Tests for {@link ForceHumanResources#getPatients(Collection)}
      */
     @Nested
     class GetPatients {
@@ -173,7 +177,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getPatients(people);
+            List<Person> result = ForceHumanResources.getPatients(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -186,7 +190,7 @@ public class HumanResourcesTest {
             when(injured.needsFixing()).thenReturn(true);
 
             // Act
-            List<Person> result = HumanResources.getPatients(List.of(injured));
+            List<Person> result = ForceHumanResources.getPatients(List.of(injured));
 
             // Assert
             assertEquals(List.of(injured), result);
@@ -199,7 +203,7 @@ public class HumanResourcesTest {
             when(healthy.needsFixing()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getPatients(List.of(healthy));
+            List<Person> result = ForceHumanResources.getPatients(List.of(healthy));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -215,7 +219,7 @@ public class HumanResourcesTest {
             when(healthy.needsFixing()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getPatients(List.of(injured, healthy));
+            List<Person> result = ForceHumanResources.getPatients(List.of(injured, healthy));
 
             // Assert
             assertEquals(List.of(injured), result);
@@ -223,7 +227,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getAdmins(Collection)}
+     * Tests for {@link ForceHumanResources#getAdmins(Collection)}
      */
     @Nested
     class GetAdmins {
@@ -234,7 +238,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getAdmins(people);
+            List<Person> result = ForceHumanResources.getAdmins(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -247,7 +251,7 @@ public class HumanResourcesTest {
             when(admin.isAdministrator()).thenReturn(true);
 
             // Act
-            List<Person> result = HumanResources.getAdmins(List.of(admin));
+            List<Person> result = ForceHumanResources.getAdmins(List.of(admin));
 
             // Assert
             assertEquals(List.of(admin), result);
@@ -260,7 +264,7 @@ public class HumanResourcesTest {
             when(pilot.isAdministrator()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getAdmins(List.of(pilot));
+            List<Person> result = ForceHumanResources.getAdmins(List.of(pilot));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -279,7 +283,7 @@ public class HumanResourcesTest {
             when(tech.isAdministrator()).thenReturn(false);
 
             // Act
-            List<Person> result = HumanResources.getAdmins(List.of(admin, pilot, tech));
+            List<Person> result = ForceHumanResources.getAdmins(List.of(admin, pilot, tech));
 
             // Assert
             assertEquals(List.of(admin), result);
@@ -287,7 +291,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getActiveDependents(Collection)}
+     * Tests for {@link ForceHumanResources#getActiveDependents(Collection)}
      */
     @Nested
     class GetActiveDependents {
@@ -298,7 +302,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getActiveDependents(people);
+            List<Person> result = ForceHumanResources.getActiveDependents(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -318,7 +322,7 @@ public class HumanResourcesTest {
             when(dependent.getStatus()).thenReturn(activeStatus);
 
             // Act
-            List<Person> result = HumanResources.getActiveDependents(List.of(dependent));
+            List<Person> result = ForceHumanResources.getActiveDependents(List.of(dependent));
 
             // Assert
             assertEquals(List.of(dependent), result);
@@ -338,7 +342,7 @@ public class HumanResourcesTest {
             when(dependent.getStatus()).thenReturn(retiredStatus);
 
             // Act
-            List<Person> result = HumanResources.getActiveDependents(List.of(dependent));
+            List<Person> result = ForceHumanResources.getActiveDependents(List.of(dependent));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -358,7 +362,7 @@ public class HumanResourcesTest {
             when(pilot.getStatus()).thenReturn(activeStatus);
 
             // Act
-            List<Person> result = HumanResources.getActiveDependents(List.of(pilot));
+            List<Person> result = ForceHumanResources.getActiveDependents(List.of(pilot));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -366,7 +370,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getCurrentPrisoners(Collection)}
+     * Tests for {@link ForceHumanResources#getCurrentPrisoners(Collection)}
      */
     @Nested
     class GetCurrentPrisoners {
@@ -377,7 +381,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getCurrentPrisoners(people);
+            List<Person> result = ForceHumanResources.getCurrentPrisoners(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -390,7 +394,7 @@ public class HumanResourcesTest {
             when(prisoner.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
 
             // Act
-            List<Person> result = HumanResources.getCurrentPrisoners(List.of(prisoner));
+            List<Person> result = ForceHumanResources.getCurrentPrisoners(List.of(prisoner));
 
             // Assert
             assertEquals(List.of(prisoner), result);
@@ -403,7 +407,7 @@ public class HumanResourcesTest {
             when(defector.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER_DEFECTOR);
 
             // Act
-            List<Person> result = HumanResources.getCurrentPrisoners(List.of(defector));
+            List<Person> result = ForceHumanResources.getCurrentPrisoners(List.of(defector));
 
             // Assert
             assertEquals(List.of(defector), result);
@@ -416,7 +420,7 @@ public class HumanResourcesTest {
             when(freePerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
 
             // Act
-            List<Person> result = HumanResources.getCurrentPrisoners(List.of(freePerson));
+            List<Person> result = ForceHumanResources.getCurrentPrisoners(List.of(freePerson));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -432,7 +436,7 @@ public class HumanResourcesTest {
             when(freePerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
 
             // Act
-            List<Person> result = HumanResources.getCurrentPrisoners(List.of(prisoner, freePerson));
+            List<Person> result = ForceHumanResources.getCurrentPrisoners(List.of(prisoner, freePerson));
 
             // Assert
             assertEquals(List.of(prisoner), result);
@@ -440,7 +444,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getSalaryEligiblePersonnel(Collection)}
+     * Tests for {@link ForceHumanResources#getSalaryEligiblePersonnel(Collection)}
      */
     @Nested
     class GetSalaryEligiblePersonnel {
@@ -451,7 +455,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            List<Person> result = HumanResources.getSalaryEligiblePersonnel(people);
+            List<Person> result = ForceHumanResources.getSalaryEligiblePersonnel(people);
 
             // Assert
             assertTrue(result.isEmpty());
@@ -467,7 +471,7 @@ public class HumanResourcesTest {
             when(activePerson.getStatus()).thenReturn(activeStatus);
 
             // Act
-            List<Person> result = HumanResources.getSalaryEligiblePersonnel(List.of(activePerson));
+            List<Person> result = ForceHumanResources.getSalaryEligiblePersonnel(List.of(activePerson));
 
             // Assert
             assertEquals(List.of(activePerson), result);
@@ -483,7 +487,7 @@ public class HumanResourcesTest {
             when(retiree.getStatus()).thenReturn(retiredStatus);
 
             // Act
-            List<Person> result = HumanResources.getSalaryEligiblePersonnel(List.of(retiree));
+            List<Person> result = ForceHumanResources.getSalaryEligiblePersonnel(List.of(retiree));
 
             // Assert
             assertTrue(result.isEmpty());
@@ -505,7 +509,7 @@ public class HumanResourcesTest {
             when(retired.getStatus()).thenReturn(retiredStatus);
 
             // Act
-            List<Person> result = HumanResources.getSalaryEligiblePersonnel(List.of(active, retired));
+            List<Person> result = ForceHumanResources.getSalaryEligiblePersonnel(List.of(active, retired));
 
             // Assert
             assertEquals(List.of(active), result);
@@ -514,7 +518,7 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link HumanResources#getSeniorAdminPerson(Collection, AdministratorSpecialization, CampaignOptions, boolean, LocalDate)}
+     * {@link ForceHumanResources#getSeniorAdminPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class GetSeniorAdminPerson {
@@ -525,8 +529,8 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            Person result = HumanResources.getSeniorAdminPerson(people,
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorAdminPerson(people,
+                  campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -535,19 +539,12 @@ public class HumanResourcesTest {
         @Test
         void singleCommandAdminIsReturned() {
             // Arrange
-            PersonnelRole commandRole = mock(PersonnelRole.class);
-            when(commandRole.isAdministratorCommand()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorCommand()).thenReturn(false);
-
             Person admin = mock(Person.class);
-            when(admin.getPrimaryRole()).thenReturn(commandRole);
-            when(admin.getSecondaryRole()).thenReturn(none);
+            when(admin.isAdministrator()).thenReturn(true);
 
             // Act
-            Person result = HumanResources.getSeniorAdminPerson(List.of(admin),
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorAdminPerson(List.of(admin),
+                  campaignOptions, false, today);
 
             // Assert
             assertEquals(admin, result);
@@ -556,47 +553,31 @@ public class HumanResourcesTest {
         @Test
         void higherRankingAdminWins() {
             // Arrange
-            PersonnelRole hrRole = mock(PersonnelRole.class);
-            when(hrRole.isAdministratorHR()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorHR()).thenReturn(false);
-
             Person junior = mock(Person.class);
-            when(junior.getPrimaryRole()).thenReturn(hrRole);
-            when(junior.getSecondaryRole()).thenReturn(none);
+            when(junior.isAdministrator()).thenReturn(true);
             when(junior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(false);
 
             Person senior = mock(Person.class);
-            when(senior.getPrimaryRole()).thenReturn(hrRole);
-            when(senior.getSecondaryRole()).thenReturn(none);
+            when(senior.isAdministrator()).thenReturn(true);
             when(senior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
 
             // Act
-            Person result = HumanResources.getSeniorAdminPerson(List.of(junior, senior),
-                  AdministratorSpecialization.HR, campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorAdminPerson(List.of(junior, senior),
+                  campaignOptions, false, today);
 
             // Assert
             assertEquals(senior, result);
         }
 
         @Test
-        void nonMatchingSpecializationIsExcluded() {
-            // Arrange — person is logistics admin, we ask for command admin
-            PersonnelRole logisticsRole = mock(PersonnelRole.class);
-            when(logisticsRole.isAdministratorCommand()).thenReturn(false);
-            when(logisticsRole.isAdministratorLogistics()).thenReturn(true);
-
-            PersonnelRole none = mock(PersonnelRole.class);
-            when(none.isAdministratorCommand()).thenReturn(false);
-
-            Person logisticsAdmin = mock(Person.class);
-            when(logisticsAdmin.getPrimaryRole()).thenReturn(logisticsRole);
-            when(logisticsAdmin.getSecondaryRole()).thenReturn(none);
+        void nonAdministratorIsExcluded() {
+            // Arrange
+            Person nonAdministrator = mock(Person.class);
+            when(nonAdministrator.isAdministrator()).thenReturn(false);
 
             // Act
-            Person result = HumanResources.getSeniorAdminPerson(List.of(logisticsAdmin),
-                  AdministratorSpecialization.COMMAND, campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorAdminPerson(List.of(nonAdministrator),
+                  campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -604,11 +585,10 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#getSeniorMedicalPerson(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link ForceHumanResources#getSeniorPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
-    class GetSeniorMedicalPerson {
+    class GetSeniorPerson {
 
         @Test
         void emptyInputReturnsNull() {
@@ -616,7 +596,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(people, campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorPerson(people, campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -628,7 +608,7 @@ public class HumanResourcesTest {
             Person doctor = mock(Person.class);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(doctor), campaignOptions, false, today);
+            Person result = ForceHumanResources.getSeniorPerson(List.of(doctor), campaignOptions, false, today);
 
             // Assert
             assertEquals(doctor, result);
@@ -644,7 +624,7 @@ public class HumanResourcesTest {
             when(senior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(junior, senior),
+            Person result = ForceHumanResources.getSeniorPerson(List.of(junior, senior),
                   campaignOptions, false, today);
 
             // Assert
@@ -653,7 +633,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#findTopCommanders(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link ForceHumanResources#findTopCommanders(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class FindTopCommanders {
@@ -664,7 +644,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            Person[] result = HumanResources.findTopCommanders(people, campaignOptions, false, today);
+            Person[] result = ForceHumanResources.findTopCommanders(people, campaignOptions, false, today);
 
             // Assert
             assertNotNull(result);
@@ -685,7 +665,7 @@ public class HumanResourcesTest {
             when(sic.isSecondInCommand()).thenReturn(true);
 
             // Act
-            Person[] result = HumanResources.findTopCommanders(List.of(sic, commander),
+            Person[] result = ForceHumanResources.findTopCommanders(List.of(sic, commander),
                   campaignOptions, false, today);
 
             // Assert
@@ -707,7 +687,7 @@ public class HumanResourcesTest {
             when(lowRanker.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(false);
 
             // Act
-            Person[] result = HumanResources.findTopCommanders(List.of(lowRanker, highRanker),
+            Person[] result = ForceHumanResources.findTopCommanders(List.of(lowRanker, highRanker),
                   campaignOptions, false, today);
 
             // Assert
@@ -723,7 +703,7 @@ public class HumanResourcesTest {
             when(only.isSecondInCommand()).thenReturn(false);
 
             // Act
-            Person[] result = HumanResources.findTopCommanders(List.of(only), campaignOptions, false, today);
+            Person[] result = ForceHumanResources.findTopCommanders(List.of(only), campaignOptions, false, today);
 
             // Assert
             assertEquals(only, result[0]);
@@ -732,8 +712,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#findBestAtSkill(Collection, String, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link ForceHumanResources#findBestAtSkill(Collection, String, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class FindBestAtSkill {
@@ -742,10 +721,10 @@ public class HumanResourcesTest {
         void emptyInputReturnsNull() {
             // Arrange
             List<Person> people = List.of();
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             // Act
-            Person result = HumanResources.findBestAtSkill(people, "Negotiation", campaignOptions, false, today);
+            Person result = ForceHumanResources.findBestAtSkill(people, "Negotiation", campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -754,7 +733,7 @@ public class HumanResourcesTest {
         @Test
         void personWithSkillIsReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -764,7 +743,7 @@ public class HumanResourcesTest {
             when(person.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestAtSkill(List.of(person), "Negotiation",
+            Person result = ForceHumanResources.findBestAtSkill(List.of(person), "Negotiation",
                   campaignOptions, false, today);
 
             // Assert
@@ -774,13 +753,13 @@ public class HumanResourcesTest {
         @Test
         void personWithoutSkillIsNotReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Person person = mock(Person.class);
             when(person.getSkill(anyString())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestAtSkill(List.of(person), "Negotiation",
+            Person result = ForceHumanResources.findBestAtSkill(List.of(person), "Negotiation",
                   campaignOptions, false, today);
 
             // Assert
@@ -790,7 +769,7 @@ public class HumanResourcesTest {
         @Test
         void personWithHigherSkillWins() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill lowSkill = mock(Skill.class);
             when(lowSkill.getTotalSkillLevel(any())).thenReturn(3);
@@ -807,7 +786,7 @@ public class HumanResourcesTest {
             when(stronger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestAtSkill(List.of(weaker, stronger), "Negotiation",
+            Person result = ForceHumanResources.findBestAtSkill(List.of(weaker, stronger), "Negotiation",
                   campaignOptions, false, today);
 
             // Assert
@@ -817,7 +796,8 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link HumanResources#findBestInRole(Collection, PersonnelRole, String, String, CampaignOptions, boolean, LocalDate)}
+     * {@link ForceHumanResources#findBestInRole(Collection, PersonnelRole, String, String, CampaignOptions, boolean,
+     * LocalDate)}
      */
     @Nested
     class FindBestInRole {
@@ -825,11 +805,11 @@ public class HumanResourcesTest {
         @Test
         void emptyInputReturnsNull() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
             List<Person> people = List.of();
 
             // Act
-            Person result = HumanResources.findBestInRole(people, PersonnelRole.DOCTOR,
+            Person result = ForceHumanResources.findBestInRole(people, PersonnelRole.DOCTOR,
                   "Surgery/Any", null, campaignOptions, false, today);
 
             // Assert
@@ -839,7 +819,7 @@ public class HumanResourcesTest {
         @Test
         void personInRoleWithSkillIsReturned() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -851,7 +831,7 @@ public class HumanResourcesTest {
             when(doctor.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestInRole(List.of(doctor), PersonnelRole.DOCTOR,
+            Person result = ForceHumanResources.findBestInRole(List.of(doctor), PersonnelRole.DOCTOR,
                   "Surgery/Any", null, campaignOptions, false, today);
 
             // Assert
@@ -861,7 +841,7 @@ public class HumanResourcesTest {
         @Test
         void personNotInRoleIsExcluded() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -873,7 +853,7 @@ public class HumanResourcesTest {
             when(pilot.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestInRole(List.of(pilot), PersonnelRole.DOCTOR,
+            Person result = ForceHumanResources.findBestInRole(List.of(pilot), PersonnelRole.DOCTOR,
                   "Surgery/Any", null, campaignOptions, false, today);
 
             // Assert
@@ -883,7 +863,7 @@ public class HumanResourcesTest {
         @Test
         void higherPrimarySkillWins() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill weakSkill = mock(Skill.class);
             when(weakSkill.getTotalSkillLevel(any())).thenReturn(3);
@@ -904,7 +884,7 @@ public class HumanResourcesTest {
             when(stronger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestInRole(List.of(weaker, stronger), PersonnelRole.DOCTOR,
+            Person result = ForceHumanResources.findBestInRole(List.of(weaker, stronger), PersonnelRole.DOCTOR,
                   "Surgery/Any", null, campaignOptions, false, today);
 
             // Assert
@@ -914,7 +894,7 @@ public class HumanResourcesTest {
         @Test
         void secondaryRoleMatchCounts() {
             // Arrange
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill skill = mock(Skill.class);
             when(skill.getTotalSkillLevel(any())).thenReturn(5);
@@ -926,7 +906,7 @@ public class HumanResourcesTest {
             when(secondaryDoctor.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.findBestInRole(List.of(secondaryDoctor), PersonnelRole.DOCTOR,
+            Person result = ForceHumanResources.findBestInRole(List.of(secondaryDoctor), PersonnelRole.DOCTOR,
                   "Surgery/Any", null, campaignOptions, false, today);
 
             // Assert
@@ -935,8 +915,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#getLogisticsPerson(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link ForceHumanResources#getLogisticsPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class GetLogisticsPerson {
@@ -944,12 +923,12 @@ public class HumanResourcesTest {
         @Test
         void automaticAcquisitionTypeReturnsNull() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.AUTOMATIC);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.AUTOMATIC);
 
             Person admin = mock(Person.class);
 
             // Act
-            Person result = HumanResources.getLogisticsPerson(List.of(admin), campaignOptions, false, today);
+            Person result = ForceHumanResources.getLogisticsPerson(List.of(admin), campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -958,13 +937,13 @@ public class HumanResourcesTest {
         @Test
         void emptyInputReturnsNull() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(campaignOptions.getAcquisitionPersonnelCategory()).thenReturn(ProcurementPersonnelPick.ALL);
-            when(campaignOptions.getMaxAcquisitions()).thenReturn(0);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(0);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             // Act
-            Person result = HumanResources.getLogisticsPerson(List.of(), campaignOptions, false, today);
+            Person result = ForceHumanResources.getLogisticsPerson(List.of(), campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -973,10 +952,10 @@ public class HumanResourcesTest {
         @Test
         void bestAdminSkillWinsForAdministrationMode() {
             // Arrange
-            when(campaignOptions.getAcquisitionType()).thenReturn(AcquisitionsType.ADMINISTRATION);
-            when(campaignOptions.getAcquisitionPersonnelCategory()).thenReturn(ProcurementPersonnelPick.ALL);
-            when(campaignOptions.getMaxAcquisitions()).thenReturn(0);
-            when(campaignOptions.isUseAgeEffects()).thenReturn(false);
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(0);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
 
             Skill weakAdmin = mock(Skill.class);
             when(weakAdmin.getTotalSkillLevel(any())).thenReturn(3);
@@ -993,7 +972,7 @@ public class HumanResourcesTest {
             when(stronger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
 
             // Act
-            Person result = HumanResources.getLogisticsPerson(List.of(weaker, stronger),
+            Person result = ForceHumanResources.getLogisticsPerson(List.of(weaker, stronger),
                   campaignOptions, false, today);
 
             // Assert
@@ -1002,7 +981,75 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#writeToXML(PrintWriter, int, Campaign)}
+     * Tests for {@link ForceHumanResources#maxAcquisitionsFor(Person, int)} and the ADMIN_SCROUNGE bonus it feeds into
+     * the procurement personnel filters.
+     */
+    @Nested
+    class MaxAcquisitions {
+
+        private Person personWithScrounge(boolean hasScrounge) {
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            when(options.booleanOption(PersonnelOptions.ADMIN_SCROUNGE)).thenReturn(hasScrounge);
+
+            Person person = mock(Person.class);
+            when(person.getOptions()).thenReturn(options);
+            return person;
+        }
+
+        @Test
+        void scroungeAdminGetsOneExtraAttempt() {
+            // Act & Assert
+            assertEquals(2, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), 1),
+                  "ADMIN_SCROUNGE must raise the cap by one");
+            assertEquals(1, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(false), 1),
+                  "Personnel without ADMIN_SCROUNGE keep the base cap");
+        }
+
+        @Test
+        void disabledCapIsReturnedUnchanged() {
+            // A base cap of zero or less means "no limit" and must never gain a bonus, or it would flip an unlimited
+            // limit into a finite one for Scrounge admins.
+            assertEquals(0, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), 0),
+                  "A zero base cap stays disabled for Scrounge admins");
+            assertEquals(-1, ForceHumanResources.maxAcquisitionsFor(personWithScrounge(true), -1),
+                  "A negative base cap stays disabled for Scrounge admins");
+        }
+
+        @Test
+        void scroungeAdminAtBaseCapSurvivesLogisticsFilter() {
+            // Arrange: base cap of 1, both admins have already made 1 acquisition (at the base cap).
+            when(campaignOptions.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ADMINISTRATION);
+            when(campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY)).thenReturn(ProcurementPersonnelPick.ALL);
+            when(campaignOptions.get(CampaignOption.MAX_ACQUISITIONS)).thenReturn(1);
+            when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
+
+            Skill adminSkill = mock(Skill.class);
+            when(adminSkill.getTotalSkillLevel(any())).thenReturn(5);
+
+            Person scrounger = personWithScrounge(true);
+            when(scrounger.getAcquisitions()).thenReturn(1);
+            when(scrounger.hasSkill("Administration")).thenReturn(true);
+            when(scrounger.getSkill("Administration")).thenReturn(adminSkill);
+            when(scrounger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
+
+            Person nonScrounger = personWithScrounge(false);
+            when(nonScrounger.getAcquisitions()).thenReturn(1);
+            when(nonScrounger.hasSkill("Administration")).thenReturn(true);
+            when(nonScrounger.getSkill("Administration")).thenReturn(adminSkill);
+            when(nonScrounger.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(null);
+
+            // Act
+            List<Person> eligible = ForceHumanResources.getLogisticsPersonnel(List.of(scrounger, nonScrounger),
+                  campaignOptions, false, today);
+
+            // Assert: the Scrounge admin's bonus attempt keeps them eligible; the plain admin is filtered out.
+            assertTrue(eligible.contains(scrounger), "Scrounge admin at the base cap must remain eligible");
+            assertFalse(eligible.contains(nonScrounger), "Non-Scrounge admin at the base cap must be filtered out");
+        }
+    }
+
+    /**
+     * Tests for {@link ForceHumanResources#writeToXML(PrintWriter, int, Campaign)}
      */
     @Nested
     class WriteToXML {
@@ -1010,7 +1057,7 @@ public class HumanResourcesTest {
         @Test
         void outputWrapsContentInHumanResourcesTag() {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);
 
@@ -1027,7 +1074,7 @@ public class HumanResourcesTest {
         @Test
         void poolValuesAreWritten() {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
             hr.setAsTechPool(3);
             hr.setMedicPool(2);
 
@@ -1047,7 +1094,7 @@ public class HumanResourcesTest {
         @Test
         void personnelBlockIsNestedInsideHumanResources() {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);
 
@@ -1068,7 +1115,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#loadFromXML(Node, Campaign, Version)}
+     * Tests for {@link ForceHumanResources#loadFromXML(Node, Campaign, Version)}
      */
     @Nested
     class LoadFromXML {
@@ -1076,7 +1123,7 @@ public class HumanResourcesTest {
         @Test
         void roundTripPreservesAsTechPoolValue() throws Exception {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
             hr.setAsTechPool(5);
 
             StringWriter stringWriter = new StringWriter();
@@ -1087,11 +1134,11 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
-            HumanResources loaded = HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources loaded = ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
             assertNotNull(loaded);
@@ -1101,7 +1148,7 @@ public class HumanResourcesTest {
         @Test
         void roundTripPreservesMedicPoolValue() throws Exception {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
             hr.setMedicPool(4);
 
             StringWriter stringWriter = new StringWriter();
@@ -1112,11 +1159,11 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
-            HumanResources loaded = HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources loaded = ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
             assertNotNull(loaded);
@@ -1126,9 +1173,13 @@ public class HumanResourcesTest {
         @Test
         void roundTripPreservesPersonnelCount() throws Exception {
             // Arrange
-            HumanResources hr = campaign.getHumanResources();
-            Person mekwarrior = campaign.newPerson(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE);
-            Person doctor = campaign.newPerson(PersonnelRole.DOCTOR, PersonnelRole.NONE);
+            ForceHumanResources hr = campaign.getPlayerForce().getHumanResources();
+            Person mekwarrior = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newPerson(campaign, PersonnelRole.MEKWARRIOR, PersonnelRole.NONE);
+            Person doctor = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign, PersonnelRole.DOCTOR, PersonnelRole.NONE);
             hr.recruitPerson(campaign, mekwarrior);
             hr.recruitPerson(campaign, doctor);
 
@@ -1142,22 +1193,22 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
-            HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
-            assertEquals(originalCount, fresh.getHumanResources().getPersonnel().size(),
+            assertEquals(originalCount, fresh.getPlayerForce().getHumanResources().getPersonnel().size(),
                   "Personnel count must match after XML round-trip");
         }
     }
 
     /**
-     * Tests for the backward-compatibility path in {@link HumanResources#loadFromXML(Node, Campaign, Version)}
-     * that handles the pre-{@code <humanResources>} save format where pool values and personnel
-     * appeared at the campaign level.
+     * Tests for the backward-compatibility path in {@link ForceHumanResources#loadFromXML(Node, Campaign, Version)} that
+     * handles the pre-{@code <humanResources>} save format where pool values and personnel appeared at the campaign
+     * level.
      */
     @Nested
     class BackwardCompatibility {
@@ -1166,21 +1217,21 @@ public class HumanResourcesTest {
         void legacyAsTechPoolNodeIsRead() throws Exception {
             // Arrange
             String legacyXml = "<humanResources>"
-                  + "<asTechPool>7</asTechPool>"
-                  + "<asTechPoolMinutes>3360</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>1680</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                                     + "<asTechPool>7</asTechPool>"
+                                     + "<asTechPoolMinutes>3360</asTechPoolMinutes>"
+                                     + "<asTechPoolOvertime>1680</asTechPoolOvertime>"
+                                     + "<medicPool>0</medicPool>"
+                                     + "<personnelWhoAdvancedInXP/>"
+                                     + "<personnel/>"
+                                     + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(legacyXml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(legacyXml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
-            HumanResources loaded = HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources loaded = ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
             assertNotNull(loaded);
@@ -1194,22 +1245,22 @@ public class HumanResourcesTest {
         void unknownChildNodeDoesNotThrow() throws Exception {
             // Arrange
             String xmlWithUnknown = "<humanResources>"
-                  + "<asTechPool>0</asTechPool>"
-                  + "<asTechPoolMinutes>0</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>0</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<unknownFutureElement>someValue</unknownFutureElement>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                                          + "<asTechPool>0</asTechPool>"
+                                          + "<asTechPoolMinutes>0</asTechPoolMinutes>"
+                                          + "<asTechPoolOvertime>0</asTechPoolOvertime>"
+                                          + "<medicPool>0</medicPool>"
+                                          + "<unknownFutureElement>someValue</unknownFutureElement>"
+                                          + "<personnelWhoAdvancedInXP/>"
+                                          + "<personnel/>"
+                                          + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xmlWithUnknown.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xmlWithUnknown.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act — must not throw
-            HumanResources loaded = HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources loaded = ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
             assertNotNull(loaded, "Parser must return a valid HumanResources even with unknown elements");
@@ -1219,38 +1270,38 @@ public class HumanResourcesTest {
         void emptyPersonnelNodeProducesEmptyRoster() throws Exception {
             // Arrange
             String xml = "<humanResources>"
-                  + "<asTechPool>0</asTechPool>"
-                  + "<asTechPoolMinutes>0</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>0</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                               + "<asTechPool>0</asTechPool>"
+                               + "<asTechPoolMinutes>0</asTechPoolMinutes>"
+                               + "<asTechPoolOvertime>0</asTechPoolOvertime>"
+                               + "<medicPool>0</medicPool>"
+                               + "<personnelWhoAdvancedInXP/>"
+                               + "<personnel/>"
+                               + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
-            HumanResources.loadFromXML(hrNode, fresh, new Version());
+            ForceHumanResources.loadFromXML(hrNode, fresh, new Version());
 
             // Assert
-            assertTrue(fresh.getHumanResources().getPersonnel().isEmpty(),
+            assertTrue(fresh.getPlayerForce().getHumanResources().getPersonnel().isEmpty(),
                   "Empty <personnel/> node must produce an empty roster");
         }
 
         @Test
         void usesExistingHRFromCampaign() throws Exception {
-            Campaign mockCampaign = mock(Campaign.class);
-            HumanResources existingHr = new HumanResources();
-            when(mockCampaign.getHumanResources()).thenReturn(existingHr);
+            Campaign mockCampaign = mockCampaign();
+            ForceHumanResources existingHr = new ForceHumanResources();
+            when(mockCampaign.getPlayerForce().getHumanResources()).thenReturn(existingHr);
 
             String xml = "<humanResources></humanResources>";
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Node node = db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
 
-            HumanResources result = HumanResources.loadFromXML(node, mockCampaign, new Version("0.50.00"));
+            ForceHumanResources result = ForceHumanResources.loadFromXML(node, mockCampaign, new Version("0.50.00"));
 
             assertSame(existingHr, result);
         }
@@ -1258,7 +1309,7 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link HumanResources#getTechsExpanded(Collection, Collection, CampaignOptions, boolean, LocalDate, boolean,
+     * {@link ForceHumanResources#getTechsExpanded(Collection, Collection, CampaignOptions, boolean, LocalDate, boolean,
      * boolean, boolean)}
      */
     @Nested
@@ -1284,7 +1335,7 @@ public class HumanResourcesTest {
 
         @Test
         void emptyInputReturnsEmptyList() {
-            List<Person> result = HumanResources.getTechsExpanded(
+            List<Person> result = ForceHumanResources.getTechsExpanded(
                   List.of(), List.of(), campaignOptions, false, today, false, false, true);
 
             assertTrue(result.isEmpty());
@@ -1295,7 +1346,7 @@ public class HumanResourcesTest {
             Person nonTech = mock(Person.class);
             when(nonTech.isTechExpanded()).thenReturn(false);
 
-            List<Person> result = HumanResources.getTechsExpanded(
+            List<Person> result = ForceHumanResources.getTechsExpanded(
                   List.of(nonTech), List.of(), campaignOptions, false, today, false, false, true);
 
             assertTrue(result.isEmpty());
@@ -1306,7 +1357,7 @@ public class HumanResourcesTest {
             Person veteran = makeTech(SkillLevel.VETERAN, 480);
             Person regular = makeTech(SkillLevel.REGULAR, 480);
 
-            List<Person> result = HumanResources.getTechsExpanded(
+            List<Person> result = ForceHumanResources.getTechsExpanded(
                   List.of(regular, veteran), List.of(), campaignOptions, false, today,
                   false, true, true);
 
@@ -1319,7 +1370,7 @@ public class HumanResourcesTest {
             Person busy = makeTech(SkillLevel.REGULAR, 0);
             Person available = makeTech(SkillLevel.REGULAR, 480);
 
-            List<Person> result = HumanResources.getTechsExpanded(
+            List<Person> result = ForceHumanResources.getTechsExpanded(
                   List.of(busy, available), List.of(), campaignOptions, false, today,
                   true, false, true);
 
@@ -1337,7 +1388,7 @@ public class HumanResourcesTest {
             when(selfCrewedUnit.getEntity()).thenReturn(entity);
             when(selfCrewedUnit.getEngineer()).thenReturn(engineer);
 
-            List<Person> result = HumanResources.getTechsExpanded(
+            List<Person> result = ForceHumanResources.getTechsExpanded(
                   List.of(), List.of(selfCrewedUnit), campaignOptions, false, today,
                   false, false, true);
 

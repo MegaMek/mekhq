@@ -33,8 +33,12 @@
  */
 package mekhq.campaign.universe;
 
+import static mekhq.campaign.universe.Faction.ABANDONED_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.DISPUTED_FACTION_CODE;
+
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,8 +63,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
@@ -73,7 +79,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonDeserialize(converter = PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
-    private static final double COMMAND_CIRCUIT_RECHARGE_TIME_HOURS = 10;
+    public static final double MINIMUM_RECHARGE_TIME_HOURS = 10;
 
     // --- Sophistication Rating Enum ---
     public enum PlanetarySophistication {
@@ -328,12 +334,210 @@ public class PlanetarySystem {
         return factions;
     }
 
+    /**
+     * @return the shared nonempty administration path recorded by this system's planets, or an empty list when none is
+     *       recorded or the planets disagree
+     */
+    public List<String> getAdministration(LocalDate when) {
+        List<String> administration = null;
+        for (Planet planet : planets.values()) {
+            List<String> planetAdministration = planet.getAdministration(when);
+            if (planetAdministration.isEmpty()) {
+                continue;
+            }
+            if ((administration != null) && !administration.equals(planetAdministration)) {
+                return List.of();
+            }
+            administration = planetAdministration;
+        }
+        return (administration == null) ? List.of() : List.copyOf(administration);
+    }
+
+    /**
+     * The look-back window, in years, over which prior rulers still count toward a world's living population. A native
+     * up to this old could have been born under a faction that has since lost the world, so those factions remain a
+     * plausible birth origin.
+     */
+    private static final int POPULATION_WINDOW_YEARS = 40;
+
+    /** Average days per year (accounting for leap years), for converting a tenure span into whole-year weights. */
+    private static final double DAYS_PER_YEAR = 365.25;
+
+    /**
+     * Returns the factions a person native to this system could plausibly have been born under, each weighted by how
+     * long it ruled within the last {@link #POPULATION_WINDOW_YEARS} years.
+     *
+     * <p>For every planet, this measures how much of the window each real faction held the world and credits it that
+     * many years of tenure. A faction that has held the world for the whole window weighs
+     * {@link #POPULATION_WINDOW_YEARS}; one that ruled only briefly weighs proportionally less (minimum 1). Tenure is
+     * summed across the system's planets, so a faction credited on several worlds accumulates their spans.</p>
+     *
+     * <p>Contested stretches are handled specially. {@link #getFactionSet(LocalDate)} reports a disputed world's owner
+     * as the aggregate {@code DIS} ("Disputed") pseudo-faction, which is not a real polity a person can belong to. The
+     * duration of each dispute is instead split evenly between the two sides fighting over it: the owner recorded
+     * immediately before the dispute and the one who eventually resolves it (which may lie in the future for a dispute
+     * still raging at {@code when}). This keeps both combatants in the pool, weighted by how long the world has been
+     * fought over.</p>
+     *
+     * <p>The {@code DIS} marker is never returned, and {@code ABN} (Abandoned) is dropped when other owners are
+     * present.</p>
+     *
+     * @param when the date to evaluate ownership at
+     *
+     * @return a map of birth-eligible factions to their tenure weight in whole years; may be empty if a disputed world
+     *       has no recorded owner before or after the dispute
+     */
+    public Map<Faction, Integer> getPopulationFactions(LocalDate when) {
+        Map<Faction, Double> tenureYears = new HashMap<>();
+        for (Planet planet : planets.values()) {
+            accumulatePopulationTenure(tenureYears, planet, when);
+        }
+
+        Map<Faction, Integer> weights = new HashMap<>();
+        for (Map.Entry<Faction, Double> entry : tenureYears.entrySet()) {
+            // Any faction that ruled at all is worth at least one ticket; longer and multi-world tenure weighs more.
+            int weight = (int) Math.max(1, Math.round(entry.getValue()));
+            weights.put(entry.getKey(), weight);
+        }
+
+        // Abandoned (ABN) is a pseudo-faction; it must never be treated as a valid birth origin.
+        weights.remove(Factions.getInstance().getFaction(ABANDONED_FACTION_CODE));
+        return weights;
+    }
+
+    /**
+     * Accumulates, into {@code tenureYears}, how long each real faction held {@code planet} within the last
+     * {@link #POPULATION_WINDOW_YEARS} years before {@code when}.
+     *
+     * <p>Walks the ownership timeline, crediting each owner the length of its reign clipped to the window. Future
+     * ownership (after {@code when}) is not part of the current population and is skipped, except that an ongoing
+     * dispute's eventual resolver is credited its share of the contested span (see {@link #creditContestants}).</p>
+     *
+     * @param tenureYears the running per-faction tenure total, in years
+     * @param planet      the planet whose ownership timeline is walked
+     * @param when        the date the population is evaluated at
+     */
+    private static void accumulatePopulationTenure(Map<Faction, Double> tenureYears, Planet planet, LocalDate when) {
+        List<Planet.PlanetaryEvent> events = planet.getEvents();
+        if (events == null) {
+            return;
+        }
+        LocalDate windowStart = when.minusYears(POPULATION_WINDOW_YEARS);
+
+        // Ownership snapshots (events that set a faction) in chronological order, across the whole timeline.
+        List<Planet.PlanetaryEvent> ownership = new ArrayList<>();
+        for (Planet.PlanetaryEvent event : events) {
+            if (event.date != null && event.faction != null && event.faction.getValue() != null) {
+                ownership.add(event);
+            }
+        }
+
+        for (int i = 0; i < ownership.size(); i++) {
+            Planet.PlanetaryEvent event = ownership.get(i);
+            if (!event.date.isBefore(when)) {
+                break; // this reign begins at or after the evaluation date — not part of the current population
+            }
+            // This owner holds from its own date until the next ownership change (or the evaluation date).
+            LocalDate segmentEnd = (i + 1 < ownership.size()) ? ownership.get(i + 1).date : when;
+            if (segmentEnd.isAfter(when)) {
+                segmentEnd = when;
+            }
+            // Clip the reign to the living-population window.
+            LocalDate segmentStart = event.date.isBefore(windowStart) ? windowStart : event.date;
+            if (!segmentStart.isBefore(segmentEnd)) {
+                continue; // reign falls entirely outside the window
+            }
+            double years = ChronoUnit.DAYS.between(segmentStart, segmentEnd) / DAYS_PER_YEAR;
+
+            if (isDisputedOnly(event.faction.getValue())) {
+                creditContestants(tenureYears, ownership, i, years);
+            } else {
+                creditCodes(tenureYears, event.faction.getValue(), years);
+            }
+        }
+    }
+
+    /**
+     * Credits {@code years} of tenure to each real faction named in {@code codes} (the Disputed marker and unknown
+     * codes are skipped). Co-owners each receive the full span rather than a split.
+     */
+    private static void creditCodes(Map<Faction, Double> tenureYears, List<String> codes, double years) {
+        Set<Faction> factions = new HashSet<>();
+        addFactionsFromCodes(factions, codes);
+        for (Faction faction : factions) {
+            tenureYears.merge(faction, years, Double::sum);
+        }
+    }
+
+    /**
+     * Splits a contested span evenly between the two sides fighting over the world: the last real owner recorded before
+     * the dispute at {@code disputeIndex} and the first real owner recorded after it (which may lie in the future for a
+     * dispute still ongoing at the evaluation date). If only one side is recorded, it takes the whole span.
+     *
+     * @param tenureYears  the running per-faction tenure total, in years
+     * @param ownership    the planet's chronological ownership snapshots
+     * @param disputeIndex the index of the disputed snapshot within {@code ownership}
+     * @param years        the length of the contested span, in years
+     */
+    private static void creditContestants(Map<Faction, Double> tenureYears, List<Planet.PlanetaryEvent> ownership,
+          int disputeIndex, double years) {
+        Set<Faction> contestants = new HashSet<>();
+        for (int j = disputeIndex - 1; j >= 0; j--) {
+            List<String> codes = ownership.get(j).faction.getValue();
+            if (!isDisputedOnly(codes)) {
+                addFactionsFromCodes(contestants, codes);
+                break;
+            }
+        }
+        for (int j = disputeIndex + 1; j < ownership.size(); j++) {
+            List<String> codes = ownership.get(j).faction.getValue();
+            if (!isDisputedOnly(codes)) {
+                addFactionsFromCodes(contestants, codes);
+                break;
+            }
+        }
+        if (contestants.isEmpty()) {
+            return;
+        }
+        double share = years / contestants.size();
+        for (Faction faction : contestants) {
+            tenureYears.merge(faction, share, Double::sum);
+        }
+    }
+
+    /**
+     * @return {@code true} if {@code codes} is non-empty and every code is the Disputed marker, i.e. the world is
+     *       actively contested with no real owner recorded at the queried date
+     */
+    private static boolean isDisputedOnly(List<String> codes) {
+        if (codes == null || codes.isEmpty()) {
+            return false;
+        }
+        for (String code : codes) {
+            if (!DISPUTED_FACTION_CODE.equals(code)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Resolves each faction code to a {@link Faction} and adds the non-null, non-disputed results to {@code sink}. */
+    private static void addFactionsFromCodes(Set<Faction> sink, List<String> codes) {
+        for (String code : codes) {
+            if (DISPUTED_FACTION_CODE.equals(code)) {
+                continue;
+            }
+            Faction faction = Factions.getInstance().getFaction(code);
+            if (faction != null) {
+                sink.add(faction);
+            }
+        }
+    }
+
     public long getPopulation(LocalDate when) {
         long pop = 0L;
         for (Planet planet : planets.values()) {
-            if (null != planet.getPopulation(when)) {
-                pop += planet.getPopulation(when);
-            }
+            pop += planet.getPopulation(when);
         }
         return pop;
     }
@@ -369,6 +573,23 @@ public class PlanetarySystem {
         return new SocioIndustrialData(tech, industry, rawMaterials, output, agriculture);
     }
 
+    /**
+     * @param when the date to check
+     *
+     * @return the most significant administrative capital status among the planets of this system (national outranks
+     *       regional outranks district), or {@link CapitalType#NONE} if no planet is a capital
+     */
+    public CapitalType getCapitalType(LocalDate when) {
+        CapitalType mostSignificant = CapitalType.NONE;
+        for (Planet planet : planets.values()) {
+            CapitalType planetCapitalType = planet.getCapitalType(when);
+            if (planetCapitalType.significance() > mostSignificant.significance()) {
+                mostSignificant = planetCapitalType;
+            }
+        }
+        return mostSignificant;
+    }
+
     /** @return the highest HPG rating among planets **/
     public HPGRating getHPG(LocalDate when) {
         HPGRating rating = HPGRating.X;
@@ -399,6 +620,15 @@ public class PlanetarySystem {
     /**
      * @return short name if set, else full name, else "unnamed"
      */
+    /**
+     * @param when the date to name the system as of, since ownership and name can change over time
+     *
+     * @return the system's name as a report hyperlink that focuses the interstellar map on it
+     */
+    public String getHyperlinkedName(LocalDate when) {
+        return String.format("<a href='SYSTEM:%s'>%s</a>", getId(), getName(when));
+    }
+
     public String getPrintableName(LocalDate when) {
         final String system = getName(when);
         return (system == null) ? "Unknown System" : system;
@@ -478,9 +708,9 @@ public class PlanetarySystem {
     public double getRechargeTime(LocalDate when, boolean isUseCommandCircuits) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
             // The 176 value comes from pg. 87-88 and 138 of StratOps
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
         } else {
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
                   getSolarRechargeTime());
         }
     }
@@ -754,7 +984,7 @@ public class PlanetarySystem {
                                               && (!setName.equalsIgnoreCase("Prestigious Academies")
                                                         ||
                                                         campaign.getCampaignOptions()
-                                                              .isEnablePrestigiousAcademies())) // Additional
+                                                              .get(CampaignOption.ENABLE_PRESTIGIOUS_ACADEMIES))) // Additional
                      // condition for
                      // "Prestigious
                      // Academies"

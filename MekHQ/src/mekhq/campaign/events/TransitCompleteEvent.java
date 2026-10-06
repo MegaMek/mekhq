@@ -34,7 +34,7 @@ package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
 import mekhq.campaign.AbstractLocation;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractMobileLocation;
 
 /**
  * Triggered when a jump path is completed
@@ -43,7 +43,7 @@ public class TransitCompleteEvent extends MMEvent {
 
     private final AbstractLocation location;
 
-    public TransitCompleteEvent(CurrentLocation location) {
+    public TransitCompleteEvent(AbstractMobileLocation location) {
         this.location = location;
     }
 

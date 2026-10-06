@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
 import org.junit.jupiter.api.Test;
@@ -92,13 +93,13 @@ public class RandomDivorceMethodTest {
     @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomOppositeSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-        when(mockOptions.getRandomDivorceDiceSize()).thenReturn(5);
+        when(mockOptions.get(CampaignOption.USE_CLAN_PERSONNEL_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_PRISONER_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_OPPOSITE_SEX_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_CLAN_PERSONNEL_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.USE_RANDOM_PRISONER_DIVORCE)).thenReturn(false);
+        when(mockOptions.get(CampaignOption.RANDOM_DIVORCE_DICE_SIZE)).thenReturn(5);
 
         assertInstanceOf(DisabledRandomDivorce.class, RandomDivorceMethod.NONE.getMethod(mockOptions));
         assertInstanceOf(RandomDivorce.class, RandomDivorceMethod.DICE_ROLL.getMethod(mockOptions));

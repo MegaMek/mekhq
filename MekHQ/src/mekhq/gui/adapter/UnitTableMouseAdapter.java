@@ -41,7 +41,6 @@ import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
@@ -49,6 +48,7 @@ import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -57,6 +57,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -100,20 +101,24 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.location.LocationDispatch;
-import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.rentals.FacilityRentals;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.unit.BombUnloader;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -128,21 +133,24 @@ import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.control.EditUnitLogControl.UnitLogType;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.EditUnitLogDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
-import mekhq.gui.menus.SendToLocationMenu;
+import mekhq.gui.menus.LocationMenu;
+import mekhq.gui.menus.TransportAssignmentMenus;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -177,6 +185,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CANCEL_MOTHBALL = "CANCEL_MOTHBALL";
     // Unit History Commands
     public static final String COMMAND_CHANGE_HISTORY = "CHANGE_HISTORY";
+    public static final String COMMAND_EDIT_UNIT_LOG = "EDIT_UNIT_LOG";
+    public static final String COMMAND_EDIT_KILL_LOG = "EDIT_KILL_LOG";
+    public static final String COMMAND_EDIT_CREW_LOG = "EDIT_CREW_LOG";
+    public static final String COMMAND_EDIT_DEPLOYMENT_LOG = "EDIT_DEPLOYMENT_LOG";
+    public static final String COMMAND_EDIT_REPAIR_LOG = "EDIT_REPAIR_LOG";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
     public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
@@ -187,6 +200,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";
     public static final String COMMAND_BOMBS = "BOMBS";
+    public static final String COMMAND_UNLOAD_ALL_BOMBS = "UNLOAD_ALL_BOMBS";
     public static final String COMMAND_SUPPLY_COST = "SUPPLY_COST";
     public static final String COMMAND_PARTS_REPORT = "PARTS_REPORT";
     public static final String COMMAND_TAG_CUSTOM = "TAG_CUSTOM";
@@ -195,6 +209,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CUSTOMIZE = "CUSTOMIZE";
     public static final String COMMAND_CANCEL_CUSTOMIZE = "CANCEL_CUSTOMIZE";
     public static final String COMMAND_REFIT_GM_COMPLETE = "REFIT_GM_COMPLETE";
+    public static final String COMMAND_ASSIGN_REFIT_TECH = "ASSIGN_REFIT_TECH";
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
@@ -254,6 +269,37 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         }.connect(unitTable);
     }
 
+    /**
+     * Whether the shared kit-issue dialog has anything to offer for this unit: its crew can wear an armor kit, it is a
+     * conventional infantry platoon (issued a platoon kit), or any crew member can be issued technician tool kits.
+     */
+    private static boolean canIssueKitsFor(Unit unit) {
+        if (ArmorKitCatalog.canWearIssuedKit(unit.getEntity()) || unit.getEntity().isConventionalInfantry()) {
+            return true;
+        }
+        for (Person crew : unit.getCrew()) {
+            if (EquipmentKitCatalog.canBeIssuedKit(crew)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Opens the log editor for the given unit and log type, then fires a {@link UnitLogEvent}.
+     *
+     * @param unit    the unit whose log is being edited
+     * @param logType which of the unit's logs to edit
+     */
+    private void editUnitLog(Unit unit, UnitLogType logType) {
+        EditUnitLogDialog editUnitLogDialog = new EditUnitLogDialog(gui.getFrame(),
+              gui.getCampaign().getLocalDate(),
+              unit,
+              logType);
+        editUnitLogDialog.setVisible(true);
+        MekHQ.triggerEvent(new UnitLogEvent(unit));
+    }
+
     @Override
     public void actionPerformed(ActionEvent action) {
         // First make sure we actually get a row of data
@@ -277,7 +323,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
             new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
+            boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
             Object[] possibilities = { PartQuality.QUALITY_A.toName(reverse), PartQuality.QUALITY_B.toName(reverse),
                                        PartQuality.QUALITY_C.toName(reverse), PartQuality.QUALITY_D.toName(reverse),
                                        PartQuality.QUALITY_E.toName(reverse), PartQuality.QUALITY_F.toName(reverse) };
@@ -319,7 +365,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             Campaign campaign = gui.getCampaign();
             String commanderAddress = campaign.getCommanderAddress();
-            Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
+            Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
+                                          .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                                campaign.getPlayerForce().isClanForce(),
+                                                campaign.getLocalDate());
 
             // Cancel is first (index 0), so closing dialog via X defaults to cancel
             List<String> buttons = List.of(
@@ -394,7 +443,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             boolean wasSiteChangeSuccessful = true;
             Campaign campaign = gui.getCampaign();
             if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
-                      campaign.getCampaignOptions().getRentedFacilitiesCostRepairBays() > 0) {
+                      campaign.getCampaignOptions().get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS) > 0) {
                 wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
             }
 
@@ -527,17 +576,25 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 // Determine the appropriate crew role for this unit
                 PersonnelRole crewRole = unit.getDriverRole();
 
-                if (crewRole != null && gui.getCampaign().isBlobCrewEnabled(crewRole)) {
-                    int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
-                    int needed = maxTempCrewForUnit - currentTempCrew;
+                if (crewRole != null) {
+                    mekhq.campaign.Campaign campaign = gui.getCampaign();
+                    if (campaign.getPlayerForce()
+                              .getHumanResources()
+                              .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())) {
+                        int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
+                        int needed = maxTempCrewForUnit - currentTempCrew;
 
-                    if (needed > 0) {
-                        // Check available pool for this crew type
-                        int availableInPool = gui.getCampaign().getAvailableTempCrewPool(crewRole);
-                        int toAssign = Math.min(needed, availableInPool);
+                        if (needed > 0) {
+                            // Check available pool for this crew type
+                            Campaign campaign1 = gui.getCampaign();
+                            int availableInPool = campaign1.getPlayerForce()
+                                                        .getHumanResources()
+                                                        .getAvailableTempCrewPool(campaign1, crewRole);
+                            int toAssign = Math.min(needed, availableInPool);
 
-                        if (toAssign > 0) {
-                            unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                            if (toAssign > 0) {
+                                unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                            }
                         }
                     }
                 }
@@ -557,6 +614,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.setSelectedTab(gui.getMekLabTab());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
+        } else if (command.equals(COMMAND_ASSIGN_REFIT_TECH)) { // Single Unit only
+            gui.assignRefitTech(selectedUnit.getRefit());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().succeed());
         } else if (command.equals(COMMAND_REFURBISH)) {
@@ -597,6 +656,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 selectedUnit.setHistory(tad.getText());
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
+        } else if (command.equals(COMMAND_EDIT_UNIT_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.UNIT_LOG);
+        } else if (command.equals(COMMAND_EDIT_KILL_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.KILL_LOG);
+        } else if (command.equals(COMMAND_EDIT_CREW_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.CREW_LOG);
+        } else if (command.equals(COMMAND_EDIT_DEPLOYMENT_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.DEPLOYMENT_LOG);
+        } else if (command.equals(COMMAND_EDIT_REPAIR_LOG)) { // Single Unit only
+            editUnitLog(selectedUnit, UnitLogType.REPAIR_LOG);
         } else if (command.equals(COMMAND_REMOVE_INDI_CAMO)) {
             for (final Unit unit : units) {
                 unit.getEntity().setCamouflage(new Camouflage());
@@ -618,14 +687,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 Money refundAmount = u.getBuyCost()
                                            .multipliedBy(gui.getCampaign()
                                                                .getCampaignOptions()
-                                                               .getCancelledOrderRefundMultiplier());
-                gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign()
-                      .getFinances()
-                      .credit(TransactionType.EQUIPMENT_PURCHASE,
-                            gui.getCampaign().getLocalDate(),
-                            refundAmount,
-                            "refund for cancelled equipment sale");
+                                                               .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER));
+                if (gui.getCampaign().removeUnit(u.getId())) {
+                    gui.getCampaign().getPlayerForce().getFinances()
+                          .credit(TransactionType.EQUIPMENT_PURCHASE,
+                                gui.getCampaign().getLocalDate(),
+                                refundAmount,
+                                "refund for cancelled equipment sale");
+                }
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {
@@ -637,8 +706,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 if (tech != null) {
+                    Campaign campaign1 = selectedUnit.getCampaign();
                     if ((!selectedUnit.getActiveCrew().isEmpty()) ||
-                              (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                              (campaign1.getPlayerForce().getFormationFor(selectedUnit)) != null ||
+                              selectedUnit.getTech() != null) {
                         Campaign campaign = gui.getCampaign();
                         ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
                               tech,
@@ -653,7 +724,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               false);
                         if (clearAssignments.getDialogChoice() == 1) {
                             selectedUnit.clearCrew();
-                            campaign.removeUnitFromFormation(selectedUnit);
+                            campaign.getPlayerForce().removeUnitFromFormation(selectedUnit, campaign);
                         }
                     }
                     MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
@@ -682,6 +753,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             BombsDialog dialog = new BombsDialog((IBomber) selectedUnit.getEntity(), gui.getCampaign(), gui.getFrame());
             dialog.setVisible(true);
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+        } else if (command.equals(COMMAND_UNLOAD_ALL_BOMBS)) {
+            for (Unit unit : units) {
+                if (BombUnloader.hasBombsToUnload(unit)) {
+                    BombUnloader.unloadAll(gui.getCampaign(), unit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                }
+            }
         } else if (command.equals(COMMAND_QUIRKS)) { // Single Unit only
             QuirksDialog dialog = new QuirksDialog(selectedUnit.getEntity(), gui.getFrame());
             dialog.setVisible(true);
@@ -749,7 +827,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.startsWith(COMMAND_PERFORM_AD_HOC_MAINTENANCE)) {
             final Campaign campaign = gui.getCampaign();
             final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            final boolean isUseMaintenance = campaignOptions.isCheckMaintenance();
+            final boolean isUseMaintenance = campaignOptions.get(CampaignOption.CHECK_MAINTENANCE);
 
             if (!isUseMaintenance) {
                 return;
@@ -770,7 +848,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
 
-        if (unit.isConventionalInfantry()) {
+        if (unit.isSelfMaintainedInfantry()) {
             return null;
         }
 
@@ -784,7 +862,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
-                tech = gui.getCampaign().getPerson(id);
+                Campaign campaign = gui.getCampaign();
+                tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (!tech.getTechUnits().isEmpty()) {
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(gui.getFrame(),
@@ -805,6 +884,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private boolean isSelfCrewedButHasNoTech(Unit unit) {
         return unit.isSelfCrewed() && unit.engineerResponsible().isEmpty();
+    }
+
+    /** @return {@code true} if any of the units carries a bomb that can be unloaded */
+    private static boolean isAnyCarryingBombs(Unit[] units) {
+        for (Unit unit : units) {
+            if (BombUnloader.hasBombsToUnload(unit)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -989,7 +1078,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         AmmoType curType = ammo.getType();
                         for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
                               curType,
-                              gui.getCampaign().getCampaignOptions().getTechLevel())) {
+                              gui.getCampaign().getCampaignOptions().get(CampaignOption.TECH_LEVEL))) {
                             cbMenuItem = new JCheckBoxMenuItem(ammoType.getDesc());
                             if (ammoType.equals(curType)) {
                                 cbMenuItem.setSelected(true);
@@ -1012,6 +1101,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (oneSelected && unit.getEntity().isBomber()) {
                 menuItem = new JMenuItem("Select Bombs");
                 menuItem.setActionCommand(COMMAND_BOMBS);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // Unload all bombs, from one aircraft or a whole selection
+            if (isAnyCarryingBombs(units)) {
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "unloadAllBombs.text"));
+                menuItem.setActionCommand(COMMAND_UNLOAD_ALL_BOMBS);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
@@ -1060,15 +1157,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
             List<mekhq.campaign.unit.Unit> unitList = List.of(units);
-            JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
-                  gui.getCampaign(), gui.getFrame(), unitList,
-                  destination -> LocationDispatch.dispatchUnitsToLocation(
-                        unitList, destination, gui.getCampaign())));
+            JMenuHelpers.addMenuIfNonEmpty(popup,
+                  new LocationMenu(gui.getCampaign(), gui.getFrame(), unitList));
 
             // if we're using maintenance and have selected something that requires
             // maintenance and
             // isn't mothballed or being mothballed
-            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
+            if (gui.getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
                 menuItem = new JMenu(getText("maintenanceExtraTime.text"));
 
                 for (int x = 1; x <= 4; x++) {
@@ -1103,14 +1198,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected && !unit.isMothballed() && gui.getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
+            if (oneSelected
+                      && !unit.isMothballed()
+                      && gui.getCampaign().getCampaignOptions().isChargingPeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
 
-            if (oneSelected && gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
+            if (oneSelected && gui.getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
                 menuItem = new JMenuItem("Show Part Quality Report");
                 menuItem.setActionCommand(COMMAND_PARTS_REPORT);
                 menuItem.addActionListener(this);
@@ -1169,6 +1266,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
 
+                    boolean isRefitWithoutTech = oneSelected
+                          && unit.isRefitting()
+                          && (unit.getRefit().getTech() == null)
+                          && !unit.isSelfCrewed();
+                    if (isRefitWithoutTech) {
+                        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "assignRefitTech.text"));
+                        menuItem.setActionCommand(COMMAND_ASSIGN_REFIT_TECH);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
+
                     if (isGM) {
                         menuItem = new JMenuItem("Complete Refit (GM)");
                         menuItem.setActionCommand(COMMAND_REFIT_GM_COMPLETE);
@@ -1176,11 +1284,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         menu.add(menuItem);
                     }
                 }
+
+                if (Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
+                    JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
+                          "menu.issueArmorKits"));
+                    issueKits.addActionListener(evt -> IssueEquipmentDialog.showFor(gui.getFrame(),
+                          gui.getCampaign(), null, Arrays.asList(units)));
+                    menu.add(issueKits);
+                }
+
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
 
             // fill with personnel
-            if (gui.getCampaign().getCampaignOptions().getPersonnelMarketStyle() != MEKHQ) {
+            if (gui.getCampaign().getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_STYLE) != MEKHQ) {
                 if (oneAvailableUnitBelowMaxCrew) {
                     menuItem = new JMenuItem(getText("hireMinimumComplement.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL);
@@ -1203,9 +1320,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     fillDisabledReason = getText("tempCrew.fillWithTempCrew.atFullStrength");
                 } else {
                     PersonnelRole crewRole = unit.getDriverRole();
+                    mekhq.campaign.Campaign campaign = gui.getCampaign();
+                    Campaign campaign1 = gui.getCampaign();
                     boolean hasPool = crewRole != null
-                                            && gui.getCampaign().isBlobCrewEnabled(crewRole)
-                                            && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
+                                            &&
+                                            campaign.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())
+                                            &&
+                                            campaign1.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .getAvailableTempCrewPool(campaign1, crewRole) > 0;
                     if (!hasPool) {
                         fillDisabledReason = getText("tempCrew.fillWithTempCrew.noPoolAvailable");
                     }
@@ -1251,7 +1376,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected && gui.getCampaign().getCampaignOptions().isUseQuirks()) {
+            if (oneSelected && gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS)) {
                 menuItem = new JMenuItem("Edit Quirks");
                 menuItem.setActionCommand(COMMAND_QUIRKS);
                 menuItem.addActionListener(this);
@@ -1259,10 +1384,43 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected) {
-                menuItem = new JMenuItem("Edit Unit History...");
+                JMenu unitHistoryMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "unitHistoryMenu.text"));
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitHistory.text"));
                 menuItem.setActionCommand(COMMAND_CHANGE_HISTORY);
                 menuItem.addActionListener(this);
-                popup.add(menuItem);
+                unitHistoryMenu.add(menuItem);
+
+                JMenu editLogsMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "editUnitLogsMenu.text"));
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_UNIT_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitKillLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_KILL_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitCrewLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_CREW_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitDeploymentLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_DEPLOYMENT_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "editUnitRepairLog.text"));
+                menuItem.setActionCommand(COMMAND_EDIT_REPAIR_LOG);
+                menuItem.addActionListener(this);
+                editLogsMenu.add(menuItem);
+
+                unitHistoryMenu.add(editLogsMenu);
+
+                popup.add(unitHistoryMenu);
             }
 
             if (oneSelected) {
@@ -1285,8 +1443,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
             }
 
+            // transport assignment (ship / tactical / tow), same actions as the TO&E tab
+            TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(),
+                  Arrays.asList(units));
+
             // sell unit
-            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits()) {
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS)) {
                 popup.addSeparator();
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand(COMMAND_SELL);
@@ -1420,7 +1582,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void addCustomUnitTag(Unit... units) {
-        String sCustomsDirCampaign = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + gui.getCampaign().getName() + '/';
+        String sCustomsDirCampaign = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + gui.getCampaign().getPlayerForce().getName() + '/';
         File customsDir = new File(MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
@@ -1492,19 +1654,32 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         PersonnelRole gunnerRole = unit.getGunnerRole();
 
         // Check if driver role is enabled
-        if (driverRole != null && gui.getCampaign().isBlobCrewEnabled(driverRole)) {
-            return true;
+        if (driverRole != null) {
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            if (campaign.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(driverRole, campaign.getCampaignOptions())) {
+                return true;
+            }
         }
 
         // Check if gunner role is enabled (and different from driver)
-        if (gunnerRole != null && !gunnerRole.equals(driverRole) &&
-                  gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
-            return true;
+        if (gunnerRole != null && !gunnerRole.equals(driverRole)) {
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            if (campaign.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(gunnerRole, campaign.getCampaignOptions())) {
+                return true;
+            }
         }
 
         // For vessels, also check vessel crew
         if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
-            return gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW);
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            return campaign.getPlayerForce()
+                         .getHumanResources()
+                         .isBlobCrewEnabled(mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_CREW,
+                               campaign.getCampaignOptions());
         }
 
         return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -325,29 +325,17 @@ class ROMDesignationTest {
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEDIC);
         assertEquals(" " + ROMDesignation.KAPPA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // Administrator (Command) - Expect " Chi"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
-        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
-
-        // Administrator (Logistics) - Expect " Chi"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
-
-        // Administrator (Transport) - Expect " Chi"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-        assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
-
-        // Administrator (HR) - Expect " Chi"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_HR);
+        // Administrator - Expect " Chi"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR);
         assertEquals(" " + ROMDesignation.CHI, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Dependent - Expect " "
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.DEPENDENT);
         assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // MekWarrior / Administrator (Command) - Expect " Epsilon Chi"
+        // MekWarrior / Administrator - Expect " Epsilon Chi"
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
-        when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
+        when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR);
         assertEquals(" " + ROMDesignation.EPSILON + ' ' + ROMDesignation.CHI,
               ROMDesignation.getComStarBranchDesignation(mockPerson));
 

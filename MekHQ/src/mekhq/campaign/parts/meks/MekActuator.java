@@ -40,12 +40,12 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.units.BipedMek;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -212,7 +212,7 @@ public class MekActuator extends Part {
             }
             hits = unit.getEntity().getDamagedCriticalSlots(CriticalSlot.TYPE_SYSTEM, type, location);
             if (checkForDestruction && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -279,7 +279,7 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillType.S_TECH_MYOMER);
     }
 
     @Override

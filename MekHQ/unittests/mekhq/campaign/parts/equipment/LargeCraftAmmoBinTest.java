@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static org.mockito.Mockito.lenient;
+
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,6 +46,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -58,15 +61,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import megamek.Version;
-import megamek.common.equipment.AmmoType;
-import megamek.common.units.Entity;
-import megamek.common.equipment.Mounted;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -85,7 +89,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void largeCraftAmmoBinCtorTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
         int equipmentNum = 18;
@@ -108,7 +112,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void cloneTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
         int equipmentNum = 18;
@@ -137,7 +141,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getNewPartTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
 
         double capacity = 5.0;
@@ -152,7 +156,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void cannotDestroyLargeCraftAmmoBin() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
         int equipmentNum = 18;
@@ -171,7 +175,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void largeCraftAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
         int equipmentNum = 18;
@@ -235,7 +239,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getBayReturnsBayMatchingEqNum() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -265,7 +269,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getBayFallsBackToMatchingWeaponBayIfMissingBayEquipment() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -300,7 +304,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getBayFallsBackToMatchingWeaponBayIfNoBayEquipment() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -333,7 +337,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getBayReturnsNullIfNoMatch() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -363,7 +367,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void getBayReturnsSetBayValue() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -389,7 +393,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void bayAvailableCapacityZeroWithoutUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -402,7 +406,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void bayAvailableCapacityEmptyOnlyBayOnUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -437,7 +441,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void bayAvailableCapacityFullOnlyBayOnUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -472,7 +476,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void bayAvailableCapacityEmptyOnlyBayOfTypeOnUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -512,7 +516,7 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void bayAvailableCapacityFullOnlyBayOfTypeOnUnit() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
 
@@ -552,10 +556,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadEmptyBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -573,12 +577,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadFullBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -607,10 +612,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadPartialBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -637,12 +642,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void salvageEmptyBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -661,12 +667,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void salvageFullBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -695,12 +702,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void salvagePartialBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -729,10 +737,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadSingleTonEmptyBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -767,12 +775,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadSingleTonFullBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -821,10 +830,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void unloadSingleTonPartialBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -874,10 +883,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinWithoutUnitDoesNothing() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -896,12 +905,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinWithoutSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -937,12 +947,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinWithOnlySpareAmmoOfWrongType() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -985,12 +996,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinWithJustEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1032,12 +1044,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinWithMoreThanEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1080,10 +1093,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinSingleTonWithoutUnitDoesNothing() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1102,12 +1115,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinSingleTonWithoutSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1143,12 +1157,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinSingleTonithOnlySpareAmmoOfWrongType() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1191,12 +1206,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinSingleTonWithJustEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1238,12 +1254,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void loadBinSingleTonWithMoreThanEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1286,10 +1303,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void needsFixingEmptyBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1321,12 +1338,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void needsFixingFullBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1358,10 +1376,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void needsFixingPartialBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1393,10 +1411,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void needsFixingOverflowingBinTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1428,10 +1446,10 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void fixBinWithoutUnitDoesNothing() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1450,12 +1468,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void fixBinWithoutSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1491,12 +1510,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void fixBinWithOnlySpareAmmoOfWrongType() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1539,12 +1559,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void fixBinWithJustEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Artemis-capable Ammo");
@@ -1586,12 +1607,13 @@ public class LargeCraftAmmoBinTest {
 
     @Test
     public void fixBinWithMoreThanEnoughSpareAmmo() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
@@ -1630,5 +1652,157 @@ public class LargeCraftAmmoBinTest {
 
         // ... and have more ammo available in the warehouse
         assertEquals(shotsOnHand - ammoType.getShots(), quartermaster.getAmmoAvailable(ammoType));
+    }
+
+    /**
+     * A work action on a bay handles a single ton, so a fabrication attempt is priced for a single ton no matter how
+     * much of the bay is empty. It must not scale with the bay's capacity the way
+     * {@link LargeCraftAmmoBin#getValueNeeded()} does.
+     */
+    @Test
+    public void fabricationPricesASingleTonRegardlessOfHowEmptyTheBayIs() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+        int capacity = 10;
+
+        // Under the balanced profile the part price is ten times the value of what is manufactured - one ton.
+        Money oneTonAttempt = Money.of(ammoType.getRawCost()).multipliedBy(10);
+
+        // A ten ton bay missing a single ton is charged for that one ton ...
+        LargeCraftAmmoBin missingOneTon = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots(), capacity,
+              mockCampaign);
+        missingOneTon.setFabricating(true);
+        assertEquals(oneTonAttempt, missingOneTon.getFabricationCost());
+
+        // ... and so is the same bay standing completely empty, since it still only loads a ton per attempt.
+        LargeCraftAmmoBin missingEverything = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots() * capacity,
+              capacity, mockCampaign);
+        missingEverything.setFabricating(true);
+        assertEquals(oneTonAttempt, missingEverything.getFabricationCost());
+
+        // The capacity-scaled reload value would have charged far more for that same one-ton attempt.
+        assertTrue(oneTonAttempt.isLessThan(missingEverything.getValueNeeded()));
+    }
+
+    /** The one-ton basis is the ammunition's own per-ton price, so a costlier munition costs more to fabricate. */
+    @Test
+    public void fabricationPricesTheBaysOwnMunition() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PAY_FOR_PARTS, true);
+        options.set(CampaignOption.PAY_FOR_REPAIRS, false);
+        options.set(CampaignOption.USE_BALANCED_FABRICATION, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(options);
+
+        AmmoType standardAmmo = getAmmoType("ISLRM20 Ammo");
+        AmmoType artemisAmmo = getAmmoType("ISLRM20 Artemis-capable Ammo");
+
+        LargeCraftAmmoBin standardBin = new LargeCraftAmmoBin(0, standardAmmo, 42, standardAmmo.getShots(), 10,
+              mockCampaign);
+        standardBin.setFabricating(true);
+        LargeCraftAmmoBin artemisBin = new LargeCraftAmmoBin(0, artemisAmmo, 42, artemisAmmo.getShots(), 10,
+              mockCampaign);
+        artemisBin.setFabricating(true);
+
+        assertEquals(Money.of(standardAmmo.getRawCost()).multipliedBy(10), standardBin.getFabricationCost());
+        assertEquals(Money.of(artemisAmmo.getRawCost()).multipliedBy(10), artemisBin.getFabricationCost());
+        assertTrue(standardBin.getFabricationCost().isLessThan(artemisBin.getFabricationCost()));
+    }
+
+    /**
+     * Refit completion refills large craft bays by setting them empty and calling {@link LargeCraftAmmoBin#loadBin()}
+     * directly, with no fabrication charge. A bay flagged for fabrication must load from stock on that path rather than
+     * manufacturing its ammunition for free.
+     */
+    @Test
+    public void refitStyleLoadingOfAFabricationFlaggedBayNeverManufactures() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+
+        int capacity = 4;
+        int equipmentNum = 42;
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, equipmentNum, 0, capacity, mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+        ammoBin.setFabricating(true);
+
+        // This is what Refit does on completion: treat the bay as empty and load it back up.
+        ammoBin.setShotsNeeded(ammoBin.getFullShots());
+        ammoBin.loadBin();
+
+        // The warehouse was empty, so nothing was manufactured and nothing was loaded.
+        assertEquals(ammoBin.getFullShots(), ammoBin.getShotsNeeded());
+        verify(mockMounted, times(1)).setShotsLeft(eq(0));
+    }
+
+    /**
+     * A bay is loaded one ton at a time, and fabrication manufactures that ton for money instead of requisitioning it,
+     * so a successful attempt must load a ton even with an empty warehouse.
+     */
+    @Test
+    public void fabricationLoadsASingleTonFromAnEmptyWarehouse() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+
+        // Create an empty Ammo Bin with room for several tons ...
+        int capacity = 4;
+        int shotsNeeded = ammoType.getShots() * capacity;
+        int equipmentNum = 42;
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0,
+              ammoType,
+              equipmentNum,
+              shotsNeeded,
+              capacity,
+              mockCampaign);
+
+        // ... place the ammo bin on a unit ...
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockMounted.getType()).thenReturn(ammoType);
+        when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
+        ammoBin.setUnit(mockUnit);
+
+        ammoBin.setFabricating(true);
+
+        // The warehouse is empty, but the attempt can still be worked on ...
+        assertNull(ammoBin.checkFixable());
+        ammoBin.succeed();
+
+        // ... and it loads a full ton of manufactured shots ...
+        assertEquals(shotsNeeded - ammoType.getShots(), ammoBin.getShotsNeeded());
+        verify(mockMounted, times(1)).setShotsLeft(eq(ammoType.getShots()));
+
+        // ... without drawing anything from stock.
+        assertEquals(0, quartermaster.getAmmoAvailable(ammoType));
     }
 }

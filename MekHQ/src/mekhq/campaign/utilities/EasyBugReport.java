@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -128,7 +128,7 @@ public class EasyBugReport {
     public static void saveCampaignForBugReport(JFrame frame, Campaign campaign) {
         LOGGER.info("Saving campaign for bug report...");
 
-        String campaignName = campaign.getName();
+        String campaignName = campaign.getPlayerForce().getName();
         LocalDate today = campaign.getLocalDate();
 
         // Random call sign so multiple bug report builds on the same in-game date don't overwrite each other

@@ -1,0 +1,1160 @@
+/*
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.utilities.MHQXMLUtility;
+
+/**
+ * Track-level state object for a StratCon campaign.
+ *
+ * @author NickAragua
+ */
+@XmlRootElement(name = "campaignTrack")
+public class StratConTrackState {
+    public static final String ROOT_XML_ELEMENT_NAME = "StratConTrackState";
+
+    /**
+     * The six sides of a hex. Kept here rather than taken from {@code StratConHexGeometry} so this core state class
+     * stays independent of the sector-generation package, as its environment fields already do.
+     */
+    private static final int HEX_DIRECTIONS = 6;
+
+    // a track has the following characteristics:
+    // width/height
+    // [future]: terrain information by coordinates
+    // scenario information by coordinates
+    // active facilities by coordinates
+    private String displayableName;
+    private int width;
+    private int height;
+    private boolean gmRevealed;
+
+    private Map<StratConCoords, StratConFacility> facilities;
+    private Map<StratConCoords, StratConScenario> scenarios;
+    private Map<StratConCoords, Set<Integer>> assignedCoordForces;
+    private Map<Integer, StratConCoords> assignedForceCoords;
+    private Map<Integer, LocalDate> assignedForceReturnDates;
+    private Set<Integer> stickyForces;
+    private Map<Integer, String> assignedForceReturnDatesForStorage;
+    private Set<StratConCoords> revealedCoords;
+    private List<StratConStrategicObjective> strategicObjectives;
+
+    private Map<StratConCoords, String> terrainTypes;
+
+    // city overlay: a city sits on top of the base terrain of its hex; rendered with the generic urban sprite
+    private Set<StratConCoords> cities;
+
+    // road overlay: hexes carrying a road, plus the border hexes whose road branches off the map into a neighbor sector
+    private Set<StratConCoords> roads;
+    private Set<StratConCoords> roadExits;
+
+    // points of interest: map objects that are neither scenarios nor facilities; each records its own coordinates
+    private List<StratConPointOfInterest> pointsOfInterest;
+
+    // orders that take time, each held by a formation until it completes
+    private List<StratConFacilityOrder> facilityOrders;
+    // supply lines; see StratConFacilitySupply
+    private List<StratConRoadCut> roadCuts;
+    private Set<StratConCoords> cutOffFacilities;
+
+    // don't serialize this
+    private transient Map<Integer, StratConScenario> backingScenarioMap;
+    private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
+    private transient Map<StratConCoords, List<StratConPointOfInterest>> pointsOfInterestByCoords;
+    private transient Map<String, StratConPointOfInterest> pointsOfInterestById;
+
+    private int scenarioOdds;
+    private int deploymentTime;
+    private int requiredLanceCount;
+
+    private int temperature;
+
+    // how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis), from the planet's population;
+    // carried onto city-hex scenarios to scale the urban area laid onto their battle maps
+    private double urbanizationLevel;
+
+    // Environment summary recorded by the improved generator, for the sector info panel (all null on legacy tracks).
+    // Stored as the profile/band enum names (prettified for display) to keep this core class off the generation package.
+    private String latitudeBand;
+    private String hydrologyProfile;
+    private String orogenyProfile;
+    private String urbanProfile;
+
+    public StratConTrackState() {
+        facilities = new HashMap<>();
+        scenarios = new HashMap<>();
+        assignedForceCoords = new HashMap<>();
+        assignedForceReturnDates = new HashMap<>();
+        assignedCoordForces = new HashMap<>();
+        setAssignedForceReturnDatesForStorage(new HashMap<>());
+        revealedCoords = new HashSet<>();
+        stickyForces = new HashSet<>();
+        strategicObjectives = new ArrayList<>();
+        terrainTypes = new HashMap<>();
+        cities = new HashSet<>();
+        roads = new HashSet<>();
+        roadExits = new HashSet<>();
+        pointsOfInterest = new ArrayList<>();
+        facilityOrders = new ArrayList<>();
+        roadCuts = new ArrayList<>();
+        cutOffFacilities = new HashSet<>();
+    }
+
+    public String getDisplayableName() {
+        return displayableName;
+    }
+
+    public void setDisplayableName(String name) {
+        displayableName = name;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    /**
+     * @return The size of the track derived by multiplying width and height.
+     */
+    public int getSize() {
+        return width * height;
+    }
+
+    @XmlElementWrapper(name = "trackFacilities")
+    @XmlElement(name = "facility")
+    public Map<StratConCoords, StratConFacility> getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(Map<StratConCoords, StratConFacility> facilities) {
+        this.facilities = facilities;
+    }
+
+    public StratConFacility getFacility(StratConCoords coords) {
+        return facilities.get(coords);
+    }
+
+    /**
+     * Used for serialization/deserialization. Do not manipulate directly, or things get unpleasant.
+     */
+    @XmlElementWrapper(name = "trackScenarios")
+    @XmlElement(name = "scenario")
+    public Map<StratConCoords, StratConScenario> getScenarios() {
+        return scenarios;
+    }
+
+    public void setScenarios(Map<StratConCoords, StratConScenario> scenarios) {
+        this.scenarios = scenarios;
+    }
+
+    /**
+     * Adds a StratConScenario to this track. Assumes it already has some coordinates assigned, and a valid campaign
+     * scenario ID for its backing AtB scenario
+     */
+    public void addScenario(StratConScenario scenario) {
+        scenarios.put(scenario.getCoords(), scenario);
+
+        updateScenario(scenario);
+    }
+
+    /**
+     * Updates an existing scenario on this track.
+     */
+    public void updateScenario(StratConScenario scenario) {
+        if (scenarios.containsKey(scenario.getCoords()) && (scenario.getBackingScenarioID() > 0)) {
+            getBackingScenariosMap().put(scenario.getBackingScenarioID(), scenario);
+        }
+    }
+
+    public void removeScenario(int campaignScenarioID) {
+        if (getBackingScenariosMap().containsKey(campaignScenarioID)) {
+            removeScenario(getBackingScenariosMap().get(campaignScenarioID));
+        }
+    }
+
+    /**
+     * Removes a StratConScenario from this track, sending home the formations assigned to it. A formation still
+     * besieging a facility stays where it is: the siege outlasts the fight.
+     */
+    public void removeScenario(StratConScenario scenario) {
+        scenarios.remove(scenario.getCoords());
+        getBackingScenariosMap().remove(scenario.getBackingScenarioID());
+
+        // any assigned forces get cleared out here as well.
+        for (int forceID : scenario.getAssignedForces()) {
+            StratConFacilityOrder order = getFacilityOrder(forceID);
+            if ((order == null) || (order.getOperation() != FacilityOperation.SIEGE)) {
+                unassignFormation(forceID);
+            }
+
+            // scenario bookkeeping
+            scenario.getPrimaryForceIDs().clear();
+        }
+    }
+
+    public StratConScenario getScenario(StratConCoords coords) {
+        return scenarios.get(coords);
+    }
+
+    public int getRequiredLanceCount() {
+        return requiredLanceCount;
+    }
+
+    public void setRequiredLanceCount(int requiredLanceCount) {
+        this.requiredLanceCount = requiredLanceCount;
+    }
+
+    public int getDeploymentTime() {
+        return deploymentTime;
+    }
+
+    public void setDeploymentTime(int deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
+
+    public int getScenarioOdds() {
+        return scenarioOdds;
+    }
+
+    public void setScenarioOdds(int scenarioOdds) {
+        this.scenarioOdds = scenarioOdds;
+    }
+
+    public boolean isGmRevealed() {
+        return gmRevealed;
+    }
+
+    public void setGmRevealed(boolean gmRevealed) {
+        this.gmRevealed = gmRevealed;
+    }
+
+    /**
+     * Convenience function that determines if there are any forces deployed to the given coordinates.
+     */
+    public boolean areAnyForceDeployedTo(StratConCoords coords) {
+        return getAssignedCoordForces().containsKey(coords) &&
+                     !getAssignedCoordForces().get(coords).isEmpty();
+    }
+
+    /**
+     * Handles the assignment of a force to the given coordinates on this track on the given date.
+     */
+    public void assignForce(int forceID, StratConCoords coords, LocalDate date, boolean sticky) {
+        assignedForceCoords.put(forceID, coords);
+        assignedCoordForces.putIfAbsent(coords, new HashSet<>());
+        assignedCoordForces.get(coords).add(forceID);
+
+        if (sticky) {
+            addStickyForce(forceID);
+        }
+
+        LocalDate returnDate;
+
+        // if we're assigning the force to a scenario, then
+        // the return date should be the scenario's return date;
+        // otherwise, just deploy it for the minimum amount for the track
+        if (getScenarios().containsKey(coords)) {
+            returnDate = getScenarios().get(coords).getReturnDate();
+        } else {
+            returnDate = date.plusDays(deploymentTime);
+        }
+
+        getAssignedForceReturnDates().put(forceID, returnDate);
+        getAssignedForceReturnDatesForStorage().put(forceID, returnDate.toString());
+    }
+
+    /**
+     * Handles the unassignment of a force from this track.
+     */
+    public void unassignFormation(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            // A formation carrying out a facility order - holding a siege through a sortie, say - keeps holding its
+            // position when a fight re-deploys it; the order itself decides when it may leave.
+            if (getFacilityOrder(forceID) == null) {
+                removeStickyForce(forceID);
+            }
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
+     * Handles the unassignment of a force from this track.
+     */
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void unassignUnit(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
+     * Restores the look-up table of force IDs to return dates
+     */
+    public void restoreReturnDates() {
+        for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
+            assignedForceReturnDates.put(forceID,
+                  MHQXMLUtility.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
+        }
+    }
+
+    public Map<Integer, StratConCoords> getAssignedForceCoords() {
+        return assignedForceCoords;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setAssignedForceCoords(Map<Integer, StratConCoords> assignedForceCoords) {
+        this.assignedForceCoords = assignedForceCoords;
+    }
+
+    @XmlTransient
+    public Map<StratConCoords, Set<Integer>> getAssignedCoordForces() {
+        return assignedCoordForces;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setAssignedCoordForces(Map<StratConCoords, Set<Integer>> assignedCoordForces) {
+        this.assignedCoordForces = assignedCoordForces;
+    }
+
+    /**
+     * Restores the look-up table of coordinates to force lists
+     */
+    public void restoreAssignedCoordForces() {
+        for (int forceID : assignedForceCoords.keySet()) {
+            assignedCoordForces.putIfAbsent(assignedForceCoords.get(forceID), new HashSet<>());
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).add(forceID);
+        }
+    }
+
+    @XmlTransient
+    public Map<Integer, LocalDate> getAssignedForceReturnDates() {
+        return assignedForceReturnDates;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setAssignedForceReturnDates(Map<Integer, LocalDate> assignedForceReturnDates) {
+        this.assignedForceReturnDates = assignedForceReturnDates;
+    }
+
+    public Map<Integer, String> getAssignedForceReturnDatesForStorage() {
+        return assignedForceReturnDatesForStorage;
+    }
+
+    public void setAssignedForceReturnDatesForStorage(Map<Integer, String> assignedForceReturnDatesForStorage) {
+        this.assignedForceReturnDatesForStorage = assignedForceReturnDatesForStorage;
+    }
+
+    public boolean coordsRevealed(int x, int y) {
+        return revealedCoords.contains(new StratConCoords(x, y));
+    }
+
+    public Set<StratConCoords> getRevealedCoords() {
+        return revealedCoords;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setRevealedCoords(Set<StratConCoords> revealedCoords) {
+        this.revealedCoords = revealedCoords;
+    }
+
+    public void addFacility(StratConCoords coords, StratConFacility facility) {
+        facilities.put(coords, facility);
+    }
+
+    public void removeFacility(StratConCoords coords) {
+        facilities.remove(coords);
+    }
+
+    /**
+     * Returns (and possibly initializes, if necessary) a map between scenario IDs and StratCon scenario pointers
+     */
+    public Map<Integer, StratConScenario> getBackingScenariosMap() {
+        if (backingScenarioMap == null) {
+            backingScenarioMap = new HashMap<>();
+            for (StratConScenario scenario : getScenarios().values()) {
+                backingScenarioMap.put(scenario.getBackingScenarioID(), scenario);
+            }
+        }
+
+        return backingScenarioMap;
+    }
+
+    /**
+     * Returns (and possibly initializes, if necessary) a map between coordinates and strategic objectives
+     */
+    public Map<StratConCoords, StratConStrategicObjective> getObjectivesByCoords() {
+        if (specificStrategicObjectives == null) {
+            specificStrategicObjectives = new HashMap<>();
+            for (StratConStrategicObjective objective : strategicObjectives) {
+                StratConCoords coords = objective.getObjectiveCoords();
+                if (coords != null) {
+                    specificStrategicObjectives.put(coords, objective);
+                }
+            }
+        }
+
+        return specificStrategicObjectives;
+    }
+
+    /**
+     * Moves a strategic objectives from the source to the destination coordinates.
+     *
+     * @return True if the operation succeeded, false if it failed
+     */
+    public boolean moveObjective(StratConCoords source, StratConCoords destination) {
+        // safety: don't move it if it's not there; logic prevents two objectives in the same coords
+        if (getObjectivesByCoords().containsKey(source) &&
+                  !getObjectivesByCoords().containsKey(destination)) {
+            StratConStrategicObjective objective = getObjectivesByCoords().get(source);
+            // I've to get the cache
+            getObjectivesByCoords().remove(source);
+            getObjectivesByCoords().put(destination, objective);
+            objective.setObjectiveCoords(destination);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Convenience method to fail an objective at the given coordinates. Does nothing if the objective has already been
+     * completed.
+     */
+    public void failObjective(StratConCoords coords) {
+        if (getObjectivesByCoords().containsKey(coords)) {
+            StratConStrategicObjective objective = getObjectivesByCoords().get(coords);
+            if (!objective.isObjectiveCompleted(this)) {
+                objective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+            }
+        }
+    }
+
+    /**
+     * @return Whether this track has a facility on it that reveals the track.
+     */
+    public boolean hasActiveTrackReveal() {
+        for (StratConFacility facility : getFacilities().values()) {
+            if (facility.isRevealingTrack()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Matches every facility loaded from a save written before 0.51.01 to its definition (see
+     * {@link StratConFacility#resolveLegacyData()}). Called once the campaign state has loaded.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void restoreFacilityDefinitions() {
+        for (StratConFacility facility : facilities.values()) {
+            facility.resolveLegacyData();
+        }
+    }
+
+    /**
+     * Whether a facility on this track keeps air and space scenarios from being generated here, whichever side holds
+     * it (see {@link StratConFacility#isPreventingAerospace()}).
+     *
+     * @return {@code true} if no random air or space scenario may be generated on this track
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isAerospacePrevented() {
+        for (StratConFacility facility : getFacilities().values()) {
+            if (facility.isPreventingAerospace()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines how many hexes are added to the scan range of every force scouting this track.
+     *
+     * <p>Each facility adds what its current owner's profile gives (see
+     * {@link StratConFacility#getScanRangeIncrease()}).
+     * Each point of interest adds whatever its type's behavior decides (see
+     * {@link IStratConPointOfInterestBehavior#getScanRangeIncrease}).</p>
+     *
+     * @return the total scan range increase on this track
+     */
+    public int getScanRangeIncrease() {
+        int scanRange = 0;
+        for (StratConFacility facility : getFacilities().values()) {
+            scanRange += facility.getScanRangeIncrease();
+        }
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            scanRange += pointOfInterest.getBehavior().getScanRangeIncrease(pointOfInterest, this);
+        }
+
+        return scanRange;
+    }
+
+    /**
+     * Count of all the scenario odds adjustments on this track: from facilities, and from points of interest as their
+     * types' behaviors decide (see {@link IStratConPointOfInterestBehavior#getScenarioOddsModifier}).
+     */
+    public int getScenarioOddsAdjustment() {
+        int accumulator = 0;
+        for (StratConFacility facility : getFacilities().values()) {
+            accumulator += facility.getScenarioOddsModifier();
+        }
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            accumulator += pointOfInterest.getBehavior().getScenarioOddsModifier(pointOfInterest, this);
+        }
+
+        return accumulator;
+    }
+
+    /**
+     * Convenience method - returns true if the force with the given ID is currently deployed to this track
+     */
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public boolean isForceDeployed(int forceID) {
+        return assignedForceCoords.containsKey(forceID);
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayableName();
+    }
+
+    public Set<Integer> getStickyForces() {
+        return stickyForces;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setStickyForces(Set<Integer> stickyForces) {
+        this.stickyForces = stickyForces;
+    }
+
+    public void addStickyForce(int forceID) {
+        stickyForces.add(forceID);
+    }
+
+    public void removeStickyForce(int forceID) {
+        stickyForces.remove(forceID);
+    }
+
+    @XmlElementWrapper(name = "instantiatedObjectives")
+    @XmlElement(name = "instantiatedObjective")
+    public List<StratConStrategicObjective> getStrategicObjectives() {
+        return strategicObjectives;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setStrategicObjectives(List<StratConStrategicObjective> strategicObjectives) {
+        this.strategicObjectives = strategicObjectives;
+        specificStrategicObjectives = null;
+    }
+
+    public void addStrategicObjective(StratConStrategicObjective strategicObjective) {
+        getStrategicObjectives().add(strategicObjective);
+        if (specificStrategicObjectives != null) {
+            StratConCoords coords = strategicObjective.getObjectiveCoords();
+            if (coords != null) {
+                specificStrategicObjectives.put(coords, strategicObjective);
+            }
+        }
+    }
+
+    /**
+     * Removes a strategic objective from this track entirely, so it counts as neither met nor failed.
+     *
+     * @param strategicObjective the objective to remove
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeStrategicObjective(StratConStrategicObjective strategicObjective) {
+        getStrategicObjectives().remove(strategicObjective);
+        if (specificStrategicObjectives != null) {
+            StratConCoords coords = strategicObjective.getObjectiveCoords();
+            if ((coords != null) && (specificStrategicObjectives.get(coords) == strategicObjective)) {
+                specificStrategicObjectives.remove(coords);
+            }
+        }
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temp) {
+        temperature = temp;
+    }
+
+    /**
+     * @return how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis)
+     */
+    public double getUrbanizationLevel() {
+        return urbanizationLevel;
+    }
+
+    public void setUrbanizationLevel(double urbanizationLevel) {
+        this.urbanizationLevel = urbanizationLevel;
+    }
+
+    public String getLatitudeBand() {
+        return latitudeBand;
+    }
+
+    public void setLatitudeBand(String latitudeBand) {
+        this.latitudeBand = latitudeBand;
+    }
+
+    public String getHydrologyProfile() {
+        return hydrologyProfile;
+    }
+
+    public void setHydrologyProfile(String hydrologyProfile) {
+        this.hydrologyProfile = hydrologyProfile;
+    }
+
+    public String getOrogenyProfile() {
+        return orogenyProfile;
+    }
+
+    public void setOrogenyProfile(String orogenyProfile) {
+        this.orogenyProfile = orogenyProfile;
+    }
+
+    public String getUrbanProfile() {
+        return urbanProfile;
+    }
+
+    public void setUrbanProfile(String urbanProfile) {
+        this.urbanProfile = urbanProfile;
+    }
+
+    public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
+        terrainTypes.put(coords, terrainTypeName);
+    }
+
+    /**
+     * Check to see if specified coordinates would be placed off the StratCon board
+     */
+    public boolean isOffTrack(StratConCoords coords) {
+        int width = getWidth() - 1;
+        int height = getHeight() - 1;
+        return (coords.getX() < 0) ||
+                     (coords.getX() > width) ||
+                     (coords.getY() < 0) ||
+                     (coords.getY() > height);
+    }
+
+    public String getTerrainTile(StratConCoords coords) {
+        return terrainTypes.getOrDefault(coords, "");
+    }
+
+    @XmlElementWrapper(name = "terrainTypes")
+    @XmlElement(name = "terrainType")
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public Map<StratConCoords, String> getTerrainTypes() {
+        return terrainTypes;
+    }
+
+    @Deprecated(since = "0.51.0", forRemoval = true)
+    public void setStrategicObjectives(Map<StratConCoords, String> terrainTypes) {
+        this.terrainTypes = terrainTypes;
+    }
+
+    /**
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a city sits on the given hex
+     */
+    public boolean isCity(StratConCoords coords) {
+        return cities.contains(coords);
+    }
+
+    /**
+     * Marks the given hex as holding a city. Cities are an overlay: the hex keeps its base terrain.
+     *
+     * @param coords the hex to make a city
+     */
+    public void addCity(StratConCoords coords) {
+        cities.add(coords);
+    }
+
+    @XmlElementWrapper(name = "cities")
+    @XmlElement(name = "city")
+    public Set<StratConCoords> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<StratConCoords> cities) {
+        this.cities = cities;
+    }
+
+    /**
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a road runs through the given hex
+     */
+    public boolean isRoad(StratConCoords coords) {
+        return roads.contains(coords);
+    }
+
+    @XmlElementWrapper(name = "roads")
+    @XmlElement(name = "road")
+    public Set<StratConCoords> getRoads() {
+        return roads;
+    }
+
+    public void setRoads(Set<StratConCoords> roads) {
+        this.roads = roads;
+    }
+
+    /**
+     * @return the border hexes whose road branches off the map into a neighboring sector
+     */
+    @XmlElementWrapper(name = "roadExits")
+    @XmlElement(name = "roadExit")
+    public Set<StratConCoords> getRoadExits() {
+        return roadExits;
+    }
+
+    public void setRoadExits(Set<StratConCoords> roadExits) {
+        this.roadExits = roadExits;
+    }
+
+    /**
+     * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
+     * Scenarios, facilities, points of interest, and assigned forces are left untouched; road cuts and the cut-off
+     * record are cleared, since they belong to the old road network.
+     */
+    public void clearForRegeneration() {
+        terrainTypes.clear();
+        cities.clear();
+        roads.clear();
+        roadExits.clear();
+        revealedCoords.clear();
+        // Both are keyed to the old road network and supply picture, which no longer exist
+        roadCuts.clear();
+        cutOffFacilities.clear();
+    }
+
+    /**
+     * Drops every terrain tile and overlay now lying outside the sector, after its width or height has been reduced.
+     *
+     * <p>Occupants - facilities, scenarios, points of interest, and deployed forces - are deliberately left alone
+     * here: they are moved back inside by the caller rather than quietly destroyed along with the ground they stood
+     * on. That includes points of interest that do not occupy their hex, since any of them may carry a strategic
+     * objective.</p>
+     */
+    public void trimToBounds() {
+        terrainTypes.keySet().removeIf(this::isOutOfBounds);
+        cities.removeIf(this::isOutOfBounds);
+        roads.removeIf(this::isOutOfBounds);
+        roadExits.removeIf(this::isOutOfBounds);
+        revealedCoords.removeIf(this::isOutOfBounds);
+        roadCuts.removeIf(roadCut -> isOutOfBounds(roadCut.getCoords()));
+        cutOffFacilities.removeIf(this::isOutOfBounds);
+    }
+
+    /**
+     * Used for serialization/deserialization. To change the points of interest in this sector, use
+     * {@link #addPointOfInterest}, {@link #movePointOfInterest}, and {@link #removePointOfInterest}, which keep the
+     * lookup by hex correct.
+     *
+     * @return every point of interest in this sector, in the order they were added
+     */
+    @XmlElementWrapper(name = "pointsOfInterest")
+    @XmlElement(name = "pointOfInterest")
+    public List<StratConPointOfInterest> getPointsOfInterest() {
+        return pointsOfInterest;
+    }
+
+    public void setPointsOfInterest(List<StratConPointOfInterest> pointsOfInterest) {
+        this.pointsOfInterest = (pointsOfInterest == null) ? new ArrayList<>() : pointsOfInterest;
+        invalidatePointOfInterestLookups();
+    }
+
+    /**
+     * @param coords the hex to look in
+     *
+     * @return the points of interest on the given hex, in the order they were added; empty if there are none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<StratConPointOfInterest> getPointsOfInterest(StratConCoords coords) {
+        List<StratConPointOfInterest> pointsOfInterestOnHex = getPointsOfInterestByCoords().get(coords);
+        return (pointsOfInterestOnHex == null) ?
+                     Collections.emptyList() :
+                     Collections.unmodifiableList(pointsOfInterestOnHex);
+    }
+
+    /**
+     * Used for serialization/deserialization. To change the orders, use {@link #addFacilityOrder} and
+     * {@link #removeFacilityOrder}.
+     *
+     * @return the orders under way in this sector that take time to complete
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "facilityOrders")
+    @XmlElement(name = "facilityOrder")
+    public List<StratConFacilityOrder> getFacilityOrders() {
+        return facilityOrders;
+    }
+
+    public void setFacilityOrders(List<StratConFacilityOrder> facilityOrders) {
+        this.facilityOrders = (facilityOrders == null) ? new ArrayList<>() : facilityOrders;
+    }
+
+    /**
+     * @return the road hexes where the player has cut the enemy's supply line, and until when (mutable)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "roadCuts")
+    @XmlElement(name = "roadCut")
+    public List<StratConRoadCut> getRoadCuts() {
+        return roadCuts;
+    }
+
+    public void setRoadCuts(List<StratConRoadCut> roadCuts) {
+        this.roadCuts = (roadCuts == null) ? new ArrayList<>() : roadCuts;
+    }
+
+    /**
+     * @param coords a hex
+     *
+     * @return {@code true} if the enemy's supply line through the hex is cut
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isRoadCut(StratConCoords coords) {
+        for (StratConRoadCut roadCut : roadCuts) {
+            if (coords.equals(roadCut.getCoords())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the hexes of the facilities that were cut off from their supply lines when last checked (mutable); used
+     *       to report the facilities that are newly cut off or reconnected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "cutOffFacilities")
+    @XmlElement(name = "cutOffFacility")
+    public Set<StratConCoords> getCutOffFacilities() {
+        return cutOffFacilities;
+    }
+
+    public void setCutOffFacilities(Set<StratConCoords> cutOffFacilities) {
+        this.cutOffFacilities = (cutOffFacilities == null) ? new HashSet<>() : cutOffFacilities;
+    }
+
+    /**
+     * @param order an order that has just been given
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.add(order);
+    }
+
+    /**
+     * @param order an order that has completed or been abandoned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.remove(order);
+    }
+
+    /**
+     * @param formationId a formation's ID
+     *
+     * @return the order that formation is carrying out, or {@code null} if it has none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConFacilityOrder getFacilityOrder(int formationId) {
+        for (StratConFacilityOrder order : facilityOrders) {
+            if (order.getFormationId() == formationId) {
+                return order;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param id the point of interest's unique ID
+     *
+     * @return the point of interest with that ID in this sector, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest getPointOfInterest(String id) {
+        if (pointsOfInterestById == null) {
+            pointsOfInterestById = new HashMap<>();
+            for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+                pointsOfInterestById.put(pointOfInterest.getId(), pointOfInterest);
+            }
+        }
+
+        return pointsOfInterestById.get(id);
+    }
+
+    /**
+     * @param coords the hex to look in
+     *
+     * @return the point of interest on the given hex that occupies it, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest getOccupyingPointOfInterest(StratConCoords coords) {
+        for (StratConPointOfInterest pointOfInterest : getPointsOfInterest(coords)) {
+            if (pointOfInterest.occupiesHex()) {
+                return pointOfInterest;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Adds a point of interest to this sector at its own coordinates.
+     *
+     * <p>It is refused if it has no coordinates, lies outside the sector, shares an ID with a point of interest already
+     * here, or occupies its hex while that hex is already occupied (see {@link #isHexOccupied}).</p>
+     *
+     * @param pointOfInterest the point of interest to add
+     *
+     * @return {@code true} if it was added
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean addPointOfInterest(StratConPointOfInterest pointOfInterest) {
+        StratConCoords coords = pointOfInterest.getCoords();
+        if ((coords == null) || isOutOfBounds(coords) || (getPointOfInterest(pointOfInterest.getId()) != null)) {
+            return false;
+        }
+
+        if (pointOfInterest.occupiesHex() && isHexOccupied(coords)) {
+            return false;
+        }
+
+        pointsOfInterest.add(pointOfInterest);
+        invalidatePointOfInterestLookups();
+        return true;
+    }
+
+    /**
+     * Removes the point of interest with the given ID from this sector.
+     *
+     * @param id the point of interest's unique ID
+     *
+     * @return the removed point of interest, or {@code null} if there was none with that ID
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest removePointOfInterest(String id) {
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(id);
+        if (pointOfInterest != null) {
+            pointsOfInterest.remove(pointOfInterest);
+            invalidatePointOfInterestLookups();
+        }
+
+        return pointOfInterest;
+    }
+
+    /**
+     * Moves the point of interest with the given ID to another hex. A point of interest that occupies its hex is not
+     * moved onto a hex that is already occupied.
+     *
+     * @param id          the point of interest's unique ID
+     * @param destination the hex to move it to
+     *
+     * @return {@code true} if it was moved (or was already there)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean movePointOfInterest(String id, StratConCoords destination) {
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(id);
+        if ((pointOfInterest == null) || isOutOfBounds(destination)) {
+            return false;
+        }
+
+        if (destination.equals(pointOfInterest.getCoords())) {
+            return true;
+        }
+
+        if (pointOfInterest.occupiesHex() && isHexOccupied(destination)) {
+            return false;
+        }
+
+        pointOfInterest.setCoords(destination);
+        invalidatePointOfInterestLookups();
+        return true;
+    }
+
+    /**
+     * Whether something already takes up the given hex: a scenario, a facility, or a point of interest that occupies
+     * its hex. Deployed forces and points of interest that do not occupy their hex are not counted.
+     *
+     * @param coords the hex to test
+     *
+     * @return {@code true} if the hex is occupied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isHexOccupied(StratConCoords coords) {
+        return scenarios.containsKey(coords) ||
+                     facilities.containsKey(coords) ||
+                     (getOccupyingPointOfInterest(coords) != null);
+    }
+
+    /**
+     * Counts the distinct hexes that are occupied (see {@link #isHexOccupied}). A facility and the scenario fought over
+     * it share a hex, so they count once.
+     *
+     * @return how many hexes in this sector are occupied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getOccupiedHexCount() {
+        Set<StratConCoords> occupiedHexes = new HashSet<>(facilities.keySet());
+        occupiedHexes.addAll(scenarios.keySet());
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            if ((pointOfInterest.getCoords() != null) && pointOfInterest.occupiesHex()) {
+                occupiedHexes.add(pointOfInterest.getCoords());
+            }
+        }
+
+        return occupiedHexes.size();
+    }
+
+    /**
+     * Drops the lookups by hex and by ID, so they are rebuilt from the list on next use. Call after any change to the
+     * points of interest or where they sit.
+     */
+    private void invalidatePointOfInterestLookups() {
+        pointsOfInterestByCoords = null;
+        pointsOfInterestById = null;
+    }
+
+    /**
+     * Returns (and builds, if necessary) the lookup from hex to the points of interest on it. Rebuilt lazily after any
+     * change to the points of interest.
+     */
+    private Map<StratConCoords, List<StratConPointOfInterest>> getPointsOfInterestByCoords() {
+        if (pointsOfInterestByCoords == null) {
+            pointsOfInterestByCoords = new HashMap<>();
+            for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+                StratConCoords coords = pointOfInterest.getCoords();
+                if (coords != null) {
+                    pointsOfInterestByCoords.computeIfAbsent(coords, key -> new ArrayList<>()).add(pointOfInterest);
+                }
+            }
+        }
+
+        return pointsOfInterestByCoords;
+    }
+
+    /** @return {@code true} if the given hex lies outside this sector's current bounds. */
+    public boolean isOutOfBounds(StratConCoords coords) {
+        return (coords.getX() < 0) ||
+                     (coords.getY() < 0) ||
+                     (coords.getX() >= width) ||
+                     (coords.getY() >= height);
+    }
+}

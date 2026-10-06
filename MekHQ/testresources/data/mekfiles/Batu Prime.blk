@@ -1,0 +1,182 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ae04-73c0-b230-a6460db9b098
+</UUID>
+
+<UnitType>
+AeroSpaceFighter
+</UnitType>
+
+<Name>
+Batu
+</Name>
+
+<Model>
+Prime
+</Model>
+
+<mul id:>
+309
+</mul id:>
+
+<year>
+2987
+</year>
+
+<type>
+Clan Level 2
+</type>
+
+<role>
+Fast Dogfighter
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<SafeThrust>
+9
+</SafeThrust>
+
+<cockpit_type>
+0
+</cockpit_type>
+
+<heatsinks>
+12
+</heatsinks>
+
+<sink_type>
+1
+</sink_type>
+
+<omnipodheatsinks>
+2
+</omnipodheatsinks>
+
+<fuel>
+240
+</fuel>
+
+<engine_type>
+2
+</engine_type>
+
+<armor_type>
+19
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+2
+</armor_tech_level>
+
+<omni>
+1
+</omni>
+
+<armor>
+50
+38
+38
+27
+</armor>
+
+<Nose Equipment>
+CLERLargeLaser:OMNI
+CLTargeting Computer:OMNI
+</Nose Equipment>
+
+<Left Wing Equipment>
+CLMediumPulseLaser:OMNI
+CLMediumPulseLaser:OMNI
+</Left Wing Equipment>
+
+<Right Wing Equipment>
+CLMediumPulseLaser:OMNI
+CLMediumPulseLaser:OMNI
+</Right Wing Equipment>
+
+<Aft Equipment>
+CLERMediumLaser:OMNI
+</Aft Equipment>
+
+<Wings Equipment>
+</Wings Equipment>
+
+<Fuselage Equipment>
+</Fuselage Equipment>
+
+<capabilities>
+<p>Built on the Mercer Ultralight chassis and powered by a 280-rated XL engine, the Batu achieves a safe thrust of nine and maximum thrust of fourteen, making it one of the more agile fighters in its weight class. The Cobra Pattern 12 ferro-aluminum armor provides reasonable protection while keeping weight available for weaponry, though the resulting 153 points of armor coverage is below average for a forty-ton fighter. Ten fixed double heat sinks handle baseline thermal loads, though many configurations push beyond their capacity.</p><p>The Batu's eighteen tons of pod space represent its primary advantage, allowing it to mount firepower that rivals heavier designs. This comes at a cost, however. The fighter carries only 240 points of fuel, which severely limits its operational endurance. Pilots must engage decisively and withdraw quickly, as extended patrols or prolonged dogfights will exhaust fuel reserves well before ammunition or heat become concerns. The LongTalk 2 communications suite and Mark IX targeting and tracking system provide solid electronic support across all configurations.</p>
+</capabilities>
+
+<overview>
+<p>The Batu is a forty-ton Clan OmniFighter developed by Clan Steel Viper as a light interceptor. Introduced in 2987 at the Mercer Foundries on New Kent, the design reflects the Vipers' preference for swift, decisive strikes in both aerial and ground engagements. The Batu prioritizes agility and raw offensive potential over durability, carrying an impressive eighteen tons of pod space for a fighter of its weight class. This generous payload allows the Batu to be configured for a wide range of combat roles despite its light frame.</p><p>Over the centuries, Clans Wolf, Jade Falcon, Fire Mandrill, and others have acquired Batu fighters through Trials of Possession and battlefield salvage, redistributing the design wherever it was most needed. The fighter remains a respected, if niche, presence in Clan toumans as a fast-response interceptor.</p>
+</overview>
+
+<deployment>
+<p>The Prime configuration serves as the Batu's baseline dogfighting loadout, built around a nose-mounted ER large laser supported by four medium pulse lasers split between the wing mounts. An ER medium laser covers the rear arc. All weapons are linked to a targeting computer, significantly enhancing accuracy across the entire suite. This configuration excels in close-range aerial engagements where its precision and all-energy loadout eliminate ammunition concerns.</p>
+</deployment>
+
+<history>
+<p>Clan Steel Viper first fielded the Batu in 2987, producing the OmniFighter at the Mercer Foundries on the jungle continent of Celebes on their capital world of New Kent. The design quickly established itself as a capable interceptor within the Viper touman, well suited to the Clan's doctrine of rapid, overwhelming strikes. As a production OmniFighter available from a single factory, the Batu remained closely associated with the Steel Vipers throughout its early service life.</p><p>The Batu's distribution beyond Clan Steel Viper came through the normal mechanisms of Clan warfare. Clans Wolf, Jade Falcon, and Fire Mandrill all captured examples through Trials of Possession over the years, along with the pilots and technicians needed to maintain them. During Operation REVIVAL, Inner Sphere forces encountered the Batu primarily in the Lyran Alliance and Free Rasalhague Republic occupation zones. Clan Smoke Jaguar also deployed small numbers in the Draconis Combine theater of operations.</p><p>The Wars of Reaving proved catastrophic for both the Steel Vipers and the Batu's production line. Clan Steel Viper's increasingly aggressive campaigns culminated in a Trial of Annihilation declared against the Clan in 3075. A combined force of Home Clans assaulted New Kent in December of that year, and after a brutal week of fighting, the surviving Steel Vipers made their final stand in New Kent City. When ground forces could not dislodge the defenders, orbital bombardment from the McKenna's Pride destroyed the city entirely, ending Clan Steel Viper and its industrial base with it.</p><p>The Z configuration, developed by the shadowy Society faction during the Wars of Reaving, represents one of the last new variants produced before the factory's destruction. Surviving Batu airframes scattered across Clan space continued to serve in various toumans. Those fighters previously belonging to the Smoke Jaguars were absorbed into the SLDF or DCMS following that Clan's own destruction, ensuring the design's continued presence well beyond its creators' demise.</p>
+</history>
+
+<manufacturer>
+Mercer Foundries
+</manufacturer>
+
+<primaryFactory>
+New Kent (Celebes)
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Mercer
+ENGINE:Unknown
+ARMOR:Cobra
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Ultralight
+ENGINE:280 XL
+ARMOR:Pattern 12 Ferro-aluminum
+COMMUNICATIONS:LongTalk 2
+TARGETING:Mark IX TTS
+</systemModels>
+
+<source>
+TR:3055U
+</source>
+
+<published>
+RS:3055Uu
+</published>
+
+<tonnage>
+40.0
+</tonnage>
+

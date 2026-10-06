@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,7 +46,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.HumanResources;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -533,28 +533,6 @@ public class Genealogy {
     }
 
     /**
-     * Determines whether this family unit is considered "active" by checking whether any member of the extended family
-     * network is currently active (i.e., has not left the unit).
-     *
-     * <p>Traverses the full genealogical graph rooted at {@code origin}, including parents,
-     * children, current and former spouses, and pregnancy fathers, returning {@code true} as soon as any such relative
-     * is found to be active.</p>
-     *
-     * @param humanResources the {@link HumanResources} registry used to resolve person lookups by ID (e.g., pregnancy
-     *                       father resolution)
-     *
-     * @return {@code true} if at least one member of the extended family is active; {@code false} if all reachable
-     *       relatives have left the unit
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    public boolean isActive(HumanResources humanResources) {
-        HashSet<Person> allFamilyMembers = new HashSet<>();
-        return collectRelatives(humanResources, origin, allFamilyMembers, true);
-    }
-
-    /**
      * Recursively traverses the genealogical graph from {@code currentPerson}, collecting all reachable relatives and
      * optionally short-circuiting as soon as a genealogically active person is found.
      *
@@ -564,14 +542,14 @@ public class Genealogy {
      *     <li>Children</li>
      *     <li>Former spouses (via {@link FormerSpouse} wrapper)</li>
      *     <li>Current spouse</li>
-     *     <li>Pregnancy father, resolved through {@link HumanResources} when the current person
+     *     <li>Pregnancy father, resolved through {@link ForceHumanResources} when the current person
      *     is pregnant and father ID data is present</li>
      * </ul>
      *
      * <p>Already-visited persons are tracked in {@code allFamilyMembers} to prevent infinite
      * recursion across cyclical or bidirectional relationships.</p>
      *
-     * @param humanResources          the {@link HumanResources} registry for resolving persons by UUID
+     * @param humanResources          the {@link ForceHumanResources} registry for resolving persons by UUID
      * @param currentPerson           the person whose relatives are currently being examined
      * @param allFamilyMembers        the set of already-visited persons; modified in place
      * @param checkForActiveGenealogy if {@code true}, the traversal will return {@code true} immediately upon finding
@@ -583,7 +561,7 @@ public class Genealogy {
      * @author Illiani
      * @since 0.51.0
      */
-    private static boolean collectRelatives(HumanResources humanResources, Person currentPerson,
+    private static boolean collectRelatives(ForceHumanResources humanResources, Person currentPerson,
           HashSet<Person> allFamilyMembers, boolean checkForActiveGenealogy) {
         if (!allFamilyMembers.add(currentPerson)) {
             return false;
@@ -633,6 +611,28 @@ public class Genealogy {
         }
 
         return false;
+    }
+
+    /**
+     * Determines whether this family unit is considered "active" by checking whether any member of the extended family
+     * network is currently active (i.e., has not left the unit).
+     *
+     * <p>Traverses the full genealogical graph rooted at {@code origin}, including parents,
+     * children, current and former spouses, and pregnancy fathers, returning {@code true} as soon as any such relative
+     * is found to be active.</p>
+     *
+     * @param humanResources the {@link ForceHumanResources} registry used to resolve person lookups by ID (e.g.,
+     *                       pregnancy father resolution)
+     *
+     * @return {@code true} if at least one member of the extended family is active; {@code false} if all reachable
+     *       relatives have left the unit
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean isActive(ForceHumanResources humanResources) {
+        HashSet<Person> allFamilyMembers = new HashSet<>();
+        return collectRelatives(humanResources, origin, allFamilyMembers, true);
     }
 
     /**

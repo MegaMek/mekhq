@@ -33,7 +33,7 @@
 package mekhq.campaign.events;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class DayEndingEventTest {
     @Test
     void checkDayEndingEventCancellable() {
         // Creates a mock instance of the Campaign class.
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         // Creates a new DayEndingEvent associated with the mock Campaign.
         DayEndingEvent dayEndingEvent = new DayEndingEvent(mockCampaign);

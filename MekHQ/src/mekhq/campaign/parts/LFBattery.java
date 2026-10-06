@@ -38,7 +38,6 @@ import java.util.StringJoiner;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -46,6 +45,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.units.Jumpship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingLFBattery;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -86,6 +86,16 @@ public class LFBattery extends Part {
         return docks;
     }
 
+    /**
+     * Sets how many docking collars this drive supports, used when a refit changes the number of collars on the
+     * ship that keeps this drive.
+     *
+     * @param docks the number of docking collars
+     */
+    public void setDocks(int docks) {
+        this.docks = docks;
+    }
+
     @Deprecated(since = "0.51.0", forRemoval = true)
     public LFBattery() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);
@@ -118,7 +128,7 @@ public class LFBattery extends Part {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }
@@ -272,7 +282,7 @@ public class LFBattery extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_VESSEL);
+        return skillType.equals(SkillType.S_TECH_NUCLEAR);
     }
 
     @Override

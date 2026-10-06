@@ -67,11 +67,15 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.RepairCosts;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -111,7 +115,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements IPartWork, ITechnology, ILocation {
+public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
@@ -131,7 +135,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     private final LocationNode locationNode = new LocationNode(this);
 
     protected String name;
+    /** The part's number in its warehouse, shown to the player; numbers repeat between warehouses */
     protected int id;
+    /** The part's identity, unique across the whole campaign and kept when the part moves */
+    private UUID uniqueId = UUID.randomUUID();
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -157,6 +164,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     protected Person tech;
     private boolean isTeamSalvaging;
+    // when true, this (missing) part is being fabricated from scratch rather than replaced from stock
+    private boolean isFabricating;
+    // when true (and fabricating), a failed attempt is automatically retried until it succeeds
+    private boolean fabricateUntilSuccess;
 
     // null is valid. It indicates parts that are not attached to units.
     protected Unit unit;
@@ -243,7 +254,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     public String getQualityName() {
-        return quality.toName(campaign.getCampaignOptions().isReverseQualityNames());
+        return quality.toName(campaign.getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES));
     }
 
     public void setId(int id) {
@@ -253,6 +264,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     public int getId() {
         return id;
     }
+
+    /**
+     * @return the part's identity, unique across the campaign: every warehouse numbers its parts from 1, so use this,
+     *       not {@link #getId()}, to find or link a part
+     */
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
 
     public void setCampaign(Campaign c) {
         this.campaign = c;
@@ -313,26 +333,26 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getInnerSphereUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanUnitPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER));
                 break;
         }
 
         if (!isBrandNew()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions()
-                                           .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
+                                           .get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[getQuality().toNumeric()]);
         }
 
         if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_LEGENDARY) ?
-                                           campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier() :
-                                           campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
+                                           campaign.getCampaignOptions().get(CampaignOption.UNREPAIRABLE_PARTS_VALUE_MULTIPLIER) :
+                                           campaign.getCampaignOptions().get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER));
         }
 
         return cost;
@@ -412,9 +432,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public @Nullable Warehouse getWarehouse() {
+    public @Nullable LocalWarehouse getWarehouse() {
         IPlace place = getPlace();
-        return place != null ? place.getWarehouse() : campaign.getWarehouse();
+        return place != null ? place.getWarehouse() : campaign.getPlayerForce().getWarehouse();
     }
 
     @Override
@@ -440,28 +460,30 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     public String getStatus() {
-        String toReturn = "Functional";
-        if (needsFixing()) {
-            toReturn = "Damaged";
-        }
+        String toReturn = getConditionStatus();
         if (isReservedForRefit()) {
-            toReturn = "Reserved for Refit";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.reservedForRefit");
         }
         if (isReservedForReplacement()) {
-            toReturn = "Reserved for Repair";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.reservedForRepair");
         }
         if (isBeingWorkedOn()) {
-            toReturn = "Being worked on";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.beingWorkedOn");
         }
         if (!isPresent()) {
-            // toReturn = "" + getDaysToArrival() + " days to arrival";
-            String dayName = "day";
-            if (getDaysToArrival() > 1) {
-                dayName += "s";
-            }
-            toReturn = "In transit (" + getDaysToArrival() + ' ' + dayName + ')';
+            // The warehouse sorts statuses by the number in "(N days)", so the text keeps that shape
+            toReturn = getFormattedTextAt(RESOURCE_BUNDLE, "Part.status.inTransit",
+                  String.valueOf(getDaysToArrival()), getDaysToArrival());
         }
         return toReturn;
+    }
+
+    /**
+     * @return the part's status when it is not reserved, being worked on or in transit: whether it works or is
+     *       damaged
+     */
+    protected String getConditionStatus() {
+        return getTextAt(RESOURCE_BUNDLE, needsFixing() ? "Part.status.damaged" : "Part.status.functional");
     }
 
     /**
@@ -496,7 +518,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             toReturn.append(" (").append(tonnage).append(" ton)");
         }
 
-        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
             toReturn.append(" - ")
                   .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
@@ -511,10 +533,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         if (this.isSalvaging()) {
             int inStock = 0;
             if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                Warehouse localWarehouse = getWarehouse();
+                LocalWarehouse localWarehouse = getWarehouse();
                 if (localWarehouse != null) {
                     megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
-                    boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
+                    boolean useAmmoByType = campaign.getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE);
                     inStock = localWarehouse.streamSpareParts()
                                     .filter(p -> p instanceof AmmoStorage
                                                        && p.isPresent()
@@ -524,7 +546,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                                         if (spare.isSameAmmoType(ammoType)) {
                                             return spare.getShots();
                                         } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
-                                            return mekhq.campaign.Quartermaster.convertShots(
+                                            return mekhq.campaign.ForceQuartermaster.convertShots(
                                                   spare.getType(), spare.getShots(), ammoType);
                                         }
                                         return 0;
@@ -536,10 +558,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             }
             String inStockText = inStock == 0 ?
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                           .getFontColorNegativeHexColor(),
+                                                                                                 .getFontColorNegativeHexColor(),
                                              "None in stock") :
                                        ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                           .getFontColorPositiveHexColor(),
+                                                                                                 .getFontColorPositiveHexColor(),
                                              inStock + " in stock");
 
             toReturn.append("<br>").append(inStockText).append("<br>");
@@ -575,7 +597,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled) " : "");
 
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
                 toReturn.append(" - <b>")
                       .append(ReportingUtilities.messageSurroundedBySpanWithColor(SkillType.getExperienceLevelColor(
                             getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"))
@@ -610,7 +632,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
      * @return TechConstants tech level
      */
     public int getTechLevel() {
-        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
+        return getSimpleTechLevel().getCompoundTechLevel(campaign.getPlayerForce().getFaction().isClan());
     }
 
     public SimpleTechLevel getSimpleTechLevel() {
@@ -685,6 +707,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "uniqueId", uniqueId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         if (omniPodded) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
@@ -730,7 +753,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         }
 
         if (replacementPart != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementUniqueId", replacementPart.getUniqueId());
         }
 
         if (reservedBy != null) {
@@ -741,12 +764,20 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
 
+        if (isFabricating) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isFabricating", true);
+        }
+
+        if (fabricateUntilSuccess) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fabricateUntilSuccess", true);
+        }
+
         if (parentPart != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartUniqueId", parentPart.getUniqueId());
         }
 
         for (final Part childPart : childParts) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartUniqueId", childPart.getUniqueId());
         }
 
         return indent;
@@ -874,6 +905,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("uniqueId")) {
+                    // a save from before parts had an identity has none, and the part keeps the one it was made with
+                    readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
@@ -912,14 +946,27 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                     retVal.workingOvertime = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("isTeamSalvaging")) {
                     retVal.isTeamSalvaging = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("isFabricating")) {
+                    retVal.isFabricating = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("fabricateUntilSuccess")) {
+                    retVal.fabricateUntilSuccess = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
                     retVal.brandNew = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("replacementUniqueId")) {
+                    retVal.replacementPart = readLinkByIdentity(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = PartQuality.fromNumeric(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("parentPartUniqueId")) {
+                    retVal.parentPart = readLinkByIdentity(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
                     retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("childPartUniqueId")) {
+                    PartRef childLink = readLinkByIdentity(retVal, wn2.getTextContent().trim());
+                    if (childLink != null) {
+                        retVal.childParts.add(childLink);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
                     int childPartId = Integer.parseInt(wn2.getTextContent());
                     if (childPartId > 0) {
@@ -1033,7 +1080,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         }
 
         final TargetRoll mods = new TargetRoll(difficulty, "difficulty");
-        final int modeMod = getMode().getMod(getCampaign().getCampaignOptions().isDestroyByMargin());
+        final int modeMod = getMode().getMod(getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN));
         if (modeMod != 0) {
             mods.addModifier(modeMod, getCurrentModeName());
         }
@@ -1098,7 +1145,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     public TargetRoll getAllModsForMaintenance() {
         // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts,
         // but we will make this user customizable
-        final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
+        final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_BONUS), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
               "tech rating " + getTechRating().getName());
 
@@ -1153,7 +1200,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             mods.addModifier(1, "prototype TSM");
         }
 
-        return getCampaign().getCampaignOptions().isUseQualityMaintenance() ?
+        return getCampaign().getCampaignOptions().get(CampaignOption.USE_QUALITY_MAINTENANCE) ?
                      getQualityMods(mods, getUnit().getTech()) :
                      mods;
     }
@@ -1200,6 +1247,40 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     public boolean isTeamSalvaging() {
         return null != getTech() && isTeamSalvaging;
+    }
+
+    /**
+     * @return {@code true} if this (missing) part is being fabricated from scratch rather than replaced from stock
+     */
+    public boolean isFabricating() {
+        return isFabricating;
+    }
+
+    /**
+     * Flags this part as being fabricated from scratch. Only meaningful for
+     * {@link mekhq.campaign.parts.missing.MissingPart} instances; other part types ignore the flag.
+     *
+     * @param isFabricating whether the part is being fabricated
+     */
+    public void setFabricating(final boolean isFabricating) {
+        this.isFabricating = isFabricating;
+    }
+
+    /**
+     * @return {@code true} if a failed fabrication attempt should be automatically retried until it succeeds. Only
+     *       meaningful while {@link #isFabricating()} is {@code true}.
+     */
+    public boolean isFabricateUntilSuccess() {
+        return fabricateUntilSuccess;
+    }
+
+    /**
+     * Sets whether a failed fabrication attempt is automatically retried until it succeeds.
+     *
+     * @param fabricateUntilSuccess whether to retry fabrication until success
+     */
+    public void setFabricateUntilSuccess(final boolean fabricateUntilSuccess) {
+        this.fabricateUntilSuccess = fabricateUntilSuccess;
     }
 
     /**
@@ -1317,8 +1398,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
         if (includeRepairDetails && hits > 0) {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
-            if (campaign.getCampaignOptions().isPayForRepairs()) {
-                details.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+            if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
+                details.add(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
+                      getRepairCost()
+                                  .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
+                                  .toAmountAndSymbolString()));
             }
         }
         return details.toString();
@@ -1376,6 +1460,30 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     @Override
     public abstract Part clone();
 
+    /**
+     * Reads a saved link to another part by its identity.
+     *
+     * @return the link, or {@code null} if the identity cannot be read, which drops the link
+     */
+    private static @Nullable PartRef readLinkByIdentity(Part part, String uniqueIdText) {
+        try {
+            return new PartRef(UUID.fromString(uniqueIdText));
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] Part {} has an unreadable link '{}'; the link is dropped", part.id,
+                  uniqueIdText);
+            return null;
+        }
+    }
+
+    private static void readUniqueId(Part part, String uniqueIdText) {
+        try {
+            part.uniqueId = UUID.fromString(uniqueIdText);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] Part {} has an unreadable identity '{}'; it keeps a new one", part.id,
+                  uniqueIdText);
+        }
+    }
+
     protected void copyBaseData(Part part) {
         this.mode = part.mode;
         this.hits = part.hits;
@@ -1407,6 +1515,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
      */
     public boolean isReservedForRefit() {
         return refitUnit != null;
+    }
+
+    /**
+     * @param personId a person's id
+     *
+     * @return {@code true} if this part is reserved for overnight work by that person
+     */
+    boolean isReservedByPerson(UUID personId) {
+        return (reservedBy != null) && personId.equals(reservedBy.getId());
     }
 
     /**
@@ -1445,6 +1562,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
      */
     public boolean isPresent() {
         return daysToArrival == 0;
+    }
+
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A part still in transit from a purchase hasn't arrived yet, and a reserved part is committed to work.
+        return isPresent() && !isReservedForRefit() && !isReservedForReplacement();
     }
 
     @Override
@@ -1619,7 +1742,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     public void resetDaysToWait() {
-        this.daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
+        this.daysToWait = campaign.getCampaignOptions().get(CampaignOption.WAITING_PERIOD);
     }
 
     public void decrementDaysToWait() {
@@ -1880,7 +2003,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public TechRating getTechRating() {
+    public @Nonnull TechRating getTechRating() {
         return getTechAdvancement().getTechRating();
     }
 
@@ -1985,10 +2108,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     @Override
     public AvailabilityValue calcYearAvailability(int year, boolean clan) {
         AvailabilityValue av = getTechAdvancement().calcYearAvailability(campaign.getGameYear(),
-              campaign.getFaction().isClan());
+              campaign.getPlayerForce().getFaction().isClan());
         if (omniPodded) {
             AvailabilityValue podRating = TA_POD.calcYearAvailability(campaign.getGameYear(),
-                  campaign.getFaction().isClan());
+                  campaign.getPlayerForce().getFaction().isClan());
             if (podRating.isBetterThan(av)) {
                 av = podRating;
             }
@@ -2042,48 +2165,35 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     public void fixReferences(Campaign campaign) {
-        if (replacementPart instanceof PartRef) {
-            int id = replacementPart.getId();
-            replacementPart = getWarehouse().getPart(id);
-            if ((replacementPart == null) && (id > 0)) {
-                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
-            }
+        if (replacementPart instanceof PartRef replacementLink) {
+            replacementPart = PartLinkResolver.resolve(campaign, this, replacementLink, LinkKind.REPLACEMENT);
         }
 
-        if (parentPart instanceof PartRef) {
-            int id = parentPart.getId();
-            parentPart = getWarehouse().getPart(id);
-            if ((parentPart == null) && (id > 0)) {
-                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
-            }
+        if (parentPart instanceof PartRef parentLink) {
+            parentPart = PartLinkResolver.resolve(campaign, this, parentLink, LinkKind.PARENT);
         }
 
-        for (int ii = childParts.size() - 1; ii >= 0; --ii) {
-            Part childPart = childParts.get(ii);
-            if (childPart instanceof PartRef) {
-                Part realPart = getWarehouse().getPart(childPart.getId());
-                if (realPart != null) {
-                    childParts.set(ii, realPart);
-                } else if (childPart.getId() > 0) {
-                    LOGGER.error("Part {} ('{}') references missing child part {}",
-                          getId(),
-                          getName(),
-                          childPart.getId());
-                    childParts.remove(ii);
+        for (int childIndex = childParts.size() - 1; childIndex >= 0; --childIndex) {
+            if (childParts.get(childIndex) instanceof PartRef childLink) {
+                Part childPart = PartLinkResolver.resolve(campaign, this, childLink, LinkKind.CHILD);
+                if (childPart != null) {
+                    childParts.set(childIndex, childPart);
+                } else {
+                    childParts.remove(childIndex);
                 }
             }
         }
 
         if (tech instanceof PartPersonRef) {
             UUID id = tech.getId();
-            tech = campaign.getPerson(id);
+            tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (tech == null) {
                 LOGGER.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
             }
         }
         if (reservedBy instanceof PartPersonRef) {
             UUID id = reservedBy.getId();
-            reservedBy = campaign.getPerson(id);
+            reservedBy = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (reservedBy == null) {
                 LOGGER.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
             }
@@ -2107,8 +2217,34 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     public static class PartRef extends Part {
+        /** The identity of the linked part, or {@code null} for a link from an older save, which names a number */
+        private final UUID linkedUniqueId;
+
         public PartRef(int id) {
             this.id = id;
+            this.linkedUniqueId = null;
+        }
+
+        /**
+         * @param linkedUniqueId the identity of the linked part
+         */
+        public PartRef(UUID linkedUniqueId) {
+            this.linkedUniqueId = linkedUniqueId;
+        }
+
+        /**
+         * @return the identity of the linked part, or {@code null} if the link names a part number from an older save
+         */
+        public @Nullable UUID getLinkedUniqueId() {
+            return linkedUniqueId;
+        }
+
+        /**
+         * A link that is saved before it is resolved keeps pointing at the part it names.
+         */
+        @Override
+        public UUID getUniqueId() {
+            return (linkedUniqueId == null) ? super.getUniqueId() : linkedUniqueId;
         }
 
         @Override

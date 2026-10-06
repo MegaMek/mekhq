@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,13 +49,13 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
@@ -111,7 +111,7 @@ public class GoingRogue {
      * @since 0.50.07
      */
     public GoingRogue(Campaign campaign, Person commander, @Nullable Person second) {
-        boolean isUsingFactionStandings = campaign.getCampaignOptions().isTrackFactionStanding();
+        boolean isUsingFactionStandings = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
         FactionCensureGoingRogueDialog dialog = new FactionCensureGoingRogueDialog(campaign, isUsingFactionStandings);
         wasConfirmed = dialog.wasConfirmed();
         if (!wasConfirmed) {
@@ -127,7 +127,7 @@ public class GoingRogue {
               commander,
               second,
               FactionJudgmentSceneType.GO_ROGUE,
-              campaign.getFaction());
+              campaign.getPlayerForce().getFaction());
 
         processGoingRogue(campaign, chosenFaction, commander, second, isUsingFactionStandings, false);
     }
@@ -151,15 +151,15 @@ public class GoingRogue {
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isUsingFactionStandings, boolean isUltimatum) {
-        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getFaction().isAggregate();
+        boolean isDefection = !chosenFaction.isAggregate() && !campaign.getPlayerForce().getFaction().isAggregate();
 
         processGoingRogue(campaign,
               chosenFaction,
               commander,
               second,
               isDefection,
-              isUsingFactionStandings,
-              isUltimatum);
+              isUltimatum,
+              isUsingFactionStandings);
     }
 
     /**
@@ -180,11 +180,37 @@ public class GoingRogue {
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings) {
-        Faction currentFaction = campaign.getFaction();
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUltimatum,
+              isUsingFactionStandings, 0);
+    }
+
+    /**
+     * Carries out the narrative and data changes when the force goes rogue, with a modifier to how many personnel
+     * refuse to follow.
+     *
+     * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
+     *
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction may be the same or a new one
+     * @param commander               the force commander
+     * @param second                  secondary command personnel
+     * @param isDefection             whether the 'going rogue' action counts as defection
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
+     * @param divisiveness            added to the loyalty check's target number; positive values make more personnel
+     *                                refuse to follow, negative values fewer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
+          @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings,
+          int divisiveness) {
+        Faction currentFaction = campaign.getPlayerForce().getFaction();
         String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
-            processPersonnel(campaign, isDefection, commander, second);
+            processPersonnel(campaign, isDefection, commander, second, divisiveness);
 
             if (currentFaction.equals(chosenFaction)) {
                 processRegardBump(campaign);
@@ -196,7 +222,8 @@ public class GoingRogue {
 
         processMassLoyaltyChange(campaign, true, true);
 
-        if (!isUltimatum) {
+        // Staying with the current faction isn't leaving it, so there is nothing to denounce
+        if (!isUltimatum && !currentFaction.equals(chosenFaction)) {
             new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false, chosenFaction);
         }
@@ -209,13 +236,18 @@ public class GoingRogue {
 
         if (!currentFaction.equals(chosenFaction)) {
             PersonnelRole role = chosenFaction.isClan() ? PersonnelRole.MEKWARRIOR : PersonnelRole.MILITARY_LIAISON;
-            Person speaker = campaign.newPerson(role, chosenFactionCode, Gender.RANDOMIZE);
-            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+            Person speaker = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         role,
+                                         chosenFactionCode,
+                                         megamek.common.enums.Gender.RANDOMIZE);
+            AutomaticRankAssigner.assignRankSystemFromFaction(speaker, RO_MIN);
             new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, newFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
         }
 
-        campaign.setFaction(chosenFaction);
+        campaign.getPlayerForce().setFaction(chosenFaction);
     }
 
     /**
@@ -225,15 +257,16 @@ public class GoingRogue {
      * @param campaign    the current campaign context
      * @param isDefection whether this event counts as a defection to a new faction
      * @param commander   the commanding officer
-     * @param second      the second-in-command
+     * @param second       the second-in-command
+     * @param divisiveness added to the loyalty check's target number
      *
      * @author Illiani
      * @since 0.50.07
      */
     private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
-          @Nullable Person second) {
+          @Nullable Person second, int divisiveness) {
         final LocalDate today = campaign.getLocalDate();
-        Collection<Person> allPersonnel = campaign.getAllPersonnel();
+        Collection<Person> allPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         Set<Person> preProcessedPersonnel = new HashSet<>();
 
         preProcessedPersonnel.add(commander);
@@ -261,15 +294,16 @@ public class GoingRogue {
             }
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain
-            boolean loyaltyEnabled = campaign.getCampaignOptions().isUseLoyaltyModifiers();
-            boolean altAdvancedMedicalEnabled = campaign.getCampaignOptions().isUseAlternativeAdvancedMedical();
-            int loyalty = loyaltyEnabled ?
-                                person.getAdjustedLoyalty(campaign.getFaction(), altAdvancedMedicalEnabled) :
-                                0;
+            boolean loyaltyEnabled = campaign.getCampaignOptions().get(CampaignOption.USE_LOYALTY_MODIFIERS);
+            boolean altAdvancedMedicalEnabled = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
+            int loyalty;
+            if (loyaltyEnabled) {
+                loyalty = person.getAdjustedLoyalty(campaign.getPlayerForce().getFaction(), altAdvancedMedicalEnabled);
+            } else {loyalty = 0;}
             int modifier = loyaltyEnabled ? person.getLoyaltyModifier(loyalty) : 0;
             int roll = Compute.d6(2);
 
-            if (roll < (LOYALTY_TARGET_NUMBER + modifier)) {
+            if (failsLoyaltyCheck(roll, modifier, divisiveness)) {
                 person.changeStatus(campaign, today, isDefection ? PersonnelStatus.HOMICIDE : PersonnelStatus.DESERTED);
             } else if (isDefection) {
                 // Small chance a person still gets murdered when defecting
@@ -281,6 +315,22 @@ public class GoingRogue {
 
             processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
         }
+    }
+
+    /**
+     * Determines whether a person refuses to follow the campaign when it goes rogue.
+     *
+     * @param roll            the person's 2d6 roll
+     * @param loyaltyModifier the person's loyalty modifier; positive values make them more likely to leave
+     * @param divisiveness    how divisive the event is; positive values make everyone more likely to leave
+     *
+     * @return {@code true} if the person refuses to follow
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean failsLoyaltyCheck(int roll, int loyaltyModifier, int divisiveness) {
+        return roll < (LOYALTY_TARGET_NUMBER + loyaltyModifier + divisiveness);
     }
 
     /**
@@ -346,7 +396,7 @@ public class GoingRogue {
      * @param campaign the current campaign context
      */
     private static void processFactionStandingChangeForOldFaction(Campaign campaign) {
-        processFactionStandingChangeForOldFaction(campaign, campaign.getFaction());
+        processFactionStandingChangeForOldFaction(campaign, campaign.getPlayerForce().getFaction());
     }
 
     /**
@@ -365,7 +415,7 @@ public class GoingRogue {
         }
 
         String factionCode = oldFaction.getShortName();
-        FactionStandings factionStandings = campaign.getFactionStandings();
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
         double targetRegard = FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard();
         double currentRegard = factionStandings.getRegardForFaction(factionCode, false);
@@ -373,7 +423,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+        String report = factionStandings.setRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),
@@ -401,13 +451,13 @@ public class GoingRogue {
      *                 ultimatum
      */
     public static void processRegardBump(Campaign campaign) {
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
         if (faction.isAggregate()) {
             return;
         }
 
         String factionCode = faction.getShortName();
-        FactionStandings factionStandings = campaign.getFactionStandings();
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
         double currentRegard = factionStandings.getRegardForFaction(factionCode, false);
         FactionStandingLevel currentStanding = calculateFactionStandingLevel(currentRegard);
         int nextLevel = currentStanding.getStandingLevel() + 1;
@@ -429,7 +479,7 @@ public class GoingRogue {
         }
 
         String report = factionStandings.setRegardForFaction(
-              campaign.getFaction().getShortName(),
+              campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),
@@ -454,7 +504,7 @@ public class GoingRogue {
         }
 
         String factionCode = newFaction.getShortName();
-        FactionStandings factionStandings = campaign.getFactionStandings();
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
         double targetRegard = FactionStandingLevel.STANDING_LEVEL_5.getMinimumRegard();
         double currentRegard = factionStandings.getRegardForFaction(factionCode, false);
@@ -462,7 +512,7 @@ public class GoingRogue {
             return;
         }
 
-        String report = factionStandings.setRegardForFaction(campaign.getFaction().getShortName(),
+        String report = factionStandings.setRegardForFaction(campaign.getPlayerForce().getFaction().getShortName(),
               factionCode,
               targetRegard,
               campaign.getGameYear(),

@@ -32,9 +32,12 @@
  */
 package mekhq.campaign;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
 
@@ -58,15 +61,50 @@ class CampaignSummaryTest {
         assertEquals("100% bay capacity", summary.getTransportCapacity());
     }
 
+    @Test
+    void getCargoCapacityReportClampsNonFiniteCargoTonnage() {
+        // A single part reporting a non-finite tonnage (e.g. infantry ammo, see MekHQ issue #9616) makes
+        // getCargoTonnage() return Infinity. BigDecimal cannot parse "Infinity"/"NaN", so an unclamped
+        // report throws a NumberFormatException that repeats on every Command Center refresh and bricks
+        // the save. getCargoCapacityReport() must clamp the non-finite figure to 0 instead of throwing.
+        Campaign campaign = campaignWithEmptySummaryInputs();
+        when(campaign.getHangarStatistics()).thenReturn(mock(HangarStatistics.class));
+        CargoStatistics cargoStatistics = campaign.getCargoStatistics();
+        when(cargoStatistics.getCargoTonnage(false)).thenReturn(Double.POSITIVE_INFINITY);
+
+        CampaignSummary summary = new CampaignSummary();
+        summary.setCampaign(campaign);
+
+        String report = assertDoesNotThrow(summary::getCargoCapacityReport);
+        assertTrue(report.contains("0.0 tons"), "Expected non-finite cargo to be clamped to 0.0, got: " + report);
+    }
+
+    @Test
+    void getCargoCapacityReportClampsNaNCargoCapacity() {
+        // The capacity side is equally vulnerable: a NaN maximum cargo capacity must be clamped rather
+        // than handed to BigDecimal.
+        Campaign campaign = campaignWithEmptySummaryInputs();
+        when(campaign.getHangarStatistics()).thenReturn(mock(HangarStatistics.class));
+        CargoStatistics cargoStatistics = campaign.getCargoStatistics();
+        when(cargoStatistics.getTotalCargoCapacity()).thenReturn(Double.NaN);
+
+        CampaignSummary summary = new CampaignSummary();
+        summary.setCampaign(campaign);
+
+        String report = assertDoesNotThrow(summary::getCargoCapacityReport);
+        assertTrue(report.contains("0.0 tons capacity)"),
+              "Expected non-finite capacity to be clamped to 0.0, got: " + report);
+    }
+
     private static Campaign campaignWithEmptySummaryInputs() {
-        Campaign campaign = mock(Campaign.class);
-        Hangar hangar = mock(Hangar.class);
+        Campaign campaign = mockCampaign();
+        LocalHangar hangar = mock(LocalHangar.class);
         CargoStatistics cargoStatistics = mock(CargoStatistics.class);
 
-        when(campaign.getActivePersonnel(false, false)).thenReturn(List.of());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)).thenReturn(List.of());
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
         when(hangar.getUnits()).thenReturn(List.of());
-        when(campaign.getMissions()).thenReturn(List.of());
+        when(campaign.getActiveContracts()).thenReturn(List.of());
         when(campaign.getCargoStatistics()).thenReturn(cargoStatistics);
 
         return campaign;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 
@@ -54,15 +53,15 @@ public class FactionHunterAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, AbstractContract mission,
           UUID person, List<Award> awards) {
         boolean isEligible = false;
         List<Award> eligibleAwards = new ArrayList<>();
 
-        Faction missionFaction = ((AtBContract) mission).getEnemy();
+        Faction missionFaction = mission.getEnemyFaction();
 
         for (Award award : awards) {
-            if (award.canBeAwarded(campaign.getPerson(person))) {
+            if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> targetFactions = List.of(award.getRange().split(","));
 
                 if (!targetFactions.isEmpty()) {

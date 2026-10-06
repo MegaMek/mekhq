@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,6 +51,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -105,6 +107,23 @@ public class StructuralIntegrity extends Part {
         super(entityWeight, c);
         pointsNeeded = 0;
         this.name = "Structural Integrity";
+    }
+
+    /**
+     * Structural Integrity is repaired with the unit's global technician skill: Tech/Vessel for DropShips and
+     * JumpShips (including WarShips and Space Stations), otherwise Tech/Aerospace.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public boolean isRightTechType(String skillType) {
+        String globalSkillName = Person.getGlobalTechSkillNameFor(getUnit());
+        if (globalSkillName == null) {
+            globalSkillName = SkillType.S_TECH_AERO;
+        }
+
+        return skillType.equals(globalSkillName);
     }
 
     @Override

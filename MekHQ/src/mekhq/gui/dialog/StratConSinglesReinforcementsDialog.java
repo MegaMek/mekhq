@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,7 +80,10 @@ public class StratConSinglesReinforcementsDialog {
         final String commanderAddress = campaign.getCommanderAddress();
 
         ImmersiveDialogCore dialog = new ImmersiveDialogCore(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                          campaign.getPlayerForce().isClanForce(),
+                          campaign.getLocalDate()),
               null,
               getFormattedTextAt(RESOURCE_BUNDLE,
                     "StratConSinglesReinforcementsDialog.centerMessage",

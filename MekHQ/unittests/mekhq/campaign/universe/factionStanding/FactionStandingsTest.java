@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,8 +47,8 @@ import static mekhq.campaign.universe.factionStanding.FactionStandings.REGARD_DE
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -173,8 +173,8 @@ class FactionStandingsTest {
               false); // Initial regard for Capellan Confederation
         factionStandings.setRegardForFaction(null, "CS", -5.0, 3025, false); // Initial regard for ComStar
 
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getFaction()).thenReturn(factions.getDefaultFaction());
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(factions.getDefaultFaction());
 
         Faction federatedSuns = factions.getFaction("FS");
         Faction capellanConfederation = factions.getFaction("CC");

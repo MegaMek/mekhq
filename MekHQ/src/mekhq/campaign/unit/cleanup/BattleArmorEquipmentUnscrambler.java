@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.unit.cleanup;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,15 +109,35 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
                     }
                 }
 
+                // Same-type parts that were never assigned an equipment number - e.g. fresh parts materialized by a
+                // refit, which arrive with equipmentNum == -1 and trooper == -1.
+                final List<BattleArmorEquipmentPart> unassigned = new ArrayList<>();
+                for (final EquipmentPart part : tempParts) {
+                    if ((part instanceof BattleArmorEquipmentPart)
+                              && part.getType().getInternalName().equals(m.getType().getInternalName())
+                              && (part.getEquipmentNum() < 0)) {
+                        unassigned.add((BattleArmorEquipmentPart) part);
+                    }
+                }
+
                 // Assign a part to any empty position and set the trooper field
                 for (int t = 0; t < perTrooper.length; t++) {
                     if (perTrooper[t] == null) {
+                        BattleArmorEquipmentPart chosen = null;
                         for (final Part part : parts) {
                             if (((BattleArmorEquipmentPart) part).getTrooper() < 1) {
-                                ((BattleArmorEquipmentPart) part).setTrooper(t + 1);
-                                perTrooper[t] = part;
+                                chosen = (BattleArmorEquipmentPart) part;
                                 break;
                             }
+                        }
+                        // Fall back to an unassigned same-type part if no eqNum-matched part is free for this slot.
+                        if ((chosen == null) && !unassigned.isEmpty()) {
+                            chosen = unassigned.removeFirst();
+                            chosen.setEquipmentNum(eqNum);
+                        }
+                        if (chosen != null) {
+                            chosen.setTrooper(t + 1);
+                            perTrooper[t] = chosen;
                         }
                     }
                 }

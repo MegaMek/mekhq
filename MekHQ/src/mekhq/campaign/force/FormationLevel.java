@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -392,7 +392,7 @@ public enum FormationLevel {
      * @return The corresponding formation level
      */
     public static FormationLevel parseFromDepth(Campaign campaign, int depth) {
-        Faction faction = campaign.getFaction();
+        Faction faction = campaign.getPlayerForce().getFaction();
 
         if (faction.isClan()) {
             return switch (depth) {

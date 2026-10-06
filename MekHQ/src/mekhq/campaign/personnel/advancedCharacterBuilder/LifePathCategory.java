@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
@@ -44,8 +46,6 @@ import megamek.logging.MMLogger;
  * @since 0.50.07
  */
 public enum LifePathCategory {
-    CLAN("CLAN"),
-    DARK_CASTE("DARK_CASTE"),
     FIELD_ANALYSIS("FIELD_ANALYSIS"),
     FIELD_ANTHROPOLOGIST("FIELD_ANTHROPOLOGIST"),
     FIELD_ARCHAEOLOGIST("FIELD_ARCHAEOLOGIST"),
@@ -65,6 +65,7 @@ public enum LifePathCategory {
     FIELD_DOCTOR("FIELD_DOCTOR"),
     FIELD_ENGINEER("FIELD_ENGINEER"),
     FIELD_GENERAL_STUDIES("FIELD_GENERAL_STUDIES"),
+
     FIELD_HPG_TECHNICIAN("FIELD_HPG_TECHNICIAN"),
     FIELD_INFANTRY("FIELD_INFANTRY"),
     FIELD_INFANTRY_ANTI_MEK("FIELD_INFANTRY_ANTI_MEK"),
@@ -102,13 +103,39 @@ public enum LifePathCategory {
     FIELD_TECHNICIAN_MEK("FIELD_TECHNICIAN_MEK"),
     FIELD_TECHNICIAN_MILITARY("FIELD_TECHNICIAN_MILITARY"),
     FIELD_TECHNICIAN_VEHICLE("FIELD_TECHNICIAN_VEHICLE"),
-    GENERAL("GENERAL"),
+    GENERAL_CLAN("GENERAL_CLAN"),
+    GENERAL_CLAN_RULED_INNER_SPHERE("GENERAL_CLAN_RULED_INNER_SPHERE"),
+    GENERAL_CRIMINAL("GENERAL_CRIMINAL"),
+    GENERAL_DARK_CASTE("GENERAL_DARK_CASTE"),
+    GENERAL_FREE_WORLDS_LEAGUE("GENERAL_FREE_WORLDS_LEAGUE"),
+    GENERAL_INNER_SPHERE("GENERAL_INNER_SPHERE"),
+    NONE("NONE"),
     SCHOOL_CIVILIAN("SCHOOL_CIVILIAN"),
     SCHOOL_INTELLIGENCE("SCHOOL_INTELLIGENCE"),
     SCHOOL_MILITARY("SCHOOL_MILITARY"),
     SCHOOL_OFFICER_CANDIDATE("SCHOOL_OFFICER_CANDIDATE"),
-    SCHOOL_POLICE("SCHOOL_POLICE");
+    SCHOOL_POLICE("SCHOOL_POLICE"),
+    SPECIAL_CHILD_LABOR_ENABLED("SPECIAL_CHILD_LABOR_ENABLED"),
+    SPECIAL_FRANKLIN_FIEFS_RESTRICTIONS("SPECIAL_FRANKLIN_FIEFS_RESTRICTIONS"),
+    SPECIAL_JARNFOLK_RESTRICTIONS("SPECIAL_JARNFOLK_RESTRICTIONS"),
+    SPECIAL_MERCENARY_IMPACT_FAME("SPECIAL_MERCENARY_IMPACT_FAME"),
+    SPECIAL_MILITARY_REQUIRES_CITIZENSHIP("SPECIAL_MILITARY_REQUIRES_CITIZENSHIP"),
+    SPECIAL_MINOR_PERIPHERY("SPECIAL_MINOR_PERIPHERY"),
+    SPECIAL_NOBLE_MEKWARRIORS("SPECIAL_NOBLE_MEKWARRIORS"),
+    SPECIAL_NOBLE_OFFICERS("SPECIAL_NOBLE_OFFICERS"),
+    SPECIAL_NOBLE_WARRIORS("SPECIAL_NOBLE_WARRIORS"),
+    SPECIAL_NO_MILITARY_SCHOOL("SPECIAL_NO_MILITARY_SCHOOL"),
+    SPECIAL_NO_NOBLES("SPECIAL_NO_NOBLES"),
+    SPECIAL_NO_PREPARATORY_SCHOOLS("SPECIAL_NO_PREPARATORY_SCHOOLS"),
+    SPECIAL_NO_TITLES("SPECIAL_NO_TITLES"),
+    SPECIAL_NO_TRANSIT_DISORIENTATION_SYNDROME("SPECIAL_NO_TRANSIT_DISORIENTATION_SYNDROME"),
+    SPECIAL_NO_UNIVERSITIES("SPECIAL_NO_UNIVERSITIES"),
+    SPECIAL_PROSTHETICS_IMPACT_FAME("SPECIAL_PROSTHETICS_IMPACT_FAME"),
+    SPECIAL_RANKS_REQUIRE_TITLES("SPECIAL_RANKS_REQUIRE_TITLES"),
+    SPECIAL_SLAVERY("SPECIAL_SLAVERY"),
+    SPECIAL_TITLE_REQUIRES_CITIZENSHIP("SPECIAL_TITLE_REQUIRES_CITIZENSHIP");
 
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategory";
     private static final MMLogger LOGGER = MMLogger.create(LifePathCategory.class);
 
     private final String lookupName;
@@ -138,6 +165,32 @@ public enum LifePathCategory {
     }
 
     /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.11
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
      * Gets the {@link LifePathCategory} associated with a lookup name (case-insensitive).
      *
      * @param lookup the name to match
@@ -161,5 +214,10 @@ public enum LifePathCategory {
 
         LOGGER.warn("Unknown lookup name: {}", lookup);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_MEDICS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -43,7 +41,6 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -68,7 +65,7 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      *                 settings required for constructing the dialog.
      */
     public InsufficientMedicsNagDialog(final Campaign campaign) {
-        super(campaign, null, NAG_INSUFFICIENT_MEDICS, "InsufficientMedicsNagDialog");
+        super(campaign, NAG_INSUFFICIENT_MEDICS, "InsufficientMedicsNagDialog");
     }
 
     /**
@@ -83,20 +80,18 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      * employed to determine the speaker based on senior administrators.</p>
      *
      * @param campaign       The {@link Campaign} instance providing access to personnel and administrator data.
-     * @param specialization The {@link AdministratorSpecialization} used as a criterion for selecting the speaker.
      *
      * @return The {@link Person} designated as the speaker, prioritizing medical specialists, then senior
      *       administrators with "HR" or "COMMAND" specializations. Returns {@code null} if no suitable speaker can be
      *       found.
      */
     @Override
-    protected @Nullable Person getSpeaker(@Nullable Campaign campaign,
-          @Nullable AdministratorSpecialization specialization) {
+    protected @Nullable Person getSpeaker(@Nullable Campaign campaign) {
         if (campaign == null) {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -139,10 +134,16 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                  campaign.getPlayerForce().isClanForce(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }
@@ -157,7 +158,7 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
         int count = 0;
 
         if (campaign != null) {
-            count = campaign.getMedicsNeed();
+            count = campaign.getPlayerForce().getHumanResources().getMedicsNeed();
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);
@@ -177,6 +178,8 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient medics, {@code false} otherwise.
      */
     public static boolean checkNag(int medicsRequired) {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_MEDICS) && hasMedicsNeeded(medicsRequired);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_MEDICS) &&
+                     !MekHQ.getMHQOptions().getNewDayMedicPoolFill() &&
+                     hasMedicsNeeded(medicsRequired);
     }
 }

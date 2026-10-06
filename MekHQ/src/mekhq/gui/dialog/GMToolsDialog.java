@@ -75,14 +75,18 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
@@ -1084,7 +1088,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         lblCurrentCompanyName.setName("lblCurrentCompanyName");
         addComponent(panel, lblCurrentCompanyName, gridBagConstraints, 0, 0);
 
-        JLabel lblCurrentCompanyNameValue = new JLabel(gui.getCampaign().getName());
+        JLabel lblCurrentCompanyNameValue = new JLabel(gui.getCampaign().getPlayerForce().getName());
         lblCurrentCompanyNameValue.setName("lblCurrentCompanyName");
         lblCurrentCompanyName.setLabelFor(lblCurrentCompanyNameValue);
         addComponent(panel, lblCurrentCompanyNameValue, gridBagConstraints, 1, 0);
@@ -1093,7 +1097,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         lblCompanyNameGenerated.setName("lblCompanyNameGenerated");
         addComponent(panel, lblCompanyNameGenerated, gridBagConstraints, 0, 1);
 
-        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
+        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getPlayerForce().getName());
         txtCompanyNamesGenerated.setName("txtCompanyNamesGenerated");
         addComponent(panel, txtCompanyNamesGenerated, gridBagConstraints, 1, 1);
         lblCompanyNameGenerated.setLabelFor(txtCompanyNamesGenerated);
@@ -1119,8 +1123,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
               "btnGenerateCompanyName.text",
               "btnGenerateCompanyName.toolTipText",
               evt -> {
-                  lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(gui.getCampaign()
-                                                                                       .getCommander());
+                  Campaign campaign = gui.getCampaign();
+                  lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(campaign.getPlayerForce()
+                                                                                       .getHumanResources()
+                                                                                       .getCommander(campaign.getCampaignOptions(),
+                                                                                             campaign.getPlayerForce().isClanForce(),
+                                                                                             campaign.getLocalDate()));
                   txtCompanyNamesGenerated.setText(lastGeneratedCompanyName);
               });
     }
@@ -1145,10 +1153,13 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
      * @param evt the ActionEvent associated with the button click
      */
     private void assignCompanyName(ActionEvent evt) {
-        if (gui.getCampaign().getFormation(0).getName().equals(gui.getCampaign().getName())) {
-            gui.getCampaign().getFormation(0).setName(lastGeneratedCompanyName);
+        Campaign campaign1 = gui.getCampaign();
+        if (campaign1.getPlayerForce().getFormation(0).getName().equals(gui.getCampaign().getPlayerForce().getName())) {
+            Campaign campaign = gui.getCampaign();
+            campaign.getPlayerForce().getFormation(0).setName(lastGeneratedCompanyName);
         }
-        gui.getCampaign().setName(lastGeneratedCompanyName);
+        mekhq.campaign.Campaign campaign = gui.getCampaign();
+        campaign.getPlayerForce().setName(lastGeneratedCompanyName);
         gui.refreshAllTabs();
     }
 
@@ -1386,8 +1397,8 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             }
         }
 
-        final Clan clan = Clan.getClan((getGUI().getCampaign().getFaction().isClan() ?
-                                              getGUI().getCampaign().getFaction() :
+        final Clan clan = Clan.getClan((getGUI().getCampaign().getPlayerForce().getFaction().isClan() ?
+                                              getGUI().getCampaign().getPlayerForce().getFaction() :
                                               getPerson().getOriginFaction()).getShortName());
         if (clan != null) {
             getComboOriginClan().setSelectedItem(new ClanDisplay(clan, getGUI().getCampaign().getLocalDate()));
@@ -1446,16 +1457,16 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
 
         final Predicate<MekSummary> predicate = summary -> (!getGUI().getCampaign()
                                                                    .getCampaignOptions()
-                                                                   .isLimitByYear() ||
+                                                                   .get(CampaignOption.LIMIT_BY_YEAR) ||
                                                                   (targetYear > summary.getYear())) &&
                                                                  (!summary.isClan() ||
                                                                         getGUI().getCampaign()
                                                                               .getCampaignOptions()
-                                                                              .isAllowClanPurchases()) &&
+                                                                              .get(CampaignOption.ALLOW_CLAN_PURCHASES)) &&
                                                                  (summary.isClan() ||
                                                                         getGUI().getCampaign()
                                                                               .getCampaignOptions()
-                                                                              .isAllowISPurchases());
+                                                                              .get(CampaignOption.ALLOW_IS_PURCHASES));
         final int unitType = UnitType.determineUnitTypeCode(getComboUnitType().getSelectedItem());
         final int unitWeight = getComboUnitWeight().isEnabled() ?
                                      getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT :
@@ -1498,17 +1509,22 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         if (getLastRolledUnit() != null) {
             PartQuality quality;
 
-            if (getGUI().getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            if (getGUI().getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
                 quality = PartQuality.QUALITY_D;
             }
 
-            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, quality);
+            final Unit unit = getGUI().getCampaign()
+                                    .addNewUnit(getLastRolledUnit(), false, 0, quality, UnitAcquisitionType.GM_ADDED);
 
             if ((getPerson() != null) && (getPerson().getUnit() == null)) {
+                // The new unit joins the main force, so bring the person to it if they are elsewhere
+                LocationDispatch.movePersonToLocationOf(getGUI().getCampaign(), getPerson(), unit);
                 unit.addPilotOrSoldier(getPerson());
-                getPerson().setOriginalUnit(unit);
+                if (getPerson().getUnit() == unit) {
+                    getPerson().setOriginalUnit(unit);
+                }
             }
             setLastRolledUnit(null);
         }

@@ -36,6 +36,7 @@ import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -47,6 +48,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
@@ -98,23 +100,20 @@ public class EscapeSkills {
 
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useEdge = campaignOptions.isUseEdge();
+        boolean useEdge = campaignOptions.get(CampaignOption.USE_EDGE);
         useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
         ActionCheckResult actionCheckResult =
               person.checkSkill(skillToUse, false, false, today)
-                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"), false);
-
-        MarginOfSuccess marginOfSuccess =
-              MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.marginOfSuccess());
+                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"));
+        int marginOfSuccess = actionCheckResult.getMarginOfSuccess();
 
         // Nothing happens for these cases, so we can just early exit
-        List<MarginOfSuccess> noFurtherActionCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,
-              MarginOfSuccess.ALMOST);
-        if (noFurtherActionCases.contains(marginOfSuccess)) {
+        if ((MarginOfSuccess.ALMOST.getLowerBound() <= marginOfSuccess) &&
+                  (marginOfSuccess <= MarginOfSuccess.IT_WILL_DO.getUpperBound())) {
             return;
         }
 
-        processEscapeAttempt(campaign, person, marginOfSuccess, today);
+        processEscapeAttempt(campaign, person, actionCheckResult, today);
     }
 
     /**
@@ -160,29 +159,29 @@ public class EscapeSkills {
      *
      * <p>Updates prisoner status, applies failure consequences, and generates reports as appropriate.</p>
      *
-     * @param campaign        the current campaign instance
-     * @param prisoner        the {@link Person} attempting escape
-     * @param marginOfSuccess the result of the skill check
-     * @param today           the current in-game date
+     * @param campaign          the current campaign instance
+     * @param prisoner          the {@link Person} attempting escape
+     * @param actionCheckResult the escape attempt check result
+     * @param today             the current in-game date
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static void processEscapeAttempt(Campaign campaign, Person prisoner, MarginOfSuccess marginOfSuccess,
+    private static void processEscapeAttempt(Campaign campaign, Person prisoner, ActionCheckResult actionCheckResult,
           LocalDate today) {
-        String report = getEscapeAttemptReport(prisoner, marginOfSuccess);
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+
+        String report = getEscapeAttemptReport(prisoner, actionCheckResult.getReportMargin());
         if (!report.isBlank()) {
             campaign.addReport(PERSONNEL, report);
         }
 
-        switch (marginOfSuccess) {
-            // Nothing happens for MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT, or MarginOfSuccess.ALMOST
-            case SPECTACULAR, EXTRAORDINARY, GOOD -> prisoner.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
-            case BAD -> getEscapeAttemptReport(prisoner, MarginOfSuccess.BAD);
-            case TERRIBLE, DISASTROUS -> {
-                boolean wasDisastrous = marginOfSuccess == MarginOfSuccess.DISASTROUS;
-                processNotableFailure(campaign, prisoner, wasDisastrous);
-            }
+        int marginOfSuccess = actionCheckResult.getMarginOfSuccess();
+        if (marginOfSuccess >= MarginOfSuccess.GOOD.getLowerBound()) {
+            prisoner.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
+        } else if (marginOfSuccess <= MarginOfSuccess.TERRIBLE.getUpperBound()) {
+            boolean wasDisastrous = marginOfSuccess <= MarginOfSuccess.DISASTROUS.getUpperBound();
+            processNotableFailure(campaign, prisoner, wasDisastrous);
         }
     }
 
@@ -202,8 +201,8 @@ public class EscapeSkills {
         int injuries = (int) floor(roll / 2.0);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.isUseInjuryFatigue(),
-              campaignOptions.getFatigueRate(), injuries);
+        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE),
+              campaignOptions.get(CampaignOption.FATIGUE_RATE), injuries);
 
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {
@@ -226,17 +225,17 @@ public class EscapeSkills {
     /**
      * Retrieves a formatted report for the given prisoner's escape attempt based on the result margin.
      *
-     * @param prisoner        the {@link Person} whose escape attempt is being reported
-     * @param marginOfSuccess the margin of success result for the escape attempt
+     * @param prisoner     the {@link Person} whose escape attempt is being reported
+     * @param reportMargin the margin of success result for the escape attempt
      *
      * @return a formatted string for user display or an empty string if no report is generated
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static String getEscapeAttemptReport(Person prisoner, MarginOfSuccess marginOfSuccess) {
-        String reportColor = marginOfSuccess.getColor();
-        String reportKey = "EscapeArtist.report." + marginOfSuccess.name();
+    private static String getEscapeAttemptReport(Person prisoner, MarginOfSuccess reportMargin) {
+        String reportColor = reportMargin.getColor();
+        String reportKey = "EscapeArtist.report." + reportMargin.name();
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               reportKey,

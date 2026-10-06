@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -55,7 +56,7 @@ public class PerformanceLogger {
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static void improvedSkill(final Campaign campaign, final Person person, final LocalDate date,
           final String skill, final String value) {
-        if (campaign.getCampaignOptions().isPersonnelLogSkillGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
         }
@@ -79,8 +80,27 @@ public class PerformanceLogger {
         }
     }
 
+    /**
+     * Logs a person gaining a Natural Aptitude in a skill, if skill gain logging is enabled.
+     *
+     * @param isLogSkillGain whether skill gain logging is enabled
+     * @param person         the person who gained the aptitude
+     * @param date           the date it was gained
+     * @param skill          the name of the skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void gainedNaturalAptitude(final boolean isLogSkillGain, final Person person, final LocalDate date,
+          final String skill) {
+        if (isLogSkillGain) {
+            person.addPerformanceLogEntry(new PerformanceLogEntry(date,
+                  MessageFormat.format(resources.getString("gainedNaturalAptitude.text"), skill)));
+        }
+    }
+
     public static void gainedSPA(final Campaign campaign, final Person person, final LocalDate date, final String spa) {
-        if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_ABILITY_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("gained.text"), spa)));
         }
@@ -88,14 +108,14 @@ public class PerformanceLogger {
 
     public static void paidOffFlaw(final Campaign campaign, final Person person, final LocalDate date,
           final String spa) {
-        if (campaign.getCampaignOptions().isPersonnelLogAbilityGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_ABILITY_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("removed.text"), spa)));
         }
     }
 
     public static void gainedEdge(final Campaign campaign, final Person person, final LocalDate date) {
-        if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_EDGE_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("gainedEdge.text"), person.getEdge())));
         }
@@ -103,7 +123,7 @@ public class PerformanceLogger {
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public static void changedEdge(final Campaign campaign, final Person person, final LocalDate date) {
-        if (campaign.getCampaignOptions().isPersonnelLogEdgeGain()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_EDGE_GAIN)) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("changedEdge.text"), person.getEdge())));
         }

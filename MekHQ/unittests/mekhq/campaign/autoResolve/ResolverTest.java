@@ -72,19 +72,19 @@ import megamek.common.units.CrewType;
 import megamek.common.units.Entity;
 import megamek.common.util.BoardUtilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.BotForce;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.AfterAll;
@@ -188,9 +188,9 @@ public class ResolverTest {
     }
 
     AtBScenario createScenario(Campaign campaign) {
-        var contract = mock(AtBContract.class);
-        when(contract.getEnemySkill()).thenReturn(SkillLevel.REGULAR);
-        when(contract.getAllySkill()).thenReturn(SkillLevel.REGULAR);
+        var contract = mock(AbstractContract.class);
+        when(contract.getEnemyForceSkill()).thenReturn(SkillLevel.REGULAR);
+        when(contract.getEmployerForceSkill()).thenReturn(SkillLevel.REGULAR);
 
         var scenario = mock(AtBDynamicScenario.class);
         when(scenario.getContract(any())).thenReturn(contract);
@@ -222,7 +222,7 @@ public class ResolverTest {
         when(scenario.getBotForce(anyInt())).thenReturn(botForce);
         when(scenario.getNumBots()).thenReturn(1);
 
-        for (var force : campaign.getAllFormations()) {
+        for (var force : campaign.getPlayerForce().getAllFormations()) {
             force.setScenarioId(11, campaign);
         }
 
@@ -231,14 +231,15 @@ public class ResolverTest {
 
     Campaign createCampaign() {
         var campaign = MHQTestUtilities.getTestCampaign();
-        campaign.setName("Test Player");
-        var reputationController = mock(ReputationController.class);
+        campaign.getPlayerForce().setName("Test Player");
+        var reputationController = mock(ForceReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
-        campaign.setReputation(reputationController);
+        campaign.getPlayerForce().setCamOpsReputation(reputationController);
         var force = new Formation("Heroes");
 
-        campaign.addFormation(force, campaign.getFormation(0));
+        Formation superFormation = campaign.getPlayerForce().getFormation(0);
+        campaign.getPlayerForce().addFormation(force, superFormation, campaign);
         return campaign;
     }
 

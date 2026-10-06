@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,6 +36,7 @@ import megamek.common.compute.Compute;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.universe.Faction;
 
 public class AtBStaticWeightGenerator {
@@ -48,7 +49,7 @@ public class AtBStaticWeightGenerator {
      */
     public static int getRandomWeight(final Campaign campaign, final int unitType,
           final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMekVariations());
+        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().get(CampaignOption.REGIONAL_MEK_VARIATIONS));
     }
 
     /**
@@ -62,6 +63,8 @@ public class AtBStaticWeightGenerator {
           final boolean regionVariations) {
         if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();
+        } else if (unitType == UnitType.SMALL_CRAFT) {
+            return EntityWeightClass.WEIGHT_SMALL_CRAFT;
         } else if (unitType == UnitType.DROPSHIP) {
             return getRandomDropShipWeight();
         } else if (unitType == UnitType.JUMPSHIP) {

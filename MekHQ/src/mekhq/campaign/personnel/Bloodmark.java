@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,6 +53,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -170,14 +171,6 @@ public class Bloodmark {
      * @since 0.50.07
      */
     public static boolean checkForAssassinationAttempt(Person target, LocalDate today, boolean isCampaignPlanetside) {
-        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
-            return false;
-        }
-
-        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
-            return false;
-        }
-
         List<LocalDate> bloodhuntSchedule = target.getBloodhuntSchedule();
         if (bloodhuntSchedule.isEmpty()) {
             return false;
@@ -191,6 +184,14 @@ public class Bloodmark {
         // Removing the date even if the hunt is skips is a way of representing the character getting lucky and just
         // not being accessible when the bounty hunter makes their move.
         target.removeBloodhuntDate(today);
+
+        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
+            return false;
+        }
+
+        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
+            return false;
+        }
 
         if (!isCampaignPlanetside && !target.getStatus().isAbsent()) {
             return false;
@@ -230,7 +231,7 @@ public class Bloodmark {
 
         if (person.isUnderProtection()) {
             Money cost = bloodmark.getBounty().multipliedBy(2.0);
-            boolean paymentSuccessful = campaign.getFinances()
+            boolean paymentSuccessful = campaign.getPlayerForce().getFinances()
                                               .debit(TransactionType.MISCELLANEOUS,
                                                     campaign.getLocalDate(),
                                                     cost,
@@ -263,8 +264,8 @@ public class Bloodmark {
 
         // Inflict injuries or wounds as appropriate
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person,
-              campaign.getCampaignOptions().isUseInjuryFatigue(),
-              campaign.getCampaignOptions().getFatigueRate(), wounds);
+              campaign.getCampaignOptions().get(CampaignOption.USE_INJURY_FATIGUE),
+              campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
         processWounds(campaign, person, today, wounds);
 
         String report = getReport(person.getStatus().isDead(), person.getHyperlinkedFullTitle(), bountyHunterName);
@@ -377,12 +378,11 @@ public class Bloodmark {
             }
         } else {
             int currentWounds = person.getHits();
-            int newWounds = currentWounds + wounds;
-            if (newWounds >= 6) {
-                newWounds = 6;
+            int newWounds = min(currentWounds + wounds, DEATH);
+            person.setHits(newWounds);
+            if (newWounds >= DEATH) {
                 person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
             }
-            person.setHits(newWounds);
         }
     }
 }

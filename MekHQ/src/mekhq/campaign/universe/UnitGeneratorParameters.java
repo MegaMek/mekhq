@@ -45,7 +45,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 
 /**
  * Data structure that contains parameters relevant to unit generation via the IUnitGenerator interface and is capable

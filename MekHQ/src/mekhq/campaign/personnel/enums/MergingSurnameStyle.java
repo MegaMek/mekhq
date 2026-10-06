@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,6 +43,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 public enum MergingSurnameStyle {
     // region Enum Declarations
@@ -190,7 +191,7 @@ public enum MergingSurnameStyle {
         final String spouseSurname = spouse.getSurname();
         final MergingSurnameStyle surnameStyle = isWeighted() ?
                                                        createWeightedSurnameMap(campaign.getCampaignOptions()
-                                                                                      .getMarriageSurnameWeights()).randomItem() :
+                                                                                      .get(CampaignOption.MARRIAGE_SURNAME_WEIGHTS)).randomItem() :
                                                        this;
 
         switch (surnameStyle) {
@@ -294,7 +295,7 @@ public enum MergingSurnameStyle {
                 break;
         }
 
-        if (campaign.getCampaignOptions().isLogMarriageNameChanges()) {
+        if (campaign.getCampaignOptions().get(CampaignOption.LOG_MARRIAGE_NAME_CHANGES)) {
             if (!spouse.getSurname().equals(spouseSurname)) {
                 PersonalLogger.marriageNameChange(spouse, origin, today);
             }

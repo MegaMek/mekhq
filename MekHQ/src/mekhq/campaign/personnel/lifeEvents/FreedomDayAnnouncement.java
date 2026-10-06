@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import javax.swing.ImageIcon;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -81,7 +82,10 @@ public record FreedomDayAnnouncement(Campaign campaign) {
      */
     public FreedomDayAnnouncement(Campaign campaign) {
         this.campaign = campaign;
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.getPlayerForce().isClanForce(),
+                                       campaign.getLocalDate());
 
         String inCharacterMessage = getInCharacterMessage();
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "freedomDay.message.ooc");
@@ -103,7 +107,7 @@ public record FreedomDayAnnouncement(Campaign campaign) {
 
         if (dialog.getDialogChoice() == SUPPRESS_DIALOG_RESPONSE_INDEX) {
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            campaignOptions.setShowLifeEventDialogCelebrations(false);
+            campaignOptions.set(CampaignOption.SHOW_LIFE_EVENT_DIALOG_CELEBRATIONS, false);
         }
     }
 
@@ -159,7 +163,7 @@ public record FreedomDayAnnouncement(Campaign campaign) {
         List<Person> factionPool = new ArrayList<>();
         List<Person> activePool = new ArrayList<>();
 
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (isIneligible(commander, person)) {
                 continue;
             }

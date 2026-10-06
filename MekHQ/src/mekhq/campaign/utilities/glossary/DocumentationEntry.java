@@ -53,7 +53,6 @@ import mekhq.MHQConstants;
  */
 public enum DocumentationEntry {
     ACAR("ACAR", "GlossaryDocs/ACAR-Abstract Combat Auto-Resolve documentation", new Version("0.50.06")),
-    ADMIN_SKILLS("ADMIN_SKILLS", "GlossaryDocs/Admin Skills", new Version("0.50.06")),
     AGING_EFFECTS("AGING_EFFECTS", "GlossaryDocs/Personnel Modules/Aging Effects", new Version("0.50.06")),
     AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", new Version("0.50.06")),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide", new Version("0.50.06")),

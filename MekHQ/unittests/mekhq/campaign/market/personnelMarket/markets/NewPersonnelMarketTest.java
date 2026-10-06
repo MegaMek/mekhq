@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,8 +32,7 @@
  */
 package mekhq.campaign.market.personnelMarket.markets;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT;
@@ -45,20 +44,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import megamek.common.compute.Compute;
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
@@ -68,10 +64,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
 class NewPersonnelMarketTest {
-    static PersonnelMarketEntry marketEntryAdminHR = entry(ADMINISTRATOR_HR, 1, 1);
+    static PersonnelMarketEntry marketEntryAdmin = entry(ADMINISTRATOR, 1, 1);
     static PersonnelMarketEntry marketEntryDoctor = entry(DOCTOR, 2, 2);
     static PersonnelMarketEntry marketEntryMekWarrior = entry(MEKWARRIOR, 3, 3);
 
@@ -110,9 +107,9 @@ class NewPersonnelMarketTest {
               marketEntryDoctor,
               MEKWARRIOR,
               marketEntryMekWarrior,
-              ADMINISTRATOR_HR,
-              marketEntryAdminHR);
-        List<PersonnelRole> expectedOrder = List.of(ADMINISTRATOR_HR, DOCTOR, MEKWARRIOR);
+              ADMINISTRATOR,
+              marketEntryAdmin);
+        List<PersonnelRole> expectedOrder = List.of(ADMINISTRATOR, DOCTOR, MEKWARRIOR);
 
         List<PersonnelMarketEntry> sortedList = personnelMarket.getMarketEntriesAsList(marketEntries);
 
@@ -204,8 +201,7 @@ class NewPersonnelMarketTest {
         Map<PersonnelRole, PersonnelMarketEntry> marketEntries = new HashMap<>();
         marketEntries.put(DOCTOR, entry(DOCTOR, -2, 4));
         marketEntries.put(MEKWARRIOR, entry(MEKWARRIOR, 0, 1));
-        marketEntries.put(ADMINISTRATOR_HR, entry(ADMINISTRATOR_HR, 1, -1));
-        marketEntries.put(ADMINISTRATOR_COMMAND, entry(ADMINISTRATOR_COMMAND, 1, 0));
+        marketEntries.put(ADMINISTRATOR, entry(ADMINISTRATOR, 1, -1));
         marketEntries.put(LAM_PILOT, entry(LAM_PILOT, -1, -1));
         marketEntries.put(PROTOMEK_PILOT, entry(PROTOMEK_PILOT, 1, 1));
 
@@ -218,8 +214,7 @@ class NewPersonnelMarketTest {
         assertTrue(sanitizedEntries.containsKey(PROTOMEK_PILOT));
         assertFalse(sanitizedEntries.containsKey(DOCTOR));
         assertFalse(sanitizedEntries.containsKey(MEKWARRIOR));
-        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR_HR));
-        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR_COMMAND));
+        assertFalse(sanitizedEntries.containsKey(ADMINISTRATOR));
         assertFalse(sanitizedEntries.containsKey(LAM_PILOT));
     }
 
@@ -291,11 +286,11 @@ class NewPersonnelMarketTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = { "0, ADMINISTRATOR_HR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
+    @CsvSource(value = { "0, ADMINISTRATOR", "1, DOCTOR", "2, DOCTOR", "3, MEKWARRIOR", "4, MEKWARRIOR",
                          "5, MEKWARRIOR" })
     void testPickEntry_multiplePositiveEntriesEachPickable(int randomValue, String expectedEntryKey) {
         // Setup
-        List<PersonnelMarketEntry> entries = List.of(marketEntryAdminHR, marketEntryDoctor, marketEntryMekWarrior);
+        List<PersonnelMarketEntry> entries = List.of(marketEntryAdmin, marketEntryDoctor, marketEntryMekWarrior);
         NewPersonnelMarket market = new NewPersonnelMarket();
 
         // Act
@@ -358,7 +353,7 @@ class NewPersonnelMarketTest {
         PersonnelMarketEntry negativeCountDoctor = entry(DOCTOR, 100, -1);
         PersonnelMarketEntry zeroCountLAMPilot = entry(LAM_PILOT, 100, 0);
         PersonnelMarketEntry negativeWeightProtoMekPilot = entry(PROTOMEK_PILOT, -1, 10);
-        PersonnelMarketEntry zeroWeightAdmin = entry(ADMINISTRATOR_COMMAND, 0, 10);
+        PersonnelMarketEntry zeroWeightAdmin = entry(ADMINISTRATOR, 0, 10);
 
         List<PersonnelMarketEntry> entries = List.of(weightedMekWarrior,
               negativeCountDoctor,
@@ -495,7 +490,7 @@ class NewPersonnelMarketTest {
     @Test
     void generateSingleApplicant_returnNullIfApplicantIsNull() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -504,9 +499,12 @@ class NewPersonnelMarketTest {
         Faction faction = new Faction();
         market.setApplicantOriginFactions(List.of(faction));
 
-        when(mockCampaign.newPerson(any(PersonnelRole.class),
-              eq(faction.getShortName()),
-              eq(Gender.RANDOMIZE))).thenReturn(null);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(null);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, SOLDIER);
 
@@ -527,7 +525,7 @@ class NewPersonnelMarketTest {
     @Test
     void generateSingleApplicant_returnApplicantIfApplicantIsNotNull() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -535,12 +533,15 @@ class NewPersonnelMarketTest {
 
         Faction faction = new Faction();
         market.setApplicantOriginFactions(List.of(faction));
-        when(mockCampaign.getFaction()).thenReturn(faction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(faction);
 
         Person person = new Person(mockCampaign);
-        when(mockCampaign.newPerson(any(PersonnelRole.class),
-              eq(faction.getShortName()),
-              eq(Gender.RANDOMIZE))).thenReturn(person);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(person);
 
         PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3050, 3100, SOLDIER);
 

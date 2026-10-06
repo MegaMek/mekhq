@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -62,6 +62,13 @@ package mekhq.campaign.campaignOptions;
  * @param useDiseases                   whether random diseases are enabled (and applicable)
  * @param useNormalizedContractPayModel whether contract pay is using the alternate method
  * @param useDiminishingContractPay     whether diminishing returns are applied to contract pay
+ * @param requireMekWarriorKitToDeploy  whether a Mek requires its crew to wear a MekWarrior kit to deploy
+ * @param specialistTechSkillsEnabled   whether the granular specialist tech skills are in use (the inverse of the
+ *                                      "use global tech skills only" option), so enabling them reads as a
+ *                                      {@code false -> true} transition like every other tracked freebie
+ * @param techsNeedToolKit              whether technicians require a tool kit to make repairs
+ * @param requireAerospaceKitToDeploy   whether an aerospace fighter requires its crew to wear the aerospace pilot kit
+ *                                      to deploy
  *
  * @author Illiani
  * @since 0.50.11
@@ -69,7 +76,10 @@ package mekhq.campaign.campaignOptions;
 public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean trackFactionStanding,
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
-      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay) {
+      boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
+      boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy,
+      boolean useSupportTeams, boolean specialistTechSkillsEnabled, boolean techsNeedToolKit,
+      boolean requireAerospaceKitToDeploy) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -88,23 +98,30 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
      */
     public CampaignOptionsFreebieTracker(CampaignOptions options) {
         this(
-              options.isAwardVeterancySPAs(),
-              options.isTrackFactionStanding(),
-              !options.getPrisonerCaptureStyle().isNone(),
-              options.isUseMASHTheatres(),
-              options.isUseFatigue(),
-              options.isUseCamOpsSalvage(),
+              options.get(CampaignOption.AWARD_VETERANCY_SP_AS),
+              options.get(CampaignOption.TRACK_FACTION_STANDING),
+              !options.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone(),
+              options.get(CampaignOption.USE_MASH_THEATRES),
+              options.get(CampaignOption.USE_FATIGUE),
+              options.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations(),
               options.isUseStratCon(),
               options.isUseStratConMaplessMode(),
-              options.isUseAdvancedScouting() && options.isUseStratCon(),
-              options.isUseAlternativeAdvancedMedical(),
-              options.isUseAlternativeAdvancedMedical() && options.isUseRandomDiseases(),
-              options.isUseAlternatePaymentMode(),
-              options.isUseDiminishingContractPay() && isDiminishingContractPayRelevant(options)
+              options.get(CampaignOption.USE_ADVANCED_SCOUTING) && options.isUseStratCon(),
+              options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
+              options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL) && options.get(CampaignOption.USE_RANDOM_DISEASES),
+              options.get(CampaignOption.USE_ALTERNATE_PAYMENT_MODE),
+              options.get(CampaignOption.USE_DIMINISHING_CONTRACT_PAY) && isDiminishingContractPayRelevant(options),
+              options.get(CampaignOption.USE_CHAOS_REPUTATION),
+              options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY),
+              options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY),
+              options.get(CampaignOption.USE_SUPPORT_TEAMS),
+              !options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY),
+              options.get(CampaignOption.TECHS_NEED_TOOL_KIT),
+              options.get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY)
         );
     }
 
     private static boolean isDiminishingContractPayRelevant(CampaignOptions options) {
-        return options.isUsePeacetimeCost() || options.isEquipmentContractBase();
+        return options.get(CampaignOption.USE_PEACETIME_COST) || options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
     }
 }

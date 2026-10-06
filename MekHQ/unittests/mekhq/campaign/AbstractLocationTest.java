@@ -46,6 +46,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -154,7 +155,7 @@ public class AbstractLocationTest {
 
         @BeforeEach
         void setUp() {
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
             today = LocalDate.of(3025, 1, 1);
         }
 

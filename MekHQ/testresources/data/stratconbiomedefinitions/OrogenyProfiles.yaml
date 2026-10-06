@@ -1,0 +1,91 @@
+# MegaMek Data (C) 2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+#
+# StratCon improved-sector-generation orogeny (mountain-building) profiles. A profile is chosen for a planet by
+# multi-factor weighting: weight = (Gaussian on gravity) * (Gaussian on temperature) * (Gaussian on water%) *
+# (rocky/icy/airless multipliers). A null Gaussian center means the profile is indifferent to that condition. A null
+# multiplier or modifier is neutral (1.0); a null volcanismChance uses the default. The 'type' must match an
+# OrogenyProfileType constant, which also selects the mountain-shape algorithm.
+#
+# Sigmas are in each condition's own units: gravity in G, temperature in Celsius, water in percent.
+
+gravitySigma: 0.4
+temperatureSigma: 25
+waterSigma: 25
+
+profiles:
+  # Long parallel ranges: high-gravity, rocky, temperate worlds.
+  - type: CORDILLERA
+    gravityCenter: 1.4
+    waterCenter: 40
+    rockyMultiplier: 1.4
+    rangeCountModifier: 1.0
+    volcanismChance: 10
+
+  # Many short parallel ridges: high-gravity, arid, rocky worlds.
+  - type: BASIN_AND_RANGE
+    gravityCenter: 1.4
+    waterCenter: 10
+    rockyMultiplier: 1.5
+    rangeCountModifier: 1.3
+    volcanismChance: 5
+
+  # One large rugged upland.
+  - type: MASSIF
+    gravityCenter: 1.2
+    rockyMultiplier: 1.2
+    rangeCountModifier: 0.8
+    volcanismChance: 5
+
+  # Sparse isolated peaks: low-gravity or old, heavily eroded worlds.
+  - type: SCATTERED_PEAKS
+    gravityCenter: 0.6
+    waterCenter: 75
+    rangeCountModifier: 0.6
+    volcanismChance: 15
+
+  # Curved chain of mostly volcanic peaks: hot, active worlds.
+  - type: VOLCANIC_ARC
+    gravityCenter: 1.1
+    temperatureCenter: 40
+    rockyMultiplier: 1.2
+    rangeCountModifier: 1.0
+    volcanismChance: 70
+
+  # Scattered volcanic and lunar clusters: airless worlds strongly favored.
+  - type: SHIELD_CRATERED
+    temperatureCenter: 30
+    rockyMultiplier: 1.3
+    airlessMultiplier: 3.0
+    rangeCountModifier: 0.9
+    volcanismChance: 55
+
+  # A few low, worn-down ranges: wet, old worlds.
+  - type: ERODED_ROLLING
+    gravityCenter: 0.7
+    waterCenter: 70
+    icyMultiplier: 1.2
+    rangeCountModifier: 0.5
+    volcanismChance: 5
+
+  # A large flat-topped upland: arid, rocky worlds.
+  - type: PLATEAU
+    gravityCenter: 1.0
+    waterCenter: 10
+    rockyMultiplier: 1.5
+    rangeCountModifier: 0.8
+    volcanismChance: 5

@@ -586,7 +586,7 @@ public enum PersonnelStatus {
             return false;
         }
         for (ILocation cursor = person.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
-            if (cursor == campaign) {
+            if (cursor == campaign.getPlayerForce().getForceDetachment()) {
                 return false;
             }
             if (cursor instanceof AbstractLocation) {

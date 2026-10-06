@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2010-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,12 +59,15 @@ import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * @author Jay Lawson
@@ -139,7 +142,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
-            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getFaction().isClan()),
+            personTypeModel.addElement(new PersonTypeItem(personnelRole.getLabel(campaign.getPlayerForce().getFaction().isClan()),
                   personnelRole));
         }
         choiceType.setModel(personTypeModel);
@@ -284,11 +287,10 @@ public class HireBulkPersonnelDialog extends JDialog {
             JPanel skillRangePanel = new JPanel(new GridBagLayout());
             getContentPane().add(skillRangePanel, gridBagConstraints);
 
-            skillLevel = new MMComboBox<>("comboSkillLevel", SkillLevel.values());
-            skillLevel.setSelectedItem(SkillLevel.REGULAR);
+            skillLevel = new MMComboBox<>("comboSkillLevel", SkillLevelPickerUtility.PICKER_LEVELS);
+            SkillLevelPickerUtility.applyRandomRenderer(skillLevel);
+            skillLevel.setSelectedItem(SkillLevel.NONE);
             skillLevel.setEnabled(false);
-
-            skillLevel.removeItem(SkillLevel.NONE);
 
             JLabel labelMinSkill = new JLabel("Minimum Skill:");
             labelMinSkill.setLabelFor(skillLevel);
@@ -352,19 +354,17 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         while (number > 0) {
             PersonnelRole selectedRole = selectedItem.getRole();
-            Person person = campaign.newPerson(selectedRole);
+            Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, selectedRole);
 
             // Dependents & 'None' don't have skills
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
             if (useSkill && !selectedRole.isDependent() && !selectedRole.isNone()) {
-                if (skillLevel.getSelectedItem() != null) {
-                    boolean checkVeterancyEligibility = false;
-                    overrideSkills(campaign,
-                          person,
-                          selectedRole,
-                          skillLevel.getSelectedItem(),
-                          checkVeterancyEligibility);
-                }
+                boolean checkVeterancyEligibility = false;
+                overrideSkills(campaign,
+                      person,
+                      selectedRole,
+                      SkillLevelPickerUtility.resolve(skillLevel.getSelectedItem()),
+                      checkVeterancyEligibility);
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).rankNumeric());
@@ -385,7 +385,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                     person.limitSkills(0);
                 }
 
-                if (isUnderSixteen && campaignOptions.isNoRandomPortraitsForChildren()) {
+                if (isUnderSixteen && campaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)) {
                     person.setPortrait(new Portrait());
                 }
             }
@@ -398,7 +398,21 @@ public class HireBulkPersonnelDialog extends JDialog {
             // might have occurred via GM Mode or age restrictions.
             setVeterancyAwardEligibility(campaign, person);
 
-            if (!campaign.recruitPerson(person, isGmHire, true)) {
+            // Per-character starting reputation only matters under personnel tracking; campaign-level tracking uses a
+            // single stored value, so there is nothing to seed per character.
+            boolean applyStartingReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION) &&
+                                                    !campaignOptions.get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION) &&
+                                                    campaignOptions.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
+            if (applyStartingReputation) {
+                ChaosReputation.applyStartingReputation(campaignOptions,
+                      campaign.getPlayerForce().isClanForce(),
+                      today,
+                      person);
+                ChaosReputation.applyStartingCriminalRecord(today, person);
+            }
+
+
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGmHire, true)) {
                 number = 0;
             } else {
                 number--;
@@ -412,7 +426,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         // Determine correct profession to pass into the loop
         final PersonnelRole role = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole();
-        rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
+        rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getPlayerForce().getRankSystem(),
               Profession.getProfessionFromPersonnelRole(role)));
 
         choiceRanks.setModel(rankModel);

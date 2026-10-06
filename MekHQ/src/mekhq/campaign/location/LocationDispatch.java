@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.location;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,11 +42,16 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.UnitPartsTransfer;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -69,54 +73,75 @@ public final class LocationDispatch {
     private static final String LOG_DISPATCH_UNITS = "dispatchUnitsToLocation";
     private static final String LOG_DISPATCH_PARTS = "dispatchPartsToLocation";
 
+    /** Overland transit time, in days, for a same-planet move to a different root location. */
+    private static final double GROUND_TRANSIT_DAYS = 2.0;
+
     private LocationDispatch() {}
 
     /**
-     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
-     * parameter when calculating a new journey's duration.
+     * Moves a person directly to the same effective location as {@code anchor}, with no travel time.
      *
-     * <p>When already in-system, we inherit its current transit progress.
-     * When there is no location, we assume the
-     * traveler starts at the outer jump point of their system.</p>
+     * <p>Used when a person is created or recruited with the main force but is immediately meant to serve with
+     * something elsewhere, such as crew hired for a unit at a player base or in transit. The person is placed in the
+     * anchor's base personnel when it is at a base, onto the anchor's travel node when it is in transit, and otherwise
+     * with the main force's personnel.</p>
      *
-     * @param fromSystem the departure system; must not be {@code null}
-     * @param campaign   the active campaign; must not be {@code null}
-     * @return transit time in days
+     * @param campaign the current campaign
+     * @param person   the person to move
+     * @param anchor   the location item the person must end up alongside, typically a {@link Unit}
+     *
+     * @return {@code true} if the person is now at the same effective location as {@code anchor}, otherwise
+     *       {@code false}
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
-        return campaign.getCurrentLocation() != null
-              ? campaign.getCurrentLocation().getTransitTime()
-              : fromSystem.getTimeToJumpPoint(1.0);
+    public static boolean movePersonToLocationOf(Campaign campaign, Person person, ILocation anchor) {
+        if (LocationUtils.areSameEffectiveLocation(anchor, person)) {
+            return true;
+        }
+
+        AbstractBase anchorBase = LocationUtils.findEffectiveBase(anchor);
+        ILocation personnelDestination;
+        if (anchorBase != null) {
+            personnelDestination = anchorBase.getBasePersonnel();
+        } else if (LocationUtils.isInTransit(anchor)) {
+            personnelDestination = anchor.getCurrentLocation();
+        } else {
+            personnelDestination = campaign.getPlayerForce().getPersonnel();
+        }
+
+        person.setParent(personnelDestination);
+
+        if (!LocationUtils.areSameEffectiveLocation(anchor, person)) {
+            LOGGER.warn("Could not move {} to the location of {}", person.getFullName(), anchor);
+            return false;
+        }
+        return true;
     }
 
     /**
-     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
-     * 2 days.
+     * Removes a spent travel node from the campaign: detaches it from the location tree and de-registers it from the
+     * campaign's location list.
      *
-     * @param path         the route to calculate; must not be {@code null}
-     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
-     * @param startTransit the already-elapsed transit time at the origin, in days
-     * @return journey length in whole days, always at least 2
+     * <p>No-op when {@code travelNode} is {@code null}, still {@link ILocation#isInUse() in use} — i.e. it still has a
+     * {@link mekhq.campaign.Campaign}, {@link mekhq.campaign.base.AbstractBase}, person, unit, or part below it — or its
+     * subtree is still a queued {@link CampaignLocationManager#holdsPendingTravelDestination pending-travel
+     * destination}. This guards against removing a node that is not really a spent travel node, most notably the main
+     * force's own {@link mekhq.campaign.CurrentLocation} (which carries the whole campaign) when it is reached during
+     * education arrival.</p>
+     *
+     * @param travelNode      the node to remove, or {@code null}
+     * @param locationManager the campaign's location registry; must not be {@code null}
      */
-    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
-        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
-    }
-
-    /**
-     * Removes a completed travel node from the campaign: detaches it from the location tree and
-     * de-registers it from the campaign's location list.
-     *
-     * <p>Safe to call with a {@code null} argument (no-op).</p>
-     *
-     * @param travelNode the node to remove, or {@code null}
-     * @param campaign   the active campaign; must not be {@code null}
-     */
-    public static void removeTravelNode(@Nullable CurrentLocation travelNode, Campaign campaign) {
-        if (travelNode == null) {
+    public static void removeTravelNode(@Nullable AbstractMobileLocation travelNode, CampaignLocationManager locationManager) {
+        if (travelNode == null
+                  || travelNode.isInUse()
+                  || locationManager.holdsPendingTravelDestination(travelNode)) {
             return;
         }
         travelNode.setParent(null);
-        campaign.removeLocation(travelNode);
+        locationManager.removeLocation(travelNode);
     }
 
     /**
@@ -130,39 +155,43 @@ public final class LocationDispatch {
      *
      * @param travelNode        the completed travel node; must not be {@code null}
      * @param personDestination destination container for persons; if {@code null}, persons fall back to
-     *                          {@code campaign} with a warning
+     *                          {@code fallbackLocation} with a warning
      * @param unitDestination   destination container for units; if {@code null}, units fall back to
-     *                          {@code campaign} with a warning
+     *                          {@code fallbackLocation} with a warning
      * @param partDestination   destination container for parts; if {@code null}, parts fall back to
-     *                          {@code campaign} with a warning
-     * @param campaign          the active campaign; must not be {@code null}
+     *                          {@code fallbackLocation} with a warning
+     * @param fallbackLocation  the location to land items at when their destination is {@code null} (currently the
+     *                          campaign root); must not be {@code null}
+     * @param locationManager   the campaign's location registry, used to de-register the spent node; must not be
+     *                          {@code null}
      */
-    public static void landFromTravelNode(CurrentLocation travelNode,
+    public static void landFromTravelNode(AbstractMobileLocation travelNode,
           @Nullable ILocation personDestination,
           @Nullable ILocation unitDestination,
           @Nullable ILocation partDestination,
-          Campaign campaign) {
+          ILocation fallbackLocation,
+          CampaignLocationManager locationManager) {
         if (personDestination == null) {
-            LOGGER.warn("landFromTravelNode: null personDestination; landing persons at Campaign root");
+            LOGGER.warn("landFromTravelNode: null personDestination; landing persons at fallback location");
         }
         if (unitDestination == null) {
-            LOGGER.warn("landFromTravelNode: null unitDestination; landing units at Campaign root");
+            LOGGER.warn("landFromTravelNode: null unitDestination; landing units at fallback location");
         }
         if (partDestination == null) {
-            LOGGER.warn("landFromTravelNode: null partDestination; landing parts at Campaign root");
+            LOGGER.warn("landFromTravelNode: null partDestination; landing parts at fallback location");
         }
         landFromTravelNodeImpl(travelNode,
-              personDestination != null ? personDestination : campaign,
-              unitDestination != null ? unitDestination : campaign,
-              partDestination != null ? partDestination : campaign,
-              campaign);
+              personDestination != null ? personDestination : fallbackLocation,
+              unitDestination != null ? unitDestination : fallbackLocation,
+              partDestination != null ? partDestination : fallbackLocation,
+              locationManager);
     }
 
-    private static void landFromTravelNodeImpl(CurrentLocation travelNode,
+    private static void landFromTravelNodeImpl(AbstractMobileLocation travelNode,
           ILocation personDestination,
           ILocation unitDestination,
           ILocation partDestination,
-          Campaign campaign) {
+          CampaignLocationManager locationManager) {
         for (Person person : new ArrayList<>(travelNode.fetchPersonnelAtLocation())) {
             person.setParent(personDestination);
         }
@@ -172,7 +201,7 @@ public final class LocationDispatch {
         for (Part part : new ArrayList<>(travelNode.fetchPartsAtLocation())) {
             LocationNode.LocationManager.setLocation(part, partDestination);
         }
-        removeTravelNode(travelNode, campaign);
+        removeTravelNode(travelNode, locationManager);
     }
 
     /**
@@ -181,14 +210,14 @@ public final class LocationDispatch {
      * immediately {@code true} and {@link IPlace#processArrivals} will land all carried items on
      * its next call.
      */
-    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination, Campaign campaign,
-          String logContext) {
+    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination,
+          CampaignLocationManager locationManager, String logContext) {
         CurrentLocation arrivedLocation = new CurrentLocation(system, 0.0);
         if (!arrivedLocation.setParent(destination)) {
             LOGGER.warn("{}: setParent failed for arrivedLocation → {}",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(arrivedLocation);
+        locationManager.addLocation(arrivedLocation);
         return arrivedLocation;
     }
 
@@ -201,11 +230,11 @@ public final class LocationDispatch {
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
           PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
-        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
-        if (path == null || path.isEmpty()) {
+        JumpPath path = LocationUtils.planJumpPath(fromSystem, destinationSystem, campaign);
+        if (path == null) {
             return Optional.empty();
         }
-        double startTransit = computeStartTransit(fromSystem, campaign);
+        double startTransit = LocationUtils.computeStartTransit(fromSystem, campaign);
         CurrentLocation travelNode = new CurrentLocation(fromSystem, startTransit);
         travelNode.setJumpPath(path);
         if (!travelNode.setParent(destination)) {
@@ -213,8 +242,41 @@ public final class LocationDispatch {
                   + "items may display as Main Force after save/load",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(travelNode);
+        campaign.getCampaignLocationManager().addLocation(travelNode);
         return Optional.of(travelNode);
+    }
+
+    /**
+     * Builds an on-planet overland travel node at {@code system} (a fixed {@link #GROUND_TRANSIT_DAYS}
+     * day journey, no jump path), parented under {@code destination}, and registers it with the
+     * campaign. Used for same-planet moves to a different root location.
+     */
+    private static GroundTransitLocation buildGroundTransitNode(PlanetarySystem system, ILocation destination,
+          Campaign campaign, String logContext) {
+        GroundTransitLocation groundNode = new GroundTransitLocation(system, GROUND_TRANSIT_DAYS);
+        if (!groundNode.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for groundTransitNode → {}; "
+                  + "items may display as Main Force after save/load",
+                  logContext, destination.getClass().getSimpleName());
+        }
+        campaign.getCampaignLocationManager().addLocation(groundNode);
+        return groundNode;
+    }
+
+    /**
+     * Returns {@code true} if {@code item} and {@code destination} hang under the same root
+     * {@link AbstractLocation} — i.e. they are already at the same location and no travel node is
+     * needed. Each base, campus, and the main force is its own root {@code AbstractLocation}, so
+     * identity comparison distinguishes them. When either root can't be resolved, returns
+     * {@code true} so callers fall back to direct landing (preserving legacy behavior).
+     */
+    private static boolean sharesRootLocation(ILocation item, ILocation destination) {
+        AbstractLocation itemRoot = item.getCurrentLocation();
+        AbstractLocation destinationRoot = destination.getCurrentLocation();
+        if (itemRoot == null || destinationRoot == null) {
+            return true;
+        }
+        return itemRoot == destinationRoot;
     }
 
     /**
@@ -225,7 +287,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
+    private static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
         dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, destination, null);
     }
 
@@ -244,31 +306,27 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchUnitsToLocation(Collection<Unit> units,
+    private static void dispatchUnitsToLocation(Collection<Unit> units,
           ILocation destination,
           Campaign campaign) {
 
-        Hangar arrivalHangar = (destination instanceof AbstractBase base)
-              ? base.getBaseHangar()
-              : campaign.getHangar();
-        Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
-              ? base.getBaseWarehouse()
-              : campaign.getWarehouse();
+        LocalHangar arrivalHangar;
+        arrivalHangar = destination instanceof AbstractBase base ?
+                              base.getBaseHangar() :
+                              campaign.getPlayerForce().getHangar();
+        LocalWarehouse arrivalWarehouse;
+        arrivalWarehouse = destination instanceof AbstractBase base ?
+                                 base.getBaseWarehouse() :
+                                 campaign.getPlayerForce().getWarehouse();
 
         // Move data structures immediately so hangar and warehouse filters stay correct.
         dispatch(units, destination, campaign, LOG_DISPATCH_UNITS, arrivalHangar, group -> {
             for (Unit unit : group) {
-                Hangar sourceHangar = unit.getHangar();
-                (sourceHangar != null ? sourceHangar : campaign.getHangar()).removeUnit(unit.getId());
+                LocalHangar sourceHangar = unit.getHangar();
+                (sourceHangar != null ? sourceHangar : campaign.getPlayerForce().getHangar()).removeUnit(unit.getId());
                 arrivalHangar.addUnit(unit);
-                // Installed parts live in the warehouse local to their unit; move them along.
-                for (Part part : unit.getParts()) {
-                    Warehouse sourceWarehouse = part.getWarehouse();
-                    if (sourceWarehouse != arrivalWarehouse) {
-                        (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
-                        arrivalWarehouse.addPart(part);
-                    }
-                }
+                // Its parts go with it, each from the warehouse that keeps it, with their links intact
+                UnitPartsTransfer.moveUnitParts(campaign, unit, arrivalWarehouse);
             }
         });
     }
@@ -287,20 +345,54 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
+    private static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
 
-        Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
-              ? base.getBaseWarehouse()
-              : campaign.getWarehouse();
+        LocalWarehouse arrivalWarehouse;
+        arrivalWarehouse = destination instanceof AbstractBase base ?
+                                 base.getBaseWarehouse() :
+                                 campaign.getPlayerForce().getWarehouse();
 
         // Move the data structure immediately so warehouse filters stay correct.
         dispatch(parts, destination, campaign, LOG_DISPATCH_PARTS, arrivalWarehouse, group -> {
-            for (Part part : group) {
-                Warehouse sourceWarehouse = part.getWarehouse();
-                (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
-                arrivalWarehouse.addPart(part);
-            }
+            // each spare goes with the parts that belong to it, such as a removed suit's equipment
+            UnitPartsTransfer.moveSpareParts(campaign, group, arrivalWarehouse);
         });
+    }
+
+    /**
+     * Dispatches a heterogeneous group of {@code travelers} to {@code destination}, splitting them by type so each
+     * reaches {@code destination} through the appropriate type-specific entry point
+     * ({@link #dispatchToLocation}, {@link #dispatchUnitsToLocation}, {@link #dispatchPartsToLocation}), which maintains
+     * the relevant hangar and warehouse data structures. Travelers that are not a {@link Person}, {@link Unit}, or
+     * {@link Part} are logged and skipped.
+     *
+     * @param travelers  the persons, units, and/or parts to dispatch; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchTravelers(Collection<? extends ILocation> travelers, ILocation destination,
+          Campaign campaign) {
+        List<Person> people = new ArrayList<>();
+        List<Unit> units = new ArrayList<>();
+        List<Part> parts = new ArrayList<>();
+        for (ILocation traveler : travelers) {
+            switch (traveler) {
+                case Person person -> people.add(person);
+                case Unit unit -> units.add(unit);
+                case Part part -> parts.add(part);
+                default -> LOGGER.warn("dispatchTravelers: unsupported traveler type {} — skipping",
+                      traveler.getClass().getSimpleName());
+            }
+        }
+        if (!people.isEmpty()) {
+            dispatchToLocation(people, destination, campaign);
+        }
+        if (!units.isEmpty()) {
+            dispatchUnitsToLocation(units, destination, campaign);
+        }
+        if (!parts.isEmpty()) {
+            dispatchPartsToLocation(parts, destination, campaign);
+        }
     }
 
     /**
@@ -341,14 +433,29 @@ public final class LocationDispatch {
 
             if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
                 PlanetarySystem system = destinationSystem != null ? destinationSystem : fromSystem;
-                land(group, destination, directLandingTarget, system, campaign, logMarker);
+                // Same planet: items already at the destination's root location land immediately;
+                // items at a different root on the same planet take a GroundTransitLocation overland trip.
+                List<T> alreadyThere = new ArrayList<>();
+                List<T> needGroundTransit = new ArrayList<>();
+                for (T item : group) {
+                    (sharesRootLocation(item, destination) ? alreadyThere : needGroundTransit).add(item);
+                }
+                if (!alreadyThere.isEmpty()) {
+                    land(alreadyThere, destination, directLandingTarget, system,
+                          campaign.getCampaignLocationManager(), logMarker);
+                }
+                if (!needGroundTransit.isEmpty()) {
+                    GroundTransitLocation groundNode = buildGroundTransitNode(system, destination, campaign, logMarker);
+                    needGroundTransit.forEach(item -> reparent(item, groundNode));
+                }
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destinationSystem, destination, campaign, logMarker);
             if (maybeTravelLocation.isEmpty()) {
-                land(group, destination, directLandingTarget, destinationSystem, campaign, logMarker);
+                land(group, destination, directLandingTarget, destinationSystem,
+                      campaign.getCampaignLocationManager(), logMarker);
                 continue;
             }
             CurrentLocation travelLocation = maybeTravelLocation.get();
@@ -362,9 +469,9 @@ public final class LocationDispatch {
      * {@code directLandingTarget}.
      */
     private static void land(List<? extends ILocation> group, ILocation destination, ILocation directLandingTarget,
-          PlanetarySystem system, Campaign campaign, String logMarker) {
+          PlanetarySystem system, CampaignLocationManager locationManager, String logMarker) {
         if (destination instanceof AbstractBase) {
-            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, logMarker);
+            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, locationManager, logMarker);
             group.forEach(item -> reparent(item, arrivedLocation));
         } else {
             group.forEach(item -> reparent(item, directLandingTarget));

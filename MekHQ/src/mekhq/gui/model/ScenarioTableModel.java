@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,21 +38,25 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
+import mekhq.campaign.mission.scenarios.AtBScenario;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
 
@@ -183,11 +187,14 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             return ScenarioClassification.NONE;
         }
 
+        AbstractContract contract = (scenario instanceof AtBScenario atBScenario) ?
+                                          atBScenario.getContract(getCampaign()) :
+                                          null;
         return new ScenarioClassification(true,
               stratconScenario.isStrategicObjective(),
               stratconScenario.isTurningPoint(),
               scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial(),
-              scenario.getStratConScenarioType().isOfficialChallenge());
+              MHQMorale.isScenarioOutcomeAffectingMorale(scenario.getStratConScenarioType(), contract));
     }
 
     private String getScenarioSeverityText(ScenarioClassification classification) {
@@ -232,7 +239,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             return null;
         }
 
-        AtBContract contract = atBScenario.getContract(campaign);
+        AbstractContract contract = atBScenario.getContract(campaign);
         if (contract == null) {
             return null;
         }
@@ -254,17 +261,15 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
         } else if (col == COL_STATUS) {
             return getScenarioStatusText(scenario);
         } else if (col == COL_DATE) {
-            if (scenario.getDate() == null) {
-                return "-";
-            } else {
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(scenario.getDate());
-            }
+            LocalDate date = scenario.getDate();
+            String text = (date == null) ? "-" : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
+            return new DisplayDate(date, text);
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(false).size();
         } else if (col == COL_SECTOR) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario atBScenario) {
-                    AtBContract contract = atBScenario.getContract(campaign);
+                    AbstractContract contract = atBScenario.getContract(campaign);
                     if (contract == null) {
                         return "-";
                     }
@@ -287,6 +292,28 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             return "-";
         } else {
             return "?";
+        }
+    }
+
+    /**
+     * A scenario date paired with its display text, so the table shows the user's chosen date format while sorting
+     * on the underlying date. Undated scenarios sort before all dated ones.
+     *
+     * @param date the scenario date, or {@code null} if the scenario is undated
+     * @param text the text shown in the table
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record DisplayDate(@Nullable LocalDate date, String text) implements Comparable<DisplayDate> {
+        @Override
+        public int compareTo(DisplayDate other) {
+            return Comparator.nullsFirst(Comparator.<LocalDate>naturalOrder()).compare(date, other.date);
+        }
+
+        @Override
+        public String toString() {
+            return text;
         }
     }
 

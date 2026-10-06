@@ -219,7 +219,7 @@ public class AttributesTest {
         attributes.changeAllAttributes(phenotype, options, -999);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -240,7 +240,7 @@ public class AttributesTest {
         attributes.changeAllAttributes(phenotype, options, 999);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -260,7 +260,7 @@ public class AttributesTest {
             attributes.changeAllAttributes(phenotype, options, i);
 
             for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
+                if (attribute.isNoAttribute()) {
                     continue;
                 }
 
