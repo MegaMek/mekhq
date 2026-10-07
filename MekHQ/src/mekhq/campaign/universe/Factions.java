@@ -366,6 +366,25 @@ public class Factions {
      * @since 0.51.0
      */
     public static String getFactionLogoAddress(int gameYear, String factionCode) {
+        String canonicalAddress = getCanonicalFactionLogoAddress(gameYear, factionCode);
+        if (canonicalAddress != null) {
+            return canonicalAddress;
+        }
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        String key = faction.isClan() ? "logo_clan_generic" : "logo_mercenaries";
+        return "data/images/universe/factions/" + key + ".png";
+    }
+
+    /**
+     * Returns the era-appropriate built-in logo path, or {@code null} when the faction has no dedicated map artwork.
+     * Callers can use this to distinguish a dedicated logo from the generic fallback without duplicating the mapping.
+     *
+     * @param gameYear    the in-game year
+     * @param factionCode the faction identifier
+     *
+     * @return the built-in logo path, or {@code null} if the faction is not mapped
+     */
+    public static @Nullable String getCanonicalFactionLogoAddress(int gameYear, String factionCode) {
         final String IMAGE_DIRECTORY = "data/images/universe/factions/";
         final String FILE_TYPE = ".png";
 
@@ -457,18 +476,9 @@ public class Factions {
             case "AXP" -> "logo_axumite_providence";
             case "NDC" -> "logo_new_delphi_compact";
             case "REB" -> "logo_rebels";
-            // Fallbacks
-            default -> {
-                Faction faction = Factions.getInstance().getFaction(factionCode);
-
-                if (faction != null && faction.isClan()) {
-                    yield "logo_clan_generic";
-                } else {
-                    yield "logo_mercenaries";
-                }
-            }
+            default -> null;
         };
 
-        return IMAGE_DIRECTORY + key + FILE_TYPE;
+        return key == null ? null : IMAGE_DIRECTORY + key + FILE_TYPE;
     }
 }
