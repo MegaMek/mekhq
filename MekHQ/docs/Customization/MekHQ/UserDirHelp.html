@@ -34,7 +34,37 @@
 
     <LI><B>Planetary Systems</B> Correctly formatted yaml files containing a single system can be placed in &lt;user
         data directory&gt;/data/universe/planetary_systems/.
+
+    <LI><B>Factions</B> YAML files defining custom factions can be placed in &lt;user data directory&gt;/data/universe/factions/.
+        Their <code>logo</code> paths are relative to
+        &lt;user data directory&gt;/data/images/force/Pieces/Logos/. These logos are also used for custom faction
+        territory emblems on the Java2D interstellar map.
 </UL>
+
+<H2>Custom Faction Map Logos</H2>
+<P>
+    For example, a faction with <code>logo: Custom/My Faction.png</code> uses
+    &lt;user data directory&gt;/data/images/force/Pieces/Logos/Custom/My Faction.png. The same relative path can also
+    refer to an image in the installation's data/images/force/Pieces/Logos/ directory; an image in the user directory
+    takes precedence. Use a PNG with a transparent background, since the map draws its silhouette as a faint,
+    faction-colored watermark rather than displaying the original colors.
+</P>
+<P>
+    The faction's <code>logoChanges</code> field can select different images by game year:
+</P>
+<pre>
+logo: Custom/My Faction.png
+logoChanges:
+  3080: Custom/My Later Faction.png
+</pre>
+<P>
+    Factions without dedicated built-in map artwork use their configured logo, falling back to the generic clan or
+    mercenary image if it is absent or cannot be loaded. Built-in map artwork and historical logo selection are unchanged.
+    A configured logo lets a custom faction display a compact emblem without major-power tags, but independent and
+    abandoned territories remain excluded. The faction must own territory; zoom, available territory size, and collisions
+    with other emblems still affect visibility. Selecting a campaign unit badge does not set a territorial faction logo.
+    Restart MekHQ after changing faction definitions or logo images.
+</P>
 
 <P>
     This is an example of a suitable directory structure with a few example files:
