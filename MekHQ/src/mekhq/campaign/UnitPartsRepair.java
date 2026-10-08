@@ -166,18 +166,30 @@ public final class UnitPartsRepair {
             case MekActuator actuator -> "actuator " + actuator.getLocation() + " " + actuator.getType();
             case MissingMekActuator actuator -> "actuator " + actuator.getLocation() + " " + actuator.getType();
             case Armor armor -> "armor " + armor.getLocation() + (armor.isRearMounted() ? " rear" : " front");
-            case EnginePart ignored -> "engine";
-            case MissingEnginePart ignored -> "engine";
-            case MekGyro ignored -> "gyro";
-            case MissingMekGyro ignored -> "gyro";
-            case MekCockpit ignored -> "cockpit";
-            case MissingMekCockpit ignored -> "cockpit";
-            case MekSensor ignored -> "sensors";
-            case MissingMekSensor ignored -> "sensors";
-            case MekLifeSupport ignored -> "life support";
-            case MissingMekLifeSupport ignored -> "life support";
-            default -> null;
+            default -> onlyOneOnAUnit(part);
         };
+    }
+
+    /**
+     * The name of a part a unit carries only one of, whatever its location, or {@code null} for any other part.
+     */
+    private static @Nullable String onlyOneOnAUnit(Part part) {
+        if ((part instanceof EnginePart) || (part instanceof MissingEnginePart)) {
+            return "engine";
+        }
+        if ((part instanceof MekGyro) || (part instanceof MissingMekGyro)) {
+            return "gyro";
+        }
+        if ((part instanceof MekCockpit) || (part instanceof MissingMekCockpit)) {
+            return "cockpit";
+        }
+        if ((part instanceof MekSensor) || (part instanceof MissingMekSensor)) {
+            return "sensors";
+        }
+        if ((part instanceof MekLifeSupport) || (part instanceof MissingMekLifeSupport)) {
+            return "life support";
+        }
+        return null;
     }
 
     /**
