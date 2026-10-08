@@ -138,7 +138,7 @@ class UnitPartsTransferTest {
         Part refitKitPart = PartsScenario.unitParts(locust, EquipmentPart.class).getFirst().clone();
         refitKitPart.setRefitUnit(locust);
 
-        campaign.getQuartermaster().addPart(refitKitPart, 0);
+        campaign.getQuartermaster().addPart(refitKitPart, 0, false);
 
         assertSame(refitKitPart, baseWarehouse.getPart(refitKitPart.getUniqueId()));
         assertFalse(isKeptBy(mainWarehouse, refitKitPart));
