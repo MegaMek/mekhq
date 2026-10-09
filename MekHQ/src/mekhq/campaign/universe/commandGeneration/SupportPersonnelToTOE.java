@@ -526,17 +526,11 @@ public final class SupportPersonnelToTOE {
      */
     static List<Unit> idleOwnedVehicles(Campaign campaign, SupportSection section) {
         List<Unit> idle = new ArrayList<>();
-        for (Unit unit : campaign.getUnits()) {
-            if ((unit.getFormationId() != Formation.FORMATION_NONE) || !unit.getCrew().isEmpty()
-                  || unit.isMothballed() || !unit.isPresent()) {
-                continue;
+        for (SupportCapability capability : SupportCapability.values()) {
+            if ((capability.crewSection() == section) && capability.isEnabled(campaign)
+                  && capability.joinsSection(campaign)) {
+                idle.addAll(SupportUnitGenerator.idleOwnedVehicles(campaign, capability));
             }
-            SupportCapability capability = SupportVehicleSelector.capabilityOf(unit.getEntity());
-            if ((capability == null) || (capability.crewSection() != section) || !capability.isEnabled(campaign)
-                  || !capability.joinsSection(campaign)) {
-                continue;
-            }
-            idle.add(unit);
         }
         return idle;
     }
@@ -670,11 +664,14 @@ public final class SupportPersonnelToTOE {
      * vehicle company where one still exists; a campaign whose company was collapsed into its section gets them in the
      * section itself rather than a rival company beside it.</p>
      *
+     * <p>Vehicles the campaign owns but left idle are crewed the same way and filed first. They already count
+     * towards the target, so only the shortfall beyond them is built.</p>
+     *
      * @param campaign   the campaign being topped up
      * @param capability the capability whose vehicles are granted
      * @param crewSource where the crews come from
      *
-     * @return the number of vehicles built
+     * @return the number of vehicles put into service, owned and newly built together
      */
     public static int topUpCapabilityVehicles(Campaign campaign, SupportCapability capability,
           VehicleCrewSource crewSource, Faction faction) {
@@ -687,7 +684,10 @@ public final class SupportPersonnelToTOE {
 
         List<VehicleSpec> vehicles = vehiclesStillNeeded(campaign, capability, faction,
               capability.targetCount(campaign, faction));
-        if (vehicles.isEmpty()) {
+        List<Unit> idleVehicles = SupportUnitGenerator.idleOwnedVehicles(campaign, capability);
+        if (vehicles.isEmpty() && idleVehicles.isEmpty()) {
+            LOGGER.info("[SupportTeams] {}: target already met and no owned vehicle idle; nothing topped up",
+                  capability);
             return 0;
         }
 
@@ -699,7 +699,8 @@ public final class SupportPersonnelToTOE {
         }
         String companyLabel = (section == SupportSection.MAINTENANCE) ? label("recovery") : label("fieldHospital");
         Formation vehicleCompany = childStartingWith(sectionFormation, companyLabel);
-        if (vehicleCompany == null) {
+        boolean isNewCompany = vehicleCompany == null;
+        if (isNewCompany) {
             vehicleCompany = createFormation(campaign, companyLabel + " " + profile.rollupLabel(),
                   FormationType.SUPPORT, sectionFormation, profile.rollupLevel());
         }
@@ -707,6 +708,7 @@ public final class SupportPersonnelToTOE {
         List<Person> pool = (crewSource == VehicleCrewSource.NEW_CREW)
                                   ? new ArrayList<>()
                                   : availableSectionStaff(campaign, sectionFormation, section);
+        int putToUse = putIdleVehiclesToUse(campaign, vehicleCompany, idleVehicles, pool, crewSource, faction);
         int built = 0;
         for (VehicleSpec vehicle : vehicles) {
             built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource);
@@ -718,10 +720,50 @@ public final class SupportPersonnelToTOE {
                   .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
                         PersonnelRole.VEHICLE_CREW_GROUND);
         }
+        // Owned vehicles with nobody left to crew them leave a newly made company with nothing in it.
+        if (isNewCompany && vehicleCompany.getAllUnits(false).isEmpty()) {
+            campaign.getPlayerForce().removeFormation(vehicleCompany, campaign);
+        }
         resizeSupportEchelons(campaign);
-        LOGGER.info("[SupportTeams] {}: topped up {} vehicle(s) into '{}', crewed from {}", capability, built,
-              vehicleCompany.getName(), crewSource);
-        return built;
+        LOGGER.info("[SupportTeams] {}: put {} owned vehicle(s) to use and built {} into '{}', crewed from {}",
+              capability, putToUse, built, vehicleCompany.getName(), crewSource);
+        return putToUse + built;
+    }
+
+    /**
+     * Crews the campaign's idle vehicles of one capability as the player chose and files them under {@code parent}.
+     * A vehicle that would be crewed from staff when none are left stays where it was, rather than joining the
+     * company empty.
+     *
+     * @param campaign     the campaign that owns the TOE
+     * @param parent       the section's capability-vehicle company
+     * @param idleVehicles the vehicles to put to use
+     * @param pool         the section's staff, consumed as they are seated
+     * @param crewSource   where the crews come from
+     * @param faction      the faction new hires are drawn from
+     *
+     * @return the number of vehicles put to use
+     */
+    private static int putIdleVehiclesToUse(Campaign campaign, Formation parent, List<Unit> idleVehicles,
+          List<Person> pool, VehicleCrewSource crewSource, Faction faction) {
+        int putToUse = 0;
+        for (Unit unit : idleVehicles) {
+            if (crewSource == VehicleCrewSource.NEW_CREW) {
+                SupportUnitGenerator.crewSupportUnit(campaign, unit, faction, crewSource);
+            } else if (pool.isEmpty()) {
+                LOGGER.info("[SupportTeams]     no staff left to crew owned vehicle '{}'; it stays where it was",
+                      unit.getName());
+                continue;
+            } else {
+                int seats = (crewSource == VehicleCrewSource.TEMPORARY_CREW) ? 1 : unit.getFullCrewSize();
+                seatFromSection(unit, pool, seats);
+            }
+            campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
+            putToUse++;
+            LOGGER.info("[SupportTeams]     owned vehicle '{}' unitId={} put to use, crewed {}/{} from {}",
+                  unit.getName(), unit.getId(), unit.getActiveCrew().size(), unit.getFullCrewSize(), crewSource);
+        }
+        return putToUse;
     }
 
     /** Builds one capability vehicle's worth of top-up, crewed as the player chose. */

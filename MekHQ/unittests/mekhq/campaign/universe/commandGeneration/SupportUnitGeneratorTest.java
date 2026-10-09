@@ -56,6 +56,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -63,6 +64,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator.SecurityTier;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.junit.jupiter.api.AfterEach;
@@ -352,6 +354,44 @@ class SupportUnitGeneratorTest {
 
         assertEquals(1, SupportUnitGenerator.countOwnedVehicles(campaign, SupportCapability.SALVAGE),
               "a recovery vehicle counts whatever its formation is called");
+    }
+
+    @Test
+    void aStandaloneGrantPutsAnIdleOwnedVehicleToWork() {
+        // Issue 10375: with support teams off, switching salvage on counted a recovery vehicle the player already
+        // owned towards the target and left it in the hangar with nobody aboard. It is crewed and filed with the rest.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        campaign.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitWhoseNameContains(campaign, "APC");
+        assertTrue(owned.getCrew().isEmpty(), "this test is only meaningful while the owned vehicle is crewless");
+
+        SupportUnitGenerator.generate(SupportCapability.SALVAGE, campaign, campaign.getPlayerForce().getFaction(),
+              false, VehicleCrewSource.NEW_CREW, null);
+
+        assertFalse(owned.getCrew().isEmpty(), "the owned recovery vehicle is crewed");
+        assertTrue(owned.getFormationId() != Formation.FORMATION_NONE, "and filed with the salvage formation");
+    }
+
+    @Test
+    void aStandaloneGrantLeavesACrewedOwnedVehicleWhereThePlayerPutIt() {
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        campaign.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitWhoseNameContains(campaign, "APC");
+        Person driver = campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.NONE);
+        owned.addDriver(driver);
+
+        SupportUnitGenerator.generate(SupportCapability.SALVAGE, campaign, campaign.getPlayerForce().getFaction(),
+              false, VehicleCrewSource.NEW_CREW, null);
+
+        assertEquals(Formation.FORMATION_NONE, owned.getFormationId(), "a vehicle the player crewed is in use");
+        assertEquals(List.of(driver), owned.getCrew(), "and its crew is untouched");
     }
 
     @Test

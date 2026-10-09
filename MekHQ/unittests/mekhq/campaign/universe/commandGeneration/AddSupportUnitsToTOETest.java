@@ -113,6 +113,31 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void topUp_putsAnIdleOwnedRecoveryVehicleToWorkFromExistingStaff() {
+        // Issue 10375: switching salvage on mid-campaign counted a recovery vehicle the player already owned towards
+        // the target, built only the rest, and left the owned one in the hangar with nobody aboard.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 8), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, SupportCapability.SALVAGE,
+              SupportPersonnelToTOE.VehicleCrewSource.EXISTING_STAFF, campaign.getPlayerForce().getFaction());
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertTrue(supportCommand.getAllUnits(false).contains(owned.getId()),
+              "the owned recovery vehicle must join the support teams");
+        assertFalse(owned.getCrew().isEmpty(), "and be crewed");
+        for (Person crewMember : owned.getCrew()) {
+            assertEquals(PersonnelRole.MECHANIC, crewMember.getPrimaryRole(),
+                  "from the maintenance staff, as the player chose, not from new hires");
+        }
+    }
+
+    @Test
     void idleOwnedVehicles_leavesAVehicleThePlayerHasPutToUseAlone() {
         // A vehicle the player crewed, or filed in a formation of their own, is in use. It counts towards the
         // target but is not taken over by the support teams.

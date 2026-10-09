@@ -402,6 +402,33 @@ public final class SupportUnitGenerator {
         return inToe + outsideToe;
     }
 
+    /**
+     * The vehicles of a capability that the campaign owns but has never put to use: in no formation, with nobody
+     * aboard, and at hand. These are the vehicles a player bought or was granted and left in the hangar.
+     *
+     * <p>They are already counted towards the capability's target by {@link #countOwnedVehicles}, so whatever grants
+     * the capability must crew them, or the command ends up short by exactly that many. A vehicle the player has
+     * crewed, or filed in a formation of their own, is in use and is left alone.</p>
+     *
+     * @param campaign   the campaign whose hangar is searched
+     * @param capability the capability whose vehicles are wanted
+     *
+     * @return the idle vehicles, in hangar order; empty when there are none
+     */
+    static List<Unit> idleOwnedVehicles(Campaign campaign, SupportCapability capability) {
+        List<Unit> idle = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if ((unit.getFormationId() != Formation.FORMATION_NONE) || !unit.getCrew().isEmpty()
+                  || unit.isMothballed() || !unit.isPresent()) {
+                continue;
+            }
+            if (SupportVehicleSelector.capabilityOf(unit.getEntity()) == capability) {
+                idle.add(unit);
+            }
+        }
+        return idle;
+    }
+
     /** Where the support sub-formations sit: the faction's smallest formation, a lance, Star or Level II. */
     private static final int SUPPORT_SUB_FORMATION_DEPTH = 1;
 
@@ -895,9 +922,11 @@ public final class SupportUnitGenerator {
 
     /**
      * Ensures the campaign fields {@code targetCount} of {@code unitName}, generating only the shortfall
-     * beyond what already exists (see {@link #countGeneratedUnitsNamed}). Each fresh copy is loaded
-     * crewed, optionally rank-assigned, and filed into {@code formationType}. A missing unit entry or an
-     * unloadable entity is logged and skipped rather than aborting the whole batch.
+     * beyond what already exists (see {@link #countGeneratedUnitsNamed} and {@link #countOwnedVehicles}). Owned
+     * vehicles left idle in the hangar already count towards the target, so they are crewed and filed with the new
+     * ones rather than left where they are. Each fresh copy is loaded crewed, optionally rank-assigned, and filed into
+     * {@code formationType}. A missing unit entry or an unloadable entity is logged and skipped rather than aborting
+     * the whole batch.
      */
     private static void generate(SupportCapability capability, Campaign campaign, Faction faction,
           boolean autoAssignRanks, @Nullable String unitName, int targetCount,
@@ -909,51 +938,37 @@ public final class SupportUnitGenerator {
               ? countGeneratedUnitsNamed(campaign, unitName)
               : countOwnedVehicles(campaign, capability);
         int count = Math.max(0, targetCount - existing);
-        if (count <= 0) {
-            LOGGER.info("[CompanyGen][SupportUnits] {}: target {} already met ({} present) -> generating 0",
-                  formationType.name(), targetCount, existing);
-            return;
-        }
 
-        List<RolledBatch> batches;
-        if (unitName != null) {
-            MekSummary named = MekSummaryCache.getInstance().getMek(unitName);
-            if (named == null) {
-                LOGGER.error("Cannot find entry for {}", unitName);
-                return;
-            }
-            batches = List.of(new RolledBatch(unitName, named, count));
-        } else {
-            batches = rollBatches(capability, campaign, faction, count,
-                  subFormationSize(faction, formationType));
-            if (batches.isEmpty()) {
-                return;
-            }
-        }
-
-        boolean useRandomQuality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
         List<Unit> units = new ArrayList<>();
         Set<PersonnelRole> pooledRoles = new HashSet<>();
+        for (Unit idleVehicle : idleOwnedVehicles(campaign, capability)) {
+            prepareSupportUnit(campaign, idleVehicle, faction, crewSource, autoAssignRanks, pooledRoles);
+            units.add(idleVehicle);
+            LOGGER.info("[CompanyGen][SupportUnits] {}: owned vehicle '{}' unitId={} put to use, crewed {}/{}",
+                  formationType.name(), idleVehicle.getName(), idleVehicle.getId(),
+                  idleVehicle.getActiveCrew().size(), idleVehicle.getFullCrewSize());
+        }
+        int putToUse = units.size();
+
+        List<RolledBatch> batches = (count > 0) ? batchesToBuild(capability, campaign, faction, unitName, count,
+              formationType) : List.of();
+        boolean useRandomQuality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
         for (RolledBatch batch : batches) {
             for (int index = 0; index < batch.count(); index++) {
-            try {
-                PartQuality quality = useRandomQuality ? UnitOrder.getRandomUnitQuality(0) : PartQuality.QUALITY_D;
-                // Built crewless, then crewed to match how the campaign crews everything else.
-                Unit unit = campaign.addNewUnit(batch.summary().loadEntity(), false, 0, quality);
-                if (unit != null) {
-                    PersonnelRole pooledRole = crewSupportUnit(campaign, unit, faction, crewSource);
-                    if (pooledRole != null) {
-                        pooledRoles.add(pooledRole);
+                try {
+                    PartQuality quality = useRandomQuality
+                                                ? UnitOrder.getRandomUnitQuality(0)
+                                                : PartQuality.QUALITY_D;
+                    // Built crewless, then crewed to match how the campaign crews everything else.
+                    Unit unit = campaign.addNewUnit(batch.summary().loadEntity(), false, 0, quality);
+                    if (unit != null) {
+                        prepareSupportUnit(campaign, unit, faction, crewSource, autoAssignRanks, pooledRoles);
+                        units.add(unit);
                     }
-                    if (autoAssignRanks) {
-                        AutomaticRankAssigner.assignRanks(campaign, unit, faction);
-                    }
-                    units.add(unit);
+                } catch (Exception exception) {
+                    LOGGER.error(exception, "Unable to load entity {}: {}", batch.unitName(),
+                          batch.summary().getSourceFile());
                 }
-            } catch (Exception exception) {
-                LOGGER.error(exception, "Unable to load entity {}: {}", batch.unitName(),
-                      batch.summary().getSourceFile());
-            }
             }
         }
 
@@ -975,7 +990,42 @@ public final class SupportUnitGenerator {
             }
             built.append(batch.count()).append(" x '").append(batch.unitName()).append("'");
         }
-        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new ({}) ({} already present, target {})",
-              formationType.name(), units.size(), count, built, existing, targetCount);
+        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new ({}), put {} owned vehicle(s) to use ({} "
+                          + "already present, target {})",
+              formationType.name(), units.size() - putToUse, count, built, putToUse, existing, targetCount);
+    }
+
+    /**
+     * What to build for a shortfall: the named unit when the capability names one, otherwise one rolled model per
+     * formation.
+     *
+     * @return the batches to build; empty when the unit cannot be found or nothing suitable could be rolled
+     */
+    private static List<RolledBatch> batchesToBuild(SupportCapability capability, Campaign campaign, Faction faction,
+          @Nullable String unitName, int count, SupportTOEFormationTypes formationType) {
+        if (unitName == null) {
+            return rollBatches(capability, campaign, faction, count, subFormationSize(faction, formationType));
+        }
+        MekSummary named = MekSummaryCache.getInstance().getMek(unitName);
+        if (named == null) {
+            LOGGER.error("Cannot find entry for {}", unitName);
+            return List.of();
+        }
+        return List.of(new RolledBatch(unitName, named, count));
+    }
+
+    /**
+     * Crews a support unit and assigns its ranks, noting the role crewed from the temporary crew pool so the pool
+     * can be filled once every unit is in.
+     */
+    private static void prepareSupportUnit(Campaign campaign, Unit unit, Faction faction,
+          @Nullable VehicleCrewSource crewSource, boolean autoAssignRanks, Set<PersonnelRole> pooledRoles) {
+        PersonnelRole pooledRole = crewSupportUnit(campaign, unit, faction, crewSource);
+        if (pooledRole != null) {
+            pooledRoles.add(pooledRole);
+        }
+        if (autoAssignRanks) {
+            AutomaticRankAssigner.assignRanks(campaign, unit, faction);
+        }
     }
 }
