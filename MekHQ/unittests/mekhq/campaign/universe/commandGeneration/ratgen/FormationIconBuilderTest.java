@@ -100,7 +100,8 @@ class FormationIconBuilderTest {
     @DisplayName("Each lance under Recovery Operations carries it too")
     void theLancesUnderItCarryItAsWell() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 4),
+        // Eight vehicles, so two lances: a formation of one lance's worth is that lance and is not split.
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 8),
               SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         Formation lance = formationNamed(campaign, "Lance 1");

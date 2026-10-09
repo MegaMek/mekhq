@@ -436,21 +436,24 @@ public final class SupportUnitGenerator {
     private static final String SUPPORT_FORMATION_RESOURCE_BUNDLE = "mekhq.resources.SupportTOEFormationTypes";
 
     /**
-     * Units per sub-formation when a capability is fielded as whole formations, or {@code 0} when its vehicles are
-     * filed flat. Only the capabilities sized in whole formations are broken into lances or Stars; a command's two
-     * MASH trucks or single canteen would read worse split up than listed together.
+     * Units per lance or Star for a capability's vehicles, or {@code 0} when its units are filed flat.
+     *
+     * <p>Every vehicle capability is arranged the same way: a formation of one lance or fewer is that lance, and past
+     * that its vehicles are split into lances so the order of battle reads as a tree. Two MASH trucks stay listed
+     * together; eleven become a company of three lances. The security detail is infantry platoons, not vehicles, and
+     * is always filed flat.</p>
      *
      * @param faction       the faction of the command being supported, which sets the formation size
      * @param formationType the capability formation being filed into
      *
-     * @return the sub-formation size, or {@code 0} for flat filing
+     * @return the lance size, or {@code 0} for flat filing
      */
     static int subFormationSize(Faction faction, SupportTOEFormationTypes formationType) {
-        boolean fieldedAsFormations = switch (formationType) {
-            case SALVAGE_FORMATION, LOGISTICS_FORMATION -> true;
+        boolean isVehicleFormation = switch (formationType) {
+            case SALVAGE_FORMATION, LOGISTICS_FORMATION, MEDICAL_FORMATION, COMMISSARY_FORMATION -> true;
             default -> false;
         };
-        return fieldedAsFormations ? supportFormationSize(faction) : 0;
+        return isVehicleFormation ? supportFormationSize(faction) : 0;
     }
 
     /**

@@ -188,6 +188,96 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void arrangeIntoLances_leavesOneLancesWorthFlatAndSplitsMore() {
+        // Issue 10375: eleven MASH trucks sat directly under a Medical company, with no lances in it.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation small = groupWithVehicles(campaign, "Small Group", 4);
+        Formation medical = groupWithVehicles(campaign, "Medical Group", 11);
+
+        assertTrue(AddSupportUnitsToTOE.arrangeIntoLances(campaign, small, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SUPPORT).isEmpty(), "a group of one lance's worth is that lance");
+        assertEquals(4, small.getUnits().size());
+
+        List<Formation> lances = AddSupportUnitsToTOE.arrangeIntoLances(campaign, medical, 4,
+              AddSupportUnitsToTOETest::lanceName, FormationType.SUPPORT);
+
+        assertEquals(3, lances.size(), "eleven vehicles make three lances");
+        assertTrue(medical.getUnits().isEmpty(), "no vehicle is left directly under the company");
+        assertEquals(List.of(4, 4, 3), lanceSizes(medical), "lances are filled in order");
+    }
+
+    @Test
+    void arrangeIntoLances_dropsAnEmptyLanceAndMovesNoOne() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation group = groupWithVehicles(campaign, "Recovery Group", 8);
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, group, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SUPPORT);
+        Formation second = group.getSubFormations().get(1);
+        List<java.util.UUID> firstLance = new ArrayList<>(group.getSubFormations().get(0).getUnits());
+        for (java.util.UUID unitId : new ArrayList<>(second.getUnits())) {
+            campaign.getPlayerForce().removeUnitFromFormation(campaign.getUnit(unitId), campaign);
+        }
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, group, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SUPPORT);
+
+        assertEquals(1, group.getSubFormations().size(), "the emptied lance is removed");
+        assertEquals(firstLance, group.getSubFormations().get(0).getUnits(), "and the other lance is not reshuffled");
+    }
+
+    @Test
+    void resizeSupportEchelons_lancesAFlatGroupInSupportCommand() {
+        // An older save, or a grant before this fix, left a Support Command vehicle group flat. Loading re-sizes the
+        // teams, which now files those vehicles into lances.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        Formation recovery = new Formation("Recovery Company");
+        campaign.getPlayerForce().addFormation(recovery, supportCommand, campaign);
+        for (int index = 0; index < 6; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        for (Unit vehicle : unitsNamedLike(campaign, "APC")) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, recovery.getId(), campaign);
+        }
+
+        SupportPersonnelToTOE.resizeSupportEchelons(campaign);
+
+        assertTrue(recovery.getUnits().isEmpty(), "the vehicles moved into lances");
+        assertEquals(List.of(4, 2), lanceSizes(recovery));
+        assertEquals(FormationLevel.COMPANY, recovery.getFormationLevel(), "six vehicles in two lances is a company");
+    }
+
+    private static String lanceName(int position) {
+        return "Lance " + position;
+    }
+
+    private static Formation groupWithVehicles(Campaign campaign, String name, int count) {
+        Formation group = new Formation(name);
+        campaign.getPlayerForce().addFormation(group,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        int before = campaign.getUnits().size();
+        for (int index = 0; index < count; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        List<Unit> all = new ArrayList<>(campaign.getUnits());
+        for (Unit vehicle : all.subList(before, all.size())) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, group.getId(), campaign);
+        }
+        return group;
+    }
+
+    private static List<Integer> lanceSizes(Formation group) {
+        List<Integer> sizes = new ArrayList<>();
+        for (Formation lance : group.getSubFormations()) {
+            sizes.add(lance.getUnits().size());
+        }
+        return sizes;
+    }
+
+    @Test
     void idleOwnedVehicles_leavesAVehicleThePlayerHasPutToUseAlone() {
         // A vehicle the player crewed, or filed in a formation of their own, is in use. It counts towards the
         // target but is not taken over by the support teams.
