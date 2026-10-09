@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Objects;
 
 import jakarta.annotation.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningResult;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningStatus;
@@ -44,6 +46,8 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
 final class RoutePlanningIntent {
+    private static final MMLogger LOGGER = MMLogger.create(RoutePlanningIntent.class);
+
     @FunctionalInterface
     interface SegmentPlanner {
         PlanningResult calculate(PlanetarySystem origin, PlanetarySystem destination);
@@ -78,6 +82,28 @@ final class RoutePlanningIntent {
 
     JumpPath getJumpPath() {
         return copyOf(jumpPath);
+    }
+
+    /** Keeps a planned route attached to the campaign's edited records without recalculating its course. */
+    void refreshPlanetarySystems(Campaign campaign) {
+        if (origin != null) {
+            origin = resolveSystem(campaign, origin);
+        }
+        List<PlanetarySystem> updatedStops = new ArrayList<>();
+        for (PlanetarySystem stop : requestedStops) {
+            updatedStops.add(resolveSystem(campaign, stop));
+        }
+        requestedStops = List.copyOf(updatedStops);
+        jumpPath.refreshPlanetarySystems(campaign);
+    }
+
+    private static PlanetarySystem resolveSystem(Campaign campaign, PlanetarySystem system) {
+        PlanetarySystem updatedSystem = campaign.getSystemById(system.getId());
+        if (updatedSystem == null) {
+            LOGGER.warn("Couldn't refresh planned route system {}; retaining the existing system.", system.getId());
+            return system;
+        }
+        return updatedSystem;
     }
 
     boolean adopt(@Nullable JumpPath proposedPath) {

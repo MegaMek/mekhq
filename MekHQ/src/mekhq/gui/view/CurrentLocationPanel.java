@@ -57,6 +57,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
+import mekhq.campaign.events.PlanetarySystemsChangedEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
@@ -465,6 +466,13 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     // ======================================
     // Event handlers for UI synchronization
     // ======================================
+
+    @Subscribe
+    public void handle(PlanetarySystemsChangedEvent event) {
+        if (event.getCampaign() == campaign) {
+            refresh();
+        }
+    }
 
     @Subscribe
     public void handle(LocationChangedEvent event) {

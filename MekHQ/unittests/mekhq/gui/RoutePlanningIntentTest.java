@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Map;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningResult;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningStatus;
@@ -51,6 +52,42 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 class RoutePlanningIntentTest {
+    @Test
+    void planetaryEditsPreserveThePlannedCourseAndRequestedStops() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem intermediate = system("Intermediate");
+        PlanetarySystem destination = system("Destination");
+        Planet target = new Planet("target");
+        target.setParentSystem(destination);
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        assertTrue(intent.plotToPlanet(origin, target,
+              planner(Map.of(new Leg(origin, destination), List.of(origin, intermediate, destination)))).changed());
+        Campaign campaign = Mockito.mock(Campaign.class);
+        PlanetarySystem updatedOrigin = Mockito.mock(PlanetarySystem.class);
+        PlanetarySystem updatedIntermediate = Mockito.mock(PlanetarySystem.class);
+        PlanetarySystem updatedDestination = Mockito.mock(PlanetarySystem.class);
+        Mockito.when(updatedOrigin.getId()).thenReturn("Origin");
+        Mockito.when(updatedIntermediate.getId()).thenReturn("Intermediate");
+        Mockito.when(updatedDestination.getId()).thenReturn("Destination");
+        Planet updatedTarget = new Planet("target");
+        updatedTarget.setParentSystem(updatedDestination);
+        Mockito.when(campaign.getSystemById("Origin")).thenReturn(updatedOrigin);
+        Mockito.when(campaign.getSystemById("Intermediate")).thenReturn(updatedIntermediate);
+        Mockito.when(campaign.getSystemById("Destination")).thenReturn(updatedDestination);
+        Mockito.when(updatedDestination.getPlanetById("target")).thenReturn(updatedTarget);
+
+        intent.refreshPlanetarySystems(campaign);
+
+        assertSame(updatedOrigin, intent.getOrigin());
+        assertSame(updatedDestination, intent.getRequestedStops().getFirst());
+        JumpPath refreshedPath = intent.getJumpPath();
+        assertEquals(3, refreshedPath.size());
+        assertSame(updatedOrigin, refreshedPath.get(0));
+        assertSame(updatedIntermediate, refreshedPath.get(1));
+        assertSame(updatedDestination, refreshedPath.get(2));
+        assertSame(updatedTarget, refreshedPath.getTargetPlanet());
+    }
+
     @Test
     void automaticIntermediateIsNotARemovableRequestedStop() {
         PlanetarySystem origin = system("Origin");

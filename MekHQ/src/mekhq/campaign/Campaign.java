@@ -4235,8 +4235,16 @@ public class Campaign implements ITechManager {
         return (systemId != null) && planetarySystemOverrides.containsKey(systemId);
     }
 
+    /**
+     * Installs the planetary overrides, synchronizes all locations and their travel routes, then notifies views.
+     * Updating the registry alone would leave current-location mechanics and displays using the previous records.
+     */
     public void refreshPlanetarySystemOverlay() {
         systemsInstance = Systems.activateCampaignSystems(planetarySystemOverrides.values());
+        for (AbstractLocation location : locationManager.getLocations()) {
+            location.refreshPlanetarySystems(this);
+        }
+        MekHQ.triggerEvent(new PlanetarySystemsChangedEvent(this));
     }
 
     private void addPlanetarySystemOverride(PlanetarySystem system) {

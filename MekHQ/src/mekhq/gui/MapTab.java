@@ -71,6 +71,7 @@ import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.PlanetarySystemsChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.scenarios.ScenarioEvent;
 import mekhq.campaign.finances.Money;
@@ -1662,6 +1663,35 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private enum RouteViewMode {
         ACTIVE,
         PLANNED
+    }
+
+    @Subscribe
+    public void handle(PlanetarySystemsChangedEvent event) {
+        if (event.getCampaign() != getCampaign()) {
+            return;
+        }
+        int planetPosition = panSystem.getSelectedPlanetPosition();
+        routePlanningIntent.refreshPlanetarySystems(getCampaign());
+        panMap.setJumpPath(routePlanningIntent.getJumpPath());
+        panMap.setCampaign(getCampaign());
+        PlanetarySystem system = panMap.getSelectedSystem();
+        if (system != null) {
+            Planet planet = system.getPlanet(planetPosition);
+            if (planet != null) {
+                panSystem.updatePlanetarySystem(planet);
+            } else {
+                panSystem.updatePlanetarySystem(system);
+            }
+        }
+        suggestPlanet.setSuggestData(getCampaign().getSystemNames());
+        suggestRouteOrigin.setSuggestData(getCampaign().getSystemNames());
+        suggestRouteDestination.setSuggestData(getCampaign().getSystemNames());
+        setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
+        List<PlanetarySystem> stops = routePlanningIntent.getRequestedStops();
+        if (!stops.isEmpty()) {
+            setRouteFieldSystem(suggestRouteDestination, stops.getLast());
+        }
+        refreshPlanetView();
     }
 
     @Subscribe
