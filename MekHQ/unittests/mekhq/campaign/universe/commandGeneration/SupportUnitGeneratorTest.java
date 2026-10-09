@@ -53,6 +53,7 @@ import megamek.common.universe.Factions2;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.PlayerForce;
@@ -61,6 +62,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Faction;
@@ -392,6 +394,85 @@ class SupportUnitGeneratorTest {
 
         assertEquals(Formation.FORMATION_NONE, owned.getFormationId(), "a vehicle the player crewed is in use");
         assertEquals(List.of(driver), owned.getCrew(), "and its crew is untouched");
+    }
+
+    @Test
+    void theShortfallListsASwitchedOnCapabilityTheCampaignLacksAndOnlyThat() {
+        // Issue 10375: a campaign with fatigue on from the start was never offered canteens, because the offer only
+        // comes when the option is switched on and never during campaign setup. The shortfall is what is still owed.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = campaignWithEveryCapabilityOff();
+        campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, true);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        int salvageTarget = SupportCapability.SALVAGE.targetCount(campaign, campaign.getPlayerForce().getFaction());
+        for (int index = 0; index < salvageTarget; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        // Crewed, so in use: the salvage target is met and nothing about it is owed.
+        for (Unit recoveryVehicle : campaign.getUnits()) {
+            recoveryVehicle.addDriver(campaign.getPlayerForce().getHumanResources()
+                                            .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND,
+                                                  PersonnelRole.NONE));
+        }
+
+        List<SupportUnitGenerator.CapabilityShortfall> shortfalls = SupportUnitGenerator.capabilityShortfalls(
+              campaign, campaign.getPlayerForce().getFaction());
+
+        assertEquals(1, shortfalls.size(), "only the canteens are owed: " + shortfalls);
+        assertEquals(SupportCapability.COMMISSARY, shortfalls.get(0).capability());
+        assertEquals(0, shortfalls.get(0).owned());
+        assertTrue(shortfalls.get(0).missing() > 0, "the canteens are missing");
+    }
+
+    @Test
+    void theShortfallListsACapabilityWhoseTargetIsMetByIdleVehicles() {
+        // Issue 10375: the reporter's two canteens met the canteen target, so canteens were never offered, and the
+        // canteens stayed in the hangar with nobody aboard. Idle units are owed a crew even when the target is met.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = campaignWithEveryCapabilityOff();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        int salvageTarget = SupportCapability.SALVAGE.targetCount(campaign, campaign.getPlayerForce().getFaction());
+        for (int index = 0; index < salvageTarget; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+
+        List<SupportUnitGenerator.CapabilityShortfall> shortfalls = SupportUnitGenerator.capabilityShortfalls(
+              campaign, campaign.getPlayerForce().getFaction());
+
+        assertEquals(1, shortfalls.size(), "the idle recovery vehicles are owed a crew: " + shortfalls);
+        assertEquals(SupportCapability.SALVAGE, shortfalls.get(0).capability());
+        assertEquals(0, shortfalls.get(0).missing(), "nothing needs building");
+        assertEquals(salvageTarget, shortfalls.get(0).idle(), "every recovery vehicle is idle");
+    }
+
+    @Test
+    void temporaryCrewsAreUsedOnlyWhenAskedForAndTheCampaignUsesThem() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+        assertEquals(VehicleCrewSource.TEMPORARY_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, true));
+        assertEquals(VehicleCrewSource.NEW_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, false),
+              "the player said no");
+
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        assertEquals(VehicleCrewSource.NEW_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, true),
+              "a campaign that does not use temporary crews for the role gets new hires whatever is asked");
+    }
+
+    /** A test campaign with every support capability switched off, so a test can switch on the ones it means. */
+    private static Campaign campaignWithEveryCapabilityOff() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_MASH_THEATRES, false);
+        campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, false);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        campaign.getCampaignOptions().set(CampaignOption.PRISONER_CAPTURE_STYLE, PrisonerCaptureStyle.NONE);
+        campaign.getCampaignOptions().set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.DISABLED);
+        for (SupportCapability capability : SupportCapability.values()) {
+            assertFalse(capability.isEnabled(campaign), capability + " must start switched off");
+        }
+        return campaign;
     }
 
     @Test

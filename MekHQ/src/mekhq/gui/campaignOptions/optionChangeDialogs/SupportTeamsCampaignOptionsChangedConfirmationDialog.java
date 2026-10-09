@@ -200,6 +200,9 @@ public class SupportTeamsCampaignOptionsChangedConfirmationDialog extends JDialo
         btnConfirm.addActionListener(event -> {
             organizeSupportStaff(campaign);
             dispose();
+            // The conversion only builds what its sections can crew. Anything else the campaign's rules call for has
+            // never been offered if its option was on from the start, so it is offered now, once.
+            SupportCapabilityShortfallDialog.offerIfShort(campaign);
         });
 
         pnlButtons.add(btnCancel);

@@ -260,6 +260,80 @@ public final class SupportUnitGenerator {
     }
 
     /**
+     * A switched-on capability the campaign is not fully using: it fields fewer units than a command of this size
+     * should, or it owns units it has left idle, or both.
+     *
+     * @param capability the capability
+     * @param target     how many units the command should field
+     * @param owned      how many it already owns, idle ones included
+     * @param idle       how many of those it owns but has left in the hangar with nobody aboard
+     */
+    public record CapabilityShortfall(SupportCapability capability, int target, int owned, int idle) {
+        /**
+         * @return how many units are still to be built
+         */
+        public int missing() {
+            return Math.max(0, target - owned);
+        }
+    }
+
+    /**
+     * Every switched-on capability that is short of its target or has owned units left idle, in
+     * {@link SupportCapability} order.
+     *
+     * <p>A capability's free units are offered when its option is switched on, never while a campaign is being set up,
+     * and a Support Teams conversion only builds the recovery and MASH vehicles its sections can crew. A campaign that
+     * had fatigue, StratCon or prisoners on from the start is therefore never offered canteens, a convoy or a security
+     * detail, and canteens it bought itself sit uncrewed. This is what is still owed, so it can be offered once the
+     * conversion is done. Granting a capability builds what is missing and crews what is idle.</p>
+     *
+     * @param campaign the campaign to check
+     * @param faction  the faction the command is organised as
+     *
+     * @return the capabilities still owed something; empty when every switched-on capability is met and in use
+     */
+    public static List<CapabilityShortfall> capabilityShortfalls(Campaign campaign, Faction faction) {
+        List<CapabilityShortfall> shortfalls = new ArrayList<>();
+        for (SupportCapability capability : SupportCapability.values()) {
+            if (!capability.isEnabled(campaign)) {
+                continue;
+            }
+            String unitName = capability.unitName(campaign);
+            int target = capability.targetCount(campaign, faction);
+            int owned = (unitName != null)
+                              ? countGeneratedUnitsNamed(campaign, unitName)
+                              : countOwnedVehicles(campaign, capability);
+            int idle = idleOwnedVehicles(campaign, capability).size();
+            LOGGER.info("[SupportTeams] shortfall check {}: target {}, owned {}, idle {}", capability, target, owned,
+                  idle);
+            if ((owned < target) || (idle > 0)) {
+                shortfalls.add(new CapabilityShortfall(capability, target, owned, idle));
+            }
+        }
+        return shortfalls;
+    }
+
+    /**
+     * How a capability's units are crewed when the player grants them outside the support sections: one named crew
+     * member plus the temporary crew pool where the player asked for that and the campaign uses temporary crews for
+     * the role, otherwise a full crew of new hires.
+     *
+     * @param campaign              the campaign
+     * @param capability            the capability being granted
+     * @param wantsTemporaryCrews   whether the player asked for temporary crews
+     *
+     * @return the crewing to use
+     */
+    public static VehicleCrewSource grantedCrewSource(Campaign campaign, SupportCapability capability,
+          boolean wantsTemporaryCrews) {
+        boolean usesTemporaryCrews = campaign.getPlayerForce()
+                                           .getHumanResources()
+                                           .isBlobCrewEnabled(capability.crewRole(), campaign.getCampaignOptions());
+        return (wantsTemporaryCrews && usesTemporaryCrews) ? VehicleCrewSource.TEMPORARY_CREW
+                     : VehicleCrewSource.NEW_CREW;
+    }
+
+    /**
      * One rolled model and how many of it to build, so a formation is filled with a single kind of vehicle.
      *
      * @param unitName the rolled unit's name
