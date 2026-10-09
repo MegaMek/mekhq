@@ -1665,23 +1665,29 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         PLANNED
     }
 
+    static void restoreSelectedPlanet(PlanetarySystemMapPanel panel, PlanetarySystem system,
+          @Nullable String planetId) {
+        Planet planet = planetId == null ? null : system.getPlanetById(planetId);
+        if (planet != null) {
+            panel.updatePlanetarySystem(planet);
+        } else {
+            panel.updatePlanetarySystem(system);
+        }
+    }
+
     @Subscribe
     public void handle(PlanetarySystemsChangedEvent event) {
         if (event.getCampaign() != getCampaign()) {
             return;
         }
-        int planetPosition = panSystem.getSelectedPlanetPosition();
+        Planet selectedPlanet = panSystem.getSelectedPlanet();
+        String selectedPlanetId = selectedPlanet == null ? null : selectedPlanet.getId();
         routePlanningIntent.refreshPlanetarySystems(getCampaign());
         panMap.setJumpPath(routePlanningIntent.getJumpPath());
         panMap.setCampaign(getCampaign());
         PlanetarySystem system = panMap.getSelectedSystem();
         if (system != null) {
-            Planet planet = system.getPlanet(planetPosition);
-            if (planet != null) {
-                panSystem.updatePlanetarySystem(planet);
-            } else {
-                panSystem.updatePlanetarySystem(system);
-            }
+            restoreSelectedPlanet(panSystem, system, selectedPlanetId);
         }
         suggestPlanet.setSuggestData(getCampaign().getSystemNames());
         suggestRouteOrigin.setSuggestData(getCampaign().getSystemNames());

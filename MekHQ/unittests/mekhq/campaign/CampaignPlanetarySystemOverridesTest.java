@@ -35,12 +35,15 @@ package mekhq.campaign;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -174,6 +177,97 @@ class CampaignPlanetarySystemOverridesTest {
     }
 
     @Test
+    void savingABatchInstallsAllCopiesBeforeEmittingOneEventAndPreservesUnrelatedOverrides() throws IOException {
+        PlanetarySystem unrelatedSystem = PlanetarySystemYamlIO.read("""
+              id: Unrelated
+              planet:
+                - name: unrelated-world
+                  sysPos: 1
+              """);
+        PlanetarySystem unrelatedOverride = campaign.putPlanetarySystemOverride(unrelatedSystem);
+        PlanetarySystem secondSystem = PlanetarySystemYamlIO.read("""
+              id: Second
+              planet:
+                - name: second-world
+                  sysPos: 1
+                  temperature: 30
+              """);
+        FixedLocation secondLocation = new FixedLocation(secondSystem);
+        campaign.getCampaignLocationManager().addLocation(secondLocation);
+        PlanetarySystem edited = editedSystem();
+        ChangeRecorder recorder = new ChangeRecorder(campaign);
+        MekHQ.registerHandler(recorder);
+        try {
+            List<PlanetarySystem> saved = campaign.putPlanetarySystemOverrides(List.of(edited, secondSystem));
+
+            assertEquals(1, recorder.eventCount);
+            assertEquals(3, recorder.notifiedSystems.size());
+            assertTrue(recorder.notifiedSystems.containsAll(saved));
+            assertSame(saved.getFirst(), campaign.getCurrentSystem());
+            assertSame(saved.getLast(), secondLocation.getCurrentSystem());
+            assertSame(unrelatedOverride, campaign.getSystemById("Unrelated"));
+            assertNotSame(edited, saved.getFirst());
+            assertNotSame(secondSystem, saved.getLast());
+        } finally {
+            MekHQ.unregisterHandler(recorder);
+        }
+    }
+
+    @Test
+    void invalidBatchDoesNotInstallEarlierCopiesOrEmitAnEvent() throws IOException {
+        PlanetarySystem existingOverride = campaign.putPlanetarySystemOverride(editedSystem());
+        PlanetarySystem edited = editedSystem();
+        edited.getPrimaryPlanet().setSourcedTemperature(SourceableValue.of(15));
+        ChangeRecorder recorder = new ChangeRecorder(campaign);
+        MekHQ.registerHandler(recorder);
+        try {
+            assertThrows(IOException.class, () -> campaign.putPlanetarySystemOverrides(
+                  List.of(edited, new PlanetarySystem(" "))));
+
+            assertSame(existingOverride, campaign.getCurrentSystem());
+            assertEquals(-87, campaign.getCurrentSystem().getPrimaryPlanet().getTemperature(campaign.getLocalDate()));
+            assertEquals(0, recorder.eventCount);
+            assertEquals(List.of(existingOverride), List.copyOf(campaign.getPlanetarySystemOverrides()));
+        } finally {
+            MekHQ.unregisterHandler(recorder);
+        }
+    }
+
+    @Test
+    void copyFailureDoesNotInstallEarlierCopiesOrEmitAnEvent() throws IOException {
+        PlanetarySystem edited = editedSystem();
+        PlanetarySystem failingSystem = mock(PlanetarySystem.class);
+        when(failingSystem.getId()).thenReturn("Failing");
+        ChangeRecorder recorder = new ChangeRecorder(campaign);
+        MekHQ.registerHandler(recorder);
+        try (MockedStatic<PlanetarySystemYamlIO> yaml = mockStatic(PlanetarySystemYamlIO.class)) {
+            yaml.when(() -> PlanetarySystemYamlIO.copy(edited)).thenReturn(edited);
+            yaml.when(() -> PlanetarySystemYamlIO.copy(failingSystem)).thenThrow(new IOException("Copy failed"));
+
+            assertThrows(IOException.class, () -> campaign.putPlanetarySystemOverrides(List.of(edited, failingSystem)));
+
+            assertSame(originalSystem, campaign.getCurrentSystem());
+            assertTrue(campaign.getPlanetarySystemOverrides().isEmpty());
+            assertEquals(0, recorder.eventCount);
+        } finally {
+            MekHQ.unregisterHandler(recorder);
+        }
+    }
+
+    @Test
+    void emptyBatchDoesNotRefreshTheOverlayOrEmitAnEvent() throws IOException {
+        ChangeRecorder recorder = new ChangeRecorder(campaign);
+        MekHQ.registerHandler(recorder);
+        try {
+            assertTrue(campaign.putPlanetarySystemOverrides(List.of()).isEmpty());
+            assertSame(originalSystem, campaign.getCurrentSystem());
+            assertEquals(0, recorder.eventCount);
+        } finally {
+            MekHQ.unregisterHandler(recorder);
+        }
+    }
+
+    @Test
     void savingAndDeletingAnOverrideRefreshTheDisplayedTopBarWithoutAdvancingADay() throws Exception {
         PlanetarySystem edited = editedSystem();
         SwingUtilities.invokeAndWait(() -> {
@@ -225,6 +319,7 @@ class CampaignPlanetarySystemOverridesTest {
     public static class ChangeRecorder {
         private final Campaign campaign;
         private PlanetarySystem notifiedSystem;
+        private List<PlanetarySystem> notifiedSystems;
         private int eventCount;
 
         ChangeRecorder(Campaign campaign) {
@@ -235,6 +330,7 @@ class CampaignPlanetarySystemOverridesTest {
         public void handle(PlanetarySystemsChangedEvent event) {
             if (event.getCampaign() == campaign) {
                 notifiedSystem = campaign.getCurrentSystem();
+                notifiedSystems = campaign.getSystems();
                 eventCount++;
             }
         }
