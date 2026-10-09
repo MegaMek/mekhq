@@ -213,6 +213,57 @@ public final class FormationIconBuilder {
         return applied;
     }
 
+    /**
+     * Brings the echelon symbol on a formation's icon into line with its level, and leaves the rest of the icon alone.
+     *
+     * <p>Support formations are re-sized as their teams and vehicles change, long after their icons were drawn. A
+     * Medical section drawn while it held one MASH truck kept the Team symbol after ten more trucks made it a company.
+     * Only an icon whose formation layer is a single echelon shape from this builder's folder is touched, so an icon
+     * the player designed is never overwritten.</p>
+     *
+     * @param formation the formation whose icon may be stale
+     * @param campaign  the campaign, for the faction family that decides the shape set
+     *
+     * @return {@code true} if the symbol was changed
+     */
+    public static boolean refreshEchelonPiece(@Nullable Formation formation, @Nullable Campaign campaign) {
+        if ((formation == null) || (campaign == null)
+                  || !(formation.getFormationIcon() instanceof LayeredFormationIcon icon)) {
+            return false;
+        }
+        Faction iconFaction = campaign.getPlayerForce().getFaction();
+        List<FormationPieceIcon> pieces = icon.getPieces().get(LayeredFormationIconLayer.FORMATION);
+        if ((iconFaction == null) || (pieces == null) || (pieces.size() != 1)) {
+            return false;
+        }
+        String folder = formationFolderFor(iconFaction);
+        FormationPieceIcon piece = pieces.get(0);
+        if (!folder.equals(piece.getCategory()) || !isEchelonShape(piece.getFilename(), iconFaction)) {
+            return false;
+        }
+        String wanted = formationFilenameFor(formation.getFormationLevel(), iconFaction);
+        if ((wanted == null) || wanted.equals(piece.getFilename())) {
+            return false;
+        }
+        pieces.set(0, new FormationPieceIcon(LayeredFormationIconLayer.FORMATION, folder, wanted));
+        LOGGER.info("[SupportTOE] formation '{}' re-sized to {}: echelon symbol '{}' -> '{}'", formation.getName(),
+              formation.getFormationLevel(), piece.getFilename(), wanted);
+        return true;
+    }
+
+    /** Whether the file is one of the echelon shapes this builder draws for the faction family. */
+    private static boolean isEchelonShape(@Nullable String filename, Faction faction) {
+        if (filename == null) {
+            return false;
+        }
+        for (FormationLevel level : FormationLevel.values()) {
+            if (filename.equals(formationFilenameFor(level, faction))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static int applyToSubtree(Formation parent, Campaign campaign, Faction iconFaction,
           FormationPieceIcon background) {
         int count = 0;
