@@ -248,7 +248,13 @@ public final class SupportUnitGenerator {
             if (!capability.needsMechanics() || !capability.isEnabled(campaign)) {
                 continue;
             }
-            planned += shortfall(campaign, capability.unitName(campaign), capability.targetCount(campaign, faction));
+            String unitName = capability.unitName(campaign);
+            int targetCount = capability.targetCount(campaign, faction);
+            // A rolled capability has no name to count by, and counting a null name found nothing, so every
+            // vehicle a campaign already owned was planned again and given mechanics it would never need.
+            planned += (unitName != null)
+                             ? shortfall(campaign, unitName, targetCount)
+                             : Math.max(0, targetCount - countOwnedVehicles(campaign, capability));
         }
         return planned;
     }
@@ -362,23 +368,38 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * What a capability already fields, counted by its TOE formation rather than by unit name.
+     * What a capability already fields: every vehicle in the hangar that does its job, wherever it is filed.
      *
-     * <p>A capability's vehicles are rolled, so they no longer share a name to count: a convoy can be three lances
-     * of Flatbeds and one of Burros. What they do share is the formation they are filed into.</p>
+     * <p>A capability's vehicles are rolled, so they share no name to count: a convoy can be three lances of
+     * Flatbeds and one of Burros. They used to be counted by the formation they are filed into, which missed every
+     * vehicle filed anywhere else - one the player bought and left outside the TOE, or a recovery vehicle a support
+     * team keeps in its Recovery Company - and built the whole target again on top of them. Each vehicle is now asked
+     * what it does instead, see {@link SupportVehicleSelector#capabilityOf}.</p>
      *
-     * @param campaign      the campaign to inspect
-     * @param formationType the capability's formation
+     * @param campaign   the campaign to inspect
+     * @param capability the capability to count
      *
-     * @return the vehicles already filed there
+     * @return the vehicles the campaign already owns for it
      */
-    static int countVehiclesInFormation(Campaign campaign, SupportTOEFormationTypes formationType) {
-        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            if (formation.getName().equalsIgnoreCase(formationType.getLabel())) {
-                return formation.getAllUnits(false).size();
+    static int countOwnedVehicles(Campaign campaign, SupportCapability capability) {
+        int inToe = 0;
+        int outsideToe = 0;
+        for (Unit unit : campaign.getUnits()) {
+            if (SupportVehicleSelector.capabilityOf(unit.getEntity()) != capability) {
+                continue;
             }
+            boolean isFiled = unit.getFormationId() != Formation.FORMATION_NONE;
+            if (isFiled) {
+                inToe++;
+            } else {
+                outsideToe++;
+            }
+            LOGGER.info("[CompanyGen][SupportUnits] {}: '{}' already owned ({})", capability, unit.getName(),
+                  isFiled ? "in the TOE" : "outside the TOE");
         }
-        return 0;
+        LOGGER.info("[CompanyGen][SupportUnits] {}: owns {} ({} in the TOE, {} outside it)", capability,
+              inToe + outsideToe, inToe, outsideToe);
+        return inToe + outsideToe;
     }
 
     /** Where the support sub-formations sit: the faction's smallest formation, a lance, Star or Level II. */
@@ -550,6 +571,12 @@ public final class SupportUnitGenerator {
      * recovery vehicles had already been built would size its convoy against six hundred tons of its own
      * support.</p>
      *
+     * <p>Filing alone misses a support vehicle that is not filed at all. A campaign converted to support teams
+     * counted sixteen recovery vehicles, canteens and trucks the player had bought and left outside the TOE as part
+     * of its fighting force, and was given four more recovery vehicles for them. A unit that does a capability's job
+     * is left out too, recognised by {@link SupportVehicleSelector#capabilityOf}, which reads the mission role and
+     * equipment rather than construction, so the primitive support-built carriers above still count.</p>
+     *
      * @param campaign the campaign to tally
      *
      * @return the combat unit count and tonnage
@@ -557,17 +584,21 @@ public final class SupportUnitGenerator {
     static CombatForceTally tallyCombatForce(Campaign campaign) {
         int units = 0;
         double tonnage = 0;
+        int supportVehicles = 0;
         for (Unit unit : campaign.getUnits()) {
             Entity entity = unit.getEntity();
             if ((entity == null) || Resupply.isProhibitedUnitType(entity, false, false)) {
                 continue;
             }
-            if (isInSupportFormation(campaign, unit)) {
+            if (isInSupportFormation(campaign, unit) || (SupportVehicleSelector.capabilityOf(entity) != null)) {
+                supportVehicles++;
                 continue;
             }
             units++;
             tonnage += entity.getWeight();
         }
+        LOGGER.info("[CompanyGen][SupportUnits] combat tally: {} unit(s), {} tons; {} support unit(s) left out",
+              units, tonnage, supportVehicles);
         return new CombatForceTally(units, tonnage);
     }
 
@@ -873,10 +904,10 @@ public final class SupportUnitGenerator {
           SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource,
           @Nullable ForceNamingMethod namingMethod) {
         // A named capability is infantry, counted by name as before. A rolled one has no single name to count, so
-        // what it already fields is read off its formation instead.
+        // each vehicle in the hangar is asked what it does instead.
         int existing = (unitName != null)
               ? countGeneratedUnitsNamed(campaign, unitName)
-              : countVehiclesInFormation(campaign, formationType);
+              : countOwnedVehicles(campaign, capability);
         int count = Math.max(0, targetCount - existing);
         if (count <= 0) {
             LOGGER.info("[CompanyGen][SupportUnits] {}: target {} already met ({} present) -> generating 0",

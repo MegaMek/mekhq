@@ -272,6 +272,10 @@ public final class SupportPersonnelToTOE {
         // converted to support teams may already own these vehicles.
         List<VehicleSpec> maintenanceVehicles = sectionVehicles(campaign, SupportSection.MAINTENANCE, faction);
         List<VehicleSpec> medicalVehicles = sectionVehicles(campaign, SupportSection.MEDICAL, faction);
+        // Vehicles the campaign already owns but has never put to use are crewed before anything new is built. The
+        // shortfall above already counts them, so leaving them idle would leave the section short.
+        List<Unit> maintenanceIdleVehicles = idleOwnedVehicles(campaign, SupportSection.MAINTENANCE);
+        List<Unit> medicalIdleVehicles = idleOwnedVehicles(campaign, SupportSection.MEDICAL);
 
         LOGGER.info("[CompanyGen][SupportTOE] === Support Command: {} staff (maintenance={} medical={} command={}, clan={}) ===",
               maintenance.size() + medical.size() + command.size(),
@@ -281,11 +285,11 @@ public final class SupportPersonnelToTOE {
         // capability vehicles get their own company named for their function ("Recovery",
         // "Field Hospital"). Command has no capability vehicles, so its label is unused.
         organizeSection(campaign, supportCommand, label("maintenance"), maintenance, profile,
-              useClanStructure, maintenanceVehicles, label("recovery"));
+              useClanStructure, maintenanceIdleVehicles, maintenanceVehicles, label("recovery"));
         organizeSection(campaign, supportCommand, label("medical"), medical, profile,
-              useClanStructure, medicalVehicles, label("fieldHospital"));
+              useClanStructure, medicalIdleVehicles, medicalVehicles, label("fieldHospital"));
         organizeSection(campaign, supportCommand, label("command"), command, profile,
-              useClanStructure, List.of(), label("command"));
+              useClanStructure, List.of(), List.of(), label("command"));
 
         collapseSingleChildLayers(campaign, supportCommand);
         applyEchelonLevels(campaign, supportCommand, profile, useClanStructure);
@@ -448,11 +452,12 @@ public final class SupportPersonnelToTOE {
      * detachment that does not warrant a company of its own. The section's capability vehicles
      * (recovery / MASH), crewed from the front of the staff pool, get their own function-named company
      * ("Recovery Company", "Field Hospital Company"). Each carrier is fluff-named after the profession
-     * it carries (e.g. "Support Squad - MekTech").
+     * it carries (e.g. "Support Squad - MekTech"). Capability vehicles the campaign already owns but has
+     * left idle join that company first, crewed the same way, before any new vehicle is built.
      */
     private static void organizeSection(Campaign campaign, Formation supportCommand, String sectionLabel,
-          List<Person> people, EchelonProfile profile, boolean useClanStructure, List<VehicleSpec> vehicles,
-          String vehicleCompanyLabel) {
+          List<Person> people, EchelonProfile profile, boolean useClanStructure, List<Unit> idleVehicles,
+          List<VehicleSpec> vehicles, String vehicleCompanyLabel) {
         if (people.isEmpty()) {
             return;
         }
@@ -464,12 +469,17 @@ public final class SupportPersonnelToTOE {
         // staff pool so their crew is not double-generated.
         List<Person> pool = new ArrayList<>(people);
         int consumed = 0;
-        if (!vehicles.isEmpty()) {
+        if (!idleVehicles.isEmpty() || !vehicles.isEmpty()) {
             Formation vehicleCompany = createFormation(campaign,
                   vehicleCompanyLabel + " " + profile.rollupLabel(),
                   FormationType.SUPPORT, section, profile.rollupLevel());
+            consumed += fileIdleVehicles(campaign, vehicleCompany, idleVehicles, pool);
             for (VehicleSpec vehicle : vehicles) {
                 consumed += addCapabilityVehicles(campaign, vehicleCompany, vehicle, pool, consumed);
+            }
+            // Owned vehicles alone, with no staff left to crew them, leave the company with nothing in it.
+            if (vehicleCompany.getAllUnits(false).isEmpty()) {
+                campaign.getPlayerForce().removeFormation(vehicleCompany, campaign);
             }
         }
         List<Person> remaining = pool.subList(consumed, pool.size());
@@ -500,6 +510,65 @@ public final class SupportPersonnelToTOE {
 
         LOGGER.info("[CompanyGen][SupportTOE] {}: {} staff, {} crewed onto vehicles, {} profession company(ies), {} lone carrier(s) under the section",
               sectionLabel, people.size(), consumed, professionCompanies, loneCarriers);
+    }
+
+    /**
+     * The capability vehicles of one section that the campaign owns but has never put to use: in no formation, with
+     * nobody aboard, and at hand. These are the vehicles a player bought or was granted and left in the hangar.
+     *
+     * <p>A vehicle the player has crewed, or filed in a formation of their own, is in use and is left alone. It still
+     * counts towards the section's target, see {@link #vehiclesStillNeeded}.</p>
+     *
+     * @param campaign the campaign whose hangar is searched
+     * @param section  the section whose capability vehicles are wanted
+     *
+     * @return the idle vehicles, in hangar order; empty when there are none
+     */
+    static List<Unit> idleOwnedVehicles(Campaign campaign, SupportSection section) {
+        List<Unit> idle = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if ((unit.getFormationId() != Formation.FORMATION_NONE) || !unit.getCrew().isEmpty()
+                  || unit.isMothballed() || !unit.isPresent()) {
+                continue;
+            }
+            SupportCapability capability = SupportVehicleSelector.capabilityOf(unit.getEntity());
+            if ((capability == null) || (capability.crewSection() != section) || !capability.isEnabled(campaign)
+                  || !capability.joinsSection(campaign)) {
+                continue;
+            }
+            idle.add(unit);
+        }
+        return idle;
+    }
+
+    /**
+     * Crews the campaign's idle capability vehicles from the front of the section's staff and files them under
+     * {@code parent}. A vehicle nobody is left to crew stays where it was rather than joining the company empty.
+     *
+     * @param campaign     the campaign that owns the TOE
+     * @param parent       the section's capability-vehicle company
+     * @param idleVehicles the vehicles to put to use, from {@link #idleOwnedVehicles}
+     * @param pool         the section's staff, in the order they are handed out
+     *
+     * @return the number of people consumed as crew
+     */
+    private static int fileIdleVehicles(Campaign campaign, Formation parent, List<Unit> idleVehicles,
+          List<Person> pool) {
+        int consumed = 0;
+        for (Unit unit : idleVehicles) {
+            if (consumed >= pool.size()) {
+                LOGGER.info("[CompanyGen][SupportTOE]     no staff left to crew owned vehicle '{}'; it stays where it"
+                                  + " was", unit.getName());
+                continue;
+            }
+            int crewNeeded = unit.getFullCrewSize();
+            int crewSize = seatVehicleCrew(unit, pool, consumed);
+            consumed += crewSize;
+            campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
+            LOGGER.info("[CompanyGen][SupportTOE]     {} owned vehicle '{}' unitId={} put to use, crewed with {}/{}"
+                              + " staff", parent.getName(), unit.getName(), unit.getId(), crewSize, crewNeeded);
+        }
+        return consumed;
     }
 
     /**
@@ -816,13 +885,13 @@ public final class SupportPersonnelToTOE {
     static List<VehicleSpec> vehiclesStillNeeded(Campaign campaign, SupportCapability capability,
           Faction faction, int targetCount) {
         // A named capability is infantry and is counted by name. A rolled one has no single name to count or to
-        // build from, so what it already fields is read off its formation and the shortfall is rolled.
+        // build from, so each vehicle in the hangar is asked what it does, and the shortfall is rolled.
         String unitName = capability.unitName(campaign);
         if (unitName != null) {
             return vehiclesStillNeeded(campaign, unitName, targetCount);
         }
 
-        int existing = SupportUnitGenerator.countVehiclesInFormation(campaign, capability.formationType());
+        int existing = SupportUnitGenerator.countOwnedVehicles(campaign, capability);
         int missing = Math.max(0, targetCount - existing);
         LOGGER.info("[CompanyGen][SupportTOE] {}: target {}, already owned {}, building {}",
               capability, targetCount, existing, missing);
