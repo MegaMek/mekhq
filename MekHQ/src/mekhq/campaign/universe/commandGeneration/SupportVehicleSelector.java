@@ -139,7 +139,7 @@ public final class SupportVehicleSelector {
         // The table's own weighted roll, narrowed by the capability. Rolling it rather than picking from a
         // collected list keeps the availability weighting intact, which is what makes the common recovery
         // vehicles common: they outweigh the rest of the table roughly three to one.
-        MekSummary rolled = table.generateUnit(summary -> suits(capability, describe(summary)));
+        MekSummary rolled = table.generateUnit(summary -> classify(describe(summary)) == capability);
         if (rolled == null) {
             // Worth separating: a table with entries that none of them suit is a capability filter that is too
             // tight, while an empty table is a faction that could field nothing of the kind in that year.
@@ -180,7 +180,7 @@ public final class SupportVehicleSelector {
                 continue;
             }
             Candidate candidate = describe(summary);
-            if (suits(capability, candidate)) {
+            if (classify(candidate) == capability) {
                 candidates.add(candidate);
             }
         }
@@ -282,10 +282,20 @@ public final class SupportVehicleSelector {
      * @return the capability it provides, or {@code null} when it provides none
      */
     public static @Nullable SupportCapability capabilityOf(@Nullable Entity entity) {
-        if (entity == null) {
-            return null;
-        }
-        Candidate candidate = describe(entity);
+        return (entity == null) ? null : classify(describe(entity));
+    }
+
+    /**
+     * The one capability a vehicle is counted under, judged in {@link #RECOGNITION_ORDER}. A rolled vehicle is only
+     * fielded for the capability it classifies as, so a vehicle built for one capability is never counted as
+     * another's: a BattleMek Recovery Vehicle carries the cargo role as well as the recovery role, and fielding it in
+     * a convoy would leave the convoy one truck short and the recovery formation one vehicle over.
+     *
+     * @param candidate the vehicle, owned or offered by the generator
+     *
+     * @return the capability it is counted under, or {@code null} when it provides none
+     */
+    static @Nullable SupportCapability classify(Candidate candidate) {
         // Looked up only when needed: equipment settles medical and commissary without asking the generator.
         Set<MissionRole> roles = null;
         for (SupportCapability capability : RECOGNITION_ORDER) {

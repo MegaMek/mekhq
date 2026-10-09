@@ -32,10 +32,18 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
+import java.util.function.Function;
+
+import megamek.client.ratgenerator.MissionRole;
 import mekhq.campaign.universe.commandGeneration.SupportVehicleSelector.Candidate;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +67,57 @@ class SupportVehicleSelectorTest {
     /** The same vehicle, but as a trailer: no engine of its own, so it needs a tractor to go anywhere. */
     private static Candidate trailer(double cargoTons, int mashTheatres, int fieldKitchens) {
         return new Candidate("test trailer", null, cargoTons, mashTheatres, fieldKitchens, true);
+    }
+
+    /** The real role lookup, put back after each test that stands in for the force generator. */
+    private Function<String, Set<MissionRole>> realRoleLookup;
+
+    @BeforeEach
+    void rememberRoleLookup() {
+        realRoleLookup = SupportVehicleSelector.roleLookup;
+    }
+
+    @AfterEach
+    void restoreRoleLookup() {
+        SupportVehicleSelector.roleLookup = realRoleLookup;
+    }
+
+    /** Stands in for the force generator, which is not staged for tests: every vehicle carries these roles. */
+    private static void everyVehicleHasRoles(MissionRole... roles) {
+        Set<MissionRole> roleSet = Set.of(roles);
+        SupportVehicleSelector.roleLookup = unitName -> roleSet;
+    }
+
+    @Test
+    @DisplayName("A recovery vehicle with a cargo bay is counted as recovery, never as a convoy truck")
+    void aRecoveryVehicleWithCargoIsSalvageNotLogistics() {
+        // Issue 10375: the convoy roll accepted BattleMek Recovery Vehicles, which carry the cargo role too. Counted
+        // afterwards they were recovery vehicles, so the convoy came up short and the recovery formation over.
+        everyVehicleHasRoles(MissionRole.RECOVERY, MissionRole.CARGO);
+
+        assertEquals(SupportCapability.SALVAGE, SupportVehicleSelector.classify(vehicle(FLATBED_TRUCK_CARGO, 0, 0)));
+    }
+
+    @Test
+    @DisplayName("Equipment decides first: a MASH vehicle with a cargo bay is medical")
+    void equipmentOutranksRoles() {
+        everyVehicleHasRoles(MissionRole.SUPPORT, MissionRole.CARGO, MissionRole.RECOVERY);
+
+        assertEquals(SupportCapability.MEDICAL, SupportVehicleSelector.classify(vehicle(BURRO_II_CARGO, 1, 0)));
+        assertEquals(SupportCapability.COMMISSARY, SupportVehicleSelector.classify(vehicle(BURRO_II_CARGO, 0, 2)));
+    }
+
+    @Test
+    @DisplayName("A cargo truck is logistics, and a vehicle with no support role or equipment is nothing")
+    void cargoTrucksAndCombatVehicles() {
+        everyVehicleHasRoles(MissionRole.CARGO);
+        assertEquals(SupportCapability.LOGISTICS, SupportVehicleSelector.classify(vehicle(FLATBED_TRUCK_CARGO, 0, 0)));
+        assertNull(SupportVehicleSelector.classify(vehicle(SKODA_GROWLER_CARGO, 0, 0)),
+              "a runabout's bay is too small to make it a convoy truck");
+
+        everyVehicleHasRoles();
+        assertNull(SupportVehicleSelector.classify(vehicle(FLATBED_TRUCK_CARGO, 0, 0)),
+              "a combat vehicle with a cargo bay but no support role is part of the fighting force");
     }
 
     @Test
