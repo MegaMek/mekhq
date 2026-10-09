@@ -667,6 +667,10 @@ public final class SupportPersonnelToTOE {
      * <p>Vehicles the campaign owns but left idle are crewed the same way and filed first. They already count
      * towards the target, so only the shortfall beyond them is built.</p>
      *
+     * <p>Whoever crews them, the vehicles land in the section. Crewed with new hires or a temporary crew, a MASH truck
+     * still belongs with the rest of the medical units, rather than in a second Medical formation beside Support
+     * Command.</p>
+     *
      * @param campaign   the campaign being topped up
      * @param capability the capability whose vehicles are granted
      * @param crewSource where the crews come from
@@ -699,19 +703,24 @@ public final class SupportPersonnelToTOE {
         }
         String companyLabel = (section == SupportSection.MAINTENANCE) ? label("recovery") : label("fieldHospital");
         Formation vehicleCompany = childStartingWith(sectionFormation, companyLabel);
+        if ((vehicleCompany == null) && holdsVehiclesOf(campaign, sectionFormation, capability)) {
+            // The company was collapsed into the section, which now holds its vehicles directly. The new ones join
+            // them there rather than in a company of their own beside them.
+            vehicleCompany = sectionFormation;
+        }
         boolean isNewCompany = vehicleCompany == null;
         if (isNewCompany) {
             vehicleCompany = createFormation(campaign, companyLabel + " " + profile.rollupLabel(),
                   FormationType.SUPPORT, sectionFormation, profile.rollupLevel());
         }
 
-        List<Person> pool = (crewSource == VehicleCrewSource.NEW_CREW)
-                                  ? new ArrayList<>()
-                                  : availableSectionStaff(campaign, sectionFormation, section);
+        List<Person> pool = (crewSource == VehicleCrewSource.EXISTING_STAFF)
+                                  ? availableSectionStaff(campaign, sectionFormation, section)
+                                  : new ArrayList<>();
         int putToUse = putIdleVehiclesToUse(campaign, vehicleCompany, idleVehicles, pool, crewSource, faction);
         int built = 0;
         for (VehicleSpec vehicle : vehicles) {
-            built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource);
+            built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource, faction);
         }
         if (crewSource == VehicleCrewSource.TEMPORARY_CREW) {
             campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
@@ -728,6 +737,17 @@ public final class SupportPersonnelToTOE {
         LOGGER.info("[SupportTeams] {}: put {} owned vehicle(s) to use and built {} into '{}', crewed from {}",
               capability, putToUse, built, vehicleCompany.getName(), crewSource);
         return putToUse + built;
+    }
+
+    /** Whether {@code formation} itself, not a formation below it, holds a vehicle of this capability. */
+    private static boolean holdsVehiclesOf(Campaign campaign, Formation formation, SupportCapability capability) {
+        for (UUID unitId : formation.getUnits()) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit != null) && (SupportVehicleSelector.capabilityOf(unit.getEntity()) == capability)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -748,15 +768,14 @@ public final class SupportPersonnelToTOE {
           List<Person> pool, VehicleCrewSource crewSource, Faction faction) {
         int putToUse = 0;
         for (Unit unit : idleVehicles) {
-            if (crewSource == VehicleCrewSource.NEW_CREW) {
+            if (crewSource != VehicleCrewSource.EXISTING_STAFF) {
                 SupportUnitGenerator.crewSupportUnit(campaign, unit, faction, crewSource);
             } else if (pool.isEmpty()) {
                 LOGGER.info("[SupportTeams]     no staff left to crew owned vehicle '{}'; it stays where it was",
                       unit.getName());
                 continue;
             } else {
-                int seats = (crewSource == VehicleCrewSource.TEMPORARY_CREW) ? 1 : unit.getFullCrewSize();
-                seatFromSection(unit, pool, seats);
+                seatFromSection(unit, pool, unit.getFullCrewSize());
             }
             campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
             putToUse++;
@@ -766,9 +785,12 @@ public final class SupportPersonnelToTOE {
         return putToUse;
     }
 
-    /** Builds one capability vehicle's worth of top-up, crewed as the player chose. */
+    /**
+     * Builds one capability vehicle's worth of top-up, crewed as the player chose: from the section's staff, or with
+     * new hires or a temporary crew, as a vehicle granted outside the sections is.
+     */
     private static int addTopUpVehicles(Campaign campaign, Formation parent, VehicleSpec vehicle, List<Person> pool,
-          VehicleCrewSource crewSource) {
+          VehicleCrewSource crewSource, Faction faction) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(vehicle.unitName());
         if (mekSummary == null) {
             LOGGER.error("Cannot find capability vehicle entry for {}", vehicle.unitName());
@@ -776,19 +798,20 @@ public final class SupportPersonnelToTOE {
         }
 
         int built = 0;
+        boolean fromStaff = crewSource == VehicleCrewSource.EXISTING_STAFF;
         for (int index = 0; index < vehicle.count(); index++) {
-            boolean wantsNewCrew = crewSource == VehicleCrewSource.NEW_CREW;
             // A vehicle nobody can crew is worse than one the command does not have, so the shortfall stops here.
-            if (!wantsNewCrew && pool.isEmpty()) {
+            if (fromStaff && pool.isEmpty()) {
                 LOGGER.info("[SupportTeams]     no staff left to crew another '{}'; built {} of {}",
                       vehicle.unitName(), built, vehicle.count());
                 break;
             }
             try {
-                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), wantsNewCrew, 0);
-                if (!wantsNewCrew) {
-                    int seats = (crewSource == VehicleCrewSource.TEMPORARY_CREW) ? 1 : unit.getFullCrewSize();
-                    seatFromSection(unit, pool, seats);
+                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), false, 0);
+                if (fromStaff) {
+                    seatFromSection(unit, pool, unit.getFullCrewSize());
+                } else {
+                    SupportUnitGenerator.crewSupportUnit(campaign, unit, faction, crewSource);
                 }
                 campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
                 built++;

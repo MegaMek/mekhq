@@ -58,6 +58,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SupportCapabilityGrantDialog;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -135,6 +136,55 @@ class AddSupportUnitsToTOETest {
             assertEquals(PersonnelRole.MECHANIC, crewMember.getPrimaryRole(),
                   "from the maintenance staff, as the player chose, not from new hires");
         }
+    }
+
+    @Test
+    void grant_filesARecoveryVehicleInSupportCommandWhoeverCrewsIt() {
+        // Granting recovery vehicles or MASH trucks with new hires used to stand them up in a formation of their own,
+        // so a campaign with support teams ended up with a second Medical formation beside Support Command's.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 8), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitNamedLike(campaign, "APC");
+
+        SupportCapabilityGrantDialog.processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true,
+              SupportCapability.SALVAGE, SupportPersonnelToTOE.VehicleCrewSource.NEW_CREW);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertTrue(supportCommand.getAllUnits(false).contains(owned.getId()),
+              "the recovery vehicle joins Support Command even though new hires crew it");
+        assertFalse(owned.getCrew().isEmpty(), "and it is crewed");
+        for (Person crewMember : owned.getCrew()) {
+            assertFalse(crewMember.getPrimaryRole().isTech(), "by new hires, not by the maintenance staff");
+        }
+        String standaloneLabel = SupportTOEFormationTypes.SALVAGE_FORMATION.getLabel();
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            assertFalse(formation.getName().equalsIgnoreCase(standaloneLabel),
+                  "no recovery formation may stand beside Support Command");
+        }
+    }
+
+    @Test
+    void topUp_withATemporaryCrewNeedsNoSectionStaff() {
+        // The temporary crew's named member used to be taken from the section's staff, so a section with nobody left
+        // to spare built nothing. A temporary crew is a new hire plus the pool, as everywhere else.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, SupportCapability.SALVAGE,
+              SupportPersonnelToTOE.VehicleCrewSource.TEMPORARY_CREW, campaign.getPlayerForce().getFaction());
+
+        assertTrue(campaign.getPlayerForce().getSupportCommandFormation().getAllUnits(false).contains(owned.getId()),
+              "the recovery vehicle joins Support Command");
+        assertFalse(owned.getCrew().isEmpty(), "with its named temporary crew member aboard");
     }
 
     @Test
