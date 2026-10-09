@@ -406,6 +406,26 @@ public class AddSupportUnitsToTOE {
         return (bestCount >= 2) ? best : null;
     }
 
+    /**
+     * The formation a capability's units were filed into under the HQ, without creating anything.
+     *
+     * @param campaign       the campaign whose TOE is searched
+     * @param formationTypes the capability formation
+     *
+     * @return the formation, or {@code null} when the campaign has none
+     */
+    public static @Nullable Formation findCapabilityFormation(Campaign campaign,
+          SupportTOEFormationTypes formationTypes) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            Formation parent = formation.getParentFormation();
+            if ((parent != null) && parent.getName().equalsIgnoreCase(HQ_FORMATION.getLabel())
+                      && formation.getName().equalsIgnoreCase(formationTypes.getLabel())) {
+                return formation;
+            }
+        }
+        return null;
+    }
+
     /** @return {@code true} if this formation is one of the support kinds, rather than a fighting formation */
     private static boolean isSupportType(Formation formation) {
         return formation.isFormationType(FormationType.SUPPORT)

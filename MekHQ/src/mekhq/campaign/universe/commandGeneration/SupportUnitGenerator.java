@@ -71,6 +71,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 
@@ -230,6 +231,27 @@ public final class SupportUnitGenerator {
         LOGGER.info("[CompanyGen][SupportUnits]     '{}' crewed with {} individual personnel", unit.getName(),
               unit.getActiveCrew().size());
         return null;
+    }
+
+    /**
+     * Draws the icons of the support formations granted under the HQ that are still blank: recovery, MASH, convoy,
+     * canteens and the security detail. Run when a campaign loads, so formations granted before grants drew icons
+     * get theirs. A formation that already has an icon, from this code or the player, is left alone.
+     *
+     * @param campaign the campaign just loaded
+     *
+     * @return the number of formations decorated
+     */
+    public static int decorateGrantedSupportFormations(@Nullable Campaign campaign) {
+        if (campaign == null) {
+            return 0;
+        }
+        int decorated = 0;
+        for (SupportCapability capability : SupportCapability.values()) {
+            decorated += FormationIconBuilder.decorateUndecorated(AddSupportUnitsToTOE.findCapabilityFormation(campaign,
+                  capability.formationType()), campaign);
+        }
+        return decorated;
     }
 
     /**
@@ -978,6 +1000,10 @@ public final class SupportUnitGenerator {
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
                   subFormationSize(faction, formationType), subFormationNamer(faction, namingMethod));
+            // Only command generation and the Support Teams conversion drew support icons, so a convoy or canteens
+            // granted mid-campaign were filed blank. Generation redraws the whole TOE afterwards anyway.
+            FormationIconBuilder.decorateUndecorated(AddSupportUnitsToTOE.findCapabilityFormation(campaign,
+                  formationType), campaign);
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {
