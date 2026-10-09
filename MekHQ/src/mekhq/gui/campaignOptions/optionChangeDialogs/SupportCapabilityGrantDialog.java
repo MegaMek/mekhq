@@ -275,7 +275,6 @@ public class SupportCapabilityGrantDialog extends JDialog {
         }
 
         VehicleCrewSource crewSource = temporaryCrews ? VehicleCrewSource.TEMPORARY_CREW : VehicleCrewSource.NEW_CREW;
-        LOGGER.info("[SupportTeams] {}: granted standalone, crewed as {}", capability, crewSource);
         processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true, capability, crewSource);
     }
 
@@ -287,6 +286,11 @@ public class SupportCapabilityGrantDialog extends JDialog {
     /**
      * Grants the capability's free vehicles, topping the campaign up to what a command its size should field.
      *
+     * <p>Recovery vehicles and MASH trucks go wherever the campaign keeps the rest of its maintenance and medical
+     * units. In a campaign organized into support teams that is the matching Support Command section, however they are
+     * crewed; filing them standalone would leave a second Medical formation beside the one in Support Command. Every
+     * other capability, and any campaign without a Support Command, gets a formation of its own.</p>
+     *
      * @param campaign                   the campaign the vehicles are granted to
      * @param faction                    the faction whose ranks the crews are given
      * @param isAutomaticallyAssignRanks whether generated crews have ranks assigned automatically
@@ -296,8 +300,27 @@ public class SupportCapabilityGrantDialog extends JDialog {
      */
     public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks,
           SupportCapability capability, @Nullable VehicleCrewSource crewSource) {
+        if (capability.joinsSection(campaign) && (campaign.getPlayerForce().getSupportCommandFormation() != null)) {
+            VehicleCrewSource sectionCrewSource = (crewSource != null) ? crewSource : campaignCrewSource(campaign,
+                  capability);
+            int granted = SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, capability, sectionCrewSource,
+                  faction);
+            LOGGER.info("[SupportTeams] {}: granted {} vehicle(s) into the support sections, crewed as {}",
+                  capability, granted, sectionCrewSource);
+            return;
+        }
+        LOGGER.info("[SupportTeams] {}: granted in a formation of its own, crewed as {}", capability,
+              (crewSource != null) ? crewSource : "the campaign's temporary crew options");
         // Granted mid-campaign, so no generation convention was stated; the default naming is used.
         SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks, crewSource,
               null);
+    }
+
+    /** The crewing the campaign's own temporary crew options give this capability's role. */
+    private static VehicleCrewSource campaignCrewSource(Campaign campaign, SupportCapability capability) {
+        boolean usesTemporaryCrews = campaign.getPlayerForce()
+                                           .getHumanResources()
+                                           .isBlobCrewEnabled(capability.crewRole(), campaign.getCampaignOptions());
+        return usesTemporaryCrews ? VehicleCrewSource.TEMPORARY_CREW : VehicleCrewSource.NEW_CREW;
     }
 }
