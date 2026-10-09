@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.InfantryClass;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -73,6 +74,8 @@ public final class ForceDescriptorSnapshot {
     private Integer experience;
     /** weight class integer, or {@code null} for ruleset default. */
     private Integer weightClass;
+    /** kind of conventional infantry to generate, or {@code null} for no restriction. */
+    private InfantryClass infantryClass;
     /** flag tokens (e.g. "c3", "omni", "novacews"). */
     private final Set<String> flags = new LinkedHashSet<>();
     private boolean augmented;
@@ -163,6 +166,17 @@ public final class ForceDescriptorSnapshot {
         this.weightClass = weightClass;
     }
 
+    /**
+     * @return the kind of conventional infantry to generate, or {@code null} for no restriction
+     */
+    public @Nullable InfantryClass getInfantryClass() {
+        return infantryClass;
+    }
+
+    public void setInfantryClass(@Nullable InfantryClass infantryClass) {
+        this.infantryClass = infantryClass;
+    }
+
     public Set<String> getFlags() {
         return flags;
     }
@@ -241,6 +255,7 @@ public final class ForceDescriptorSnapshot {
         this.rating = fd.getRating();
         this.experience = fd.getExperience();
         this.weightClass = fd.getWeightClass();
+        this.infantryClass = fd.getInfantryClass();
         this.augmented = fd.isAugmented();
         // getSizeMod() returns int; the snapshot stores Integer so the engine's "no preference" is null.
         // Treat 0 as "not specified" here, matching how the panel leaves the value when the user doesn't touch it.
@@ -284,6 +299,9 @@ public final class ForceDescriptorSnapshot {
         }
         if (weightClass != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "weightClass", weightClass);
+        }
+        if (infantryClass != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "infantryClass", infantryClass.name());
         }
         if (!flags.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent + 1, "flags", String.join(",", flags));
@@ -373,6 +391,8 @@ public final class ForceDescriptorSnapshot {
               snapshot.experience));
         readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = parseOptionalInteger("weightClass", text,
               snapshot.weightClass));
+        readers.put("infantryClass", (snapshot, text) -> snapshot.infantryClass = parseInfantryClass(text,
+              snapshot.infantryClass));
         readers.put("flags", (snapshot, text) -> addTokens(text, snapshot.flags));
         readers.put("augmented", (snapshot, text) -> snapshot.augmented = Boolean.parseBoolean(text));
         readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = parseOptionalInteger("sizeMod", text, snapshot.sizeMod));
@@ -444,6 +464,24 @@ public final class ForceDescriptorSnapshot {
         }
     }
 
+    /**
+     * Reads an infantry class by its name, keeping the current value where the text names no class.
+     *
+     * @param text         the element's text, e.g. {@code MECHANIZED}
+     * @param currentValue the value to keep on failure
+     *
+     * @return the class named, or {@code currentValue} where the text names none
+     */
+    private static @Nullable InfantryClass parseInfantryClass(String text, @Nullable InfantryClass currentValue) {
+        try {
+            return InfantryClass.valueOf(text);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[CommandGen] preset element 'infantryClass' held '{}', which is not an infantry class; the"
+                  + " setting keeps its default", text);
+            return currentValue;
+        }
+    }
+
     private static void logUnreadableNumber(String elementName, String text) {
         LOGGER.warn("[CommandGen] preset element '{}' held '{}', which is not a number; the setting keeps its"
               + " default", elementName, text);
@@ -482,6 +520,7 @@ public final class ForceDescriptorSnapshot {
               && Objects.equals(rating, other.rating)
               && Objects.equals(experience, other.experience)
               && Objects.equals(weightClass, other.weightClass)
+              && (infantryClass == other.infantryClass)
               && Objects.equals(flags, other.flags)
               && (augmented == other.augmented)
               && Objects.equals(sizeMod, other.sizeMod)
@@ -500,6 +539,7 @@ public final class ForceDescriptorSnapshot {
               rating,
               experience,
               weightClass,
+              infantryClass,
               flags,
               augmented,
               sizeMod,
