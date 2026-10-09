@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.IntFunction;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
@@ -292,6 +293,8 @@ public final class SupportPersonnelToTOE {
         organizeSection(campaign, supportCommand, label("command"), command, profile,
               useClanStructure, List.of(), List.of(), label("command"));
 
+        // A section's vehicles past one lance's worth are split into lances, so the TOE reads as a tree.
+        lanceSupportVehicles(campaign, supportCommand, faction);
         collapseSingleChildLayers(campaign, supportCommand);
         applyEchelonLevels(campaign, supportCommand, profile, useClanStructure);
 
@@ -344,11 +347,47 @@ public final class SupportPersonnelToTOE {
             return;
         }
         boolean useClanStructure = campaign.getPlayerForce().isClanForce();
+        // Vehicles added since the teams were last shaped - granted, or filed flat by an older save - go into lances.
+        List<Formation> newLances = lanceSupportVehicles(campaign, supportCommand,
+              campaign.getPlayerForce().getFaction());
         applyEchelonLevels(campaign, supportCommand,
               useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure);
+        if (!newLances.isEmpty()) {
+            FormationIconBuilder.applyIconsToFormations(newLances, campaign);
+        }
         // A new size needs a new echelon symbol, or a section that grew from one MASH truck to eleven still shows a
         // Team on its icon.
         refreshEchelonSymbols(campaign, supportCommand);
+    }
+
+    /**
+     * Splits the support vehicles under {@code root} into lances wherever a formation holds more than one lance's
+     * worth, using the faction's lance size and the default lance names. Formations that are themselves lances are
+     * left alone. See {@link AddSupportUnitsToTOE#arrangeIntoLances}.
+     *
+     * @param campaign the campaign that owns the TOE
+     * @param root     Support Command, or any formation under it
+     * @param faction  the faction the command is organised as, which sets the lance size and names
+     *
+     * @return the lances created
+     */
+    static List<Formation> lanceSupportVehicles(Campaign campaign, Formation root, Faction faction) {
+        List<Formation> created = new ArrayList<>();
+        lanceSubtree(campaign, root, SupportUnitGenerator.supportFormationSize(faction),
+              SupportUnitGenerator.subFormationNamer(faction, null), created);
+        return created;
+    }
+
+    private static void lanceSubtree(Campaign campaign, Formation formation, int lanceSize,
+          IntFunction<String> namer, List<Formation> created) {
+        if (AddSupportUnitsToTOE.isLanceName(formation.getName(), namer)) {
+            return;
+        }
+        created.addAll(AddSupportUnitsToTOE.arrangeIntoLances(campaign, formation, lanceSize, namer,
+              FormationType.SUPPORT));
+        for (Formation child : new ArrayList<>(formation.getSubFormations())) {
+            lanceSubtree(campaign, child, lanceSize, namer, created);
+        }
     }
 
     /** Updates the echelon symbol of {@code formation} and every formation under it to match its level. */

@@ -34,9 +34,14 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes.HQ_FORMATION;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.IntFunction;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -55,6 +60,8 @@ import org.jspecify.annotations.Nullable;
  * @since 0.51.0
  */
 public class AddSupportUnitsToTOE {
+    private static final MMLogger LOGGER = MMLogger.create(AddSupportUnitsToTOE.class);
+
 
     /**
      * Adds the given support {@link Unit} list to the campaign's TOE under the HQ formation.
@@ -133,7 +140,8 @@ public class AddSupportUnitsToTOE {
      * vehicles and cargo trucks read as the lances or Stars they are fielded as rather than as one long list.
      *
      * <p>A command given twelve recovery vehicles gets three lances of four under Recovery Operations, not twelve
-     * vehicles under a single marker.</p>
+     * vehicles under a single marker. A formation of one lance or fewer is that lance, so its vehicles stay filed
+     * directly under it; see {@link #arrangeIntoLances}.</p>
      *
      * <p>Units fill the lowest numbered sub-formation with room in it before a new one is created, so regenerating
      * support against a grown force tops up the last part-filled lance rather than opening a new one beside it.</p>
@@ -159,10 +167,107 @@ public class AddSupportUnitsToTOE {
               formationTypes.getType());
 
         for (Unit unit : units) {
-            Formation subFormation = nextSubFormationWithRoom(campaign, capabilityFormation, subFormationNamer,
-                  subFormationSize, formationTypes.getType(), units.size());
-            campaign.getPlayerForce().addUnitToFormation(unit, subFormation.getId(), campaign);
+            campaign.getPlayerForce().addUnitToFormation(unit, capabilityFormation.getId(), campaign);
         }
+        arrangeIntoLances(campaign, capabilityFormation, subFormationSize, subFormationNamer,
+              formationTypes.getType());
+    }
+
+    /**
+     * Arranges the vehicles a support formation holds into lances once it holds more than one lance's worth, so the
+     * order of battle reads as a tree: a company of lances, not a company holding eleven vehicles.
+     *
+     * <p>A formation of one lance or fewer is itself that lance and is left flat. Past that, every vehicle filed
+     * directly under it moves into the lowest numbered lance with room, and new lances are opened as needed. Vehicles
+     * already in a lance stay where they are, so losing a vehicle never reshuffles the others; a lance left with
+     * nothing in it is removed. Support carriers - the squads and platoons that carry the support staff - are never
+     * moved.</p>
+     *
+     * @param campaign  the campaign that owns the TOE
+     * @param group     the formation whose vehicles are arranged
+     * @param lanceSize vehicles in a full lance; zero or less leaves the formation as it is
+     * @param namer     the name of the lance at a given position, counting from one
+     * @param type      the formation type to give a new lance
+     *
+     * @return the lances created; empty when none were needed
+     */
+    public static List<Formation> arrangeIntoLances(Campaign campaign, Formation group, int lanceSize,
+          IntFunction<String> namer, FormationType type) {
+        List<Formation> created = new ArrayList<>();
+        if (lanceSize <= 0) {
+            return created;
+        }
+        removeEmptyLances(campaign, group, namer);
+
+        List<Unit> looseVehicles = new ArrayList<>();
+        for (UUID unitId : group.getUnits()) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit != null) && !unit.isCarrier()) {
+                looseVehicles.add(unit);
+            }
+        }
+        boolean hasLances = false;
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer)) {
+                hasLances = true;
+                break;
+            }
+        }
+        if (looseVehicles.isEmpty() || (!hasLances && (looseVehicles.size() <= lanceSize))) {
+            return created;
+        }
+
+        Set<Integer> before = new HashSet<>();
+        for (Formation child : group.getSubFormations()) {
+            before.add(child.getId());
+        }
+        for (Unit vehicle : looseVehicles) {
+            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, type, looseVehicles.size());
+            campaign.getPlayerForce().addUnitToFormation(vehicle, lance.getId(), campaign);
+        }
+        for (Formation child : group.getSubFormations()) {
+            if (!before.contains(child.getId())) {
+                created.add(child);
+            }
+        }
+        LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
+              looseVehicles.size(), lanceSize, created.size());
+        return created;
+    }
+
+    /** Removes the lances under {@code group} that no longer hold anything. */
+    private static void removeEmptyLances(Campaign campaign, Formation group, IntFunction<String> namer) {
+        for (Formation child : new ArrayList<>(group.getSubFormations())) {
+            if (isLanceName(child.getName(), namer) && child.getUnits().isEmpty()
+                      && child.getSubFormations().isEmpty()) {
+                LOGGER.info("[SupportTOE] '{}': removing empty lance '{}'", group.getName(), child.getName());
+                campaign.getPlayerForce().removeFormation(child, campaign);
+            }
+        }
+    }
+
+    /** The most lances a support formation is looked through for, well past what any command fields. */
+    private static final int MAXIMUM_LANCES = 26;
+
+    /**
+     * Whether a formation name is one the lance namer produces, which is how a lance this class made is told apart
+     * from a formation the player named.
+     *
+     * @param name  the formation's name
+     * @param namer the name of the lance at a given position, counting from one
+     *
+     * @return {@code true} if the name is one of the namer's
+     */
+    public static boolean isLanceName(@Nullable String name, IntFunction<String> namer) {
+        if (name == null) {
+            return false;
+        }
+        for (int position = 1; position <= MAXIMUM_LANCES; position++) {
+            if (name.equalsIgnoreCase(namer.apply(position))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

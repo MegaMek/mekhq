@@ -547,15 +547,15 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
-    void mashTrucksAndCanteensAreNotBrokenIntoLances() {
+    void mashTrucksAndCanteensAreArrangedInLancesToo() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
 
-        // These are sized to exact need rather than to whole formations, so a pair of MASH trucks reads better
-        // listed together than split across lance markers.
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
-              SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are filed flat");
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
-              SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are filed flat");
+        // Issue 10375: eleven MASH trucks under one Medical marker is a company with no lances in it. Every vehicle
+        // capability is arranged the same way; a group of one lance or fewer still stays flat.
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
+              SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are arranged in lances");
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
+              SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are arranged in lances");
         assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.SECURITY_FORMATION), "the security detail is already platoons");
     }
