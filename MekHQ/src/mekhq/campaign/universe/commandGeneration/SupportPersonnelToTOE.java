@@ -393,6 +393,7 @@ public final class SupportPersonnelToTOE {
     /** Updates the echelon symbol of {@code formation} and every formation under it to match its level. */
     private static void refreshEchelonSymbols(Campaign campaign, Formation formation) {
         FormationIconBuilder.refreshEchelonPiece(formation, campaign);
+        FormationIconBuilder.refreshPurposePiece(formation, campaign);
         for (Formation child : formation.getSubFormations()) {
             refreshEchelonSymbols(campaign, child);
         }
@@ -912,6 +913,33 @@ public final class SupportPersonnelToTOE {
             }
         }
         return staff;
+    }
+
+    /**
+     * The formation a section's carriers and vehicles live in: the section under Support Command, created if the
+     * campaign has none yet. A section that was collapsed into Support Command is recreated, which is what generation
+     * would build for the profession arriving.
+     *
+     * @param campaign       the campaign that owns the TOE
+     * @param supportCommand the Support Command formation
+     * @param section        the section; {@code null} answers Support Command itself
+     *
+     * @return the section's formation
+     */
+    static Formation sectionHome(Campaign campaign, Formation supportCommand, @Nullable SupportSection section) {
+        if (section == null) {
+            return supportCommand;
+        }
+        Formation existing = childNamed(supportCommand, sectionLabel(section));
+        if (existing != null) {
+            return existing;
+        }
+        EchelonProfile profile = campaign.getPlayerForce().isClanForce() ? clanProfile() : innerSphereProfile();
+        Formation created = createFormation(campaign, sectionLabel(section), FormationType.SUPPORT, supportCommand,
+              profile.sectionLevel());
+        FormationIconBuilder.applyIconsToFormations(List.of(created), campaign);
+        LOGGER.info("[SupportTeams] created the {} section under Support Command", sectionLabel(section));
+        return created;
     }
 
     /** The section's display name, as the player sees it in the order of battle. */

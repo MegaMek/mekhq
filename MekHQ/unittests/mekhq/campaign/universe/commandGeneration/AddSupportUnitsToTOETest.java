@@ -278,6 +278,25 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void seat_aProfessionsFirstSquadGoesInItsSection() {
+        // Every medic was crewing a MASH truck, so the next medic's new squad had no other squad to sit beside and was
+        // filed at the top of Support Command. It belongs in the Medical section.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        Person medic = newStaff(campaign, PersonnelRole.MEDIC, 1).get(0);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, medic, true, true);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, medic);
+
+        assertNotNull(medic.getUnit(), "the medic is seated");
+        Formation squadHome = campaign.getPlayerForce().getFormation(medic.getUnit().getFormationId());
+        assertEquals("Medical", squadHome.getName(), "in the Medical section");
+        assertEquals(supportCommand.getId(), squadHome.getParentFormation().getId(), "which sits in Support Command");
+    }
+
+    @Test
     void idleOwnedVehicles_leavesAVehicleThePlayerHasPutToUseAlone() {
         // A vehicle the player crewed, or filed in a formation of their own, is in use. It counts towards the
         // target but is not taken over by the support teams.

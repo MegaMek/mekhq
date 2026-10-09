@@ -53,6 +53,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.AddSupportUnitsToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -173,6 +174,27 @@ class FormationIconBuilderTest {
     private static String echelonFilename(Formation formation) {
         return ((LayeredFormationIcon) formation.getFormationIcon()).getPieces()
                      .get(LayeredFormationIconLayer.FORMATION).get(0).getFilename();
+    }
+
+    @Test
+    @DisplayName("A granted formation left blank gets its icon; one with any piece of its own is left alone")
+    void blankIconsAreDrawnAndOthersAreLeftAlone() {
+        Assumptions.assumeTrue(mekhq.MHQStaticDirectoryManager.getFormationIcons() != null,
+              "the formation icon images are not available");
+        Campaign campaign = innerSphereCampaign();
+        Formation blank = new Formation("Logistics");
+        campaign.getPlayerForce().addFormation(blank,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        Formation custom = formationWithEchelonPiece(campaign, "Custom/", "My Convoy.png");
+        // In play, filing a unit raises the event that sets every formation's level; an icon needs a level.
+        Formation.populateFormationLevelsFromOrigin(campaign);
+
+        FormationIconBuilder.decorateUndecorated(blank, campaign);
+        FormationIconBuilder.decorateUndecorated(custom, campaign);
+
+        assertTrue(((LayeredFormationIcon) blank.getFormationIcon()).getPieces()
+                         .containsKey(LayeredFormationIconLayer.FORMATION), "the blank formation was drawn");
+        assertEquals("My Convoy.png", echelonFilename(custom), "the player's icon is untouched");
     }
 
     /**
