@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 
 /**
  * Organizes freshly generated support personnel into the campaign's TOE.
@@ -345,6 +346,17 @@ public final class SupportPersonnelToTOE {
         boolean useClanStructure = campaign.getPlayerForce().isClanForce();
         applyEchelonLevels(campaign, supportCommand,
               useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure);
+        // A new size needs a new echelon symbol, or a section that grew from one MASH truck to eleven still shows a
+        // Team on its icon.
+        refreshEchelonSymbols(campaign, supportCommand);
+    }
+
+    /** Updates the echelon symbol of {@code formation} and every formation under it to match its level. */
+    private static void refreshEchelonSymbols(Campaign campaign, Formation formation) {
+        FormationIconBuilder.refreshEchelonPiece(formation, campaign);
+        for (Formation child : formation.getSubFormations()) {
+            refreshEchelonSymbols(campaign, child);
+        }
     }
 
     /**
