@@ -53,6 +53,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
@@ -323,6 +324,121 @@ class AddSupportUnitsToTOETest {
         assertNotNull(campaign.getPlayerForce().getFormation(combatLance.getId()), "the empty combat lance survives");
         assertNotNull(campaign.getPlayerForce().getFormation(commandLance.getId()),
               "and so does an empty lance under Headquarters");
+    }
+
+    @Test
+    void seatIfEligible_returnsAStaffMemberToTheirVehiclesEmptySeat() {
+        // Issue 10396: a mechanic back from leave was seated in a squad, and the recovery vehicle they had crewed
+        // stayed a seat short for good.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        Unit recoveryVehicle = organizedRecoveryVehicle(campaign);
+        Person driver = recoveryVehicle.getDrivers().get(0);
+        recoveryVehicle.remove(driver, true);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, driver);
+
+        assertEquals(recoveryVehicle, driver.getUnit(), "the mechanic goes back to the empty seat on the vehicle");
+        assertTrue(recoveryVehicle.getDrivers().contains(driver), "the driver's seat, which is filled first");
+        assertEquals(recoveryVehicle.getFullCrewSize(), recoveryVehicle.getTotalCrewSize(), "so it is fully crewed");
+    }
+
+    @Test
+    void seatIfEligible_goesToASquadWhenNoVehicleHasRoom() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        Unit recoveryVehicle = organizedRecoveryVehicle(campaign);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit combatVehicle = null;
+        for (Unit unit : unitsNamedLike(campaign, "APC")) {
+            if (unit != recoveryVehicle) {
+                combatVehicle = unit;
+            }
+        }
+        assertNotNull(combatVehicle);
+        campaign.getPlayerForce().addUnitToFormation(combatVehicle, Formation.FORMATION_ORIGIN, campaign);
+        Person mechanic = newStaff(campaign, PersonnelRole.MECHANIC, 1).get(0);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, mechanic, true, true);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, mechanic);
+
+        assertNotNull(mechanic.getUnit(), "the mechanic is seated");
+        assertTrue(mechanic.getUnit().isCarrier(), "in a squad, since the recovery vehicle is full");
+        assertTrue(combatVehicle.getCrew().isEmpty(), "and a vehicle outside Support Command is never filled");
+    }
+
+    @Test
+    void seatIfEligible_passesOverADeployedVehicle() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        Unit recoveryVehicle = organizedRecoveryVehicle(campaign);
+        Person driver = recoveryVehicle.getDrivers().get(0);
+        recoveryVehicle.remove(driver, true);
+        recoveryVehicle.setScenarioId(1);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, driver);
+
+        assertNotNull(driver.getUnit(), "the mechanic is seated");
+        assertTrue(driver.getUnit().isCarrier(), "in a squad: a vehicle out on a battle is left as it is");
+    }
+
+    @Test
+    void seatIfEligible_neverPutsADoctorInARecoveryVehicle() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        Unit recoveryVehicle = organizedRecoveryVehicle(campaign);
+        recoveryVehicle.remove(recoveryVehicle.getDrivers().get(0), true);
+        Person doctor = newStaff(campaign, PersonnelRole.DOCTOR, 1).get(0);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, doctor, true, true);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, doctor);
+
+        assertNotNull(doctor.getUnit(), "the doctor is seated");
+        assertTrue(doctor.getUnit().isCarrier(), "in a Medical squad, not the Maintenance section's empty seat");
+    }
+
+    @Test
+    void reconcileAll_fillsAShortVehicleFromTheSquadsOnce() {
+        // A save written before issue 10396 holds vehicles short of crew beside squads of the people who crewed them.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        Unit recoveryVehicle = organizedRecoveryVehicle(campaign);
+        Person driver = recoveryVehicle.getDrivers().get(0);
+        recoveryVehicle.remove(driver, true);
+        driver.setStatus(PersonnelStatus.ON_LEAVE);
+        int squadStaffBefore = squadStaffCount(campaign);
+
+        SupportCarrierReconciler.reconcileAll(campaign);
+
+        assertEquals(recoveryVehicle.getFullCrewSize(), recoveryVehicle.getTotalCrewSize(),
+              "the empty seat is filled from the Maintenance squads");
+        assertEquals(squadStaffBefore - 1, squadStaffCount(campaign), "by one person, who left their squad");
+        assertNull(driver.getUnit(), "the mechanic on leave stays off duty");
+
+        SupportCarrierReconciler.reconcileAll(campaign);
+
+        assertEquals(squadStaffBefore - 1, squadStaffCount(campaign), "a second load moves no one");
+    }
+
+    /** Organizes eight mechanics with an owned APC standing in for a recovery vehicle, and returns the vehicle. */
+    private static Unit organizedRecoveryVehicle(Campaign campaign) {
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+        List<Person> mechanics = newStaff(campaign, PersonnelRole.MECHANIC, 8);
+        for (Person mechanic : mechanics) {
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, mechanic, true, true);
+        }
+        SupportPersonnelToTOE.organize(campaign, mechanics, false, campaign.getPlayerForce().getFaction());
+        assertEquals(recoveryVehicle.getFullCrewSize(), recoveryVehicle.getTotalCrewSize(),
+              "this test is only meaningful while the recovery vehicle starts fully crewed");
+        assertFalse(recoveryVehicle.getDrivers().isEmpty(), "and has a driver to send on leave");
+        assertTrue(squadStaffCount(campaign) > 0, "and some mechanics are left over for the squads");
+        return recoveryVehicle;
+    }
+
+    private static int squadStaffCount(Campaign campaign) {
+        int count = 0;
+        for (Unit unit : campaign.getUnits()) {
+            if (unit.isCarrier()) {
+                count += unit.getCrew().size();
+            }
+        }
+        return count;
     }
 
     @Test

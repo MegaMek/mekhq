@@ -1020,7 +1020,7 @@ public final class SupportPersonnelToTOE {
     }
 
     /** The section's display name, as the player sees it in the order of battle. */
-    private static String sectionLabel(SupportSection section) {
+    static String sectionLabel(SupportSection section) {
         return switch (section) {
             case MAINTENANCE -> label("maintenance");
             case MEDICAL -> label("medical");

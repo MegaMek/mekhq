@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.EchelonProfile;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 
 /**
@@ -143,6 +144,12 @@ public final class SupportCarrierReconciler {
         if (supportCommand == null) {
             // This campaign has no support structure - it was not built by the Command Generator, or the player
             // deleted the formation. Either way, do not invent one.
+            return;
+        }
+
+        // A vehicle seat comes before a squad seat, as it does at generation: someone back from leave would otherwise
+        // join a squad and leave their recovery vehicle or MASH truck short of crew for good.
+        if (seatInSectionVehicle(campaign, person, supportCommand)) {
             return;
         }
 
@@ -274,6 +281,9 @@ public final class SupportCarrierReconciler {
             }
         }
 
+        // Before the sweep and the reshape, so a squad emptied by this is removed and the shapes are settled after it.
+        int filled = fillSectionVehicleSeats(campaign, supportCommand);
+
         // Empty carriers are normally removed by the crew event that empties them, but a carrier built for a newcomer
         // who was then never seated has no such event. Sweep them here so a campaign that hit that state self-heals.
         int emptied = 0;
@@ -296,9 +306,10 @@ public final class SupportCarrierReconciler {
         SupportPersonnelToTOE.resizeSupportEchelons(campaign);
 
         // Always reported, even when nothing changed: a second load of the same save should say "seated 0, released
-        // 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
-        LOGGER.info("[SupportTeams] Support carrier reconciliation: seated {}, released {}, removed {} empty carrier(s), reshaped {}"
-                          + " profession(s)", seated, released, emptied, reshaped);
+        // 0, filled 0, removed 0, reshaped 0", and that line is how a playtest confirms the sweep is idempotent.
+        LOGGER.info("[SupportTeams] Support carrier reconciliation: seated {}, released {}, filled {} vehicle seat(s),"
+                          + " removed {} empty carrier(s), reshaped {} profession(s)", seated, released, filled, emptied,
+              reshaped);
     }
 
     /**
@@ -585,6 +596,180 @@ public final class SupportCarrierReconciler {
         } else {
             LOGGER.warn("[SupportTeams] Could not seat {}: no {} carrier has a free seat, although the shape was sized for them",
                   person.getFullName(), label);
+        }
+    }
+
+    /**
+     * Seats a character in an empty seat on a vehicle of their own section, if one has room.
+     *
+     * <p>Leaving duty takes a character off their vehicle; coming back used to put them in a squad, so the recovery
+     * vehicle or MASH truck they crewed stayed short for good. Mechanics and other technicians go to Maintenance's
+     * vehicles, doctors and medics to Medical's. A vehicle that is deployed, mothballed or elsewhere is passed over.</p>
+     *
+     * @param campaign       the campaign that owns the TOE
+     * @param person         the character, holding no seat
+     * @param supportCommand the Support Command formation
+     *
+     * @return {@code true} when the character was seated in a vehicle
+     */
+    private static boolean seatInSectionVehicle(Campaign campaign, Person person, Formation supportCommand) {
+        SupportSection section = SupportPersonnelToTOE.sectionFor(person.getPrimaryRole());
+        for (Unit vehicle : shortCrewedVehicles(campaign, supportCommand, section)) {
+            if (!LocationUtils.areSameEffectiveLocation(vehicle, person)) {
+                continue;
+            }
+            addToEmptySeat(vehicle, person);
+            LOGGER.info("[SupportTeams] Returned {} to an empty seat on {} ({}/{})", person.getFullName(),
+                  vehicle.getName(), vehicle.getTotalCrewSize(), vehicle.getFullCrewSize());
+            return true;
+        }
+        LOGGER.info("[SupportTeams] No empty vehicle seat in the {} section for {}; seating them in a squad", section,
+              person.getFullName());
+        return false;
+    }
+
+    /**
+     * Moves squad staff into the empty seats of their section's vehicles.
+     *
+     * <p>The load-time catch-up for {@link #seatInSectionVehicle}: a campaign saved before it, or after the starting
+     * history simulation, can hold vehicles short of crew beside squads of the people who crewed them. Squads emptied
+     * by this are removed by the sweep that follows in {@link #reconcileAll}, and the shapes are settled there too.</p>
+     *
+     * @param campaign       the campaign that owns the TOE
+     * @param supportCommand the Support Command formation
+     *
+     * @return the number of seats filled
+     */
+    private static int fillSectionVehicleSeats(Campaign campaign, Formation supportCommand) {
+        int filled = 0;
+        boolean wasRepacking = repacking;
+        // Leaving a squad fires its crew event, which would reshape the profession under the walk.
+        repacking = true;
+        try {
+            for (SupportSection section : SupportSection.values()) {
+                List<Unit> vehicles = shortCrewedVehicles(campaign, supportCommand, section);
+                if (vehicles.isEmpty()) {
+                    continue;
+                }
+                List<Person> squadStaff = squadStaff(campaign, supportCommand, section);
+                for (Unit vehicle : vehicles) {
+                    filled += fillFromSquads(vehicle, squadStaff);
+                }
+            }
+        } finally {
+            repacking = wasRepacking;
+        }
+        return filled;
+    }
+
+    /** Fills a vehicle's empty seats from the squad staff who can reach it, taking each out of their squad. */
+    private static int fillFromSquads(Unit vehicle, List<Person> squadStaff) {
+        int filled = 0;
+        for (Person person : new ArrayList<>(squadStaff)) {
+            if (!hasEmptySeat(vehicle)) {
+                break;
+            }
+            if (!LocationUtils.areSameEffectiveLocation(vehicle, person)) {
+                continue;
+            }
+            squadStaff.remove(person);
+            Unit squad = person.getUnit();
+            if (squad != null) {
+                squad.remove(person, true);
+            }
+            addToEmptySeat(vehicle, person);
+            filled++;
+            LOGGER.info("[SupportTeams] Moved {} from squad {} to an empty seat on {} ({}/{})", person.getFullName(),
+                  (squad == null) ? "-" : squad.getName(), vehicle.getName(), vehicle.getTotalCrewSize(),
+                  vehicle.getFullCrewSize());
+        }
+        return filled;
+    }
+
+    /**
+     * The vehicles in a section with an empty seat, in TOE order.
+     *
+     * <p>A vehicle's section is read from its crew, as a squad's profession is, so a section collapsed into Support
+     * Command is still told apart; one with nobody aboard to ask is placed by the section formation it is filed
+     * under.</p>
+     */
+    private static List<Unit> shortCrewedVehicles(Campaign campaign, Formation supportCommand,
+          @Nullable SupportSection section) {
+        List<Unit> vehicles = new ArrayList<>();
+        if (section == null) {
+            return vehicles;
+        }
+        for (UUID unitId : supportCommand.getAllUnits(false)) {
+            Unit vehicle = campaign.getUnit(unitId);
+            if ((vehicle == null) || vehicle.isCarrier() || (vehicle.getEntity() == null) || isParked(vehicle)
+                      || !hasEmptySeat(vehicle)) {
+                continue;
+            }
+            if (sectionOf(campaign, vehicle, supportCommand) == section) {
+                vehicles.add(vehicle);
+            }
+        }
+        return vehicles;
+    }
+
+    /** The section a vehicle in Support Command belongs to, or {@code null} when nothing says. */
+    private static @Nullable SupportSection sectionOf(Campaign campaign, Unit vehicle, Formation supportCommand) {
+        for (Person crewMember : vehicle.getCrew()) {
+            SupportSection section = SupportPersonnelToTOE.sectionFor(crewMember.getPrimaryRole());
+            if (section != null) {
+                return section;
+            }
+        }
+        Formation formation = campaign.getPlayerForce().getFormation(vehicle.getFormationId());
+        while ((formation != null) && (formation.getId() != supportCommand.getId())) {
+            for (SupportSection section : SupportSection.values()) {
+                if (SupportPersonnelToTOE.sectionLabel(section).equals(formation.getName())) {
+                    return section;
+                }
+            }
+            formation = formation.getParentFormation();
+        }
+        return null;
+    }
+
+    /** The people seated in a section's squads that are not deployed or mothballed, in TOE order. */
+    private static List<Person> squadStaff(Campaign campaign, Formation supportCommand, SupportSection section) {
+        List<Person> staff = new ArrayList<>();
+        for (UUID unitId : supportCommand.getAllUnits(false)) {
+            Unit squad = campaign.getUnit(unitId);
+            if ((squad == null) || !squad.isCarrier() || isParked(squad)) {
+                continue;
+            }
+            for (Person person : squad.getCrew()) {
+                if (SupportPersonnelToTOE.sectionFor(person.getPrimaryRole()) == section) {
+                    staff.add(person);
+                }
+            }
+        }
+        return staff;
+    }
+
+    /**
+     * Whether a vehicle has a seat nobody fills, named or temporary. A MASH truck whose empty seats the temporary crew
+     * pool covers has none.
+     */
+    private static boolean hasEmptySeat(Unit vehicle) {
+        if (vehicle.getTotalCrewSize() >= vehicle.getFullCrewSize()) {
+            return false;
+        }
+        return (vehicle.getDrivers().size() < vehicle.getTotalDriverNeeds())
+                     || (vehicle.getGunners().size() < vehicle.getTotalGunnerNeeds())
+                     || (vehicle.getVesselCrew().size() < vehicle.getTotalCrewNeeds());
+    }
+
+    /** Seats a character in a vehicle's first empty seat: driver, then gunner, then crew, as generation fills them. */
+    private static void addToEmptySeat(Unit vehicle, Person person) {
+        if (vehicle.getDrivers().size() < vehicle.getTotalDriverNeeds()) {
+            vehicle.addDriver(person);
+        } else if (vehicle.getGunners().size() < vehicle.getTotalGunnerNeeds()) {
+            vehicle.addGunner(person);
+        } else {
+            vehicle.addVesselCrew(person);
         }
     }
 
