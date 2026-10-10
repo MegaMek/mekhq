@@ -161,6 +161,30 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
+    void combatPersonnelCountLeavesOutSupportCrews() {
+        // Issue 10391: each MASH truck brought a named Vehicle Crew/Ground driver, who counted as a combatant, so every
+        // truck built raised the number of MASH trucks wanted - eleven became twelve after a conversion.
+        SupportVehicleSelector.roleLookup = unitName -> Set.of();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        int before = SupportUnitGenerator.combatPersonnelCount(campaign);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit supportVehicle = unitWhoseNameContains(campaign, "APC");
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(supportVehicle),
+              SupportTOEFormationTypes.MEDICAL_FORMATION);
+        Person driver = campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.NONE);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, driver, true, true);
+        supportVehicle.addDriver(driver);
+        Person rifleman = campaign.getPlayerForce().getHumanResources()
+                                .newPerson(campaign, PersonnelRole.SOLDIER, PersonnelRole.NONE);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, rifleman, true, true);
+        assertTrue(driver.isCombat(), "this test is only meaningful while the driver's role counts as combat");
+
+        assertEquals(before + 1, SupportUnitGenerator.combatPersonnelCount(campaign),
+              "the rifleman counts; the MASH driver does not");
+    }
+
+    @Test
     void securityDetailTracksForceEchelon() {
         // Non-combatants never drive the tier, so only the combatant total matters.
         assertEquals(SecurityTier.SQUAD, SupportUnitGenerator.securityTier(campaignWithPersonnel(12, 50)),
