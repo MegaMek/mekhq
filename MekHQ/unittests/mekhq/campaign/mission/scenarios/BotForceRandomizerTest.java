@@ -44,6 +44,7 @@ import java.util.List;
 
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Player;
+import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
@@ -120,6 +121,9 @@ public class BotForceRandomizerTest {
         BotForceRandomizer randomizer = new BotForceRandomizer();
         randomizer.setBalancingMethod(BotForceRandomizer.BalancingMethod.BV);
         randomizer.setForceMultiplier(2.0);
+        // BV depends on crew skill, and the default "Random" skill rolls a level per unit. Pin it so every Sparky is
+        // worth the same BV; an Elite crew would otherwise reach the target alone and only one unit would generate.
+        randomizer.setSkill(SkillLevel.REGULAR);
 
         List<Entity> generated = randomizer.generateForce(playerUnits, fixedEntities, mockCampaign);
 

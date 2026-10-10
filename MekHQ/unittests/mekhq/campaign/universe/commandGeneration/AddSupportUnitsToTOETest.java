@@ -297,6 +297,34 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void supportPasses_neverRemoveAnEmptyCombatLance() {
+        // Only support formations are tidied. A combat lance that loses every unit in battle must survive, even one
+        // whose name matches the support lance names, and even one under Headquarters.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        Formation origin = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
+        Formation combatCompany = new Formation("Heavy Mek Company");
+        campaign.getPlayerForce().addFormation(combatCompany, origin, campaign);
+        Formation combatLance = new Formation("Able Lance");
+        campaign.getPlayerForce().addFormation(combatLance, combatCompany, campaign);
+        Formation headquarters = AddSupportUnitsToTOE.getHqFormation(campaign);
+        Formation commandLance = new Formation("Able Lance");
+        campaign.getPlayerForce().addFormation(commandLance, headquarters, campaign);
+
+        SupportPersonnelToTOE.resizeSupportEchelons(campaign);
+        SupportUnitGenerator.decorateGrantedSupportFormations(campaign);
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(UnitTestUtilities.addAndGetUnit(campaign,
+              UnitTestUtilities.getHeavyTrackedApcStandard())), SupportTOEFormationTypes.LOGISTICS_FORMATION, 4,
+              position -> SupportUnitGenerator.subFormationNamer(campaign.getPlayerForce().getFaction(), null)
+                                .apply(position));
+
+        assertNotNull(campaign.getPlayerForce().getFormation(combatLance.getId()), "the empty combat lance survives");
+        assertNotNull(campaign.getPlayerForce().getFormation(commandLance.getId()),
+              "and so does an empty lance under Headquarters");
+    }
+
+    @Test
     void idleOwnedVehicles_leavesAVehicleThePlayerHasPutToUseAlone() {
         // A vehicle the player crewed, or filed in a formation of their own, is in use. It counts towards the
         // target but is not taken over by the support teams.

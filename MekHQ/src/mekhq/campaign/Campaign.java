@@ -161,7 +161,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.RepairCosts;
+import mekhq.campaign.finances.RepairPayments;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
@@ -181,7 +181,6 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -3081,6 +3080,8 @@ public class Campaign implements ITechManager {
             final Unit repairedUnit = partWork.getUnit();
             final String repairedPartName = partWork.getPartName();
             final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
+            final boolean isPaidRepair = RepairPayments.isPaidFor(this, partWork, action.equals(" fix "));
+            final Money repairCost = RepairPayments.getCost(this, partWork);
 
             report += partWork.succeed();
             // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
@@ -3088,16 +3089,8 @@ public class Campaign implements ITechManager {
             if ((repairedUnit != null) && isRepair) {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
-            if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getRepairCost()
-                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
-                report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
-                getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
-                      getLocalDate(),
-                      cost,
-                      "Repair of " + partWork.getPartName());
-                // An employer covering straight support reimburses its share of the repair cost.
-                ContractSupportPayments.reimburseStraightSupport(this, cost, partWork.getPartName());
+            if (isPaidRepair) {
+                report += RepairPayments.pay(this, repairCost, repairedPartName);
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().get(CampaignOption.SUCCESS_XP);
@@ -4570,6 +4563,11 @@ public class Campaign implements ITechManager {
             }
         } else if ((partWork instanceof MissingPart missingPart) && (missingPart.findReplacement(false) == null)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
+        }
+        String unaffordableReason = RepairPayments.isPaidFor(this, partWork, getAction(partWork).equals(" fix "))
+              ? RepairPayments.getUnaffordableReason(this, partWork) : null;
+        if (unaffordableReason != null) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, unaffordableReason);
         }
 
         final int techTime = isOvertimeAllowed() ?
