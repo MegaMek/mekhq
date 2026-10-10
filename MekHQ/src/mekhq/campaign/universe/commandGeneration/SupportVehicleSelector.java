@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
 import megamek.client.ratgenerator.FactionRecord;
@@ -44,6 +46,7 @@ import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.CargoBay;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.loaders.MekSummary;
@@ -76,6 +79,26 @@ public final class SupportVehicleSelector {
     /** How hard the role filter is applied when rolling; matches the strictness the cargo hull roller uses. */
     private static final int ROLE_STRICTNESS = 2;
 
+    /** How long recognising an owned vehicle waits for the force generator to finish loading before giving up. */
+    private static final long GENERATOR_WAIT_MILLIS = 30_000;
+
+    /** Pause between checks while waiting for the force generator. */
+    private static final long GENERATOR_POLL_MILLIS = 50;
+
+    /**
+     * The order an owned vehicle is tested in, so a vehicle that could do two jobs counts once. Equipment is the
+     * surest sign and goes first: a MASH truck may also carry the support role and a cargo bay, and is still a MASH
+     * truck. Security is infantry and is never recognised this way.
+     */
+    private static final List<SupportCapability> RECOGNITION_ORDER = List.of(SupportCapability.MEDICAL,
+          SupportCapability.COMMISSARY, SupportCapability.SALVAGE, SupportCapability.LOGISTICS);
+
+    /**
+     * Reads a model's mission roles from the force generator. Replaceable so tests, which do not stage the generator
+     * data, can say what roles a unit has.
+     */
+    static Function<String, Set<MissionRole>> roleLookup = SupportVehicleSelector::generatorRoles;
+
     private SupportVehicleSelector() {
     }
 
@@ -83,13 +106,14 @@ public final class SupportVehicleSelector {
      * A vehicle the generator offered, with the capacity that decides whether it suits the capability.
      *
      * @param unitName      the unit's name as the cache knows it
-     * @param summary       the cache entry, used to build the entity
+     * @param summary       the cache entry, used to build the entity; {@code null} for a vehicle the campaign
+     *                      already owns, which is only ever counted
      * @param cargoTons     cargo bay capacity in tons
      * @param mashTheatres  MASH theatres carried
      * @param fieldKitchens field kitchens carried
      * @param trailer       whether the vehicle is a trailer, which cannot move without a tractor
      */
-    public record Candidate(String unitName, MekSummary summary, double cargoTons, int mashTheatres,
+    public record Candidate(String unitName, @Nullable MekSummary summary, double cargoTons, int mashTheatres,
                             int fieldKitchens, boolean trailer) {
     }
 
@@ -115,7 +139,7 @@ public final class SupportVehicleSelector {
         // The table's own weighted roll, narrowed by the capability. Rolling it rather than picking from a
         // collected list keeps the availability weighting intact, which is what makes the common recovery
         // vehicles common: they outweigh the rest of the table roughly three to one.
-        MekSummary rolled = table.generateUnit(summary -> suits(capability, describe(summary)));
+        MekSummary rolled = table.generateUnit(summary -> classify(describe(summary)) == capability);
         if (rolled == null) {
             // Worth separating: a table with entries that none of them suit is a capability filter that is too
             // tight, while an empty table is a faction that could field nothing of the kind in that year.
@@ -156,7 +180,7 @@ public final class SupportVehicleSelector {
                 continue;
             }
             Candidate candidate = describe(summary);
-            if (suits(capability, candidate)) {
+            if (classify(candidate) == capability) {
                 candidates.add(candidate);
             }
         }
@@ -239,6 +263,117 @@ public final class SupportVehicleSelector {
             // Infantry, not a rolled vehicle.
             case SECURITY -> false;
         };
+    }
+
+    /**
+     * Which support capability a vehicle the campaign already owns provides, judged by the same rules a rolled
+     * vehicle must pass, so what is counted as owned matches what would otherwise be built.
+     *
+     * <p>Where the vehicle is filed plays no part. A recovery vehicle the player bought and left outside the TOE
+     * recovers wrecks just the same, and counting by formation is what had a converted campaign build sixteen
+     * recovery vehicles while four of its own sat in the hangar.</p>
+     *
+     * <p>Medical and commissary vehicles are recognised by the MASH theatre or field kitchen they carry. Recovery
+     * vehicles and convoy trucks carry nothing that sets them apart from a combat vehicle, so they are recognised by
+     * the mission role the force generator gives the model, the same role they are rolled on.</p>
+     *
+     * @param entity the owned vehicle; {@code null} provides nothing
+     *
+     * @return the capability it provides, or {@code null} when it provides none
+     */
+    public static @Nullable SupportCapability capabilityOf(@Nullable Entity entity) {
+        return (entity == null) ? null : classify(describe(entity));
+    }
+
+    /**
+     * The one capability a vehicle is counted under, judged in {@link #RECOGNITION_ORDER}. A rolled vehicle is only
+     * fielded for the capability it classifies as, so a vehicle built for one capability is never counted as
+     * another's: a BattleMek Recovery Vehicle carries the cargo role as well as the recovery role, and fielding it in
+     * a convoy would leave the convoy one truck short and the recovery formation one vehicle over.
+     *
+     * @param candidate the vehicle, owned or offered by the generator
+     *
+     * @return the capability it is counted under, or {@code null} when it provides none
+     */
+    static @Nullable SupportCapability classify(Candidate candidate) {
+        // Looked up only when needed: equipment settles medical and commissary without asking the generator.
+        Set<MissionRole> roles = null;
+        for (SupportCapability capability : RECOGNITION_ORDER) {
+            if (!suits(capability, candidate)) {
+                continue;
+            }
+            if (isRecognisedByEquipment(capability)) {
+                return capability;
+            }
+            if (roles == null) {
+                roles = roleLookup.apply(candidate.unitName());
+            }
+            if (!Collections.disjoint(roles, rolesFor(capability))) {
+                return capability;
+            }
+        }
+        return null;
+    }
+
+    /** Whether the capability is recognised by the equipment it carries rather than by its mission role. */
+    private static boolean isRecognisedByEquipment(SupportCapability capability) {
+        return switch (capability) {
+            case MEDICAL, COMMISSARY -> true;
+            default -> false;
+        };
+    }
+
+    /**
+     * Reads a model's mission roles from the force generator, waiting a while for it to finish loading.
+     *
+     * <p>The generator loads on a thread of its own, and a campaign can be loaded before it finishes. Rather than
+     * read an empty table as "no roles", the lookup waits, as {@code RATGeneratorConnector} does. If the generator
+     * is still not ready the vehicle goes unrecognised, which is logged: it is then built around, as before this
+     * check existed, rather than counted.</p>
+     *
+     * @param unitName the model's name as the generator keys it
+     *
+     * @return the model's roles, empty when the model is unknown or the generator is not ready
+     */
+    private static Set<MissionRole> generatorRoles(String unitName) {
+        RATGenerator generator = RATGenerator.getInstance();
+        long deadline = System.currentTimeMillis() + GENERATOR_WAIT_MILLIS;
+        while (!generator.isInitialized() && (System.currentTimeMillis() < deadline)) {
+            try {
+                Thread.sleep(GENERATOR_POLL_MILLIS);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        if (!generator.isInitialized()) {
+            LOGGER.warn("[CompanyGen][SupportUnits] the force generator is not loaded, so '{}' cannot be recognised"
+                              + " by its mission role", unitName);
+            return Set.of();
+        }
+        ModelRecord model = generator.getModelRecord(unitName);
+        return (model == null) ? Set.of() : model.getRoles();
+    }
+
+    /**
+     * Reads the capacities that decide suitability off a vehicle that already exists. The candidate carries no cache
+     * entry, because an owned vehicle is counted, never built from.
+     */
+    private static Candidate describe(Entity entity) {
+        return new Candidate(entity.getShortNameRaw(), null, cargoTons(entity),
+              countEquipment(entity, MiscType.F_MASH), countEquipment(entity, MiscType.F_FIELD_KITCHEN),
+              entity.isTrailer());
+    }
+
+    /** Cargo bay capacity in tons, read the way the unit cache reads it, but full rather than what is unused. */
+    private static double cargoTons(Entity entity) {
+        double tons = 0;
+        for (var transporter : entity.getTransports()) {
+            if (transporter instanceof CargoBay cargoBay) {
+                tons += cargoBay.getCapacity();
+            }
+        }
+        return tons;
     }
 
     /** Reads the capacities that decide suitability off the unit. */

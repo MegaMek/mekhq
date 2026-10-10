@@ -34,19 +34,26 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.icons.FormationPieceIcon;
+import mekhq.campaign.icons.LayeredFormationIcon;
+import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.AddSupportUnitsToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,7 +101,8 @@ class FormationIconBuilderTest {
     @DisplayName("Each lance under Recovery Operations carries it too")
     void theLancesUnderItCarryItAsWell() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 4),
+        // Eight vehicles, so two lances: a formation of one lance's worth is that lance and is not split.
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 8),
               SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         Formation lance = formationNamed(campaign, "Lance 1");
@@ -115,6 +123,78 @@ class FormationIconBuilderTest {
 
         assertEquals(SUPPLY_ICON, FormationIconBuilder.purposeIconFor(logistics, campaign),
               "cargo trucks are supply, not maintenance");
+    }
+
+    @Test
+    @DisplayName("A support formation that grows gets the echelon symbol for its new size")
+    void aGrownFormationGetsItsNewEchelonSymbol() {
+        // Issue 10375: the Medical section was drawn while it held one MASH truck, so its icon kept the Team symbol
+        // after ten more trucks made it a company.
+        Campaign campaign = innerSphereCampaign();
+        Formation medical = formationWithEchelonPiece(campaign, MHQConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME);
+        medical.setOverrideFormationLevel(FormationLevel.COMPANY);
+
+        assertTrue(FormationIconBuilder.refreshEchelonPiece(medical, campaign));
+        assertEquals(MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME, echelonFilename(medical),
+              "a company carries the company symbol");
+        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, campaign), "and an up to date icon is left as is");
+    }
+
+    @Test
+    @DisplayName("An icon the player designed is never overwritten")
+    void aPlayersOwnIconIsLeftAlone() {
+        Campaign campaign = innerSphereCampaign();
+        Formation medical = formationWithEchelonPiece(campaign, "Custom/", "My Field Hospital.png");
+        medical.setOverrideFormationLevel(FormationLevel.COMPANY);
+
+        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, campaign));
+        assertEquals("My Field Hospital.png", echelonFilename(medical));
+    }
+
+    private static Campaign innerSphereCampaign() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        assertFalse(campaign.getPlayerForce().getFaction().isClan()
+                          || campaign.getPlayerForce().getFaction().isComStarOrWoB(),
+              "these tests use the Inner Sphere symbols");
+        return campaign;
+    }
+
+    private static Formation formationWithEchelonPiece(Campaign campaign, String folder, String filename) {
+        Formation formation = new Formation("Medical");
+        campaign.getPlayerForce().addFormation(formation,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        LayeredFormationIcon icon = new LayeredFormationIcon();
+        icon.getPieces().put(LayeredFormationIconLayer.FORMATION,
+              new ArrayList<>(List.of(new FormationPieceIcon(LayeredFormationIconLayer.FORMATION, folder, filename))));
+        formation.setFormationIcon(icon);
+        return formation;
+    }
+
+    private static String echelonFilename(Formation formation) {
+        return ((LayeredFormationIcon) formation.getFormationIcon()).getPieces()
+                     .get(LayeredFormationIconLayer.FORMATION).get(0).getFilename();
+    }
+
+    @Test
+    @DisplayName("A granted formation left blank gets its icon; one with any piece of its own is left alone")
+    void blankIconsAreDrawnAndOthersAreLeftAlone() {
+        Assumptions.assumeTrue(mekhq.MHQStaticDirectoryManager.getFormationIcons() != null,
+              "the formation icon images are not available");
+        Campaign campaign = innerSphereCampaign();
+        Formation blank = new Formation("Logistics");
+        campaign.getPlayerForce().addFormation(blank,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        Formation custom = formationWithEchelonPiece(campaign, "Custom/", "My Convoy.png");
+        // In play, filing a unit raises the event that sets every formation's level; an icon needs a level.
+        Formation.populateFormationLevelsFromOrigin(campaign);
+
+        FormationIconBuilder.decorateUndecorated(blank, campaign);
+        FormationIconBuilder.decorateUndecorated(custom, campaign);
+
+        assertTrue(((LayeredFormationIcon) blank.getFormationIcon()).getPieces()
+                         .containsKey(LayeredFormationIconLayer.FORMATION), "the blank formation was drawn");
+        assertEquals("My Convoy.png", echelonFilename(custom), "the player's icon is untouched");
     }
 
     /**
