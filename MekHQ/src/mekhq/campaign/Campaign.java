@@ -4206,13 +4206,32 @@ public class Campaign implements ITechManager {
     }
 
     public PlanetarySystem putPlanetarySystemOverride(PlanetarySystem system) throws IOException {
-        if ((system == null) || (system.getId() == null) || system.getId().isBlank()) {
-            throw new IOException("Cannot save planetary system edits without a system id.");
+        return putPlanetarySystemOverrides(Collections.singletonList(system)).getFirst();
+    }
+
+    /**
+     * Saves a batch of overrides without replacing unrelated overrides. All copies must succeed before the batch is
+     * installed, and locations and views are refreshed once after the complete batch is available.
+     *
+     * @return the saved copies in input order
+     * @throws IOException if an override has no system id or cannot be copied; no changes are installed
+     */
+    public List<PlanetarySystem> putPlanetarySystemOverrides(Collection<PlanetarySystem> systems) throws IOException {
+        List<PlanetarySystem> savedSystems = new ArrayList<>();
+        for (PlanetarySystem system : systems) {
+            if ((system == null) || (system.getId() == null) || system.getId().isBlank()) {
+                throw new IOException("Cannot save planetary system edits without a system id.");
+            }
+            savedSystems.add(PlanetarySystemYamlIO.copy(system));
         }
-        PlanetarySystem savedSystem = PlanetarySystemYamlIO.copy(system);
-        planetarySystemOverrides.put(savedSystem.getId(), savedSystem);
+        if (savedSystems.isEmpty()) {
+            return List.of();
+        }
+        for (PlanetarySystem savedSystem : savedSystems) {
+            planetarySystemOverrides.put(savedSystem.getId(), savedSystem);
+        }
         refreshPlanetarySystemOverlay();
-        return savedSystem;
+        return List.copyOf(savedSystems);
     }
 
     public boolean removePlanetarySystemOverride(String systemId) {
@@ -4228,8 +4247,16 @@ public class Campaign implements ITechManager {
         return (systemId != null) && planetarySystemOverrides.containsKey(systemId);
     }
 
+    /**
+     * Installs the planetary overrides, synchronizes all locations and their travel routes, then notifies views.
+     * Updating the registry alone would leave current-location mechanics and displays using the previous records.
+     */
     public void refreshPlanetarySystemOverlay() {
         systemsInstance = Systems.activateCampaignSystems(planetarySystemOverrides.values());
+        for (AbstractLocation location : locationManager.getLocations()) {
+            location.refreshPlanetarySystems(this);
+        }
+        MekHQ.triggerEvent(new PlanetarySystemsChangedEvent(this));
     }
 
     private void addPlanetarySystemOverride(PlanetarySystem system) {

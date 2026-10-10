@@ -37,7 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +52,46 @@ import mekhq.campaign.RouteAlternativesPlanner.PlanningResult;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningStatus;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.PlanetarySystemYamlIO;
 import org.junit.jupiter.api.Test;
 
 class MapTabRoutePlanningTest {
+    @Test
+    void planetaryRefreshPreservesTheSelectedWorldWhenItsOrbitalSlotChanges() throws IOException {
+        PlanetarySystemMapPanel panel = mock(PlanetarySystemMapPanel.class);
+        PlanetarySystem originalSystem = systemWithSecondaryWorld("selected-world", 2);
+        String selectedPlanetId = originalSystem.getPlanet(2).getId();
+        PlanetarySystem updatedSystem = systemWithSecondaryWorld("selected-world", 3);
+
+        MapTab.restoreSelectedPlanet(panel, updatedSystem, selectedPlanetId);
+
+        verify(panel).updatePlanetarySystem(updatedSystem.getPlanet(3));
+        verify(panel, never()).updatePlanetarySystem(updatedSystem);
+    }
+
+    @Test
+    void planetaryRefreshFallsBackToPrimaryRatherThanAReplacementWorldAtTheOldSlot() throws IOException {
+        PlanetarySystemMapPanel panel = mock(PlanetarySystemMapPanel.class);
+        PlanetarySystem originalSystem = systemWithSecondaryWorld("selected-world", 2);
+        String selectedPlanetId = originalSystem.getPlanet(2).getId();
+        PlanetarySystem updatedSystem = systemWithSecondaryWorld("replacement-world", 2);
+
+        MapTab.restoreSelectedPlanet(panel, updatedSystem, selectedPlanetId);
+
+        verify(panel).updatePlanetarySystem(updatedSystem);
+        verify(panel, never()).updatePlanetarySystem(updatedSystem.getPlanet(2));
+    }
+
+    @Test
+    void planetaryRefreshUsesPrimaryWhenNoWorldWasSelected() throws IOException {
+        PlanetarySystemMapPanel panel = mock(PlanetarySystemMapPanel.class);
+        PlanetarySystem updatedSystem = systemWithSecondaryWorld("secondary-world", 2);
+
+        MapTab.restoreSelectedPlanet(panel, updatedSystem, null);
+
+        verify(panel).updatePlanetarySystem(updatedSystem);
+    }
+
     @Test
     void whatIfRouteIgnoresFleetProgressAndCannotBeginTransit() {
         PlanetarySystem fleetSystem = new PlanetarySystem("Fleet System");
@@ -138,6 +179,18 @@ class MapTabRoutePlanningTest {
 
     private static PathAssessment assessment(Severity severity) {
         return new PathAssessment(List.of(), severity);
+    }
+
+    private static PlanetarySystem systemWithSecondaryWorld(String worldId, int position) throws IOException {
+        return PlanetarySystemYamlIO.read("""
+              id: Selection Test
+              primarySlot: 1
+              planet:
+                - name: primary-world
+                  sysPos: 1
+                - name: %s
+                  sysPos: %d
+              """.formatted(worldId, position));
     }
 
     private static JumpPath path(PlanetarySystem... systems) {

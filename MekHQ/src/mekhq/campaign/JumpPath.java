@@ -119,6 +119,27 @@ public class JumpPath {
         this.targetPlanet = targetPlanet;
     }
 
+    /** Rebinds systems and the destination world after planetary edits, preserving the route's waypoint order. */
+    public void refreshPlanetarySystems(Campaign campaign) {
+        for (int index = 0; index < path.size(); index++) {
+            PlanetarySystem system = path.get(index);
+            PlanetarySystem updatedSystem = campaign.getSystemById(system.getId());
+            if (updatedSystem == null) {
+                LOGGER.warn("Couldn't refresh route system {}; retaining the existing waypoint.", system.getId());
+            } else {
+                path.set(index, updatedSystem);
+            }
+        }
+        if (targetPlanet != null) {
+            String planetId = targetPlanet.getId();
+            PlanetarySystem destination = getLastSystem();
+            targetPlanet = destination == null ? null : destination.getPlanetById(planetId);
+            if (targetPlanet == null) {
+                LOGGER.warn("Couldn't find route destination world {}; falling back to the primary world.", planetId);
+            }
+        }
+    }
+
     public double getStartTime(double currentTransit) {
         double startTime = 0.0;
         if (null != getFirstSystem()) {
