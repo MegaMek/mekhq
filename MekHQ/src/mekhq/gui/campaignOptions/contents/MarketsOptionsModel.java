@@ -167,17 +167,19 @@ class MarketsOptionsModel {
 
     void applyTo(@Nullable Campaign campaign, @Nonnull CampaignOptions options) {
         if (personnelMarketStyle != null) {
-            PersonnelMarketStyle originalPersonnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
             // No campaign when saving a preset, whose options must not swap out the running campaign's market
-            if ((campaign != null) && (personnelMarketStyle != originalPersonnelMarketStyle)) {
-                NewPersonnelMarket replacementMarket = switch (personnelMarketStyle) {
-                    case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                    case MEKHQ -> new PersonnelMarketMekHQ();
-                    case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                    case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                };
-                replacementMarket.setCampaign(campaign);
-                campaign.setNewPersonnelMarket(replacementMarket);
+            if (campaign != null) {
+                NewPersonnelMarket currentMarket = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
+                if (personnelMarketStyle != currentMarket.getAssociatedPersonnelMarketStyle()) {
+                    NewPersonnelMarket replacementMarket = switch (personnelMarketStyle) {
+                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+                        case MEKHQ -> new PersonnelMarketMekHQ();
+                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
+                    };
+                    replacementMarket.setCampaign(campaign);
+                    campaign.setNewPersonnelMarket(replacementMarket);
+                }
             }
             options.set(CampaignOption.PERSONNEL_MARKET_STYLE, personnelMarketStyle);
         }
