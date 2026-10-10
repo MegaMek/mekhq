@@ -32,23 +32,51 @@
  */
 package mekhq;
 
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.gui.enums.PersonnelTableModelColumn.BLOODNAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.FIRST_NAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.LAST_NAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.PERSONNEL_STATUS;
+import static mekhq.gui.enums.PersonnelTableModelColumn.PERSON_GRAPHICAL;
+import static mekhq.gui.enums.PersonnelTableModelColumn.RANK;
+import static mekhq.gui.enums.PersonnelTableModelColumn.SKILL_LEVEL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.baseComponents.tables.MHQTableModel;
+import mekhq.gui.enums.PersonnelTableModelColumn;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Tests for {@link Utilities#applyPhenotypeSkillBonus(Person, Phenotype)}, which restores the Clan Trueborn {@code +1}
- * "Misc bonus" for personnel converted from a crew (for example captured enemy pilots) — see MekHQ issue 9833.
+ * Tests for personnel skill adjustments and CSV table exports.
  */
 class UtilitiesTest {
     private Campaign mockCampaign;
@@ -134,5 +162,102 @@ class UtilitiesTest {
 
         assertEquals(0, person.getSkill(SkillType.S_GUN_MEK).getBonus());
         assertEquals(0, person.getSkill(SkillType.S_PILOT_MEK).getBonus());
+    }
+
+    @Nested
+    class CsvExport {
+        @TempDir
+        Path directory;
+
+        @Test
+        void exportsPersonnelColumnTextInsteadOfRawModelObjects() throws IOException {
+            when(mockCampaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+            when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+            Person person = mock(Person.class);
+            String fullName = "Fiona \"Tango\" Bignal";
+            when(person.toString()).thenReturn(fullName);
+            when(person.getFullDesc(mockCampaign))
+                  .thenReturn("<b>Captain " + fullName + "</b><br/>Elite MekWarrior");
+            when(person.getRankName()).thenReturn("Captain");
+            when(person.getFirstName()).thenReturn("Fiona");
+            when(person.getLastName()).thenReturn("Bignal");
+            when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+            when(person.getExperienceLevel(mockCampaign.getCampaignOptions(), false, mockCampaign.getLocalDate(),
+                  false, true)).thenReturn(EXP_ELITE);
+
+            MHQTableModel<Person, PersonnelTableModelColumn> model = new MHQTableModel<>(
+                  List.of(PERSON_GRAPHICAL, RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_STATUS, BLOODNAME)) {
+                @Override
+                protected Object getCellValue(Person row, PersonnelTableModelColumn column) {
+                    return column.getCellValue(mockCampaign, row);
+                }
+
+                @Override
+                protected TableCellRenderer getRenderer() {
+                    return new Renderer();
+                }
+            };
+            model.setData(List.of(person));
+
+            CSVRecord record = exportAndRead(new JTable(model)).getFirst();
+
+            assertEquals("Captain " + fullName + "\nElite MekWarrior", record.get(PERSON_GRAPHICAL.toString()));
+            assertEquals("Captain", record.get(RANK.toString()));
+            assertEquals("Fiona", record.get(FIRST_NAME.toString()));
+            assertEquals("Bignal", record.get(LAST_NAME.toString()));
+            assertEquals("Elite", record.get(SKILL_LEVEL.toString()));
+            assertEquals(PersonnelStatus.ACTIVE.getLabel(), record.get(PERSONNEL_STATUS.toString()));
+            assertEquals("", record.get(BLOODNAME.toString()));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = { "<br>", "<br/>", "<br />", "<BR>" })
+        void preservesHtmlLineBreaksInsideCsvFields(String lineBreak) throws IOException {
+            JTable table = new JTable(new DefaultTableModel(
+                  new Object[][] { { "<html><b>Captain Fiona Bignal</b>" + lineBreak + "Elite MekWarrior</html>" } },
+                  new String[] { "Person" }));
+
+            CSVRecord record = exportAndRead(table).getFirst();
+
+            assertEquals("Captain Fiona Bignal\nElite MekWarrior", record.get("Person"));
+        }
+
+        @Test
+        void preservesPlainTableValuesAndCsvEscaping() throws IOException {
+            String name = "R\u00e9my, \"Ace\"";
+            JTable table = new JTable(new DefaultTableModel(
+                  new Object[][] { { name, "<html><span>Active</span></html>", "First line\nSecond line", 42, null } },
+                  new String[] { "Name", "Status", "Notes", "Number", "Empty" }));
+
+            CSVRecord record = exportAndRead(table).getFirst();
+
+            assertEquals(name, record.get("Name"));
+            assertEquals("Active", record.get("Status"));
+            assertEquals("First line\nSecond line", record.get("Notes"));
+            assertEquals("42", record.get("Number"));
+            assertEquals("", record.get("Empty"));
+        }
+
+        private List<CSVRecord> exportAndRead(JTable table) throws IOException {
+            Path file = directory.resolve("personnel.csv");
+            String report = Utilities.exportTableToCSV(table, file.toFile());
+            assertEquals(table.getModel().getRowCount() + " " + getTextAt("mekhq.resources.Utilities", "RowsWritten.text"),
+                  report);
+
+            try (CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get()
+                  .parse(Files.newBufferedReader(file))) {
+                int columnCount = table.getModel().getColumnCount();
+                assertEquals(columnCount, parser.getHeaderNames().size());
+                for (int column = 0; column < columnCount; column++) {
+                    assertEquals(table.getModel().getColumnName(column), parser.getHeaderNames().get(column));
+                }
+                List<CSVRecord> records = parser.getRecords();
+                assertEquals(table.getModel().getRowCount(), records.size());
+                for (CSVRecord record : records) {
+                    assertEquals(columnCount, record.size());
+                }
+                return records;
+            }
+        }
     }
 }
