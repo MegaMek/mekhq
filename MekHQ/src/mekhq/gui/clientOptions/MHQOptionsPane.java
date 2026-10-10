@@ -123,7 +123,7 @@ public class MHQOptionsPane extends JPanel {
 
     /**
      * Floors the pane's initial size so the dialog opens at a comfortable size rather than packing tightly around the
-     * simpler MekHQ pages (whose sections start collapsed). Width is floored to the navigation column plus the shared
+     * simpler MekHQ pages. Width is floored to the navigation column plus the shared
      * page-width cap (narrower pages centre within it, as in Campaign Options); height is floored to a fixed start
      * height. The base dialog still clamps the result to 80% of the screen, the dialog stays freely resizable, and
      * naturally larger content still wins via {@code Math.max}.
@@ -141,7 +141,7 @@ public class MHQOptionsPane extends JPanel {
      * Writes the edited options back to {@link MHQOptions}. Called by the hosting dialog when the user confirms. Each
      * visited page copies its controls into the shared {@link MHQOptionsModel}; a page the user never opened was never
      * built, so its {@link MHQOptionsPage#writeToModel()} is a no-op and the model keeps the values it was built with.
-     * The fully-populated model is then applied to {@link MHQOptions} (and the GUI-scale and user-directory stores) in
+     * The fully-populated model is then applied to {@link MHQOptions} (and the shared UI and user-directory stores) in
      * one step.
      */
     public void save() {

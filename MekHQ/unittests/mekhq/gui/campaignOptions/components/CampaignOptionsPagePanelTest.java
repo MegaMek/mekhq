@@ -32,11 +32,11 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -44,9 +44,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.settings.CollapsibleSectionPanel;
 import megamek.client.ui.settings.SettingsTextProvider;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests for {@link CampaignOptionsPagePanel#getSectionSearchText()}, which
@@ -56,6 +61,44 @@ import org.junit.jupiter.api.Test;
  * do not depend on the campaign options resource bundle.
  */
 class CampaignOptionsPagePanelTest {
+    private boolean originalExpansionPreference;
+
+    @BeforeEach
+    void setExpansionPreference() {
+        originalExpansionPreference = GUIPreferences.getInstance().getExpandOptionSections();
+        GUIPreferences.getInstance().setExpandOptionSections(true);
+    }
+
+    @AfterEach
+    void restoreExpansionPreference() {
+        GUIPreferences.getInstance().setExpandOptionSections(originalExpansionPreference);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void multipleCampaignSectionsFollowClientPreference(boolean expanded) {
+        GUIPreferences.getInstance().setExpandOptionSections(expanded);
+        CampaignOptionsPagePanel page = CampaignOptionsPagePanel.builder("Test", "Test", "")
+              .literalSection("Alpha", null, new JLabel())
+              .literalSection("Beta", null, new JLabel())
+              .build();
+
+        assertEquals(2, findSections(page).size());
+        for (CollapsibleSectionPanel section : findSections(page)) {
+            assertEquals(expanded, section.isExpanded());
+        }
+    }
+
+    @Test
+    void singleCampaignSectionStaysExpandedWithCollapsedPreference() {
+        GUIPreferences.getInstance().setExpandOptionSections(false);
+        CampaignOptionsPagePanel page = CampaignOptionsPagePanel.builder("Test", "Test", "")
+              .literalSection("Only section", null, new JLabel())
+              .build();
+
+        assertEquals(1, findSections(page).size());
+        assertTrue(findSections(page).getFirst().isExpanded());
+    }
 
     @Test
     void sectionSearchTextConcatenatesLiteralTitlesAndSummaries() {
