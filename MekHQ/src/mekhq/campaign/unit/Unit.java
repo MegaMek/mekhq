@@ -310,7 +310,9 @@ public class Unit implements ITechnology, ILocatable {
         this.repairLog = new ArrayList<>();
         this.lastMaintenanceReport = "";
         this.fluffName = "";
-        this.maintenanceMultiplier = 4;
+        // Large vessels are maintained by their own crew and always use x1; at x4 a DropShip needs more minutes than
+        // its engineer has in a day. Nothing else sets their multiplier, as every setter skips self-crewed units.
+        this.maintenanceMultiplier = ((entity instanceof Dropship) || (entity instanceof Jumpship)) ? 1 : 4;
         this.tempPersonnelRoleMap = new HashMap<>();
         initializeAllTransportSpace();
         reCalc();

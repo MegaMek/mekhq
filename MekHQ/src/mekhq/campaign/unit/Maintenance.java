@@ -101,7 +101,14 @@ public class Maintenance {
 
     public static void doMaintenance(Campaign campaign, Unit unit) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!unit.requiresMaintenance() || !campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+        if (!campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+            return;
+        }
+        if (!unit.requiresMaintenance()) {
+            LOGGER.debug("[Maintenance] {}: no maintenance today (present={}, deployed={}, refitting={}, "
+                               + "mothballing={}, mothballed={})",
+                  unit.getName(), unit.isPresent(), unit.isDeployed(), unit.isRefitting(), unit.isMothballing(),
+                  unit.isMothballed());
             return;
         }
         // Maintenance is paused, rather than skipped: the cycle does not advance, so nothing is charged or checked
@@ -114,6 +121,7 @@ public class Maintenance {
         boolean maintained;
         boolean paidMaintenance = true;
 
+        double daysBeforeIncrement = unit.getDaysSinceMaintenance();
         unit.incrementDaysSinceMaintenance(campaign, false, asTechsUsed);
 
         int ruggedMultiplier = 1;
@@ -125,8 +133,22 @@ public class Maintenance {
             ruggedMultiplier = 3;
         }
 
-        if (unit.getDaysSinceMaintenance() >= (campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier)) {
+        int cycleDays = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier;
+        boolean isCheckDue = unit.getDaysSinceMaintenance() >= cycleDays;
+        LOGGER.debug("[Maintenance] {}: {} of {} days since last check (clock +{} today, rugged x{}), check {}",
+              unit.getName(), unit.getDaysSinceMaintenance(), cycleDays,
+              unit.getDaysSinceMaintenance() - daysBeforeIncrement, ruggedMultiplier,
+              isCheckDue ? "due" : "not due");
+
+        if (isCheckDue) {
             Person tech = unit.getTech();
+            if (tech == null) {
+                LOGGER.debug("[Maintenance] {}: no tech or engineer, checked as unmaintained", unit.getName());
+            } else {
+                LOGGER.debug("[Maintenance] {}: {} has {} minutes, needs {} (multiplier x{})",
+                      unit.getName(), tech.getFullName(), tech.getMinutesLeft(), minutesUsed,
+                      unit.getMaintenanceMultiplier());
+            }
             if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
                 // Tech is at a different location; maintenance cannot be performed this cycle.
                 campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,

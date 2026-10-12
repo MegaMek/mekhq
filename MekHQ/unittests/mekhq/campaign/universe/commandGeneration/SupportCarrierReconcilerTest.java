@@ -159,6 +159,19 @@ class SupportCarrierReconcilerTest {
     }
 
     @Test
+    void seatIfEligible_campFollowersAreNotSeated() {
+        // A camp-follower medic was seated in a Medic squad by a status event, although the load sweep never seats
+        // camp followers. Support teams are for staff on duty.
+        Campaign campaign = mock(Campaign.class);
+        Person person = activePerson(PersonnelRole.MEDIC);
+        when(person.getStatus()).thenReturn(PersonnelStatus.CAMP_FOLLOWER);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, person);
+
+        verify(campaign, never()).getPlayerForce();
+    }
+
+    @Test
     void seatIfEligible_prisonersAreNotSeated() {
         Campaign campaign = mock(Campaign.class);
         Person person = activePerson(PersonnelRole.DOCTOR);
@@ -243,6 +256,20 @@ class SupportCarrierReconcilerTest {
         when(carrier.isCarrier()).thenReturn(true);
 
         Person person = activePerson(PersonnelRole.MEKWARRIOR);
+        when(person.getUnit()).thenReturn(carrier);
+
+        SupportCarrierReconciler.releaseIfIneligible(campaign, person);
+
+        verify(carrier, times(1)).remove(person, true);
+    }
+
+    @Test
+    void releaseIfIneligible_campFollowerLosesTheirSeat() {
+        Campaign campaign = mock(Campaign.class);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        Person person = activePerson(PersonnelRole.MEDIC);
+        when(person.getStatus()).thenReturn(PersonnelStatus.CAMP_FOLLOWER);
         when(person.getUnit()).thenReturn(carrier);
 
         SupportCarrierReconciler.releaseIfIneligible(campaign, person);
