@@ -996,4 +996,3 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setVisible(true);
     }
 }
-
