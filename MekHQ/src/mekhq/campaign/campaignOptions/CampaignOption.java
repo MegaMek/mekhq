@@ -89,6 +89,16 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "checkMaintenance");
     public static final CampaignOption<Integer> MAINTENANCE_CYCLE_DAYS =
           of(Integer.class, 7, "maintenanceCycleDays");
+    public static final CampaignOption<Boolean> MAINTENANCE_ON_CONTRACT =
+          of(Boolean.class, true, "maintenanceOnContract");
+    public static final CampaignOption<Boolean> MAINTENANCE_OFF_CONTRACT =
+          of(Boolean.class, true, "maintenanceOffContract");
+    public static final CampaignOption<Boolean> MAINTENANCE_IN_TRANSIT =
+          of(Boolean.class, true, "maintenanceInTransit");
+    public static final CampaignOption<Double> COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER =
+          of(Double.class, 0.25, "combatContractMaintenanceCostMultiplier");
+    public static final CampaignOption<Double> IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER =
+          of(Double.class, 1.0, "inTransitMaintenanceCostMultiplier");
     public static final CampaignOption<Integer> MAINTENANCE_BONUS =
           of(Integer.class, -1, "maintenanceBonus");
     public static final CampaignOption<Boolean> USE_QUALITY_MAINTENANCE =
