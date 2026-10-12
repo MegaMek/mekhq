@@ -68,8 +68,11 @@ class RecruitmentCostsTest {
     private static final Money UTILITY_TRAINING = Money.of(1_000_000);
     private static final Money ROLEPLAY_TRAINING = Money.of(800_000);
     private static final Money OTHER_TRAINING = Money.of(1_000_000);
-    /** Every skill but Roleplay, which recruitment leaves out by default */
-    private static final Money SKILL_TRAINING = Money.of(4_000_000);
+    /**
+     * Every skill at the default multipliers: Profession and other skills x 1.5, Utility x 1, Roleplay left out
+     * (2,000,000 x 1.5 + 1,000,000 x 1 + 1,000,000 x 1.5)
+     */
+    private static final Money DEFAULT_SKILL_RECRUITMENT_COST = Money.of(5_500_000);
     private static final Money SPA_TRAINING = Money.of(2_400_000);
 
     private Campaign campaign;
@@ -115,12 +118,12 @@ class RecruitmentCostsTest {
     }
 
     @Test
-    void multipliersDefaultToOneAndAHalfWithRoleplayLeftOut() {
+    void multiplierDefaultsLeaveRoleplayOut() {
         CampaignOptions defaultOptions = new CampaignOptions();
 
         assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER));
         assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER));
-        assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER));
+        assertEquals(1.0, (double) defaultOptions.get(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER));
         assertEquals(0.0, (double) defaultOptions.get(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER));
     }
 
@@ -145,7 +148,7 @@ class RecruitmentCostsTest {
     void skillTrainingAloneCountsOnlySkills() {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
 
-        assertEquals(SKILL_TRAINING.multipliedBy(1.5), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        assertEquals(DEFAULT_SKILL_RECRUITMENT_COST, RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -160,13 +163,13 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
 
-        // (4,000,000 + 2,400,000) x 1.5
-        assertEquals(Money.of(9_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 5,500,000 + 2,400,000 x 1.5
+        assertEquals(Money.of(9_100_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
-    /** Profession and Utility skills (3,000,000 x 1.5) are unaffected; other skills and SPAs scale. */
+    /** Profession and Utility skills (2,000,000 x 1.5 + 1,000,000 x 1) are unaffected; other skills and SPAs scale. */
     @ParameterizedTest
-    @CsvSource({ "0.0, 4500000", "1.0, 7900000", "2.5, 13000000" })
+    @CsvSource({ "0.0, 4000000", "1.0, 7400000", "2.5, 12500000" })
     void otherSkillsAndSpasMultiplierScalesOnlyOtherSkillsAndSpas(double multiplier, long expected) {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
@@ -180,8 +183,8 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER, 3.0);
 
-        // 2,000,000 x 3 + (1,000,000 + 1,000,000) x 1.5
-        assertEquals(Money.of(9_000_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 2,000,000 x 3 + 1,000,000 x 1 + 1,000,000 x 1.5
+        assertEquals(Money.of(8_500_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -198,8 +201,8 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, 2.0);
 
-        // 4,000,000 x 1.5 + 800,000 x 2
-        assertEquals(Money.of(7_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 5,500,000 + 800,000 x 2
+        assertEquals(Money.of(7_100_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -222,7 +225,7 @@ class RecruitmentCostsTest {
                     campaign.getLocalDate()))
                    .thenReturn(Money.of(999_999_999));
 
-        assertEquals(SKILL_TRAINING.multipliedBy(1.5), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        assertEquals(DEFAULT_SKILL_RECRUITMENT_COST, RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
