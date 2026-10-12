@@ -71,6 +71,7 @@ import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.PlanetarySystemsChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.scenarios.ScenarioEvent;
 import mekhq.campaign.finances.Money;
@@ -1662,6 +1663,41 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private enum RouteViewMode {
         ACTIVE,
         PLANNED
+    }
+
+    static void restoreSelectedPlanet(PlanetarySystemMapPanel panel, PlanetarySystem system,
+          @Nullable String planetId) {
+        Planet planet = planetId == null ? null : system.getPlanetById(planetId);
+        if (planet != null) {
+            panel.updatePlanetarySystem(planet);
+        } else {
+            panel.updatePlanetarySystem(system);
+        }
+    }
+
+    @Subscribe
+    public void handle(PlanetarySystemsChangedEvent event) {
+        if (event.getCampaign() != getCampaign()) {
+            return;
+        }
+        Planet selectedPlanet = panSystem.getSelectedPlanet();
+        String selectedPlanetId = selectedPlanet == null ? null : selectedPlanet.getId();
+        routePlanningIntent.refreshPlanetarySystems(getCampaign());
+        panMap.setJumpPath(routePlanningIntent.getJumpPath());
+        panMap.setCampaign(getCampaign());
+        PlanetarySystem system = panMap.getSelectedSystem();
+        if (system != null) {
+            restoreSelectedPlanet(panSystem, system, selectedPlanetId);
+        }
+        suggestPlanet.setSuggestData(getCampaign().getSystemNames());
+        suggestRouteOrigin.setSuggestData(getCampaign().getSystemNames());
+        suggestRouteDestination.setSuggestData(getCampaign().getSystemNames());
+        setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
+        List<PlanetarySystem> stops = routePlanningIntent.getRequestedStops();
+        if (!stops.isEmpty()) {
+            setRouteFieldSystem(suggestRouteDestination, stops.getLast());
+        }
+        refreshPlanetView();
     }
 
     @Subscribe

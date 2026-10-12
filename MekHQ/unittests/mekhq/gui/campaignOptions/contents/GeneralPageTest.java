@@ -34,21 +34,29 @@ package mekhq.gui.campaignOptions.contents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getTestCampaign;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.CollapsibleSectionPanel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -72,6 +80,35 @@ class GeneralPageTest {
     @AfterEach
     void tearDown() {
         Factions.setInstance(originalFactions);
+    }
+
+    @Test
+    void generalPageKeepsAllThreeSectionsExpandedWithCollapsedPreference() throws Exception {
+        Faction faction = createFaction("MERC", date -> true);
+        Campaign campaign = getTestCampaign();
+        campaign.getPlayerForce().setFaction(faction);
+        Factions factions = mock(Factions.class);
+        when(factions.getChoosableFactions()).thenReturn(List.of(faction));
+        when(factions.getFaction("MERC")).thenReturn(faction);
+        Factions.setInstance(factions);
+
+        GUIPreferences preferences = GUIPreferences.getInstance();
+        boolean originalPreference = preferences.getExpandOptionSections();
+        preferences.setExpandOptionSections(false);
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                JPanel page = new GeneralPage(campaign, null, CampaignOptionsDialogMode.STARTUP)
+                      .createGeneralPage();
+                List<CollapsibleSectionPanel> sections = findSections(page);
+
+                assertEquals(3, sections.size());
+                for (CollapsibleSectionPanel section : sections) {
+                    assertTrue(section.isExpanded());
+                }
+            });
+        } finally {
+            preferences.setExpandOptionSections(originalPreference);
+        }
     }
 
     @Test
@@ -124,6 +161,19 @@ class GeneralPageTest {
         when(faction.getFullName(anyInt())).thenAnswer(invocation -> shortName + " " + invocation.getArgument(0));
         when(faction.validIn(any(LocalDate.class))).thenAnswer(invocation -> validity.test(invocation.getArgument(0)));
         return faction;
+    }
+
+    private static List<CollapsibleSectionPanel> findSections(Container root) {
+        List<CollapsibleSectionPanel> sections = new ArrayList<>();
+        for (Component child : root.getComponents()) {
+            if (child instanceof CollapsibleSectionPanel section) {
+                sections.add(section);
+            }
+            if (child instanceof Container container) {
+                sections.addAll(findSections(container));
+            }
+        }
+        return sections;
     }
 
     private static void setDate(GeneralPage page, LocalDate date) throws ReflectiveOperationException {

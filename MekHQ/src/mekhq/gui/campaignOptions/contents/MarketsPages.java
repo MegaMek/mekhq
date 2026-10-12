@@ -130,14 +130,21 @@ public class MarketsPages {
         updateCreatedControlsFromModel();
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    /**
+     * Writes the market page selections to the target options. Applying live options also reconciles the campaign's
+     * personnel market; saving a preset leaves the live market unchanged.
+     *
+     * @param presetCampaignOptions the target options, or {@code null} to use the current campaign's options
+     * @param isSaveAction          whether the target is a preset being saved rather than the live campaign
+     */
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isSaveAction) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
         }
 
         updateModelFromCreatedControls();
-        model.applyTo(presetCampaignOptions == null ? campaign : null, options);
+        model.applyTo(isSaveAction ? null : campaign, options);
     }
 
     private void updateCreatedControlsFromModel() {

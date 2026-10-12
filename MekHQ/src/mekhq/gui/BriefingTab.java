@@ -178,7 +178,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private static final MMLogger logger = MMLogger.create(BriefingTab.class);
 
-    private enum ScenarioQueueFilter {
+    enum ScenarioQueueFilter {
         ALL("briefingTab.scenarioFilter.all"),
         ALL_ACTIVE("briefingTab.scenarioFilter.allActive"),
         PRIORITY("briefingTab.scenarioFilter.priority"),
@@ -2213,6 +2213,7 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <ol>
      *   <li>Select the parent mission in the mission combo box (if available)</li>
+     *   <li>Keep the selected filter if it includes the scenario, otherwise switch to Active or Resolved</li>
      *   <li>Select the scenario in the scenario table (if the table contains rows)</li>
      *   <li>Scroll the scenario table to make the selected scenario visible</li>
      *   <li>Update the selectedScenario tracking variable</li>
@@ -2259,13 +2260,12 @@ public final class BriefingTab extends CampaignGuiTab {
             if (missionInCombo) {
                 comboMission.setSelectedItem(targetMission);
 
-                if ((targetScenario != null) && targetScenario.getStatus().isCurrent()) {
-                    scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_ACTIVE);
-                    if (selectScenarioInTable(scenarioTable, scenarioModel, targetId)) {
-                        selectedScenario = targetId;
-                    }
+                if (selectScenarioInTable(scenarioTable, scenarioModel, targetId)) {
+                    selectedScenario = targetId;
                 } else {
-                    scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
+                    scenarioFilter.setSelectedItem(
+                          ((targetScenario != null) && targetScenario.getStatus().isCurrent()) ?
+                                ScenarioQueueFilter.ALL_ACTIVE : ScenarioQueueFilter.ALL_RESOLVED);
                     if (selectScenarioInTable(scenarioTable, scenarioModel, targetId)) {
                         selectedScenario = targetId;
                     }

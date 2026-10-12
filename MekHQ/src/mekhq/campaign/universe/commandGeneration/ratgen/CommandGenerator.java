@@ -262,14 +262,16 @@ public final class CommandGenerator {
         if (snapshot.getWeightClass() != null) {
             forceDescriptor.setWeightClass(snapshot.getWeightClass());
         }
+        forceDescriptor.setInfantryClass(snapshot.getInfantryClass());
         forceDescriptor.setAugmented(snapshot.isAugmented());
         if (snapshot.getSizeMod() != null) {
             forceDescriptor.setSizeMod(snapshot.getSizeMod());
         }
         forceDescriptor.setDropshipPct(snapshot.getDropshipPct());
-        LOGGER.info("[CompanyGen][Pipeline]  built forceDescriptor: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
+        LOGGER.info("[CompanyGen][Pipeline]  built forceDescriptor: faction={} year={} echelon={} unitType={} rating={} weightClass={}"
+                    + " infantryClass={}",
               forceDescriptor.getFaction(), forceDescriptor.getYear(), forceDescriptor.getEchelon(), forceDescriptor.getUnitType(),
-              forceDescriptor.getRating(), forceDescriptor.getWeightClass());
+              forceDescriptor.getRating(), forceDescriptor.getWeightClass(), forceDescriptor.getInfantryClass());
 
         // 3. Run the engine. Null listener is safe per Ruleset.processRoot's internal guards.
         LOGGER.info("[CompanyGen][Pipeline]Stage 3: Ruleset.processRoot()");
