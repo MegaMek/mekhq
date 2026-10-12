@@ -68,6 +68,7 @@ import java.awt.Image;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -6476,10 +6477,14 @@ public class Unit implements ITechnology, ILocatable {
      *     <li>For all other entities:
      *         <ul>
      *             <li>If the vessel crew is empty, there is no engineer.</li>
-     *             <li>Otherwise, the engineer is chosen from the vessel crew using the same ranking logic.</li>
+     *             <li>Otherwise, the engineer is the vessel crew member with the best Tech/Vessel skill (see
+     *             {@link #selectVesselEngineer()}).</li>
      *         </ul>
      *     </li>
      * </ul>
+     *
+     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer.</p>
      *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
@@ -6505,6 +6510,9 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
+        if (engineer != null) {
+            engineer.setEngineer(false);
+        }
         engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
@@ -6518,18 +6526,11 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         } else {
-            if (vesselCrew.isEmpty()) {
-                engineer = null;
-            } else {
-                for (Person person : getVesselCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
-            }
+            engineer = selectVesselEngineer();
         }
 
         if (engineer != null) {
+            engineer.setEngineer(true);
             // change reference for any scheduled tasks
             for (Part part : getParts()) {
                 if (part.isBeingWorkedOn()) {
@@ -6553,6 +6554,52 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         }
+    }
+
+    /**
+     * Picks the engineer for a large vessel: the vessel crew member with the highest total Tech/Vessel skill level,
+     * with rank breaking ties. If nobody in the crew has Tech/Vessel, the highest-ranked crew member is used, so the
+     * vessel is never left without an engineer while it has a crew.
+     *
+     * @return the chosen engineer, or {@code null} if the vessel has no crew
+     */
+    private @Nullable Person selectVesselEngineer() {
+        final List<Person> crew = getVesselCrew();
+        if (crew.isEmpty()) {
+            return null;
+        }
+
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        final LocalDate today = campaign.getLocalDate();
+
+        Person bestTech = null;
+        int bestTechLevel = Integer.MIN_VALUE;
+        Person highestRanked = null;
+        for (Person person : crew) {
+            if (person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, highestRanked)) {
+                highestRanked = person;
+            }
+
+            Skill vesselTechSkill = person.getSkill(SkillType.S_TECH_VESSEL);
+            if (vesselTechSkill == null) {
+                continue;
+            }
+
+            int techLevel = vesselTechSkill.getTotalSkillLevel(person.getSkillModifierData());
+            boolean isBetterTech = techLevel > bestTechLevel;
+            boolean isTiedAndOutranks = (techLevel == bestTechLevel)
+                                              && person.outRanksUsingSkillTiebreaker(campaignOptions,
+                  isClanCampaign,
+                  today,
+                  bestTech);
+            if (isBetterTech || isTiedAndOutranks) {
+                bestTech = person;
+                bestTechLevel = techLevel;
+            }
+        }
+
+        return (bestTech != null) ? bestTech : highestRanked;
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
@@ -7700,6 +7747,7 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
+        engineer.setEngineer(false);
         engineer = null;
     }
 
