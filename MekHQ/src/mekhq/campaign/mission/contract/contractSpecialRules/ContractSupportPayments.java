@@ -45,15 +45,16 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 
 /**
- * Renders the ongoing support an employer owes the player during a contract: the straight-support share of repair and
- * maintenance costs, and battle loss compensation for units lost beyond repair.
+ * Renders the ongoing support an employer owes the player during a contract: the straight-support share of repair
+ * costs, and battle loss compensation for units lost beyond repair. Straight support does not cover maintenance (Hot
+ * Spots: Draconis Reach pg 27).
  *
  * <p>Both are paid as they are earned for an ordinary contract. Under the {@link ChaosObjectiveSpecialRules
  * #NO_IN_CONTRACT_SUPPORT} special rule they are instead withheld onto the contract (see
  * {@link AbstractContract#changeWithheldSupportPayments(Money)}) and settled as a single lump sum when the contract ends
  * through {@link #renderWithheldSupport(Campaign, AbstractContract)}.</p>
  *
- * <p>Straight support is a per-contract term but repairs and maintenance are campaign-wide costs, so the share is drawn
+ * <p>Straight support is a per-contract term but repairs are campaign-wide costs, so the share is drawn
  * from the active contract offering the most generous support (see {@link #getStraightSupportContract(Campaign)}).
  * Battle loss compensation, by contrast, is settled against the specific contract whose scenario cost the unit.</p>
  *
@@ -75,8 +76,7 @@ public final class ContractSupportPayments {
     }
 
     /**
-     * Reimburses the straight-support share of a campaign-wide cost the player has just paid, such as a repair or a
-     * maintenance charge.
+     * Reimburses the straight-support share of a repair cost the player has just paid.
      *
      * <p>The share is {@code cost * } the support multiplier of the active contract offering the most generous straight
      * support, doubled when that contract carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}. When the
@@ -101,18 +101,18 @@ public final class ContractSupportPayments {
             return;
         }
 
-        double supportMultiplier = contract.getSupportMultiplier();
-        if (supportMultiplier <= 0) {
+        double supportShare = getStraightSupportShare(contract);
+        if (supportShare <= 0) {
             return;
         }
 
-        Money share = applyDoubleSupportPayouts(contract, cost.multipliedBy(supportMultiplier));
+        Money share = cost.multipliedBy(supportShare);
         if (!share.isPositive()) {
             return;
         }
 
         String note = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.straightSupport.note", costDescription);
-        // Straight support fires on every repair and maintenance charge, so it is credited silently to the ledger
+        // Straight support fires on every repair charge, so it is credited silently to the ledger
         // rather than adding a daily report line for each one.
         creditOrWithhold(campaign, contract, share, note, null);
     }
@@ -199,6 +199,25 @@ public final class ContractSupportPayments {
             }
         }
         return bestContract;
+    }
+
+    /**
+     * The fraction of a repair cost the contract reimburses through straight support: its support
+     * multiplier, doubled when it carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}.
+     *
+     * @param contract the contract offering straight support
+     *
+     * @return the reimbursed fraction of each cost; zero or less when the contract offers no straight support
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getStraightSupportShare(AbstractContract contract) {
+        double supportMultiplier = contract.getSupportMultiplier();
+        if (contract.usesSpecialRule(DOUBLE_SUPPORT_PAYOUTS)) {
+            supportMultiplier *= DOUBLE_SUPPORT_PAYOUT_MULTIPLIER;
+        }
+        return supportMultiplier;
     }
 
     /**

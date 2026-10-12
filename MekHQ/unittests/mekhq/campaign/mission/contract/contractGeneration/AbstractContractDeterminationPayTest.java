@@ -226,6 +226,49 @@ class AbstractContractDeterminationPayTest {
 
     // endregion combat pay (reduced combat pay)
 
+    // region false flag premium
+
+    private static AbstractContract falseFlagContract() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+        when(contract.isFalseFlag()).thenReturn(true);
+        return contract;
+    }
+
+    @Test
+    void getContractMonthlyPayAddsTheFalseFlagPremium() {
+        // FixedPay.MONTHLY (500) * 1.25 = 625
+        assertEquals(Money.of(625), new FixedPay().getContractMonthlyPay(mock(Campaign.class), falseFlagContract()));
+    }
+
+    @Test
+    void getContractCombatPayAddsTheFalseFlagPremium() {
+        // FixedPay.COMBAT (250) * 1.25 = 312.5
+        assertEquals(Money.of(312.5), new FixedPay().getContractCombatPay(mock(Campaign.class), falseFlagContract()));
+    }
+
+    @Test
+    void getContractMonthlyPayHasNoPremiumWithoutAFalseFlag() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+
+        assertEquals(FixedPay.MONTHLY, new FixedPay().getContractMonthlyPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void determineContractPayAppliesTheFalseFlagPremiumOnce() {
+        AbstractContract contract = falseFlagContract();
+
+        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+
+        ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
+        verify(contract).setContractFinanceData(captor.capture());
+        assertEquals(Money.of(625), captor.getValue().monthlyPay());
+        assertEquals(Money.of(312.5), captor.getValue().combatPay());
+        // Transport is cost reimbursement, so it carries no premium
+        assertEquals(FixedPay.TRANSPORT, captor.getValue().transport());
+    }
+
+    // endregion false flag premium
+
     // region transport pay
 
     /**

@@ -71,7 +71,6 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
-import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -163,7 +162,8 @@ public class Maintenance {
                 }
             }
 
-            // maybe use the money
+            // maybe use the money. Straight support covers repairs, not maintenance (Hot Spots: Draconis Reach pg 27),
+            // so none of this is reimbursed.
             if (campaignOptions.isChargingMaintenance()) {
                 Money maintenanceCost = unit.getMaintenanceCost()
                                               .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign))
@@ -178,8 +178,6 @@ public class Maintenance {
                                                         unit.getHyperlinkedName() +
                                                         "!</b></font>");
                     paidMaintenance = false;
-                } else {
-                    ContractSupportPayments.reimburseStraightSupport(campaign, maintenanceCost, unit.getName());
                 }
             }
             // it is time for a maintenance check
@@ -337,15 +335,32 @@ public class Maintenance {
      * @since 0.51.01
      */
     public static boolean isMaintenanceEnabledForSituation(Campaign campaign, Unit unit) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isOnContract = !campaign.getActiveContracts().isEmpty();
+        return isMaintenanceEnabledForSituation(campaign.getCampaignOptions(),
+              !campaign.getActiveContracts().isEmpty(),
+              isUnitInTransit(unit));
+    }
+
+    /**
+     * As {@link #isMaintenanceEnabledForSituation(Campaign, Unit)}, for a given situation rather than the current one.
+     *
+     * @param campaignOptions the campaign options
+     * @param isOnContract    whether any contract is active
+     * @param isUnitInTransit whether the unit is travelling
+     *
+     * @return {@code true} if maintenance may run on a unit in that situation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isMaintenanceEnabledForSituation(CampaignOptions campaignOptions, boolean isOnContract,
+          boolean isUnitInTransit) {
         CampaignOption<Boolean> contractOption = isOnContract
                                                        ? CampaignOption.MAINTENANCE_ON_CONTRACT
                                                        : CampaignOption.MAINTENANCE_OFF_CONTRACT;
         if (!campaignOptions.get(contractOption)) {
             return false;
         }
-        return campaignOptions.get(CampaignOption.MAINTENANCE_IN_TRANSIT) || !isUnitInTransit(unit);
+        return campaignOptions.get(CampaignOption.MAINTENANCE_IN_TRANSIT) || !isUnitInTransit;
     }
 
     /**
@@ -363,18 +378,85 @@ public class Maintenance {
      * @since 0.51.01
      */
     public static double getSituationalMaintenanceCostMultiplier(Campaign campaign, Unit unit) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        return getSituationalMaintenanceCostMultiplier(campaign.getCampaignOptions(),
+              unit,
+              isOnCombatContract(campaign),
+              isUnitInTransit(unit));
+    }
+
+    /**
+     * As {@link #getSituationalMaintenanceCostMultiplier(Campaign, Unit)}, for a given situation rather than the
+     * current one.
+     *
+     * @param campaignOptions    the campaign options
+     * @param unit               the unit being maintained
+     * @param isOnCombatContract whether a contract other than Garrison Duty or a Retainer is active
+     * @param isUnitInTransit    whether the unit is travelling
+     *
+     * @return the combined situational cost multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getSituationalMaintenanceCostMultiplier(CampaignOptions campaignOptions, Unit unit,
+          boolean isOnCombatContract, boolean isUnitInTransit) {
         double multiplier = 1.0;
-        if (isOnCombatContract(campaign)) {
+        if (isOnCombatContract) {
             multiplier *= campaignOptions.get(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER);
         }
 
         Entity entity = unit.getEntity();
         boolean isVessel = entity != null && entity.isLargeCraft();
-        if (!isVessel && isUnitInTransit(unit)) {
+        if (!isVessel && isUnitInTransit) {
             multiplier *= campaignOptions.get(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER);
         }
         return multiplier;
+    }
+
+    /**
+     * Projects the maintenance a unit will be charged per day, on average, in a given situation. This mirrors
+     * {@link #doMaintenance(Campaign, Unit)}: a cycle is charged every {@link CampaignOption#MAINTENANCE_CYCLE_DAYS}
+     * (stretched by Rugged quirks), and away from a combat contract the cycle advances at x0.25 speed (see
+     * {@link Unit#incrementDaysSinceMaintenance}). The situational toggles and cost multipliers apply as they would on
+     * the day. Planetary cost reductions are not applied: they never apply on contract, and a unit in transit is not on
+     * a planet.
+     *
+     * @param campaign           the campaign providing options
+     * @param unit               the unit to project
+     * @param isOnContract       whether a contract will be active
+     * @param isOnCombatContract whether that contract is neither Garrison Duty nor a Retainer
+     * @param isTravelling       whether the force will be travelling; a unit with no location never travels
+     *
+     * @return the average daily maintenance cost, or zero if the unit will not be charged maintenance
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getProjectedDailyMaintenanceCost(Campaign campaign, Unit unit, boolean isOnContract,
+          boolean isOnCombatContract, boolean isTravelling) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isChargingMaintenance()
+                  || !campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)
+                  || !unit.requiresMaintenance()) {
+            return Money.zero();
+        }
+
+        boolean isUnitInTransit = isTravelling && unit.hasLocation();
+        if (!isMaintenanceEnabledForSituation(campaignOptions, isOnContract, isUnitInTransit)) {
+            return Money.zero();
+        }
+
+        int cycleDays = unit.getMaintenanceCycleDuration(campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS));
+        if (cycleDays <= 0) {
+            return Money.zero();
+        }
+
+        double cyclesPerDay = (isOnCombatContract ? 1.0 : 0.25) / cycleDays;
+        double multiplier = getSituationalMaintenanceCostMultiplier(campaignOptions,
+              unit,
+              isOnCombatContract,
+              isUnitInTransit);
+        return unit.getMaintenanceCost().multipliedBy(cyclesPerDay * multiplier);
     }
 
     private static String getDamageString(Unit unit, int nDamage, int nDestroy) {

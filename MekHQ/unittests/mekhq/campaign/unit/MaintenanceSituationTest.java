@@ -37,7 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 
 import java.time.Duration;
 
@@ -45,11 +48,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.LocationNode.LocationManager;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -138,4 +144,97 @@ class MaintenanceSituationTest {
 
         assertEquals(0.5, Maintenance.getSituationalMaintenanceCostMultiplier(campaign, locust), DELTA);
     }
+
+    // region projected maintenance
+
+    private void chargeMaintenance() {
+        campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
+        campaignOptions.set(CampaignOption.CHECK_MAINTENANCE, true);
+        campaignOptions.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, 7);
+    }
+
+    private double cycleCost() {
+        return locust.getMaintenanceCost().getAmount().doubleValue();
+    }
+
+    private static double amount(Money money) {
+        return money.getAmount().doubleValue();
+    }
+
+    @Test
+    void projectedMaintenanceOnACombatContractIsChargedEveryCycleAtTheCombatMultiplier() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER, 0.25);
+
+        double expected = cycleCost() / 7 * 0.25;
+        assertEquals(expected,
+              amount(Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, true, true, false)), DELTA);
+    }
+
+    @Test
+    void projectedMaintenanceOnAGarrisonContractRunsAtQuarterPace() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER, 0.25);
+
+        double expected = cycleCost() * 0.25 / 7;
+        assertEquals(expected,
+              amount(Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, true, false, false)), DELTA);
+    }
+
+    @Test
+    void projectedMaintenanceInTransitAppliesTheTransitMultiplier() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER, 0.5);
+        sendLocustOverland();
+
+        double expected = cycleCost() * 0.25 / 7 * 0.5;
+        assertEquals(expected,
+              amount(Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, false, false, true)), DELTA);
+    }
+
+    @Test
+    void projectedMaintenanceIsZeroWhenPausedInTransit() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.MAINTENANCE_IN_TRANSIT, false);
+        sendLocustOverland();
+
+        assertEquals(Money.zero(), Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, false, false, true));
+    }
+
+    @Test
+    void projectedMaintenanceIsZeroWhenPausedOnContract() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.MAINTENANCE_ON_CONTRACT, false);
+
+        assertEquals(Money.zero(), Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, true, true, false));
+    }
+
+    @Test
+    void projectedMaintenanceIsZeroWhenMaintenanceIsNotCharged() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
+
+        assertEquals(Money.zero(), Maintenance.getProjectedDailyMaintenanceCost(campaign, locust, true, true, false));
+    }
+
+    /** Straight support covers repairs, not maintenance (Hot Spots: Draconis Reach pg 27). */
+    @Test
+    void chargedMaintenanceIsNotReimbursedByStraightSupport() {
+        chargeMaintenance();
+        campaignOptions.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, 1);
+
+        try (MockedStatic<ContractSupportPayments> supportPayments = mockStatic(ContractSupportPayments.class)) {
+            // Off contract the cycle advances at x0.25, so four days complete a one-day cycle
+            for (int day = 0; day < 4; day++) {
+                Maintenance.doMaintenance(campaign, locust);
+            }
+
+            assertEquals(0.0, locust.getDaysSinceMaintenance(), DELTA, "The cycle completed and was charged");
+            supportPayments.verify(() -> ContractSupportPayments.reimburseStraightSupport(any(), any(), any()),
+                  never());
+        }
+    }
+
+    // endregion projected maintenance
 }

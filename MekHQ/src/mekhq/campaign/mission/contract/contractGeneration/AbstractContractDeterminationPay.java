@@ -99,17 +99,9 @@ public abstract class AbstractContractDeterminationPay {
      */
     public void determineContractPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
-        Money monthlyPay = getMonthlyPay(campaign, contract);
+        Money monthlyPay = getContractMonthlyPay(campaign, contract);
         Money combatPay = getContractCombatPay(campaign, contract);
         Money transportPay = getTransportPay(campaign, currentDate, contract, currentLocation);
-
-        // A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too
-        // generous for this job" tell an attentive player can learn to notice. Transport is cost reimbursement, so it
-        // is left alone. Applies to whichever pay scheme is in effect, since both route through here.
-        if (contract.isFalseFlag()) {
-            monthlyPay = monthlyPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
-            combatPay = combatPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
-        }
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
         contract.setContractFinanceData(contractFinanceData);
@@ -139,12 +131,24 @@ public abstract class AbstractContractDeterminationPay {
     public abstract @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract);
 
     /**
+     * The monthly retainer actually owed for this contract: the active scheme's {@link #getMonthlyPay monthly pay}, plus
+     * the false flag deniability premium. Prefer this over {@link #getMonthlyPay} wherever a contract's real retainer is
+     * computed, so the premium holds on every path (generation, the GM editor, and negotiation).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @NonNull Money getContractMonthlyPay(Campaign campaign, AbstractContract contract) {
+        return applyFalseFlagPremium(contract, getMonthlyPay(campaign, contract));
+    }
+
+    /**
      * The per-battle combat bonus actually owed for this contract: the active scheme's {@link #getCombatPay combat pay},
      * except an opportunistic (non-covert) pirate raid always earns zero - the band loots for itself, and only a
      * secretly-bankrolled (covert) pirate raid is paid a combat bonus, by its hidden sponsor. A contract carrying the
-     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule instead has its combat pay quartered. Prefer
-     * this over {@link #getCombatPay} wherever a contract's real combat bonus is computed, so the rule holds on every
-     * path (generation, the GM editor, and negotiation).
+     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule instead has its combat pay quartered, and a
+     * false flag operation adds its deniability premium. Prefer this over {@link #getCombatPay} wherever a contract's
+     * real combat bonus is computed, so the rules hold on every path (generation, the GM editor, and negotiation).
      *
      * @author Illiani
      * @since 0.51.01
@@ -160,7 +164,23 @@ public abstract class AbstractContractDeterminationPay {
         if (contract.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY)) {
             combatPay = combatPay.multipliedBy(REDUCED_COMBAT_PAY_FRACTION);
         }
-        return combatPay;
+        return applyFalseFlagPremium(contract, combatPay);
+    }
+
+    /**
+     * A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too generous
+     * for this job" tell an attentive player can learn to notice. Transport is cost reimbursement, so it is left alone.
+     *
+     * @param contract the contract being paid
+     * @param pay      the retainer or combat bonus before the premium
+     *
+     * @return {@code pay} with the premium applied for a false flag operation, otherwise {@code pay} unchanged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money applyFalseFlagPremium(AbstractContract contract, Money pay) {
+        return contract.isFalseFlag() ? pay.multipliedBy(FALSE_FLAG_PAY_PREMIUM) : pay;
     }
 
     /**

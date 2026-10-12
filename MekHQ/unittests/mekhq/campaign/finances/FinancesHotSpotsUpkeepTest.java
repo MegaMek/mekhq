@@ -186,7 +186,7 @@ class FinancesHotSpotsUpkeepTest {
         assertTrue(transactionsOfType(TransactionType.MAINTENANCE).isEmpty());
     }
 
-    /** Straight support covers repairs and maintenance, not peacetime costs. */
+    /** Straight support covers repairs, not peacetime costs. */
     @Test
     void peacetimeCostsAreNotReimbursedByStraightSupport() {
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);

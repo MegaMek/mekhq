@@ -64,6 +64,7 @@ import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -186,6 +187,24 @@ class ContractCharacteristicsTest {
         assertEquals(base, ContractCharacteristics.bakeCombatPay(base, contractWith()));
         // HIGH_PAY is a PAY characteristic and must not touch combat pay.
         assertEquals(base, ContractCharacteristics.bakeCombatPay(base, contractWith(HIGH_PAY)));
+    }
+
+    /** An intensity step changes the track count combat pay was worked out from, so it is recomputed and rebaked. */
+    @Test
+    void refreshCombatPayRecomputesFromTheFinalTrackCountAndRebakesTheCharacteristic() {
+        AbstractContract contract = contractWith(HIGH_INTENSITY, HAZARD_PAY);
+        Campaign campaign = mock(Campaign.class);
+        Money recomputed = Money.of(200);
+
+        try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
+            generation.when(() -> AbstractContractGeneration.determineCombatPay(campaign, contract))
+                  .thenReturn(recomputed);
+
+            ContractCharacteristics.refreshCombatPayForTrackCount(contract, campaign);
+        }
+
+        assertEquals(recomputed.multipliedBy(HAZARD_PAY.getMagnitude()),
+              contract.getContractFinanceData().combatPay());
     }
 
     @Test

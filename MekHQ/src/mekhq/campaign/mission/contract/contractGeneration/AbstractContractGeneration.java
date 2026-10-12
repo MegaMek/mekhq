@@ -503,7 +503,7 @@ public abstract class AbstractContractGeneration {
      * when {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the Chaos scale-and-base-pay scheme.
      */
     public static Money determineMonthlyPay(Campaign campaign, AbstractContract contract) {
-        return AbstractContractDeterminationPay.forCampaign(campaign).getMonthlyPay(campaign, contract);
+        return AbstractContractDeterminationPay.forCampaign(campaign).getContractMonthlyPay(campaign, contract);
     }
 
     /**
