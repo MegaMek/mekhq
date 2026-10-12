@@ -178,8 +178,9 @@ public abstract class AbstractContractDeterminationPay {
             return Money.zero();
         }
 
-        int transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * contract.getScale();
-        transportCostInSupportPoints *= jumpCount;
+        double economicScale = contract.getEconomicScale(campaign.getCampaignOptions()
+                                                               .get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * economicScale * jumpCount;
 
         // Two-way pay for hiring halls: when the player sets out from a hiring hall, the employer covers the return
         // journey too, doubling transport pay. Only applied when the campaign opts into it.
@@ -189,8 +190,9 @@ public abstract class AbstractContractDeterminationPay {
             transportCostInSupportPoints *= HIRING_HALL_RETURN_MULTIPLIER;
         }
 
-        transportCostInSupportPoints = (int) round(transportCostInSupportPoints * contract.getTransportMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints,
+        int roundedTransportCostInSupportPoints = (int) round(transportCostInSupportPoints
+                                                                    * contract.getTransportMultiplier());
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedTransportCostInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }
 

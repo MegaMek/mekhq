@@ -92,6 +92,7 @@ class MarketsOptionsModel {
     boolean basePayOnlyConsidersScale;
     boolean capContractScaleByHiringHall;
     boolean taperCombatPayAndSalvageByScale;
+    boolean useFractionalScale;
     boolean useLegacyContractPay;
     boolean equipmentContractBase;
     double equipmentContractPercent;
@@ -151,6 +152,7 @@ class MarketsOptionsModel {
         basePayOnlyConsidersScale = options.get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
         capContractScaleByHiringHall = options.get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL);
         taperCombatPayAndSalvageByScale = options.get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE);
+        useFractionalScale = options.get(CampaignOption.USE_FRACTIONAL_SCALE);
         useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
         equipmentContractPercent = options.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT);
@@ -226,6 +228,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, basePayOnlyConsidersScale);
         options.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, capContractScaleByHiringHall);
         options.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, taperCombatPayAndSalvageByScale);
+        options.set(CampaignOption.USE_FRACTIONAL_SCALE, useFractionalScale);
         options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);
         options.setEquipmentContractPercent(equipmentContractPercent);

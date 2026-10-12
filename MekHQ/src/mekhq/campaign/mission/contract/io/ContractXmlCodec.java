@@ -112,7 +112,7 @@ public final class ContractXmlCodec {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nameIsOperationCodename",
               contract.isNameOperationCodename());
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getExactScale());
         if (contract.getSalvageTaperMultiplier() != 1.0) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvageTaperMultiplier",
                   contract.getSalvageTaperMultiplier());
@@ -435,7 +435,8 @@ public final class ContractXmlCodec {
         readers.put("nameIsOperationCodename",
               (contract, node, campaign, version) -> contract.setNameOperationCodename(Boolean.parseBoolean(text(node))));
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
-        readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
+        readers.put("scale",
+              (contract, node, campaign, version) -> contract.setScale(MathUtility.parseDouble(text(node), 0.0)));
         readers.put("salvageTaperMultiplier", (contract, node, campaign, version) ->
               contract.setSalvageTaperMultiplier(MathUtility.parseDouble(text(node), 1.0)));
         readers.put("requiredVictoryPoints",
