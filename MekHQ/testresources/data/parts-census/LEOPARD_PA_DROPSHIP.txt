@@ -68,9 +68,9 @@ SpacecraftEngine | Spacecraft Engine | location HULL (4) | equipment - | quantit
 StructuralIntegrity | Structural Integrity | location HULL (4) | equipment - | quantity 1
 Thrusters | Thrusters | location HULL (4) | equipment - | quantity 1
 Thrusters | Thrusters | location HULL (4) | equipment - | quantity 1
-TransportBayPart | 1st Class Quarters Bay #0 | location none | equipment - | quantity 1
-TransportBayPart | 1st Class Quarters Bay #0 | location none | equipment - | quantity 1
-TransportBayPart | 1st Class Quarters Bay #0 | location none | equipment - | quantity 1
+TransportBayPart | 1st Class Quarters Bay #3 | location none | equipment - | quantity 1
+TransportBayPart | 2nd Class Quarters Bay #4 | location none | equipment - | quantity 1
+TransportBayPart | Crew Quarters Bay #6 | location none | equipment - | quantity 1
 TransportBayPart | Fighter Bay #2 | location none | equipment - | quantity 1
 TransportBayPart | Infantry (Jump) Bay #5 | location none | equipment - | quantity 1
 TransportBayPart | Small Craft Bay #1 | location none | equipment - | quantity 1
