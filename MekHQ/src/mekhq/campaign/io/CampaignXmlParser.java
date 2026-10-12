@@ -160,6 +160,7 @@ import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
+import mekhq.campaign.unit.cleanup.WithdrawnInfernoSrmAmmoCleanup;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -737,6 +738,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
+        WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
         final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
         final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
@@ -882,6 +884,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * Inferno ammo for infantry SRM launchers was withdrawn (TechManual pp. 350-352 errata); turn any left in a
+     * warehouse into standard ammo for the same launcher.
+     */
+    private static void cleanWithdrawnInfernoSrmStock(Campaign campaign) {
+        WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(campaign.getPlayerForce().getWarehouse());
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(base.getBaseWarehouse());
+        }
+    }
+
     private static void performEdgeConversion(Campaign campaign, Person person) {
         for (Enumeration<IOption> i = person.getOptions().getOptions(); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
@@ -994,12 +1007,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                               + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
-                    for (int partId : travelLocation.drainPendingPartIds()) {
-                        Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                        if (part != null && !part.isParented()) {
+                    for (Part part : drainPendingParts(campaign, travelLocation)) {
+                        if (!part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getPlayerForce().getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main warehouse", partId);
+                                              + "(orphaned arrived node); re-homed to main warehouse", part.getId());
                         }
                     }
                     continue;
@@ -1024,11 +1036,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
 
                 // Parts in transit — in base warehouse data structure, but LocationNode under the travel node
-                for (int partId : travelLocation.drainPendingPartIds()) {
-                    Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                    if (part != null) {
-                        LocationNode.LocationManager.setLocation(part, travelLocation);
-                    }
+                for (Part part : drainPendingParts(campaign, travelLocation)) {
+                    LocationNode.LocationManager.setLocation(part, travelLocation);
                 }
 
             }
@@ -1135,11 +1144,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     Unit unit = campaign.getUnit(parseUuidOrNull(text));
                     addIfNotNull(travelers, unit, "unit", text);
                 }
-                case "partId" -> {
-                    Integer partId = parsePartId(text);
-                    Part part = partId == null
+                case "partUniqueId" -> {
+                    UUID partId = parseUuidOrNull(text);
+                    Part part = (partId == null)
                                       ? null
                                       : campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
+                    addIfNotNull(travelers, part, "part", text);
+                }
+                case "partId" -> {
+                    Integer partId = parsePartId(text);
+                    Part part = (partId == null)
+                                      ? null
+                                      : campaign.getCampaignLocationManager().findPartByLegacyNumber(campaign, partId);
                     addIfNotNull(travelers, part, "part", text);
                 }
                 default -> { /* destination tags and whitespace */ }
@@ -1163,6 +1179,28 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         } catch (IllegalArgumentException ex) {
             return null;
         }
+    }
+
+    /**
+     * The parts a travel location named in the save, by identity or, in an older save, by number. Each name is used
+     * once; a part that is no longer in the campaign is skipped.
+     */
+    private static List<Part> drainPendingParts(Campaign campaign, AbstractMobileLocation travelLocation) {
+        List<Part> parts = new ArrayList<>();
+        CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
+        for (UUID partId : travelLocation.drainPendingPartUniqueIds()) {
+            Part part = locationManager.findPartAnywhere(campaign, partId);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        for (int legacyNumber : travelLocation.drainPendingPartIds()) {
+            Part part = locationManager.findPartByLegacyNumber(campaign, legacyNumber);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        return parts;
     }
 
     private static @Nullable Integer parsePartId(String text) {
@@ -2466,6 +2504,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(campaign, version);
         rehomeBaseHangarUnitParts(campaign);
+        cleanWithdrawnInfernoSrmStock(campaign);
 
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -2502,6 +2541,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // possible that these might have changed if changes were made to
             // the ordering of equipment in the underlying data file for the unit.
             // We're not checking for refit here.
+            WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
             final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
             final EquipmentUnscramblerResult result = unscrambler.unscramble();
             if (!result.succeeded()) {
@@ -2645,6 +2685,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             });
         }
+
+        // Units an older version left with duplicate or scattered parts, at a base or after a move, are put right
+        UnitPartsRepair.repair(campaign);
 
         // Spares reserved by tasks on units that have since left the campaign are freed
         ReservedSpares.releaseOrphanedReservations(campaign);

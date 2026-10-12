@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,6 +61,8 @@ import org.w3c.dom.NodeList;
  */
 public class LargeCraftAmmoBin extends AmmoBin {
     private static final MMLogger LOGGER = MMLogger.create(LargeCraftAmmoBin.class);
+    /** Tonnages closer than this are the same; they come from multiplying fractional tons. */
+    private static final double CAPACITY_TOLERANCE = 0.001;
 
     private int bayEqNum = -1;
 
@@ -172,7 +174,34 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public int getFullShots() {
+        int designShots = getDesignShotsIfSpaceUnchanged();
+        if (designShots > 0) {
+            return designShots;
+        }
         return (int) Math.floor(getCapacity() * getType().getShots() / ammoTonnage);
+    }
+
+    /**
+     * Large craft round the mass of their ammunition up to the nearest ton, so a bin built for 60 Gauss rounds has 8
+     * tons of space, enough for 64. Such a bin is filled to the 60 rounds its design carries. Once its space no longer
+     * matches the design, after an ammunition swap, it holds whatever its space fits.
+     *
+     * @return the design's round count while this bin still has the space the design gave it, else {@code 0}
+     */
+    private int getDesignShotsIfSpaceUnchanged() {
+        Mounted<?> mounted = getMounted();
+        if (mounted == null) {
+            return 0;
+        }
+        int designShots = mounted.getOriginalShots();
+        if (designShots <= 0) {
+            return 0;
+        }
+        // whole lots of the ammunition's own tonnage (a ton, a half ton, one 50 ton capital missile), the same way
+        // MegaMek sizes the bin when it loads the unit
+        double designCapacity = Math.ceil((double) designShots / getType().getShots()) * ammoTonnage;
+        boolean hasDesignCapacity = Math.abs(getCapacity() - designCapacity) < CAPACITY_TOLERANCE;
+        return hasDesignCapacity ? designShots : 0;
     }
 
     @Override

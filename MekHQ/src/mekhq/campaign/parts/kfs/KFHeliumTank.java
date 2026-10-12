@@ -227,17 +227,8 @@ public class KFHeliumTank extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if (unit != null && unit.getEntity() instanceof Jumpship) {
-            int cost = (50000 * ((Jumpship) unit.getEntity()).getOKFIntegrity());
-            if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                      && ((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 15;
-            } else if (((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 3;
-            } else if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
-                cost *= 5;
-            }
-            return Money.of(cost);
+        if ((unit != null) && (unit.getEntity() instanceof Jumpship jumpship)) {
+            return KFDrivePrice.onShip(jumpship, 50_000.0 * jumpship.getOKFIntegrity());
         }
         return Money.of(50000);
     }

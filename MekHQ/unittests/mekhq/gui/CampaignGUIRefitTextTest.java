@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -56,6 +57,14 @@ class CampaignGUIRefitTextTest {
         String text = getFormattedTextAt(BUNDLE, key);
 
         assertFalse(text.startsWith("!"), key + " is missing from the bundle");
+    }
+
+    @Test
+    void cannotBuyWarningNamesThePartsAndKeepsItsApostrophe() {
+        String text = getFormattedTextAt(BUNDLE, "refitConfirm.cannotBuy.text", "ER Medium Laser");
+
+        assertFalse(text.contains("{"), text);
+        assertEquals(true, text.contains("ER Medium Laser") && text.contains("campaign's"), text);
     }
 
     @ParameterizedTest

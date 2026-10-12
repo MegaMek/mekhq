@@ -111,7 +111,6 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -251,6 +250,8 @@ public class Unit implements ITechnology, ILocatable {
     private Person tech;
     // blob crew - temporary personnel not represented by Person objects
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
+    // which person wears which battle armor suit
+    private final TrooperSlots trooperSlots = new TrooperSlots();
 
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
@@ -1391,6 +1392,24 @@ public class Unit implements ITechnology, ILocatable {
             return new Turret(location, tonnage, getCampaign());
         }
         return new TankLocation(location, tonnage, getCampaign());
+    }
+
+    /**
+     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
+     */
+    private void discardPart(Part part) {
+        removePart(part);
+        // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
+        LocalWarehouse warehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                         ? holdingWarehouse
+                                         : part.getWarehouse();
+        if ((warehouse != null) && (warehouse.getPart(part.getId()) == part)) {
+            warehouse.removePart(part);
+        } else {
+            LOGGER.warn("[UnitParts] {}: could not find the warehouse keeping {} #{}", getName(), part.getName(),
+                  part.getId());
+        }
+        part.setUnit(null);
     }
 
     public void removePart(Part part) {
@@ -3245,6 +3264,7 @@ public class Unit implements ITechnology, ILocatable {
             }
             pw.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewMap>");
         }
+        trooperSlots.writeToXML(pw, indent);
 
         // If this entity is assigned to a transport ship, write that
         if (hasTransportShipAssignment()) {
@@ -3539,6 +3559,8 @@ public class Unit implements ITechnology, ILocatable {
                             }
                         }
                     }
+                } else if (TrooperSlots.isTrooperSlotsNode(wn2.getNodeName())) {
+                    retVal.trooperSlots.readFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
@@ -4250,9 +4272,13 @@ public class Unit implements ITechnology, ILocatable {
 
             part.updateConditionFromPart();
         }
-        // Remove invalid Aero parts due to changes after 0.45.4
+        // Parts the unit has no place for, such as heat sink parts for the sinks a fusion engine provides, leave the
+        // campaign rather than staying in the warehouse tied to the unit, where they turned into free spares once it left
         for (Part part : partsToRemove) {
-            removePart(part);
+            discardPart(part);
+        }
+        if (!partsToRemove.isEmpty()) {
+            LOGGER.debug("[UnitParts] {}: {} parts it has no place for were discarded", getName(), partsToRemove.size());
         }
 
         LocalWarehouse warehouse = getWarehouse();
@@ -6018,6 +6044,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
+        List<UUID> gunnerIds = new ArrayList<>();
         for (Person person : relevantCrew) {
             if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
@@ -6032,6 +6059,7 @@ public class Unit implements ITechnology, ILocatable {
                 sumGunnery += person.getSkill(tempGunType)
                                     .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
+                gunnerIds.add(person.getId());
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
                       person.getSkill(SkillType.S_ARTILLERY)
@@ -6097,41 +6125,8 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (entity instanceof Infantry) {
-            if (entity instanceof BattleArmor) {
-                int numTroopers = 0;
-                // OK, we want to reorder the way we move through suits, so that we always put BA in the suits with
-                // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
-                // waiting further down the line.
-                Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
-                    bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
-                    if (entity.getInternal(i) < 0) {
-                        bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
-                    }
-                    bestSuits = Utilities.sortMapByValue(bestSuits, true);
-                }
-                // Get temp BA count up front so it can fill suits after real troopers are placed
-                int tempBACount = getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)
-                                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
-                int tempBAUsed = 0;
-                for (String key : bestSuits.keySet()) {
-                    int i = Integer.parseInt(key);
-                    if (!isBattleArmorSuitOperable(i)) {
-                        // no suit here move along
-                        continue;
-                    }
-                    if (numTroopers < nGunners) {
-                        entity.setInternal(1, i);
-                        numTroopers++;
-                    } else if (tempBACount > 0) {
-                        entity.setInternal(1, i);
-                        tempBACount--;
-                        tempBAUsed++;
-                    } else {
-                        entity.setInternal(0, i);
-                    }
-                }
-                nGunners += tempBAUsed;
+            if (entity instanceof BattleArmor battleArmor) {
+                nGunners += seatBattleArmorTroopers(battleArmor, gunnerIds);
             }
 
             // Add temp crew to fill shortfall for conventional infantry
@@ -6295,6 +6290,50 @@ public class Unit implements ITechnology, ILocatable {
             boolean isSingleCrewInThisInstance = getFullCrewSize() == 1;
             return isDrivers || isSingleCrewInThisInstance ? drivers : new ArrayList<>(gunners);
         }
+    }
+
+    /**
+     * Puts a battle armor unit's troopers in its suits. Each person keeps the suit they wear while it can still be
+     * worn, anyone else takes the free suit with the most armor, and temporary troopers fill the suits left over. Any
+     * other suit that can be worn is left empty.
+     *
+     * @param battleArmor the unit's entity
+     * @param trooperIds  the people able to fight, in the order they choose a suit
+     *
+     * @return how many temporary troopers were put in suits
+     */
+    private int seatBattleArmorTroopers(BattleArmor battleArmor, List<UUID> trooperIds) {
+        List<Integer> usableSlots = new ArrayList<>();
+        for (int slot = BattleArmor.LOC_TROOPER_1; slot <= battleArmor.getSquadSize(); slot++) {
+            if (isBattleArmorSuitOperable(slot)) {
+                usableSlots.add(slot);
+            }
+        }
+        // the suits with the most armor first, so nobody is put in a stripped suit while a good one is free
+        usableSlots.sort(Comparator.comparingInt((Integer slot) -> battleArmor.getArmorForReal(slot)).reversed());
+
+        List<Integer> wornSlots = trooperSlots.seat(trooperIds, usableSlots);
+        int tempTroopersLeft = getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)
+                                     ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
+        int tempTroopersSeated = 0;
+        for (int slot : usableSlots) {
+            if (wornSlots.contains(slot)) {
+                battleArmor.setInternal(1, slot);
+            } else if (tempTroopersSeated < tempTroopersLeft) {
+                battleArmor.setInternal(1, slot);
+                tempTroopersSeated++;
+            } else {
+                battleArmor.setInternal(0, slot);
+            }
+        }
+        return tempTroopersSeated;
+    }
+
+    /**
+     * @return which person wears which suit, for a battle armor unit
+     */
+    public TrooperSlots getTrooperSlots() {
+        return trooperSlots;
     }
 
     /**
@@ -6962,6 +7001,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (wasCrew) {
+            trooperSlots.release(person.getId());
             resetPilotAndEntity();
             // the departure is part of the unit's service history whether or not the person's own logs record it, as
             // a transfer still leaves this unit without that crew member

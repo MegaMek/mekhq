@@ -282,15 +282,10 @@ public class MRMSService {
                                          campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),
                                          true);
-        if (!configuredOptions.isEnabled()) {
-            campaign.addReport(TECHNICAL, getTextAt(RESOURCE_BUNDLE, "MRMS.CompleteDisabled.report"));
-            return;
-        } else if (!configuredOptions.useSalvage()) {
-            String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
-                  getTextAt(RESOURCE_BUNDLE, "Salvage"));
-            campaign.addReport(TECHNICAL, msg);
-            return;
-        } else if (campaign.getPlayerForce()
+        // Quick Strip is a direct order on one location, so the force-wide Use Repair and Use Salvage switches do not
+        // apply to it
+        LOGGER.debug("[MRMS] Quick Strip of {} on {}", part.getPartName(), unit.getName());
+        if (campaign.getPlayerForce()
                          .getHumanResources()
                          .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             String message = getTextAt(RESOURCE_BUNDLE, "MRMS.InsufficientAstechs.report");

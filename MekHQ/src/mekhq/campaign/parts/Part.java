@@ -75,6 +75,7 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -134,7 +135,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private final LocationNode locationNode = new LocationNode(this);
 
     protected String name;
+    /** The part's number in its warehouse, shown to the player; numbers repeat between warehouses */
     protected int id;
+    /** The part's identity, unique across the whole campaign and kept when the part moves */
+    private UUID uniqueId = UUID.randomUUID();
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -260,6 +264,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     public int getId() {
         return id;
     }
+
+    /**
+     * @return the part's identity, unique across the campaign: every warehouse numbers its parts from 1, so use this,
+     *       not {@link #getId()}, to find or link a part
+     */
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
 
     public void setCampaign(Campaign c) {
         this.campaign = c;
@@ -694,6 +707,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "uniqueId", uniqueId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         if (omniPodded) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
@@ -739,7 +753,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         if (replacementPart != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementUniqueId", replacementPart.getUniqueId());
         }
 
         if (reservedBy != null) {
@@ -759,11 +773,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         if (parentPart != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartUniqueId", parentPart.getUniqueId());
         }
 
         for (final Part childPart : childParts) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartUniqueId", childPart.getUniqueId());
         }
 
         return indent;
@@ -891,6 +905,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("uniqueId")) {
+                    // a save from before parts had an identity has none, and the part keeps the one it was made with
+                    readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
@@ -935,12 +952,21 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     retVal.fabricateUntilSuccess = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
                     retVal.brandNew = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("replacementUniqueId")) {
+                    retVal.replacementPart = readLinkByIdentity(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = PartQuality.fromNumeric(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("parentPartUniqueId")) {
+                    retVal.parentPart = readLinkByIdentity(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
                     retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("childPartUniqueId")) {
+                    PartRef childLink = readLinkByIdentity(retVal, wn2.getTextContent().trim());
+                    if (childLink != null) {
+                        retVal.childParts.add(childLink);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
                     int childPartId = Integer.parseInt(wn2.getTextContent());
                     if (childPartId > 0) {
@@ -1434,6 +1460,30 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     @Override
     public abstract Part clone();
 
+    /**
+     * Reads a saved link to another part by its identity.
+     *
+     * @return the link, or {@code null} if the identity cannot be read, which drops the link
+     */
+    private static @Nullable PartRef readLinkByIdentity(Part part, String uniqueIdText) {
+        try {
+            return new PartRef(UUID.fromString(uniqueIdText));
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] Part {} has an unreadable link '{}'; the link is dropped", part.id,
+                  uniqueIdText);
+            return null;
+        }
+    }
+
+    private static void readUniqueId(Part part, String uniqueIdText) {
+        try {
+            part.uniqueId = UUID.fromString(uniqueIdText);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] Part {} has an unreadable identity '{}'; it keeps a new one", part.id,
+                  uniqueIdText);
+        }
+    }
+
     protected void copyBaseData(Part part) {
         this.mode = part.mode;
         this.hits = part.hits;
@@ -1465,6 +1515,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public boolean isReservedForRefit() {
         return refitUnit != null;
+    }
+
+    /**
+     * @param personId a person's id
+     *
+     * @return {@code true} if this part is reserved for overnight work by that person
+     */
+    boolean isReservedByPerson(UUID personId) {
+        return (reservedBy != null) && personId.equals(reservedBy.getId());
     }
 
     /**
@@ -2106,34 +2165,21 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public void fixReferences(Campaign campaign) {
-        if (replacementPart instanceof PartRef) {
-            int id = replacementPart.getId();
-            replacementPart = getWarehouse().getPart(id);
-            if ((replacementPart == null) && (id > 0)) {
-                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
-            }
+        if (replacementPart instanceof PartRef replacementLink) {
+            replacementPart = PartLinkResolver.resolve(campaign, this, replacementLink, LinkKind.REPLACEMENT);
         }
 
-        if (parentPart instanceof PartRef) {
-            int id = parentPart.getId();
-            parentPart = getWarehouse().getPart(id);
-            if ((parentPart == null) && (id > 0)) {
-                LOGGER.error("Part {} ('{}') references missing replacement part {}", getId(), getName(), id);
-            }
+        if (parentPart instanceof PartRef parentLink) {
+            parentPart = PartLinkResolver.resolve(campaign, this, parentLink, LinkKind.PARENT);
         }
 
-        for (int ii = childParts.size() - 1; ii >= 0; --ii) {
-            Part childPart = childParts.get(ii);
-            if (childPart instanceof PartRef) {
-                Part realPart = getWarehouse().getPart(childPart.getId());
-                if (realPart != null) {
-                    childParts.set(ii, realPart);
-                } else if (childPart.getId() > 0) {
-                    LOGGER.error("Part {} ('{}') references missing child part {}",
-                          getId(),
-                          getName(),
-                          childPart.getId());
-                    childParts.remove(ii);
+        for (int childIndex = childParts.size() - 1; childIndex >= 0; --childIndex) {
+            if (childParts.get(childIndex) instanceof PartRef childLink) {
+                Part childPart = PartLinkResolver.resolve(campaign, this, childLink, LinkKind.CHILD);
+                if (childPart != null) {
+                    childParts.set(childIndex, childPart);
+                } else {
+                    childParts.remove(childIndex);
                 }
             }
         }
@@ -2171,8 +2217,34 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public static class PartRef extends Part {
+        /** The identity of the linked part, or {@code null} for a link from an older save, which names a number */
+        private final UUID linkedUniqueId;
+
         public PartRef(int id) {
             this.id = id;
+            this.linkedUniqueId = null;
+        }
+
+        /**
+         * @param linkedUniqueId the identity of the linked part
+         */
+        public PartRef(UUID linkedUniqueId) {
+            this.linkedUniqueId = linkedUniqueId;
+        }
+
+        /**
+         * @return the identity of the linked part, or {@code null} if the link names a part number from an older save
+         */
+        public @Nullable UUID getLinkedUniqueId() {
+            return linkedUniqueId;
+        }
+
+        /**
+         * A link that is saved before it is resolved keeps pointing at the part it names.
+         */
+        @Override
+        public UUID getUniqueId() {
+            return (linkedUniqueId == null) ? super.getUniqueId() : linkedUniqueId;
         }
 
         @Override

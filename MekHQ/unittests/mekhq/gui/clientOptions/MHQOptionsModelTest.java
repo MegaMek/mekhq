@@ -33,6 +33,7 @@
 package mekhq.gui.clientOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,7 @@ import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.common.preference.ClientPreferences;
@@ -58,11 +60,12 @@ import org.mockito.MockedStatic;
  * <p>
  * Unlike {@code CampaignOptions}, {@link MHQOptions} is not an isolated value object: it is a proxy over the JVM-wide
  * {@link java.util.prefs.Preferences#userRoot()} store, and {@code applyTo}'s two non-{@code MHQOptions} escapees (the
- * GUI scale in {@link GUIPreferences} and the user directory in {@link PreferenceManager}) have real side effects
+ * UI preferences in {@link GUIPreferences} and the user directory in {@link PreferenceManager}) have real side effects
  * (a look-and-feel rescale and a settings file written to disk). To keep this test hermetic, those two singletons are
  * mocked so no rescale or disk write happens, and the two escapee fields ({@code guiScaleValue} and {@code userDir})
  * are excluded from the mutate/verify pass because they cannot round-trip through the mocked singletons. The shared
- * preferences store is snapshotted through the model itself before the test mutates it and restored afterwards.
+ * section-expansion preference uses a stateful mock and participates in the round-trip. The shared preferences
+ * store is snapshotted through the model itself before the test mutates it and restored afterwards.
  * </p>
  */
 class MHQOptionsModelTest {
@@ -73,6 +76,12 @@ class MHQOptionsModelTest {
     void applyToRoundTripsEveryField() throws ReflectiveOperationException {
         GUIPreferences guiPreferences = mock(GUIPreferences.class);
         when(guiPreferences.getGUIScale()).thenReturn(1.0f);
+        AtomicBoolean expandedSections = new AtomicBoolean(true);
+        when(guiPreferences.getExpandOptionSections()).thenAnswer(invocation -> expandedSections.get());
+        doAnswer(invocation -> {
+            expandedSections.set(invocation.getArgument(0));
+            return null;
+        }).when(guiPreferences).setExpandOptionSections(org.mockito.ArgumentMatchers.anyBoolean());
         ClientPreferences clientPreferences = mock(ClientPreferences.class);
         when(clientPreferences.getUserDir()).thenReturn("test-user-dir");
         PreferenceManager preferenceManager = mock(PreferenceManager.class);

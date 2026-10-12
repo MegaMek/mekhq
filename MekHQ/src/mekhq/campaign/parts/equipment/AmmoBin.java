@@ -60,6 +60,7 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
@@ -74,7 +75,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -661,7 +661,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
      * @return {@code true} if the warehouse has at least one shot of the required ammo type.
      */
     public boolean isAmmoAvailable() {
-        return getCampaign().getQuartermaster().getAmmoAvailable(getType()) > 0;
+        return getAmountAvailable() > 0;
     }
 
     @Override
@@ -753,8 +753,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
         return null;
     }
 
+    /**
+     * @return the spare shots of this bin's ammunition in the warehouse it loads from, which may be a base's warehouse
+     */
     public int getAmountAvailable() {
-        return campaign.getQuartermaster().getAmmoAvailable(getType());
+        return campaign.getQuartermaster().getAmmoAvailable(getWarehouse(), getType());
     }
 
     public boolean isEnoughSpareAmmoAvailable() {
@@ -797,7 +800,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
 
     @Override
     public Part getAcquisitionPart() {
-        return getNewPart();
+        return newOrderForThisBin();
     }
 
     @Override
@@ -836,7 +839,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     @Override
     public IAcquisitionWork getAcquisitionWork() {
         // FIXME: is this MissingPart or AmmoStorage? Inconsistency between subtypes
-        return getNewPart();
+        return newOrderForThisBin();
+    }
+
+    /**
+     * Ammunition to buy for this bin, delivered to the warehouse the bin's unit is kept in, which may be a base's.
+     */
+    private AmmoStorage newOrderForThisBin() {
+        AmmoStorage order = getNewPart();
+        if (unit != null) {
+            order.setDeliveryUnitId(unit.getId());
+        }
+        return order;
     }
 
     @Override

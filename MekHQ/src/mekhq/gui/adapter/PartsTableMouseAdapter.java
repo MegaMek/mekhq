@@ -46,6 +46,8 @@ import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
+import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -62,7 +64,6 @@ import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -177,7 +178,11 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     clonedPart.setQuantity(quantity);
                 }
 
-                gui.getCampaign().getPlayerForce().getWarehouse().addPart(clonedPart, true);
+                // the copies join the stock the selected part is kept in, which may be a base's
+                LocalWarehouse stock = (selectedPart.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                             ? holdingWarehouse
+                                             : gui.getCampaign().getPlayerForce().getWarehouse();
+                stock.addPart(clonedPart, true);
             }
         } else if (command.contains("SET_QUALITY")) {
             boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);

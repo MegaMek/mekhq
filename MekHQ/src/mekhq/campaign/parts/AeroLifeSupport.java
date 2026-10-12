@@ -60,6 +60,8 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AeroLifeSupport extends Part {
+    private static final int FIGHTER_LIFE_SUPPORT_COST = 50000;
+
     private Money cost;
     private boolean fighter;
 
@@ -208,14 +210,18 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public Money getStickerPrice() {
-        return cost;
+        // A fighter's price is flat, so one saved at another price before this was fixed still comes out right
+        return fighter ? Money.of(FIGHTER_LIFE_SUPPORT_COST) : cost;
     }
 
+    /**
+     * A fighter's life support costs a flat 50,000 C-bills, as MegaMek prices it; a spacecraft's costs 5,000 for each
+     * crew member and passenger.
+     */
     public void calculateCost() {
         if (fighter) {
-            cost = Money.of(50000);
-        }
-        if (null != unit) {
+            cost = Money.of(FIGHTER_LIFE_SUPPORT_COST);
+        } else if (null != unit) {
             cost = Money.of(5000.0 * (unit.getEntity().getNCrew() + unit.getEntity().getNPassenger()));
         }
     }

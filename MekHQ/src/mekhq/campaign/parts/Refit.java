@@ -68,7 +68,6 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.icons.Camouflage;
-import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
@@ -97,6 +96,8 @@ import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.log.UnitLogger;
+import mekhq.campaign.parts.Part.PartRef;
+import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -2642,7 +2643,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (!oldUnitParts.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "oldUnitParts");
             for (final Part part : oldUnitParts) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId());
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "oldUnitParts");
         }
@@ -2650,7 +2651,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (!newUnitParts.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "newUnitParts");
             for (final Part part : newUnitParts) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId());
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newUnitParts");
         }
@@ -2667,7 +2668,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (!largeCraftBinsToChange.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lcBinsToChange");
             for (Part part : largeCraftBinsToChange) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId());
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lcBinsToChange");
         }
@@ -2686,7 +2687,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 newArmorSupplies.writeToXML(pw, indent);
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newArmorSupplies");
             } else {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newArmorSuppliesId", newArmorSupplies.getId());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newArmorSuppliesUniqueId",
+                      newArmorSupplies.getUniqueId());
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "refit");
@@ -2732,6 +2734,9 @@ public class Refit extends Part implements IAcquisitionWork {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
                     retVal.cost = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesUniqueId")) {
+                    UUID armorSuppliesId = readPartIdentity(wn2.getTextContent().trim());
+                    retVal.newArmorSupplies = (armorSuppliesId == null) ? null : new RefitArmorRef(armorSuppliesId);
                 } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
                     retVal.newArmorSupplies = new RefitArmorRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
@@ -2756,29 +2761,11 @@ public class Refit extends Part implements IAcquisitionWork {
                     retVal.newEntity = Objects.requireNonNull(MHQXMLUtility.parseSingleEntityMul((Element) wn2,
                           campaign));
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                            retVal.oldUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
-                        }
-                    }
+                    readPartLinks(wn2, retVal.oldUnitParts);
                 } else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                            retVal.newUnitParts.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
-                        }
-                    }
+                    readPartLinks(wn2, retVal.newUnitParts);
                 } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        if (wn3.getNodeName().equalsIgnoreCase("pid")) {
-                            retVal.largeCraftBinsToChange.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
-                        }
-                    }
+                    readPartLinks(wn2, retVal.largeCraftBinsToChange);
                 } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
                     processShoppingListFromXML(retVal, wn2, retVal.oldUnit, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldIntegratedHeatSinks")) {
@@ -2793,6 +2780,38 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return retVal;
+    }
+
+    /**
+     * Reads a saved list of the refit's parts: by identity, or by number in an older save.
+     */
+    private static void readPartLinks(Node listNode, Collection<Part> links) {
+        NodeList linkNodes = listNode.getChildNodes();
+        for (int index = 0; index < linkNodes.getLength(); index++) {
+            Node linkNode = linkNodes.item(index);
+            if (linkNode.getNodeName().equalsIgnoreCase("partUniqueId")) {
+                UUID partId = readPartIdentity(linkNode.getTextContent().trim());
+                if (partId != null) {
+                    links.add(new RefitPartRef(partId));
+                }
+            } else if (linkNode.getNodeName().equalsIgnoreCase("pid")) {
+                try {
+                    links.add(new RefitPartRef(Integer.parseInt(linkNode.getTextContent().trim())));
+                } catch (NumberFormatException exception) {
+                    LOGGER.warn("[PartIdentity] A refit has an unreadable part number '{}'; the link is dropped",
+                          linkNode.getTextContent());
+                }
+            }
+        }
+    }
+
+    private static @Nullable UUID readPartIdentity(String partIdText) {
+        try {
+            return UUID.fromString(partIdText);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] A refit has an unreadable part link '{}'; the link is dropped", partIdText);
+            return null;
+        }
     }
 
     /**
@@ -3533,78 +3552,13 @@ public class Refit extends Part implements IAcquisitionWork {
 
         setCampaign(campaign);
 
-        if (newArmorSupplies instanceof RefitArmorRef) {
-            Part realPart = getWarehouse().getPart(newArmorSupplies.getId());
-            if (realPart instanceof Armor) {
-                newArmorSupplies = (Armor) realPart;
-            } else {
-                LOGGER.error("Refit on Unit {} references missing armor supplies {}",
-                      getUnit().getId(),
-                      newArmorSupplies.getId());
-                newArmorSupplies = null;
-            }
+        if (newArmorSupplies instanceof RefitArmorRef armorLink) {
+            Part armor = PartLinkResolver.resolve(campaign, this, armorLink.toPartLink(), LinkKind.REFIT_ARMOR_SUPPLIES);
+            newArmorSupplies = (armor instanceof Armor armorSupplies) ? armorSupplies : null;
         }
-
-        for (int oldPartIndex = oldUnitParts.size() - 1; oldPartIndex >= 0; --oldPartIndex) {
-            Part part = oldUnitParts.get(oldPartIndex);
-            if (part instanceof RefitPartRef) {
-                Part realPart = getWarehouse().getPart(part.getId());
-                if (realPart != null) {
-                    oldUnitParts.set(oldPartIndex, realPart);
-
-                } else if (part.getId() > 0) {
-                    LOGGER.error("Refit on Unit {} references missing old unit part {}",
-                          getUnit().getId(),
-                          part.getId());
-                    oldUnitParts.remove(oldPartIndex);
-
-                } else {
-                    LOGGER.error("Refit on Unit {} references unknown old unit part with an id of 0",
-                          getUnit().getId());
-                    oldUnitParts.remove(oldPartIndex);
-                }
-            }
-        }
-
-        for (int newPartIndex = newUnitParts.size() - 1; newPartIndex >= 0; --newPartIndex) {
-            Part part = newUnitParts.get(newPartIndex);
-            if (part instanceof RefitPartRef) {
-                Part realPart = getWarehouse().getPart(part.getId());
-                if (realPart != null) {
-                    newUnitParts.set(newPartIndex, realPart);
-
-                } else if (part.getId() > 0) {
-                    LOGGER.error("Refit on Unit {} references missing new unit part {}",
-                          getUnit().getId(),
-                          part.getId());
-                    newUnitParts.remove(newPartIndex);
-
-                } else {
-                    LOGGER.error("Refit on Unit {} references unknown new unit part with an id of 0",
-                          getUnit().getId());
-                    newUnitParts.remove(newPartIndex);
-                }
-            }
-        }
-
-        List<Part> realParts = new ArrayList<>();
-        Iterator<Part> lcBinIt = largeCraftBinsToChange.iterator();
-        while (lcBinIt.hasNext()) {
-            Part part = lcBinIt.next();
-            if (part instanceof RefitPartRef) {
-                Part realPart = getWarehouse().getPart(part.getId());
-                lcBinIt.remove();
-                if (realPart != null) {
-                    realParts.add(realPart);
-                } else {
-                    LOGGER.error("Refit on Unit {} references missing large craft ammo bin {}",
-                          getUnit().getId(),
-                          part.getId());
-                }
-            }
-        }
-
-        largeCraftBinsToChange.addAll(realParts);
+        resolvePartLinks(campaign, oldUnitParts, LinkKind.REFIT_OLD_PART);
+        resolvePartLinks(campaign, newUnitParts, LinkKind.REFIT_NEW_PART);
+        resolvePartLinks(campaign, largeCraftBinsToChange, LinkKind.REFIT_LARGE_CRAFT_BIN);
 
         if (assignedTech instanceof RefitPersonRef) {
             UUID id = assignedTech.getId();
@@ -3616,102 +3570,62 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Proxy Armor that references a certain ID
+     * Replaces each saved link among the refit's parts with the part it names, dropping links that fit no part. As
+     * the campaign loads every entry is a saved link, so a list keeps its order.
+     */
+    private void resolvePartLinks(Campaign campaign, Collection<Part> links, LinkKind kind) {
+        List<Part> resolvedParts = new ArrayList<>();
+        Iterator<Part> linkIterator = links.iterator();
+        while (linkIterator.hasNext()) {
+            if (linkIterator.next() instanceof PartRef link) {
+                linkIterator.remove();
+                Part part = PartLinkResolver.resolve(campaign, this, link, kind);
+                if (part != null) {
+                    resolvedParts.add(part);
+                }
+            }
+        }
+        links.addAll(resolvedParts);
+    }
+
+    /**
+     * Proxy Armor that references the armor set aside for the refit, by identity or, in an older save, by number.
      */
     public static class RefitArmorRef extends Armor {
+        private final UUID linkedUniqueId;
+
         private RefitArmorRef(int id) {
             this.id = id;
+            this.linkedUniqueId = null;
+        }
+
+        private RefitArmorRef(UUID linkedUniqueId) {
+            this.linkedUniqueId = linkedUniqueId;
+        }
+
+        private PartRef toPartLink() {
+            return (linkedUniqueId == null) ? new PartRef(id) : new PartRef(linkedUniqueId);
+        }
+
+        /**
+         * Armor saved before its link is resolved keeps pointing at the armor it names.
+         */
+        @Override
+        public UUID getUniqueId() {
+            return (linkedUniqueId == null) ? super.getUniqueId() : linkedUniqueId;
         }
     }
 
     /**
-     * Proxy Part that references a certain ID. All of its mandatory overrides are stubs.
+     * Proxy Part that references one of the refit's parts, by identity or, in an older save, by number.
      */
-    public static class RefitPartRef extends Part {
+    public static class RefitPartRef extends PartRef {
         private RefitPartRef(int id) {
-            this.id = id;
+            super(id);
         }
 
-        @Override
-        public int getBaseTime() {
-            return 0;
-        }
-
-        @Override
-        public void updateConditionFromEntity(boolean checkForDestruction) {
-        }
-
-        @Override
-        public void updateConditionFromPart() {
-        }
-
-        @Override
-        public void remove(boolean salvage) {
-        }
-
-        @Override
-        public MissingPart getMissingPart() {
-            return null;
-        }
-
-        @Override
-        public int getLocation() {
-            return 0;
-        }
-
-        @Override
-        public @Nullable String checkFixable() {
-            return null;
-        }
-
-        @Override
-        public boolean needsFixing() {
-            return false;
-        }
-
-        @Override
-        public int getDifficulty() {
-            return 0;
-        }
-
-        @Override
-        public Money getStickerPrice() {
-            return null;
-        }
-
-        @Override
-        public double getTonnage() {
-            return 0;
-        }
-
-        @Override
-        public boolean isSamePartType(Part part) {
-            return false;
-        }
-
-        @Override
-        public void writeToXML(final PrintWriter pw, int indent) {
-
-        }
-
-        @Override
-        protected void loadFieldsFromXmlNode(Node wn) {
-
-        }
-
-        @Override
-        public Part clone() {
-            return null;
-        }
-
-        @Override
-        public String getLocationName() {
-            return null;
-        }
-
-        @Override
-        public ITechnology getTechAdvancement() {
-            return null;
+        private RefitPartRef(UUID linkedUniqueId) {
+            super(linkedUniqueId);
         }
     }
 

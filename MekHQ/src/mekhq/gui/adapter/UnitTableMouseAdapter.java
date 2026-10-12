@@ -688,12 +688,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                            .multipliedBy(gui.getCampaign()
                                                                .getCampaignOptions()
                                                                .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER));
-                gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign().getPlayerForce().getFinances()
-                      .credit(TransactionType.EQUIPMENT_PURCHASE,
-                            gui.getCampaign().getLocalDate(),
-                            refundAmount,
-                            "refund for cancelled equipment sale");
+                if (gui.getCampaign().removeUnit(u.getId())) {
+                    gui.getCampaign().getPlayerForce().getFinances()
+                          .credit(TransactionType.EQUIPMENT_PURCHASE,
+                                gui.getCampaign().getLocalDate(),
+                                refundAmount,
+                                "refund for cancelled equipment sale");
+                }
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {

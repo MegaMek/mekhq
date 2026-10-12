@@ -161,7 +161,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.RepairCosts;
+import mekhq.campaign.finances.RepairPayments;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
@@ -181,7 +181,6 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -3081,6 +3080,8 @@ public class Campaign implements ITechManager {
             final Unit repairedUnit = partWork.getUnit();
             final String repairedPartName = partWork.getPartName();
             final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
+            final boolean isPaidRepair = RepairPayments.isPaidFor(this, partWork, action.equals(" fix "));
+            final Money repairCost = RepairPayments.getCost(this, partWork);
 
             report += partWork.succeed();
             // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
@@ -3088,16 +3089,8 @@ public class Campaign implements ITechManager {
             if ((repairedUnit != null) && isRepair) {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
-            if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getRepairCost()
-                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
-                report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
-                getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
-                      getLocalDate(),
-                      cost,
-                      "Repair of " + partWork.getPartName());
-                // An employer covering straight support reimburses its share of the repair cost.
-                ContractSupportPayments.reimburseStraightSupport(this, cost, partWork.getPartName());
+            if (isPaidRepair) {
+                report += RepairPayments.pay(this, repairCost, repairedPartName);
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().get(CampaignOption.SUCCESS_XP);
@@ -3361,10 +3354,18 @@ public class Campaign implements ITechManager {
                      .stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
-    public void removeUnit(UUID id) {
-        Unit unit = getPlayerForce().getHangar().getUnit(id);
+    /**
+     * Removes a unit, with its parts, from the campaign, wherever it is kept: the main force's hangar or a base's.
+     *
+     * @param id the unit's id
+     *
+     * @return {@code true} if the unit was removed, {@code false} if no hangar holds it
+     */
+    public boolean removeUnit(UUID id) {
+        Unit unit = getUnit(id);
         if (unit == null) {
-            return;
+            LOGGER.debug("[PartIdentity] No hangar holds unit {}, so nothing was removed", id);
+            return false;
         }
 
         // A refit in progress gives back its reserved parts and removes its orders before the unit goes
@@ -3423,12 +3424,22 @@ public class Campaign implements ITechManager {
             detachment.getAutomatedMothballUnits().remove(unit.getId());
         }
 
-        // finally, remove the unit
-        getPlayerForce().getHangar().removeUnit(unit.getId());
+        // finally, remove the unit from the hangar that holds it, which may be a base's
+        holdingHangar(unit).removeUnit(unit.getId());
 
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(ACQUISITIONS, unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
+        return true;
+    }
+
+    private LocalHangar holdingHangar(Unit unit) {
+        for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
+            if (base.getBaseHangar().getUnit(unit.getId()) == unit) {
+                return base.getBaseHangar();
+            }
+        }
+        return getPlayerForce().getHangar();
     }
 
     public void removeScenario(final Scenario scenario) {
@@ -4046,13 +4057,45 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * The design of every unit in the campaign, in the main force's hangar and at each base, and the design each refit
+     * is turning a unit into, so that a save carries everything needed to load it on another machine.
+     */
+    private Set<String> collectDesignNamesOfAllUnits() {
+        List<Unit> units = new ArrayList<>(getPlayerForce().getHangar().getUnits());
+        for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
+            units.addAll(base.getBaseHangar().getUnits());
+        }
+        Set<String> designNames = new HashSet<>();
+        for (Unit unit : units) {
+            addDesignName(unit.getEntity(), unit.getName(), designNames);
+            Refit refit = unit.getRefit();
+            if (refit != null) {
+                addDesignName(refit.getNewEntity(), unit.getName() + " refit", designNames);
+            }
+        }
+        return designNames;
+    }
+
+    private static void addDesignName(@Nullable Entity entity, String description, Set<String> designNames) {
+        if (entity == null) {
+            return;
+        }
+        String shortName = entity.getShortNameRaw();
+        if (StringUtility.isNullOrBlank(shortName)) {
+            LOGGER.warn("shortName was null or blank for {}. Skipping", description);
+            return;
+        }
+        designNames.add(shortName);
+    }
+
+    /**
      * Writes custom unit definitions to the campaign XML output.
      *
      * <p>This method can operate in two modes:</p>
      * <ul>
-     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it scans all units currently present in the campaign
-     *     and collects each unit's raw short name (via {@code entity.getShortNameRaw()}) as a candidate custom
-     *     definition.</li>
+     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it collects the raw short name (via
+     *     {@code entity.getShortNameRaw()}) of every unit in the main force's hangar and at each base, and of the design
+     *     each refit in progress is turning a unit into, as candidate custom definitions.</li>
      *     <li>Else, if {@code shouldSaveAllCustoms} is {@code true}, it writes all names already present in the
      *     campaign's {@code customs} collection.</li>
      * </ul>
@@ -4081,17 +4124,7 @@ public class Campaign implements ITechManager {
           boolean shouldSaveAllCustoms) {
         Set<String> customUnits = new HashSet<>();
         if (shouldSaveAllUnits) {
-            for (Unit unit : getPlayerForce().getHangar().getUnits()) {
-                Entity entity = unit.getEntity();
-                if (entity != null) {
-                    String shortName = entity.getShortNameRaw();
-                    if (!StringUtility.isNullOrBlank(shortName)) {
-                        customUnits.add(shortName);
-                    } else {
-                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
-                    }
-                }
-            }
+            customUnits = collectDesignNamesOfAllUnits();
         } else if (shouldSaveAllCustoms) {
             customUnits = new HashSet<>(customs);
         }
@@ -4173,13 +4206,32 @@ public class Campaign implements ITechManager {
     }
 
     public PlanetarySystem putPlanetarySystemOverride(PlanetarySystem system) throws IOException {
-        if ((system == null) || (system.getId() == null) || system.getId().isBlank()) {
-            throw new IOException("Cannot save planetary system edits without a system id.");
+        return putPlanetarySystemOverrides(Collections.singletonList(system)).getFirst();
+    }
+
+    /**
+     * Saves a batch of overrides without replacing unrelated overrides. All copies must succeed before the batch is
+     * installed, and locations and views are refreshed once after the complete batch is available.
+     *
+     * @return the saved copies in input order
+     * @throws IOException if an override has no system id or cannot be copied; no changes are installed
+     */
+    public List<PlanetarySystem> putPlanetarySystemOverrides(Collection<PlanetarySystem> systems) throws IOException {
+        List<PlanetarySystem> savedSystems = new ArrayList<>();
+        for (PlanetarySystem system : systems) {
+            if ((system == null) || (system.getId() == null) || system.getId().isBlank()) {
+                throw new IOException("Cannot save planetary system edits without a system id.");
+            }
+            savedSystems.add(PlanetarySystemYamlIO.copy(system));
         }
-        PlanetarySystem savedSystem = PlanetarySystemYamlIO.copy(system);
-        planetarySystemOverrides.put(savedSystem.getId(), savedSystem);
+        if (savedSystems.isEmpty()) {
+            return List.of();
+        }
+        for (PlanetarySystem savedSystem : savedSystems) {
+            planetarySystemOverrides.put(savedSystem.getId(), savedSystem);
+        }
         refreshPlanetarySystemOverlay();
-        return savedSystem;
+        return List.copyOf(savedSystems);
     }
 
     public boolean removePlanetarySystemOverride(String systemId) {
@@ -4195,8 +4247,16 @@ public class Campaign implements ITechManager {
         return (systemId != null) && planetarySystemOverrides.containsKey(systemId);
     }
 
+    /**
+     * Installs the planetary overrides, synchronizes all locations and their travel routes, then notifies views.
+     * Updating the registry alone would leave current-location mechanics and displays using the previous records.
+     */
     public void refreshPlanetarySystemOverlay() {
         systemsInstance = Systems.activateCampaignSystems(planetarySystemOverrides.values());
+        for (AbstractLocation location : locationManager.getLocations()) {
+            location.refreshPlanetarySystems(this);
+        }
+        MekHQ.triggerEvent(new PlanetarySystemsChangedEvent(this));
     }
 
     private void addPlanetarySystemOverride(PlanetarySystem system) {
@@ -4531,6 +4591,11 @@ public class Campaign implements ITechManager {
         } else if ((partWork instanceof MissingPart missingPart) && (missingPart.findReplacement(false) == null)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Replacement part not available.");
         }
+        String unaffordableReason = RepairPayments.isPaidFor(this, partWork, getAction(partWork).equals(" fix "))
+              ? RepairPayments.getUnaffordableReason(this, partWork) : null;
+        if (unaffordableReason != null) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, unaffordableReason);
+        }
 
         final int techTime = isOvertimeAllowed() ?
                                    tech.getMinutesLeft() + tech.getOvertimeLeft() :
@@ -4760,12 +4825,11 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.AUTOMATIC) {
             decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_SUCCESS,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.automaticSuccess"));
-        } else if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) {
+        } else if (!RefitPurchaseCheck.canBuyTechBase(getCampaignOptions(), acquisition.getTechBase())) {
+            String reasonKey = (acquisition.getTechBase() == TechBase.CLAN) ? "acquisition.modifier.clanTech"
+                                     : "acquisition.modifier.ISTech";
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.clanTech"));
-        } else if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.ISTech"));
+                  getTextAt(ACTION_CHECK_BUNDLE, reasonKey));
         } else if (getCampaignOptions().get(CampaignOption.TECH_LEVEL) < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.techLevel"));
