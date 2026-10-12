@@ -132,14 +132,13 @@ abstract class MHQOptionsPage {
 
     /**
      * Creates the shared page builder used by every MekHQ option page: the per-page faction emblem header (matching
-     * Campaign Options), the GUI resource bundle, whether to show the "Option Details" help box, and sections collapsed
-     * by default. Multi-section pages keep that collapsed default; the single-section {@link #buildMHQPage} wrapper
-     * re-expands its lone section. Callers add their section(s) and call {@code build()}.
+     * Campaign Options), the GUI resource bundle, and whether to show the "Option Details" help box. Section expansion
+     * follows the shared client preference; a single section always starts expanded. Callers add their section(s)
+     * and call {@code build()}.
      */
     static SettingsPagePanel.Builder pageBuilder(String pageName, boolean showDetailsPanel) {
         return SettingsPagePanel.builder(pageName, TEXT_PROVIDER, "lbl" + pageName + ".text", pageHeaderIcon(pageName))
-                     .showDetailsPanel(showDetailsPanel)
-                     .sectionsExpandedByDefault(false);
+                     .showDetailsPanel(showDetailsPanel);
     }
 
     /**
@@ -163,8 +162,7 @@ abstract class MHQOptionsPage {
         // Route each control's tooltip to the shared "Option Details" box (like Campaign Options) and drop the floating
         // tooltip. Only pages that actually have tip-bearing controls get the box, so tooltip-free pages (the colour
         // grids) are not saddled with an empty details area.
-        SettingsPagePanel.Builder builder = pageBuilder(pageName, registerDetailsTips(content))
-                                                  .sectionsExpandedByDefault(true);
+        SettingsPagePanel.Builder builder = pageBuilder(pageName, registerDetailsTips(content));
         if (introKey != null) {
             builder.intro(introKey + ".intro");
         }
