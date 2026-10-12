@@ -35,11 +35,13 @@ package mekhq.campaign.unit;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -120,11 +122,14 @@ public class Maintenance {
         }
 
         if (unit.getDaysSinceMaintenance() >= (campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier)) {
+            // What went wrong with this check, for the notice on the General tab
+            List<String> problems = new ArrayList<>();
             Person tech = unit.getTech();
             if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
                 // Tech is at a different location; maintenance cannot be performed this cycle.
                 campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                       "Maintenance.techAtDifferentLocation", unit.getName()));
+                problems.add(getTextAt(RESOURCE_BUNDLE, "Maintenance.problem.techAway"));
                 tech = null;
             }
             if (tech != null) {
@@ -135,6 +140,8 @@ public class Maintenance {
                     // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
+                    problems.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.problem.noTime",
+                          tech.getFullTitle()));
                 } else {
                     maintained = !tech.isMothballing();
                 }
@@ -170,6 +177,7 @@ public class Maintenance {
                                                         "'><b>You cannot afford to pay maintenance costs for " +
                                                         unit.getHyperlinkedName() +
                                                         "!</b></font>");
+                    problems.add(getTextAt(RESOURCE_BUNDLE, "Maintenance.problem.unpaid"));
                     paidMaintenance = false;
                 } else {
                     ContractSupportPayments.reimburseStraightSupport(campaign, maintenanceCost, unit.getName());
@@ -251,6 +259,8 @@ public class Maintenance {
                             qualityOrig.toName(reverse) +
                             " to " +
                             quality.toName(reverse));
+                problems.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.problem.qualityDeclined",
+                      qualityOrig.toName(reverse), quality.toName(reverse)));
             } else {
                 qualityString = "Overall quality remains " + quality.toName(reverse);
             }
@@ -273,8 +283,37 @@ public class Maintenance {
                                                 unit.getId() +
                                                 "'>Get details</a>]");
 
+            if (nDamage > 0) {
+                problems.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.problem.partsDamaged",
+                      String.valueOf(nDamage)));
+            }
+            if (nDestroy > 0) {
+                problems.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.problem.partsDestroyed",
+                      String.valueOf(nDestroy)));
+            }
+            reportProblemsToGeneral(campaign, unit, problems);
+
             unit.resetDaysSinceMaintenance();
         }
+    }
+
+    /**
+     * Posts a one-line notice to the General tab of the daily log when a maintenance check went wrong, so the problem
+     * is not hidden on the Technical tab. Routine checks post nothing here. Nothing is posted when the daily log tabs
+     * are disabled either, as the full report is then already on the General tab.
+     *
+     * @param campaign the campaign whose daily log receives the notice
+     * @param unit     the unit that was checked
+     * @param problems what went wrong with the check; empty when the check went well
+     */
+    private static void reportProblemsToGeneral(Campaign campaign, Unit unit, List<String> problems) {
+        if (problems.isEmpty() || MekHQ.getMHQOptions().getUnifiedDailyReport()) {
+            return;
+        }
+
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.generalProblem",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, unit.getHyperlinkedName(),
+              String.join("; ", problems)));
     }
 
     private static String getDamageString(Unit unit, int nDamage, int nDestroy) {
