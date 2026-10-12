@@ -86,6 +86,12 @@ public final class SupportVehicleSelector {
     private static final long GENERATOR_POLL_MILLIS = 50;
 
     /**
+     * Set once a wait for the force generator has run out, so later lookups do not wait again. Every campaign unit is
+     * looked up, and waiting for each in turn would hold the grant dialog for half a minute per unit.
+     */
+    private static volatile boolean generatorWaitExpired;
+
+    /**
      * The order an owned vehicle is tested in, so a vehicle that could do two jobs counts once. Equipment is the
      * surest sign and goes first: a MASH truck may also carry the support role and a cargo bay, and is still a MASH
      * truck. Security is infantry and is never recognised this way.
@@ -277,12 +283,18 @@ public final class SupportVehicleSelector {
      * vehicles and convoy trucks carry nothing that sets them apart from a combat vehicle, so they are recognised by
      * the mission role the force generator gives the model, the same role they are rolled on.</p>
      *
+     * <p>Only ground vehicles count, because only ground vehicles are rolled. A cargo-role DropShip or a Mek
+     * carrying a MASH theatre is not a support vehicle, and counting one would leave the command a truck short.</p>
+     *
      * @param entity the owned vehicle; {@code null} provides nothing
      *
      * @return the capability it provides, or {@code null} when it provides none
      */
     public static @Nullable SupportCapability capabilityOf(@Nullable Entity entity) {
-        return (entity == null) ? null : classify(describe(entity));
+        if ((entity == null) || (entity.getUnitType() != UnitType.TANK)) {
+            return null;
+        }
+        return classify(describe(entity));
     }
 
     /**
@@ -327,9 +339,10 @@ public final class SupportVehicleSelector {
      * Reads a model's mission roles from the force generator, waiting a while for it to finish loading.
      *
      * <p>The generator loads on a thread of its own, and a campaign can be loaded before it finishes. Rather than
-     * read an empty table as "no roles", the lookup waits, as {@code RATGeneratorConnector} does. If the generator
-     * is still not ready the vehicle goes unrecognised, which is logged: it is then built around, as before this
-     * check existed, rather than counted.</p>
+     * read an empty table as "no roles", the lookup waits, as {@code RATGeneratorConnector} does. It waits once: when
+     * the wait runs out, later lookups check the generator without waiting. If the generator is still not ready the
+     * vehicle goes unrecognised, which is logged: it is then built around, as before this check existed, rather than
+     * counted.</p>
      *
      * @param unitName the model's name as the generator keys it
      *
@@ -337,14 +350,17 @@ public final class SupportVehicleSelector {
      */
     private static Set<MissionRole> generatorRoles(String unitName) {
         RATGenerator generator = RATGenerator.getInstance();
-        long deadline = System.currentTimeMillis() + GENERATOR_WAIT_MILLIS;
-        while (!generator.isInitialized() && (System.currentTimeMillis() < deadline)) {
-            try {
-                Thread.sleep(GENERATOR_POLL_MILLIS);
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt();
-                break;
+        if (!generatorWaitExpired) {
+            long deadline = System.currentTimeMillis() + GENERATOR_WAIT_MILLIS;
+            while (!generator.isInitialized() && (System.currentTimeMillis() < deadline)) {
+                try {
+                    Thread.sleep(GENERATOR_POLL_MILLIS);
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
+            generatorWaitExpired = !generator.isInitialized();
         }
         if (!generator.isInitialized()) {
             LOGGER.warn("[CompanyGen][SupportUnits] the force generator is not loaded, so '{}' cannot be recognised"
