@@ -34,8 +34,12 @@ package mekhq.gui.campaignOptions.contents;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
@@ -44,18 +48,21 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Exhaustive round-trip test for {@link MarketsOptionsModel}. Every scalar field is mutated automatically, except
  * {@code personnelMarketStyle} (changing it drives a market-replacement branch that needs a live campaign, so it is
  * left at its default) and the four contract-percent doubles (their setters clamp, so they are set to in-range values
- * explicitly). {@code applyTo} takes a {@link Campaign}, which a bare mock satisfies because the style branch is not
- * taken.
+ * explicitly). {@code applyTo} takes a {@link Campaign} whose personnel market is stubbed with the default style.
  */
 class MarketsOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
         Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(new NewPersonnelMarket());
         MarketsOptionsModel model = new MarketsOptionsModel(new CampaignOptions());
         OptionsModelTestSupport.mutateScalarFields(model,
               "personnelMarketStyle",
@@ -82,6 +89,9 @@ class MarketsOptionsModelTest {
     @Test
     void applyToWithACampaign_replacesThePersonnelMarketWhenTheStyleChanges() {
         Campaign campaign = mockCampaign();
+        NewPersonnelMarket currentMarket = mock(NewPersonnelMarket.class);
+        when(currentMarket.getAssociatedPersonnelMarketStyle()).thenReturn(PersonnelMarketStyle.MEKHQ);
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(currentMarket);
         CampaignOptions source = new CampaignOptions();
         source.set(CampaignOption.PERSONNEL_MARKET_STYLE, PersonnelMarketStyle.MEKHQ);
         MarketsOptionsModel model = new MarketsOptionsModel(source);
@@ -91,6 +101,47 @@ class MarketsOptionsModelTest {
 
         verify(campaign).setNewPersonnelMarket(any(NewPersonnelMarket.class));
         assertEquals(PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED, source.get(CampaignOption.PERSONNEL_MARKET_STYLE));
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void applyToRepairsAMarketThatDoesNotMatchTheConfiguredStyle(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PERSONNEL_MARKET_STYLE, style);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        NewPersonnelMarket currentMarket = mock(NewPersonnelMarket.class);
+        PersonnelMarketStyle currentStyle = style == PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED ?
+                                                 PersonnelMarketStyle.MEKHQ :
+                                                 PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+        when(currentMarket.getAssociatedPersonnelMarketStyle()).thenReturn(currentStyle);
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(currentMarket);
+        MarketsOptionsModel model = new MarketsOptionsModel(options);
+
+        model.applyTo(campaign, options);
+
+        ArgumentCaptor<NewPersonnelMarket> replacementMarket = ArgumentCaptor.forClass(NewPersonnelMarket.class);
+        verify(campaign).setNewPersonnelMarket(replacementMarket.capture());
+        assertEquals(style, replacementMarket.getValue().getAssociatedPersonnelMarketStyle());
+        assertSame(campaign, replacementMarket.getValue().getCampaign());
+        assertEquals(style, options.get(CampaignOption.PERSONNEL_MARKET_STYLE));
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void applyToPreservesTheMarketWhenTheLiveStyleMatches(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.PERSONNEL_MARKET_STYLE, style);
+        NewPersonnelMarket currentMarket = mock(NewPersonnelMarket.class);
+        when(currentMarket.getAssociatedPersonnelMarketStyle()).thenReturn(style);
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(currentMarket);
+        MarketsOptionsModel model = new MarketsOptionsModel(options);
+
+        model.applyTo(campaign, options);
+
+        verify(campaign, never()).setNewPersonnelMarket(any(NewPersonnelMarket.class));
+        assertEquals(style, options.get(CampaignOption.PERSONNEL_MARKET_STYLE));
     }
 
     /**
