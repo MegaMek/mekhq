@@ -36,128 +36,112 @@ package mekhq.campaign.unit;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
-import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import megamek.common.units.Dropship;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * A large vessel's engineer is the crew member with the best Tech/Vessel skill, with rank breaking ties and as the
- * fallback when nobody has the skill. The chosen engineer is flagged as such, and the flag is cleared when they stop
- * being the engineer.
+ * A large vessel's engineer is the highest-ranked member of its vessel crew. The chosen engineer is flagged as such,
+ * so the daily maintenance check and the salvage, refit and TOE tech pickers recognise them, and the flag is cleared
+ * when they stop being the engineer.
  */
 class UnitVesselEngineerTest {
     private final Map<Person, Integer> ranks = new HashMap<>();
 
+    private Campaign campaign;
     private Unit unit;
 
     @BeforeEach
     void setUp() {
-        Campaign campaign = mockCampaign();
-        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 3, 5));
+        campaign = mockCampaign();
         unit = spy(new Unit(mock(Dropship.class), campaign));
+        doNothing().when(unit).resetPilotAndEntity();
     }
 
     @Test
-    void bestVesselTechIsEngineerEvenWhenOutranked() {
-        Person captain = crewMember(10, 3);
-        Person bestTech = crewMember(2, 7);
-        Person crewman = crewMember(1, 5);
+    void highestRankedVesselCrewIsEngineer() {
+        vesselCrew(1);
+        Person captain = vesselCrew(10);
+        vesselCrew(5);
 
-        Person engineer = resetEngineerWith(captain, bestTech, crewman);
+        unit.resetEngineer();
 
-        assertSame(bestTech, engineer);
+        assertSame(captain, unit.getEngineer());
     }
 
     @Test
-    void rankBreaksTiesBetweenEquallySkilledTechs() {
-        Person juniorTech = crewMember(2, 6);
-        Person seniorTech = crewMember(5, 6);
+    void engineerIsFlagged() {
+        Person captain = vesselCrew(10);
+        vesselCrew(1);
 
-        Person engineer = resetEngineerWith(juniorTech, seniorTech);
+        unit.resetEngineer();
 
-        assertSame(seniorTech, engineer);
+        verify(captain).setEngineer(true);
     }
 
     @Test
-    void highestRankIsEngineerWhenNobodyHasVesselTech() {
-        Person pilot = crewMember(8, null);
-        Person gunner = crewMember(3, null);
+    void engineerWhoLeavesTheShipIsNoLongerFlagged() {
+        // Otherwise, as an ordinary Tech elsewhere they would still be skipped for salvage and refits
+        Person captain = vesselCrew(10);
+        Person mate = vesselCrew(5);
+        unit.resetEngineer();
 
-        Person engineer = resetEngineerWith(gunner, pilot);
+        unit.remove(captain, false);
+        verify(captain).setEngineer(false);
 
-        assertSame(pilot, engineer);
+        unit.resetEngineer();
+        verify(mate).setEngineer(true);
+        assertSame(mate, unit.getEngineer());
     }
 
     @Test
-    void crewMemberWithoutVesselTechIsNotPickedOverOneWithIt() {
-        Person captain = crewMember(10, null);
-        Person crewman = crewMember(1, 0);
+    void engineerOutrankedByANewCrewMemberIsNoLongerFlagged() {
+        Person captain = vesselCrew(5);
+        unit.resetEngineer();
 
-        Person engineer = resetEngineerWith(captain, crewman);
+        Person commodore = vesselCrew(10);
+        unit.resetEngineer();
 
-        assertSame(crewman, engineer);
+        verify(captain).setEngineer(false);
+        verify(commodore).setEngineer(true);
+        assertSame(commodore, unit.getEngineer());
     }
 
     @Test
     void vesselWithNoCrewHasNoEngineer() {
-        assertNull(resetEngineerWith());
-    }
-
-    @Test
-    void engineerIsFlaggedAndFormerEngineerIsCleared() {
-        Person firstTech = crewMember(5, 7);
-        Person secondTech = crewMember(5, 4);
-        resetEngineerWith(firstTech, secondTech);
-        verify(firstTech).setEngineer(true);
-
-        resetEngineerWith(secondTech);
-
-        verify(firstTech).setEngineer(false);
-        verify(secondTech).setEngineer(true);
-    }
-
-    private Person resetEngineerWith(Person... crew) {
-        doReturn(List.of(crew)).when(unit).getVesselCrew();
         unit.resetEngineer();
-        return unit.getEngineer();
+
+        assertNull(unit.getEngineer());
     }
 
-    /**
-     * @param rank            the crew member's rank; a higher rank outranks a lower one
-     * @param vesselTechLevel the total Tech/Vessel skill level, or {@code null} if they do not have the skill
-     */
-    private Person crewMember(int rank, Integer vesselTechLevel) {
+    /** Adds a vessel crew member of the given rank; a higher rank outranks a lower one. */
+    private Person vesselCrew(int rank) {
+        UUID id = UUID.randomUUID();
         Person person = mock(Person.class);
+        when(person.getId()).thenReturn(id);
+        when(person.getUnit()).thenReturn(unit);
+        when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
         ranks.put(person, rank);
-        when(person.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenAnswer(invocation -> {
-            Person otherPerson = invocation.getArgument(3);
+        when(person.outRanksUsingSkillTiebreaker(any(Campaign.class), any())).thenAnswer(invocation -> {
+            Person otherPerson = invocation.getArgument(1);
             return (otherPerson == null) || (rank > ranks.get(otherPerson));
         });
 
-        if (vesselTechLevel != null) {
-            Skill vesselTechSkill = mock(Skill.class);
-            when(vesselTechSkill.getTotalSkillLevel(any())).thenReturn(vesselTechLevel);
-            when(person.getSkill(SkillType.S_TECH_VESSEL)).thenReturn(vesselTechSkill);
-        }
+        unit.addVesselCrew(person);
         return person;
     }
 }
