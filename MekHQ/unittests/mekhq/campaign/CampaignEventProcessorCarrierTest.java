@@ -32,23 +32,33 @@
  */
 package mekhq.campaign;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Pins the one event-routing rule the carrier reconciler depends on: a crew-assignment change must never be treated
@@ -97,6 +107,7 @@ class CampaignEventProcessorCarrierTest {
         when(campaign.getPlayerForce()).thenReturn(playerForce);
         when(playerForce.getSupportCommandFormation()).thenReturn(null);
         Person person = unseatedAdministrator();
+        onRoster(playerForce, person);
 
         new CampaignEventProcessor(campaign).handleSupportRoleChange(new PersonStatusChangedEvent(person));
 
@@ -111,11 +122,77 @@ class CampaignEventProcessorCarrierTest {
         when(campaign.getPlayerForce()).thenReturn(playerForce);
         when(playerForce.getSupportCommandFormation()).thenReturn(null);
         Person person = unseatedAdministrator();
+        onRoster(playerForce, person);
 
         new CampaignEventProcessor(campaign).handleSupportRoleChange(new PersonChangedEvent(person));
 
         // Same character, a genuine change event: the reconciler is consulted (and stops at "no support structure").
         verify(playerForce, times(1)).getSupportCommandFormation();
+    }
+
+    @Test
+    void newPersonFromAnotherCampaign_isIgnored() {
+        // While File, Load reads the next campaign, this campaign's handlers still hear every character it adds.
+        Campaign campaign = mock(Campaign.class);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHumanResources()).thenReturn(mock(ForceHumanResources.class));
+        Person stranger = unseatedAdministrator();
+
+        new CampaignEventProcessor(campaign).handleNewPersonForCarrier(new PersonNewEvent(stranger));
+        new CampaignEventProcessor(campaign).handleSupportRoleChange(new PersonChangedEvent(stranger));
+
+        verify(playerForce, never()).getSupportCommandFormation();
+    }
+
+    @Test
+    void crewChangeOnAnotherCampaignsUnit_isIgnored() {
+        Campaign campaign = mock(Campaign.class);
+        // The event's constructor reads the unit's formation from the campaign.
+        when(campaign.getPlayerForce()).thenReturn(mock(PlayerForce.class));
+        Unit strangersCarrier = mock(Unit.class);
+        when(strangersCarrier.isCarrier()).thenReturn(true);
+        when(strangersCarrier.getCrew()).thenReturn(java.util.List.of());
+        when(strangersCarrier.getId()).thenReturn(java.util.UUID.randomUUID());
+
+        new CampaignEventProcessor(campaign).handlePersonUnitAssignmentEvent(
+              new PersonCrewAssignmentEvent(campaign, unseatedAdministrator(), strangersCarrier));
+
+        // An empty carrier of ours would be removed; one from another campaign is not ours to remove.
+        verify(campaign, never()).removeUnit(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void loadingASecondCampaign_leavesItsStaffUnseated() {
+        // The real case: two campaigns, the open one organized into support teams, the other one being read in.
+        EquipmentType.initializeTypes();
+        SkillType.initializeTypes();
+        Campaign open = MHQTestUtilities.getTestCampaign();
+        open.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, true);
+        List<Person> openStaff = new ArrayList<>();
+        for (int index = 0; index < 4; index++) {
+            openStaff.add(open.getPlayerForce().getHumanResources()
+                                .newPerson(open, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
+        }
+        SupportPersonnelToTOE.organize(open, openStaff, false, open.getPlayerForce().getFaction());
+        Campaign loading = MHQTestUtilities.getTestCampaign();
+        Person newcomer = loading.getPlayerForce().getHumanResources()
+                                .newPerson(loading, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE);
+        loading.getPlayerForce().getHumanResources().recruitPerson(loading, newcomer, true, true);
+        assertNull(newcomer.getUnit(), "this test is only meaningful while the newcomer is unseated");
+
+        new CampaignEventProcessor(open).handleNewPersonForCarrier(new PersonNewEvent(newcomer));
+
+        assertNull(newcomer.getUnit(), "the open campaign must not seat the loading campaign's staff");
+    }
+
+    /** Puts {@code person} on the force's roster, as a character of this campaign is. */
+    private static void onRoster(PlayerForce playerForce, Person person) {
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        java.util.UUID id = java.util.UUID.randomUUID();
+        when(person.getId()).thenReturn(id);
+        when(humanResources.getPerson(id)).thenReturn(person);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
     }
 
     /** An active, free administrator holding no unit - exactly what a GM removal looks like mid-flight. */

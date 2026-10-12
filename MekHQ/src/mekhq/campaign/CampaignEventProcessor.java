@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -93,7 +94,39 @@ public record CampaignEventProcessor(Campaign campaign) {
      */
     @Subscribe
     public void handleNewPersonForCarrier(PersonNewEvent personNewEvent) {
-        SupportCarrierReconciler.seatIfEligible(campaign(), personNewEvent.getPerson());
+        Person person = personNewEvent.getPerson();
+        if (!isOwnPerson(person)) {
+            return;
+        }
+        SupportCarrierReconciler.seatIfEligible(campaign(), person);
+    }
+
+    /**
+     * Whether a character belongs to this processor's campaign.
+     *
+     * <p>Events are not addressed to a campaign. While File, Load reads the next campaign, this campaign's handlers are
+     * still registered and hear every character the loader adds. Without this check, the open campaign seated the
+     * loading campaign's support staff in squads of its own, and the loaded campaign was saved with 154 people
+     * pointing at squads that existed only in the other one.</p>
+     *
+     * @param person the character an event is about
+     *
+     * @return {@code true} when this campaign holds that very character
+     */
+    private boolean isOwnPerson(@Nullable Person person) {
+        return (person != null)
+                     && (campaign().getPlayerForce().getHumanResources().getPerson(person.getId()) == person);
+    }
+
+    /**
+     * Whether a unit belongs to this processor's campaign. See {@link #isOwnPerson}.
+     *
+     * @param unit the unit an event is about
+     *
+     * @return {@code true} when this campaign holds that very unit
+     */
+    private boolean isOwnUnit(@Nullable Unit unit) {
+        return (unit != null) && (campaign().getUnit(unit.getId()) == unit);
     }
 
     /**
@@ -122,6 +155,9 @@ public record CampaignEventProcessor(Campaign campaign) {
             return;
         }
         Person person = personChangedEvent.getPerson();
+        if (!isOwnPerson(person)) {
+            return;
+        }
         SupportCarrierReconciler.releaseIfIneligible(campaign(), person);
         SupportCarrierReconciler.seatIfEligible(campaign(), person);
     }
@@ -146,8 +182,11 @@ public record CampaignEventProcessor(Campaign campaign) {
     public void handlePersonUnitAssignmentEvent(PersonCrewAssignmentEvent personCrewAssignmentEvent) {
         Unit unit = personCrewAssignmentEvent.getUnit();
         // Seating a character fires this event back into us. Safe because the reconciler only ever deletes a carrier
-        // that has reached zero crew, and seating moves crew the other way.
-        SupportCarrierReconciler.onCarrierCrewChanged(campaign(), unit);
+        // that has reached zero crew, and seating moves crew the other way. A unit from a campaign being loaded is not
+        // ours to tidy.
+        if (isOwnUnit(unit)) {
+            SupportCarrierReconciler.onCarrierCrewChanged(campaign(), unit);
+        }
 
         // If this unit has no commander, clear out any temporary crew assignments
         if (unit != null && !unit.hasCommander() && unit.getTotalTempCrew() > 0) {
