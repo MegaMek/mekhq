@@ -146,6 +146,67 @@ public class AbstractLocationTest {
         assertSame(planet, location.getPlanet());
     }
 
+    @Test
+    void refreshPlanetarySystems_rebindsTheSpecificWorldWithoutChangingTheLocation() {
+        Campaign campaign = mockCampaign();
+        Planet originalWorld = new Planet("secondary-world");
+        Planet updatedWorld = new Planet("secondary-world");
+        PlanetarySystem updatedSystem = mock(PlanetarySystem.class);
+        when(system.getId()).thenReturn("system");
+        when(campaign.getSystemById("system")).thenReturn(updatedSystem);
+        when(updatedSystem.getPlanetById("secondary-world")).thenReturn(updatedWorld);
+        location.setCurrentPlanet(originalWorld);
+        var locationNode = location.getLocationNode();
+
+        location.refreshPlanetarySystems(campaign);
+
+        assertSame(updatedSystem, location.getCurrentSystem());
+        assertSame(updatedWorld, location.getCurrentPlanetDirect());
+        assertSame(updatedWorld, location.getPlanet());
+        assertSame(locationNode, location.getLocationNode());
+    }
+
+    @Test
+    void refreshPlanetarySystems_preservesAnUnspecifiedWorld() {
+        Campaign campaign = mockCampaign();
+        Planet primaryWorld = new Planet("primary-world");
+        PlanetarySystem updatedSystem = mock(PlanetarySystem.class);
+        when(system.getId()).thenReturn("system");
+        when(campaign.getSystemById("system")).thenReturn(updatedSystem);
+        when(updatedSystem.getPrimaryPlanet()).thenReturn(primaryWorld);
+
+        location.refreshPlanetarySystems(campaign);
+
+        assertNull(location.getCurrentPlanetDirect());
+        assertSame(primaryWorld, location.getPlanet());
+    }
+
+    @Test
+    void refreshPlanetarySystems_fallsBackToPrimaryWhenTheSpecificWorldWasRemoved() {
+        Campaign campaign = mockCampaign();
+        PlanetarySystem updatedSystem = mock(PlanetarySystem.class);
+        Planet primaryWorld = new Planet("primary-world");
+        when(system.getId()).thenReturn("system");
+        when(campaign.getSystemById("system")).thenReturn(updatedSystem);
+        when(updatedSystem.getPrimaryPlanet()).thenReturn(primaryWorld);
+        location.setCurrentPlanet(new Planet("removed-world"));
+
+        location.refreshPlanetarySystems(campaign);
+
+        assertNull(location.getCurrentPlanetDirect());
+        assertSame(primaryWorld, location.getPlanet());
+    }
+
+    @Test
+    void refreshPlanetarySystems_retainsAnUnresolvableSystem() {
+        location.setCurrentPlanet(new Planet("world"));
+
+        location.refreshPlanetarySystems(mockCampaign());
+
+        assertSame(system, location.getCurrentSystem());
+        assertEquals("world", location.getPlanet().getId());
+    }
+
     /** Tests for {@link AbstractLocation#applyRechargeForHours(Campaign, java.time.LocalDate, boolean, double, boolean)}. */
     @Nested
     class ApplyRechargeForHours {
