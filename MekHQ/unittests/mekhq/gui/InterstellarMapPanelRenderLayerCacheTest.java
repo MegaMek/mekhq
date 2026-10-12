@@ -48,6 +48,9 @@ import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -657,6 +660,143 @@ class InterstellarMapPanelRenderLayerCacheTest {
               5120 + (fiveKMargin * 2), 2880 + (fiveKMargin * 2)));
           assertEquals(0, InterstellarMapPanel.renderLayerOverscan(8192, 8192));
         }
+
+    @Test
+    void hiDpiRetainedLayerMatchesDirectRenderingWithoutResampling() {
+        double pixelScale = 1.75;
+        InterstellarMapPanel.PannableRenderLayerCache<String> cache =
+              new InterstellarMapPanel.PannableRenderLayerCache<>();
+        InterstellarMapPanel.RenderViewKey view = InterstellarMapPanel.RenderViewKey.create(
+              40, 30, 0.0, 0.0, 1.0, pixelScale);
+
+        InterstellarMapPanel.PannableRenderLayer layer = cache.getOrRender("stars", view, 8,
+              InterstellarMapPanelRenderLayerCacheTest::drawStarMarker);
+        BufferedImage cached = new BufferedImage(70, 53, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D cachedGraphics = cached.createGraphics();
+        cachedGraphics.scale(pixelScale, pixelScale);
+        InterstellarMapPanel.drawPannableRenderLayer(cachedGraphics, layer, 40, 30, 1.0);
+        cachedGraphics.dispose();
+        BufferedImage direct = new BufferedImage(70, 53, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D directGraphics = direct.createGraphics();
+        directGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        directGraphics.scale(pixelScale, pixelScale);
+        drawStarMarker(directGraphics);
+        directGraphics.dispose();
+
+        assertEquals(70 + (2 * 14), layer.image().getWidth());
+        assertEquals(53 + (2 * 14), layer.image().getHeight());
+        assertPremultipliedImagesEquivalent(direct, cached);
+    }
+
+    @Test
+    void snappedHiDpiPansReuseRetainedRasterInWholeDevicePixels() {
+        double pixelScale = 1.75;
+        double devicePixelsPerMapUnit = 2.0 * pixelScale;
+        InterstellarMapPanel.PannableRenderLayerCache<String> cache =
+              new InterstellarMapPanel.PannableRenderLayerCache<>();
+        AtomicInteger rendererCalls = new AtomicInteger();
+        cache.getOrRender("territory", hiDpiView(0.0, devicePixelsPerMapUnit, pixelScale), 20,
+              graphics -> rendererCalls.incrementAndGet());
+
+        InterstellarMapPanel.PannableRenderLayer panned = cache.getOrRender("territory",
+              hiDpiView(1.0 / 2.0, devicePixelsPerMapUnit, pixelScale), 20,
+              graphics -> rendererCalls.incrementAndGet());
+
+        assertEquals(1, rendererCalls.get());
+        assertEquals(1, cache.getReuseCount());
+        assertEquals(2 - 35, panned.drawX());
+        assertEquals(pixelScale, panned.pixelScale());
+    }
+
+    @Test
+    void hiDpiCacheEntriesDoNotReuseRastersFromOtherDisplayScales() {
+        InterstellarMapPanel.PannableRenderLayerCache<String> cache =
+              new InterstellarMapPanel.PannableRenderLayerCache<>();
+        AtomicInteger rendererCalls = new AtomicInteger();
+        cache.getOrRender("territory", InterstellarMapPanel.RenderViewKey.create(40, 30, 0.0, 0.0, 1.0, 1.0),
+              8, graphics -> rendererCalls.incrementAndGet());
+
+        InterstellarMapPanel.PannableRenderLayer scaled = cache.getOrRender("territory",
+              InterstellarMapPanel.RenderViewKey.create(40, 30, 0.0, 0.0, 1.0, 2.0), 8,
+              graphics -> rendererCalls.incrementAndGet());
+
+        assertEquals(2, rendererCalls.get());
+        assertEquals(80 + (2 * 16), scaled.image().getWidth());
+    }
+
+    @Test
+    void snapToDevicePixelMakesCameraDeltasIntegralAndIsIdempotent() {
+        double devicePixelsPerMapUnit = 3.0 * 1.75;
+        double first = InterstellarMapPanel.snapToDevicePixel(12.3456, devicePixelsPerMapUnit);
+        double second = InterstellarMapPanel.snapToDevicePixel(12.3456 + (5.0 / 3.0), devicePixelsPerMapUnit);
+        double delta = (second - first) * devicePixelsPerMapUnit;
+
+        assertEquals(Math.rint(delta), delta, 0.000_001);
+        assertEquals(first, InterstellarMapPanel.snapToDevicePixel(first, devicePixelsPerMapUnit));
+        assertEquals(4.2, InterstellarMapPanel.snapToDevicePixel(4.2, 0.0));
+    }
+
+    @Test
+    void hiDpiOverscanFitsPhysicalPixelBudget() {
+        double pixelScale = 1.75;
+        int overscan = InterstellarMapPanel.renderLayerOverscan(1463, 914, pixelScale);
+        int cartographyOverscan = InterstellarMapPanel.retainedCartographyOverscan(1463, 914, pixelScale);
+
+        assertTrue(overscan > 0);
+        assertTrue(cartographyOverscan >= overscan);
+        for (int logical : new int[] { overscan, cartographyOverscan }) {
+            int device = InterstellarMapPanel.deviceOverscan(logical, pixelScale);
+            assertTrue(InterstellarMapPanel.canCacheRenderLayer(
+                  InterstellarMapPanel.deviceExtent(1463, pixelScale) + (device * 2),
+                  InterstellarMapPanel.deviceExtent(914, pixelScale) + (device * 2)));
+        }
+    }
+
+    @Test
+    void hiDpiSnapshotTransformMapsDevicePixelsToLogicalCoordinates() {
+        InterstellarMapPanel.RenderViewKey renderedView =
+              InterstellarMapPanel.RenderViewKey.create(100, 80, 10.0, -5.0, 2.0, 2.0);
+        InterstellarMapPanel.RenderViewKey requestedView =
+              InterstellarMapPanel.RenderViewKey.create(100, 80, 20.0, 0.0, 4.0, 2.0);
+        BufferedImage image = new BufferedImage(280, 240, BufferedImage.TYPE_INT_ARGB_PRE);
+        InterstellarMapPanel.PannableRenderLayerSnapshot<String> snapshot =
+              new InterstellarMapPanel.PannableRenderLayerSnapshot<>("territory", renderedView, image, 40);
+
+        Point2D transformed = InterstellarMapPanel.transformPannableSnapshot(snapshot, requestedView)
+              .transform(new Point2D.Double(180.0, 100.0), null);
+
+        assertEquals(130.0, transformed.getX());
+        assertEquals(40.0, transformed.getY());
+    }
+
+    @Test
+    void alignToDevicePixelsRoundsOnlyTheOriginForUniformScales() {
+        BufferedImage target = new BufferedImage(4, 4, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = target.createGraphics();
+        graphics.setTransform(new AffineTransform(1.75, 0.0, 0.0, 1.75, 12.25, 7.75));
+
+        double pixelScale = InterstellarMapPanel.alignToDevicePixels(graphics);
+
+        assertEquals(1.75, pixelScale);
+        assertEquals(new AffineTransform(1.75, 0.0, 0.0, 1.75, 12.0, 8.0), graphics.getTransform());
+        graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 2.0, 0.5, 0.5));
+        assertEquals(1.0, InterstellarMapPanel.alignToDevicePixels(graphics));
+        graphics.dispose();
+    }
+
+    private static InterstellarMapPanel.RenderViewKey hiDpiView(double centerX, double devicePixelsPerMapUnit,
+          double pixelScale) {
+        return InterstellarMapPanel.RenderViewKey.create(100, 80,
+              InterstellarMapPanel.snapToDevicePixel(centerX + 0.07, devicePixelsPerMapUnit), 0.0, 2.0, pixelScale);
+    }
+
+    private static void drawStarMarker(Graphics2D graphics) {
+        graphics.setStroke(new java.awt.BasicStroke(2.3f));
+        graphics.setColor(new Color(60, 180, 160));
+        graphics.draw(new Ellipse2D.Double(8.0, 3.0, 24.0, 24.0));
+        graphics.setColor(new Color(255, 200, 140));
+        graphics.fill(new Ellipse2D.Double(16.0, 11.0, 8.0, 8.0));
+    }
 
     @Test
     void retainedCartographyUsesLargerOverscanWithinPixelBudget() {
