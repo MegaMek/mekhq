@@ -322,6 +322,12 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "capTotalSpas");
     public static final CampaignOption<Boolean> SKILL_IMPROVEMENTS_COST_C_BILLS =
           of(Boolean.class, false, "skillImprovementsCostCBills");
+    public static final CampaignOption<Double> PROFESSION_SKILL_TRAINING_COST_MULTIPLIER =
+          of(Double.class, 1.0, "professionSkillTrainingCostMultiplier");
+    public static final CampaignOption<Double> UTILITY_SKILL_TRAINING_COST_MULTIPLIER =
+          of(Double.class, 1.0, "utilitySkillTrainingCostMultiplier");
+    public static final CampaignOption<Double> ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER =
+          of(Double.class, 0.0, "roleplaySkillTrainingCostMultiplier");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_VEHICLES =
           of(Boolean.class, false, "onlyCommandersMatterVehicles");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_INFANTRY =
@@ -805,6 +811,12 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForRecruitment");
     public static final CampaignOption<Double> RECRUITMENT_TRAINING_COST_MULTIPLIER =
           of(Double.class, 1.5, "recruitmentTrainingCostMultiplier");
+    public static final CampaignOption<Double> RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER =
+          of(Double.class, 1.5, "recruitmentProfessionSkillCostMultiplier");
+    public static final CampaignOption<Double> RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER =
+          of(Double.class, 1.0, "recruitmentUtilitySkillCostMultiplier");
+    public static final CampaignOption<Double> RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER =
+          of(Double.class, 0.0, "recruitmentRoleplaySkillCostMultiplier");
     public static final CampaignOption<Boolean> PAY_FOR_FOOD =
           of(Boolean.class, false, "payForFood");
     public static final CampaignOption<Boolean> PAY_FOR_HOUSING =

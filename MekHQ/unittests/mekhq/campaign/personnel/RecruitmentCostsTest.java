@@ -40,10 +40,14 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillTrainingCategory;
 import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.utilities.spaUtilities.SpaUtilities;
 import org.junit.jupiter.api.AfterEach;
@@ -55,10 +59,16 @@ import org.mockito.MockedStatic;
 
 /**
  * Tests {@link RecruitmentCosts}: recruits normally cost two months' salary, but when recruitment is paid for and skill
- * or SPA training costs C-bills they cost what their training would have, times a multiplier.
+ * or SPA training costs C-bills they cost what their training would have, with each skill category and SPAs scaled by
+ * their own multiplier.
  */
 class RecruitmentCostsTest {
     private static final Money SALARY = Money.of(10_000);
+    private static final Money PROFESSION_TRAINING = Money.of(2_000_000);
+    private static final Money UTILITY_TRAINING = Money.of(1_000_000);
+    private static final Money ROLEPLAY_TRAINING = Money.of(800_000);
+    private static final Money OTHER_TRAINING = Money.of(1_000_000);
+    /** Every skill but Roleplay, which recruitment leaves out by default */
     private static final Money SKILL_TRAINING = Money.of(4_000_000);
     private static final Money SPA_TRAINING = Money.of(2_400_000);
 
@@ -81,8 +91,9 @@ class RecruitmentCostsTest {
         when(person.getSalary(any(CampaignOptions.class), anyBoolean(), any())).thenReturn(SALARY);
 
         skillTrainingCosts = mockStatic(SkillTrainingCosts.class);
-        skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCost(any(), any()))
-              .thenReturn(SKILL_TRAINING);
+        skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCosts(any(), any()))
+              .thenReturn(skillTrainingByCategory(PROFESSION_TRAINING, UTILITY_TRAINING, ROLEPLAY_TRAINING,
+                    OTHER_TRAINING));
         spaUtilities = mockStatic(SpaUtilities.class);
         spaUtilities.when(() -> SpaUtilities.getAccumulatedSpaTrainingCost(any())).thenReturn(SPA_TRAINING);
     }
@@ -93,9 +104,24 @@ class RecruitmentCostsTest {
         skillTrainingCosts.close();
     }
 
+    private static Map<SkillTrainingCategory, Money> skillTrainingByCategory(Money profession, Money utility,
+          Money roleplay, Money other) {
+        Map<SkillTrainingCategory, Money> costs = new EnumMap<>(SkillTrainingCategory.class);
+        costs.put(SkillTrainingCategory.PROFESSION, profession);
+        costs.put(SkillTrainingCategory.UTILITY, utility);
+        costs.put(SkillTrainingCategory.ROLEPLAY, roleplay);
+        costs.put(SkillTrainingCategory.OTHER, other);
+        return costs;
+    }
+
     @Test
-    void multiplierDefaultsToOneAndAHalf() {
-        assertEquals(1.5, (double) new CampaignOptions().get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER));
+    void multipliersDefaultToOneAndAHalfWithRoleplayLeftOut() {
+        CampaignOptions defaultOptions = new CampaignOptions();
+
+        assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER));
+        assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER));
+        assertEquals(1.5, (double) defaultOptions.get(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER));
+        assertEquals(0.0, (double) defaultOptions.get(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER));
     }
 
     @ParameterizedTest
@@ -138,14 +164,52 @@ class RecruitmentCostsTest {
         assertEquals(Money.of(9_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
+    /** Profession and Utility skills (3,000,000 x 1.5) are unaffected; other skills and SPAs scale. */
     @ParameterizedTest
-    @CsvSource({ "0.0, 0", "1.0, 6400000", "2.5, 16000000" })
-    void multiplierScalesTheTrainingCost(double multiplier, long expected) {
+    @CsvSource({ "0.0, 4500000", "1.0, 7900000", "2.5, 13000000" })
+    void otherSkillsAndSpasMultiplierScalesOnlyOtherSkillsAndSpas(double multiplier, long expected) {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER, multiplier);
 
         assertEquals(Money.of(expected), RecruitmentCosts.getRecruitmentCost(campaign, person));
+    }
+
+    @Test
+    void professionMultiplierScalesOnlyProfessionSkills() {
+        campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
+        campaignOptions.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER, 3.0);
+
+        // 2,000,000 x 3 + (1,000,000 + 1,000,000) x 1.5
+        assertEquals(Money.of(9_000_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+    }
+
+    @Test
+    void utilityMultiplierScalesOnlyUtilitySkills() {
+        campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
+        campaignOptions.set(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER, 3.0);
+
+        // 1,000,000 x 3 + (2,000,000 + 1,000,000) x 1.5
+        assertEquals(Money.of(7_500_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+    }
+
+    @Test
+    void roleplayMultiplierAddsRoleplaySkills() {
+        campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
+        campaignOptions.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, 2.0);
+
+        // 4,000,000 x 1.5 + 800,000 x 2
+        assertEquals(Money.of(7_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+    }
+
+    @Test
+    void skillMultipliersDoNotAffectSpas() {
+        campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
+        campaignOptions.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER, 5.0);
+        campaignOptions.set(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER, 5.0);
+        campaignOptions.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, 5.0);
+
+        assertEquals(SPA_TRAINING.multipliedBy(1.5), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     /** Salary plays no part in the training-based cost. */
@@ -165,8 +229,8 @@ class RecruitmentCostsTest {
     void untrainedRecruitsAreFree() {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
-        skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCost(any(), any()))
-              .thenReturn(Money.zero());
+        skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCosts(any(), any()))
+              .thenReturn(skillTrainingByCategory(Money.zero(), Money.zero(), Money.zero(), Money.zero()));
         spaUtilities.when(() -> SpaUtilities.getAccumulatedSpaTrainingCost(any())).thenReturn(Money.zero());
 
         assertEquals(Money.zero(), RecruitmentCosts.getRecruitmentCost(campaign, person));
