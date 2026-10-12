@@ -106,6 +106,7 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.baseComponents.tables.MHQTableModel;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -1315,7 +1316,8 @@ public class Utilities {
     }
 
     /**
-     * Export a JTable to a CSV file
+     * Exports a JTable to a CSV file, using column text converters for {@link MHQTableModel} cells. HTML line breaks
+     * become newlines within CSV fields, and other HTML tags are removed.
      *
      * @param table the table to save to csv
      * @param file  the file to save to
@@ -1336,8 +1338,15 @@ public class Utilities {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
                     Object value = model.getValueAt(i, j);
-                    // use regex to remove any HTML tags
-                    toWrite[j] = (value != null) ? value.toString().replaceAll("<[^>]*>", "") : "";
+                    String text = null;
+                    if (value != null) {
+                        text = model instanceof MHQTableModel<?, ?> mhqTableModel
+                                     ? mhqTableModel.getAllColumns().get(j).getText(value)
+                                     : value.toString();
+                    }
+                    toWrite[j] = (text != null)
+                                       ? ReportingUtilities.stripHtmlTags(text.replaceAll("(?i)<br\\s*/?>", "\n"))
+                                       : "";
                 }
                 csvPrinter.printRecord(toWrite);
             }

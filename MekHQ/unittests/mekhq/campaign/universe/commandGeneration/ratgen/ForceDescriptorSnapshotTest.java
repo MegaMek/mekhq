@@ -33,13 +33,17 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.InfantryClass;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;
 
@@ -88,5 +92,54 @@ class ForceDescriptorSnapshotTest {
         assertEquals(defaults.getDropshipPct(), snapshot.getDropshipPct());
         assertEquals("FS", snapshot.getFaction(), "the settings around the bad ones still load");
         assertEquals("A", snapshot.getRating());
+    }
+
+    @Test
+    void infantryClassIsCopiedFromThePanelAndSurvivesSaveAndLoad() throws Exception {
+        ForceDescriptor forceDescriptor = new ForceDescriptor();
+        forceDescriptor.setInfantryClass(InfantryClass.MECHANIZED);
+        ForceDescriptorSnapshot snapshot = new ForceDescriptorSnapshot();
+        snapshot.populateFromForceDescriptor(forceDescriptor);
+
+        ForceDescriptorSnapshot reloaded = ForceDescriptorSnapshot.parseFromXML(parse(writeToString(snapshot)));
+
+        assertEquals(InfantryClass.MECHANIZED, snapshot.getInfantryClass());
+        assertEquals(InfantryClass.MECHANIZED, reloaded.getInfantryClass(), "the class is saved with the preset");
+        assertEquals(snapshot, reloaded);
+    }
+
+    @Test
+    void anUnknownInfantryClassLeavesItUnset() throws Exception {
+        String xml = "<forceDescriptorSnapshot><faction>FS</faction><infantryClass>HOVERCRAFT</infantryClass>"
+              + "</forceDescriptorSnapshot>";
+
+        ForceDescriptorSnapshot snapshot = ForceDescriptorSnapshot.parseFromXML(parse(xml));
+
+        assertNull(snapshot.getInfantryClass());
+        assertEquals("FS", snapshot.getFaction());
+    }
+
+    @Test
+    void changingTheInfantryClassCountsAsChangedSettings() {
+        ForceDescriptorSnapshot jump = new ForceDescriptorSnapshot();
+        jump.setInfantryClass(InfantryClass.JUMP);
+        ForceDescriptorSnapshot unrestricted = new ForceDescriptorSnapshot();
+
+        assertNotEquals(jump, unrestricted);
+    }
+
+    private static String writeToString(ForceDescriptorSnapshot snapshot) {
+        StringWriter writer = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(writer)) {
+            snapshot.writeToXML(printWriter, 0);
+        }
+        return writer.toString();
+    }
+
+    private static Element parse(String xml) throws Exception {
+        return DocumentBuilderFactory.newInstance()
+              .newDocumentBuilder()
+              .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
+              .getDocumentElement();
     }
 }

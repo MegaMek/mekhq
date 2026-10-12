@@ -1707,8 +1707,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
 
         try {
+            campaign.putPlanetarySystemOverrides(systemsToSave);
             for (PlanetarySystem system : systemsToSave) {
-                campaign.putPlanetarySystemOverride(system);
                 markSystemSaved(system);
             }
             updateSelectedSystem();

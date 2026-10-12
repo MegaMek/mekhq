@@ -41,8 +41,11 @@ import java.util.Set;
 import java.util.function.Function;
 
 import megamek.client.ratgenerator.MissionRole;
+import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.SupportVehicleSelector.Candidate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,6 +70,11 @@ class SupportVehicleSelectorTest {
     /** The same vehicle, but as a trailer: no engine of its own, so it needs a tractor to go anywhere. */
     private static Candidate trailer(double cargoTons, int mashTheatres, int fieldKitchens) {
         return new Candidate("test trailer", null, cargoTons, mashTheatres, fieldKitchens, true);
+    }
+
+    @BeforeAll
+    static void initializeTypes() {
+        EquipmentType.initializeTypes();
     }
 
     /** The real role lookup, put back after each test that stands in for the force generator. */
@@ -118,6 +126,20 @@ class SupportVehicleSelectorTest {
         everyVehicleHasRoles();
         assertNull(SupportVehicleSelector.classify(vehicle(FLATBED_TRUCK_CARGO, 0, 0)),
               "a combat vehicle with a cargo bay but no support role is part of the fighting force");
+    }
+
+    @Test
+    @DisplayName("Only an owned ground vehicle is counted: a Mek with the recovery role is not a recovery vehicle")
+    void onlyGroundVehiclesAreRecognised() {
+        // Rolled vehicles come from the TANK table, so owned ones must be judged the same way. Before, a cargo-role
+        // DropShip or a Mek carrying a MASH theatre counted as a support vehicle and cut what was built.
+        everyVehicleHasRoles(MissionRole.RECOVERY);
+
+        assertEquals(SupportCapability.SALVAGE,
+              SupportVehicleSelector.capabilityOf(UnitTestUtilities.getHeavyTrackedApcStandard()),
+              "a tracked vehicle with the recovery role is a recovery vehicle");
+        assertNull(SupportVehicleSelector.capabilityOf(UnitTestUtilities.getLocustLCT1V()),
+              "a Mek is never counted as a support vehicle, whatever role the generator gives it");
     }
 
     @Test
