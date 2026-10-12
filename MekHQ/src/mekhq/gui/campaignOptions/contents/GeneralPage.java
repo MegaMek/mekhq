@@ -56,6 +56,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsIconLegend;
+import megamek.client.ui.settings.SettingsIntroPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.icons.Camouflage;
@@ -71,11 +74,8 @@ import mekhq.campaign.universe.StartingLocationChoice;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
-import megamek.client.ui.settings.SettingsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
-import megamek.client.ui.settings.SettingsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
@@ -289,6 +289,7 @@ public class GeneralPage {
 
         updateStartingLocationVisibility();
 
+        // This landing page always starts expanded, regardless of the client preference.
         return CampaignOptionsPagePanel.builder("GeneralPage", "General", "data/images/misc/MekHQ.png")
               .headerImageSize(GENERAL_HEADER_IMAGE_SIZE)
               .tintHeaderImage(false)

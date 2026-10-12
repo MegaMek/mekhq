@@ -70,6 +70,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JTextField fieldDisplayDateFormat;
     private JTextField fieldLongDisplayDateFormat;
     private JSlider guiScaleSlider;
+    private SettingsCheckBox chkExpandOptionSections;
     private SettingsCheckBox chkHideUnitFluff;
     private SettingsCheckBox chkUseAlternateStratConFogOfWar;
     private SettingsCheckBox chkHistoricalDailyLog;
@@ -185,13 +186,15 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
         chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac,
               getMetadata(new Version(0, 51, 1)));
+        chkExpandOptionSections = checkBox("chkExpandOptionSections", model.expandOptionSections);
         panel.addCheckBoxGrid(2,
               chkHideUnitFluff,
               chkUseAlternateStratConFogOfWar,
               chkHistoricalDailyLog,
               chkShowCommandGenerator,
               chkShowUnitPicturesOnTOE,
-              chkShowWarriorsAlmanac);
+              chkShowWarriorsAlmanac,
+              chkExpandOptionSections);
 
         return panel;
     }
@@ -416,6 +419,7 @@ class MHQDisplayPage extends MHQOptionsPage {
             model.longDisplayDateFormat = fieldLongDisplayDateFormat.getText();
         }
         model.guiScaleValue = guiScaleSlider.getValue();
+        model.expandOptionSections = chkExpandOptionSections.isSelected();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
         model.useAlternateStratConFogOfWarDisplay = chkUseAlternateStratConFogOfWar.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();

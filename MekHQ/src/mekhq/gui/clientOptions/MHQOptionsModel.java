@@ -50,7 +50,7 @@ import mekhq.gui.enums.PersonnelFilterStyle;
  * Plain data-transfer object holding an editable snapshot of every MekHQ client option shown by {@link MHQOptionsPane},
  * mirroring the model pattern the Campaign Options dialog uses (for example
  * {@link mekhq.gui.campaignOptions.contents.PersonnelOptionsModel}). The constructor reads the current values from
- * {@link MHQOptions} (and the two stores that back options which do not live on {@code MHQOptions} - the GUI scale in
+ * {@link MHQOptions} (and the two stores that back options which do not live on {@code MHQOptions} - UI preferences in
  * {@link GUIPreferences} and the user directory in {@link PreferenceManager}); {@link #applyTo(MHQOptions)} writes the
  * edited values back to those same stores.
  *
@@ -111,6 +111,7 @@ class MHQOptionsModel {
     String displayDateFormat;
     String longDisplayDateFormat;
     int guiScaleValue;
+    boolean expandOptionSections;
     boolean hideUnitFluff;
     boolean useAlternateStratConFogOfWarDisplay;
     boolean historicalDailyLog;
@@ -228,6 +229,7 @@ class MHQOptionsModel {
         displayDateFormat = options.getDisplayDateFormat();
         longDisplayDateFormat = options.getLongDisplayDateFormat();
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
+        expandOptionSections = GUIPreferences.getInstance().getExpandOptionSections();
         hideUnitFluff = options.getHideUnitFluff();
         useAlternateStratConFogOfWarDisplay = options.getUseAlternateStratConFogOfWarDisplay();
         historicalDailyLog = options.getHistoricalDailyLog();
@@ -414,6 +416,7 @@ class MHQOptionsModel {
         // Display - General
         options.setDisplayDateFormat(displayDateFormat);
         options.setLongDisplayDateFormat(longDisplayDateFormat);
+        GUIPreferences.getInstance().setExpandOptionSections(expandOptionSections);
         // Compare on the integer scale (the slider's units) so floating-point noise in the stored scale cannot trigger
         // a spurious rescale; the look-and-feel is only refreshed when the value actually changed.
         if ((int) (GUIPreferences.getInstance().getGUIScale() * 10) != guiScaleValue) {
