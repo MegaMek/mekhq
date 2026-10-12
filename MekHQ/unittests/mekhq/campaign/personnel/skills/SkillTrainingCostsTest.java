@@ -158,6 +158,8 @@ class SkillTrainingCostsTest {
         @Test
         void roleplaySkillsUseTheProfessionTableOutsideTheRole() {
             when(skillType.isRoleplaySkill()).thenReturn(true);
+            // Roleplay skills are free by default
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
 
             assertEquals(supportPoints(200), cost(personWithSkillAt(3), false));
         }
@@ -200,9 +202,9 @@ class SkillTrainingCostsTest {
         @Test
         void roleplayMultiplierScalesRoleplaySkills() {
             when(skillType.isRoleplaySkill()).thenReturn(true);
-            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
 
-            assertEquals(Money.zero(), cost(personWithSkillAt(3), false));
+            assertEquals(supportPoints(100), cost(personWithSkillAt(3), false));
         }
 
         /** A Utility skill belonging to the person's role is priced as a profession skill. */
