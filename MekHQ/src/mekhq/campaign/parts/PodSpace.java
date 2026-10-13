@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +45,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
@@ -57,7 +59,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used to group them together
@@ -66,6 +71,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Neoancient
  */
 public class PodSpace implements IPartWork {
+    private static final MMLogger LOGGER = MMLogger.create(PodSpace.class);
+
     protected Campaign campaign;
     protected Unit unit;
     protected int location;
@@ -78,6 +85,9 @@ public class PodSpace implements IPartWork {
     protected int shorthandedMod = 0;
 
     protected boolean repairInPlace = false;
+
+    /** The tech a saved job named, until {@link #fixReferences(Campaign)} finds them in the loaded campaign. */
+    private UUID savedTechId;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public PodSpace() {
@@ -132,6 +142,93 @@ public class PodSpace implements IPartWork {
     @Override
     public void updateConditionFromPart() {
         //nothing to do here
+    }
+
+    /**
+     * @return {@code true} if this pod space holds anything a save has to keep: a tech on the job, time already spent
+     *       on it, or the repair-in-place choice made for it
+     */
+    public boolean hasWorkInProgress() {
+        return (tech != null) || (timeSpent > 0) || repairInPlace;
+    }
+
+    /**
+     * Takes over the job from an earlier copy of this pod space. A unit's pod spaces are built again whenever its parts
+     * are, which includes every load, so the job in progress is handed from the old copy to the new one.
+     *
+     * @param earlier the pod space for the same location before the rebuild, or a job read from a save
+     */
+    public void continueWorkFrom(PodSpace earlier) {
+        tech = earlier.tech;
+        timeSpent = earlier.timeSpent;
+        workingOvertime = earlier.workingOvertime;
+        shorthandedMod = earlier.shorthandedMod;
+        repairInPlace = earlier.repairInPlace;
+    }
+
+    /**
+     * Saves the job in progress on this pod space. Only called for a pod space that {@link #hasWorkInProgress()}.
+     */
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "podSpace");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "location", location);
+        if (tech != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "workingOvertime", workingOvertime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "repairInPlace", repairInPlace);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "podSpace");
+    }
+
+    /**
+     * Reads a saved job. The result only carries the job: the unit's real pod spaces are built when its parts are
+     * initialized, and take the job over with {@link #continueWorkFrom(PodSpace)}.
+     *
+     * @return the saved job, or {@code null} if it could not be read, in which case the unit loads without it
+     */
+    public static @Nullable PodSpace generateInstanceFromXML(Node podSpaceNode, Unit unit) {
+        PodSpace savedJob = new PodSpace(Entity.LOC_NONE, null);
+        savedJob.unit = unit;
+        NodeList childNodes = podSpaceNode.getChildNodes();
+        try {
+            for (int index = 0; index < childNodes.getLength(); index++) {
+                Node childNode = childNodes.item(index);
+                String value = childNode.getTextContent().trim();
+                switch (childNode.getNodeName()) {
+                    case "location" -> savedJob.location = Integer.parseInt(value);
+                    case "techId" -> savedJob.savedTechId = UUID.fromString(value);
+                    case "timeSpent" -> savedJob.timeSpent = Integer.parseInt(value);
+                    case "workingOvertime" -> savedJob.workingOvertime = Boolean.parseBoolean(value);
+                    case "shorthandedMod" -> savedJob.shorthandedMod = Integer.parseInt(value);
+                    case "repairInPlace" -> savedJob.repairInPlace = Boolean.parseBoolean(value);
+                    default -> {
+                        // whitespace between the tags
+                    }
+                }
+            }
+        } catch (IllegalArgumentException exception) {
+            LOGGER.error(exception, "[PodSpace] A saved pod job on {} could not be read and was dropped",
+                  unit.getName());
+            return null;
+        }
+        return savedJob;
+    }
+
+    /**
+     * Finds the tech a saved job named among the loaded personnel.
+     */
+    public void fixReferences(Campaign campaign) {
+        if (savedTechId == null) {
+            return;
+        }
+        tech = campaign.getPlayerForce().getHumanResources().getPerson(savedTechId);
+        if (tech == null) {
+            LOGGER.error("[PodSpace] The pod job at location {} on {} names missing tech {}", location,
+                  unit.getName(), savedTechId);
+        }
+        savedTechId = null;
     }
 
     @Override
@@ -347,6 +444,18 @@ public class PodSpace implements IPartWork {
         return getTech() != null;
     }
 
+    /**
+     * When the job ends, finished or abandoned, the repair-in-place choice made for it goes too, so the next job on
+     * this pod space starts from the usual swap. A job put on hold keeps it.
+     */
+    @Override
+    public void cancelAssignment(boolean resetTime) {
+        IPartWork.super.cancelAssignment(resetTime);
+        if (resetTime) {
+            repairInPlace = false;
+        }
+    }
+
     @Override
     public String getPartName() {
         return getLocationName() + " Pod Space";
@@ -527,6 +636,13 @@ public class PodSpace implements IPartWork {
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean shouldRepairInPlace() {
+        return isRepairInPlace();
+    }
+
+    /**
+     * @return {@code true} if damaged pod equipment is repaired where it is, {@code false} if it is swapped for a spare
+     */
+    public boolean isRepairInPlace() {
         return repairInPlace;
     }
 
@@ -544,12 +660,20 @@ public class PodSpace implements IPartWork {
         return false;
     }
 
+    /**
+     * Holds a spare for each piece of missing pod equipment, in the name of the tech on this job, so the spare is still
+     * there when the job carries over to the next day.
+     */
     @Override
     public void reservePart() {
-        childPartIds.stream()
-              .map(this::findChildPart)
-              .filter(Objects::nonNull)
-              .forEach(Part::reservePart);
+        if (tech == null) {
+            return;
+        }
+        for (UUID childPartId : childPartIds) {
+            if (findChildPart(childPartId) instanceof MissingPart missingPart) {
+                missingPart.reserveReplacementFor(tech);
+            }
+        }
     }
 
     @Override

@@ -63,6 +63,8 @@ import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -870,6 +872,52 @@ public class AbstractProcreationTest {
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testProcessNewWeek_PregnantActivePersonGoesOnMaternityLeave() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
+
+        final LocalDate today = LocalDate.ofYearDay(3025, 1);
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(today.plusWeeks(10));
+        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        mockProcreation.processNewWeek(mockCampaign, today, mockPerson);
+
+        verify(mockPerson, times(1)).changeStatus(mockCampaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
+    }
+
+    /**
+     * Regression test: only {@link PersonnelStatus#ACTIVE} personnel should be moved onto maternity leave. Anyone in
+     * another status (e.g. {@link PersonnelStatus#STUDENT}) must keep that status.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @ParameterizedTest
+    @EnumSource(value = PersonnelStatus.class, names = { "ACTIVE" }, mode = EnumSource.Mode.EXCLUDE)
+    public void testProcessNewWeek_PregnantNonActivePersonDoesNotGoOnMaternityLeave(PersonnelStatus status) {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
+
+        final LocalDate today = LocalDate.ofYearDay(3025, 1);
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(today.plusWeeks(10));
+        when(mockPerson.getStatus()).thenReturn(status);
+
+        mockProcreation.processNewWeek(mockCampaign, today, mockPerson);
+
+        verify(mockPerson, never()).changeStatus(any(), any(), any());
     }
 
     //region Random Procreation
