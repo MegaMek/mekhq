@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.work;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -43,9 +45,16 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * Decides which techs a repair or salvage task is offered to. The Repair tab and the Warehouse tab's repair bench both
- * ask here, so the two lists follow the same rules, and each refusal comes with its reason.
+ * ask here, so the two lists follow the same rules, and each refusal comes with its reason. The to-hit check asks here
+ * too, so a task started any other way, such as from the strip menu or carried over to the next day, follows the same
+ * rules about who may work on it.
  */
 public final class RepairTechEligibility {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
+
+    /** Switches that leave nobody out: the to-hit check does not depend on how the tech list is filtered. */
+    private static final TechListToggles EVERY_TECH = new TechListToggles(false, true);
+
     private RepairTechEligibility() {}
 
     /**
@@ -85,7 +94,16 @@ public final class RepairTechEligibility {
         /** The tech has no time left today. */
         NO_TIME_LEFT,
         /** The task needs a better tech than this one. */
-        SKILL_TOO_LOW
+        SKILL_TOO_LOW,
+        /** The tech is tied up with a refit on another unit. */
+        BUSY_WITH_REFIT;
+
+        /**
+         * @return the reason in words, as the to-hit check shows it
+         */
+        public String getDescription() {
+            return getTextAt(RESOURCE_BUNDLE, "RepairTechEligibility.refusal." + name());
+        }
     }
 
     /**
@@ -102,6 +120,34 @@ public final class RepairTechEligibility {
         if (!partWork.needsFixing() && !partWork.isSalvaging()) {
             return Refusal.TASK_NOT_NEEDED;
         }
+        Refusal assignmentRefusal = findAssignmentRefusal(campaign, partWork, unit, tech, toggles);
+        if (assignmentRefusal != null) {
+            return assignmentRefusal;
+        }
+        if (isBusyWithAnotherRefit(campaign, partWork, tech)) {
+            return Refusal.BUSY_WITH_REFIT;
+        }
+        return findSkillRefusal(campaign, partWork, tech);
+    }
+
+    /**
+     * The rules every repair path applies to the tech put on a task, however the task was started. The tech must be
+     * where the task is and have the skill it needs, so a tech of the wrong type is refused. The tech must carry a tool
+     * kit where the campaign demands one, and must not be another unit's crew. How the tech list is filtered, and the
+     * tech's time and skill level, are left to the caller.
+     *
+     * @param campaign the campaign
+     * @param partWork the task
+     * @param tech     the tech
+     *
+     * @return why the tech may not work on the task, or {@code null} if none of these rules stands in the way
+     */
+    public static @Nullable Refusal findAssignmentRefusal(Campaign campaign, IPartWork partWork, Person tech) {
+        return findAssignmentRefusal(campaign, partWork, partWork.getUnit(), tech, EVERY_TECH);
+    }
+
+    private static @Nullable Refusal findAssignmentRefusal(Campaign campaign, IPartWork partWork, @Nullable Unit unit,
+          Person tech, TechListToggles toggles) {
         if (!RepairLocationCheck.isTechAtTask(tech, partWork)) {
             return Refusal.AT_ANOTHER_LOCATION;
         }
@@ -121,11 +167,33 @@ public final class RepairTechEligibility {
         if (isToolKitRequired && !EquipmentKitCatalog.hasToolKit(tech)) {
             return Refusal.NO_TOOL_KIT;
         }
-        Refusal crewRefusal = findCrewRefusal(unit, tech, toggles);
-        if (crewRefusal != null) {
-            return crewRefusal;
-        }
-        return findSkillRefusal(campaign, partWork, tech);
+        return findCrewRefusal(unit, tech, toggles);
+    }
+
+    /**
+     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
+     * so they take no other work. Maintenance of units they already look after is separate and carries on.
+     *
+     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
+     */
+    public static boolean isBusyWithAnotherRefit(Campaign campaign, IPartWork partWork, Person tech) {
+        Unit refittingUnit = findUnitRefitBy(campaign, tech);
+        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
+    }
+
+    /**
+     * @return the unit whose refit the tech is working on, or {@code null} if they are not working on a refit
+     */
+    private static @Nullable Unit findUnitRefitBy(Campaign campaign, Person tech) {
+        return campaign.getPlayerForce().getHumanResources().findUnitRefitBy(campaign.getPlayerForce().getHangar(),
+              tech);
+    }
+
+    /**
+     * @return the minutes the tech can still work today, counting overtime when the campaign allows it
+     */
+    public static int getTimeLeftToday(Campaign campaign, Person tech) {
+        return campaign.isOvertimeAllowed() ? (tech.getMinutesLeft() + tech.getOvertimeLeft()) : tech.getMinutesLeft();
     }
 
     /** Vessel crew on a large craft repair only as that craft's engineer. */
@@ -163,7 +231,7 @@ public final class RepairTechEligibility {
         if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
             return Refusal.TASK_IMPOSSIBLE;
         }
-        if (tech.getMinutesLeft() <= 0) {
+        if (getTimeLeftToday(campaign, tech) <= 0) {
             return Refusal.NO_TIME_LEFT;
         }
         // With destroy-by-margin a failed roll damages the part by how much it failed, so any tech may try
