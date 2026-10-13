@@ -154,6 +154,8 @@ public class SpacecraftCoolingSystem extends Part {
     @Override
     public void fix() {
         replaceHeatSinks();
+        // A completed batch clears any difficulty left by an earlier failure, as a completed repair does
+        resetRepairSettings();
     }
 
     @Override

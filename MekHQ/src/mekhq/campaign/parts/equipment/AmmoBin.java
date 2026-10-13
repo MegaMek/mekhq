@@ -303,6 +303,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     @Override
     public void fix() {
         loadBin();
+        // A completed reload clears any difficulty left by an earlier failure, as a completed repair does
+        resetRepairSettings();
+    }
+
+    /**
+     * A routine reload succeeds automatically, and a failed fabrication never raises the difficulty, so only an unload
+     * while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
     }
 
     @Override

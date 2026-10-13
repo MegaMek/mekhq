@@ -232,6 +232,19 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
             mount.setFired(false);
         }
         spent = false;
+        // A completed reload clears any difficulty left by an earlier failure, as a completed repair does
+        resetRepairSettings();
+    }
+
+    /**
+     * A reload succeeds automatically, so only a removal while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
     }
 
     @Override

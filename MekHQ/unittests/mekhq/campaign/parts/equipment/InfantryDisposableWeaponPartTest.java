@@ -45,6 +45,7 @@ import java.lang.reflect.Field;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -155,5 +156,36 @@ class InfantryDisposableWeaponPartTest {
         assertTrue(part.needsFixing());
         assertEquals(15, part.getBaseTime());
         assertEquals(0, part.getDifficulty());
+    }
+
+    @Test
+    @DisplayName("a completed reload clears a reload left impossible by an earlier failure")
+    void fixClearsRaisedReloadDifficulty() {
+        InfantryDisposableWeaponPart part = newPart();
+        part.setSkillMin(SkillType.EXP_LEGENDARY + 1);
+
+        part.fix();
+
+        assertEquals(SkillType.EXP_GREEN, part.getSkillMin());
+    }
+
+    @Test
+    @DisplayName("an impossible reload is cleared, since a reload can never fail on its own")
+    void clearImpossibleDifficultyResetsImpossibleReload() {
+        InfantryDisposableWeaponPart part = newPart();
+        part.setSkillMin(SkillType.EXP_LEGENDARY + 1);
+
+        assertTrue(part.clearImpossibleDifficulty());
+        assertEquals(SkillType.EXP_GREEN, part.getSkillMin());
+    }
+
+    @Test
+    @DisplayName("a reload difficulty that is still possible is kept")
+    void clearImpossibleDifficultyKeepsPossibleDifficulty() {
+        InfantryDisposableWeaponPart part = newPart();
+        part.setSkillMin(SkillType.EXP_LEGENDARY);
+
+        assertFalse(part.clearImpossibleDifficulty());
+        assertEquals(SkillType.EXP_LEGENDARY, part.getSkillMin());
     }
 }

@@ -1396,6 +1396,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if ((prt instanceof AmmoBin) && prt.isSpare()) {
                 removeParts.add(prt);
             }
+
+            if (!prt.isSpare() && prt.clearImpossibleDifficulty()) {
+                LOGGER.info("Cleared impossible task difficulty on {}", prt.getName());
+            }
         }
     }
 
