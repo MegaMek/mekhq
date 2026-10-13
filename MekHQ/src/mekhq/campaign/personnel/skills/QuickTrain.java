@@ -51,8 +51,8 @@ import java.util.List;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
@@ -98,6 +98,9 @@ public class QuickTrain {
         // Should we train Administration for Techs and Doctors?
         boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
+
+        // Should techs train every tech skill, rather than just their profession's global tech skill?
+        boolean isUseGlobalTechSkillsOnly = campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY);
 
         // Should soldiers only train Small Arms?
         boolean isUseSmallArmsOnly = campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY);
@@ -149,6 +152,7 @@ public class QuickTrain {
                   isAdminsHaveNegotiation,
                   isDoctorsUseAdministration,
                   isTechsUseAdministration,
+                  isUseGlobalTechSkillsOnly,
                   isLevelArtillery,
                   isUseSmallArmsOnly,
                   isLevelScoutingSkills,
@@ -281,8 +285,8 @@ public class QuickTrain {
      * <p>This method:
      * <ul>
      *     <li>Adds skills associated with the person's primary and secondary roles via
-     *     {@code fetchSkillsForProfession}, honoring the administration/negotiation and artillery/small-arms
-     *     flags.</li>
+     *     {@code fetchSkillsForProfession}, honoring the administration/negotiation, global tech skill, and
+     *     artillery/small-arms flags.</li>
      *     <li>Removes artillery from the target list if the person does not have the {@code S_ARTILLERY} skill.</li>
      *     <li>Optionally adds StratCon-related skills (training, tactics, leadership, strategy) for combat personnel
      *     when StratCon rules are enabled.</li>
@@ -303,6 +307,8 @@ public class QuickTrain {
      *                                   skills for their profession-based picks
      * @param isTechsUseAdministration   {@code true} if technicians should use administration instead of
      *                                   technical-specific skills for their profession-based picks
+     * @param isUseGlobalTechSkillsOnly  {@code false} if every tech skill should be treated as a profession skill for
+     *                                   tech professions
      * @param isLevelArtillery           {@code true} if artillery skills should be considered when building the target
      *                                   skill list
      * @param isUseSmallArmsOnly         {@code true} if only small-arms combat skills should be considered for combat
@@ -324,16 +330,17 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void processSkills(Person person, boolean isAdminsHaveNegotiation,
-          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isLevelArtillery,
-          boolean isUseSmallArmsOnly, boolean isLevelScoutingSkills, boolean isLevelEscapeSkills,
-          boolean isUseAppraisal, ProcurementPersonnelPick procurementPersonnel, boolean isLevelLeadership,
-          boolean isLevelTraining, boolean isLevelOtherCommandSkills, List<String> targetSkills,
-          SkillModifierData skillModifierData) {
+          boolean isDoctorsUseAdministration, boolean isTechsUseAdministration, boolean isUseGlobalTechSkillsOnly,
+          boolean isLevelArtillery, boolean isUseSmallArmsOnly, boolean isLevelScoutingSkills,
+          boolean isLevelEscapeSkills, boolean isUseAppraisal, ProcurementPersonnelPick procurementPersonnel,
+          boolean isLevelLeadership, boolean isLevelTraining, boolean isLevelOtherCommandSkills,
+          List<String> targetSkills, SkillModifierData skillModifierData) {
         Skills personSkills = person.getSkills();
 
         fetchSkillsForProfession(isAdminsHaveNegotiation,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
+              isUseGlobalTechSkillsOnly,
               isLevelArtillery,
               isUseSmallArmsOnly,
               person,
@@ -343,6 +350,7 @@ public class QuickTrain {
         fetchSkillsForProfession(isAdminsHaveNegotiation,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
+              isUseGlobalTechSkillsOnly,
               isLevelArtillery,
               isUseSmallArmsOnly,
               person,
@@ -452,6 +460,8 @@ public class QuickTrain {
      * @param isAdminsHaveNegotiation    campaign option: admins also train Negotiation
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
+     * @param isUseGlobalTechSkillsOnly  campaign option: techs only use their profession's global tech skill; when
+     *                                   disabled, every tech skill is a profession skill for tech professions
      * @param isUseArtillery             campaign option: include artillery skills
      * @param isUseSmallArmsOnly         campaign option: infantry uses Small Arms only
      * @param person                     the person whose skills are being evaluated
@@ -462,8 +472,9 @@ public class QuickTrain {
      * @since 0.50.10
      */
     private static void fetchSkillsForProfession(boolean isAdminsHaveNegotiation, boolean isDoctorsUseAdministration,
-          boolean isTechsUseAdministration, boolean isUseArtillery, boolean isUseSmallArmsOnly, Person person,
-          List<String> targetSkills, PersonnelRole profession, SkillModifierData skillModifierData) {
+          boolean isTechsUseAdministration, boolean isUseGlobalTechSkillsOnly, boolean isUseArtillery,
+          boolean isUseSmallArmsOnly, Person person, List<String> targetSkills, PersonnelRole profession,
+          SkillModifierData skillModifierData) {
         if (profession.isNone() || profession.isDependent()) {
             return;
         }
@@ -492,6 +503,15 @@ public class QuickTrain {
                   isTechsUseAdministration,
                   isUseArtillery,
                   false));
+        }
+
+        // Without the global-tech-only option, every tech skill counts as a profession skill for tech professions
+        if (!isUseGlobalTechSkillsOnly && profession.isTech()) {
+            for (String techSkill : SkillType.getTechSkills()) {
+                if (!targetSkills.contains(techSkill)) {
+                    targetSkills.add(techSkill);
+                }
+            }
         }
     }
 
