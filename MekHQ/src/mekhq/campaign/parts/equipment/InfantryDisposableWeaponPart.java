@@ -232,8 +232,6 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
             mount.setFired(false);
         }
         spent = false;
-        // A completed reload clears any difficulty left by an earlier failure, as a completed repair does
-        resetRepairSettings();
     }
 
     /**

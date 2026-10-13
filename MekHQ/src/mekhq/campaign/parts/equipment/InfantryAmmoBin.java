@@ -283,7 +283,6 @@ public class InfantryAmmoBin extends AmmoBin {
         }
 
         loadBin();
-        resetRepairSettings();
     }
 
     @Override

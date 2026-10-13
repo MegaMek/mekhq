@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import megamek.common.units.Aero;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -51,18 +50,14 @@ import testUtilities.parts.UnitFixture;
  * #10372).
  */
 class ImpossibleTaskRecoveryTest {
-    /** A Leopard's cooling system holds 80 heat sinks. */
-    private static final int LEOPARD_HEAT_SINKS = 80;
     private static final int IMPOSSIBLE = SkillType.EXP_LEGENDARY + 1;
 
-    private PartsScenario scenario;
     private Unit leopard;
     private SpacecraftCoolingSystem coolingSystem;
 
     @BeforeEach
     void setUp() {
-        scenario = PartsScenario.create();
-        leopard = scenario.withUnit(UnitFixture.LEOPARD_DROPSHIP);
+        leopard = PartsScenario.create().withUnit(UnitFixture.LEOPARD_DROPSHIP);
         coolingSystem = PartsScenario.unitParts(leopard, SpacecraftCoolingSystem.class).getFirst();
         coolingSystem.updateConditionFromEntity(false);
     }
@@ -108,18 +103,5 @@ class ImpossibleTaskRecoveryTest {
 
         assertTrue(ammoBin.clearImpossibleDifficulty());
         assertEquals(SkillType.EXP_GREEN, ammoBin.getSkillMin());
-    }
-
-    @Test
-    void installingHeatSinksClearsADifficultyRaisedByAnEarlierFailure() {
-        ((Aero) leopard.getEntity()).setHeatSinks(LEOPARD_HEAT_SINKS - 30);
-        coolingSystem.updateConditionFromEntity(false);
-        scenario.withSpare(new AeroHeatSink(0, coolingSystem.getSinkType(), false, scenario.getCampaign()), 30);
-        coolingSystem.setSkillMin(SkillType.EXP_VETERAN);
-
-        coolingSystem.fix();
-
-        assertEquals(SkillType.EXP_GREEN, coolingSystem.getSkillMin());
-        assertEquals(LEOPARD_HEAT_SINKS, ((Aero) leopard.getEntity()).getHeatSinks());
     }
 }

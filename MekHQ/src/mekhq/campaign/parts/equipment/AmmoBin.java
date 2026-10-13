@@ -303,8 +303,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     @Override
     public void fix() {
         loadBin();
-        // A completed reload clears any difficulty left by an earlier failure, as a completed repair does
-        resetRepairSettings();
     }
 
     /**

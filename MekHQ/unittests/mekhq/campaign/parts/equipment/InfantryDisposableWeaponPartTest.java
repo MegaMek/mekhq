@@ -159,17 +159,6 @@ class InfantryDisposableWeaponPartTest {
     }
 
     @Test
-    @DisplayName("a completed reload clears a reload left impossible by an earlier failure")
-    void fixClearsRaisedReloadDifficulty() {
-        InfantryDisposableWeaponPart part = newPart();
-        part.setSkillMin(SkillType.EXP_LEGENDARY + 1);
-
-        part.fix();
-
-        assertEquals(SkillType.EXP_GREEN, part.getSkillMin());
-    }
-
-    @Test
     @DisplayName("an impossible reload is cleared, since a reload can never fail on its own")
     void clearImpossibleDifficultyResetsImpossibleReload() {
         InfantryDisposableWeaponPart part = newPart();

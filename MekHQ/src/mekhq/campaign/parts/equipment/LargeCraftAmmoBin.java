@@ -264,7 +264,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         } else {
             loadBinSingleTon();
         }
-        resetRepairSettings();
     }
 
     /**

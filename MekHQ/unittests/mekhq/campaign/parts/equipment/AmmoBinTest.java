@@ -949,38 +949,6 @@ public class AmmoBinTest {
     }
 
     @Test
-    public void fixClearsRaisedReloadDifficulty() {
-        Campaign mockCampaign = mockCampaign();
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        lenient().when(mockCampaignOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
-        LocalWarehouse warehouse = new LocalWarehouse();
-        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
-        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
-        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
-
-        AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
-        int equipmentNum = 42;
-        AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, ammoType.getShots(), false, false, mockCampaign);
-
-        Unit mockUnit = mock(Unit.class);
-        Entity mockEntity = mock(Entity.class);
-        when(mockUnit.getEntity()).thenReturn(mockEntity);
-        AmmoMounted mockMounted = mock(AmmoMounted.class);
-        when(mockMounted.getType()).thenReturn(ammoType);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
-        ammoBin.setUnit(mockUnit);
-
-        // A failure left the reload impossible...
-        ammoBin.setSkillMin(SkillType.EXP_LEGENDARY + 1);
-
-        // ...but a completed reload (e.g. a GM fix) clears it for good
-        ammoBin.fix();
-
-        assertEquals(SkillType.EXP_GREEN, ammoBin.getSkillMin());
-    }
-
-    @Test
     public void clearImpossibleDifficultyResetsBinAboveLegendary() {
         Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
