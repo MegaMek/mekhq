@@ -65,6 +65,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -418,6 +419,29 @@ class EducationControllerTest {
             assertSame(route, travelNode.getJumpPath());
             assertEquals(40, person.getEduJourneyTime());
             assertEquals(0, person.getEduDaysOfTravel());
+        }
+
+        @Test
+        void strandedWithNoRoute_arrivesHomeImmediately() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            CurrentLocation travelNode = strandTravelerAt(academySystem);
+            Detachment homeDetachment = new Detachment();
+            homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+            CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, campaignSystem, campaign))
+                      .thenReturn(null);
+
+                runNewDay();
+            }
+
+            assertSame(homeDetachment.getPersonnel(), person.getParentLocation());
+            assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+            assertNull(travelNode.getJumpPath());
+            assertNull(travelNode.getParentLocation());
+            verify(locationManager).removeLocation(travelNode);
         }
 
         @Test
