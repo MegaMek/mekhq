@@ -473,4 +473,33 @@ class ActionCheckTest {
         }
     }
 
+    @Test
+    void rollOfTwoFailsATechnicianStyleCheckEvenAgainstALowTarget() {
+        Person person = new Person("F", "L", null, "Faction");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, new TargetRoll(1, ""), false, false, "Action")
+                                          .withRollOfTwoAlwaysFailing();
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 1, 1);
+
+        assertFalse(result.isSuccess());
+        assertTrue(result.getReport().contains("Failed"), result.getReport());
+    }
+
+    @Test
+    void rollOfThreePassesATechnicianStyleCheckAgainstALowTarget() {
+        Person person = new Person("F", "L", null, "Faction");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, new TargetRoll(1, ""), false, false, "Action")
+                                          .withRollOfTwoAlwaysFailing();
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 1, 2);
+
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    void rollOfTwoStillPassesAnOrdinaryCheckAgainstALowTarget() {
+        Person person = new Person("F", "L", null, "Faction");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, new TargetRoll(1, ""), false, false, "Action");
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 1, 1);
+
+        assertTrue(result.isSuccess());
+    }
 }
