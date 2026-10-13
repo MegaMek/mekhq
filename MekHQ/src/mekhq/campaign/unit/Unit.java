@@ -268,6 +268,8 @@ public class Unit implements ITechnology, ILocatable {
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
     private final ArrayList<PodSpace> podSpace;
+    /** Pod jobs read from a save, held until the pod spaces are built when the unit's parts are initialized. */
+    private final List<PodSpace> savedPodJobs = new ArrayList<>();
 
     private Refit refit;
 
@@ -3454,6 +3456,12 @@ public class Unit implements ITechnology, ILocatable {
             refit.writeToXML(pw, indent);
         }
 
+        for (PodSpace podSpaceWithJob : podSpace) {
+            if (podSpaceWithJob.hasWorkInProgress()) {
+                podSpaceWithJob.writeToXML(pw, indent);
+            }
+        }
+
         if ((lastMaintenanceReport != null) &&
                   !lastMaintenanceReport.isEmpty() &&
                   getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
@@ -3643,6 +3651,11 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("podSpace")) {
+                    PodSpace savedJob = PodSpace.generateInstanceFromXML(wn2, retVal);
+                    if (savedJob != null) {
+                        retVal.savedPodJobs.add(savedJob);
+                    }
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -5232,13 +5245,46 @@ public class Unit implements ITechnology, ILocatable {
                                            .findAny();
             bayPart.ifPresent(part -> bayPartsToAdd.get(bayNum).forEach(part::addChildPart));
         }
+        rebuildPodSpaces();
+    }
+
+    /**
+     * Builds the pod spaces of an Omni unit again, handing any job in progress, including one read from a save, to
+     * the new pod space for the same location.
+     */
+    private void rebuildPodSpaces() {
+        List<PodSpace> earlierPodSpaces = new ArrayList<>(podSpace);
+        earlierPodSpaces.addAll(savedPodJobs);
+        savedPodJobs.clear();
+        podSpace.clear();
         if (getEntity().isOmni()) {
-            podSpace.clear();
-            for (int loc = 0; loc < getEntity().locations(); loc++) {
-                podSpace.add(new PodSpace(loc, this));
+            for (int location = 0; location < getEntity().locations(); location++) {
+                podSpace.add(new PodSpace(location, this));
             }
-            podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+            podSpace.forEach(newPodSpace -> newPodSpace.updateConditionFromEntity(false));
         }
+        for (PodSpace earlier : earlierPodSpaces) {
+            if (!earlier.hasWorkInProgress()) {
+                continue;
+            }
+            PodSpace successor = findPodSpace(earlier.getLocation());
+            if (successor != null) {
+                successor.continueWorkFrom(earlier);
+            } else {
+                LOGGER.warn("[PodSpace] {} has no pod space at location {} any more; its job there is dropped",
+                      getName(), earlier.getLocation());
+                earlier.cancelAssignment(true);
+            }
+        }
+    }
+
+    private @Nullable PodSpace findPodSpace(int location) {
+        for (PodSpace candidate : podSpace) {
+            if (candidate.getLocation() == location) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     public List<Part> getParts() {
@@ -6533,10 +6579,8 @@ public class Unit implements ITechnology, ILocatable {
 
         if (engineer != null) {
             // change reference for any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.setTech(engineer);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.setTech(engineer);
             }
             // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
             // the new engineer is refused as "another team"
@@ -6549,12 +6593,28 @@ public class Unit implements ITechnology, ILocatable {
                 mothballTime = 0;
             }
             // cancel any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.cancelAssignment(true);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * @return the parts and pod spaces on this unit that have a tech assigned
+     */
+    private List<IPartWork> getScheduledWork() {
+        List<IPartWork> scheduledWork = new ArrayList<>();
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn()) {
+                scheduledWork.add(part);
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.isBeingWorkedOn()) {
+                scheduledWork.add(pod);
+            }
+        }
+        return scheduledWork;
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
@@ -7696,9 +7756,9 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
-        for (Part part : getParts()) {
-            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
-                part.cancelAssignment(true);
+        for (IPartWork scheduledWork : getScheduledWork()) {
+            if (engineer.equals(scheduledWork.getTech())) {
+                scheduledWork.cancelAssignment(true);
             }
         }
 
@@ -8144,6 +8204,11 @@ public class Unit implements ITechnology, ILocatable {
      * re-assigned.
      */
     public void removeParts() {
+        // A pod job is work on the parts being removed, so it ends with them and gives back any spare it holds
+        for (PodSpace pod : podSpace) {
+            pod.cancelAssignment(true);
+        }
+
         for (Part part : parts) {
             part.setUnit(null);
 
@@ -8800,6 +8865,8 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void fixReferences(Campaign campaign) {
+        savedPodJobs.forEach(savedJob -> savedJob.fixReferences(campaign));
+
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
