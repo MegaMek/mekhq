@@ -42,27 +42,36 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import megamek.client.ratgenerator.MissionRole;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.universe.Factions2;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator.SecurityTier;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
@@ -77,11 +86,24 @@ class SupportUnitGeneratorTest {
     /** Each canteen counts as one field kitchen; at the default capacity that feeds 150 personnel. */
     private static final int CANTEEN_COVERAGE = 150;
 
+    /** The real role lookup, put back after each test that stands in for the force generator. */
+    private Function<String, Set<MissionRole>> realRoleLookup;
+
     @BeforeAll
     static void initializeTypes() {
         EquipmentType.initializeTypes();
         // Recruiting a crew member rolls their skills, which needs the skill table loaded.
         SkillType.initializeTypes();
+    }
+
+    @BeforeEach
+    void rememberRoleLookup() {
+        realRoleLookup = SupportVehicleSelector.roleLookup;
+    }
+
+    @AfterEach
+    void restoreRoleLookup() {
+        SupportVehicleSelector.roleLookup = realRoleLookup;
     }
 
     @Test
@@ -136,6 +158,30 @@ class SupportUnitGeneratorTest {
     void combatPersonnelCountCountsOnlyCombatants() {
         Campaign campaign = campaignWithPersonnel(3, 2);
         assertEquals(3, SupportUnitGenerator.combatPersonnelCount(campaign));
+    }
+
+    @Test
+    void combatPersonnelCountLeavesOutSupportCrews() {
+        // Issue 10391: each MASH truck brought a named Vehicle Crew/Ground driver, who counted as a combatant, so every
+        // truck built raised the number of MASH trucks wanted - eleven became twelve after a conversion.
+        SupportVehicleSelector.roleLookup = unitName -> Set.of();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        int before = SupportUnitGenerator.combatPersonnelCount(campaign);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit supportVehicle = unitWhoseNameContains(campaign, "APC");
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(supportVehicle),
+              SupportTOEFormationTypes.MEDICAL_FORMATION);
+        Person driver = campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.NONE);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, driver, true, true);
+        supportVehicle.addDriver(driver);
+        Person rifleman = campaign.getPlayerForce().getHumanResources()
+                                .newPerson(campaign, PersonnelRole.SOLDIER, PersonnelRole.NONE);
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, rifleman, true, true);
+        assertTrue(driver.isCombat(), "this test is only meaningful while the driver's role counts as combat");
+
+        assertEquals(before + 1, SupportUnitGenerator.combatPersonnelCount(campaign),
+              "the rifleman counts; the MASH driver does not");
     }
 
     @Test
@@ -287,6 +333,185 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
+    void theCombatTallyIgnoresASupportVehicleLeftOutsideTheToe() {
+        // Issue 10375: a player's recovery vehicles, canteens and trucks bought and left outside the TOE were counted
+        // as combat units, and a converted campaign was given four more recovery vehicles for them.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        assertEquals(Formation.FORMATION_NONE, unitWhoseNameContains(campaign, "APC").getFormationId(),
+              "this test is only meaningful while the recovery vehicle is filed nowhere");
+
+        SupportUnitGenerator.CombatForceTally tally = SupportUnitGenerator.tallyCombatForce(campaign);
+
+        assertEquals(1, tally.units(), "a recovery vehicle is support wherever it is filed");
+        assertEquals(LOCUST_TONNAGE, tally.tonnage(), 0.001, "its tonnage must not size the convoy either");
+    }
+
+    @Test
+    void anOwnedVehicleOutsideTheToeCountsTowardsItsCapability() {
+        // Issue 10375: owned vehicles were counted by the formation they sat in, so four recovery vehicles left in
+        // the hangar counted as none and a full sixteen were built on top of them.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        assertEquals(2, SupportUnitGenerator.countOwnedVehicles(campaign, SupportCapability.SALVAGE),
+              "both recovery vehicles count, and the Mek does not");
+        assertEquals(0, SupportUnitGenerator.countOwnedVehicles(campaign, SupportCapability.LOGISTICS),
+              "a recovery vehicle is not also counted as a convoy truck");
+    }
+
+    @Test
+    void aRecoveryVehicleInASupportTeamsCompanyStillCounts() {
+        // Support teams file recovery vehicles under "Recovery Company", not the "Recovery Operations" formation the
+        // count used to look for, so switching salvage off and on again would have built the whole lot a second time.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitWhoseNameContains(campaign, "APC");
+        Formation origin = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
+        Formation recoveryCompany = new Formation("Recovery Company");
+        campaign.getPlayerForce().addFormation(recoveryCompany, origin, campaign);
+        campaign.getPlayerForce().addUnitToFormation(recoveryVehicle, recoveryCompany.getId(), campaign);
+
+        assertEquals(1, SupportUnitGenerator.countOwnedVehicles(campaign, SupportCapability.SALVAGE),
+              "a recovery vehicle counts whatever its formation is called");
+    }
+
+    @Test
+    void aStandaloneGrantPutsAnIdleOwnedVehicleToWork() {
+        // Issue 10375: with support teams off, switching salvage on counted a recovery vehicle the player already
+        // owned towards the target and left it in the hangar with nobody aboard. It is crewed and filed with the rest.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        campaign.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitWhoseNameContains(campaign, "APC");
+        assertTrue(owned.getCrew().isEmpty(), "this test is only meaningful while the owned vehicle is crewless");
+
+        SupportUnitGenerator.generate(SupportCapability.SALVAGE, campaign, campaign.getPlayerForce().getFaction(),
+              false, VehicleCrewSource.NEW_CREW, null);
+
+        assertFalse(owned.getCrew().isEmpty(), "the owned recovery vehicle is crewed");
+        assertTrue(owned.getFormationId() != Formation.FORMATION_NONE, "and filed with the salvage formation");
+    }
+
+    @Test
+    void aStandaloneGrantLeavesACrewedOwnedVehicleWhereThePlayerPutIt() {
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        campaign.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit owned = unitWhoseNameContains(campaign, "APC");
+        Person driver = campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.NONE);
+        owned.addDriver(driver);
+
+        SupportUnitGenerator.generate(SupportCapability.SALVAGE, campaign, campaign.getPlayerForce().getFaction(),
+              false, VehicleCrewSource.NEW_CREW, null);
+
+        assertEquals(Formation.FORMATION_NONE, owned.getFormationId(), "a vehicle the player crewed is in use");
+        assertEquals(List.of(driver), owned.getCrew(), "and its crew is untouched");
+    }
+
+    @Test
+    void theShortfallListsASwitchedOnCapabilityTheCampaignLacksAndOnlyThat() {
+        // Issue 10375: a campaign with fatigue on from the start was never offered canteens, because the offer only
+        // comes when the option is switched on and never during campaign setup. The shortfall is what is still owed.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = campaignWithEveryCapabilityOff();
+        campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, true);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        int salvageTarget = SupportCapability.SALVAGE.targetCount(campaign, campaign.getPlayerForce().getFaction());
+        for (int index = 0; index < salvageTarget; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        // Crewed, so in use: the salvage target is met and nothing about it is owed.
+        for (Unit recoveryVehicle : campaign.getUnits()) {
+            recoveryVehicle.addDriver(campaign.getPlayerForce().getHumanResources()
+                                            .newPerson(campaign, PersonnelRole.VEHICLE_CREW_GROUND,
+                                                  PersonnelRole.NONE));
+        }
+
+        List<SupportUnitGenerator.CapabilityShortfall> shortfalls = SupportUnitGenerator.capabilityShortfalls(
+              campaign, campaign.getPlayerForce().getFaction());
+
+        assertEquals(1, shortfalls.size(), "only the canteens are owed: " + shortfalls);
+        assertEquals(SupportCapability.COMMISSARY, shortfalls.get(0).capability());
+        assertEquals(0, shortfalls.get(0).owned());
+        assertTrue(shortfalls.get(0).missing() > 0, "the canteens are missing");
+    }
+
+    @Test
+    void theShortfallListsACapabilityWhoseTargetIsMetByIdleVehicles() {
+        // Issue 10375: the reporter's two canteens met the canteen target, so canteens were never offered, and the
+        // canteens stayed in the hangar with nobody aboard. Idle units are owed a crew even when the target is met.
+        treatAsRecoveryVehicle("APC");
+        Campaign campaign = campaignWithEveryCapabilityOff();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        int salvageTarget = SupportCapability.SALVAGE.targetCount(campaign, campaign.getPlayerForce().getFaction());
+        for (int index = 0; index < salvageTarget; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+
+        List<SupportUnitGenerator.CapabilityShortfall> shortfalls = SupportUnitGenerator.capabilityShortfalls(
+              campaign, campaign.getPlayerForce().getFaction());
+
+        assertEquals(1, shortfalls.size(), "the idle recovery vehicles are owed a crew: " + shortfalls);
+        assertEquals(SupportCapability.SALVAGE, shortfalls.get(0).capability());
+        assertEquals(0, shortfalls.get(0).missing(), "nothing needs building");
+        assertEquals(salvageTarget, shortfalls.get(0).idle(), "every recovery vehicle is idle");
+    }
+
+    @Test
+    void temporaryCrewsAreUsedOnlyWhenAskedForAndTheCampaignUsesThem() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+        assertEquals(VehicleCrewSource.TEMPORARY_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, true));
+        assertEquals(VehicleCrewSource.NEW_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, false),
+              "the player said no");
+
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        assertEquals(VehicleCrewSource.NEW_CREW,
+              SupportUnitGenerator.grantedCrewSource(campaign, SupportCapability.LOGISTICS, true),
+              "a campaign that does not use temporary crews for the role gets new hires whatever is asked");
+    }
+
+    /** A test campaign with every support capability switched off, so a test can switch on the ones it means. */
+    private static Campaign campaignWithEveryCapabilityOff() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_MASH_THEATRES, false);
+        campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, false);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        campaign.getCampaignOptions().set(CampaignOption.PRISONER_CAPTURE_STYLE, PrisonerCaptureStyle.NONE);
+        campaign.getCampaignOptions().set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.DISABLED);
+        for (SupportCapability capability : SupportCapability.values()) {
+            assertFalse(capability.isEnabled(campaign), capability + " must start switched off");
+        }
+        return campaign;
+    }
+
+    @Test
+    void aUnitWithoutTheRoleIsNotCountedAsSupport() {
+        // A BattleMek Recovery Vehicle is a plain Tank, so the role is what marks it; an ordinary APC is not one.
+        SupportVehicleSelector.roleLookup = unitName -> Set.of();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+
+        assertEquals(0, SupportUnitGenerator.countOwnedVehicles(campaign, SupportCapability.SALVAGE));
+        assertEquals(1, SupportUnitGenerator.tallyCombatForce(campaign).units(),
+              "a combat vehicle with no support role stays in the fighting force");
+    }
+
+    @Test
     void aBiggerForceGetsMoreRecoveryVehicles() {
         Campaign smallForce = campaignWithMeks(4);
         Campaign largeForce = campaignWithMeks(36);
@@ -346,15 +571,15 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
-    void mashTrucksAndCanteensAreNotBrokenIntoLances() {
+    void mashTrucksAndCanteensAreArrangedInLancesToo() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
 
-        // These are sized to exact need rather than to whole formations, so a pair of MASH trucks reads better
-        // listed together than split across lance markers.
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
-              SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are filed flat");
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
-              SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are filed flat");
+        // Issue 10375: eleven MASH trucks under one Medical marker is a company with no lances in it. Every vehicle
+        // capability is arranged the same way; a group of one lance or fewer still stays flat.
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
+              SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are arranged in lances");
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
+              SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are arranged in lances");
         assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.SECURITY_FORMATION), "the security detail is already platoons");
     }
@@ -480,6 +705,16 @@ class SupportUnitGeneratorTest {
             UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
         }
         return new ArrayList<>(campaign.getPlayerForce().getHangar().getUnits());
+    }
+
+    /**
+     * Stands in for the force generator: units named like {@code namePart} carry the recovery role, everything else
+     * carries none. The generator data is not staged for tests.
+     */
+    private static void treatAsRecoveryVehicle(String namePart) {
+        SupportVehicleSelector.roleLookup = unitName -> unitName.contains(namePart)
+                                                              ? Set.of(MissionRole.RECOVERY)
+                                                              : Set.of();
     }
 
     /** The one unit in the hangar whose name contains {@code namePart}, so a test can name the unit it means. */
