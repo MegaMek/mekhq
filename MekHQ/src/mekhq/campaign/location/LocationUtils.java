@@ -202,6 +202,19 @@ public final class LocationUtils {
     }
 
     /**
+     * Builds a single-system path, so a {@link CurrentLocation} already in {@code system} completes its in-system
+     * transit to the planet. A travel node short of the planet with no path never advances.
+     *
+     * @param system the system the travel node is in and must arrive at; must not be {@code null}
+     * @return a path containing only {@code system}
+     */
+    public static JumpPath inSystemPath(PlanetarySystem system) {
+        JumpPath path = new JumpPath();
+        path.addSystem(system);
+        return path;
+    }
+
+    /**
      * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
      * 2 days.
      *

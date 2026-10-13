@@ -972,8 +972,7 @@ public class EducationController {
         JumpPath path;
         int journeyDays;
         if (nodeSystem.equals(targetSystem)) {
-            path = new JumpPath();
-            path.addSystem(nodeSystem);
+            path = LocationUtils.inSystemPath(nodeSystem);
             journeyDays = max(2, (int) Math.ceil(travelNode.getTransitTime()));
         } else {
             path = LocationUtils.planJumpPath(nodeSystem, targetSystem, campaign);

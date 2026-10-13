@@ -107,6 +107,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -445,8 +446,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      *
      * <p>For each person in JOURNEY_TO_CAMPUS or JOURNEY_FROM_CAMPUS whose location chain contains
      * no {@link CurrentLocation}, a new {@code CurrentLocation} is created at the target system (academy system for
-     * outbound, campaign current system for return). Transit time is set from the jump-point approach time so they
-     * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
+     * outbound, campaign current system for return). Transit time is the legacy journey's remaining days, and the
+     * node is given an in-system path so normal {@code newDay()} processing carries it to the planet. Return nodes
+     * are parented under the main force, outbound nodes under the academy campus.</p>
      */
     private static void migrateLegacyEducationTravel(Campaign campaign) {
         // Phase 1: scan for persons that need migration. All per-person logging here is DEBUG
@@ -555,18 +557,23 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            // Journey stages
+            // Journey stages: outbound travel arrives at the academy, return travel at the main force
             String systemId = resolveAcademySystemId(campaign, person);
             if (systemId == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
                                   + " — skipping travel node creation", person.getFullTitle(), stage);
                 continue;
             }
-            PlanetarySystem targetSystem = campaign.getSystemById(systemId);
-            if (targetSystem == null) {
+            PlanetarySystem academySystem = campaign.getSystemById(systemId);
+            if (academySystem == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: system '{}' not found for {} (stage={})"
                                   + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
                 continue;
+            }
+            boolean isReturning = stage == EducationStage.JOURNEY_FROM_CAMPUS;
+            PlanetarySystem targetSystem = academySystem;
+            if (isReturning && (campaign.getCurrentSystem() != null)) {
+                targetSystem = campaign.getCurrentSystem();
             }
 
             double transitTime = Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
@@ -578,19 +585,24 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                   transitTime);
 
             CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager()
-                                                         .getOrCreateCampusLocation(campaign,
-                                                               person.getEduAcademySet(),
-                                                               person.getEduAcademyNameInSet(),
-                                                               systemId);
-            if (campusLocation != null) {
-                LOGGER.info("migrateLegacyEducationTravel: parenting travel node under campus '{}' for {}",
-                      person.getEduAcademyNameInSet(), person.getFullTitle());
-                travelLocation.setParent(campusLocation);
-            } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
-                LOGGER.info("migrateLegacyEducationTravel: no campus found for {} (JOURNEY_FROM_CAMPUS)"
-                                  + " — parenting travel node under the main force", person.getFullTitle());
+            if (transitTime > 0) {
+                travelLocation.setJumpPath(LocationUtils.inSystemPath(targetSystem));
+            }
+            if (isReturning) {
+                LOGGER.info("migrateLegacyEducationTravel: parenting return travel node under the main force for {}",
+                      person.getFullTitle());
                 travelLocation.setParent(campaign.getPlayerForce().getForceDetachment());
+            } else {
+                AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager()
+                                                             .getOrCreateCampusLocation(campaign,
+                                                                   person.getEduAcademySet(),
+                                                                   person.getEduAcademyNameInSet(),
+                                                                   systemId);
+                if (campusLocation != null) {
+                    LOGGER.info("migrateLegacyEducationTravel: parenting travel node under campus '{}' for {}",
+                          person.getEduAcademyNameInSet(), person.getFullTitle());
+                    travelLocation.setParent(campusLocation);
+                }
             }
             person.setParent(travelLocation);
             campaign.getCampaignLocationManager().addLocation(travelLocation);
