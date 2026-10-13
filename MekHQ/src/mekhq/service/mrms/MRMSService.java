@@ -593,11 +593,30 @@ public class MRMSService {
           MRMSConfiguredOptions configuredOptions) {
         boolean wasSalvaging = unit.isSalvage();
         boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        Map<PodSpace, Boolean> repairInPlaceBefore = new HashMap<>();
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            repairInPlaceBefore.put(podSpace, podSpace.isRepairInPlace());
+        }
         try {
             return performUnitMassTechActionOnce(campaign, unit, techs, mrmsOptionsByType, salvaging,
                   configuredOptions);
         } finally {
             restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+            restoreRepairInPlace(unit, repairInPlaceBefore);
+        }
+    }
+
+    /**
+     * Mass Repair picks repair-in-place or swap for every pod space of an Omni unit. A pod space it left without a job
+     * goes back to its earlier setting, so a pod job started by hand afterwards is not steered by Mass Repair's
+     * choice. A pod job Mass Repair started and carried over keeps the choice until the job ends.
+     */
+    private static void restoreRepairInPlace(Unit unit, Map<PodSpace, Boolean> repairInPlaceBefore) {
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            Boolean wasRepairInPlace = repairInPlaceBefore.get(podSpace);
+            if ((wasRepairInPlace != null) && !podSpace.isBeingWorkedOn()) {
+                podSpace.setRepairInPlace(wasRepairInPlace);
+            }
         }
     }
 
@@ -649,8 +668,11 @@ public class MRMSService {
         }
 
         if (unit.getEntity().isOmni() && !unit.isSalvage()) {
-            for (PodSpace ps : unit.getPodSpace()) {
-                ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
+            for (PodSpace podSpace : unit.getPodSpace()) {
+                // a pod job already under way keeps the choice it was started with
+                if (!podSpace.isBeingWorkedOn()) {
+                    podSpace.setRepairInPlace(!configuredOptions.isReplacePodParts());
+                }
             }
 
             // Damaged pod equipment with a spare in stock is left to the pod swap, but only when the swap will
