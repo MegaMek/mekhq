@@ -104,15 +104,16 @@ public class MRMSService {
 
     /**
      * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
-     * right-click menu all ask this, so they offer the same units. A self-crewed unit looks after itself; any other
-     * unit qualifies when it is a type a tech can be assigned to, the same types {@link Person#canTech} accepts.
+     * right-click menu all ask this, so they offer the same units. A unit qualifies when it is a type a tech can be
+     * assigned to, the same types {@link Person#canTech} accepts. A DropShip, JumpShip, WarShip or space station
+     * qualifies too: its engineer does the work, as in the Repair tab. Infantry that maintains itself does not.
      *
      * @param unit the unit
      *
      * @return {@code true} if Mass Repair can work on the unit
      */
     public static boolean isMassRepairableUnit(Unit unit) {
-        if (unit.isSelfCrewed()) {
+        if (unit.isSelfMaintainedInfantry()) {
             return false;
         }
         Entity entity = unit.getEntity();
@@ -518,7 +519,9 @@ public class MRMSService {
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
           List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
-        List<Person> techs = getTechsWithTimeLeftToday(campaign);
+        List<Person> techs = unit.isSelfCrewed()
+                                   ? getEngineerWithTimeLeftToday(campaign, unit)
+                                   : getTechsWithTimeLeftToday(campaign);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
@@ -1414,6 +1417,27 @@ public class MRMSService {
         }
 
         return newParts;
+    }
+
+    /**
+     * A ship's crew is its only tech team (Campaign Operations, pp. 190-191), so Mass Repair on a self-crewed unit
+     * works through its engineer alone, the same tech the Repair tab offers for it.
+     *
+     * @return the unit's engineer if they can still work today, otherwise an empty list
+     */
+    private static List<Person> getEngineerWithTimeLeftToday(Campaign campaign, Unit unit) {
+        List<Person> techs = new ArrayList<>();
+        Person engineer = unit.getEngineer();
+        if (engineer == null) {
+            LOGGER.debug("[MRMS] {}: no engineer, so its crew cannot repair it", unit.getName());
+            return techs;
+        }
+        if (RepairTechEligibility.getTimeLeftToday(campaign, engineer) <= 0) {
+            LOGGER.debug("[MRMS] {}: engineer {} has no time left today", unit.getName(), engineer.getFullName());
+            return techs;
+        }
+        techs.add(engineer);
+        return techs;
     }
 
     /**
