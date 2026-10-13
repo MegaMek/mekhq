@@ -214,6 +214,8 @@ public final class WorkTimeEstimate {
 
     /**
      * Describes a tech's time today for the tech list, for example {@code Free today: 6 h of 8 h (+ 4 h overtime)}.
+     * When the campaign's Techs Use Administration option changes the tech's working day, the change is named, for
+     * example {@code Free today: 6 h 48 min of 8 h 24 min (Administration +5%)}.
      *
      * @param campaign        the campaign
      * @param tech            the tech
@@ -225,11 +227,32 @@ public final class WorkTimeEstimate {
         WorkTimeDisplay display = MekHQ.getMHQOptions().getWorkTimeDisplay();
         String freeToday = WorkTimeFormatter.formatWork(tech.getMinutesLeft(), display);
         String workingDay = WorkTimeFormatter.formatWork(getMinutesPerDay(campaign, tech, false), display);
-        if (!overtimeAllowed) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.techDay", freeToday, workingDay);
+        String techDay = overtimeAllowed ?
+                               getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.techDayWithOvertime",
+                                     freeToday, workingDay,
+                                     WorkTimeFormatter.formatWork(tech.getOvertimeLeft(), display)) :
+                               getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.techDay", freeToday,
+                                     workingDay);
+        String administrationChange = describeAdministrationChange(campaign, tech);
+        return administrationChange.isEmpty() ? techDay : (techDay + ' ' + administrationChange);
+    }
+
+    /**
+     * @return how much the tech's Administration skill lengthens or shortens their working day, for example
+     *       {@code (Administration +5%)}, or an empty string when the option is off or the day is unchanged
+     */
+    private static String describeAdministrationChange(Campaign campaign, Person tech) {
+        boolean isTechsUseAdministration = campaign.getCampaignOptions()
+                                                 .get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        if (!isTechsUseAdministration) {
+            return "";
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.techDayWithOvertime", freeToday, workingDay,
-              WorkTimeFormatter.formatWork(tech.getOvertimeLeft(), display));
+        long percentChange = Math.round((tech.calculateTechTimeMultiplier(true) - 1.0) * 100);
+        if (percentChange == 0) {
+            return "";
+        }
+        String signedPercent = ((percentChange > 0) ? "+" : "") + percentChange;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.techDayAdministration", signedPercent);
     }
 
     /**

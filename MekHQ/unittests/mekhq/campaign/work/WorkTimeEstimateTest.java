@@ -241,6 +241,36 @@ class WorkTimeEstimateTest {
     }
 
     @Test
+    void techDayNamesTheAdministrationChange() {
+        // A Veteran administrator works 5% longer; with no Administration skill the day is 15% shorter
+        campaignOptions.set(CampaignOption.TECHS_USE_ADMINISTRATION, true);
+        Person veteran = techWithTimeMultiplier(1.05);
+        when(veteran.getMinutesLeft()).thenReturn(408);
+        assertEquals("Free today: 6 h 48 min of 8 h 24 min (Administration +5%)",
+              WorkTimeEstimate.describeTechDay(campaign, veteran, false));
+        Person untrained = techWithTimeMultiplier(0.85);
+        when(untrained.getMinutesLeft()).thenReturn(408);
+        assertEquals("Free today: 6 h 48 min of 6 h 48 min (Administration -15%)",
+              WorkTimeEstimate.describeTechDay(campaign, untrained, false));
+    }
+
+    @Test
+    void techDayLeavesOutAdministrationWhenItChangesNothing() {
+        campaignOptions.set(CampaignOption.TECHS_USE_ADMINISTRATION, true);
+        Person regular = techWithTimeMultiplier(1.0);
+        when(regular.getMinutesLeft()).thenReturn(480);
+        assertEquals("Free today: 8 h of 8 h", WorkTimeEstimate.describeTechDay(campaign, regular, false));
+
+        // With the option off, a Veteran administrator gets the plain 8-hour day and no note
+        campaignOptions.set(CampaignOption.TECHS_USE_ADMINISTRATION, false);
+        Person veteran = mock(Person.class);
+        when(veteran.calculateTechTimeMultiplier(true)).thenReturn(1.05);
+        when(veteran.calculateTechTimeMultiplier(false)).thenReturn(1.0);
+        when(veteran.getMinutesLeft()).thenReturn(480);
+        assertEquals("Free today: 8 h of 8 h", WorkTimeEstimate.describeTechDay(campaign, veteran, false));
+    }
+
+    @Test
     void techJobShowsWorkAndTheRollNeeded() {
         TechTaskEstimate estimate = new TechTaskEstimate(6, "", false, 72, 1350, 2);
         assertEquals("This job: 22 h 30 min of work, needs 6+ (72%)", WorkTimeEstimate.describeTechJob(estimate));
