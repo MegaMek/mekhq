@@ -1242,7 +1242,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @return the time left, the target number modifier and the work mode, as one line of the task list
      */
     protected String getTimeAndTargetText() {
-        return getTimeLeftText() + ' ' + getTargetNumberText() + getWorkModeText();
+        String timeLeft = getTimeLeftText();
+        // A job with no time to show, such as armor with none in stock, starts with its target number
+        String timePrefix = timeLeft.isEmpty() ? "" : (timeLeft + ' ');
+        return timePrefix + getTargetNumberText() + getWorkModeText();
     }
 
     /**

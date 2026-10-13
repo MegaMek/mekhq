@@ -42,10 +42,14 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 
 /**
- * Turns minutes of work into a countdown a player can read, such as {@code 2 months 5 days} or {@code 1 h 30 min}.
+ * Turns minutes of work into text a player can read.
  *
- * <p>Whole working days are counted forward on the campaign calendar from today, so a month is a real calendar month
- * rather than a fixed 30 days. Work left over after the last whole day is shown in hours and minutes.</p>
+ * <ul>
+ *   <li>Work itself is shown in hours and minutes, for example {@code 22 h 30 min}.</li>
+ *   <li>How long a job runs is shown the same way when it fits in one working day. A longer job is shown in calendar
+ *   days, months and years, counting each day it runs into as a whole day, for example {@code 3 days} or
+ *   {@code 2 months 1 day}. Days are counted forward from the campaign date, so a month is a real calendar month.</li>
+ * </ul>
  */
 public final class WorkTimeFormatter {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
@@ -54,62 +58,82 @@ public final class WorkTimeFormatter {
     private WorkTimeFormatter() {}
 
     /**
-     * The parts of a countdown, from years down to minutes.
+     * A stretch of calendar time.
      *
-     * @param years   whole years
-     * @param months  whole months after the years
-     * @param days    whole days after the months
-     * @param hours   hours of work on the last, partly worked day
-     * @param minutes minutes of work after those hours
+     * @param years  whole years
+     * @param months whole months after the years
+     * @param days   days after the months
      */
-    public record WorkTimeBreakdown(int years, int months, int days, int hours, int minutes) {}
+    public record CalendarSpan(int years, int months, int days) {}
 
     /**
-     * Splits work into whole working days, counted on the calendar from {@code today}, and the hours and minutes
-     * left over.
-     *
-     * @param workMinutes   minutes of work left
+     * @param workMinutes   minutes of work
      * @param minutesPerDay minutes the worker puts in each day; must be above zero
-     * @param today         the campaign date the countdown starts from, or {@code null} to count whole days only
-     *                      (no months or years)
      *
-     * @return the countdown, from years down to minutes
+     * @return how many days the work runs into, counting a part day as a whole day
      */
-    public static WorkTimeBreakdown breakDown(int workMinutes, int minutesPerDay, @Nullable LocalDate today) {
-        int minutesLeft = Math.max(0, workMinutes);
-        int wholeDays = minutesLeft / minutesPerDay;
-        int lastDayMinutes = minutesLeft % minutesPerDay;
-        int hours = lastDayMinutes / MINUTES_PER_HOUR;
-        int minutes = lastDayMinutes % MINUTES_PER_HOUR;
-        if ((today == null) || (wholeDays == 0)) {
-            return new WorkTimeBreakdown(0, 0, wholeDays, hours, minutes);
-        }
-        Period calendarSpan = Period.between(today, today.plusDays(wholeDays));
-        return new WorkTimeBreakdown(calendarSpan.getYears(), calendarSpan.getMonths(), calendarSpan.getDays(), hours,
-              minutes);
+    public static int countWorkingDays(int workMinutes, int minutesPerDay) {
+        return (int) Math.ceil((double) Math.max(0, workMinutes) / minutesPerDay);
     }
 
     /**
-     * Formats work as a countdown.
+     * @param days  days counted forward from {@code today}
+     * @param today the campaign date, or {@code null} to count days only (no months or years)
      *
-     * @param workMinutes   minutes of work left
-     * @param minutesPerDay minutes the worker puts in each day; zero or less shows plain minutes, since no countdown
-     *                      can be made
-     * @param today         the campaign date the countdown starts from, or {@code null} to count whole days only
-     * @param display       which units to show
-     *
-     * @return the countdown text, for example {@code 2 months 5 days}
+     * @return the days as years, months and days on the calendar
      */
-    public static String format(int workMinutes, int minutesPerDay, @Nullable LocalDate today,
-          WorkTimeDisplay display) {
-        int minutesLeft = Math.max(0, workMinutes);
-        if ((display == WorkTimeDisplay.MINUTES) || (minutesPerDay <= 0) || (minutesLeft == 0)) {
-            return unitText("minutes", minutesLeft);
+    public static CalendarSpan toCalendarSpan(int days, @Nullable LocalDate today) {
+        if (today == null) {
+            return new CalendarSpan(0, 0, days);
         }
-        WorkTimeBreakdown breakdown = breakDown(minutesLeft, minutesPerDay, today);
-        int[] amounts = { breakdown.years(), breakdown.months(), breakdown.days(), breakdown.hours(),
-                          breakdown.minutes() };
-        String[] unitKeys = { "years", "months", "days", "hours", "minutes" };
+        Period period = Period.between(today, today.plusDays(days));
+        return new CalendarSpan(period.getYears(), period.getMonths(), period.getDays());
+    }
+
+    /**
+     * Formats an amount of work, for example {@code 22 h 30 min}, or {@code 1,350 min} for the Minutes display.
+     *
+     * @param workMinutes minutes of work
+     * @param display     the player's chosen display
+     *
+     * @return the work as text
+     */
+    public static String formatWork(int workMinutes, WorkTimeDisplay display) {
+        int minutes = Math.max(0, workMinutes);
+        if ((display == WorkTimeDisplay.MINUTES) || (minutes < MINUTES_PER_HOUR)) {
+            return unitText("minutes", minutes);
+        }
+        int hours = minutes / MINUTES_PER_HOUR;
+        int minutesAfterHours = minutes % MINUTES_PER_HOUR;
+        String hoursText = unitText("hours", hours);
+        if (minutesAfterHours == 0) {
+            return hoursText;
+        }
+        return hoursText + ' ' + unitText("minutes", minutesAfterHours);
+    }
+
+    /**
+     * Formats how long a job runs: its work in hours and minutes when it fits in one working day, otherwise the
+     * calendar days it runs into, for example {@code 3 days} or {@code 2 months 1 day}.
+     *
+     * @param workMinutes   minutes of work
+     * @param minutesPerDay minutes the worker puts in each day; zero or less shows the work only, since no days can
+     *                      be counted
+     * @param today         the campaign date the days are counted from, or {@code null} to count days only
+     * @param display       the player's chosen display; Automatic shows the largest calendar unit and the one below
+     *                      it, Full shows every calendar unit, Minutes shows plain minutes
+     *
+     * @return how long the job runs, as text
+     */
+    public static String formatDuration(int workMinutes, int minutesPerDay, @Nullable LocalDate today,
+          WorkTimeDisplay display) {
+        boolean isWithinOneDay = (minutesPerDay <= 0) || (workMinutes <= minutesPerDay);
+        if ((display == WorkTimeDisplay.MINUTES) || isWithinOneDay) {
+            return formatWork(workMinutes, display);
+        }
+        CalendarSpan span = toCalendarSpan(countWorkingDays(workMinutes, minutesPerDay), today);
+        int[] amounts = { span.years(), span.months(), span.days() };
+        String[] unitKeys = { "years", "months", "days" };
 
         int largestUnit = 0;
         while (amounts[largestUnit] == 0) {

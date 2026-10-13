@@ -37,12 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 
-import mekhq.campaign.work.WorkTimeFormatter.WorkTimeBreakdown;
+import mekhq.campaign.work.WorkTimeFormatter.CalendarSpan;
 import org.junit.jupiter.api.Test;
 
 /**
- * Checks that work times read as a countdown: short jobs in hours and minutes, long ones in calendar days, months and
- * years from the campaign date.
+ * Checks that work times read plainly: work in hours and minutes, and a job that runs past one day in calendar days,
+ * months and years from the campaign date.
  */
 class WorkTimeFormatterTest {
     /** 3025 is not a leap year, so January has 31 days and February 28. */
@@ -50,74 +50,77 @@ class WorkTimeFormatterTest {
     private static final int WORKING_DAY = 480;
 
     @Test
-    void jobShorterThanADayShowsHoursAndMinutes() {
-        assertEquals("1 h 30 min", WorkTimeFormatter.format(90, WORKING_DAY, CAMPAIGN_DATE,
-              WorkTimeDisplay.AUTOMATIC));
-        assertEquals("2 h", WorkTimeFormatter.format(120, WORKING_DAY, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
-        assertEquals("45 min", WorkTimeFormatter.format(45, WORKING_DAY, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
+    void workIsShownInHoursAndMinutes() {
+        assertEquals("1 h 30 min", WorkTimeFormatter.formatWork(90, WorkTimeDisplay.AUTOMATIC));
+        assertEquals("2 h", WorkTimeFormatter.formatWork(120, WorkTimeDisplay.AUTOMATIC));
+        assertEquals("45 min", WorkTimeFormatter.formatWork(45, WorkTimeDisplay.AUTOMATIC));
+        assertEquals("22 h 30 min", WorkTimeFormatter.formatWork(1350, WorkTimeDisplay.FULL));
     }
 
     @Test
-    void partlyWorkedLastDayShowsItsHours() {
-        // 600 minutes is one full 8-hour day and 2 hours more
-        assertEquals("1 day 2 h", WorkTimeFormatter.format(600, WORKING_DAY, CAMPAIGN_DATE,
+    void minutesDisplayKeepsPlainMinutes() {
+        String expected = NumberFormat.getIntegerInstance().format(1350) + " min";
+        assertEquals(expected, WorkTimeFormatter.formatWork(1350, WorkTimeDisplay.MINUTES));
+        assertEquals(expected, WorkTimeFormatter.formatDuration(1350, WORKING_DAY, CAMPAIGN_DATE,
+              WorkTimeDisplay.MINUTES));
+    }
+
+    @Test
+    void jobWithinOneWorkingDayShowsItsWork() {
+        assertEquals("8 h", WorkTimeFormatter.formatDuration(480, WORKING_DAY, CAMPAIGN_DATE,
               WorkTimeDisplay.AUTOMATIC));
+        assertEquals("4 h", WorkTimeFormatter.formatDuration(240, WORKING_DAY, CAMPAIGN_DATE,
+              WorkTimeDisplay.AUTOMATIC));
+    }
+
+    @Test
+    void jobRunningPastADayCountsEachDayItTouches() {
+        // 600 minutes is a full 8-hour day and 2 hours of the next, so it runs over 2 days, not "1 day 2 h"
+        assertEquals(2, WorkTimeFormatter.countWorkingDays(600, WORKING_DAY));
+        assertEquals("2 days", WorkTimeFormatter.formatDuration(600, WORKING_DAY, CAMPAIGN_DATE,
+              WorkTimeDisplay.AUTOMATIC));
+        // With overtime (720 minutes a day) the same work fits in one day
+        assertEquals("10 h", WorkTimeFormatter.formatDuration(600, 720, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
     }
 
     @Test
     void sixtyWorkingDaysCountOnTheCalendar() {
         // A K-F drive replacement: 60 working days from 1 January ends on 2 March, 2 months and 1 day away
-        int kfDriveReplacement = 60 * WORKING_DAY;
-        assertEquals(new WorkTimeBreakdown(0, 2, 1, 0, 0),
-              WorkTimeFormatter.breakDown(kfDriveReplacement, WORKING_DAY, CAMPAIGN_DATE));
-        assertEquals("2 months 1 day", WorkTimeFormatter.format(kfDriveReplacement, WORKING_DAY, CAMPAIGN_DATE,
-              WorkTimeDisplay.AUTOMATIC));
+        assertEquals(new CalendarSpan(0, 2, 1), WorkTimeFormatter.toCalendarSpan(60, CAMPAIGN_DATE));
+        assertEquals("2 months 1 day", WorkTimeFormatter.formatDuration(60 * WORKING_DAY, WORKING_DAY,
+              CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
     }
 
     @Test
     void automaticShowsTheTwoLargestUnitsAndFullShowsAll() {
-        // 400 working days from 1 January 3025 ends on 5 February 3026
+        // 401 days from 1 January 3025 ends on 6 February 3026
         int minutes = (400 * WORKING_DAY) + 70;
-        assertEquals("1 year 1 month", WorkTimeFormatter.format(minutes, WORKING_DAY, CAMPAIGN_DATE,
+        assertEquals("1 year 1 month", WorkTimeFormatter.formatDuration(minutes, WORKING_DAY, CAMPAIGN_DATE,
               WorkTimeDisplay.AUTOMATIC));
-        assertEquals("1 year 1 month 4 days 1 h 10 min", WorkTimeFormatter.format(minutes, WORKING_DAY,
-              CAMPAIGN_DATE, WorkTimeDisplay.FULL));
+        assertEquals("1 year 1 month 5 days", WorkTimeFormatter.formatDuration(minutes, WORKING_DAY, CAMPAIGN_DATE,
+              WorkTimeDisplay.FULL));
     }
 
     @Test
     void automaticDoesNotSkipPastAnEmptyUnit() {
         // 370 days is 1 year, 0 months and 5 days; Automatic stops at the empty month rather than jumping to days
         int minutes = 370 * WORKING_DAY;
-        assertEquals("1 year", WorkTimeFormatter.format(minutes, WORKING_DAY, CAMPAIGN_DATE,
+        assertEquals("1 year", WorkTimeFormatter.formatDuration(minutes, WORKING_DAY, CAMPAIGN_DATE,
               WorkTimeDisplay.AUTOMATIC));
-        assertEquals("1 year 5 days", WorkTimeFormatter.format(minutes, WORKING_DAY, CAMPAIGN_DATE,
+        assertEquals("1 year 5 days", WorkTimeFormatter.formatDuration(minutes, WORKING_DAY, CAMPAIGN_DATE,
               WorkTimeDisplay.FULL));
     }
 
     @Test
-    void minutesDisplayKeepsPlainMinutes() {
-        String expected = NumberFormat.getIntegerInstance().format(28_800) + " min";
-        assertEquals(expected, WorkTimeFormatter.format(28_800, WORKING_DAY, CAMPAIGN_DATE,
-              WorkTimeDisplay.MINUTES));
-    }
-
-    @Test
-    void longerWorkingDayShortensTheCountdown() {
-        // The same 1,440 minutes take 3 normal days, or 2 days with overtime (720 a day)
-        assertEquals("3 days", WorkTimeFormatter.format(1440, WORKING_DAY, CAMPAIGN_DATE,
-              WorkTimeDisplay.AUTOMATIC));
-        assertEquals("2 days", WorkTimeFormatter.format(1440, 720, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
-    }
-
-    @Test
-    void withoutADateWholeDaysAreNotTurnedIntoMonths() {
-        assertEquals("60 days", WorkTimeFormatter.format(60 * WORKING_DAY, WORKING_DAY, null,
+    void withoutADateDaysAreNotTurnedIntoMonths() {
+        assertEquals("60 days", WorkTimeFormatter.formatDuration(60 * WORKING_DAY, WORKING_DAY, null,
               WorkTimeDisplay.AUTOMATIC));
     }
 
     @Test
-    void noWorkingDayOrNoWorkFallsBackToMinutes() {
-        assertEquals("90 min", WorkTimeFormatter.format(90, 0, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
-        assertEquals("0 min", WorkTimeFormatter.format(0, WORKING_DAY, CAMPAIGN_DATE, WorkTimeDisplay.AUTOMATIC));
+    void noWorkingDayShowsTheWorkOnly() {
+        assertEquals("1 h 30 min", WorkTimeFormatter.formatDuration(90, 0, CAMPAIGN_DATE,
+              WorkTimeDisplay.AUTOMATIC));
+        assertEquals("0 min", WorkTimeFormatter.formatWork(0, WorkTimeDisplay.AUTOMATIC));
     }
 }

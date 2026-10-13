@@ -119,6 +119,7 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.campaign.work.TechTaskEstimate;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
@@ -142,7 +143,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.model.TechTableModel;
 import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -1133,7 +1133,8 @@ public class CampaignGUI extends JPanel {
                   tech.getFullName(),
                   SkillType.getColoredExperienceLevelName(tech.getSkillLevel(campaign, false, true)),
                   tech.getPrimaryRoleDesc(),
-                  TechTableModel.describeEstimate(TechTaskEstimate.estimate(campaign, refit, tech)));
+                  WorkTimeEstimate.describeTechJobAndFinish(campaign, TechTaskEstimate.estimate(campaign, refit,
+                        tech)));
             techsByLabel.put(techLabel, tech);
             if (tech.isRightTechTypeFor(refit)) {
                 techLabels.add(lastRightTechIndex++, techLabel);

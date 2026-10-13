@@ -33,6 +33,7 @@
 package mekhq.campaign.work;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -41,6 +42,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Locale;
 
+import megamek.common.rolls.TargetRoll;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -56,10 +58,11 @@ import org.mockito.MockedStatic;
 
 /**
  * Checks the repair time estimates on the Repair tab: whose working day they count, when overtime is included, what
- * each work mode would do, and the daily report for a job that carries over.
+ * each work mode would do, the daily report for a job that carries over, and the tech list's time and finish date.
  */
 class WorkTimeEstimateTest {
     private MockedStatic<MekHQ> mekHQ;
+    private MHQOptions mhqOptions;
     private Campaign campaign;
     private CampaignOptions campaignOptions;
 
@@ -69,9 +72,10 @@ class WorkTimeEstimateTest {
         campaignOptions = new CampaignOptions();
 
         // Pin the display choice so the player's own saved preference cannot change the results
-        MHQOptions mhqOptions = mock(MHQOptions.class);
+        mhqOptions = mock(MHQOptions.class);
         when(mhqOptions.getWorkTimeDisplay()).thenReturn(WorkTimeDisplay.AUTOMATIC);
         when(mhqOptions.getLocale()).thenReturn(Locale.getDefault());
+        when(mhqOptions.getDisplayFormattedDate(any())).thenAnswer(call -> call.getArgument(0).toString());
         mekHQ = mockStatic(MekHQ.class);
         mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
 
@@ -119,6 +123,20 @@ class WorkTimeEstimateTest {
     void unstartedJobShowsTheTimeWithAndWithoutOvertime() {
         IPartWork partWork = job(1440, null, null);
         assertEquals("3 days (2 days with overtime)", WorkTimeEstimate.describeTimeLeft(campaign, partWork));
+    }
+
+    @Test
+    void fullDisplayAddsTheHoursOfWork() {
+        when(mhqOptions.getWorkTimeDisplay()).thenReturn(WorkTimeDisplay.FULL);
+        IPartWork partWork = job(1440, null, null);
+        assertEquals("24 h of work, 3 days (2 days with overtime)",
+              WorkTimeEstimate.describeTimeLeft(campaign, partWork));
+    }
+
+    @Test
+    void jobWithNoTimeShowsNoTime() {
+        // Armor with none in stock has nothing to time; "0 min" would read as instant
+        assertEquals("", WorkTimeEstimate.describeTimeLeft(campaign, job(0, null, null)));
     }
 
     @Test
@@ -192,7 +210,7 @@ class WorkTimeEstimateTest {
         Person tech = techWithTimeMultiplier(1.0);
         assertEquals("5 h left. Work will be finished tomorrow.",
               WorkTimeEstimate.describeWorkCarriedOver(campaign, job(300, tech, null), tech));
-        assertEquals("1 day 2 h left. Work will be finished in 2 days.",
+        assertEquals("10 h left. Work will be finished on 3025-01-03.",
               WorkTimeEstimate.describeWorkCarriedOver(campaign, job(600, tech, null), tech));
     }
 
@@ -208,7 +226,60 @@ class WorkTimeEstimateTest {
     @Test
     void carriedOverReportForATechWithNoWorkingDayGivesNoDate() {
         Person tech = techWithTimeMultiplier(0.0);
-        assertEquals("300 min left.",
+        assertEquals("5 h left.",
               WorkTimeEstimate.describeWorkCarriedOver(campaign, job(300, tech, null), tech));
+    }
+
+    @Test
+    void techDayShowsFreeTimeAndOvertime() {
+        Person tech = techWithTimeMultiplier(1.0);
+        when(tech.getMinutesLeft()).thenReturn(360);
+        when(tech.getOvertimeLeft()).thenReturn(240);
+        assertEquals("Free today: 6 h of 8 h", WorkTimeEstimate.describeTechDay(campaign, tech, false));
+        assertEquals("Free today: 6 h of 8 h (+ 4 h overtime)", WorkTimeEstimate.describeTechDay(campaign, tech,
+              true));
+    }
+
+    @Test
+    void techJobShowsWorkAndTheRollNeeded() {
+        TechTaskEstimate estimate = new TechTaskEstimate(6, "", false, 72, 1350, 2);
+        assertEquals("This job: 22 h 30 min of work, needs 6+ (72%)", WorkTimeEstimate.describeTechJob(estimate));
+
+        TechTaskEstimate automatic = new TechTaskEstimate(TargetRoll.AUTOMATIC_SUCCESS, "", false, 100, 15, 0);
+        assertEquals("This job: 15 min of work, automatic success", WorkTimeEstimate.describeTechJob(automatic));
+    }
+
+    @Test
+    void impossibleTechJobGivesTheReasonSafeForTheRow() {
+        TechTaskEstimate impossible = new TechTaskEstimate(TargetRoll.IMPOSSIBLE, "Busy with <Union>", true, 0, 60,
+              0);
+        assertEquals("Cannot do this job: Busy with &lt;Union&gt;", WorkTimeEstimate.describeTechJob(impossible));
+        assertEquals("", WorkTimeEstimate.describeTechFinish(campaign, impossible));
+    }
+
+    @Test
+    void techEstimateCountsOvertimeOnEveryLaterDay() {
+        // 1,200 minutes with the day already used up: 3 more 8-hour days, but only 2 more with overtime, because
+        // work carried overnight uses overtime too
+        Person tech = techWithTimeMultiplier(1.0);
+        IPartWork partWork = job(1200, null, null);
+        when(campaign.getTargetFor(partWork, tech)).thenReturn(new TargetRoll(6, "test"));
+
+        when(campaign.isOvertimeAllowed()).thenReturn(false);
+        assertEquals(3, TechTaskEstimate.estimate(campaign, partWork, tech).daysToFinish());
+        when(campaign.isOvertimeAllowed()).thenReturn(true);
+        assertEquals(2, TechTaskEstimate.estimate(campaign, partWork, tech).daysToFinish());
+    }
+
+    @Test
+    void techFinishGivesTheDate() {
+        assertEquals("Finishes today", WorkTimeEstimate.describeTechFinish(campaign,
+              new TechTaskEstimate(6, "", false, 72, 60, 0)));
+        assertEquals("Finishes tomorrow, 3025-01-02", WorkTimeEstimate.describeTechFinish(campaign,
+              new TechTaskEstimate(6, "", false, 72, 600, 1)));
+        TechTaskEstimate twoDays = new TechTaskEstimate(6, "", false, 72, 1350, 2);
+        assertEquals("Finishes 3025-01-03, in 2 days", WorkTimeEstimate.describeTechFinish(campaign, twoDays));
+        assertEquals("This job: 22 h 30 min of work, needs 6+ (72%). Finishes 3025-01-03, in 2 days",
+              WorkTimeEstimate.describeTechJobAndFinish(campaign, twoDays));
     }
 }
