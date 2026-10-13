@@ -4350,7 +4350,7 @@ public class Campaign implements ITechManager {
                 if (!RouteAlternativesPlanner.isValidRequest(origin, requestedStops)) {
             return List.of();
         }
-        List<AbstractContract> activeContracts = getActiveContracts();
+        List<AbstractContract> activeContracts = getActiveContracts(true);
         FactionHints factionHints = FactionHints.getInstance();
           NavigationRouteAnalysis.Policy policy = createNavigationPolicy(false, false, activeContracts,
               factionHints);
@@ -4431,7 +4431,7 @@ public class Campaign implements ITechManager {
             return jumpPath;
         }
 
-        List<AbstractContract> activeAtBContracts = getActiveContracts();
+        List<AbstractContract> activeAtBContracts = getActiveContracts(true);
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -4452,7 +4452,8 @@ public class Campaign implements ITechManager {
 
     private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
           boolean skipEmptySystemCheck) {
-        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(),
+        // Accepted contracts that haven't started yet still grant access, otherwise the player can't travel to them
+        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(true),
               FactionHints.getInstance());
     }
 
