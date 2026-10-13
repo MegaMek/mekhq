@@ -86,6 +86,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 /**
  * JUnit Tests for {@link MRMSService}
@@ -156,7 +157,8 @@ public class MRMSServiceTest {
         when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).thenReturn("Part Fixed");
 
         when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(mockBaseTargetRoll);
-        doAnswer(inv -> {
+        // Mass Repair asks the skill-only check for its stand-in tech, and the full check for real techs
+        Answer<TargetRoll> targetRollByWorkMode = inv -> {
             Part part = inv.getArgument(0);
             if (part.equals(lastPartWork) && part.getMode() == lastPartWork.getMode()) {
                 return mockBaseTargetRoll;
@@ -177,7 +179,9 @@ public class MRMSServiceTest {
                 when(mockBaseTargetRoll.getValue()).thenReturn(targetRoll);
             }
             return mockBaseTargetRoll;
-        }).when(mockCampaign).getTargetFor(any(Part.class), any(Person.class));
+        };
+        doAnswer(targetRollByWorkMode).when(mockCampaign).getTargetFor(any(Part.class), any(Person.class));
+        doAnswer(targetRollByWorkMode).when(mockCampaign).getSkillTargetFor(any(Part.class), any(Person.class));
     }
 
 
