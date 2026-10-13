@@ -6486,6 +6486,9 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
+     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer.</p>
+     *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
      *
@@ -6510,6 +6513,9 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
+        if (engineer != null) {
+            engineer.setEngineer(false);
+        }
         engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
@@ -6535,6 +6541,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
+            engineer.setEngineer(true);
             // change reference for any scheduled tasks
             for (Part part : getParts()) {
                 if (part.isBeingWorkedOn()) {
@@ -7002,6 +7009,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (person.equals(engineer)) {
             wasCrew = true;
+            person.setEngineer(false);
             engineer = null;
         }
 
@@ -7705,6 +7713,7 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
+        engineer.setEngineer(false);
         engineer = null;
     }
 
