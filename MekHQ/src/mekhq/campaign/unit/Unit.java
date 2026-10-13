@@ -993,6 +993,12 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
+        if (en instanceof ProtoMek) {
+            // a ProtoMek is destroyed along with its torso
+            if (en.isLocationBad(ProtoMek.LOC_TORSO)) {
+                return false;
+            }
+        }
         if (en instanceof Tank tank) {
             for (int i = 0; i < en.locations(); i++) {
                 boolean isTurretOrRotor = VehicleLocations.isTurret(tank, i) || VehicleLocations.isRotor(tank, i);
@@ -1031,6 +1037,12 @@ public class Unit implements ITechnology, ILocatable {
         if (en instanceof Mek) {
             // you can repair anything so long as one point of CT is left
             if (en.getInternal(Mek.LOC_CENTER_TORSO) <= 0) {
+                return false;
+            }
+        }
+        if (en instanceof ProtoMek) {
+            // like a Mek's center torso, a ProtoMek torso can't be replaced
+            if (en.getInternal(ProtoMek.LOC_TORSO) <= 0) {
                 return false;
             }
         }
