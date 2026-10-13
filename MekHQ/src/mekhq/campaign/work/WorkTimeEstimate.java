@@ -94,7 +94,7 @@ public final class WorkTimeEstimate {
      * @return the time left, as the player's chosen display shows it, or an empty string when the job needs no time
      */
     public static String describeTimeLeft(Campaign campaign, IPartWork partWork) {
-        return describeTimeLeft(campaign, partWork, partWork.getTimeLeft());
+        return describeTimeLeft(campaign, partWork, partWork.getTimeLeft(), true);
     }
 
     /**
@@ -115,6 +115,15 @@ public final class WorkTimeEstimate {
      *       as armor with none in stock
      */
     public static String describeTimeLeft(Campaign campaign, IPartWork partWork, int minutesLeft) {
+        return describeTimeLeft(campaign, partWork, minutesLeft, false);
+    }
+
+    /**
+     * @param isShowingProgress {@code true} to say how much of a started job is done, which only makes sense for the
+     *                          job's real time left, not for the time another work mode would take
+     */
+    private static String describeTimeLeft(Campaign campaign, IPartWork partWork, int minutesLeft,
+          boolean isShowingProgress) {
         if (minutesLeft <= 0) {
             return "";
         }
@@ -127,8 +136,9 @@ public final class WorkTimeEstimate {
         int minutesPerDay = getMinutesPerDay(campaign, worker, false);
 
         String duration;
+        int scheduledMinutesPerDay = 0;
         if (scheduledTech != null) {
-            int scheduledMinutesPerDay = getMinutesPerDay(campaign, scheduledTech,
+            scheduledMinutesPerDay = getMinutesPerDay(campaign, scheduledTech,
                   canUseOvertime && campaign.isOvertimeAllowed());
             duration = WorkTimeFormatter.formatDuration(minutesLeft, scheduledMinutesPerDay, today, display);
         } else {
@@ -146,10 +156,86 @@ public final class WorkTimeEstimate {
             duration = getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.workAndDuration",
                   WorkTimeFormatter.formatWork(minutesLeft, display), duration);
         }
-        if (scheduledTech != null) {
+        if (scheduledTech == null) {
+            return duration;
+        }
+        boolean hasProgress = isShowingProgress && (partWork.getTimeSpent() > 0);
+        if (!hasProgress) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.scheduled", duration);
         }
-        return duration;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.scheduledWithProgress", duration,
+              describeProgress(partWork, scheduledMinutesPerDay, display));
+    }
+
+    /**
+     * @return how much of a started job is done: in days for a job longer than one working day, for example
+     *       {@code 12 of 60 days}, otherwise in hours and minutes, for example {@code 2 h of 4 h}
+     */
+    private static String describeProgress(IPartWork partWork, int minutesPerDay, WorkTimeDisplay display) {
+        int totalMinutes = partWork.getActualTime();
+        int minutesSpent = partWork.getTimeSpent();
+        boolean isCountedInDays = (display != WorkTimeDisplay.MINUTES) && (minutesPerDay > 0)
+                                        && (totalMinutes > minutesPerDay);
+        if (isCountedInDays) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.progressDays",
+                  minutesSpent / minutesPerDay, WorkTimeFormatter.countWorkingDays(totalMinutes, minutesPerDay));
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeEstimate.progressWork",
+              WorkTimeFormatter.formatWork(minutesSpent, display), WorkTimeFormatter.formatWork(totalMinutes, display));
+    }
+
+    /**
+     * @param unit the unit
+     *
+     * @return minutes of work left on every job the Repair tab lists for the unit
+     */
+    public static int getRepairMinutesLeft(Unit unit) {
+        int minutes = 0;
+        for (IPartWork partWork : unit.getPartsNeedingService()) {
+            minutes += Math.max(0, partWork.getTimeLeft());
+        }
+        return minutes;
+    }
+
+    /**
+     * Describes how long a unit's repairs take, for the unit list.
+     *
+     * <ul>
+     *   <li>A DropShip, JumpShip, WarShip or space station is repaired only by its own crew, so its time is the
+     *   calendar days that crew needs, for example {@code 6 days}.</li>
+     *   <li>Any other unit shows its total work, for example {@code 22 h 30 min}, since several techs can share
+     *   it.</li>
+     * </ul>
+     *
+     * @param campaign the campaign
+     * @param unit     the unit
+     *
+     * @return the repair time, which sorts by minutes of work left; {@code -} when there is no work
+     */
+    public static UnitRepairTime describeUnitRepairTime(Campaign campaign, Unit unit) {
+        int minutes = getRepairMinutesLeft(unit);
+        if (minutes == 0) {
+            return new UnitRepairTime(0, "-");
+        }
+        WorkTimeDisplay display = MekHQ.getMHQOptions().getWorkTimeDisplay();
+        Person shipCrew = getShipCrewWorker(unit);
+        if (shipCrew == null) {
+            return new UnitRepairTime(minutes, WorkTimeFormatter.formatWork(minutes, display));
+        }
+        String crewDays = WorkTimeFormatter.formatDuration(minutes, getMinutesPerDay(campaign, shipCrew, false),
+              campaign.getLocalDate(), display);
+        return new UnitRepairTime(minutes, crewDays);
+    }
+
+    /**
+     * @param unit the unit
+     *
+     * @return what the unit list's repair time means for this unit
+     */
+    public static String describeUnitRepairTimeToolTip(Unit unit) {
+        String key = (getShipCrewWorker(unit) == null) ? "WorkTimeEstimate.unitRepairTime.work.toolTip"
+                           : "WorkTimeEstimate.unitRepairTime.crew.toolTip";
+        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**

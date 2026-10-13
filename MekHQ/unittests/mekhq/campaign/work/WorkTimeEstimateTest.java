@@ -33,6 +33,8 @@
 package mekhq.campaign.work;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -40,6 +42,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 
 import megamek.common.rolls.TargetRoll;
@@ -299,6 +302,83 @@ class WorkTimeEstimateTest {
         assertEquals(3, TechTaskEstimate.estimate(campaign, partWork, tech).daysToFinish());
         when(campaign.isOvertimeAllowed()).thenReturn(true);
         assertEquals(2, TechTaskEstimate.estimate(campaign, partWork, tech).daysToFinish());
+    }
+
+    @Test
+    void startedLongJobShowsDaysDone() {
+        // A 10-day job with 2 days worked: 8 days left
+        Person tech = techWithTimeMultiplier(1.0);
+        IPartWork partWork = job(3840, tech, null);
+        when(partWork.getActualTime()).thenReturn(4800);
+        when(partWork.getTimeSpent()).thenReturn(960);
+        assertEquals("8 days (scheduled, 2 of 10 days done)", WorkTimeEstimate.describeTimeLeft(campaign, partWork));
+    }
+
+    @Test
+    void startedShortJobShowsHoursDone() {
+        Person tech = techWithTimeMultiplier(1.0);
+        IPartWork partWork = job(120, tech, null);
+        when(partWork.getActualTime()).thenReturn(240);
+        when(partWork.getTimeSpent()).thenReturn(120);
+        assertEquals("2 h (scheduled, 2 h of 4 h done)", WorkTimeEstimate.describeTimeLeft(campaign, partWork));
+    }
+
+    @Test
+    void modeMenuNeverShowsProgress() {
+        // The mode menu describes a different amount of work, so how much of today's job is done does not apply
+        Person tech = techWithTimeMultiplier(1.0);
+        IPartWork partWork = job(120, tech, null);
+        when(partWork.getActualTime()).thenReturn(240);
+        when(partWork.getTimeSpent()).thenReturn(120);
+        assertEquals("Extra time (x2): 6 h (scheduled), TN -1",
+              WorkTimeEstimate.describeWorkMode(campaign, partWork, WorkTime.EXTRA_2));
+    }
+
+    @Test
+    void shipRepairTimeIsItsCrewsCalendarDays() {
+        Unit ship = mock(Unit.class);
+        Person engineer = techWithTimeMultiplier(1.0);
+        when(ship.getEngineer()).thenReturn(engineer);
+        List<IPartWork> jobs = List.of(job(600, null, ship), job(360, null, ship), job(240, null, ship));
+        when(ship.getPartsNeedingService()).thenReturn(jobs);
+
+        UnitRepairTime repairTime = WorkTimeEstimate.describeUnitRepairTime(campaign, ship);
+        assertEquals(1200, repairTime.minutes());
+        assertEquals("3 days", repairTime.toString());
+        assertTrue(WorkTimeEstimate.describeUnitRepairTimeToolTip(ship).contains("crew"));
+    }
+
+    @Test
+    void otherUnitsShowTotalWork() {
+        Unit mek = mock(Unit.class);
+        List<IPartWork> jobs = List.of(job(1200, null, mek), job(150, null, mek), job(0, null, mek));
+        when(mek.getPartsNeedingService()).thenReturn(jobs);
+
+        assertEquals("22 h 30 min", WorkTimeEstimate.describeUnitRepairTime(campaign, mek).toString());
+        assertNotEquals(WorkTimeEstimate.describeUnitRepairTimeToolTip(mek),
+              WorkTimeEstimate.describeUnitRepairTimeToolTip(shipWithCrew()));
+    }
+
+    @Test
+    void unitWithNoWorkShowsADash() {
+        Unit mek = mock(Unit.class);
+        when(mek.getPartsNeedingService()).thenReturn(List.of());
+        assertEquals("-", WorkTimeEstimate.describeUnitRepairTime(campaign, mek).toString());
+    }
+
+    @Test
+    void repairTimeSortsByWorkNotText() {
+        // "10 h" sorts after "9 h" by work, though "1" comes before "9" as text
+        UnitRepairTime nineHours = new UnitRepairTime(540, "9 h");
+        UnitRepairTime tenHours = new UnitRepairTime(600, "10 h");
+        assertTrue(nineHours.compareTo(tenHours) < 0);
+    }
+
+    private static Unit shipWithCrew() {
+        Unit ship = mock(Unit.class);
+        Person engineer = techWithTimeMultiplier(1.0);
+        when(ship.getEngineer()).thenReturn(engineer);
+        return ship;
     }
 
     @Test
