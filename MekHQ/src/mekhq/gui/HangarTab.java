@@ -408,6 +408,12 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     public void filterUnits() {
+        // Filtering reads each unit's crew and condition, which a bulk generation is filling in off the EDT; the
+        // OrganizationChangedEvent fired when it completes refreshes the list (and its filter) instead.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
         final boolean hideMothballed = chkHideMothballed.isSelected();
         final String searchText = txtUnitSearch.getText().trim().toLowerCase(Locale.ROOT);
@@ -756,6 +762,13 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     public void refreshUnitList() {
+        // While a bulk generation adds and crews units off the EDT, skip this refresh: the table reads each unit's
+        // crew and parts, which the worker is mutating. The OrganizationChangedEvent fired when the generation
+        // completes reschedules this refresh against the finished campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         UUID selectedUUID = null;
         int selectedRow = unitTable.getSelectedRow();
         if (selectedRow != -1) {
