@@ -269,6 +269,8 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
 
+        removeModifierForceTemplates(scenario);
+
         if (!scenario.getStratConScenarioType().isOfficialChallenge()) {
             applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
         }
@@ -309,6 +311,44 @@ public class AtBDynamicScenarioFactory {
         selectBotTeamCommanders(scenario, campaign);
 
         scenario.setFinalized(true);
+    }
+
+    /**
+     * Removes the force templates that this scenario's modifiers added to its template during an earlier
+     * finalization.
+     *
+     * <p>Modifier forces are written into the scenario template (save/load uses the template to reconnect bot forces
+     * to their force templates). Left in place, a re-finalization would generate them once as primary forces and
+     * then the modifiers would add them again, duplicating them. Pre-force-generation modifiers re-add their forces
+     * immediately after this runs, and post-force-generation modifiers re-add theirs after the primary forces are
+     * generated.</p>
+     *
+     * <p>Only templates that are the modifier's own force definition are removed, so a template force that happens
+     * to share a modifier force's name is left alone.</p>
+     *
+     * @param scenario the scenario being finalized
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void removeModifierForceTemplates(AtBDynamicScenario scenario) {
+        ScenarioTemplate template = scenario.getTemplate();
+        if (template == null) {
+            return;
+        }
+
+        Map<String, ScenarioForceTemplate> scenarioForces = template.getScenarioForces();
+        for (AtBScenarioModifier modifier : scenario.getScenarioModifiers()) {
+            ScenarioForceTemplate forceDefinition = modifier.getForceDefinition();
+            if (forceDefinition == null) {
+                continue;
+            }
+
+            String forceName = forceDefinition.getForceName();
+            if (scenarioForces.get(forceName) == forceDefinition) {
+                scenarioForces.remove(forceName);
+            }
+        }
     }
 
     /**
@@ -585,6 +625,11 @@ public class AtBDynamicScenarioFactory {
                 factionCode = contract.getEmployerFactionCode();
                 skill = contract.getEmployerForceSkill();
                 quality = contract.getEmployerEquipmentRating();
+
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+                    effectiveBV = calculateEffectiveBV(scenario, campaign, false, false);
+                    LOGGER.info("Effective xBV Budget: {} (player forces only)", effectiveBV);
+                }
                 break;
             case Opposing:
                 factionCode = contract.getEnemyFactionCode();
@@ -3671,6 +3716,29 @@ public class AtBDynamicScenarioFactory {
      */
     public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
           boolean forceStandardBattleValue) {
+        return calculateEffectiveBV(scenario, campaign, forceStandardBattleValue, true);
+    }
+
+    /**
+     * Calculates from scratch the current effective player BV present in the given scenario, optionally including the
+     * BV of already-generated allied bot forces.
+     *
+     * <p>Allied forces scaled by BV should be sized against the player's BV alone. If they also counted earlier
+     * allied forces, each allied force would compound the next, and the OpFor - which scales off everything on the
+     * player's side - would compound again on top.</p>
+     *
+     * @param scenario                 The scenario to process.
+     * @param campaign                 The campaign in which the scenario resides.
+     * @param forceStandardBattleValue whether to calculate BV using standard Battle Value rather than Generic BV
+     * @param includeAlliedBotForces   {@code true} to add the BV of bot forces marked as contributing to BV
+     *
+     * @return Effective BV.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
+          boolean forceStandardBattleValue, boolean includeAlliedBotForces) {
         // for each deployed player and bot force that's marked as contributing to the
         // BV budget
         int bvBudget = 0;
@@ -3719,6 +3787,11 @@ public class AtBDynamicScenarioFactory {
         double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
         if (bvMultiplier > 0) {
             bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
+        }
+
+        if (!includeAlliedBotForces) {
+            LOGGER.info("Total Base {} Budget (player only): {}", generationMethod, bvBudget);
+            return bvBudget;
         }
 
         // allied bot forces that contribute to BV do not get multiplied by the
