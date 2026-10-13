@@ -169,12 +169,12 @@ public final class LocationNewDayUtil {
         }
 
         if (hangar != null) {
-            continueOvernightPodSwaps(hangar, campaign);
-
             // ok now we can check for other stuff we might need to do to units
             int defaultRepairSite = ContractRepairLocation.getBestRepairLocation(campaign.getActiveContracts());
             List<UUID> unitsToRemove = new ArrayList<>();
+            int podSwapsCarriedOver = 0;
             for (Unit unit : hangar.getUnits()) {
+                podSwapsCarriedOver += continueOvernightPodSwaps(unit, campaign);
                 if (unit.isRefitting()) {
                     campaign.refit(unit.getRefit());
                 }
@@ -198,6 +198,9 @@ public final class LocationNewDayUtil {
                     unitsToRemove.add(unit.getId());
                 }
             }
+            if (podSwapsCarriedOver > 0) {
+                LOGGER.debug("[PodSpace] {} pod swaps carried over to the new day", podSwapsCarriedOver);
+            }
             // Remove any unrepairable, unsalvageable units
             unitsToRemove.forEach(campaign::removeUnit);
         }
@@ -214,27 +217,25 @@ public final class LocationNewDayUtil {
     }
 
     /**
-     * Pod swaps are not parts, so the warehouse pass above never sees them. One that ran out of time yesterday is
-     * carried on here, after the parts, in the same way.
+     * Pod swaps are not parts, so the warehouse pass above never sees them. Any on this unit that ran out of time
+     * yesterday are carried on here, after the parts, in the same way.
+     *
+     * @return how many pod swaps were carried over
      */
-    private static void continueOvernightPodSwaps(LocalHangar hangar, Campaign campaign) {
+    private static int continueOvernightPodSwaps(Unit unit, Campaign campaign) {
         List<PodSpace> assignedPodSpaces = new ArrayList<>();
-        for (Unit unit : hangar.getUnits()) {
-            for (PodSpace podSpace : unit.getPodSpace()) {
-                if (podSpace.isBeingWorkedOn()) {
-                    assignedPodSpaces.add(podSpace);
-                }
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            if (podSpace.isBeingWorkedOn()) {
+                assignedPodSpaces.add(podSpace);
             }
-        }
-        if (!assignedPodSpaces.isEmpty()) {
-            LOGGER.debug("[PodSpace] {} pod swaps carried over to the new day", assignedPodSpaces.size());
         }
         for (PodSpace podSpace : assignedPodSpaces) {
             Person tech = getOvernightTech(podSpace);
             if (tech != null) {
-                continueOvernightWork(campaign, podSpace, podSpace.getUnit(), tech);
+                continueOvernightWork(campaign, podSpace, unit, tech);
             }
         }
+        return assignedPodSpaces.size();
     }
 
     /**
