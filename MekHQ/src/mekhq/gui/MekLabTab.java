@@ -108,6 +108,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.utilities.ReportingUtilities;
 
@@ -453,7 +454,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         lblName.setText("<html><b>" + unit.getName() + "</b></html>");
         lblRefit.setText(refit.getRefitClassName());
-        lblTime.setText(refit.getTime() + " minutes");
+        lblTime.setText(WorkTimeEstimate.describeTimeLeft(campaignGUI.getCampaign(), refit, refit.getTime()));
         lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {

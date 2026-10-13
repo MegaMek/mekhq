@@ -685,9 +685,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
                      "</b><br/>" +
                      getDetails() +
                      "<br/>" +
-                     getTimeLeft() +
-                     " minutes" +
-                     (null != getTech() ? " (scheduled) " : "") +
+                     getTimeLeftText() +
                      "</html>";
     }
 

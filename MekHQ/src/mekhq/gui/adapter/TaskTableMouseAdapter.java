@@ -69,6 +69,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.dialog.QuickStripDialog;
@@ -408,13 +409,18 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (canChangeMode) {
-            menu = new JMenu("Mode");
-            for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                if (partWork.getMode() == wt) {
+            menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.mode"));
+            // The time and target number each mode gives are shown when one job is selected
+            boolean isSingleJob = parts.length == 1;
+            for (WorkTime workMode : WorkTime.DEFAULT_TIMES) {
+                String modeText = isSingleJob ?
+                                        WorkTimeEstimate.describeWorkMode(gui.getCampaign(), partWork, workMode) :
+                                        workMode.name;
+                cbMenuItem = new JCheckBoxMenuItem(modeText);
+                if (partWork.getMode() == workMode) {
                     cbMenuItem.setSelected(true);
                 } else {
-                    cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
+                    cbMenuItem.setActionCommand("CHANGE_MODE:" + workMode.id);
                     cbMenuItem.addActionListener(this);
                 }
                 cbMenuItem.setEnabled(!isBeingWorked);

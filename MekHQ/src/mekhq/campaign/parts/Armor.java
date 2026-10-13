@@ -64,7 +64,6 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -165,15 +164,7 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getTimeAndTargetText());
         }
         toReturn.append("</html>");
         return toReturn.toString();

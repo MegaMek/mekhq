@@ -2581,8 +2581,8 @@ public class Refit extends Part implements IAcquisitionWork {
         return "(" +
                      getRefitClassName() +
                      "/" +
-                     getTimeLeft() +
-                     " minutes/" +
+                     getTimeLeftText() +
+                     "/" +
                      getCost().toAmountAndSymbolString() +
                      ")";
     }
