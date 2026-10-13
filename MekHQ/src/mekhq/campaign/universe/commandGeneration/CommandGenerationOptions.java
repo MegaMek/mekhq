@@ -106,8 +106,8 @@ public class CommandGenerationOptions {
     private boolean generateMedics;
     private boolean medicsAsPersonnel;
     private SkillLevel medicSkillLevel;
-    // Medical reserve (generation-only): optionally create spare unassigned MekWarriors as injury
-    // replacements, sized as a percentage of the generated combatants.
+    // Medical reserve (generation-only): optionally create spare unassigned combat personnel as injury
+    // replacements, sized as a percentage of the people generated in each combat role.
     private boolean generateMedicalReserve;
     private int medicalReservePercent;
 
