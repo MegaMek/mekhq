@@ -527,8 +527,14 @@ public class Unit implements ITechnology, ILocatable {
                       campaignTransportType.name(),
                       e.toString(),
                       e.getCause());
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error("Could not find constructor to initialize transport space for {} Error: {} Cause: {}",
+            } catch (InvocationTargetException e) {
+                // The constructor was found and called, but threw; log what it threw rather than the reflection wrapper
+                Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+                LOGGER.error(cause, "Failed to initialize transport space for {} on {}",
+                      campaignTransportType.name(),
+                      (entity != null) ? entity.getShortName() : "a unit with no entity");
+            } catch (InstantiationException | IllegalAccessException e) {
+                LOGGER.error("Could not instantiate transport space for {} Error: {} Cause: {}",
                       campaignTransportType.name(),
                       e,
                       e.getCause());
