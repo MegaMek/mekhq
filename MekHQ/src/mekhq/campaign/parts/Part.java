@@ -898,6 +898,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     static String fixForRenamedParts(String partName) {
         return switch (partName) {
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 2 LINES
             case "Mech Life Support System" -> "Mek Life Support System";
             case "ProtoMech Arm Actuator" -> "ProtoMek Arm Actuator";
             default -> partName;
