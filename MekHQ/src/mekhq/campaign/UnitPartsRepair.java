@@ -34,10 +34,14 @@ package mekhq.campaign;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.bays.Bay;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.parts.Armor;
@@ -70,6 +74,10 @@ import mekhq.campaign.unit.Unit;
  * is removed, keeping the one in the unit's own warehouse; missing doors beyond what a bay has are removed; and parts
  * still kept elsewhere are moved to the unit's warehouse. Removed parts were never bought, so nothing is paid for them.
  * </p>
+ *
+ * <p>Bay parts no bay on the unit accounts for are removed too. Older versions numbered every quarters and seat bay
+ * 0, so a Leopard (2537) carried three "1st Class Quarters Bay #0" parts; once each bay has its own number, those
+ * parts match no bay and the unit is given one part per bay instead.</p>
  */
 public final class UnitPartsRepair {
     private static final MMLogger LOGGER = MMLogger.create(UnitPartsRepair.class);
@@ -111,6 +119,7 @@ public final class UnitPartsRepair {
             return false;
         }
         int duplicateCount = removeDuplicates(campaign, unit, homeWarehouse);
+        int surplusBayCount = removeSurplusBays(campaign, unit);
         int surplusDoorCount = removeSurplusMissingDoors(campaign, unit);
         int movedCount = 0;
         for (Part part : List.copyOf(unit.getParts())) {
@@ -120,10 +129,11 @@ public final class UnitPartsRepair {
                 movedCount++;
             }
         }
-        boolean isRepaired = (duplicateCount + surplusDoorCount + movedCount) > 0;
+        boolean isRepaired = (duplicateCount + surplusBayCount + surplusDoorCount + movedCount) > 0;
         if (isRepaired) {
-            LOGGER.info("[PartIdentity] {}: removed {} duplicate parts and {} surplus missing doors, moved {} parts "
-                              + "to its warehouse", unit.getName(), duplicateCount, surplusDoorCount, movedCount);
+            LOGGER.info("[PartIdentity] {}: removed {} duplicate parts, {} surplus bays and {} surplus missing doors, "
+                              + "moved {} parts to its warehouse", unit.getName(), duplicateCount, surplusBayCount,
+                  surplusDoorCount, movedCount);
         }
         return isRepaired;
     }
@@ -190,6 +200,36 @@ public final class UnitPartsRepair {
             return "life support";
         }
         return null;
+    }
+
+    /**
+     * Removes bay parts, with their doors and cubicles, that no bay on the unit accounts for: a part whose bay number
+     * no bay has, a part for a bay that takes no space, and every part after the first for the same bay.
+     */
+    private static int removeSurplusBays(Campaign campaign, Unit unit) {
+        Entity entity = unit.getEntity();
+        if (entity == null) {
+            return 0;
+        }
+        Set<Integer> bayNumbersWithAPart = new HashSet<>();
+        List<Part> surplusBays = new ArrayList<>();
+        for (Part part : unit.getParts()) {
+            if (part instanceof TransportBayPart bayPart) {
+                Bay bay = entity.getBayById(bayPart.getBayNumber());
+                boolean isForABayWithSpace = (bay != null) && TransportBayPart.isWorthAPart(bay);
+                boolean isFirstForItsBay = bayNumbersWithAPart.add(bayPart.getBayNumber());
+                if (!isForABayWithSpace || !isFirstForItsBay) {
+                    surplusBays.add(part);
+                }
+            }
+        }
+        for (Part surplusBay : surplusBays) {
+            for (Part childPart : List.copyOf(surplusBay.getChildParts())) {
+                removeFromCampaign(campaign, unit, childPart);
+            }
+            removeFromCampaign(campaign, unit, surplusBay);
+        }
+        return surplusBays.size();
     }
 
     /**

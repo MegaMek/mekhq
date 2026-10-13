@@ -312,7 +312,9 @@ public class Unit implements ITechnology, ILocatable {
         this.repairLog = new ArrayList<>();
         this.lastMaintenanceReport = "";
         this.fluffName = "";
-        this.maintenanceMultiplier = 4;
+        // Large vessels are maintained by their own crew and always use x1; at x4 a DropShip needs more minutes than
+        // its engineer has in a day. Nothing else sets their multiplier, as every setter skips self-crewed units.
+        this.maintenanceMultiplier = ((entity instanceof Dropship) || (entity instanceof Jumpship)) ? 1 : 4;
         this.tempPersonnelRoleMap = new HashMap<>();
         initializeAllTransportSpace();
         reCalc();
@@ -4612,6 +4614,9 @@ public class Unit implements ITechnology, ILocatable {
 
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
+            if (!TransportBayPart.isWorthAPart(bay)) {
+                continue;
+            }
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = bays.get(bay.getBayNumber());
