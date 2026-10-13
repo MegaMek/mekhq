@@ -1128,13 +1128,15 @@ public class CampaignGUI extends JPanel {
                 continue;
             }
 
-            // The same estimate the Repair tab shows: target number, odds, minutes needed and finish day
+            // The same estimate the Repair tab's tech card shows: the tech's day, the job and its finish date.
+            // Refits never use overtime, so none is shown.
             String techLabel = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.techLabel",
                   tech.getFullName(),
                   SkillType.getColoredExperienceLevelName(tech.getSkillLevel(campaign, false, true)),
                   tech.getPrimaryRoleDesc(),
                   WorkTimeEstimate.describeTechJobAndFinish(campaign, TechTaskEstimate.estimate(campaign, refit,
-                        tech)));
+                        tech)),
+                  WorkTimeEstimate.describeTechDay(campaign, tech, false));
             techsByLabel.put(techLabel, tech);
             if (tech.isRightTechTypeFor(refit)) {
                 techLabels.add(lastRightTechIndex++, techLabel);
