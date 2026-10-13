@@ -69,6 +69,7 @@ import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.MedicPoolChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
@@ -529,6 +530,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     public void refreshDoctorsList() {
+        // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
+        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // generation completes reschedules this refresh against the finished campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         final int selected = docTable.getSelectedRow();
         final List<Person> doctors = getCampaign().getPlayerForce().getHumanResources().getDoctors();
         doctors.sort(new PersonTitleSorter().reversed());
@@ -539,6 +547,11 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     public void refreshPatientList() {
+        // Walks the personnel roster; skipped during bulk generation for the same reason as refreshDoctorsList().
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         Person doctor = getSelectedDoctor();
         ArrayList<Person> assigned = new ArrayList<>();
         ArrayList<Person> unassigned = new ArrayList<>();
@@ -598,6 +611,21 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(PersonEvent ev) {
+        doctorListScheduler.schedule();
+        patientListScheduler.schedule();
+    }
+
+    /**
+     * A force generation recruits its personnel while {@link Campaign#isBulkGenerationInProgress()} is true, so the
+     * refreshes its person events trigger are dropped by the guards in {@link #refreshDoctorsList()} and
+     * {@link #refreshPatientList()}. Generation ends by firing this event, which runs both against the finished
+     * campaign.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }

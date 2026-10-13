@@ -60,6 +60,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 import mekhq.gui.campaignOptions.optionChangeDialogs.SupportCapabilityGrantDialog;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -322,6 +323,51 @@ class AddSupportUnitsToTOETest {
         assertNotNull(campaign.getPlayerForce().getFormation(combatLance.getId()), "the empty combat lance survives");
         assertNotNull(campaign.getPlayerForce().getFormation(commandLance.getId()),
               "and so does an empty lance under Headquarters");
+    }
+
+    @Test
+    void addCapabilityVehicles_buildsEveryVehicleWhenStaffRunOut() {
+        // Issue 10391: with one doctor for two MASH trucks, the second was never built and the first was left short
+        // of crew, so neither gave any MASH capacity.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        String vehicleName = UnitTestUtilities.getHeavyTrackedApcStandard().getShortNameRaw();
+        Assumptions.assumeTrue(megamek.common.loaders.MekSummaryCache.getInstance().getMek(vehicleName) != null,
+              "the unit cache does not hold the stand-in vehicle");
+        Formation company = new Formation("Field Hospital Company");
+        campaign.getPlayerForce().addFormation(company,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+
+        SupportPersonnelToTOE.addCapabilityVehicles(campaign, company,
+              new SupportPersonnelToTOE.VehicleSpec(vehicleName, 2), newStaff(campaign, PersonnelRole.DOCTOR, 1), 0,
+              campaign.getPlayerForce().getFaction());
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
+
+        assertEquals(2, company.getUnits().size(), "both vehicles are built although the staff ran out");
+        for (Unit vehicle : unitsNamedLike(campaign, "APC")) {
+            assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(),
+                  "and each is fully crewed, with new hires where the campaign has no temporary crews");
+        }
+    }
+
+    @Test
+    void fillShortCrews_coversEmptySeatsFromTheTemporaryPool() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit vehicle = unitNamedLike(campaign, "APC");
+        Formation company = new Formation("Field Hospital Company");
+        campaign.getPlayerForce().addFormation(company,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        campaign.getPlayerForce().addUnitToFormation(vehicle, company.getId(), campaign);
+        vehicle.addDriver(newStaff(campaign, PersonnelRole.DOCTOR, 1).get(0));
+        assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
+              "this test is only meaningful while the vehicle is short of crew");
+
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
+
+        assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are covered");
+        assertTrue(vehicle.getTotalTempCrew() > 0, "by the temporary crew pool, not by new hires");
     }
 
     @Test

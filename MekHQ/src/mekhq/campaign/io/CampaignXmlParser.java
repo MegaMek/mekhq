@@ -116,6 +116,7 @@ import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.io.LegacyContractConverter;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
@@ -2856,6 +2857,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Settle the remaining balance of any legacy contracts closed out on load; deferred to here so the force is
         // populated and the campaign's contract base can be computed.
         LegacyContractConverter.settlePendingLegacyContracts(campaign);
+        // Free any forces stranded on the scenarios of contracts whose completion was interrupted in earlier versions.
+        MissionCompletionManager.releaseCompletedContractDeployments(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

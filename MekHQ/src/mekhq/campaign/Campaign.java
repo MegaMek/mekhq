@@ -254,6 +254,8 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.RepairAsTechTime;
 import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTaskHold;
+import mekhq.campaign.work.RepairTechEligibility;
+import mekhq.campaign.work.RepairTechEligibility.Refusal;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -756,7 +758,8 @@ public class Campaign implements ITechManager {
 
         if ((totalPayout.isPositive()) ||
                   (null != getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees())) {
-            if (getPlayerForce().getFinances()
+            // A zero payout needs no debit; attempting one would fail whenever the campaign is in debt.
+            if (!totalPayout.isPositive() || getPlayerForce().getFinances()
                       .debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees()) {
                     Person person = getPlayerForce().getHumanResources().getPerson(pid);
@@ -889,7 +892,7 @@ public class Campaign implements ITechManager {
                 getPlayerForce().getHumanResources().getRetirementDefectionTracker().resolveAllContracts();
                 return true;
             }
-        } else {
+
             addReport(FINANCES, "<font color='" +
                                       ReportingUtilities.getNegativeColor() +
                                       "'>You cannot afford to make the final payments.</font>");
@@ -1433,6 +1436,17 @@ public class Campaign implements ITechManager {
             unit.getEntity().setId(game.getNextEntityId());
         }
         game.addEntity(unit.getEntity());
+
+        // The constructor set up transport space against the entity's old game (or none); redo it against ours
+        unit.initializeAllTransportSpace();
+
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
+            }
+        }
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -4521,17 +4535,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
-     * so they take no other work. Maintenance of units they already look after is separate and carries on.
-     *
-     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
-     */
-    private boolean isBusyWithAnotherRefit(IPartWork partWork, Person tech) {
-        Unit refittingUnit = getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech);
-        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
-    }
-
-    /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
      * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
@@ -4541,12 +4544,36 @@ public class Campaign implements ITechManager {
      * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates
      * if a task is impossible, or has automatic success (e.g., for infantry refits).</p>
      *
+     * <p>Before anything else, a repair or salvage task checks the rules about who may work on it, the same ones the
+     * Repair tab's tech list follows: the tech must be where the task is, be the right type of tech, and not be
+     * another unit's crew.</p>
+     *
      * @param partWork the part work task to be performed
      * @param tech     the technician assigned to the task
      *
      * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
      */
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
+        if (!(partWork instanceof Refit)) {
+            Refusal refusal = RepairTechEligibility.findAssignmentRefusal(this, partWork, tech);
+            if (refusal != null) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, refusal.getDescription());
+            }
+        }
+        return getSkillTargetFor(partWork, tech);
+    }
+
+    /**
+     * Calculates the {@link TargetRoll} for a task from the tech's skill, without the rules about who may work on it.
+     * Mass Repair uses this with a stand-in elite tech, who belongs to no unit and no place, to judge whether anyone
+     * could do the task at all. Everything else uses {@link #getTargetFor(IPartWork, Person)}.
+     *
+     * @param partWork the part work task to be performed
+     * @param tech     the technician, real or stand-in
+     *
+     * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
+     */
+    public TargetRoll getSkillTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
         SkillModifierData skillModifierData = tech.getSkillModifierData();
@@ -4561,7 +4588,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
-        } else if (isBusyWithAnotherRefit(partWork, tech)) {
+        } else if (RepairTechEligibility.isBusyWithAnotherRefit(this, partWork, tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, getFormattedTextAt(RESOURCE_BUNDLE, "refit.techBusy",
                   getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
@@ -4597,9 +4624,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, unaffordableReason);
         }
 
-        final int techTime = isOvertimeAllowed() ?
-                                   tech.getMinutesLeft() + tech.getOvertimeLeft() :
-                                   tech.getMinutesLeft();
+        final int techTime = RepairTechEligibility.getTimeLeftToday(this, tech);
         if (!(partWork instanceof Refit) && (techTime <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
@@ -5500,30 +5525,87 @@ public class Campaign implements ITechManager {
         });
     }
 
+    /**
+     * Calculates the gross final payment a contract pays out on completion, before any salvage overage is repaid or
+     * shareholders take their cut.
+     *
+     * @param mission the contract being completed
+     * @param status  the status the contract is being completed with
+     *
+     * @return the gross final payment, or {@link Money#zero()} if the status earns none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Money getGrossFinalContractPayment(AbstractContract mission, MissionStatus status) {
+        // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
+        // payment even though this seems foolish
+        if (!status.isSuccess()) {
+            return Money.zero();
+        }
+
+        Money routedPayout = mission.getRoutPayout();
+        if (routedPayout != null) {
+            return routedPayout;
+        }
+
+        return mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
+    }
+
+    /**
+     * Calculates the final payment credited on completion: the gross final payment less any salvage overage the
+     * {@code OverageRepaymentInFinalPayment} option has repaid out of it. This can be negative.
+     *
+     * @param mission      the contract being completed
+     * @param grossPayment the contract's gross final payment
+     *
+     * @return the net final payment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Money getNetFinalContractPayment(AbstractContract mission, Money grossPayment) {
+        if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
+            return grossPayment.minus(ContractSettlement.salvageOverage(mission));
+        }
+
+        return grossPayment;
+    }
+
+    /**
+     * Calculates how much the campaign's balance will change when {@link #completeMission(AbstractContract,
+     * MissionStatus)} runs: the net final payment less the shareholders' cut. Used to judge, before the contract is
+     * closed, whether payments due on completion (such as turnover payouts) will be affordable.
+     *
+     * <p>The shareholders' cut is always deducted, even though it is skipped when the campaign cannot afford it, so
+     * the projection never overstates the funds available.</p>
+     *
+     * @param mission the contract being completed
+     * @param status  the status the contract is being completed with
+     *
+     * @return the projected change in balance, which may be negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getProjectedCompletionIncome(AbstractContract mission, MissionStatus status) {
+        Money grossPayment = getGrossFinalContractPayment(mission, status);
+        Money netPayment = getNetFinalContractPayment(mission, grossPayment);
+        return netPayment.minus(ContractSettlement.calculateShares(this, mission, grossPayment));
+    }
+
     public void completeMission(@Nullable AbstractContract mission, MissionStatus status) {
         if (mission == null) {
             return;
         }
         mission.setStatus(status);
-        Money remainingMoney = Money.zero();
-        // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
-        // payment even though this seems foolish
-        if (mission.getStatus().isSuccess()) {
-            remainingMoney = mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
-
-            Money routedPayout = mission.getRoutPayout();
-
-            remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
-        }
 
         // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
-        final Money grossPayout = remainingMoney;
+        final Money grossPayout = getGrossFinalContractPayment(mission, status);
 
         // With OverageRepaymentInFinalPayment enabled, salvage the player kept beyond their rights is repaid as part of
         // the final payment, which can push it into a debit (the negative branch below).
-        if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
-            remainingMoney = remainingMoney.minus(ContractSettlement.salvageOverage(mission));
-        }
+        Money remainingMoney = getNetFinalContractPayment(mission, grossPayout);
 
         if (remainingMoney.isPositive()) {
             getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,

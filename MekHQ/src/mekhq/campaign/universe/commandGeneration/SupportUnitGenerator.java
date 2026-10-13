@@ -716,7 +716,7 @@ public final class SupportUnitGenerator {
             if ((entity == null) || Resupply.isProhibitedUnitType(entity, false, false)) {
                 continue;
             }
-            if (isInSupportFormation(campaign, unit) || (SupportVehicleSelector.capabilityOf(entity) != null)) {
+            if (isSupportUnit(campaign, unit)) {
                 supportVehicles++;
                 continue;
             }
@@ -927,6 +927,10 @@ public final class SupportUnitGenerator {
      * split ({@link Person#isCombat()}) as the daily fatigue check. Prisoners and camp followers are
      * excluded, matching the roster the field-kitchen usage count is taken over.
      *
+     * <p>Anyone crewing a support unit is left out, by the same test {@link #tallyCombatForce} applies to units.
+     * A MASH truck's driver is a combat role on paper, but is not part of the force the MASH trucks and the security
+     * detail are sized for; counting them had each new MASH truck raise the number of MASH trucks wanted.</p>
+     *
      * @param campaign the campaign to inspect
      *
      * @return the number of active combat personnel
@@ -934,11 +938,26 @@ public final class SupportUnitGenerator {
     static int combatPersonnelCount(Campaign campaign) {
         int combatPersonnel = 0;
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
-            if (person.isCombat()) {
+            if (person.isCombat() && !isSupportUnit(campaign, person.getUnit())) {
                 combatPersonnel++;
             }
         }
         return combatPersonnel;
+    }
+
+    /**
+     * Whether a unit is part of the command's support rather than its fighting force: a support carrier, a unit filed
+     * in a support formation, or one that does a support capability's job wherever it is filed.
+     *
+     * @param campaign the campaign holding the formations
+     * @param unit     the unit; {@code null} is not support
+     *
+     * @return {@code true} when the unit is support
+     */
+    private static boolean isSupportUnit(Campaign campaign, @Nullable Unit unit) {
+        return (unit != null)
+                     && (unit.isCarrier() || isInSupportFormation(campaign, unit)
+                               || (SupportVehicleSelector.capabilityOf(unit.getEntity()) != null));
     }
 
     /**
