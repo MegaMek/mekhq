@@ -155,7 +155,7 @@ class PodSwapCarryOverTest {
 
         MissingEquipmentPart missingWeapon = missingPodWeapons().getFirst();
         assertTrue(missingWeapon.hasReplacementPart(), "The spare weapon is held for the swap");
-        assertSame(mechanic, missingWeapon.getReplacementPart().getReservedBy());
+        assertTrue(missingWeapon.getReplacementPart().isReservedByPerson(mechanic.getId()));
     }
 
     @Test
@@ -220,7 +220,7 @@ class PodSwapCarryOverTest {
 
         assertNull(podSpace.getTech());
         assertFalse(missingWeapon.hasReplacementPart());
-        assertNull(heldSpare.getReservedBy());
+        assertFalse(heldSpare.isReservedForReplacement());
     }
 
     @Test
@@ -232,7 +232,7 @@ class PodSwapCarryOverTest {
         epona.initializeParts(true);
 
         assertNull(podSpace().getTech(), "A restored unit starts with no pod swap under way");
-        assertNull(heldSpare.getReservedBy());
+        assertFalse(heldSpare.isReservedForReplacement());
     }
 
     @Test
