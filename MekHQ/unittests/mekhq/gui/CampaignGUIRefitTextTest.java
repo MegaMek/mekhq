@@ -79,10 +79,11 @@ class CampaignGUIRefitTextTest {
     @ParameterizedTest
     @ValueSource(strings = { "refitSelectTech.techLabel" })
     void techLabelFillsEveryField(String key) {
-        String estimate = "TN 7 (58%), 1480 min, done in 3 more day(s)";
-        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", estimate);
+        String estimate = "This job: 24 h 40 min of work, needs 7+ (58%). Finishes 3151-01-05, in 3 days";
+        String techDay = "Free today: 8 h of 8 h";
+        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", estimate, techDay);
 
         assertFalse(text.contains("{"), text);
-        assertEquals(true, text.contains(estimate), text);
+        assertEquals(true, text.contains(estimate) && text.contains(techDay), text);
     }
 }
