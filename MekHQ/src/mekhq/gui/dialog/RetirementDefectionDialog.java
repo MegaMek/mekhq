@@ -100,6 +100,8 @@ public class RetirementDefectionDialog extends JDialog {
     final private CampaignGUI hqView;
     final private AbstractContract contract;
     final private RetirementDefectionTracker rdTracker;
+    /** Money not yet credited that will be available for payouts, such as a contract's final payment. */
+    final private Money pendingIncome;
 
     private Map<UUID, TargetRoll> targetRolls;
     final private Map<UUID, UUID> unitAssignments;
@@ -188,10 +190,29 @@ public class RetirementDefectionDialog extends JDialog {
     };
 
     public RetirementDefectionDialog(CampaignGUI gui, AbstractContract mission, boolean doRetirement) {
+        this(gui, mission, doRetirement, Money.zero());
+    }
+
+    /**
+     * Creates the turnover dialog.
+     *
+     * @param gui           the campaign GUI
+     * @param mission       the contract whose completion triggered turnover, or {@code null} if it is not contract
+     *                      related
+     * @param doRetirement  {@code true} to roll for turnover, {@code false} to show existing results
+     * @param pendingIncome money not yet credited that will be available for payouts, such as the final payment of a
+     *                      contract that is still being completed; it counts towards affording the payouts
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public RetirementDefectionDialog(CampaignGUI gui, AbstractContract mission, boolean doRetirement,
+          Money pendingIncome) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
         this.contract = mission;
+        this.pendingIncome = pendingIncome;
         rdTracker = hqView.getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker();
         if (doRetirement) {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
@@ -842,7 +863,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
         }
 
-        return assignmentComplete && (totalPayout.isLessThan(hqView.getCampaign().getPlayerForce().getFunds()));
+        Money availableFunds = hqView.getCampaign().getPlayerForce().getFunds().plus(pendingIncome);
+        return assignmentComplete && (totalPayout.isLessThan(availableFunds));
     }
 
     private void enableAddRemoveButtons() {
@@ -974,4 +996,3 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setVisible(true);
     }
 }
-
