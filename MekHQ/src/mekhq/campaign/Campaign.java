@@ -1434,6 +1434,17 @@ public class Campaign implements ITechManager {
         }
         game.addEntity(unit.getEntity());
 
+        // The constructor set up transport space against the entity's old game (or none); redo it against ours
+        unit.initializeAllTransportSpace();
+
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
+            }
+        }
+
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
         return unit;
