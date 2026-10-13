@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -642,7 +643,7 @@ public class MissionCompletionManagerTest {
 
                 chaosReputation.verify(() -> ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS,
                       personnel, 1.5));
-                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyInt(),
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyDouble(),
                       any(), any(), anyBoolean(), any()), never());
             }
         }
@@ -664,7 +665,8 @@ public class MissionCompletionManagerTest {
             List<Scenario> scenarios = List.of(mock(Scenario.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
             when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(true);
-            when(mission.getScale()).thenReturn(4);
+            when(campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE)).thenReturn(false);
+            when(mission.getEconomicScale(false)).thenReturn(4.0);
             when(mission.getScenarios()).thenReturn(scenarios);
             when(mission.getName()).thenReturn("Raid");
 
@@ -678,7 +680,7 @@ public class MissionCompletionManagerTest {
 
                 MissionCompletionManager.payCompletionBonusAndReputation(campaign, mission, MissionStatus.SUCCESS);
 
-                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4, scenarios,
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4.0, scenarios,
                       null, true, "Raid"));
             }
         }

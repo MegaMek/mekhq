@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -233,7 +234,13 @@ class AbstractContractDeterminationPayTest {
      */
     private static Money transportPay(int scale, int jumps, double transportMultiplier, boolean atHiringHall,
           boolean twoWayPay, boolean convertSupportPoints) {
+        return transportPay(scale, false, jumps, transportMultiplier, atHiringHall, twoWayPay, convertSupportPoints);
+    }
+
+    private static Money transportPay(double scale, boolean useFractionalScale, int jumps, double transportMultiplier,
+          boolean atHiringHall, boolean twoWayPay, boolean convertSupportPoints) {
         CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.USE_FRACTIONAL_SCALE)).thenReturn(useFractionalScale);
         when(options.get(CampaignOption.IS_USE_TWO_WAY_PAY)).thenReturn(twoWayPay);
         when(options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)).thenReturn(convertSupportPoints);
         Campaign campaign = mock(Campaign.class);
@@ -245,7 +252,9 @@ class AbstractContractDeterminationPayTest {
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
 
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(scale);
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(scale));
+        when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
+              ChaosContractDeterminationScale.getEconomicScale(scale, invocation.getArgument(0)));
         when(contract.getTransportMultiplier()).thenReturn(transportMultiplier);
 
         JumpPath jumpPath = jumps == 0 ? null : mock(JumpPath.class);
@@ -271,6 +280,18 @@ class AbstractContractDeterminationPayTest {
     void transportPayScalesWithScaleAndJumpCount() {
         // 50 * scale(3) * jumps(2) = 300 support points, unconverted.
         assertEquals(Money.of(300), transportPay(3, 2, 1.0, false, false, false));
+    }
+
+    @Test
+    void transportPayRoundsScaleUpWithoutFractionalScale() {
+        // 50 * scale(2.4 -> 3) * jumps(2) = 300 support points
+        assertEquals(Money.of(300), transportPay(2.4, false, 2, 1.0, false, false, false));
+    }
+
+    @Test
+    void transportPayFollowsTheExactScaleWithFractionalScale() {
+        // 50 * scale(2.4) * jumps(2) = 240 support points
+        assertEquals(Money.of(240), transportPay(2.4, true, 2, 1.0, false, false, false));
     }
 
     @Test

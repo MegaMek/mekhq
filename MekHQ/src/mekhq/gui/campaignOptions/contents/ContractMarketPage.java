@@ -140,6 +140,7 @@ class ContractMarketPage {
     private JCheckBox chkBasePayOnlyConsidersScale;
     private JCheckBox chkCapContractScaleByHiringHall;
     private JCheckBox chkTaperCombatPayAndSalvageByScale;
+    private JCheckBox chkUseFractionalScale;
     private JCheckBox chkUseLegacyOptions;
     private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
@@ -463,6 +464,8 @@ class ContractMarketPage {
         chkTaperCombatPayAndSalvageByScale = new CampaignOptionsCheckBox("TaperCombatPayAndSalvageByScale",
               getMetadata(new Version(0, 51, 1)));
         chkTaperCombatPayAndSalvageByScale.addMouseListener(createTipPanelUpdater("TaperCombatPayAndSalvageByScale"));
+        chkUseFractionalScale = new CampaignOptionsCheckBox("UseFractionalScale", getMetadata(new Version(0, 51, 1)));
+        chkUseFractionalScale.addMouseListener(createTipPanelUpdater("UseFractionalScale"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
@@ -603,6 +606,9 @@ class ContractMarketPage {
 
         layout.gridy++;
         panel.add(chkTaperCombatPayAndSalvageByScale, layout);
+
+        layout.gridy++;
+        panel.add(chkUseFractionalScale, layout);
 
         layout.gridy++;
         panel.add(chkUseLegacyOptions, layout);
@@ -747,6 +753,7 @@ class ContractMarketPage {
         chkBasePayOnlyConsidersScale.setSelected(model.basePayOnlyConsidersScale);
         chkCapContractScaleByHiringHall.setSelected(model.capContractScaleByHiringHall);
         chkTaperCombatPayAndSalvageByScale.setSelected(model.taperCombatPayAndSalvageByScale);
+        chkUseFractionalScale.setSelected(model.useFractionalScale);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
@@ -811,6 +818,7 @@ class ContractMarketPage {
         model.basePayOnlyConsidersScale = chkBasePayOnlyConsidersScale.isSelected();
         model.capContractScaleByHiringHall = chkCapContractScaleByHiringHall.isSelected();
         model.taperCombatPayAndSalvageByScale = chkTaperCombatPayAndSalvageByScale.isSelected();
+        model.useFractionalScale = chkUseFractionalScale.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();

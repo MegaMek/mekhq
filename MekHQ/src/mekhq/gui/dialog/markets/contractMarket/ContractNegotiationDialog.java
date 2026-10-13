@@ -73,6 +73,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationData;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath;
@@ -295,7 +296,10 @@ public class ContractNegotiationDialog extends JDialog {
                                                  "negotiate.contractMarket.subtitle",
                                                  contract.getName(),
                                                  contract.getEmployerMarketDisplayName(),
-                                                 scale)) +
+                                                 ChaosContractDeterminationScale.formatScale(
+                                                       contract.getExactScale(),
+                                                       campaign.getCampaignOptions()
+                                                             .get(CampaignOption.USE_FRACTIONAL_SCALE)))) +
                                            "</span></html>");
 
         JPanel budgets = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(16), 0));
