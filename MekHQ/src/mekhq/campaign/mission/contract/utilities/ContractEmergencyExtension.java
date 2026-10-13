@@ -90,6 +90,11 @@ public class ContractEmergencyExtension {
         LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
 
+        // The active-contract flag was last set at the start of the day, when this contract had already passed its
+        // old end date. Without a refresh, the next day's nags (e.g. prisoners) would still treat the campaign as
+        // having no active contract.
+        campaign.setHasActiveContract();
+
         // StratCon's schedule was rolled to the old end date, so it is rolled again to cover the extension.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState != null) {
