@@ -4614,6 +4614,9 @@ public class Unit implements ITechnology, ILocatable {
 
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
+            if (!TransportBayPart.isWorthAPart(bay)) {
+                continue;
+            }
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = bays.get(bay.getBayNumber());
