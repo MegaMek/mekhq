@@ -6722,18 +6722,44 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} is assigned to fill
-     * that slot, then refreshes the unit's crew state.
+     * Reports whether this unit has an empty seat for a real crew member of the given role, counting temporary
+     * ("blob") crew as filling seats. Call it before the person is added.
      *
-     * <p>This mirrors the temp crew handling already performed by {@link #addPilotOrSoldier(Person, Unit, boolean)}
-     * for infantry and solo-piloted units.</p>
+     * <p>Vessel roles each have their own seats and their own temp crew, so they are checked per position. Every
+     * other role is checked against the whole unit, because a vehicle's temp crew are one pool shared by its driver,
+     * gunner and crew seats rather than tied to any one of them.</p>
      *
-     * @param role the temp crew role to release; when {@code null} or when no temp crew of that role is present, the
-     *             crew state is simply refreshed
+     * @param role the role of the seat being filled, or {@code null} to check the whole unit
+     *
+     * @return {@code true} if a seat is free, so assigning someone must not release a temp crew member
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role) {
+    private boolean hasFreeSeatFor(final @Nullable PersonnelRole role) {
+        if (role == PersonnelRole.VESSEL_PILOT) {
+            return drivers.size() + getTempCrewByPersonnelRole(role) < getTotalDriverNeeds();
+        } else if (role == PersonnelRole.VESSEL_GUNNER) {
+            return gunners.size() + getTempCrewByPersonnelRole(role) < getTotalGunnerNeeds();
+        } else if (role == PersonnelRole.VESSEL_CREW) {
+            return vesselCrew.size() + getTempCrewByPersonnelRole(role) < getTotalCrewNeeds();
+        }
+        return getTotalCrewSize() < getFullCrewSize();
+    }
+
+    /**
+     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} took a seat that
+     * was already filled, so the unit is not left with more crew than seats, then refreshes the unit's crew state.
+     *
+     * @param role        the temp crew role to release; when {@code null} or when no temp crew of that role is present,
+     *                    the crew state is simply refreshed
+     * @param hadFreeSeat whether the unit had an empty seat before the person was added (see
+     *                    {@link #hasFreeSeatFor(PersonnelRole)}); when {@code true} the person filled it and no temp
+     *                    crew is released
+     */
+    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role, final boolean hadFreeSeat) {
         final int currentTempCrew = (role == null) ? 0 : getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
+        if (!hadFreeSeat && currentTempCrew > 0) {
             // setTempCrew() also refreshes the unit's crew state via resetPilotAndEntity()
             setTempCrew(role, currentTempCrew - 1);
         } else {
@@ -6753,9 +6779,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole driverRole = getDriverRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(driverRole);
         drivers.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getDriverRole());
+        releaseTempCrewForAssignedRole(driverRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6777,9 +6805,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole gunnerRole = getGunnerRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(gunnerRole);
         gunners.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getGunnerRole());
+        releaseTempCrewForAssignedRole(gunnerRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6801,12 +6831,13 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
-        vesselCrew.add(person);
-        person.setUnit(this);
         final PersonnelRole crewRole = (entity instanceof Aero && !(entity instanceof ConvFighter)) ?
                                              PersonnelRole.VESSEL_CREW :
                                              getDriverRole();
-        releaseTempCrewForAssignedRole(crewRole);
+        final boolean hadFreeSeat = hasFreeSeatFor(crewRole);
+        vesselCrew.add(person);
+        person.setUnit(this);
+        releaseTempCrewForAssignedRole(crewRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6936,6 +6967,7 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final boolean hadFreeSeat = hasFreeSeatFor(getDriverRole());
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
@@ -6943,14 +6975,8 @@ public class Unit implements ITechnology, ILocatable {
         }
         person.setUnit(this);
 
-        // Remove one temp crew member when adding a real Person
-        PersonnelRole role = person.getPrimaryRole();
-        int currentTempCrew = getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
-            setTempCrew(role, currentTempCrew - 1);
-        } else {
-            resetPilotAndEntity();
-        }
+        // Replace one temp crew member only if the real Person took a seat that was already filled
+        releaseTempCrewForAssignedRole(person.getPrimaryRole(), hadFreeSeat);
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
