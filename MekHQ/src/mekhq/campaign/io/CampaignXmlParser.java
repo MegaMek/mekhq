@@ -450,7 +450,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * node is given an in-system path so normal {@code newDay()} processing carries it to the planet. Return nodes
      * are parented under the main force, outbound nodes under the academy campus.</p>
      */
-    private static void migrateLegacyEducationTravel(Campaign campaign) {
+    static void migrateLegacyEducationTravel(Campaign campaign) {
         // Phase 1: scan for persons that need migration. All per-person logging here is DEBUG
         // so post-refactor saves (where everyone is skipped) produce no INFO noise.
         List<Person> toMigrate = new ArrayList<>();
