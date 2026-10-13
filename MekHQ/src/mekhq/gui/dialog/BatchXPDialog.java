@@ -35,11 +35,13 @@ package mekhq.gui.dialog;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -51,20 +53,24 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.tables.MHQTable;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.utilities.ReportingUtilities;
 
 public final class BatchXPDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(BatchXPDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.BatchXPDialog";
 
     private final Campaign campaign;
     private final PersonnelFilter personnelFilter;
@@ -330,13 +336,18 @@ public final class BatchXPDialog extends JDialog {
             // This shouldn't happen, but guard against it anyway.
             return;
         }
+        personnelFilter.clearUnaffordablePersonnel();
         int rows = personnelTable.getRowCount();
-        int improvedPersonnelCount = rows;
+        Set<Person> improvedPersonnel = new HashSet<>();
         while (rows > 0) {
             for (int i = 0; i < rows; ++i) {
                 final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
                 Person person = personnelTable.getModel().getRow(personnelTable.convertRowIndexToModel(i));
+
+                if (!SkillTrainingCosts.payForSkillImprovement(campaign, person, skillName)) {
+                    continue;
+                }
 
                 int cost = person.getCostToImprove(skillName, campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER));
                 double costMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
@@ -363,6 +374,7 @@ public final class BatchXPDialog extends JDialog {
                       skillName,
                       skill.getLevel());
                 campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
+                improvedPersonnel.add(person);
             }
 
             // Refresh the filter and continue if we still have anyone available
@@ -370,10 +382,19 @@ public final class BatchXPDialog extends JDialog {
             rows = personnelTable.getRowCount();
         }
 
-        if (improvedPersonnelCount > 0) {
+        if (!improvedPersonnel.isEmpty()) {
             campaign.addReport(PERSONNEL, String.format(resourceMap.getString("improvedSkills.format"),
                   skillName,
-                  improvedPersonnelCount));
+                  improvedPersonnel.size()));
+        }
+
+        int unaffordablePersonnelCount = personnelFilter.getUnaffordablePersonnelCount();
+        if (unaffordablePersonnelCount > 0) {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "unaffordable.format",
+                  ReportingUtilities.spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                  skillName,
+                  unaffordablePersonnelCount,
+                  ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
 
@@ -387,6 +408,7 @@ public final class BatchXPDialog extends JDialog {
         private String skillName = null;
         private int maxSkillLevel = 10;
         private boolean prisoners = false;
+        private final Set<Person> unaffordablePersonnel = new HashSet<>();
 
         public PersonnelFilter(final Campaign campaign) {
             this.campaign = campaign;
@@ -422,17 +444,60 @@ public final class BatchXPDialog extends JDialog {
                 cost = (int) round(cost * xpCostMultiplier);
 
                 if (null == skill) {
-                    return (cost >= 0) && (cost <= person.getXP());
+                    return (cost >= 0) && (cost <= person.getXP()) && canAffordTraining(person);
                 } else {
                     if (cost < 0) {
                         return false;
                     }
 
                     cost = max(0, cost - skill.getXpProgress());
-                    return skill.getLevel() < maxSkillLevel && cost <= person.getXP();
+                    return skill.getLevel() < maxSkillLevel && cost <= person.getXP() && canAffordTraining(person);
                 }
             }
             return true;
+        }
+
+        /**
+         * Checks whether the force can pay the C-bill cost of the person's next improvement in the target skill,
+         * remembering anyone who can't so the shortfall can be reported.
+         *
+         * @param person a person who otherwise qualifies for the improvement
+         *
+         * @return {@code true} if the improvement is free or affordable
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        private boolean canAffordTraining(Person person) {
+            Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(campaign, person, skillName);
+            if (trainingCost.isZero()
+                      || campaign.getPlayerForce().getFinances().getBalance().isGreaterOrEqualThan(trainingCost)) {
+                return true;
+            }
+
+            unaffordablePersonnel.add(person);
+            return false;
+        }
+
+        /**
+         * Forgets who couldn't afford training, ready for a fresh round of improvements.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public void clearUnaffordablePersonnel() {
+            unaffordablePersonnel.clear();
+        }
+
+        /**
+         * @return how many personnel had their training held back by its C-bill cost since the last
+         *       {@link #clearUnaffordablePersonnel()}
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public int getUnaffordablePersonnelCount() {
+            return unaffordablePersonnel.size();
         }
 
         public void setPrimaryRole(PersonnelRole primaryRole) {

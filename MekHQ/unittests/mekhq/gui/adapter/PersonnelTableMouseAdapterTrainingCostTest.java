@@ -245,7 +245,7 @@ class PersonnelTableMouseAdapterTrainingCostTest {
 
         @BeforeEach
         void setUpCosts() {
-            skillTrainingCosts = mockStatic(SkillTrainingCosts.class);
+            skillTrainingCosts = mockStatic(SkillTrainingCosts.class, CALLS_REAL_METHODS);
         }
 
         @AfterEach
