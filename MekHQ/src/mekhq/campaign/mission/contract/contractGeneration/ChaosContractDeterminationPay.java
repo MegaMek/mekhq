@@ -60,23 +60,25 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
 
     @Override
     public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
-        int scale = contract.getScale();
-        int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * scale;
+        double economicScale = contract.getEconomicScale(campaign.getCampaignOptions()
+                                                               .get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * economicScale;
         if (campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
-            combatPayInSupportPoints = (int) round(DEFAULT_COMBAT_PAY_MULTIPLIER
-                                                         * ChaosScaleLimits.getTaperedScale(scale));
+            combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * ChaosScaleLimits.getTaperedScale(economicScale);
         }
         // When "Multiply Track Intensity by Scale" is set, a contract fields scale times as many scenarios. Divide
         // combat pay by scale so it stays flat across those extra scenarios rather than growing with their number.
-        if ((scale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {
-            combatPayInSupportPoints /= scale;
+        // The track rolls are a whole number, so this divides by the whole Scale even under Fractional Scale.
+        int rollScale = contract.getScale();
+        if ((rollScale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {
+            combatPayInSupportPoints = (int) round(combatPayInSupportPoints) / rollScale;
         }
         // Likewise for the extra scenarios the minimum track and weekly rolling options bring.
         double trackRollingMultiplier = TrackIntensityTable.getCombatPayMultiplier(contract.getTrackCount(),
               campaign.getCampaignOptions().get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
               campaign.getCampaignOptions().get(CampaignOption.ROLL_TRACKS_WEEKLY));
-        combatPayInSupportPoints = (int) round(combatPayInSupportPoints * trackRollingMultiplier);
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints,
+        int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints * trackRollingMultiplier);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedCombatPayInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }
 
@@ -95,7 +97,8 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if (!campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
             return 1.0;
         }
-        return ChaosScaleLimits.getTaperMultiplier(contract.getScale());
+        return ChaosScaleLimits.getTaperMultiplier(contract.getEconomicScale(campaign.getCampaignOptions()
+                                                                     .get(CampaignOption.USE_FRACTIONAL_SCALE)));
     }
 
     @Override
@@ -103,8 +106,10 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         boolean isConvertSupportPoints = shouldConvertSupportPoints(campaign);
 
         if (campaign.getCampaignOptions().get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE)) {
-            int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
-            monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
+            double economicScale = contract.getEconomicScale(campaign.getCampaignOptions()
+                                                                   .get(CampaignOption.USE_FRACTIONAL_SCALE));
+            int monthlyPayInSupportPoints = (int) round(DEFAULT_MONTHLY_PAY_MULTIPLIER * economicScale
+                                                              * contract.getBasePayMultiplier());
             return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints,
                   isConvertSupportPoints);
         }
@@ -140,14 +145,16 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         }
 
         PlayerForce playerForce = campaign.getPlayerForce();
-        int uncappedScale = AbstractContractGeneration.determineUncappedScale(campaign, playerForce,
-              playerForce.getHangar(), contract);
-        int contractScale = contract.getScale();
+        boolean useFractionalScale = campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE);
+        double uncappedScale = ChaosContractDeterminationScale.getEconomicScale(
+              AbstractContractGeneration.determineUncappedScale(campaign, playerForce, playerForce.getHangar(), contract),
+              useFractionalScale);
+        double contractScale = contract.getEconomicScale(useFractionalScale);
         if (uncappedScale <= 0 || contractScale >= uncappedScale) {
             return 1.0;
         }
 
-        return Math.max(0, contractScale) / (double) uncappedScale;
+        return Math.max(0, contractScale) / uncappedScale;
     }
 
     /**

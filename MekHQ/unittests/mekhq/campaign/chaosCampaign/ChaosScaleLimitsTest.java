@@ -159,5 +159,14 @@ class ChaosScaleLimitsTest {
         assertEquals(expected, ChaosScaleLimits.getUpkeepEscalationMultiplier(scale), DELTA);
     }
 
+    /** Under the Fractional Scale option, part Scales escalate and taper part-way. */
+    @Test
+    void partScalesEscalateAndTaperPartWay() {
+        assertEquals(1.025, ChaosScaleLimits.getUpkeepEscalationMultiplier(4.5), DELTA);
+        assertEquals(3.25, ChaosScaleLimits.getTaperedScale(3.5), DELTA);
+        assertEquals(3.25 / 3.5, ChaosScaleLimits.getTaperMultiplier(3.5), DELTA);
+        assertEquals(2.5, ChaosScaleLimits.getTaperedScale(2.5), DELTA);
+    }
+
     // endregion getUpkeepEscalationMultiplier
 }
