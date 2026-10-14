@@ -382,6 +382,30 @@ class ContractXmlCodecTest {
     // region salvage taper
 
     @Test
+    void anExactScaleSurvivesARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setScale(3.456789);
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertEquals(3.456789, reloaded.getExactScale(), 1e-12);
+        assertEquals(4, reloaded.getScale(), "the rules-as-written Scale still rounds up");
+    }
+
+    @Test
+    void aWholeNumberScaleFromAnOlderSaveIsRead() throws Exception {
+        String xml = "<contract type=\"" + ChaosContract.class.getName() + "\">"
+                           + "<scale>3</scale>"
+                           + "</contract>";
+
+        AbstractContract reloaded = parse(xml);
+
+        assertNotNull(reloaded);
+        assertEquals(3.0, reloaded.getExactScale(), 1e-12);
+        assertEquals(3, reloaded.getScale());
+    }
+
+    @Test
     void aTaperedSalvageMultiplierSurvivesARoundTrip() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
         contract.setSalvageTaperMultiplier(5.0 / 7.0);
