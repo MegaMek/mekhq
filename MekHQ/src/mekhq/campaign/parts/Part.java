@@ -885,6 +885,26 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         };
     }
 
+    /**
+     * Fixes the saved name of a part whose name has since changed. Part names are written to the save file and read
+     * back over the name the constructor sets, so without this a renamed part keeps its old name in existing saves.
+     *
+     * @param partName the part name read from the save file
+     *
+     * @return the current part name, or the passed name if it hasn't changed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String fixForRenamedParts(String partName) {
+        return switch (partName) {
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 2 LINES
+            case "Mech Life Support System" -> "Mek Life Support System";
+            case "ProtoMech Arm Actuator" -> "ProtoMek Arm Actuator";
+            default -> partName;
+        };
+    }
+
     public static Part generateInstanceFromXML(Node wn, Version version) {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -909,7 +929,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     // a save from before parts had an identity has none, and the part keeps the one it was made with
                     readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.name = fixForRenamedParts(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
                     retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
