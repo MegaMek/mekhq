@@ -44,7 +44,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * records; the {@code with*} methods return a copy with one field replaced, so a caller adjusts a single parameter
  * without disturbing the rest (as {@link AbstractContract}'s scalar setters do).</p>
  *
- * @param scale                  the support-point/Battle-Value scale the contract is sized at
+ * @param scale                  the support-point/Battle-Value scale the contract is sized at, unrounded. Rules as
+ *                               written use it rounded up to a whole number (see {@link AbstractContract#getScale()})
  * @param requiredVictoryPoints  the victory points needed to win the contract
  * @param trackCount             the number of StratCon tracks the contract runs
  * @param monthlyTrackCounts     the scenario schedule: how those tracks are spread across the contract's months, rolled
@@ -56,7 +57,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *                               the source table's native length rather than the contract's, that consumer folds any
  *                               overflow tail into the final month.
  */
-public record ContractIntensityData(int scale, int requiredVictoryPoints, int trackCount,
+public record ContractIntensityData(double scale, int requiredVictoryPoints, int trackCount,
       List<Integer> monthlyTrackCounts) {
     public ContractIntensityData {
         // Defensive copy so the schedule is genuinely immutable regardless of the list the caller passed.
@@ -71,7 +72,7 @@ public record ContractIntensityData(int scale, int requiredVictoryPoints, int tr
     }
 
     /** @return a copy with {@code scale} replaced */
-    public ContractIntensityData withScale(int scale) {
+    public ContractIntensityData withScale(double scale) {
         return new ContractIntensityData(scale, requiredVictoryPoints, trackCount,
               monthlyTrackCounts);
     }

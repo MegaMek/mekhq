@@ -64,6 +64,7 @@ import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.enums.DragoonRating;
@@ -72,6 +73,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerLiaison;
@@ -115,6 +117,7 @@ public class ContractEditorDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
     private static final int MONEY_STEP = 1000;
+    private static final double FRACTIONAL_SCALE_STEP = 0.1;
     private static final int LABEL_WIDTH = 170;
     /** The end date is held at least this many months after the start date. */
     private static final int MINIMUM_CONTRACT_LENGTH_MONTHS = 1;
@@ -146,6 +149,8 @@ public class ContractEditorDialog extends JDialog {
 
     // Parameters
     private JSpinner scaleSpinner;
+    /** The Scale the spinner opened on, so saving an untouched spinner keeps the exact Scale it was rounded from */
+    private double initialScaleSpinnerValue;
     private JCheckBox scaleAutomatic;
     private JSpinner trackCountSpinner;
     private JCheckBox trackCountAutomatic;
@@ -473,7 +478,9 @@ public class ContractEditorDialog extends JDialog {
     private JPanel buildParametersCard() {
         JPanel rows = rowsPanel();
 
-        scaleSpinner = intSpinner(contract.getScale(), 1);
+        scaleSpinner = scaleSpinner(contract.getExactScale(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE));
+        initialScaleSpinnerValue = ((Number) scaleSpinner.getValue()).doubleValue();
         scaleAutomatic = automaticToggle(scaleSpinner);
         rows.add(formRow("edit.contractMarket.field.scale", withAutomatic(scaleSpinner, scaleAutomatic)));
 
@@ -1155,7 +1162,7 @@ public class ContractEditorDialog extends JDialog {
             contract.setScale(scaleAutomatic.isSelected()
                                     ? AbstractContractGeneration.determineScale(campaign, campaign.getPlayerForce(),
                   campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
-                                    : intValue(scaleSpinner));
+                                    : getEditedScale());
             contract.setTrackCount(trackCountAutomatic.isSelected()
                                          ? ContractCharacteristics.bakeTrackCount(
                   AbstractContractGeneration.determineTrackCount(contract), contract)
@@ -1167,7 +1174,7 @@ public class ContractEditorDialog extends JDialog {
                                                     :
                                                     intValue(victoryPointsSpinner));
         } else {
-            contract.setScale(intValue(scaleSpinner));
+            contract.setScale(getEditedScale());
             contract.setTrackCount(intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(intValue(victoryPointsSpinner));
         }
@@ -1405,6 +1412,45 @@ public class ContractEditorDialog extends JDialog {
 
     private static JSpinner intSpinner(int value, int minimum) {
         return new JSpinner(new SpinnerNumberModel(max(value, minimum), minimum, Integer.MAX_VALUE, 1));
+    }
+
+    /**
+     * Builds the Scale spinner: whole numbers as the rules use them, or - under the Fractional Scale option - the exact
+     * Scale shown to two decimal places.
+     *
+     * @param exactScale         the contract's exact Scale
+     * @param useFractionalScale whether the Fractional Scale option is set
+     *
+     * @return the Scale spinner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static JSpinner scaleSpinner(double exactScale, boolean useFractionalScale) {
+        if (!useFractionalScale) {
+            return intSpinner(ChaosContractDeterminationScale.roundUpScale(exactScale), 1);
+        }
+
+        double minimumScale = ChaosContractDeterminationScale.MINIMUM_FRACTIONAL_SCALE;
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(max(exactScale, minimumScale), minimumScale,
+              Double.MAX_VALUE, FRACTIONAL_SCALE_STEP));
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner, "0.00");
+        // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
+        editor.getTextField().setColumns(6);
+        spinner.setEditor(editor);
+        return spinner;
+    }
+
+    /**
+     * @return the Scale to save: the exact Scale the spinner opened on if the GM left it alone, otherwise the GM's
+     *       value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double getEditedScale() {
+        double editedScale = ((Number) scaleSpinner.getValue()).doubleValue();
+        return (editedScale == initialScaleSpinnerValue) ? contract.getExactScale() : editedScale;
     }
 
     /**
