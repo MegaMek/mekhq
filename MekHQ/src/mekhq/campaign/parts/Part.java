@@ -1361,6 +1361,39 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
               "<b> failed</b>") + ".";
     }
 
+    /**
+     * Whether this part's current task can fail its own check. A task that cannot, such as a routine reload that
+     * succeeds automatically, can only have been left impossible in error.
+     *
+     * @return {@code true} if the current task can genuinely fail
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean canFailItsOwnCheck() {
+        return true;
+    }
+
+    /**
+     * Clears a difficulty raised above Legendary on a task that can never genuinely fail. Before impossible tasks were
+     * held, a task carried over while its unit was deployed was rolled anyway and failed, which left such a task
+     * impossible for good. A task that can genuinely fail keeps its difficulty, since a failure at Legendary is
+     * permanent.
+     *
+     * @return {@code true} if the difficulty was cleared
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean clearImpossibleDifficulty() {
+        if ((getSkillMin() <= SkillType.EXP_LEGENDARY) || canFailItsOwnCheck()) {
+            return false;
+        }
+
+        resetRepairSettings();
+        return true;
+    }
+
     @Override
     public String succeed() {
         if (isSalvaging()) {

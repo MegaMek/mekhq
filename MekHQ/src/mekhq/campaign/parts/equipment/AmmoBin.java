@@ -305,6 +305,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
         loadBin();
     }
 
+    /**
+     * A routine reload succeeds automatically, and a failed fabrication never raises the difficulty, so only an unload
+     * while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
+    }
+
     @Override
     public String succeed() {
         if (isFabricating() && !isSalvaging()) {
