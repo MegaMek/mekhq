@@ -61,8 +61,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
  * The {@code MaintenancePage} class builds and manages the Maintenance leaf page of the Campaign Options dialog. It owns
- * the widgets for maintenance configuration - cycle scheduling, maintenance bonuses, quality standards, planetary
- * modifiers, and unofficial maintenance rules - and synchronises them with a shared
+ * the widgets for maintenance configuration - cycle scheduling, situational maintenance and costs, maintenance bonuses,
+ * quality standards, planetary modifiers, and unofficial maintenance rules - and synchronises them with a shared
  * {@link RepairAndMaintenanceOptionsModel}.
  *
  * <p>This view is a sub-component of {@link RepairAndMaintenancePages}: the model snapshot and the overall load/apply
@@ -90,6 +90,13 @@ class MaintenancePage {
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
     private JCheckBox chkTechsMaintainConventionalInfantry;
+    private JCheckBox chkMaintenanceOnContract;
+    private JCheckBox chkMaintenanceOffContract;
+    private JCheckBox chkMaintenanceInTransit;
+    private JLabel lblCombatContractMaintenanceCostMultiplier;
+    private JSpinner spnCombatContractMaintenanceCostMultiplier;
+    private JLabel lblInTransitMaintenanceCostMultiplier;
+    private JSpinner spnInTransitMaintenanceCostMultiplier;
     private JLabel lblLithiumFusionBatteryMode;
     private MMComboBox<LithiumFusionBatteryMode> comboLithiumFusionBatteryMode;
 
@@ -165,6 +172,7 @@ class MaintenancePage {
                 createTipPanelUpdater("TechsMaintainConventionalInfantry"));
 
         JPanel schedulePanel = createMaintenanceSchedulePanel();
+        JPanel situationPanel = createMaintenanceSituationPanel();
         JPanel qualityPanel = createMaintenanceQualityPanel();
         JPanel interstellarTravelPanel = createInterstellarTravelPanel();
 
@@ -177,6 +185,10 @@ class MaintenancePage {
                 .section("lblMaintenancePage.text",
                         "lblMaintenancePage.summary",
                         schedulePanel)
+                .section("lblMaintenanceSituationPanel.text",
+                        "lblMaintenanceSituationPanel.summary",
+                        situationPanel,
+                        getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM))
                 .section("lblMaintenanceQualityPanel.text",
                         "lblMaintenanceQualityPanel.summary",
                         qualityPanel,
@@ -197,6 +209,53 @@ class MaintenancePage {
         panel.addRow(lblDefaultMaintenanceTime, spnDefaultMaintenanceTime);
         panel.addCheckBox(logMaintenance);
         panel.addCheckBox(chkTechsMaintainConventionalInfantry);
+
+        return panel;
+    }
+
+    /**
+     * Builds the Maintenance Situations section, which controls whether maintenance runs on contract, off contract,
+     * and in transit, and how its cost scales in those situations.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nonnull JPanel createMaintenanceSituationPanel() {
+        chkMaintenanceOnContract = new CampaignOptionsCheckBox("MaintenanceOnContract", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceOnContract.addMouseListener(createTipPanelUpdater("MaintenanceOnContract"));
+
+        chkMaintenanceOffContract = new CampaignOptionsCheckBox("MaintenanceOffContract", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceOffContract.addMouseListener(createTipPanelUpdater("MaintenanceOffContract"));
+
+        chkMaintenanceInTransit = new CampaignOptionsCheckBox("MaintenanceInTransit", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceInTransit.addMouseListener(createTipPanelUpdater("MaintenanceInTransit"));
+
+        lblCombatContractMaintenanceCostMultiplier =
+                new CampaignOptionsLabel("CombatContractMaintenanceCostMultiplier", getMetadata(new Version(0, 51, 1)));
+        lblCombatContractMaintenanceCostMultiplier.addMouseListener(
+                createTipPanelUpdater("CombatContractMaintenanceCostMultiplier"));
+        spnCombatContractMaintenanceCostMultiplier = new CampaignOptionsSpinner(
+                "CombatContractMaintenanceCostMultiplier", 0.25, 0.0, 10.0, 0.05);
+        spnCombatContractMaintenanceCostMultiplier.addMouseListener(
+                createTipPanelUpdater("CombatContractMaintenanceCostMultiplier"));
+
+        lblInTransitMaintenanceCostMultiplier = new CampaignOptionsLabel("InTransitMaintenanceCostMultiplier", getMetadata(new Version(0, 51, 1)));
+        lblInTransitMaintenanceCostMultiplier.addMouseListener(
+                createTipPanelUpdater("InTransitMaintenanceCostMultiplier"));
+        spnInTransitMaintenanceCostMultiplier = new CampaignOptionsSpinner("InTransitMaintenanceCostMultiplier",
+                1.0, 0.0, 10.0, 0.05);
+        spnInTransitMaintenanceCostMultiplier.addMouseListener(
+                createTipPanelUpdater("InTransitMaintenanceCostMultiplier"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("MaintenanceSituationPanel",
+                LABEL_COLUMN_WIDTH,
+                CONTROL_COLUMN_WIDTH);
+        panel.addCheckBoxGrid(3,
+                chkMaintenanceOnContract,
+                chkMaintenanceOffContract,
+                chkMaintenanceInTransit);
+        panel.addRow(lblCombatContractMaintenanceCostMultiplier, spnCombatContractMaintenanceCostMultiplier);
+        panel.addRow(lblInTransitMaintenanceCostMultiplier, spnInTransitMaintenanceCostMultiplier);
 
         return panel;
     }
@@ -261,6 +320,11 @@ class MaintenancePage {
 
         checkMaintenance.setSelected(model.checkMaintenance);
         spnMaintenanceDays.setValue(model.maintenanceCycleDays);
+        chkMaintenanceOnContract.setSelected(model.maintenanceOnContract);
+        chkMaintenanceOffContract.setSelected(model.maintenanceOffContract);
+        chkMaintenanceInTransit.setSelected(model.maintenanceInTransit);
+        spnCombatContractMaintenanceCostMultiplier.setValue(model.combatContractMaintenanceCostMultiplier);
+        spnInTransitMaintenanceCostMultiplier.setValue(model.inTransitMaintenanceCostMultiplier);
         spnMaintenanceBonus.setValue(model.maintenanceBonus);
         spnDefaultMaintenanceTime.setValue(model.defaultMaintenanceTime);
         useQualityMaintenance.setSelected(model.useQualityMaintenance);
@@ -286,6 +350,11 @@ class MaintenancePage {
 
         model.checkMaintenance = checkMaintenance.isSelected();
         model.maintenanceCycleDays = (int) spnMaintenanceDays.getValue();
+        model.maintenanceOnContract = chkMaintenanceOnContract.isSelected();
+        model.maintenanceOffContract = chkMaintenanceOffContract.isSelected();
+        model.maintenanceInTransit = chkMaintenanceInTransit.isSelected();
+        model.combatContractMaintenanceCostMultiplier = (double) spnCombatContractMaintenanceCostMultiplier.getValue();
+        model.inTransitMaintenanceCostMultiplier = (double) spnInTransitMaintenanceCostMultiplier.getValue();
         model.maintenanceBonus = (int) spnMaintenanceBonus.getValue();
         model.defaultMaintenanceTime = (int) spnDefaultMaintenanceTime.getValue();
         model.useQualityMaintenance = useQualityMaintenance.isSelected();

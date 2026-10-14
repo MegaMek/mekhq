@@ -109,6 +109,15 @@ public class Armor extends Part implements IAcquisitionWork {
         return "Armor";
     }
 
+    /**
+     * Armor builds its name from its type instead of storing it, so reports that ask for the part's name, such as a
+     * repair line in the daily report, get the name the warehouse shows rather than "Unknown".
+     */
+    @Override
+    public String getPartName() {
+        return getName();
+    }
+
     @Override
     public Armor clone() {
         Armor clone = new Armor(0, type, amount, -1, false, clan, campaign);

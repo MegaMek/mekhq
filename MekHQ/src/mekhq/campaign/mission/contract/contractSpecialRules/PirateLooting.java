@@ -93,7 +93,7 @@ public final class PirateLooting {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
+    public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, double scale,
           List<Scenario> scenarios, @Nullable StratConCampaignState campaignState, boolean actWasSuccessful,
           String contractName) {
         PlayerForce playerForce = campaign.getPlayerForce();
@@ -196,7 +196,7 @@ public final class PirateLooting {
      *
      * @return the total looted support points
      */
-    private static int determinePiracySP(int scale, List<Scenario> scenarios,
+    private static int determinePiracySP(double scale, List<Scenario> scenarios,
           @Nullable StratConCampaignState campaignState, @Nullable Person campaignCommander) {
         int roll = d6(1);
         if (campaignCommander != null && campaignCommander.getOptions().booleanOption(PersonnelOptions.LOOT_GOBLIN)) {
@@ -218,7 +218,7 @@ public final class PirateLooting {
      *
      * @return the scaled contract-loot support points
      */
-    private static int determineContractLoot(int roll, int scale) {
+    private static int determineContractLoot(int roll, double scale) {
         // Hot Spots Draconis Reach, first printing, pg 126
         int base = switch (roll) {
             case 1 -> 0;
@@ -230,7 +230,7 @@ public final class PirateLooting {
             default -> throw new IllegalStateException("Unexpected value: " + roll);
         };
 
-        return base * scale;
+        return (int) Math.round(base * scale);
     }
 
     /**

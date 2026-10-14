@@ -414,9 +414,10 @@ public class MissionCompletionManager {
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.usesSpecialRule(USE_PIRATE_LOOTING)) {
+                boolean useFractionalScale = campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE);
                 PirateLooting.resolveActOfPiracy(campaign,
                       personnel,
-                      mission.getScale(),
+                      mission.getEconomicScale(useFractionalScale),
                       mission.getScenarios(),
                       mission.getStratConCampaignState(),
                       status.isOverallSuccess(),

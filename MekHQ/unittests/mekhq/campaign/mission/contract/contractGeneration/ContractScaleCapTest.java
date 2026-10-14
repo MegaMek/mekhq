@@ -113,7 +113,7 @@ class ContractScaleCapTest {
         when(hangar.getUnits()).thenReturn(units);
     }
 
-    private int determineScale() {
+    private double determineScale() {
         return AbstractContractGeneration.determineScale(campaign, playerForce, hangar, contract);
     }
 

@@ -47,6 +47,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -103,6 +104,12 @@ class FinancesGeneralPage {
     private JCheckBox payForHousingBox;
     private JLabel lblRecruitmentTrainingCostMultiplier;
     private JSpinner spnRecruitmentTrainingCostMultiplier;
+    private JLabel lblRecruitmentProfessionSkillCostMultiplier;
+    private JSpinner spnRecruitmentProfessionSkillCostMultiplier;
+    private JLabel lblRecruitmentUtilitySkillCostMultiplier;
+    private JSpinner spnRecruitmentUtilitySkillCostMultiplier;
+    private JLabel lblRecruitmentRoleplaySkillCostMultiplier;
+    private JSpinner spnRecruitmentRoleplaySkillCostMultiplier;
 
     private JPanel pnlSales;
     private JCheckBox sellUnitsBox;
@@ -246,6 +253,30 @@ class FinancesGeneralPage {
               1.5, 0.0, 10.0, 0.1);
         spnRecruitmentTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
+        lblRecruitmentProfessionSkillCostMultiplier =
+              new CampaignOptionsLabel("RecruitmentProfessionSkillCostMultiplier");
+        lblRecruitmentProfessionSkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
+        spnRecruitmentProfessionSkillCostMultiplier =
+              new CampaignOptionsSpinner("RecruitmentProfessionSkillCostMultiplier",
+                    CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnRecruitmentProfessionSkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
+        lblRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentUtilitySkillCostMultiplier");
+        lblRecruitmentUtilitySkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
+        spnRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsSpinner("RecruitmentUtilitySkillCostMultiplier",
+              CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnRecruitmentUtilitySkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
+        lblRecruitmentRoleplaySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentRoleplaySkillCostMultiplier");
+        lblRecruitmentRoleplaySkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentRoleplaySkillCostMultiplier"));
+        spnRecruitmentRoleplaySkillCostMultiplier =
+              new CampaignOptionsSpinner("RecruitmentRoleplaySkillCostMultiplier",
+                    CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnRecruitmentRoleplaySkillCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentRoleplaySkillCostMultiplier"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("PaymentsPanel",
@@ -264,6 +295,9 @@ class FinancesGeneralPage {
                 payForRecruitmentBox,
                 payForFoodBox,
                 payForHousingBox);
+        panel.addRow(lblRecruitmentProfessionSkillCostMultiplier, spnRecruitmentProfessionSkillCostMultiplier);
+        panel.addRow(lblRecruitmentUtilitySkillCostMultiplier, spnRecruitmentUtilitySkillCostMultiplier);
+        panel.addRow(lblRecruitmentRoleplaySkillCostMultiplier, spnRecruitmentRoleplaySkillCostMultiplier);
         panel.addRow(lblRecruitmentTrainingCostMultiplier, spnRecruitmentTrainingCostMultiplier);
 
         return panel;
@@ -528,6 +562,9 @@ class FinancesGeneralPage {
         payForTransportBox.setSelected(model.payForTransport);
         payForRecruitmentBox.setSelected(model.payForRecruitment);
         spnRecruitmentTrainingCostMultiplier.setValue(model.recruitmentTrainingCostMultiplier);
+        spnRecruitmentProfessionSkillCostMultiplier.setValue(model.recruitmentProfessionSkillCostMultiplier);
+        spnRecruitmentUtilitySkillCostMultiplier.setValue(model.recruitmentUtilitySkillCostMultiplier);
+        spnRecruitmentRoleplaySkillCostMultiplier.setValue(model.recruitmentRoleplaySkillCostMultiplier);
         payForFoodBox.setSelected(model.payForFood);
         payForHousingBox.setSelected(model.payForHousing);
         sellUnitsBox.setSelected(model.sellUnits);
@@ -618,6 +655,10 @@ class FinancesGeneralPage {
         model.payForTransport = payForTransportBox.isSelected();
         model.payForRecruitment = payForRecruitmentBox.isSelected();
         model.recruitmentTrainingCostMultiplier = (double) spnRecruitmentTrainingCostMultiplier.getValue();
+        model.recruitmentProfessionSkillCostMultiplier =
+              (double) spnRecruitmentProfessionSkillCostMultiplier.getValue();
+        model.recruitmentUtilitySkillCostMultiplier = (double) spnRecruitmentUtilitySkillCostMultiplier.getValue();
+        model.recruitmentRoleplaySkillCostMultiplier = (double) spnRecruitmentRoleplaySkillCostMultiplier.getValue();
         model.payForFood = payForFoodBox.isSelected();
         model.payForHousing = payForHousingBox.isSelected();
         model.sellUnits = sellUnitsBox.isSelected();
