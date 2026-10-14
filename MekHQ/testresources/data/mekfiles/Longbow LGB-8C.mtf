@@ -1,0 +1,205 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-da29-72ed-a3a8-bd2ed4599e81
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Longbow
+model:LGB-8C
+mul id:8332
+
+Config:Biped
+techbase:Inner Sphere
+era:2615
+source:RG20,RGv1
+published:RG20,RGv1
+rules level:1
+role:Missile Boat
+
+quirk:no_arms
+quirk:searchlight
+quirk:ubiquitous_clan
+quirk:anti_air
+quirk:ubiquitous_is
+
+mass:85
+engine:255 Fusion Engine
+structure:IS Standard
+myomer:Standard
+
+heat sinks:20 Single
+walk mp:3
+jump mp:0
+
+armor:Standard(Inner Sphere)
+LA armor:23
+RA armor:23
+LT armor:26
+RT armor:26
+CT armor:37
+HD armor:9
+LL armor:28
+RL armor:28
+RTL armor:10
+RTR armor:10
+RTC armor:12
+
+Weapons:8
+LRM 20, Left Arm
+LRM 20, Right Arm
+Medium Laser, Left Torso
+Medium Laser, Left Torso
+LRM 5, Left Torso
+Medium Laser, Right Torso
+Medium Laser, Right Torso
+LRM 5, Right Torso
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+LRM 20
+LRM 20
+LRM 20
+LRM 20
+LRM 20
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+LRM 20
+LRM 20
+LRM 20
+LRM 20
+LRM 20
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+Heat Sink
+Heat Sink
+Heat Sink
+Medium Laser
+Medium Laser (R)
+LRM 5
+IS Ammo LRM-20
+IS Ammo LRM-20
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Torso:
+Heat Sink
+Heat Sink
+Heat Sink
+Medium Laser
+Medium Laser (R)
+LRM 5
+IS Ammo LRM-20
+IS Ammo LRM-20
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+IS Ammo LRM-5
+-Empty-
+
+Head:
+Life Support
+Sensors
+Cockpit
+-Empty-
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Heat Sink
+Heat Sink
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Heat Sink
+Heat Sink
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Longbow is one of the longest-serving fire support BattleMechs in the Inner Sphere, with a production history spanning more than six centuries. First designed in 2480 by Lockenburg-Holly Industries on Emris IV for the Free Worlds League Military, the eighty-five-ton assault 'Mech drew heavy inspiration from the Terran Hegemony's Archer, scaling the proven fire support concept up by fifteen tons and relocating its missile launchers to the arms for wider firing arcs. The Longbow's success secured Lockenburg-Holly's future, and the company's subsequent merger into StarCorps Industries made the design available to militaries across the Inner Sphere.</p><p>Despite never being a popular assignment among MechWarriors due to its vulnerability relative to its tonnage, the Longbow has remained in continuous production through centuries of conflict. StarCorps has produced no fewer than three visually distinct generations of the design (the original Star League model, the Clan Invasion-era 7Q, and the 3061 "Phoenix" redesign) each reflecting the evolving technology and combat doctrine of its era.</p>
+
+capabilities:<p>The Longbow's design philosophy has remained remarkably consistent across its many iterations: deliver overwhelming long-range missile fire while remaining safely behind the front lines. The LGB-7Q model, representative of the post-Star League standard, mounts a pair of Holly LRM-20 launchers in its iconic barrel-shaped arms complemented by two torso-mounted Delta Dart LRM-5 launchers, enabling a devastating barrage of up to fifty missiles per salvo at ranges exceeding six hundred meters. Twenty-two single heat sinks allow the 'Mech to sustain this rate of fire indefinitely, a critical consideration for extended bombardment operations. Two Ceres Arms medium lasers provide a token close-range defense, though the Longbow is poorly equipped for direct engagement.</p><p>The 7Q's Strand 255 engine limits top speed to fifty-four kilometers per hour, sacrificing the mobility of the older 0W model for fourteen and a half tons of StarSlab armor, a significant improvement in survivability. The AntiAir Flak Systems-1 targeting system gives the Longbow an exceptional ability to engage fast-moving aerospace targets, a niche capability that has kept the design relevant in combined-arms operations well beyond what its raw specifications might suggest. The lack of CASE in the standard model remains the design's most criticized vulnerability, as an ammunition explosion can destroy the 'Mech outright despite its otherwise robust construction.</p>
+
+deployment:<p>Similar to the LGB-7Q in most respects, this variant sacrifices two heat sinks to mount a pair of rear-firing medium lasers. This seemingly minor modification addressed a persistent vulnerability of fire support 'Mechs to flanking attacks, and the rear-firing laser configuration would become a common feature in most subsequent Longbow variants. The 8C saw production during the Star League era from the Fletcher facility alongside the standard 0W and 0W2 models.</p>
+
+history:<p>The Longbow traces its origins to the early BattleMech age, when the Free Worlds League Military identified fire support as a critical capability gap in its expanding forces. Lockenburg-Holly Industries answered this need in 2480 with the LGB-0C, a primitive eighty-five-ton design that paired twin LRM-20 launchers with the widest firing arcs of any assault 'Mech then in service. Despite thin armor and primitive technology, the Longbow proved the viability of dedicated missile support platforms and quickly became a fixture in League formations.</p><p>The design's success attracted wider attention during the Star League era. The merger of Lockenburg-Holly into the multinational StarCorps Industries opened production to all Great Houses, much to the Free Worlds League's displeasure. The upgraded LGB-0W, introduced in 2529 with a larger Strand 340 engine for improved mobility, became the definitive Star League model, with factories on Crofton, Emris IV, Fletcher, and Loburg producing the design for armies across the Inner Sphere. The subsequent LGB-7Q traded speed for heavier armor and an improved targeting system, establishing the template that would define the Longbow for centuries.</p><p>The Succession Wars devastated StarCorps' production network. Anton Marik's revolt in 3014 destroyed the original Emris IV facility, and by 3039 only the Crofton and Loburg plants remained fully operational, with Emris IV undergoing decades of reconstruction. Despite these losses, the Longbow's widespread proliferation ensured that spare parts and salvageable chassis remained available throughout the Inner Sphere, and the design continued to see extensive service in every major conflict of the era.</p><p>The recovery of lostech during the Clan Invasion prompted StarCorps to revitalize the Longbow, but the resulting LGB-7V proved disastrous. Designed to give the 'Mech close-range capability with an XL engine, pulse lasers, and an ER large laser, the expensive variant was misused as a frontline brawler by commanders and pilots, suffering excessive losses. Every major military that fielded it eventually sold its stocks to mercenaries and purchased alternative designs like the Naginata and Salamander. Recognizing the failure, StarCorps introduced the visually refreshed LGB-12C "Phoenix" model in 3061, returning to the Longbow's fire support roots with enhanced LRM capacity and Artemis IV fire control across all launchers. The Phoenix models were manufactured across StarCorps' fully rebuilt production network on Crofton, Emris IV, Loburg, St. Ives, and Terra.</p><p>The Jihad and its aftermath brought further evolution. The Son Hoa facility, initially limited to refits producing the popular LGB-10C, gained full production capability when the planet achieved independence in the early thirty-second century. StarCorps moved its King Crab line to the more defensible Loburg and upgraded the Son Hoa Longbow refit line to produce complete 'Mechs, resulting in several new models that combined the classic Star League-era appearance with advanced technology. These included the LGB-14V medium-range combatant and the devastating LGB-10K autocannon variant. Meanwhile, the Crofton, Loburg, and St. Ives plants continued producing Phoenix-lineage models for Federated Suns, Lyran, and Capellan buyers, while the LGB-12C also found a place in the militaries of the former St. Ives Compact and even the Word of Blake during its occupation of Terra.</p><p>By the ilClan era, the Longbow's six-century legacy showed no signs of ending. Production lines on multiple worlds continued to turn out new variants for an ever-changing battlefield, and the design remained one of the most common assault 'Mechs across the Inner Sphere. The sheer number of surviving chassis (including Star League-era 0W models still operational in Periphery states) ensured the Longbow would continue to serve for generations to come.</p>
+
+manufacturer:StarCorps Industries
+
+primaryfactory:Fletcher (TH)
+
+fluffdate:2026-02-28 17:47:08
+
+systemmanufacturer:CHASSIS:StarCorps Industries
+systemmode:CHASSIS:StarCorp 100
+systemmanufacturer:ENGINE:Strand
+systemmode:ENGINE:Strand 255
+systemmanufacturer:ARMOR:StarCorps Industries
+systemmode:ARMOR:StarSlab/9.5 Mk II
+systemmanufacturer:COMMUNICATIONS:O/P, Irian
+systemmode:COMMUNICATIONS:O/P 3000 COMSET, Irian TelStar
+systemmanufacturer:TARGETING:AntiAir Flak Systems, Octagon
+systemmode:TARGETING:AntiAir Flak Systems-1, Octagon Tartrac Systems C
