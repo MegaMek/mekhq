@@ -687,10 +687,12 @@ public class MRMSService {
          * Pre-checking for hips/shoulders on repairable meks. If we have a bad
          * hip or shoulder, we're not going to do anything until we get those
          * parts out of the location and scrap it. Once we're at a happy place,
-         * we'll proceed.
+         * we'll proceed. A salvage run takes every part off anyway, so the limb
+         * needs no special handling and the check would only stop the strip.
          */
 
-        if ((unit.getEntity() instanceof Mek)) {
+        boolean isRepairingMek = !salvaging && (unit.getEntity() instanceof Mek);
+        if (isRepairingMek) {
             Map<Integer, Part> locationMap = new HashMap<>();
 
             for (IPartWork partWork : parts) {
