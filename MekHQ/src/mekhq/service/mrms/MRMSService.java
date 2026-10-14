@@ -58,6 +58,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -1206,7 +1207,9 @@ public class MRMSService {
             int expectedTime = getExpectedWorkTime((partWork), workTime);
 
             if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < expectedTime) {
-                if (!configuredOptions.isAllowCarryover()) {
+                boolean isCarryoverAllowed = configuredOptions.isAllowCarryover()
+                                                   || isShipJobLongerThanAFullDay(campaign, unit, tech, expectedTime);
+                if (!isCarryoverAllowed) {
                     debugLog("... would carry over day and configuration doesn't allow", "repairPart");
 
                     continue;
@@ -1417,6 +1420,31 @@ public class MRMSService {
         }
 
         return newParts;
+    }
+
+    /**
+     * Whether a ship's job runs past its engineer's whole working day, overtime included when the campaign allows it.
+     * The crew is the ship's only tech team, so such a job can only ever be done over several days, and Mass Repair
+     * starts it even with carryover off. Any other unit, and a ship job that fits in one day, follows the setting.
+     *
+     * @return {@code true} if the unit is self-crewed and the job is longer than its engineer's full day
+     */
+    private static boolean isShipJobLongerThanAFullDay(Campaign campaign, Unit unit, Person tech, int expectedTime) {
+        if (!unit.isSelfCrewed()) {
+            return false;
+        }
+        boolean isTechsUseAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        int fullDay = tech.getDailyAvailableTechTime(isTechsUseAdministration);
+        if (campaign.isOvertimeAllowed()) {
+            fullDay += (int) Math.round(Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
+                                              * tech.calculateTechTimeMultiplier(isTechsUseAdministration));
+        }
+        boolean isLongerThanAFullDay = expectedTime > fullDay;
+        if (isLongerThanAFullDay) {
+            LOGGER.debug("[MRMS] {}: a {} minute job is longer than the engineer's {} minute day, so it carries over",
+                  unit.getName(), expectedTime, fullDay);
+        }
+        return isLongerThanAFullDay;
     }
 
     /**

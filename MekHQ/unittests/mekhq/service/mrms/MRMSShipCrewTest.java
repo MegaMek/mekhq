@@ -38,14 +38,18 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.units.Aero;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -150,5 +154,37 @@ class MRMSShipCrewTest {
         MRMSService.mrmsAllUnits(campaign);
 
         assertTrue(damagedWeapon.needsFixing(), "Nobody aboard can repair the weapon");
+    }
+
+    @Test
+    void shipJobLongerThanTheEngineersDayStartsEvenWithCarryoverOff() {
+        campaign.getCampaignOptions().set(CampaignOption.MRMS_ALLOW_CARRYOVER, false);
+        Person engineer = crewTheShip();
+        StructuralIntegrity structure = PartsScenario.unitParts(leopard, StructuralIntegrity.class).getFirst();
+        Aero dropShip = (Aero) leopard.getEntity();
+        dropShip.setSI(dropShip.getOSI() - 2);
+        structure.updateConditionFromEntity(false);
+        assertTrue(structure.getActualTime() > (Person.PRIMARY_ROLE_SUPPORT_TIME
+                                                     + Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME),
+              "Two points of structure take longer than a full day");
+
+        FixedDieRolls.everyDieShows(SUCCESSFUL_DIE_FACE);
+        MRMSService.mrmsAllUnits(campaign);
+
+        assertSame(engineer, structure.getTech(), "The engineer starts the structure repair and carries it over");
+    }
+
+    @Test
+    void shipJobThatFitsInADayWaitsForTomorrowWithCarryoverOff() {
+        campaign.getCampaignOptions().set(CampaignOption.MRMS_ALLOW_CARRYOVER, false);
+        Person engineer = crewTheShip();
+        engineer.setMinutesLeft(1);
+        engineer.setOvertimeLeft(0);
+
+        FixedDieRolls.everyDieShows(SUCCESSFUL_DIE_FACE);
+        MRMSService.mrmsAllUnits(campaign);
+
+        assertTrue(damagedWeapon.needsFixing(), "The short job waits for the engineer's next day");
+        assertNull(damagedWeapon.getTech());
     }
 }
