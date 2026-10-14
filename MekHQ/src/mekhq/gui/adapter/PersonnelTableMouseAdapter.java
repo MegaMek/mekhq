@@ -5206,15 +5206,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     boolean payForSkillTraining(Person person, String skillName) {
         Campaign campaign = getCampaign();
         Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(campaign, person, skillName);
-        if (trainingCost.isZero()) {
-            return true;
-        }
-
-        if (campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
-              campaign.getLocalDate(),
-              trainingCost,
-              getFormattedTextAt(GUI_RESOURCE_BUNDLE, "skillTraining.transaction", person.getFullTitle(),
-                    skillName))) {
+        if (SkillTrainingCosts.payForSkillImprovement(campaign, person, skillName, trainingCost)) {
             return true;
         }
 

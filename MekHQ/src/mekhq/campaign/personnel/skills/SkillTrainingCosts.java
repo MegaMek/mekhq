@@ -25,6 +25,7 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
@@ -51,6 +53,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @since 0.51.01
  */
 public final class SkillTrainingCosts {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillTrainingCosts";
+
     private SkillTrainingCosts() {
     }
 
@@ -133,6 +137,52 @@ public final class SkillTrainingCosts {
 
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(costTable[cappedExperienceLevel])
                      .multipliedBy(category.getTrainingCostMultiplier(campaignOptions));
+    }
+
+    /**
+     * Charges the C-bill cost of improving a person's skill by one level, if skill improvement costs are enabled. Call
+     * this before improving the skill, as the cost depends on the skill's current level.
+     *
+     * @param campaign  the campaign whose funds pay for the training
+     * @param person    the person improving the skill
+     * @param skillName the name of the skill being improved (or gained)
+     *
+     * @return {@code true} if the improvement was free or has been paid for, or {@code false} if the force couldn't
+     *       afford it, in which case nothing is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean payForSkillImprovement(Campaign campaign, Person person, String skillName) {
+        return payForSkillImprovement(campaign, person, skillName,
+              getSkillImprovementCost(campaign, person, skillName));
+    }
+
+    /**
+     * As {@link #payForSkillImprovement(Campaign, Person, String)}, for callers that have already priced the
+     * improvement.
+     *
+     * @param campaign     the campaign whose funds pay for the training
+     * @param person       the person improving the skill
+     * @param skillName    the name of the skill being improved (or gained)
+     * @param trainingCost the cost of the improvement, from {@link #getSkillImprovementCost(Campaign, Person, String)}
+     *
+     * @return {@code true} if the improvement was free or has been paid for, or {@code false} if the force couldn't
+     *       afford it, in which case nothing is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean payForSkillImprovement(Campaign campaign, Person person, String skillName,
+          Money trainingCost) {
+        if (trainingCost.isZero()) {
+            return true;
+        }
+
+        return campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
+              campaign.getLocalDate(),
+              trainingCost,
+              getFormattedTextAt(RESOURCE_BUNDLE, "skillTraining.transaction", person.getFullTitle(), skillName));
     }
 
     /**
