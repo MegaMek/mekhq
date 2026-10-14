@@ -234,17 +234,19 @@ public class MRMSServiceTest {
     }
 
     @Test
-    public void testIsValidMRMSUnitRejectsSelfMaintainedInfantry() {
+    public void testIsValidMRMSUnitAcceptsSelfMaintainedInfantry() {
         Unit unit = mock(Unit.class);
         MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+        Infantry infantry = mock(Infantry.class);
 
         when(unit.isSelfCrewed()).thenReturn(true);
         when(unit.isSelfMaintainedInfantry()).thenReturn(true);
-        when(unit.getEntity()).thenReturn(mock(Infantry.class));
+        when(infantry.isConventionalInfantry()).thenReturn(true);
+        when(unit.getEntity()).thenReturn(infantry);
         when(options.useRepair()).thenReturn(true);
         when(options.useSalvage()).thenReturn(true);
 
-        assertFalse(MRMSService.isValidMRMSUnit(unit, options));
+        assertTrue(MRMSService.isValidMRMSUnit(unit, options));
     }
 
     @Test

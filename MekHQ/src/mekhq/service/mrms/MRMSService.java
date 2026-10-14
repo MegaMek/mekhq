@@ -107,23 +107,21 @@ public class MRMSService {
      * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
      * right-click menu all ask this, so they offer the same units. A unit qualifies when it is a type a tech can be
      * assigned to, the same types {@link Person#canTech} accepts. A DropShip, JumpShip, WarShip or space station
-     * qualifies too: its engineer does the work, as in the Repair tab. Infantry that maintains itself does not.
+     * qualifies too: its engineer does the work, as in the Repair tab. So does conventional infantry: when it maintains
+     * itself its ranking soldier does the work, such as reloading its field guns, and otherwise a Mechanic does.
      *
      * @param unit the unit
      *
      * @return {@code true} if Mass Repair can work on the unit
      */
     public static boolean isMassRepairableUnit(Unit unit) {
-        if (unit.isSelfMaintainedInfantry()) {
-            return false;
-        }
         Entity entity = unit.getEntity();
         boolean isMekTechWork = (entity instanceof Mek) || (entity instanceof ProtoMek)
                                       || (entity instanceof HandheldWeapon);
         boolean isOtherTechWork = (entity instanceof Aero) || (entity instanceof BattleArmor)
                                         || (entity instanceof Tank);
-        boolean isTechMaintainedInfantry = (entity != null) && entity.isConventionalInfantry();
-        return isMekTechWork || isOtherTechWork || isTechMaintainedInfantry;
+        boolean isConventionalInfantry = (entity != null) && entity.isConventionalInfantry();
+        return isMekTechWork || isOtherTechWork || isConventionalInfantry;
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
@@ -530,12 +528,15 @@ public class MRMSService {
 
         MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_ACTIONS);
 
-        // Filter our tech list to only our techs that can work on this unit
-        for (int i = techs.size() - 1; i >= 0; i--) {
-            Person tech = techs.get(i);
+        // Filter our tech list to only our techs that can work on this unit. A self-crewed unit's engineer is its only
+        // tech whatever their training, as in the Repair tab: infantry that maintains itself is led by a soldier
+        if (!unit.isSelfCrewed()) {
+            for (int i = techs.size() - 1; i >= 0; i--) {
+                Person tech = techs.get(i);
 
-            if (!tech.canTech(unit.getEntity())) {
-                techs.remove(i);
+                if (!tech.canTech(unit.getEntity())) {
+                    techs.remove(i);
+                }
             }
         }
 
@@ -1208,7 +1209,7 @@ public class MRMSService {
 
             if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < expectedTime) {
                 boolean isCarryoverAllowed = configuredOptions.isAllowCarryover()
-                                                   || isShipJobLongerThanAFullDay(campaign, unit, tech, expectedTime);
+                                                   || isCrewJobLongerThanAFullDay(campaign, unit, tech, expectedTime);
                 if (!isCarryoverAllowed) {
                     debugLog("... would carry over day and configuration doesn't allow", "repairPart");
 
@@ -1423,13 +1424,14 @@ public class MRMSService {
     }
 
     /**
-     * Whether a ship's job runs past its engineer's whole working day, overtime included when the campaign allows it.
-     * The crew is the ship's only tech team, so such a job can only ever be done over several days, and Mass Repair
-     * starts it even with carryover off. Any other unit, and a ship job that fits in one day, follows the setting.
+     * Whether a self-crewed unit's job runs past its engineer's whole working day, overtime included when the campaign
+     * allows it. The crew is the unit's only tech team, so such a job, common on ships, can only ever be done over
+     * several days, and Mass Repair starts it even with carryover off. Any other unit, and a job that fits in one day,
+     * follows the setting.
      *
      * @return {@code true} if the unit is self-crewed and the job is longer than its engineer's full day
      */
-    private static boolean isShipJobLongerThanAFullDay(Campaign campaign, Unit unit, Person tech, int expectedTime) {
+    private static boolean isCrewJobLongerThanAFullDay(Campaign campaign, Unit unit, Person tech, int expectedTime) {
         if (!unit.isSelfCrewed()) {
             return false;
         }
@@ -1448,8 +1450,9 @@ public class MRMSService {
     }
 
     /**
-     * A ship's crew is its only tech team (Campaign Operations, pp. 190-191), so Mass Repair on a self-crewed unit
-     * works through its engineer alone, the same tech the Repair tab offers for it.
+     * A ship's crew is its only tech team (Campaign Operations, pp. 190-191), and infantry that maintains itself is
+     * led by its ranking soldier. So Mass Repair on a self-crewed unit works through its engineer alone, the same
+     * person the Repair tab offers for it.
      *
      * @return the unit's engineer if they can still work today, otherwise an empty list
      */
