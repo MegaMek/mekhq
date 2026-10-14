@@ -211,32 +211,19 @@ public class MRMSService {
               configuredOptions);
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
-        String msg = String.format(
-              "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'>Mass %s complete on %s.</font>",
-              actionDescriptor,
-              unit.getName());
+        String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.UnitComplete.report",
+              ReportingUtilities.getPositiveColor(), actionDescriptor, unit.getName());
 
-        switch (unitAction.getStatus()) {
-            case ACTIONS_PERFORMED:
-                int count = unitAction.getPartSet().countRepairs();
-                msg += String.format(" There were %s action%s performed.", count, (count == 1 ? "" : "s"));
-                break;
-            case NO_PARTS:
-                msg += " No actions were performed because there are currently no valid parts.";
-                break;
-            case ALL_PARTS_IN_PROCESS:
-                msg += " No actions were performed because all parts are being worked on.";
-                break;
-            case NO_TECHS:
-                msg += " No actions were performed because there are currently no valid techs.";
-                break;
-            case UNFIXABLE_LIMB:
-                msg += " No actions were performed because there is at least one unfixable limb and configured settings do not allow location repairs.";
-                break;
-            case NO_ACTIONS:
-            default:
-                break;
+        String statusKey = switch (unitAction.getStatus()) {
+            case ACTIONS_PERFORMED -> "MRMS.UnitActionsPerformed.report";
+            case NO_PARTS -> "MRMS.UnitNoMatchingParts.report";
+            case ALL_PARTS_IN_PROCESS -> "MRMS.UnitAllPartsInProcess.report";
+            case NO_TECHS -> "MRMS.UnitNoTechs.report";
+            case UNFIXABLE_LIMB -> "MRMS.UnitUnfixableLimb.report";
+            case NO_ACTIONS -> null;
+        };
+        if (statusKey != null) {
+            msg += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, statusKey, unitAction.getPartSet().countRepairs());
         }
 
         campaign.addReport(TECHNICAL, msg);
@@ -395,29 +382,24 @@ public class MRMSService {
                 }
             }
 
-            StringBuilder sb = new StringBuilder(
-                  String.format("<font color='" + ReportingUtilities.getPositiveColor()
-                                      + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
+            StringBuilder sb = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.Summary.report",
+                  ReportingUtilities.getPositiveColor(), totalCount));
 
             if (actionsPerformed > 0) {
-                sb.append(String.format(" %s repair/salvage action%s performed.",
-                      actionsPerformed,
-                      (actionsPerformed == 1 ? "" : "s")));
+                sb.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.Summary.actionsPerformed",
+                      actionsPerformed));
             }
 
-            sb.append(generateUnitRepairSummary("<br/>- %s unit%s had repairs/parts salvaged.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWorkedOn",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.ACTIONS_PERFORMED));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were no valid parts.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithNoMatchingParts",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.NO_PARTS));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were no valid techs.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithNoTechs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.NO_TECHS));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithUnfixableLimbs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
 
@@ -426,15 +408,15 @@ public class MRMSService {
 
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.NO_PARTS,
-              "Units with no valid parts:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.noMatchingParts"),
               campaign);
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.NO_TECHS,
-              "Units with no valid techs:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.noTechs"),
               campaign);
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.UNFIXABLE_LIMB,
-              "Units with unfixable limbs:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.unfixableLimbs"),
               campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
@@ -462,17 +444,8 @@ public class MRMSService {
                 }
 
                 if (count > 0) {
-                    if (count == 1) {
-                        campaign.addReport(TECHNICAL, "<font color='" +
-                                                            ReportingUtilities.getNegativeColor()
-                                                            +
-                                                            "'>There is still 1 part that is not being worked on.</font>");
-                    } else {
-                        campaign.addReport(TECHNICAL, String.format(
-                              "<font color='" + ReportingUtilities.getNegativeColor()
-                                    + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
-                              count, unitCount, (unitCount == 1) ? "" : "s"));
-                    }
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.StillNotWorkedOn.report",
+                          ReportingUtilities.getNegativeColor(), count, unitCount));
                 }
             }
         }
@@ -485,7 +458,13 @@ public class MRMSService {
         }
     }
 
-    private static String generateUnitRepairSummary(String baseDescription,
+    /**
+     * @param resourceKey the summary line's key in the MRMS resources; it takes the number of units as {@code {0}}
+     *
+     * @return the summary line, on a new line, for the units that ended with the given status, or an empty string
+     *       when none did
+     */
+    private static String generateUnitRepairSummary(String resourceKey,
           Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus, MRMSUnitAction.STATUS status) {
 
         if (!unitActionsByStatus.containsKey(status)) {
@@ -494,7 +473,7 @@ public class MRMSService {
 
         int count = unitActionsByStatus.get(status).size();
 
-        return String.format(baseDescription, count, count == 1 ? "" : "s");
+        return "<br/>" + getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, count);
     }
 
     private static void generateCampaignLogForUnitStatus(
@@ -687,10 +666,12 @@ public class MRMSService {
          * Pre-checking for hips/shoulders on repairable meks. If we have a bad
          * hip or shoulder, we're not going to do anything until we get those
          * parts out of the location and scrap it. Once we're at a happy place,
-         * we'll proceed.
+         * we'll proceed. A salvage run takes every part off anyway, so the limb
+         * needs no special handling and the check would only stop the strip.
          */
 
-        if ((unit.getEntity() instanceof Mek)) {
+        boolean isRepairingMek = !salvaging && (unit.getEntity() instanceof Mek);
+        if (isRepairingMek) {
             Map<Integer, Part> locationMap = new HashMap<>();
 
             for (IPartWork partWork : parts) {

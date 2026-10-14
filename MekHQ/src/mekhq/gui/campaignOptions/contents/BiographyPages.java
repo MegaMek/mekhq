@@ -236,8 +236,10 @@ public class BiographyPages {
      *                              the current UI settings, or
      *                              {@code null} to apply changes to the campaign's
      *                              options directly.
+     * @param isSaveAction          whether the target is a preset being saved rather than the live campaign; saving a
+     *                              preset leaves the campaign's rank system unchanged
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isSaveAction) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;
         if (presetCampaignOptions == null) {
@@ -251,7 +253,7 @@ public class BiographyPages {
         model.applyTo(options, originOptions);
 
         // Ranks. A preset takes its rank system from the preset builder, so saving one must not change the campaign's.
-        if (presetCampaignOptions == null) {
+        if (!isSaveAction) {
             rankPage.applyToCampaign();
         }
     }

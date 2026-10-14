@@ -909,6 +909,9 @@ public class EducationController {
         // the campaign has drifted off-course (e.g. it moved while the student was away).
         if (travelNode instanceof CurrentLocation currentLocation) {
             if (!currentLocation.isOnPlanet()) {
+                if (isStrandedTravelNode(campaign, currentLocation)) {
+                    resumeStrandedJourney(campaign, person, currentLocation, targetSystem, onTravelArrival);
+                }
                 return;
             }
             if (targetSystem == null) {
@@ -934,6 +937,60 @@ public class EducationController {
             return;
         }
         onTravelArrival.accept(travelNode);
+    }
+
+    /**
+     * Checks whether a student's travel node can never complete on its own: it is still short of the planet but has
+     * no jump path, so {@link CurrentLocation#newDay} will never advance its transit. Saves migrated from the legacy
+     * day-counter education travel produced such nodes, leaving students stranded indefinitely.
+     *
+     * <p>The main force's own location is never treated as stranded, since its route belongs to the player.</p>
+     */
+    private static boolean isStrandedTravelNode(Campaign campaign, CurrentLocation travelNode) {
+        if (travelNode == campaign.getPlayerForce().getForceDetachment().getCurrentLocation()) {
+            return false;
+        }
+        JumpPath jumpPath = travelNode.getJumpPath();
+        return (jumpPath == null) || jumpPath.isEmpty();
+    }
+
+    /**
+     * Gives a stranded travel node a route to {@code targetSystem} so the journey resumes: an in-system leg when it
+     * is already in the target system, otherwise a planned jump path. When no route exists, the travelers land
+     * immediately, matching how dispatch handles destinations without a calculable path.
+     */
+    private static void resumeStrandedJourney(Campaign campaign, Person person, CurrentLocation travelNode,
+          @Nullable PlanetarySystem targetSystem, Consumer<AbstractMobileLocation> onTravelArrival) {
+        PlanetarySystem nodeSystem = travelNode.getCurrentSystem();
+        if ((targetSystem == null) || (nodeSystem == null)) {
+            LOGGER.warn("Stranded education travel for {} has no resolvable system; landing immediately",
+                  person.getFullName());
+            onTravelArrival.accept(travelNode);
+            return;
+        }
+
+        JumpPath path;
+        int journeyDays;
+        if (nodeSystem.equals(targetSystem)) {
+            path = LocationUtils.inSystemPath(nodeSystem);
+            journeyDays = max(2, (int) Math.ceil(travelNode.getTransitTime()));
+        } else {
+            path = LocationUtils.planJumpPath(nodeSystem, targetSystem, campaign);
+            if (path == null) {
+                LOGGER.warn("No route for stranded education travel of {} from {} to {}; landing immediately",
+                      person.getFullName(), nodeSystem.getId(), targetSystem.getId());
+                onTravelArrival.accept(travelNode);
+                return;
+            }
+            journeyDays = LocationUtils.computeJourneyDays(path, campaign.getLocalDate(),
+                  travelNode.getTransitTime());
+        }
+
+        LOGGER.info("Resuming stranded education travel for {} toward {}", person.getFullName(),
+              targetSystem.getId());
+        travelNode.setJumpPath(path);
+        person.setEduJourneyTime(journeyDays);
+        person.setEduDaysOfTravel(0);
     }
 
     private static void arriveHome(Campaign campaign, Person person,
