@@ -71,7 +71,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -946,15 +945,11 @@ public class MekLocation extends Part {
               .append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
+            toReturn.append(getTimeLeftText());
             if (isBlownOff()) {
-                toReturn.append(" <b>TN:</b> ")
-                      .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                      .append(getAllMods(null).getValueAsString());
+                toReturn.append(' ').append(getTargetNumberText());
             }
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getWorkModeText());
         }
         toReturn.append("</html>");
         return toReturn.toString();

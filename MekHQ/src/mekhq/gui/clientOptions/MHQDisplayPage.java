@@ -56,6 +56,7 @@ import megamek.client.ui.settings.SettingsLabel;
 import megamek.client.ui.settings.SettingsSpinner;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
+import mekhq.campaign.work.WorkTimeDisplay;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -69,6 +70,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     // Display - General
     private JTextField fieldDisplayDateFormat;
     private JTextField fieldLongDisplayDateFormat;
+    private JComboBox<WorkTimeDisplay> comboWorkTimeDisplay;
     private JSlider guiScaleSlider;
     private SettingsCheckBox chkExpandOptionSections;
     private SettingsCheckBox chkHideUnitFluff;
@@ -152,6 +154,8 @@ class MHQDisplayPage extends MHQOptionsPage {
         fieldLongDisplayDateFormat.setName("txtlabelLongDisplayDateFormat");
         panel.addRow(new SettingsLabel(TEXT_PROVIDER, "labelLongDisplayDateFormat"),
               dateFormatControl(fieldLongDisplayDateFormat));
+        comboWorkTimeDisplay = createWorkTimeDisplayCombo();
+        panel.addRow(new SettingsLabel(TEXT_PROVIDER, "optionWorkTimeDisplay"), comboWorkTimeDisplay);
 
         String guiScaleText = Messages.getString("CommonSettingsDialog.guiScale");
         JLabel guiScaleLabel = new JLabel(guiScaleText);
@@ -197,6 +201,24 @@ class MHQDisplayPage extends MHQOptionsPage {
               chkExpandOptionSections);
 
         return panel;
+    }
+
+    private JComboBox<WorkTimeDisplay> createWorkTimeDisplayCombo() {
+        JComboBox<WorkTimeDisplay> comboBox = new JComboBox<>(WorkTimeDisplay.values());
+        comboBox.setName("optionWorkTimeDisplay");
+        comboBox.setSelectedItem(model.workTimeDisplay);
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                  final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof WorkTimeDisplay workTimeDisplay) {
+                    list.setToolTipText(workTimeDisplay.getToolTipText());
+                }
+                return this;
+            }
+        });
+        return comboBox;
     }
 
     private JPanel createDisplayRecordLogsSection() {
@@ -418,6 +440,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         if (validateDateFormat(fieldLongDisplayDateFormat.getText())) {
             model.longDisplayDateFormat = fieldLongDisplayDateFormat.getText();
         }
+        model.workTimeDisplay = (WorkTimeDisplay) Objects.requireNonNull(comboWorkTimeDisplay.getSelectedItem());
         model.guiScaleValue = guiScaleSlider.getValue();
         model.expandOptionSections = chkExpandOptionSections.isSelected();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();

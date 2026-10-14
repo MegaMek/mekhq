@@ -531,6 +531,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
@@ -564,6 +565,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
@@ -598,6 +600,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
@@ -633,6 +636,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
@@ -666,6 +670,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
@@ -699,6 +704,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR_TIME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
                   true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),

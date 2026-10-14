@@ -258,6 +258,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                       (i != UnitTableModel.COL_TYPE) &&
                       (i != UnitTableModel.COL_STATUS) &&
                       (i != UnitTableModel.COL_REPAIR) &&
+                      (i != UnitTableModel.COL_REPAIR_TIME) &&
                       (i != UnitTableModel.COL_SITE) &&
                       (i != UnitTableModel.COL_MODE)) {
                 ((XTableColumnModel) servicedUnitTable.getColumnModel()).setColumnVisible(column, false);

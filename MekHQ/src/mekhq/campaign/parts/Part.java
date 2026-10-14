@@ -94,6 +94,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.StringUtils;
@@ -570,15 +571,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         if (!isDamagedBeyondRepair()) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getTimeAndTargetText());
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                   MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
@@ -592,10 +585,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         StringBuilder toReturn = new StringBuilder();
 
         if (needsFixing()) {
-            toReturn.append("<html>")
-                  .append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled) " : "");
+            toReturn.append("<html>").append(getTimeLeftText());
 
             if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
                 toReturn.append(" - <b>")
@@ -604,13 +594,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                       .append("</b>");
             }
 
-            toReturn.append(", TN: ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
-            toReturn.append("</html>");
+            toReturn.append(", ")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumberPlain",
+                        formatTargetModifier(getAllMods(null))))
+                  .append(getWorkModeText())
+                  .append("</html>");
         }
         return toReturn.toString();
     }
@@ -1246,6 +1234,56 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
     public String getCurrentModeName() {
         return mode.name;
+    }
+
+    /**
+     * @return the time left on this job, as the player's chosen work time display shows it, for example
+     *       {@code 3 days (2 days with overtime)}
+     */
+    protected String getTimeLeftText() {
+        return WorkTimeEstimate.describeTimeLeft(getCampaign(), this);
+    }
+
+    /**
+     * @return the target number modifier for this job, for example {@code <b>TN:</b> +2}
+     */
+    protected String getTargetNumberText() {
+        return formatTargetNumberText(getAllMods(null));
+    }
+
+    /**
+     * @return the work mode in italics with a leading space, or an empty string in normal mode
+     */
+    protected String getWorkModeText() {
+        return (getMode() == WorkTime.NORMAL) ? "" : (" <i>" + getCurrentModeName() + "</i>");
+    }
+
+    /**
+     * @return the time left, the target number modifier and the work mode, as one line of the task list
+     */
+    protected String getTimeAndTargetText() {
+        String timeLeft = getTimeLeftText();
+        // A job with no time to show, such as armor with none in stock, starts with its target number
+        String timePrefix = timeLeft.isEmpty() ? "" : (timeLeft + ' ');
+        return timePrefix + getTargetNumberText() + getWorkModeText();
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the modifiers as the task list labels them, for example {@code <b>TN:</b> +2}
+     */
+    public static String formatTargetNumberText(TargetRoll targetRoll) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumber", formatTargetModifier(targetRoll));
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the total modifier with its sign, for example {@code +2} or {@code -1}
+     */
+    public static String formatTargetModifier(TargetRoll targetRoll) {
+        return ((targetRoll.getValue() > -1) ? "+" : "") + targetRoll.getValueAsString();
     }
 
     @Override

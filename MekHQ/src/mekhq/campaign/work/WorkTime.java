@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.work;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -40,18 +42,18 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
 public enum WorkTime {
-    NORMAL(0, "Normal", 0, false, 0, 1.0),
-    EXTRA_2(1, "Extra time (x2)", -1, false, 0, 2.0),
-    EXTRA_3(2, "Extra time (x3)", -2, false, 0, 3.0),
-    EXTRA_4(3, "Extra time (x4)", -3, false, 0, 4.0),
-    RUSH_2(4, "Rush Job (1/2)", 1, true, 1, 0.5),
-    RUSH_4(5, "Rush Job (1/4)", 2, true, 2, 0.25),
-    RUSH_8(6, "Rush Job (1/8)", 3, true, 3, 0.125),
+    NORMAL(0, 0, false, 0, 1.0),
+    EXTRA_2(1, -1, false, 0, 2.0),
+    EXTRA_3(2, -2, false, 0, 3.0),
+    EXTRA_4(3, -3, false, 0, 4.0),
+    RUSH_2(4, 1, true, 1, 0.5),
+    RUSH_4(5, 2, true, 2, 0.25),
+    RUSH_8(6, 3, true, 3, 0.125),
     // Some additional tiers, in case people want to use them in alternate rules
-    EXTRA_6(-1, "Extra time (x6)", -4, false, 0, 6.0),
-    EXTRA_8(-1, "Extra time (x8)", -5, false, 0, 8.0),
-    RUSH_15(-1, "Rush Job (1/15)", 4, true, 4, 1.0 / 15.0),
-    RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0 / 30.0);
+    EXTRA_6(-1, -4, false, 0, 6.0),
+    EXTRA_8(-1, -5, false, 0, 8.0),
+    RUSH_15(-1, 4, true, 4, 1.0 / 15.0),
+    RUSH_30(-1, 5, true, 5, 1.0 / 30.0);
 
     // Initialize by-id array lookup table
     private static final WorkTime[] idMap;
@@ -100,7 +102,7 @@ public enum WorkTime {
     }
 
     public final int id;
-    // User-displayable. TODO: Localize
+    // User-displayable, from the resource bundle
     public final String name;
     // Base modificator to target number. Positive = more difficult. Use
     // getMod(true) to get the value
@@ -111,9 +113,9 @@ public enum WorkTime {
     public final int expReduction;
     public final double timeMultiplier;
 
-    WorkTime(int id, String name, int mod, boolean isRushed, int expReduction, double timeMultiplier) {
+    WorkTime(int id, int mod, boolean isRushed, int expReduction, double timeMultiplier) {
         this.id = id;
-        this.name = name;
+        this.name = getTextAt("mekhq.resources.Campaign", "WorkTime." + name() + ".text");
         this.mod = mod;
         this.isRushed = isRushed;
         this.expReduction = expReduction;
