@@ -54,6 +54,7 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.FastJScrollPane;
@@ -104,7 +105,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * On-departure automation options the player toggles before accepting an offer. They are fields (not rebuilt with
      * the button bar) so their state persists across {@link #rebuildContent()} calls; read them via
      * {@link #isMothballOnDepartureSelected()} and {@link #isTravelToSystemSelected()} when committing the accepted
-     * contract.
+     * contract. The mothball and travel options remember the player's last choice in preferences (see
+     * {@link #setPreferences(JDialog)}).
      */
     private final JCheckBox mothballOnDepartureCheckbox = buildOptionCheckbox("checkbox.contractMarket.mothball",
           "checkbox.contractMarket.mothball.tooltip");
@@ -582,7 +584,10 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Builds a persistent, initially-selected automation checkbox from its label and tooltip resource keys.
+     * Builds a persistent automation checkbox from its label and tooltip resource keys.
+     *
+     * @param labelKey   resource key of the checkbox label
+     * @param tooltipKey resource key of the checkbox tooltip
      *
      * @author Illiani
      * @since 0.51.01
@@ -719,13 +724,19 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the
+     * window bounds, it remembers the mothball and travel on-departure checkboxes between opens.
      */
     private void setPreferences(JDialog dialog) {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChaosContractMarketDialog.class);
             dialog.setName("ChaosContractMarketDialog");
             preferences.manage(new JWindowPreference(dialog));
+
+            mothballOnDepartureCheckbox.setName("mothballOnDepartureCheckbox");
+            preferences.manage(new JToggleButtonPreference(mothballOnDepartureCheckbox));
+            travelToSystemCheckbox.setName("travelToSystemCheckbox");
+            preferences.manage(new JToggleButtonPreference(travelToSystemCheckbox));
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);
         }

@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import megamek.common.units.Entity;
@@ -54,6 +55,7 @@ import org.junit.jupiter.api.Test;
  * role count - with cadre formations counting too, but only on cadre-duty contracts.
  */
 class ChaosContractDeterminationScaleTest {
+    private static final double DELTA = 1e-9;
 
     private static final int BATTLE_VALUE_PER_SCALE = 20_500;
 
@@ -82,6 +84,10 @@ class ChaosContractDeterminationScaleTest {
     }
 
     private int scaleFor(final boolean isCadreDuty, final Unit... units) {
+        return ChaosContractDeterminationScale.roundUpScale(exactScaleFor(isCadreDuty, units));
+    }
+
+    private double exactScaleFor(final boolean isCadreDuty, final Unit... units) {
         LocalHangar hangar = mock(LocalHangar.class);
         when(hangar.getUnits()).thenReturn(List.of(units));
         return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, isCadreDuty, true);
@@ -95,6 +101,18 @@ class ChaosContractDeterminationScaleTest {
               "one BV over the boundary rounds up to the next scale");
         assertEquals(1, scaleFor(false, unit(1, CombatRole.MANEUVER, true, 100)),
               "any positive combat BV is at least one scale");
+    }
+
+    @Test
+    void exactScaleIsTheUnroundedBattleValueRatio() {
+        assertEquals(1.5, exactScaleFor(false,
+              unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2))), 0.000001);
+    }
+
+    @Test
+    void oneBattleValueOverABoundaryStillRoundsUpAfterCleaning() {
+        // 1 BV in 20,500 is 0.0000488 of a Scale - the precision cleaning must not swallow it
+        assertEquals(3, scaleFor(false, unit(1, CombatRole.MANEUVER, true, (BATTLE_VALUE_PER_SCALE * 2) + 1)));
     }
 
     @Test
@@ -125,5 +143,42 @@ class ChaosContractDeterminationScaleTest {
     @Test
     void aCountedUnitWithoutAnEntityAddsNothing() {
         assertEquals(0, scaleFor(false, unit(1, CombatRole.MANEUVER, true, null)));
+    }
+
+    @Test
+    void roundUpScaleRoundsPartScalesUpButLeavesWholeScales() {
+        assertEquals(3, ChaosContractDeterminationScale.roundUpScale(2.01));
+        assertEquals(2, ChaosContractDeterminationScale.roundUpScale(2.0));
+        assertEquals(2, ChaosContractDeterminationScale.roundUpScale(2.0000000001),
+              "floating-point noise must not round a whole Scale up a point");
+    }
+
+    @Test
+    void economicScaleIsWholeWithoutFractionalScale() {
+        assertEquals(3.0, ChaosContractDeterminationScale.getEconomicScale(2.3, false), DELTA);
+    }
+
+    @Test
+    void economicScaleIsExactWithFractionalScale() {
+        assertEquals(2.3, ChaosContractDeterminationScale.getEconomicScale(2.3, true), DELTA);
+    }
+
+    @Test
+    void fractionalEconomicScaleIsAtLeastTheMinimumForAnyForce() {
+        assertEquals(ChaosContractDeterminationScale.MINIMUM_FRACTIONAL_SCALE,
+              ChaosContractDeterminationScale.getEconomicScale(0.01, true), DELTA);
+        assertEquals(0.0, ChaosContractDeterminationScale.getEconomicScale(0.0, true), DELTA,
+              "no force at all is still Scale 0");
+    }
+
+    @Test
+    void scaleIsDisplayedToTwoDecimalPlacesWithFractionalScale() {
+        assertEquals(new DecimalFormat("0.00").format(3.46), ChaosContractDeterminationScale.formatScale(3.456789, true));
+        assertEquals(new DecimalFormat("0.00").format(0.1), ChaosContractDeterminationScale.formatScale(0.02, true));
+    }
+
+    @Test
+    void scaleIsDisplayedAsAWholeNumberWithoutFractionalScale() {
+        assertEquals("4", ChaosContractDeterminationScale.formatScale(3.456789, false));
     }
 }
