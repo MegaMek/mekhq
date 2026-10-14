@@ -201,6 +201,11 @@ public enum UnitFixture {
      * {@code fighters/TRO3055U/Batu D.blk}.
      */
     BATU_D("Batu D", true, AeroSpaceFighter.class),
+    /**
+     * Turk A, a Clan OmniFighter whose pod-mounted ammunition sits in the fuselage. Source:
+     * {@code fighters/TRO3055U/Turk A.blk}.
+     */
+    TURK_A("Turk A", true, AeroSpaceFighter.class),
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
