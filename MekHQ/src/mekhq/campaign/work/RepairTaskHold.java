@@ -95,9 +95,7 @@ public final class RepairTaskHold {
     private static boolean isReasonTemporary(Campaign campaign, IPartWork partWork, Person tech) {
         Unit unit = partWork.getUnit();
         boolean isUnitAway = (unit != null) && !unit.isAvailable(partWork instanceof Refit);
-        int techTimeLeft = campaign.isOvertimeAllowed() ? (tech.getMinutesLeft() + tech.getOvertimeLeft())
-              : tech.getMinutesLeft();
-        boolean hasNoTimeToday = techTimeLeft <= 0;
+        boolean hasNoTimeToday = RepairTechEligibility.getTimeLeftToday(campaign, tech) <= 0;
         return isUnitAway || hasNoTimeToday;
     }
 }

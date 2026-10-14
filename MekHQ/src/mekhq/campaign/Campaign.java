@@ -254,6 +254,8 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.RepairAsTechTime;
 import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTaskHold;
+import mekhq.campaign.work.RepairTechEligibility;
+import mekhq.campaign.work.RepairTechEligibility.Refusal;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -4533,17 +4535,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
-     * so they take no other work. Maintenance of units they already look after is separate and carries on.
-     *
-     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
-     */
-    private boolean isBusyWithAnotherRefit(IPartWork partWork, Person tech) {
-        Unit refittingUnit = getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech);
-        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
-    }
-
-    /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
      * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
@@ -4553,12 +4544,36 @@ public class Campaign implements ITechManager {
      * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates
      * if a task is impossible, or has automatic success (e.g., for infantry refits).</p>
      *
+     * <p>Before anything else, a repair or salvage task checks the rules about who may work on it, the same ones the
+     * Repair tab's tech list follows: the tech must be where the task is, be the right type of tech, and not be
+     * another unit's crew.</p>
+     *
      * @param partWork the part work task to be performed
      * @param tech     the technician assigned to the task
      *
      * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
      */
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
+        if (!(partWork instanceof Refit)) {
+            Refusal refusal = RepairTechEligibility.findAssignmentRefusal(this, partWork, tech);
+            if (refusal != null) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, refusal.getDescription());
+            }
+        }
+        return getSkillTargetFor(partWork, tech);
+    }
+
+    /**
+     * Calculates the {@link TargetRoll} for a task from the tech's skill, without the rules about who may work on it.
+     * Mass Repair uses this with a stand-in elite tech, who belongs to no unit and no place, to judge whether anyone
+     * could do the task at all. Everything else uses {@link #getTargetFor(IPartWork, Person)}.
+     *
+     * @param partWork the part work task to be performed
+     * @param tech     the technician, real or stand-in
+     *
+     * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
+     */
+    public TargetRoll getSkillTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
         SkillModifierData skillModifierData = tech.getSkillModifierData();
@@ -4573,7 +4588,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
-        } else if (isBusyWithAnotherRefit(partWork, tech)) {
+        } else if (RepairTechEligibility.isBusyWithAnotherRefit(this, partWork, tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, getFormattedTextAt(RESOURCE_BUNDLE, "refit.techBusy",
                   getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
@@ -4609,9 +4624,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, unaffordableReason);
         }
 
-        final int techTime = isOvertimeAllowed() ?
-                                   tech.getMinutesLeft() + tech.getOvertimeLeft() :
-                                   tech.getMinutesLeft();
+        final int techTime = RepairTechEligibility.getTimeLeftToday(this, tech);
         if (!(partWork instanceof Refit) && (techTime <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
