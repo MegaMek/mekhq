@@ -99,7 +99,7 @@ public class QuickTrain {
         boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
-        // Should techs train every tech skill, rather than just their profession's global tech skill?
+        // Should techs train only their profession's global tech skill, rather than every tech skill?
         boolean isUseGlobalTechSkillsOnly = campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY);
 
         // Should soldiers only train Small Arms?
