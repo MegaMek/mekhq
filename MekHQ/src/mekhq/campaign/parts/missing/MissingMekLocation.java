@@ -353,28 +353,54 @@ public class MissingMekLocation extends MissingPart {
         Part replacement = findReplacement(false);
         if (null != replacement) {
             Part actualReplacement = replacement.clone();
-            unit.addPart(actualReplacement);
-            campaign.getQuartermaster().addPart(actualReplacement, 0, false);
             replacement.changeQuantity(-1);
-            // TODO : if this is a mek head, check to see if it had components
-            if ((loc == Mek.LOC_HEAD) && (actualReplacement instanceof MekLocation)) {
-                updateHeadComponents((MekLocation) actualReplacement);
-                ((MekLocation) actualReplacement).setSensors(false);
-                ((MekLocation) actualReplacement).setLifeSupport(false);
-            }
-            // fix shoulders and hips
-            if (loc == Mek.LOC_RIGHT_ARM || loc == Mek.LOC_LEFT_ARM) {
-                if (forQuad) {
-                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
-                } else {
-                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc);
-                }
-            } else if ((loc == Mek.LOC_RIGHT_LEG) || (loc == Mek.LOC_LEFT_LEG) || (loc == Mek.LOC_CENTER_LEG)) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
-            }
-            remove(false);
-            actualReplacement.updateConditionFromPart();
+            install(actualReplacement);
         }
+    }
+
+    /**
+     * Puts the location back without using a spare, for when a Game Master has restored its structure in Edit Damage.
+     * The location keeps the structure the Game Master gave it.
+     *
+     * @return the location now on the unit, or {@code null} if this part is on no unit
+     */
+    public @Nullable MekLocation reinstate() {
+        if (unit == null) {
+            return null;
+        }
+        Mek mek = (Mek) unit.getEntity();
+        int restoredStructure = mek.getInternal(loc);
+        MekLocation restoredLocation = (MekLocation) getNewPart();
+        install(restoredLocation);
+        mek.setInternal(restoredStructure, loc);
+        restoredLocation.updateConditionFromEntity(false);
+        LOGGER.debug("[EditDamage] {}: {} restored with {} structure", mek.getShortName(), mek.getLocationName(loc),
+              restoredStructure);
+        return restoredLocation;
+    }
+
+    /** Puts the given location on the unit in place of this missing one. */
+    private void install(Part actualReplacement) {
+        unit.addPart(actualReplacement);
+        campaign.getQuartermaster().addPart(actualReplacement, 0, false);
+        // TODO : if this is a mek head, check to see if it had components
+        if ((loc == Mek.LOC_HEAD) && (actualReplacement instanceof MekLocation headLocation)) {
+            updateHeadComponents(headLocation);
+            headLocation.setSensors(false);
+            headLocation.setLifeSupport(false);
+        }
+        // fix shoulders and hips
+        if (loc == Mek.LOC_RIGHT_ARM || loc == Mek.LOC_LEFT_ARM) {
+            if (forQuad) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
+            } else {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc);
+            }
+        } else if ((loc == Mek.LOC_RIGHT_LEG) || (loc == Mek.LOC_LEFT_LEG) || (loc == Mek.LOC_CENTER_LEG)) {
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
+        }
+        remove(false);
+        actualReplacement.updateConditionFromPart();
     }
 
     private void updateHeadComponents(MekLocation part) {
