@@ -976,6 +976,8 @@ public class AmmoBinTest {
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, 0, false, false, mockCampaign);
         Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
         when(mockUnit.isSalvage()).thenReturn(true);
         ammoBin.setUnit(mockUnit);
         ammoBin.setSkillMin(SkillType.EXP_LEGENDARY + 1);
