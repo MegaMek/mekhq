@@ -266,6 +266,8 @@ public class Unit implements ITechnology, ILocatable {
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
     private final ArrayList<PodSpace> podSpace;
+    /** Pod jobs read from a save, held until the pod spaces are built when the unit's parts are initialized. */
+    private final List<PodSpace> savedPodJobs = new ArrayList<>();
 
     private Refit refit;
 
@@ -525,8 +527,14 @@ public class Unit implements ITechnology, ILocatable {
                       campaignTransportType.name(),
                       e.toString(),
                       e.getCause());
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error("Could not find constructor to initialize transport space for {} Error: {} Cause: {}",
+            } catch (InvocationTargetException e) {
+                // The constructor was found and called, but threw; log what it threw rather than the reflection wrapper
+                Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+                LOGGER.error(cause, "Failed to initialize transport space for {} on {}",
+                      campaignTransportType.name(),
+                      (entity != null) ? entity.getShortName() : "a unit with no entity");
+            } catch (InstantiationException | IllegalAccessException e) {
+                LOGGER.error("Could not instantiate transport space for {} Error: {} Cause: {}",
                       campaignTransportType.name(),
                       e,
                       e.getCause());
@@ -3452,6 +3460,12 @@ public class Unit implements ITechnology, ILocatable {
             refit.writeToXML(pw, indent);
         }
 
+        for (PodSpace podSpaceWithJob : podSpace) {
+            if (podSpaceWithJob.hasWorkInProgress()) {
+                podSpaceWithJob.writeToXML(pw, indent);
+            }
+        }
+
         if ((lastMaintenanceReport != null) &&
                   !lastMaintenanceReport.isEmpty() &&
                   getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
@@ -3641,6 +3655,11 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("podSpace")) {
+                    PodSpace savedJob = PodSpace.generateInstanceFromXML(wn2, retVal);
+                    if (savedJob != null) {
+                        retVal.savedPodJobs.add(savedJob);
+                    }
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -4612,6 +4631,9 @@ public class Unit implements ITechnology, ILocatable {
 
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
+            if (!TransportBayPart.isWorthAPart(bay)) {
+                continue;
+            }
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = bays.get(bay.getBayNumber());
@@ -5230,13 +5252,46 @@ public class Unit implements ITechnology, ILocatable {
                                            .findAny();
             bayPart.ifPresent(part -> bayPartsToAdd.get(bayNum).forEach(part::addChildPart));
         }
+        rebuildPodSpaces();
+    }
+
+    /**
+     * Builds the pod spaces of an Omni unit again, handing any job in progress, including one read from a save, to
+     * the new pod space for the same location.
+     */
+    private void rebuildPodSpaces() {
+        List<PodSpace> earlierPodSpaces = new ArrayList<>(podSpace);
+        earlierPodSpaces.addAll(savedPodJobs);
+        savedPodJobs.clear();
+        podSpace.clear();
         if (getEntity().isOmni()) {
-            podSpace.clear();
-            for (int loc = 0; loc < getEntity().locations(); loc++) {
-                podSpace.add(new PodSpace(loc, this));
+            for (int location = 0; location < getEntity().locations(); location++) {
+                podSpace.add(new PodSpace(location, this));
             }
-            podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+            podSpace.forEach(newPodSpace -> newPodSpace.updateConditionFromEntity(false));
         }
+        for (PodSpace earlier : earlierPodSpaces) {
+            if (!earlier.hasWorkInProgress()) {
+                continue;
+            }
+            PodSpace successor = findPodSpace(earlier.getLocation());
+            if (successor != null) {
+                successor.continueWorkFrom(earlier);
+            } else {
+                LOGGER.warn("[PodSpace] {} has no pod space at location {} any more; its job there is dropped",
+                      getName(), earlier.getLocation());
+                earlier.cancelAssignment(true);
+            }
+        }
+    }
+
+    private @Nullable PodSpace findPodSpace(int location) {
+        for (PodSpace candidate : podSpace) {
+            if (candidate.getLocation() == location) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     public List<Part> getParts() {
@@ -6481,6 +6536,9 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
+     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer.</p>
+     *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
      *
@@ -6505,6 +6563,9 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
+        if (engineer != null) {
+            engineer.setEngineer(false);
+        }
         engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
@@ -6530,11 +6591,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
+            engineer.setEngineer(true);
             // change reference for any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.setTech(engineer);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.setTech(engineer);
             }
             // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
             // the new engineer is refused as "another team"
@@ -6547,12 +6607,28 @@ public class Unit implements ITechnology, ILocatable {
                 mothballTime = 0;
             }
             // cancel any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.cancelAssignment(true);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * @return the parts and pod spaces on this unit that have a tech assigned
+     */
+    private List<IPartWork> getScheduledWork() {
+        List<IPartWork> scheduledWork = new ArrayList<>();
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn()) {
+                scheduledWork.add(part);
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.isBeingWorkedOn()) {
+                scheduledWork.add(pod);
+            }
+        }
+        return scheduledWork;
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
@@ -6710,18 +6786,44 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} is assigned to fill
-     * that slot, then refreshes the unit's crew state.
+     * Reports whether this unit has an empty seat for a real crew member of the given role, counting temporary
+     * ("blob") crew as filling seats. Call it before the person is added.
      *
-     * <p>This mirrors the temp crew handling already performed by {@link #addPilotOrSoldier(Person, Unit, boolean)}
-     * for infantry and solo-piloted units.</p>
+     * <p>Vessel roles each have their own seats and their own temp crew, so they are checked per position. Every
+     * other role is checked against the whole unit, because a vehicle's temp crew are one pool shared by its driver,
+     * gunner and crew seats rather than tied to any one of them.</p>
      *
-     * @param role the temp crew role to release; when {@code null} or when no temp crew of that role is present, the
-     *             crew state is simply refreshed
+     * @param role the role of the seat being filled, or {@code null} to check the whole unit
+     *
+     * @return {@code true} if a seat is free, so assigning someone must not release a temp crew member
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role) {
+    private boolean hasFreeSeatFor(final @Nullable PersonnelRole role) {
+        if (role == PersonnelRole.VESSEL_PILOT) {
+            return drivers.size() + getTempCrewByPersonnelRole(role) < getTotalDriverNeeds();
+        } else if (role == PersonnelRole.VESSEL_GUNNER) {
+            return gunners.size() + getTempCrewByPersonnelRole(role) < getTotalGunnerNeeds();
+        } else if (role == PersonnelRole.VESSEL_CREW) {
+            return vesselCrew.size() + getTempCrewByPersonnelRole(role) < getTotalCrewNeeds();
+        }
+        return getTotalCrewSize() < getFullCrewSize();
+    }
+
+    /**
+     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} took a seat that
+     * was already filled, so the unit is not left with more crew than seats, then refreshes the unit's crew state.
+     *
+     * @param role        the temp crew role to release; when {@code null} or when no temp crew of that role is present,
+     *                    the crew state is simply refreshed
+     * @param hadFreeSeat whether the unit had an empty seat before the person was added (see
+     *                    {@link #hasFreeSeatFor(PersonnelRole)}); when {@code true} the person filled it and no temp
+     *                    crew is released
+     */
+    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role, final boolean hadFreeSeat) {
         final int currentTempCrew = (role == null) ? 0 : getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
+        if (!hadFreeSeat && currentTempCrew > 0) {
             // setTempCrew() also refreshes the unit's crew state via resetPilotAndEntity()
             setTempCrew(role, currentTempCrew - 1);
         } else {
@@ -6741,9 +6843,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole driverRole = getDriverRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(driverRole);
         drivers.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getDriverRole());
+        releaseTempCrewForAssignedRole(driverRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6765,9 +6869,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole gunnerRole = getGunnerRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(gunnerRole);
         gunners.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getGunnerRole());
+        releaseTempCrewForAssignedRole(gunnerRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6789,12 +6895,13 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
-        vesselCrew.add(person);
-        person.setUnit(this);
         final PersonnelRole crewRole = (entity instanceof Aero && !(entity instanceof ConvFighter)) ?
                                              PersonnelRole.VESSEL_CREW :
                                              getDriverRole();
-        releaseTempCrewForAssignedRole(crewRole);
+        final boolean hadFreeSeat = hasFreeSeatFor(crewRole);
+        vesselCrew.add(person);
+        person.setUnit(this);
+        releaseTempCrewForAssignedRole(crewRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6924,6 +7031,7 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final boolean hadFreeSeat = hasFreeSeatFor(getDriverRole());
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
@@ -6931,14 +7039,8 @@ public class Unit implements ITechnology, ILocatable {
         }
         person.setUnit(this);
 
-        // Remove one temp crew member when adding a real Person
-        PersonnelRole role = person.getPrimaryRole();
-        int currentTempCrew = getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
-            setTempCrew(role, currentTempCrew - 1);
-        } else {
-            resetPilotAndEntity();
-        }
+        // Replace one temp crew member only if the real Person took a seat that was already filled
+        releaseTempCrewForAssignedRole(person.getPrimaryRole(), hadFreeSeat);
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
@@ -6997,6 +7099,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (person.equals(engineer)) {
             wasCrew = true;
+            person.setEngineer(false);
             engineer = null;
         }
 
@@ -7694,12 +7797,13 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
-        for (Part part : getParts()) {
-            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
-                part.cancelAssignment(true);
+        for (IPartWork scheduledWork : getScheduledWork()) {
+            if (engineer.equals(scheduledWork.getTech())) {
+                scheduledWork.cancelAssignment(true);
             }
         }
 
+        engineer.setEngineer(false);
         engineer = null;
     }
 
@@ -8131,6 +8235,11 @@ public class Unit implements ITechnology, ILocatable {
      * re-assigned.
      */
     public void removeParts() {
+        // A pod job is work on the parts being removed, so it ends with them and gives back any spare it holds
+        for (PodSpace pod : podSpace) {
+            pod.cancelAssignment(true);
+        }
+
         for (Part part : parts) {
             part.setUnit(null);
 
@@ -8787,6 +8896,8 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void fixReferences(Campaign campaign) {
+        savedPodJobs.forEach(savedJob -> savedJob.fixReferences(campaign));
+
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPlayerForce().getHumanResources().getPerson(id);

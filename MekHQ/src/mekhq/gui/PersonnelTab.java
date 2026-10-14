@@ -72,6 +72,7 @@ import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -545,6 +546,13 @@ public final class PersonnelTab extends CampaignGuiTab {
      * Refreshes the personnel table model, applying the currently-selected location filter.
      */
     public void refreshPersonnelList() {
+        // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
+        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // generation completes reschedules this refresh against the finished campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
         if (selectedRow >= 0 && selectedRow < personnelTable.getRowCount()) {
@@ -637,6 +645,20 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(PersonNewEvent ev) {
+        personnelListScheduler.schedule();
+    }
+
+    /**
+     * A force generation recruits its personnel while {@link mekhq.campaign.Campaign#isBulkGenerationInProgress()} is
+     * true, so the refreshes its {@link PersonNewEvent}s trigger are dropped by the guard in
+     * {@link #refreshPersonnelList()}. Generation ends by firing this event, which runs the refresh against the
+     * finished campaign.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
         personnelListScheduler.schedule();
     }
 
