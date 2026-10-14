@@ -631,6 +631,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     private void refreshTechsList() {
+        // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
+        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         Campaign campaign = getCampaign();
@@ -841,11 +847,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * A force generation adds its parts while {@link Campaign#isBulkGenerationInProgress()} is true, so every
      * {@link PartNewEvent} it raises is dropped by the guard at the top of {@link #refreshPartsList()}. Generation ends
      * by firing this event and nothing else, so without this handler no refresh ever runs against the finished
-     * campaign: the warehouse is full and the table still shows what it held before the build.
+     * campaign: the warehouse is full and the table still shows what it held before the build. The tech list is
+     * skipped during generation in the same way, so it is rescheduled here too.
      */
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         partsScheduler.schedule();
+        techsScheduler.schedule();
     }
 
     @Subscribe

@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -111,9 +112,12 @@ class ChaosContractDeterminationPayTest {
         when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
     }
 
-    private static AbstractContract contract(int scale, double basePayMultiplier) {
+    private static AbstractContract contract(double exactScale, double basePayMultiplier) {
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(scale);
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(exactScale));
+        when(contract.getExactScale()).thenReturn(exactScale);
+        when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
+              ChaosContractDeterminationScale.getEconomicScale(exactScale, invocation.getArgument(0)));
         when(contract.getBasePayMultiplier()).thenReturn(basePayMultiplier);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
         return contract;
@@ -184,7 +188,7 @@ class ChaosContractDeterminationPayTest {
 
             try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
                 generation.when(() -> AbstractContractGeneration.determineUncappedScale(any(), any(), any(), any()))
-                      .thenReturn(8);
+                      .thenReturn(8.0);
 
                 assertEquals(Money.of(1_000), payScheme.getMonthlyPay(campaign, contract(2, 1.0)));
             }
@@ -327,7 +331,7 @@ class ChaosContractDeterminationPayTest {
             when(accountant.getPayRoll()).thenReturn(Money.of(1_000_000));
         }
 
-        private void uncappedScaleOf(int uncappedScale, Runnable test) {
+        private void uncappedScaleOf(double uncappedScale, Runnable test) {
             try (MockedStatic<AbstractContractGeneration> mockedGeneration =
                        mockStatic(AbstractContractGeneration.class)) {
                 generation = mockedGeneration;
@@ -526,6 +530,76 @@ class ChaosContractDeterminationPayTest {
 
             assertEquals(1.0,
                   new CamOpsContractDeterminationPay().getSalvageTaperMultiplier(campaign, contract(10, 1.0)), DELTA);
+        }
+    }
+
+    /** The unofficial Fractional Scale option: pay follows the exact Scale rather than jumping a whole point. */
+    @Nested
+    class FractionalScale {
+        @Test
+        void withoutTheOptionPayRoundsScaleUp() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
+
+            // Scale 2.3 is paid as Scale 3
+            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void combatPayFollowsTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            assertEquals(Money.of(1_150), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void scaleBasedBasePayFollowsTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, true);
+
+            // 500 x 2.3 x 1.5
+            assertEquals(Money.of(1_725), payScheme.getMonthlyPay(campaign, contract(2.3, 1.5)));
+        }
+
+        @Test
+        void exactScaleNeverFallsBelowTheMinimum() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            // Paid as Scale 0.1
+            assertEquals(Money.of(50), payScheme.getCombatPay(campaign, contract(0.02, 1.0)));
+        }
+
+        @Test
+        void trackIntensityStillDividesByTheWholeScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
+
+            // Scale 2.3 rolls 3 times the tracks: 1150 / 3 (integer division)
+            assertEquals(Money.of(383), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void taperUsesTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
+
+            // Scale 4.5 tapers to 3 + (1.5 x 0.5) = 3.75
+            assertEquals(Money.of(1_875), payScheme.getCombatPay(campaign, contract(4.5, 1.0)));
+            assertEquals(3.75 / 4.5, payScheme.getSalvageTaperMultiplier(campaign, contract(4.5, 1.0)), DELTA);
+        }
+
+        @Test
+        void jobShareUsesTheExactScales() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+
+            try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
+                generation.when(() -> AbstractContractGeneration.determineUncappedScale(any(), any(), any(), any()))
+                      .thenReturn(7.5);
+
+                // Without the option this would be 2 / 8
+                assertEquals(2.0 / 7.5, ChaosContractDeterminationPay.getJobShare(campaign, contract(2.0, 1.0)),
+                      DELTA);
+            }
         }
     }
 

@@ -80,7 +80,7 @@ public final class ChaosScaleLimits {
      * @author Illiani
      * @since 0.51.01
      */
-    public static double getTaperedScale(int scale) {
+    public static double getTaperedScale(double scale) {
         if (scale <= FULL_VALUE_SCALE) {
             return scale;
         }
@@ -95,7 +95,7 @@ public final class ChaosScaleLimits {
      * @author Illiani
      * @since 0.51.01
      */
-    public static double getTaperMultiplier(int scale) {
+    public static double getTaperMultiplier(double scale) {
         if (scale <= FULL_VALUE_SCALE) {
             return 1.0;
         }
@@ -110,8 +110,8 @@ public final class ChaosScaleLimits {
      * @author Illiani
      * @since 0.51.01
      */
-    public static double getUpkeepEscalationMultiplier(int tableOfOrganizationScale) {
-        int scaleAboveThreshold = Math.max(0, tableOfOrganizationScale - UPKEEP_ESCALATION_THRESHOLD);
+    public static double getUpkeepEscalationMultiplier(double tableOfOrganizationScale) {
+        double scaleAboveThreshold = Math.max(0, tableOfOrganizationScale - UPKEEP_ESCALATION_THRESHOLD);
         return 1.0 + (scaleAboveThreshold * UPKEEP_ESCALATION_PER_SCALE);
     }
 }

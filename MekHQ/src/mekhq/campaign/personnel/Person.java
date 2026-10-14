@@ -142,6 +142,7 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
@@ -7369,6 +7370,12 @@ public class Person implements ILocatable {
 
             if ((u.getRefit() != null) && equals(u.getRefit().getTech())) {
                 u.getRefit().setTech(null);
+            }
+
+            for (PodSpace podSpace : u.getPodSpace()) {
+                if (equals(podSpace.getTech())) {
+                    podSpace.cancelAssignment(true);
+                }
             }
         });
 

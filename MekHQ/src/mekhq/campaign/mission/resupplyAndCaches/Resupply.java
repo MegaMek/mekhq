@@ -453,7 +453,8 @@ public class Resupply {
         // Next, we determine the tonnage cap. This is the maximum tonnage the employer is willing to support.
         boolean includeBSPInScale = campaign.getCampaignOptions()
                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
-        double dropSize = getDropSize(contract, unitTonnage, includeBSPInScale);
+        boolean useFractionalScale = campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE);
+        double dropSize = getDropSize(contract, unitTonnage, includeBSPInScale, useFractionalScale);
 
         if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
             FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
@@ -465,9 +466,10 @@ public class Resupply {
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
-    private static double getDropSize(AbstractContract contract, double unitTonnage, boolean isIncludeBSP) {
+    private static double getDropSize(AbstractContract contract, double unitTonnage, boolean isIncludeBSP,
+          boolean useFractionalScale) {
         final int INDIVIDUAL_TONNAGE_ALLOWANCE = isIncludeBSP ? 80 * 12 : 80 * 4;
-        final int tonnageCap = contract.getScale() * INDIVIDUAL_TONNAGE_ALLOWANCE;
+        final double tonnageCap = contract.getEconomicScale(useFractionalScale) * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
         // Then we determine the size of each individual 'drop'. This uses the lowest of
         // unitTonnage and tonnageCap and divides that by 100

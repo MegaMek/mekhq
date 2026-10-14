@@ -225,6 +225,23 @@ class InterstellarMapPanelOperationMarkerTest {
     }
 
     @Test
+    void notYetStartedContractsGrantAccessWithoutOperationMarkers() {
+        AbstractContract futureContract = missionAt("system-a");
+        Faction employer = mock(Faction.class);
+        Faction target = mock(Faction.class);
+        when(futureContract.getEmployerFaction()).thenReturn(employer);
+        when(futureContract.getEnemyFaction()).thenReturn(target);
+
+        InterstellarMapPanel.MapPresentationData presentationData =
+              InterstellarMapPanel.createMapPresentationData(List.of(), List.of(futureContract), List.of(),
+                    missionId -> futureContract, Map.of());
+
+        assertTrue(presentationData.strategicMarkers().isEmpty());
+        assertEquals(Set.of(employer), presentationData.contractEmployers());
+        assertEquals(Set.of(target), presentationData.contractTargets());
+    }
+
+    @Test
     void scenarioOnlyFallbackIsUrgentWithoutAZeroCountBadge() {
         AbstractContract resolvedMission = missionAt("system-a");
         Scenario scenario = scenarioFor(FIRST_MISSION_ID);
