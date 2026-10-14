@@ -150,6 +150,20 @@ public class EntityUtilities {
     }
 
     /**
+     * Determines whether the given {@link Entity} has the Improved Communications quirk.
+     *
+     * @param entity the {@link Entity} to check for improved communications
+     *
+     * @return {@code true} if the entity has the Improved Communications quirk
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasImprovedCommunications(Entity entity) {
+        return entity.hasQuirk(OptionsConstants.QUIRK_POS_IMP_COM);
+    }
+
+    /**
      * Determines whether the given {@link Entity} carries a working Recon Camera (TO:AUE p.150), either mounted as
      * equipment or loaded as a Recon Camera Pod in its bomb bays.
      *

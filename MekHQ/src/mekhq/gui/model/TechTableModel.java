@@ -32,15 +32,11 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
@@ -50,11 +46,11 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.TechTaskEstimate;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.utilities.ReportingUtilities;
-import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * A table model for displaying work items
@@ -69,8 +65,6 @@ public class TechTableModel extends DataTableModel<Person> {
           SkillType.S_TECH_AERO,
           SkillType.S_TECH_VESSEL,
           };
-
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private final CampaignGUI tab;
     private final ITechWorkPanel panel;
@@ -187,15 +181,14 @@ public class TechTableModel extends DataTableModel<Person> {
         }
         toReturn.append("<br/>");
 
-        toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                   .get(CampaignOption.TECHS_USE_ADMINISTRATION))));
-
-        if (overtimeAllowed) {
-            toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
-        }
+        toReturn.append(WorkTimeEstimate.describeTechDay(getCampaign(), tech, overtimeAllowed));
         if (null != part) {
-            toReturn.append("<br/>").append(describeEstimate(TechTaskEstimate.estimate(getCampaign(), part, tech)));
+            TechTaskEstimate estimate = TechTaskEstimate.estimate(getCampaign(), part, tech);
+            toReturn.append("<br/>").append(WorkTimeEstimate.describeTechJob(estimate));
+            String finish = WorkTimeEstimate.describeTechFinish(getCampaign(), estimate);
+            if (!finish.isEmpty()) {
+                toReturn.append("<br/>").append(finish);
+            }
         }
 
         if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
@@ -230,26 +223,14 @@ public class TechTableModel extends DataTableModel<Person> {
     /**
      * @param estimate the tech's estimate for a task
      *
-     * @return one line with what the tech can expect from the task: target number, chance of success, minutes needed
-     *       and when it would be done, or why the tech cannot do it
+     * @return one line with what the task asks of the tech, or why the tech cannot do it
+     *
+     * @deprecated Use {@link WorkTimeEstimate#describeTechJob(TechTaskEstimate)} and
+     *       {@link WorkTimeEstimate#describeTechFinish(Campaign, TechTaskEstimate)} instead.
      */
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public static String describeEstimate(TechTaskEstimate estimate) {
-        if (estimate.isImpossible()) {
-            // The reason can name a unit, so it is escaped before it goes into the row's HTML
-            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible",
-                  StringEscapeUtils.escapeHtml4(estimate.targetDetails()));
-        }
-        String targetNumber = (estimate.targetNumber() == TargetRoll.AUTOMATIC_SUCCESS)
-                                    ? getTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.automatic")
-                                    : String.valueOf(estimate.targetNumber());
-        String successPercent = String.valueOf(estimate.successPercent());
-        String minutesNeeded = String.valueOf(estimate.minutesNeeded());
-        if (estimate.daysToFinish() == 0) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.today", targetNumber, successPercent,
-                  minutesNeeded);
-        }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.days", targetNumber, successPercent,
-              minutesNeeded, String.valueOf(estimate.daysToFinish()));
+        return WorkTimeEstimate.describeTechJob(estimate);
     }
 
     /**

@@ -42,6 +42,7 @@ import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.work.WorkTimeDisplay;
 import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -110,6 +111,7 @@ class MHQOptionsModel {
     // region Display - General
     String displayDateFormat;
     String longDisplayDateFormat;
+    WorkTimeDisplay workTimeDisplay;
     int guiScaleValue;
     boolean expandOptionSections;
     boolean hideUnitFluff;
@@ -228,6 +230,7 @@ class MHQOptionsModel {
         // Display - General
         displayDateFormat = options.getDisplayDateFormat();
         longDisplayDateFormat = options.getLongDisplayDateFormat();
+        workTimeDisplay = options.getWorkTimeDisplay();
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         expandOptionSections = GUIPreferences.getInstance().getExpandOptionSections();
         hideUnitFluff = options.getHideUnitFluff();
@@ -416,6 +419,7 @@ class MHQOptionsModel {
         // Display - General
         options.setDisplayDateFormat(displayDateFormat);
         options.setLongDisplayDateFormat(longDisplayDateFormat);
+        options.setWorkTimeDisplay(workTimeDisplay);
         GUIPreferences.getInstance().setExpandOptionSections(expandOptionSections);
         // Compare on the integer scale (the slider's units) so floating-point noise in the stored scale cannot trigger
         // a spurious rescale; the look-and-feel is only refreshed when the value actually changed.
