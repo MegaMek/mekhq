@@ -407,11 +407,11 @@ public abstract class AbstractContractGeneration {
      * @param detachmentHangar the hangar whose units are weighed
      * @param contract         the contract being sized (its objective decides whether cadre units count)
      *
-     * @return the automatically determined scale
+     * @return the automatically determined exact (unrounded) scale
      */
-    public static int determineScale(Campaign campaign, PlayerForce playerForce, LocalHangar detachmentHangar,
+    public static double determineScale(Campaign campaign, PlayerForce playerForce, LocalHangar detachmentHangar,
           AbstractContract contract) {
-        int scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
+        double scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
 
         // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
@@ -432,12 +432,12 @@ public abstract class AbstractContractGeneration {
      * @param detachmentHangar the hangar whose units are weighed
      * @param contract         the contract being sized (its objective decides whether cadre units count)
      *
-     * @return the Scale of the committed force
+     * @return the exact (unrounded) Scale of the committed force
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int determineUncappedScale(Campaign campaign, PlayerForce playerForce,
+    public static double determineUncappedScale(Campaign campaign, PlayerForce playerForce,
           LocalHangar detachmentHangar, AbstractContract contract) {
         boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
                                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);

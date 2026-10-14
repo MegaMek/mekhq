@@ -63,7 +63,8 @@ import org.junit.jupiter.api.Test;
  *         contain at least one real crew member before its temp crew counts.</li>
  *     <li>{@link Unit#addDriver(Person, boolean)}, {@link Unit#addGunner(Person, boolean)} and
  *         {@link Unit#addVesselCrew(Person, boolean)} release one matching temp crew member when a real crew member is
- *         assigned.</li>
+ *         assigned to a position that was already full, and leave the temp crew alone when they fill an empty
+ *         seat.</li>
  * </ul>
  *
  * <p>Each add method also fires a {@code PersonCrewAssignmentEvent}, whose {@code removeExcessTempCrew()} trims temp
@@ -230,6 +231,7 @@ class VesselTempCrewTest {
     @Test
     void assigningARealDriverReleasesOneTempPilot() {
         Unit unit = unitFor(dropship());
+        doReturn(3).when(unit).getTotalDriverNeeds();
         unit.setTempCrew(PersonnelRole.VESSEL_PILOT, 3);
 
         unit.addDriver(mockPerson());
@@ -241,6 +243,7 @@ class VesselTempCrewTest {
     @Test
     void assigningARealGunnerReleasesOneTempGunner() {
         Unit unit = unitFor(dropship());
+        doReturn(4).when(unit).getTotalGunnerNeeds();
         unit.setTempCrew(PersonnelRole.VESSEL_GUNNER, 4);
 
         unit.addGunner(mockPerson());
@@ -251,11 +254,64 @@ class VesselTempCrewTest {
     @Test
     void assigningRealVesselCrewReleasesOneTempCrew() {
         Unit unit = unitFor(dropship());
+        doReturn(6).when(unit).getTotalCrewNeeds();
         unit.setTempCrew(PersonnelRole.VESSEL_CREW, 6);
 
         unit.addVesselCrew(mockPerson());
 
         assertEquals(5, unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW));
+    }
+
+    @Test
+    void assigningARealDriverToAnEmptyPilotSeatKeepsTheTempPilots() {
+        Unit unit = unitFor(dropship());
+        doReturn(3).when(unit).getTotalDriverNeeds();
+        unit.setTempCrew(PersonnelRole.VESSEL_PILOT, 2);
+
+        unit.addDriver(mockPerson());
+
+        assertEquals(2, unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT),
+              "a real pilot filling an empty seat must not release a temp pilot");
+    }
+
+    @Test
+    void assigningARealGunnerToAnEmptyGunnerSeatKeepsTheTempGunners() {
+        Unit unit = unitFor(dropship());
+        doReturn(4).when(unit).getTotalGunnerNeeds();
+        unit.setTempCrew(PersonnelRole.VESSEL_GUNNER, 3);
+
+        unit.addGunner(mockPerson());
+
+        assertEquals(3, unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER));
+    }
+
+    @Test
+    void assigningRealVesselCrewToAnEmptyCrewSeatKeepsTheTempCrew() {
+        Unit unit = unitFor(dropship());
+        doReturn(6).when(unit).getTotalCrewNeeds();
+        unit.setTempCrew(PersonnelRole.VESSEL_CREW, 5);
+
+        unit.addVesselCrew(mockPerson());
+
+        assertEquals(5, unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW));
+    }
+
+    /**
+     * The #9896 case: a vessel whose pilot seats are already filled by temp crew must never end up with more pilots
+     * than seats when real pilots are assigned.
+     */
+    @Test
+    void assigningRealPilotsToAFullVesselNeverOverCrewsIt() {
+        Unit unit = unitFor(dropship());
+        doReturn(3).when(unit).getTotalDriverNeeds();
+        unit.setTempCrew(PersonnelRole.VESSEL_PILOT, 2);
+
+        // The first pilot takes the empty seat; the second replaces a temp pilot.
+        unit.addDriver(mockPerson());
+        unit.addDriver(mockPerson());
+
+        assertEquals(1, unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT));
+        assertEquals(3, unit.getDrivers().size() + unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT));
     }
 
     @Test
@@ -270,6 +326,7 @@ class VesselTempCrewTest {
     @Test
     void releasingTempPilotsStopsAtZeroAcrossSuccessiveAssignments() {
         Unit unit = unitFor(dropship());
+        doReturn(1).when(unit).getTotalDriverNeeds();
         unit.setTempCrew(PersonnelRole.VESSEL_PILOT, 1);
 
         unit.addDriver(mockPerson());

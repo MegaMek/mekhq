@@ -40,17 +40,7 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.event.AWTEventListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -69,18 +59,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -90,6 +70,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicMenuItemUI;
 import javax.swing.plaf.basic.BasicMenuUI;
 import javax.vecmath.Vector2d;
@@ -7137,16 +7118,32 @@ public class InterstellarMapPanel extends JPanel {
 
     private void refreshMapPresentationData() {
         List<AbstractContract> activeContracts = campaign.getActiveContracts();
-          mapPresentationData = createMapPresentationData(activeContracts, campaign.getActiveScenarios(),
-              campaign::getContract, playerBaseCountsBySystem());
+          // Accepted contracts that haven't started yet still grant system access, matching route planning
+          mapPresentationData = createMapPresentationData(activeContracts, campaign.getActiveContracts(true),
+              campaign.getActiveScenarios(), campaign::getContract, playerBaseCountsBySystem());
         }
 
         static MapPresentationData createMapPresentationData(List<AbstractContract> activeContracts,
             List<Scenario> activeScenarios, Function<java.util.UUID, AbstractContract> missionLookup,
             Map<String, Integer> playerBaseCounts) {
+        return createMapPresentationData(activeContracts, activeContracts, activeScenarios, missionLookup,
+              playerBaseCounts);
+    }
+
+    /**
+     * @param activeContracts the started contracts used for operation markers
+     * @param accessContracts the contracts whose employers and targets grant system access, including accepted
+     *                        contracts that haven't started yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static MapPresentationData createMapPresentationData(List<AbstractContract> activeContracts,
+          List<AbstractContract> accessContracts, List<Scenario> activeScenarios,
+          Function<java.util.UUID, AbstractContract> missionLookup, Map<String, Integer> playerBaseCounts) {
         Set<Faction> contractEmployers = new HashSet<>();
         Set<Faction> contractTargets = new HashSet<>();
-        for (AbstractContract contract : activeContracts) {
+        for (AbstractContract contract : accessContracts) {
             contractEmployers.add(contract.getEmployerFaction());
             contractTargets.add(contract.getEnemyFaction());
         }

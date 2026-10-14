@@ -43,6 +43,7 @@ import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.lenient;
@@ -53,6 +54,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import megamek.client.bot.princess.BehaviorSettings;
@@ -71,6 +73,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
@@ -489,6 +492,125 @@ class AtBDynamicScenarioFactoryTest {
     private static ScenarioForceTemplate createForceTemplate(int destinationZone) {
         ScenarioForceTemplate forceTemplate = new ScenarioForceTemplate();
         forceTemplate.setDestinationZone(destinationZone);
+        return forceTemplate;
+    }
+
+    @Test
+    void calculateEffectiveBVIncludesContributingAlliedBotForces() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        AtBDynamicScenario scenario = mockScenarioWithAlliedBotForce(campaign, 4500, 3000);
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(7500, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVPlayerOnlyExcludesAlliedBotForces() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        AtBDynamicScenario scenario = mockScenarioWithAlliedBotForce(campaign, 4500, 3000);
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false, false);
+
+        assertEquals(4500, actual);
+    }
+
+    @Test
+    void removeModifierForceTemplatesRemovesModifierAddedForces() {
+        ScenarioTemplate template = new ScenarioTemplate();
+        ScenarioForceTemplate playerForce = createNamedForceTemplate("Player");
+        ScenarioForceTemplate modifierForce = createNamedForceTemplate("Allied Ground Reinforcements");
+        template.getScenarioForces().put(playerForce.getForceName(), playerForce);
+        template.getScenarioForces().put(modifierForce.getForceName(), modifierForce);
+
+        AtBDynamicScenario scenario = mockScenarioWithModifierForce(template, modifierForce);
+
+        AtBDynamicScenarioFactory.removeModifierForceTemplates(scenario);
+
+        assertEquals(Set.of("Player"), template.getScenarioForces().keySet());
+    }
+
+    @Test
+    void removeModifierForceTemplatesKeepsTemplateForceSharingModifierForceName() {
+        ScenarioTemplate template = new ScenarioTemplate();
+        ScenarioForceTemplate templateForce = createNamedForceTemplate("Reinforcements");
+        template.getScenarioForces().put(templateForce.getForceName(), templateForce);
+
+        // A modifier whose force shares the name but was never written into the template
+        AtBDynamicScenario scenario = mockScenarioWithModifierForce(template,
+              createNamedForceTemplate("Reinforcements"));
+
+        AtBDynamicScenarioFactory.removeModifierForceTemplates(scenario);
+
+        assertSame(templateForce, template.getScenarioForces().get("Reinforcements"));
+    }
+
+    /**
+     * @param campaign    the mocked no-seed-force campaign
+     * @param playerBV    the BV of the player's single Frontline formation
+     * @param alliedBotBV the BV of the scenario's single allied bot force, which contributes to BV
+     *
+     * @return a scenario with one allied bot force flagged as contributing to BV
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static AtBDynamicScenario mockScenarioWithAlliedBotForce(Campaign campaign, int playerBV,
+          int alliedBotBV) {
+        PlayerForce playerForce = mock(PlayerForce.class);
+        LocalHangar hangar = mock(LocalHangar.class);
+        CombatTeam frontlineTeam = mockCombatTeam(FRONTLINE, mockFormationWithBV(campaign, hangar, false, playerBV));
+
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getHangar()).thenReturn(hangar);
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(frontlineTeam));
+
+        BotForce alliedBotForce = mock(BotForce.class);
+        when(alliedBotForce.getTotalBV(campaign)).thenReturn(alliedBotBV);
+
+        ScenarioForceTemplate alliedTemplate = new ScenarioForceTemplate();
+        alliedTemplate.setContributesToBV(true);
+
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+        when(scenario.getNumBots()).thenReturn(1);
+        when(scenario.getBotForce(0)).thenReturn(alliedBotForce);
+        when(scenario.getBotForceTemplates()).thenReturn(Map.of(alliedBotForce, alliedTemplate));
+
+        return scenario;
+    }
+
+    /**
+     * @param template      the scenario's template
+     * @param modifierForce the force definition of the scenario's single modifier
+     *
+     * @return a scenario with the given template and one modifier carrying the given force definition
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static AtBDynamicScenario mockScenarioWithModifierForce(ScenarioTemplate template,
+          ScenarioForceTemplate modifierForce) {
+        AtBScenarioModifier modifier = mock(AtBScenarioModifier.class);
+        when(modifier.getForceDefinition()).thenReturn(modifierForce);
+
+        AtBDynamicScenario scenario = mock(AtBDynamicScenario.class);
+        when(scenario.getTemplate()).thenReturn(template);
+        when(scenario.getScenarioModifiers()).thenReturn(List.of(modifier));
+
+        return scenario;
+    }
+
+    /**
+     * @param forceName the force template's name
+     *
+     * @return a force template with the given name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static ScenarioForceTemplate createNamedForceTemplate(String forceName) {
+        ScenarioForceTemplate forceTemplate = new ScenarioForceTemplate();
+        forceTemplate.setForceName(forceName);
         return forceTemplate;
     }
 

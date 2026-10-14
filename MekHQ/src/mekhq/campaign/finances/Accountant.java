@@ -395,14 +395,15 @@ public record Accountant(Campaign campaign) {
             return Money.zero();
         }
 
-        int scale = ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign());
-        int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
+        double scale = ChaosContractDeterminationScale.getEconomicScale(
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign()),
+              campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
         if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
-            upkeepInSupportPoints = (int) Math.round(upkeepInSupportPoints
-                                                           * ChaosScaleLimits.getUpkeepEscalationMultiplier(scale));
+            upkeepInSupportPoints *= ChaosScaleLimits.getUpkeepEscalationMultiplier(scale);
         }
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(upkeepInSupportPoints,
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints((int) Math.round(upkeepInSupportPoints),
               campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION));
     }
 
