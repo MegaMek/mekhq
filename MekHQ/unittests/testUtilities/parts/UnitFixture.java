@@ -82,6 +82,8 @@ public enum UnitFixture {
     LOCUST_LCT_5V("Locust LCT-5V", false, Mek.class),
     /** Wolverine WVR-6R, a medium Mek. Source: {@code meks/3039u/Wolverine WVR-6R.mtf}. */
     WOLVERINE_WVR_6R("Wolverine WVR-6R", false, Mek.class),
+    /** Longbow LGB-8C, a heavy fire support Mek. Source: {@code meks/Rec Guides ilClan/Vol 20/Longbow LGB-8C.mtf}. */
+    LONGBOW_LGB_8C("Longbow LGB-8C", false, Mek.class),
     /** Wolverine WVR-6M, the refit target of the WVR-6R. Source: {@code meks/3039u/Wolverine WVR-6M.mtf}. */
     WOLVERINE_WVR_6M("Wolverine WVR-6M", false, Mek.class),
     /** Hunchback HBK-4G, a medium Mek. Source: {@code meks/3039u/Hunchback HBK-4G.mtf}. */
