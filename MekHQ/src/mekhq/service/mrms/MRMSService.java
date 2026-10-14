@@ -58,6 +58,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -104,24 +105,23 @@ public class MRMSService {
 
     /**
      * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
-     * right-click menu all ask this, so they offer the same units. A self-crewed unit looks after itself; any other
-     * unit qualifies when it is a type a tech can be assigned to, the same types {@link Person#canTech} accepts.
+     * right-click menu all ask this, so they offer the same units. A unit qualifies when it is a type a tech can be
+     * assigned to, the same types {@link Person#canTech} accepts. A DropShip, JumpShip, WarShip or space station
+     * qualifies too: its engineer does the work, as in the Repair tab. So does conventional infantry: when it maintains
+     * itself its ranking soldier does the work, such as reloading its field guns, and otherwise a Mechanic does.
      *
      * @param unit the unit
      *
      * @return {@code true} if Mass Repair can work on the unit
      */
     public static boolean isMassRepairableUnit(Unit unit) {
-        if (unit.isSelfCrewed()) {
-            return false;
-        }
         Entity entity = unit.getEntity();
         boolean isMekTechWork = (entity instanceof Mek) || (entity instanceof ProtoMek)
                                       || (entity instanceof HandheldWeapon);
         boolean isOtherTechWork = (entity instanceof Aero) || (entity instanceof BattleArmor)
                                         || (entity instanceof Tank);
-        boolean isTechMaintainedInfantry = (entity != null) && entity.isConventionalInfantry();
-        return isMekTechWork || isOtherTechWork || isTechMaintainedInfantry;
+        boolean isConventionalInfantry = (entity != null) && entity.isConventionalInfantry();
+        return isMekTechWork || isOtherTechWork || isConventionalInfantry;
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
@@ -497,7 +497,9 @@ public class MRMSService {
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
           List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
-        List<Person> techs = getTechsWithTimeLeftToday(campaign);
+        List<Person> techs = unit.isSelfCrewed()
+                                   ? getEngineerWithTimeLeftToday(campaign, unit)
+                                   : getTechsWithTimeLeftToday(campaign);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
@@ -505,12 +507,15 @@ public class MRMSService {
 
         MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_ACTIONS);
 
-        // Filter our tech list to only our techs that can work on this unit
-        for (int i = techs.size() - 1; i >= 0; i--) {
-            Person tech = techs.get(i);
+        // Filter our tech list to only our techs that can work on this unit. A self-crewed unit's engineer is its only
+        // tech whatever their training, as in the Repair tab: infantry that maintains itself is led by a soldier
+        if (!unit.isSelfCrewed()) {
+            for (int i = techs.size() - 1; i >= 0; i--) {
+                Person tech = techs.get(i);
 
-            if (!tech.canTech(unit.getEntity())) {
-                techs.remove(i);
+                if (!tech.canTech(unit.getEntity())) {
+                    techs.remove(i);
+                }
             }
         }
 
@@ -1184,7 +1189,9 @@ public class MRMSService {
             int expectedTime = getExpectedWorkTime((partWork), workTime);
 
             if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < expectedTime) {
-                if (!configuredOptions.isAllowCarryover()) {
+                boolean isCarryoverAllowed = configuredOptions.isAllowCarryover()
+                                                   || isCrewJobLongerThanAFullDay(campaign, unit, tech, expectedTime);
+                if (!isCarryoverAllowed) {
                     debugLog("... would carry over day and configuration doesn't allow", "repairPart");
 
                     continue;
@@ -1395,6 +1402,54 @@ public class MRMSService {
         }
 
         return newParts;
+    }
+
+    /**
+     * Whether a self-crewed unit's job runs past its engineer's whole working day, overtime included when the campaign
+     * allows it. The crew is the unit's only tech team, so such a job, common on ships, can only ever be done over
+     * several days, and Mass Repair starts it even with carryover off. Any other unit, and a job that fits in one day,
+     * follows the setting.
+     *
+     * @return {@code true} if the unit is self-crewed and the job is longer than its engineer's full day
+     */
+    private static boolean isCrewJobLongerThanAFullDay(Campaign campaign, Unit unit, Person tech, int expectedTime) {
+        if (!unit.isSelfCrewed()) {
+            return false;
+        }
+        boolean isTechsUseAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        int fullDay = tech.getDailyAvailableTechTime(isTechsUseAdministration);
+        if (campaign.isOvertimeAllowed()) {
+            fullDay += (int) Math.round(Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
+                                              * tech.calculateTechTimeMultiplier(isTechsUseAdministration));
+        }
+        boolean isLongerThanAFullDay = expectedTime > fullDay;
+        if (isLongerThanAFullDay) {
+            LOGGER.debug("[MRMS] {}: a {} minute job is longer than the engineer's {} minute day, so it carries over",
+                  unit.getName(), expectedTime, fullDay);
+        }
+        return isLongerThanAFullDay;
+    }
+
+    /**
+     * A ship's crew is its only tech team (Campaign Operations, pp. 190-191), and infantry that maintains itself is
+     * led by its ranking soldier. So Mass Repair on a self-crewed unit works through its engineer alone, the same
+     * person the Repair tab offers for it.
+     *
+     * @return the unit's engineer if they can still work today, otherwise an empty list
+     */
+    private static List<Person> getEngineerWithTimeLeftToday(Campaign campaign, Unit unit) {
+        List<Person> techs = new ArrayList<>();
+        Person engineer = unit.getEngineer();
+        if (engineer == null) {
+            LOGGER.debug("[MRMS] {}: no engineer, so its crew cannot repair it", unit.getName());
+            return techs;
+        }
+        if (RepairTechEligibility.getTimeLeftToday(campaign, engineer) <= 0) {
+            LOGGER.debug("[MRMS] {}: engineer {} has no time left today", unit.getName(), engineer.getFullName());
+            return techs;
+        }
+        techs.add(engineer);
+        return techs;
     }
 
     /**

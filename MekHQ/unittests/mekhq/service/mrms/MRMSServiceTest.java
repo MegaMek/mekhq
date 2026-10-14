@@ -57,6 +57,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceQuartermaster;
@@ -233,16 +234,19 @@ public class MRMSServiceTest {
     }
 
     @Test
-    public void testIsValidMRMSUnitRejectsSelfCrewedUnit() {
+    public void testIsValidMRMSUnitAcceptsSelfMaintainedInfantry() {
         Unit unit = mock(Unit.class);
         MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+        Infantry infantry = mock(Infantry.class);
 
         when(unit.isSelfCrewed()).thenReturn(true);
-        when(unit.getEntity()).thenReturn(mock(Mek.class));
+        when(unit.isSelfMaintainedInfantry()).thenReturn(true);
+        when(infantry.isConventionalInfantry()).thenReturn(true);
+        when(unit.getEntity()).thenReturn(infantry);
         when(options.useRepair()).thenReturn(true);
         when(options.useSalvage()).thenReturn(true);
 
-        assertFalse(MRMSService.isValidMRMSUnit(unit, options));
+        assertTrue(MRMSService.isValidMRMSUnit(unit, options));
     }
 
     @Test

@@ -172,6 +172,11 @@ public enum UnitFixture {
     FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", true, Infantry.class),
     /** The same DCMS foot platoon armed with machine guns. Source: {@code infantry/Foot Platoon (DCMS) (MG 2620+).blk}. */
     FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", true, Infantry.class),
+    /**
+     * A motorized platoon towing three AC/5 field guns, each with its own ammunition. Source:
+     * {@code infantry/AFFS/Field Gun Platoon (AFFS) (Motorized AC5 3067+).blk}.
+     */
+    FIELD_GUN_PLATOON_AC5("Field Gun Platoon (AFFS) (Motorized AC5 3067+)", true, Infantry.class),
     /** Minotaur, a ProtoMek. Source: {@code protomeks/3060/Minotaur.blk}. */
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
