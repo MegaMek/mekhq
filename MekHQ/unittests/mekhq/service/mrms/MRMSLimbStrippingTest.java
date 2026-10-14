@@ -148,4 +148,19 @@ class MRMSLimbStrippingTest {
         assertTrue(tech.getMinutesLeft() < FULL_SHIFT_MINUTES, "The tech starts stripping the arm");
         assertFalse(locust.isSalvage(), "The Locust is back in repair mode");
     }
+
+    @Test
+    void massSalvageStripsAMekWithABadShoulderWhenLocationsAreOff() {
+        Person tech = scenario.withTech(EXP_REGULAR);
+        // The Locations row only matters for repairs: salvage takes the arm's parts off like any other
+        for (MRMSOption option : campaign.getCampaignOptions().get(CampaignOption.MRMS_OPTIONS)) {
+            option.setActive(option.getType() != PartRepairType.GENERAL_LOCATION);
+        }
+        locust.setSalvage(true);
+
+        MRMSService.mrmsUnits(campaign, List.of(locust), new MRMSConfiguredOptions(campaign));
+
+        assertTrue(tech.getMinutesLeft() < FULL_SHIFT_MINUTES, "The tech starts stripping the Locust");
+        assertTrue(locust.isSalvage(), "The Locust stays in salvage mode");
+    }
 }

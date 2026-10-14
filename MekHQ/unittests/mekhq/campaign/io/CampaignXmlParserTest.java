@@ -35,19 +35,41 @@ package mekhq.campaign.io;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.education.AcademyFactory;
+import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -147,6 +169,101 @@ class CampaignXmlParserTest {
         } finally {
             RandomGenderGenerator.setPercentFemale(originalPercentFemale);
             RandomNameGenerator.getInstance().setChosenFaction(originalChosenFaction);
+        }
+    }
+
+    /** Tests for {@link CampaignXmlParser#migrateLegacyEducationTravel} journey-stage conversion. */
+    @Nested
+    class LegacyEducationTravelMigration {
+        private static final String ACADEMY_SET = "TestSet";
+        private static final String ACADEMY_NAME = "Test Academy";
+
+        Campaign campaign;
+        Detachment forceDetachment;
+        AcademyCampusLocation campus;
+        PlanetarySystem academySystem;
+        PlanetarySystem campaignSystem;
+        Person person;
+
+        @BeforeEach
+        void setUp() {
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            forceDetachment = new Detachment();
+            when(playerForce.getForceDetachment()).thenReturn(forceDetachment);
+            when(playerForce.getPersonnel()).thenReturn(forceDetachment.getPersonnel());
+
+            CampaignLocationManager locationManager = mock(CampaignLocationManager.class);
+            when(campaign.getCampaignLocationManager()).thenReturn(locationManager);
+            campus = new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME);
+            when(locationManager.getOrCreateCampusLocation(any(), any(), any(), any())).thenReturn(campus);
+
+            academySystem = mock(PlanetarySystem.class);
+            when(academySystem.getId()).thenReturn("AcademySystem");
+            when(campaign.getSystemById("AcademySystem")).thenReturn(academySystem);
+            campaignSystem = mock(PlanetarySystem.class);
+            when(campaignSystem.getId()).thenReturn("CampaignSystem");
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+
+            // Mirror a loaded campaign: nodes can only be parented into trees rooted at a location.
+            forceDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            campus.setParent(new CurrentLocation(academySystem, 0));
+
+            person = new Person("Test", "Student", null, "MERC");
+            person.setEduAcademySet(ACADEMY_SET);
+            person.setEduAcademyNameInSet(ACADEMY_NAME);
+            person.setEduAcademySystem("AcademySystem");
+            person.setEduJourneyTime(92);
+            person.setEduDaysOfTravel(64);
+            person.setParent(forceDetachment.getPersonnel());
+            forceDetachment.getPersonnel().putIfAbsent(person.getId(), person);
+        }
+
+        private CurrentLocation migrate() {
+            try (MockedStatic<AcademyFactory> mockFactory = mockStatic(AcademyFactory.class)) {
+                AcademyFactory factory = mock(AcademyFactory.class);
+                mockFactory.when(AcademyFactory::getInstance).thenReturn(factory);
+                when(factory.getAllSetNames()).thenReturn(List.of());
+
+                CampaignXmlParser.migrateLegacyEducationTravel(campaign);
+            }
+            return assertInstanceOf(CurrentLocation.class, person.getCurrentLocation());
+        }
+
+        @Test
+        void journeyFromCampus_travelsToCampaignSystemWithTheMainForce() {
+            person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+
+            CurrentLocation travelNode = migrate();
+
+            assertSame(campaignSystem, travelNode.getCurrentSystem());
+            assertEquals(28.0, travelNode.getTransitTime());
+            assertEquals(List.of(campaignSystem), travelNode.getJumpPath().getSystems());
+            assertSame(forceDetachment, travelNode.getParentLocation());
+        }
+
+        @Test
+        void journeyToCampus_travelsToAcademySystemUnderTheCampus() {
+            person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+
+            CurrentLocation travelNode = migrate();
+
+            assertSame(academySystem, travelNode.getCurrentSystem());
+            assertEquals(28.0, travelNode.getTransitTime());
+            assertEquals(List.of(academySystem), travelNode.getJumpPath().getSystems());
+            assertSame(campus, travelNode.getParentLocation());
+        }
+
+        @Test
+        void journeyAlreadyComplete_arrivesWithoutPath() {
+            person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+            person.setEduDaysOfTravel(92);
+
+            CurrentLocation travelNode = migrate();
+
+            assertTrue(travelNode.isOnPlanet());
+            assertNull(travelNode.getJumpPath());
         }
     }
 }

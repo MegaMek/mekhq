@@ -2356,8 +2356,9 @@ public class ResolveScenarioTracker {
             } else {
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
-                if (en.isAero()) {
-                    ((IAero) en).setFuelTonnage(((IAero) unitStatus.getBaseEntity()).getFuelTonnage());
+                // Without a base entity (unit not in the unit cache) the unit keeps its current fuel
+                if (en.isAero() && (unitStatus.getBaseEntity() instanceof IAero baseAero)) {
+                    ((IAero) en).setFuelTonnage(baseAero.getFuelTonnage());
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
@@ -2743,13 +2744,12 @@ public class ResolveScenarioTracker {
             model = unit.getEntity().getModel();
             // assume it's a total loss until we find something that says otherwise
             totalLoss = true;
-            // create a brand-new entity until we find one
+            // The unit's own entity is always usable; the unit cache is only needed for the pristine base entity, so a
+            // cache miss (custom design, cache reloading, etc.) must not leave the status without an entity.
+            entity = unit.getEntity();
             MekSummary summary = MekSummaryCache.getInstance().getMek(getLookupName());
             if (null != summary) {
                 try {
-                    entity = unit.getEntity() == null ?
-                                   new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity() :
-                                   unit.getEntity();
                     baseEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
                     logger.error("", e);

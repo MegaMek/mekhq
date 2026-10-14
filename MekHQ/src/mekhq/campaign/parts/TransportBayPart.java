@@ -73,6 +73,18 @@ public class TransportBayPart extends Part {
         return bayNumber;
     }
 
+    /**
+     * A bay that takes up no space on its unit gets no part. Unit files can list quarters of size 0, such as the
+     * second class quarters on a Leopard (2537); there is nothing there to damage or repair.
+     *
+     * @param bay a bay on a unit
+     *
+     * @return {@code true} if the bay takes up space and so is a part of the unit
+     */
+    public static boolean isWorthAPart(Bay bay) {
+        return bay.getWeight() > 0;
+    }
+
     public Bay getBay() {
         if (null != unit && null != unit.getEntity()) {
             return unit.getEntity().getBayById(bayNumber);
