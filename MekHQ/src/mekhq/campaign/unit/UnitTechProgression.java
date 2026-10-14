@@ -35,10 +35,13 @@ package mekhq.campaign.unit;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Faction;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
@@ -64,6 +67,7 @@ public class UnitTechProgression {
     private static final UnitTechProgression instance = new UnitTechProgression();
 
     private final Map<Faction, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
+    private final Set<Faction> loggedFailedFactions = ConcurrentHashMap.newKeySet();
 
     /**
      * Initializes the data for a particular faction
@@ -141,12 +145,25 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            LOGGER.error("", e);
+            // Callers such as the unit market's row filter ask once per unit, so log a failed build only once
+            if (instance.loggedFailedFactions.add(techFaction)) {
+                LOGGER.error("Could not calculate tech progression for {}", techFaction, e);
+            }
         }
         return null;
     }
 
-    private static ITechnology calcTechProgression(MekSummary ms, Faction techFaction) {
+    /**
+     * Loads a unit and calculates its tech progression for a faction. A unit that cannot be loaded yields {@code null}
+     * rather than an exception, so one broken unit file cannot fail the whole faction's map and with it every unit in
+     * the unit market.
+     *
+     * @param ms          the unit to calculate
+     * @param techFaction the faction to calculate for
+     *
+     * @return the unit's progression, or {@code null} if the unit could not be loaded
+     */
+    static @Nullable ITechnology calcTechProgression(MekSummary ms, Faction techFaction) {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
@@ -154,7 +171,8 @@ public class UnitTechProgression {
                 return null;
             }
             return en.factionTechLevel(techFaction);
-        } catch (EntityLoadingException ex) {
+        } catch (EntityLoadingException | RuntimeException ex) {
+            // MekFileParser rethrows some failures, such as a missing zip entry, as a bare NullPointerException
             LOGGER.error("Exception loading entity {}", ms.getName(), ex);
             return null;
         }
