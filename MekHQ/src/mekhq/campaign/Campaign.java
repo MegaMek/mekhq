@@ -256,6 +256,7 @@ import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTaskHold;
 import mekhq.campaign.work.RepairTechEligibility;
 import mekhq.campaign.work.RepairTechEligibility.Refusal;
+import mekhq.campaign.work.TechnicianCheck;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -2829,8 +2830,9 @@ public class Campaign implements ITechManager {
                                                      (tech.getCurrentEdge() > 0);
                     SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
                                                   .withoutSubject()
-                                                  .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
-                                                                                              target.getValue());
+                                                  .withRollOfTwoAlwaysFailing()
+                                                  .withEdgeRerollCondition(firstRoll -> !TechnicianCheck.isSuccess(
+                                                        firstRoll.result(), target));
                     if (!rightTechType) {
                         // Working out of type always rolls at a disadvantage, overriding any natural aptitude.
                         refitCheck.withRollType(RollType.DISADVANTAGE);
@@ -2841,7 +2843,7 @@ public class Campaign implements ITechManager {
                           target.getValueAsString(), refitResult.getReport()) + " ";
                 }
 
-                if (roll >= target.getValue()) {
+                if (TechnicianCheck.isSuccess(roll, target)) {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
@@ -3058,6 +3060,7 @@ public class Campaign implements ITechManager {
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
             SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
                                            .withoutSubject()
+                                           .withRollOfTwoAlwaysFailing()
                                            .withEdgeRerollCondition(firstRoll -> {
                                                int rolled = firstRoll.result();
                                                if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
@@ -3075,7 +3078,8 @@ public class Campaign implements ITechManager {
                                                      true) == SkillType.EXP_LEGENDARY) ||
                                                                                      tech.getPrimaryRole()
                                                                                            .isVesselCrew();
-                                               return legendaryOrVesselCrew && (rolled < target.getValue());
+                                               return legendaryOrVesselCrew && !TechnicianCheck.isSuccess(rolled,
+                                                     target);
                                            });
             if (!rightTechType) {
                 // Working out of type always rolls at a disadvantage, overriding any natural aptitude the tech has.
@@ -3087,7 +3091,7 @@ public class Campaign implements ITechManager {
                   target.getValueAsString(), repairResult.getReport());
         }
 
-        final boolean taskSucceeded = roll >= target.getValue();
+        final boolean taskSucceeded = TechnicianCheck.isSuccess(roll, target);
         if (taskSucceeded) {
             // capture the repair target before succeeding: replacing a MissingPart removes the placeholder from the
             // unit, which clears its unit reference and its part name along with it
@@ -4364,7 +4368,7 @@ public class Campaign implements ITechManager {
                 if (!RouteAlternativesPlanner.isValidRequest(origin, requestedStops)) {
             return List.of();
         }
-        List<AbstractContract> activeContracts = getActiveContracts();
+        List<AbstractContract> activeContracts = getActiveContracts(true);
         FactionHints factionHints = FactionHints.getInstance();
           NavigationRouteAnalysis.Policy policy = createNavigationPolicy(false, false, activeContracts,
               factionHints);
@@ -4445,7 +4449,7 @@ public class Campaign implements ITechManager {
             return jumpPath;
         }
 
-        List<AbstractContract> activeAtBContracts = getActiveContracts();
+        List<AbstractContract> activeAtBContracts = getActiveContracts(true);
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -4466,7 +4470,8 @@ public class Campaign implements ITechManager {
 
     private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
           boolean skipEmptySystemCheck) {
-        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(),
+        // Accepted contracts that haven't started yet still grant access, otherwise the player can't travel to them
+        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(true),
               FactionHints.getInstance());
     }
 
