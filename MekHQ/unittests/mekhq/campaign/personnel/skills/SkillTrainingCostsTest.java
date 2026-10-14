@@ -36,11 +36,15 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -48,12 +52,15 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.AfterEach;
@@ -157,6 +164,8 @@ class SkillTrainingCostsTest {
         @Test
         void roleplaySkillsUseTheProfessionTableOutsideTheRole() {
             when(skillType.isRoleplaySkill()).thenReturn(true);
+            // Roleplay skills are free by default
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
 
             assertEquals(supportPoints(200), cost(personWithSkillAt(3), false));
         }
@@ -178,6 +187,49 @@ class SkillTrainingCostsTest {
                 assertEquals(false, current.isLessThan(previous), "level " + currentLevel);
                 previous = current;
             }
+        }
+
+        @Test
+        void professionMultiplierScalesProfessionSkills() {
+            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 2.0);
+
+            // Regular to Veteran: 200 x 2
+            assertEquals(supportPoints(400), cost(personWithSkillAt(3), true));
+        }
+
+        @Test
+        void utilityMultiplierScalesUtilitySkills() {
+            when(skillType.isUtilitySkill()).thenReturn(true);
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+
+            assertEquals(supportPoints(100), cost(personWithSkillAt(3), false));
+        }
+
+        @Test
+        void roleplayMultiplierScalesRoleplaySkills() {
+            when(skillType.isRoleplaySkill()).thenReturn(true);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+
+            assertEquals(supportPoints(100), cost(personWithSkillAt(3), false));
+        }
+
+        /** A Utility skill belonging to the person's role is priced as a profession skill. */
+        @Test
+        void roleUtilitySkillsUseTheProfessionMultiplier() {
+            when(skillType.isUtilitySkill()).thenReturn(true);
+            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 3.0);
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+
+            assertEquals(supportPoints(600), cost(personWithSkillAt(3), true));
+        }
+
+        @Test
+        void otherSkillsIgnoreTheMultipliers() {
+            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+
+            assertEquals(supportPoints(300), cost(personWithSkillAt(3), false));
         }
 
         /** Costs are always charged in C-bills, even if contract pay is kept in raw support points. */
@@ -293,13 +345,27 @@ class SkillTrainingCostsTest {
             when(skills.getSkillNames()).thenReturn(skillNames);
         }
 
+        /** The combined cost across every category. */
         private Money accumulated() {
-            return SkillTrainingCosts.getAccumulatedSkillTrainingCost(campaign, person);
+            Money total = Money.zero();
+            for (Money categoryCost : SkillTrainingCosts.getAccumulatedSkillTrainingCosts(campaign, person).values()) {
+                total = total.plus(categoryCost);
+            }
+            return total;
+        }
+
+        private Money accumulated(SkillTrainingCategory category) {
+            return SkillTrainingCosts.getAccumulatedSkillTrainingCosts(campaign, person).get(category);
         }
 
         @Test
-        void noSkillsCostNothing() {
-            assertEquals(Money.zero(), accumulated());
+        void noSkillsCostNothingInEveryCategory() {
+            Map<SkillTrainingCategory, Money> costs = SkillTrainingCosts.getAccumulatedSkillTrainingCosts(campaign,
+                  person);
+
+            for (SkillTrainingCategory category : SkillTrainingCategory.values()) {
+                assertEquals(Money.zero(), costs.get(category), category.name());
+            }
         }
 
         @ParameterizedTest
@@ -307,7 +373,7 @@ class SkillTrainingCostsTest {
         void nonProfessionSkillsAddUpEveryLevelReached(int level, int expectedSupportPoints) {
             holdsSkills(SkillType.S_TACTICS, String.valueOf(level));
 
-            assertEquals(supportPoints(expectedSupportPoints), accumulated());
+            assertEquals(supportPoints(expectedSupportPoints), accumulated(SkillTrainingCategory.OTHER));
         }
 
         @ParameterizedTest
@@ -315,7 +381,7 @@ class SkillTrainingCostsTest {
         void roleSkillsUseTheProfessionTable(int level, int expectedSupportPoints) {
             holdsSkills(SkillType.S_GUN_MEK, String.valueOf(level));
 
-            assertEquals(supportPoints(expectedSupportPoints), accumulated());
+            assertEquals(supportPoints(expectedSupportPoints), accumulated(SkillTrainingCategory.PROFESSION));
         }
 
         @Test
@@ -324,7 +390,7 @@ class SkillTrainingCostsTest {
             when(person.getSecondaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
             holdsSkills(SkillType.S_PILOT_MEK, "7");
 
-            assertEquals(supportPoints(3400), accumulated());
+            assertEquals(supportPoints(3400), accumulated(SkillTrainingCategory.PROFESSION));
         }
 
         @Test
@@ -332,23 +398,36 @@ class SkillTrainingCostsTest {
             when(skillType.isUtilitySkill()).thenReturn(true);
             holdsSkills(SkillType.S_TACTICS, "7");
 
+            assertEquals(supportPoints(3400), accumulated(SkillTrainingCategory.UTILITY));
             assertEquals(supportPoints(3400), accumulated());
         }
 
         @Test
-        void roleplaySkillsAreLeftOut() {
+        void roleplaySkillsUseTheProfessionTable() {
             when(skillType.isRoleplaySkill()).thenReturn(true);
             holdsSkills(SkillType.S_TACTICS, "7");
 
-            assertEquals(Money.zero(), accumulated());
+            assertEquals(supportPoints(3400), accumulated(SkillTrainingCategory.ROLEPLAY));
+            assertEquals(supportPoints(3400), accumulated());
         }
 
         @Test
-        void everySkillIsSummed() {
+        void everySkillIsSummedIntoItsCategory() {
             // Veteran role skill (300) + Elite other skill (1100) + Green skill (0)
             holdsSkills(SkillType.S_GUN_MEK, "4", SkillType.S_TACTICS, "5", SkillType.S_LEADER, "2");
 
+            assertEquals(supportPoints(300), accumulated(SkillTrainingCategory.PROFESSION));
+            assertEquals(supportPoints(1100), accumulated(SkillTrainingCategory.OTHER));
             assertEquals(supportPoints(1400), accumulated());
+        }
+
+        /** Recruitment applies its own multipliers, so the improvement multipliers are left out. */
+        @Test
+        void improvementMultipliersAreNotApplied() {
+            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 3.0);
+            holdsSkills(SkillType.S_GUN_MEK, "4");
+
+            assertEquals(supportPoints(300), accumulated(SkillTrainingCategory.PROFESSION));
         }
 
         @Test
@@ -430,6 +509,58 @@ class SkillTrainingCostsTest {
             campaignOptions.set(CampaignOption.USE_ARTILLERY, true);
             assertEquals(supportPoints(200),
                   SkillTrainingCosts.getSkillImprovementCost(campaign, person, SkillType.S_ARTILLERY));
+        }
+    }
+
+    /** Quick Train and Mass Training charge through this as well as the personnel menu. */
+    @Nested
+    class Payment {
+        private Finances finances;
+        private Person person;
+
+        @BeforeEach
+        void setUpFinances() {
+            finances = mock(Finances.class);
+            when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
+            // Regular to Veteran in a skill outside the role: 300 SP
+            person = personWithSkillAt(3);
+            when(person.getFullTitle()).thenReturn("MekWarrior Test");
+        }
+
+        private void debitSucceeds(boolean isSuccessful) {
+            when(finances.debit(any(TransactionType.class), any(LocalDate.class), any(Money.class), anyString()))
+                  .thenReturn(isSuccessful);
+        }
+
+        @Test
+        void freeImprovementsAreNotCharged() {
+            campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, false);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void pricedImprovementsAreChargedAsEducation() {
+            debitSucceeds(true);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(supportPoints(300)), anyString());
+        }
+
+        @Test
+        void refusedWhenTheForceCannotPay() {
+            debitSucceeds(false);
+
+            assertFalse(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+        }
+
+        @Test
+        void aPrePricedImprovementIsChargedAtThatPrice() {
+            debitSucceeds(true);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME, Money.of(1_234)));
+            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(Money.of(1_234)), anyString());
         }
     }
 }

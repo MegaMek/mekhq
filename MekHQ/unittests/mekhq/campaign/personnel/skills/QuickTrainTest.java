@@ -32,12 +32,18 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class QuickTrainTest {
 
@@ -150,6 +157,42 @@ class QuickTrainTest {
         verify(person).getSkills();
     }
 
+    @Test
+    void unaffordableImprovementsAreSkippedAndReported() {
+        Person person = processablePerson();
+        holdsTrainableLeadership(person);
+        Campaign campaign = processCampaign(person, null);
+
+        try (MockedStatic<SkillTrainingCosts> skillTrainingCosts = mockStatic(SkillTrainingCosts.class)) {
+            skillTrainingCosts.when(() -> SkillTrainingCosts.payForSkillImprovement(campaign, person, S_LEADER))
+                  .thenReturn(false);
+
+            QuickTrain.processQuickTraining(List.of(person), 5, campaign, leadershipOnly(), true);
+        }
+
+        verify(person, never()).improveSkill(any());
+        verify(campaign).addReport(eq(PERSONNEL), anyString());
+    }
+
+    @Test
+    void affordableImprovementsArePaidForBeforeTraining() {
+        Person person = processablePerson();
+        holdsTrainableLeadership(person);
+        Campaign campaign = processCampaign(person, null);
+
+        try (MockedStatic<SkillTrainingCosts> skillTrainingCosts = mockStatic(SkillTrainingCosts.class)) {
+            skillTrainingCosts.when(() -> SkillTrainingCosts.payForSkillImprovement(campaign, person, S_LEADER))
+                  .thenReturn(true);
+
+            // Singular, as the mocked skill never actually rises
+            QuickTrain.processQuickTraining(List.of(person), 5, campaign, leadershipOnly(), false);
+
+            skillTrainingCosts.verify(() -> SkillTrainingCosts.payForSkillImprovement(campaign, person, S_LEADER));
+        }
+
+        verify(person).improveSkill(S_LEADER);
+    }
+
     /**
      * @author Illiani
      * @since 0.51.01
@@ -205,6 +248,15 @@ class QuickTrainTest {
         return person;
     }
 
+    /** Gives the person a Leadership skill that Quick Train can raise for free in XP. */
+    private static void holdsTrainableLeadership(Person person) {
+        Skill leadership = mock(Skill.class);
+        when(leadership.getLevel()).thenReturn(1);
+        when(leadership.isImprovementLegal()).thenReturn(true);
+        when(person.getSkill(S_LEADER)).thenReturn(leadership);
+        when(person.getSkills().hasSkill(S_LEADER)).thenReturn(true);
+    }
+
     private static Formation formation(CombatRole role, List<Formation> parents) {
         Formation formation = mock(Formation.class);
         when(formation.getCombatRoleInMemory()).thenReturn(role);
@@ -240,7 +292,12 @@ class QuickTrainTest {
         lenient().when(campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        lenient().when(campaign.getPlayerForce().getHumanResources()).thenReturn(mock(ForceHumanResources.class));
         return campaign;
+    }
+
+    private static QuickTrain.QuickTrainOptions leadershipOnly() {
+        return new QuickTrain.QuickTrainOptions(false, false, false, true, false, false, false);
     }
 
     private static QuickTrain.QuickTrainOptions options(boolean ignoreTrainingFormations) {

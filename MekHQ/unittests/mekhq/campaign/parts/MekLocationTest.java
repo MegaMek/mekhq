@@ -2306,6 +2306,7 @@ class MekLocationTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.REVERSE_QUALITY_NAMES)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.DESTROY_BY_MARGIN)).thenReturn(false);
@@ -2324,7 +2325,7 @@ class MekLocationTest {
         // default
         assertNotNull(mekLocation.getDesc());
         assertTrue(mekLocation.getDesc().contains("Repair"));
-        assertTrue(mekLocation.getDesc().contains("90 minutes"));
+        assertTrue(mekLocation.getDesc().contains("1 h 30 min"));
 
         // default, salvage
         when(unit.isSalvage()).thenReturn(true);
@@ -2336,13 +2337,13 @@ class MekLocationTest {
         mekLocation.setBlownOff(true);
         assertNotNull(mekLocation.getDesc());
         assertTrue(mekLocation.getDesc().contains("Re-attach "));
-        assertTrue(mekLocation.getDesc().contains("180 minutes"));
+        assertTrue(mekLocation.getDesc().contains("3 h"));
 
         mekLocation.setBlownOff(false);
         mekLocation.setBreached(true);
         assertNotNull(mekLocation.getDesc());
         assertTrue(mekLocation.getDesc().contains("Seal "));
-        assertTrue(mekLocation.getDesc().contains("60 minutes"));
+        assertTrue(mekLocation.getDesc().contains("1 h"));
 
         mekLocation.setTech(mock(Person.class));
         assertNotNull(mekLocation.getDesc());

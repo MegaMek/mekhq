@@ -248,6 +248,53 @@ public final class TrackIntensityTable {
     }
 
     /**
+     * The average total a schedule rolled by {@link #rollSchedule(int, int, int, boolean, boolean)} would come to,
+     * without rolling it.
+     *
+     * <p>Every row of a column sums to that column's track count, so a monthly schedule always totals the roll count
+     * times the column, whatever the dice say. A weekly schedule repeats the table in blocks of weeks and cuts the last
+     * block short, so its total does depend on the dice; each week contributes the average of its slot across the
+     * table's rows.</p>
+     *
+     * @param lengthInMonths    the contract's length in months, choosing which table applies
+     * @param trackCount        the contract's track count, as rolled
+     * @param rollCount         how many 1D6 rolls to combine
+     * @param isMinimumOneTrack whether the "Minimum of 1 Hot Spots Track per Roll" option is on
+     * @param isWeekly          whether the "Roll Hot Spots Tracks Weekly, Not Monthly" option is on
+     *
+     * @return the average total of the schedule
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getExpectedScheduleTotal(int lengthInMonths, int trackCount, int rollCount,
+          boolean isMinimumOneTrack, boolean isWeekly) {
+        int effectiveTrackCount = getEffectiveTrackCount(trackCount, isMinimumOneTrack);
+        if ((effectiveTrackCount <= 0) || (rollCount <= 0)) {
+            return 0;
+        }
+
+        final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
+        final int column = Math.min(effectiveTrackCount, table[0].length);
+        if (!isWeekly) {
+            return (double) rollCount * column;
+        }
+
+        final int nativeMonths = table[0][0].length;
+        int weekCount = Math.max(1, (int) Math.round(Math.max(1, lengthInMonths) * WEEKS_PER_MONTH));
+        double total = 0;
+        for (int week = 0; week < weekCount; week++) {
+            int slot = week % nativeMonths;
+            int slotTotal = 0;
+            for (int[][] row : table) {
+                slotTotal += row[column - 1][slot];
+            }
+            total += (double) slotTotal / table.length;
+        }
+        return total * rollCount;
+    }
+
+    /**
      * How much to multiply a contract's combat pay by under the two Track Intensity Table options, so the extra
      * scenarios they bring do not inflate the contract's total combat pay.
      *

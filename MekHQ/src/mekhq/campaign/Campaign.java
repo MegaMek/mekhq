@@ -257,6 +257,7 @@ import mekhq.campaign.work.RepairTaskHold;
 import mekhq.campaign.work.RepairTechEligibility;
 import mekhq.campaign.work.RepairTechEligibility.Refusal;
 import mekhq.campaign.work.TechnicianCheck;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -2797,14 +2798,7 @@ public class Campaign implements ITechManager {
         if (minutes > tech.getMinutesLeft()) {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
-            report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
-                                                 (double) tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)));
-            if (daysLeft == 1) {
-                report += " tomorrow.</b>";
-            } else {
-                report += " in " + daysLeft + " days.</b>";
-            }
+            report = report + ", " + WorkTimeEstimate.describeWorkCarriedOver(this, theRefit, tech) + "</b>";
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
             theRefit.addTimeSpent(minutes);
@@ -3014,20 +3008,11 @@ public class Campaign implements ITechManager {
                 partWork.setTech(tech);
                 partWork.reservePart();
                 report += " - <b>";
-                report += partWork.getTimeLeft();
-                report += " minutes left. Work";
                 if ((minutesUsed > 0) &&
                           (tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)) > 0)) {
-                    report += " will be finished ";
-                    int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() /
-                                                         (double) tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)));
-                    if (daysLeft == 1) {
-                        report += " tomorrow.</b>";
-                    } else {
-                        report += " in " + daysLeft + " days.</b>";
-                    }
+                    report += WorkTimeEstimate.describeWorkCarriedOver(this, partWork, tech) + "</b>";
                 } else {
-                    report += " cannot be finished because there was no time left after maintenance tasks.</b>";
+                    report += getTextAt(RESOURCE_BUNDLE, "fixPart.noTimeAfterMaintenance") + "</b>";
                     partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));

@@ -94,6 +94,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.StringUtils;
@@ -570,15 +571,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         if (!isDamagedBeyondRepair()) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getTimeAndTargetText());
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                   MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
@@ -592,10 +585,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         StringBuilder toReturn = new StringBuilder();
 
         if (needsFixing()) {
-            toReturn.append("<html>")
-                  .append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled) " : "");
+            toReturn.append("<html>").append(getTimeLeftText());
 
             if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
                 toReturn.append(" - <b>")
@@ -604,13 +594,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                       .append("</b>");
             }
 
-            toReturn.append(", TN: ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
-            toReturn.append("</html>");
+            toReturn.append(", ")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumberPlain",
+                        formatTargetModifier(getAllMods(null))))
+                  .append(getWorkModeText())
+                  .append("</html>");
         }
         return toReturn.toString();
     }
@@ -885,6 +873,26 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         };
     }
 
+    /**
+     * Fixes the saved name of a part whose name has since changed. Part names are written to the save file and read
+     * back over the name the constructor sets, so without this a renamed part keeps its old name in existing saves.
+     *
+     * @param partName the part name read from the save file
+     *
+     * @return the current part name, or the passed name if it hasn't changed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String fixForRenamedParts(String partName) {
+        return switch (partName) {
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 2 LINES
+            case "Mech Life Support System" -> "Mek Life Support System";
+            case "ProtoMech Arm Actuator" -> "ProtoMek Arm Actuator";
+            default -> partName;
+        };
+    }
+
     public static Part generateInstanceFromXML(Node wn, Version version) {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -909,7 +917,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     // a save from before parts had an identity has none, and the part keeps the one it was made with
                     readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.name = fixForRenamedParts(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
                     retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
@@ -1228,6 +1236,56 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return mode.name;
     }
 
+    /**
+     * @return the time left on this job, as the player's chosen work time display shows it, for example
+     *       {@code 3 days (2 days with overtime)}
+     */
+    protected String getTimeLeftText() {
+        return WorkTimeEstimate.describeTimeLeft(getCampaign(), this);
+    }
+
+    /**
+     * @return the target number modifier for this job, for example {@code <b>TN:</b> +2}
+     */
+    protected String getTargetNumberText() {
+        return formatTargetNumberText(getAllMods(null));
+    }
+
+    /**
+     * @return the work mode in italics with a leading space, or an empty string in normal mode
+     */
+    protected String getWorkModeText() {
+        return (getMode() == WorkTime.NORMAL) ? "" : (" <i>" + getCurrentModeName() + "</i>");
+    }
+
+    /**
+     * @return the time left, the target number modifier and the work mode, as one line of the task list
+     */
+    protected String getTimeAndTargetText() {
+        String timeLeft = getTimeLeftText();
+        // A job with no time to show, such as armor with none in stock, starts with its target number
+        String timePrefix = timeLeft.isEmpty() ? "" : (timeLeft + ' ');
+        return timePrefix + getTargetNumberText() + getWorkModeText();
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the modifiers as the task list labels them, for example {@code <b>TN:</b> +2}
+     */
+    public static String formatTargetNumberText(TargetRoll targetRoll) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumber", formatTargetModifier(targetRoll));
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the total modifier with its sign, for example {@code +2} or {@code -1}
+     */
+    public static String formatTargetModifier(TargetRoll targetRoll) {
+        return ((targetRoll.getValue() > -1) ? "+" : "") + targetRoll.getValueAsString();
+    }
+
     @Override
     public @Nullable Person getTech() {
         return tech;
@@ -1339,6 +1397,39 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         shorthandedMod = 0;
         return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
               "<b> failed</b>") + ".";
+    }
+
+    /**
+     * Whether this part's current task can fail its own check. A task that cannot, such as a routine reload that
+     * succeeds automatically, can only have been left impossible in error.
+     *
+     * @return {@code true} if the current task can genuinely fail
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean canFailItsOwnCheck() {
+        return true;
+    }
+
+    /**
+     * Clears a difficulty raised above Legendary on a task that can never genuinely fail. Before impossible tasks were
+     * held, a task carried over while its unit was deployed was rolled anyway and failed, which left such a task
+     * impossible for good. A task that can genuinely fail keeps its difficulty, since a failure at Legendary is
+     * permanent.
+     *
+     * @return {@code true} if the difficulty was cleared
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean clearImpossibleDifficulty() {
+        if ((getSkillMin() <= SkillType.EXP_LEGENDARY) || canFailItsOwnCheck()) {
+            return false;
+        }
+
+        resetRepairSettings();
+        return true;
     }
 
     @Override
