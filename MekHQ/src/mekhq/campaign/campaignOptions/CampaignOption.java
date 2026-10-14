@@ -861,6 +861,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "capContractScaleByHiringHall");
     public static final CampaignOption<Boolean> TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE =
           of(Boolean.class, false, "taperCombatPayAndSalvageByScale");
+    public static final CampaignOption<Boolean> USE_FRACTIONAL_SCALE =
+          of(Boolean.class, false, "useFractionalScale");
     public static final CampaignOption<Boolean> ESCALATING_HOT_SPOTS_UPKEEP =
           of(Boolean.class, false, "escalatingHotSpotsUpkeep");
     public static final CampaignOption<Boolean> BASE_PAY_ONLY_CONSIDERS_SCALE =
