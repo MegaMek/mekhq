@@ -502,4 +502,16 @@ class ActionCheckTest {
 
         assertTrue(result.isSuccess());
     }
+
+    @Test
+    void rollOfTwoStillReportsAnAutomaticSuccessAsPassed() {
+        Person person = new Person("F", "L", null, "Faction");
+        TargetRoll automaticSuccess = new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "reload");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, automaticSuccess, false, false, "Action")
+                                          .withRollOfTwoAlwaysFailing();
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 1, 1);
+
+        assertTrue(result.isSuccess());
+        assertTrue(result.getReport().contains("Passed"), result.getReport());
+    }
 }

@@ -322,10 +322,12 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
-     * @return {@code true} if this check fails on the given roll whatever the target number
+     * @return {@code true} if this check fails on the given roll whatever the target number. A target that needs no
+     *       roll, such as an automatic success, is never failed this way.
      */
     private boolean isAlwaysFailingRoll(int rollResult) {
-        return isRollOfTwoAlwaysFailing && !isCountUp() && (rollResult <= ALWAYS_FAILING_ROLL);
+        return isRollOfTwoAlwaysFailing && !isCountUp() && targetNumber.needsRoll()
+                     && (rollResult <= ALWAYS_FAILING_ROLL);
     }
 
     /**
