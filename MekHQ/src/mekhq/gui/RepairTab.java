@@ -73,6 +73,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.RepairStatusChangedEvent;
@@ -843,6 +844,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void refreshServicedUnitList() {
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the serviceable check
+        // iterates every unit's part list, which the worker is concurrently appending to - reading it here threw
+        // ConcurrentModificationException from the modal progress dialog's event pump. The generation fires an
+        // OrganizationChangedEvent when it completes, which reschedules this refresh against the finished campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] repair serviced unit refresh skipped - bulk generation in progress");
+            return;
+        }
+
         UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
@@ -950,6 +960,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      *                                  prevented by validating indices against updated row counts.
      */
     private void refreshTechsList() {
+        // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
+        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         int selected = techTable.getSelectedRow();
         // Offer anyone with a technician repair skill, regardless of their profession, who has more than 0 minutes
         // free; sorted by skill descending (elites at bottom). The task's required-skill filtering is applied in
@@ -1021,6 +1037,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
+        // Rebuilding walks every unit's parts, which a bulk generation is mutating off the EDT; the
+        // OrganizationChangedEvent fired when it completes triggers the rebuild instead.
+        if (rebuildPartsList && getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] repair parts acquisition refresh skipped - bulk generation in progress");
+            return;
+        }
+
         if (rebuildPartsList) {
             PartsAcquisitionService.buildPartsList(getCampaign());
         }
@@ -1041,6 +1064,21 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         servicedUnitListScheduler.schedule();
+    }
+
+    /**
+     * A force generation adds its units and parts while {@link Campaign#isBulkGenerationInProgress()} is true, so the
+     * refreshes it triggers are dropped by the guards in {@link #refreshServicedUnitList()} and
+     * {@link #refreshTechsList()}. Generation ends by firing this event, so this handler runs those refreshes (the
+     * serviced unit refresh also rebuilds the task list and parts acquisition) against the finished campaign.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+        techsScheduler.schedule();
     }
 
     @Subscribe

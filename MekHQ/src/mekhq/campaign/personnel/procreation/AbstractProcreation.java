@@ -737,7 +737,7 @@ public abstract class AbstractProcreation {
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) && !person.isBlockMaternityLeave()) {
                 if (!person.isBusy()
-                          && !person.getStatus().isCampFollower()
+                          && person.getStatus().isActive()
                           && person.getNonPermanentInjurySeverity() == 0
                           && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
