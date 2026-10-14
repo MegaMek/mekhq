@@ -131,8 +131,6 @@ import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.*;
@@ -8029,18 +8027,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        List<AbstractContract> activeMissions = campaign.getActiveContracts();
-        double timeIncrease = 0.25;
-
-        for (AbstractContract mission : activeMissions) {
-            ContractObjectiveType objectiveType = mission.getObjectiveType();
-            if (objectiveType.isGarrisonDuty() || objectiveType.isRetainer()) {
-                continue;
-            }
-
-            timeIncrease = 1;
-            break;
-        }
+        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;

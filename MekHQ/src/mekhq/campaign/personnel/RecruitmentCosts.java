@@ -32,10 +32,13 @@
  */
 package mekhq.campaign.personnel;
 
+import java.util.Map;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillTrainingCategory;
 import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.utilities.spaUtilities.SpaUtilities;
 
@@ -44,8 +47,9 @@ import mekhq.utilities.spaUtilities.SpaUtilities;
  *
  * <p>Normally a recruit costs {@link #SALARY_MONTHS} months' salary. When recruitment is paid for and skill or SPA
  * training costs C-bills, a recruit instead costs what their training would have cost: every priced experience level
- * their skills have reached (Roleplay skills excluded) if skill training costs C-bills, plus every SPA they hold if SPA
- * training costs C-bills, all multiplied by {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}.</p>
+ * their skills have reached if skill training costs C-bills, plus every SPA they hold if SPA training costs C-bills.
+ * Profession, Utility, and Roleplay skills each have their own multiplier (Roleplay defaults to zero, leaving those
+ * skills out); other skills and SPAs are multiplied by {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -95,7 +99,8 @@ public final class RecruitmentCosts {
     }
 
     /**
-     * Gets what a recruit's training would have cost, multiplied by
+     * Gets what a recruit's training would have cost. Each {@link SkillTrainingCategory} of skills is multiplied by its
+     * own recruitment multiplier; other skills and SPAs are multiplied by
      * {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}. Skill levels are only counted if skill training
      * costs C-bills, and SPAs only if SPA training does.
      *
@@ -111,13 +116,20 @@ public final class RecruitmentCosts {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Money trainingCost = Money.zero();
         if (campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
-            trainingCost = trainingCost.plus(SkillTrainingCosts.getAccumulatedSkillTrainingCost(campaign, person));
+            Map<SkillTrainingCategory, Money> skillTrainingCosts =
+                  SkillTrainingCosts.getAccumulatedSkillTrainingCosts(campaign, person);
+            for (Map.Entry<SkillTrainingCategory, Money> entry : skillTrainingCosts.entrySet()) {
+                double multiplier = entry.getKey().getRecruitmentCostMultiplier(campaignOptions);
+                trainingCost = trainingCost.plus(entry.getValue().multipliedBy(multiplier));
+            }
         }
 
         if (campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
-            trainingCost = trainingCost.plus(SpaUtilities.getAccumulatedSpaTrainingCost(person));
+            double multiplier = campaignOptions.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
+            trainingCost = trainingCost.plus(SpaUtilities.getAccumulatedSpaTrainingCost(person)
+                                                   .multipliedBy(multiplier));
         }
 
-        return trainingCost.multipliedBy(campaignOptions.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER));
+        return trainingCost;
     }
 }

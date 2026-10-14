@@ -90,6 +90,9 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseSpaTrainingCosts;
     private JCheckBox chkCapTotalSpas;
     private JCheckBox chkSkillImprovementsCostCBills;
+    private JSpinner spnProfessionSkillTrainingCostMultiplier;
+    private JSpinner spnUtilitySkillTrainingCostMultiplier;
+    private JSpinner spnRoleplaySkillTrainingCostMultiplier;
     private JCheckBox chkOnlyCommandersMatterVehicles;
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
@@ -247,6 +250,33 @@ class PersonnelGeneralPage {
         chkCapTotalSpas.addMouseListener(createTipPanelUpdater("CapTotalSpas"));
         chkSkillImprovementsCostCBills = new CampaignOptionsCheckBox("SkillImprovementsCostCBills");
         chkSkillImprovementsCostCBills.addMouseListener(createTipPanelUpdater("SkillImprovementsCostCBills"));
+
+        JLabel lblProfessionSkillTrainingCostMultiplier =
+              new CampaignOptionsLabel("ProfessionSkillTrainingCostMultiplier");
+        lblProfessionSkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
+        spnProfessionSkillTrainingCostMultiplier = new CampaignOptionsSpinner("ProfessionSkillTrainingCostMultiplier",
+              CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnProfessionSkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
+
+        JLabel lblUtilitySkillTrainingCostMultiplier = new CampaignOptionsLabel("UtilitySkillTrainingCostMultiplier");
+        lblUtilitySkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("UtilitySkillTrainingCostMultiplier"));
+        spnUtilitySkillTrainingCostMultiplier = new CampaignOptionsSpinner("UtilitySkillTrainingCostMultiplier",
+              CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnUtilitySkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("UtilitySkillTrainingCostMultiplier"));
+
+        JLabel lblRoleplaySkillTrainingCostMultiplier =
+              new CampaignOptionsLabel("RoleplaySkillTrainingCostMultiplier");
+        lblRoleplaySkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RoleplaySkillTrainingCostMultiplier"));
+        spnRoleplaySkillTrainingCostMultiplier = new CampaignOptionsSpinner("RoleplaySkillTrainingCostMultiplier",
+              CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
+        spnRoleplaySkillTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RoleplaySkillTrainingCostMultiplier"));
+
         chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterVehicles"));
@@ -319,6 +349,9 @@ class PersonnelGeneralPage {
               chkUseFoundersHavePlotArmor,
               chkUseImplants,
               chkUseAlternativeQualityAveraging);
+        panel.addRow(lblProfessionSkillTrainingCostMultiplier, spnProfessionSkillTrainingCostMultiplier);
+        panel.addRow(lblUtilitySkillTrainingCostMultiplier, spnUtilitySkillTrainingCostMultiplier);
+        panel.addRow(lblRoleplaySkillTrainingCostMultiplier, spnRoleplaySkillTrainingCostMultiplier);
         panel.addRow(lblMaximumEdge, spnMaximumEdge);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
         panel.addRow(lblEdgeRefreshPeriod, comboEdgeRefreshPeriod);
@@ -466,6 +499,9 @@ class PersonnelGeneralPage {
         chkUseSpaTrainingCosts.setSelected(model.useSpaTrainingCosts);
         chkCapTotalSpas.setSelected(model.capTotalSpas);
         chkSkillImprovementsCostCBills.setSelected(model.skillImprovementsCostCBills);
+        spnProfessionSkillTrainingCostMultiplier.setValue(model.professionSkillTrainingCostMultiplier);
+        spnUtilitySkillTrainingCostMultiplier.setValue(model.utilitySkillTrainingCostMultiplier);
+        spnRoleplaySkillTrainingCostMultiplier.setValue(model.roleplaySkillTrainingCostMultiplier);
         chkOnlyCommandersMatterVehicles.setSelected(model.onlyCommandersMatterVehicles);
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
@@ -516,6 +552,9 @@ class PersonnelGeneralPage {
         model.useSpaTrainingCosts = chkUseSpaTrainingCosts.isSelected();
         model.capTotalSpas = chkCapTotalSpas.isSelected();
         model.skillImprovementsCostCBills = chkSkillImprovementsCostCBills.isSelected();
+        model.professionSkillTrainingCostMultiplier = (double) spnProfessionSkillTrainingCostMultiplier.getValue();
+        model.utilitySkillTrainingCostMultiplier = (double) spnUtilitySkillTrainingCostMultiplier.getValue();
+        model.roleplaySkillTrainingCostMultiplier = (double) spnRoleplaySkillTrainingCostMultiplier.getValue();
         model.onlyCommandersMatterVehicles = chkOnlyCommandersMatterVehicles.isSelected();
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();

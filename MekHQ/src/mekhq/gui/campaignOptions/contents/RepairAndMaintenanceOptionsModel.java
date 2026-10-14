@@ -51,6 +51,11 @@ class RepairAndMaintenanceOptionsModel {
     int destroyPartTarget;
     boolean checkMaintenance;
     int maintenanceCycleDays;
+    boolean maintenanceOnContract;
+    boolean maintenanceOffContract;
+    boolean maintenanceInTransit;
+    double combatContractMaintenanceCostMultiplier;
+    double inTransitMaintenanceCostMultiplier;
     int maintenanceBonus;
     int defaultMaintenanceTime;
     boolean useQualityMaintenance;
@@ -80,6 +85,12 @@ class RepairAndMaintenanceOptionsModel {
         destroyPartTarget = options.get(CampaignOption.DESTROY_PART_TARGET);
         checkMaintenance = options.get(CampaignOption.CHECK_MAINTENANCE);
         maintenanceCycleDays = options.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
+        maintenanceOnContract = options.get(CampaignOption.MAINTENANCE_ON_CONTRACT);
+        maintenanceOffContract = options.get(CampaignOption.MAINTENANCE_OFF_CONTRACT);
+        maintenanceInTransit = options.get(CampaignOption.MAINTENANCE_IN_TRANSIT);
+        combatContractMaintenanceCostMultiplier =
+              options.get(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER);
+        inTransitMaintenanceCostMultiplier = options.get(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER);
         maintenanceBonus = options.get(CampaignOption.MAINTENANCE_BONUS);
         defaultMaintenanceTime = options.get(CampaignOption.DEFAULT_MAINTENANCE_TIME);
         useQualityMaintenance = options.get(CampaignOption.USE_QUALITY_MAINTENANCE);
@@ -110,6 +121,12 @@ class RepairAndMaintenanceOptionsModel {
         options.set(CampaignOption.DESTROY_PART_TARGET, destroyPartTarget);
         options.set(CampaignOption.CHECK_MAINTENANCE, checkMaintenance);
         options.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, maintenanceCycleDays);
+        options.set(CampaignOption.MAINTENANCE_ON_CONTRACT, maintenanceOnContract);
+        options.set(CampaignOption.MAINTENANCE_OFF_CONTRACT, maintenanceOffContract);
+        options.set(CampaignOption.MAINTENANCE_IN_TRANSIT, maintenanceInTransit);
+        options.set(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER,
+              combatContractMaintenanceCostMultiplier);
+        options.set(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER, inTransitMaintenanceCostMultiplier);
         options.set(CampaignOption.MAINTENANCE_BONUS, maintenanceBonus);
         options.set(CampaignOption.DEFAULT_MAINTENANCE_TIME, defaultMaintenanceTime);
         options.set(CampaignOption.USE_QUALITY_MAINTENANCE, useQualityMaintenance);
