@@ -36,11 +36,15 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -54,7 +58,9 @@ import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.AfterEach;
@@ -503,6 +509,58 @@ class SkillTrainingCostsTest {
             campaignOptions.set(CampaignOption.USE_ARTILLERY, true);
             assertEquals(supportPoints(200),
                   SkillTrainingCosts.getSkillImprovementCost(campaign, person, SkillType.S_ARTILLERY));
+        }
+    }
+
+    /** Quick Train and Mass Training charge through this as well as the personnel menu. */
+    @Nested
+    class Payment {
+        private Finances finances;
+        private Person person;
+
+        @BeforeEach
+        void setUpFinances() {
+            finances = mock(Finances.class);
+            when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
+            // Regular to Veteran in a skill outside the role: 300 SP
+            person = personWithSkillAt(3);
+            when(person.getFullTitle()).thenReturn("MekWarrior Test");
+        }
+
+        private void debitSucceeds(boolean isSuccessful) {
+            when(finances.debit(any(TransactionType.class), any(LocalDate.class), any(Money.class), anyString()))
+                  .thenReturn(isSuccessful);
+        }
+
+        @Test
+        void freeImprovementsAreNotCharged() {
+            campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, false);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void pricedImprovementsAreChargedAsEducation() {
+            debitSucceeds(true);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(supportPoints(300)), anyString());
+        }
+
+        @Test
+        void refusedWhenTheForceCannotPay() {
+            debitSucceeds(false);
+
+            assertFalse(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
+        }
+
+        @Test
+        void aPrePricedImprovementIsChargedAtThatPrice() {
+            debitSucceeds(true);
+
+            assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME, Money.of(1_234)));
+            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(Money.of(1_234)), anyString());
         }
     }
 }
