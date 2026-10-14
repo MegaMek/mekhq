@@ -225,4 +225,28 @@ class EntityUtilitiesTest {
             assertTrue(EntityUtilities.hasReconCamera(aero));
         }
     }
+
+    @Nested
+    class ImprovedCommunications {
+        @Test
+        void improvedCommunicationsQuirk_counts() {
+            Entity entity = mock(Entity.class);
+            when(entity.hasQuirk(OptionsConstants.QUIRK_POS_IMP_COM)).thenReturn(true);
+            assertTrue(EntityUtilities.hasImprovedCommunications(entity));
+        }
+
+        @Test
+        void noImprovedCommunicationsQuirk_doesNotCount() {
+            Entity entity = mock(Entity.class);
+            when(entity.hasQuirk(OptionsConstants.QUIRK_POS_IMP_COM)).thenReturn(false);
+            assertFalse(EntityUtilities.hasImprovedCommunications(entity));
+        }
+
+        @Test
+        void otherSensorQuirk_isNotImprovedCommunications() {
+            Entity entity = mock(Entity.class);
+            when(entity.hasQuirk(OptionsConstants.QUIRK_POS_IMPROVED_SENSORS)).thenReturn(true);
+            assertFalse(EntityUtilities.hasImprovedCommunications(entity));
+        }
+    }
 }
