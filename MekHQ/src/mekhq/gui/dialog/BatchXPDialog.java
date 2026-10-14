@@ -337,6 +337,7 @@ public final class BatchXPDialog extends JDialog {
             return;
         }
         personnelFilter.clearUnaffordablePersonnel();
+        updatePersonnelTable();
         int rows = personnelTable.getRowCount();
         Set<Person> improvedPersonnel = new HashSet<>();
         while (rows > 0) {
