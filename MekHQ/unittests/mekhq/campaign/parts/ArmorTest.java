@@ -34,6 +34,7 @@
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -376,6 +377,15 @@ public class ArmorTest {
             assertEquals(constructedArmor.getName(), changedArmor.getName(),
                   "Name mismatch for clan=" + clan);
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "armorParameter")
+    public void partNameIsTheNameShownInTheWarehouse(Armor armor) {
+        Armor newArmor = armor.clone();
+
+        assertEquals(newArmor.getName(), newArmor.getPartName());
+        assertNotEquals("Unknown", newArmor.getPartName());
     }
 
     private Armor getDifferentArmorType(Armor armor) {
