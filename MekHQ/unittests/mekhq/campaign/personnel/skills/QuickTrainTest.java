@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -192,6 +193,44 @@ class QuickTrainTest {
         verify(person).improveSkill(S_LEADER);
     }
 
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void techTrainsEveryTechSkillWhenGlobalTechSkillsOnlyDisabled() {
+        Person person = processablePerson();
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        Campaign campaign = processCampaign(person, null);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
+        when(campaign.getPlayerForce().getHumanResources()).thenReturn(mock(ForceHumanResources.class));
+
+        QuickTrain.processQuickTraining(List.of(person), 5, campaign, options(false), true);
+
+        for (String techSkill : SkillType.getTechSkills()) {
+            verify(person, atLeastOnce()).getSkill(techSkill);
+        }
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void techTrainsOnlyGlobalTechSkillWhenGlobalTechSkillsOnlyEnabled() {
+        Person person = processablePerson();
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        Campaign campaign = processCampaign(person, null);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(true);
+        when(campaign.getPlayerForce().getHumanResources()).thenReturn(mock(ForceHumanResources.class));
+
+        QuickTrain.processQuickTraining(List.of(person), 5, campaign, options(false), true);
+
+        verify(person, atLeastOnce()).getSkill(SkillType.S_TECH_MEK);
+        verify(person, never()).getSkill(SkillType.S_TECH_ELECTRONIC);
+        verify(person, never()).getSkill(SkillType.S_TECH_AERO);
+    }
+
     private static Person activePerson() {
         Person person = mock(Person.class);
         when(person.getStatus()).thenReturn(ACTIVE);
@@ -251,6 +290,7 @@ class QuickTrainTest {
         lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
         lenient().when(campaign.getPlayerForce().getHumanResources()).thenReturn(mock(ForceHumanResources.class));
         return campaign;
