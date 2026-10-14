@@ -1752,19 +1752,28 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public String getShoppingListReport(int quan) {
-        return getQuantityName(quan) + ((quan > 1) ? " have " : " has ") + "been added to the procurement list.";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.shoppingListReport", getQuantityName(quan), quan);
     }
 
     public String getArrivalReport() {
-        return getQuantityName(quantity) + ((quantity > 1) ? " have " : " has ") + "arrived";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.arrivalReport", getQuantityName(quantity), quantity);
     }
 
     public String getQuantityName(int quantity) {
-        String answer = String.valueOf(quantity) + ' ' + getName();
-        if (quantity > 1) {
-            answer += "s";
-        }
-        return answer;
+        return formatQuantityName(quantity, getName());
+    }
+
+    /**
+     * Names a quantity of an item without guessing at an English plural, which turned "Vehicle Sensors" into
+     * "Vehicle Sensorss": one item reads "1 Medium Laser", more read "2 x Medium Laser".
+     *
+     * @param quantity how many there are
+     * @param name     the item's name
+     *
+     * @return the quantity and name for a report
+     */
+    public static String formatQuantityName(int quantity, String name) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.quantityName", quantity, name);
     }
 
     /**

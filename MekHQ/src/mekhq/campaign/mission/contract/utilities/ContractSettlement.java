@@ -87,6 +87,30 @@ public final class ContractSettlement {
     }
 
     /**
+     * Calculates the shareholders' cut of the end-of-contract lump payout.
+     *
+     * @param campaign the paying campaign
+     * @param contract the contract being completed (supplies the shares percentage)
+     * @param payout   the gross final payout
+     *
+     * @return the shareholders' cut, or {@link Money#zero()} when the share system is disabled or there is no positive
+     *       payout to draw it from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money calculateShares(Campaign campaign, AbstractContract contract, Money payout) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            return Money.zero();
+        }
+        if ((payout == null) || !payout.isPositive()) {
+            return Money.zero();
+        }
+
+        return payout.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+    }
+
+    /**
      * Pays shareholding personnel their cut of the end-of-contract lump payout, mirroring the monthly share payout.
      * Runs only when the share system is enabled and there is a positive payout to draw the share from.
      *
@@ -98,14 +122,7 @@ public final class ContractSettlement {
      * @since 0.51.01
      */
     public static void settleShares(Campaign campaign, AbstractContract contract, Money payout) {
-        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
-            return;
-        }
-        if ((payout == null) || !payout.isPositive()) {
-            return;
-        }
-
-        Money shares = payout.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+        Money shares = calculateShares(campaign, contract, payout);
         if (!shares.isPositive()) {
             return;
         }

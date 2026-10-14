@@ -32,13 +32,19 @@
  */
 package mekhq.campaign.location;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.GroundTransitLocation;
@@ -234,6 +240,35 @@ public class LocationUtilsTest {
 
             assertTrue(LocationUtils.areSameEffectiveLocation(
                   base.getBaseHangar(), base.getBaseWarehouse()));
+        }
+    }
+
+    @Nested
+    class InSystemPath {
+
+        @Test
+        void containsOnlyTheGivenSystem() {
+            PlanetarySystem system = mock(PlanetarySystem.class);
+
+            JumpPath path = LocationUtils.inSystemPath(system);
+
+            assertEquals(List.of(system), path.getSystems());
+            assertNull(path.getTargetPlanet());
+        }
+
+        @Test
+        void travelNodeWithInSystemPath_reachesPlanet() {
+            PlanetarySystem system = mock(PlanetarySystem.class);
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(1.5);
+            CurrentLocation travelNode = new CurrentLocation(system, 1.5);
+            travelNode.setJumpPath(LocationUtils.inSystemPath(system));
+            Campaign campaign = mockCampaign();
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3050, 1, 1));
+
+            travelNode.newDay(campaign, true);
+            assertFalse(travelNode.isOnPlanet());
+            travelNode.newDay(campaign, true);
+            assertTrue(travelNode.isOnPlanet());
         }
     }
 }
