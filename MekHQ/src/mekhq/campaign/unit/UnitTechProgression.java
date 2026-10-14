@@ -167,15 +167,34 @@ public class UnitTechProgression {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                LOGGER.error("Entity was null: {}", ms.getName());
+                LOGGER.error("Entity was null: {} from {}", ms.getName(), describeSource(ms));
                 return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException | RuntimeException ex) {
             // MekFileParser rethrows some failures, such as a missing zip entry, as a bare NullPointerException
-            LOGGER.error("Exception loading entity {}", ms.getName(), ex);
+            LOGGER.error("Exception loading entity {} from {}", ms.getName(), describeSource(ms), ex);
             return null;
         }
+    }
+
+    /**
+     * Describes where a unit was loaded from, so a failure can be traced to its file or zip entry. The user's home
+     * directory is redacted because logs are attached to public bug reports.
+     *
+     * @param ms the unit
+     *
+     * @return the source file, followed by the zip entry in parentheses when the unit is inside a zip
+     */
+    static String describeSource(MekSummary ms) {
+        File sourceFile = ms.getSourceFile();
+        String source = (sourceFile == null) ? "unknown file" : sourceFile.getPath();
+        String homeDirectory = System.getProperty("user.home");
+        if ((homeDirectory != null) && !homeDirectory.isBlank()) {
+            source = source.replace(homeDirectory, "<redacted>");
+        }
+        String entryName = ms.getEntryName();
+        return (entryName == null) ? source : source + " (" + entryName + ")";
     }
 
     /**

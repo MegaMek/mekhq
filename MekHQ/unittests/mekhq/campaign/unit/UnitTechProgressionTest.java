@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.unit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,5 +71,26 @@ class UnitTechProgressionTest {
         when(missingUnit.getEntryName()).thenReturn("Marauder MAD-3J.mtf");
 
         assertNull(UnitTechProgression.calcTechProgression(missingUnit, Faction.FS));
+    }
+
+    @Test
+    void sourceOfAZippedUnitNamesTheZipAndTheEntry() {
+        File zip = new File("data" + File.separator + "mekfiles" + File.separator + "customs.zip");
+        MekSummary unit = mock(MekSummary.class);
+        when(unit.getSourceFile()).thenReturn(zip);
+        when(unit.getEntryName()).thenReturn("Marauder MAD-3J.mtf");
+
+        assertEquals(zip.getPath() + " (Marauder MAD-3J.mtf)", UnitTechProgression.describeSource(unit));
+    }
+
+    @Test
+    void sourceOfAUnitInTheHomeDirectoryRedactsTheHomeDirectory() {
+        File file = new File(System.getProperty("user.home"), "Marauder MAD-3J.mtf");
+        MekSummary unit = mock(MekSummary.class);
+        when(unit.getSourceFile()).thenReturn(file);
+
+        String source = UnitTechProgression.describeSource(unit);
+
+        assertEquals("<redacted>" + File.separator + "Marauder MAD-3J.mtf", source);
     }
 }
