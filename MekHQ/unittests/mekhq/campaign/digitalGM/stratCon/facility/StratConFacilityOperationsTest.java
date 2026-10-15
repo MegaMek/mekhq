@@ -1120,6 +1120,67 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
+        void aBuildChargesTheRaisedCost() {
+            placeBuiltFacility(OTHER_COORDS);
+            deployFormationAt(FACILITY_COORDS);
+            StratConFacilityDefinition sensorPost = StratConFacilityFactory.getDefinitionForType(
+                  FacilityType.SensorPost);
+            assertNotNull(sensorPost);
+
+            assertTrue(StratConFacilityOperations.issueOrder(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  FacilityOperation.BUILD,
+                  sensorPost));
+
+            assertEquals(10 - 4, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aBuildThatCannotFinishRefundsWhatItCost() {
+            placeBuiltFacility(OTHER_COORDS);
+            deployFormationAt(FACILITY_COORDS);
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  "NoSuchFacility"));
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            // One built facility already stood, so this one was charged 4.
+            assertEquals(10 + 4, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aFinishedBuildIsAPlayerBuiltOutpost() {
+            // A finished build joins the road grid, which asks which sector generator is in use.
+            when(options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN)).thenReturn(false);
+            deployFormationAt(FACILITY_COORDS);
+            StratConFacilityDefinition sensorPost = StratConFacilityFactory.getDefinitionForType(
+                  FacilityType.SensorPost);
+            assertNotNull(sensorPost);
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  sensorPost.getId()));
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            StratConFacility built = track.getFacility(FACILITY_COORDS);
+            assertNotNull(built);
+            assertTrue(built.isPlayerBuilt());
+            assertEquals(ForceAlignment.Player, built.getOwner());
+            assertEquals(FacilityTier.OUTPOST, built.getTier());
+            assertEquals(4, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+        }
+
+        @Test
         void builtFlagRoundTripsThroughTheSave() throws JAXBException {
             StratConFacility facility = placeBuiltFacility(OTHER_COORDS);
 

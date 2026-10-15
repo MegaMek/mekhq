@@ -3324,7 +3324,7 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers       {@code true} if facility modifiers which add forces that benefit the enemy
      *                                     should be blocked
      */
-    private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
+    static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
           StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance,
           boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
