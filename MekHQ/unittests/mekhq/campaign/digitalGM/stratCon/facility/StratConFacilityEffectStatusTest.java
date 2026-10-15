@@ -49,6 +49,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -144,6 +145,24 @@ class StratConFacilityEffectStatusTest {
         assertTrue(lines.contains(getFormattedTextAt(RESOURCE_BUNDLE,
               "effect.defenders",
               StratConFacilityEffectStatus.describeModifiers(airBase.getLocalModifiers()))));
+    }
+
+    @Test
+    void onlyYourEmployersFacilitiesSayTheyAnswerHalfTheTime() {
+        String employerLine = getFormattedTextAt(RESOURCE_BUNDLE,
+              "effect.support.employer",
+              StratConRulesManager.EMPLOYER_LEND_DIE_SIZE);
+        String sectorLine = getFormattedTextAt(RESOURCE_BUNDLE,
+              "sector.support.employer",
+              StratConRulesManager.EMPLOYER_LEND_DIE_SIZE);
+
+        StratConFacility airBase = placeAirBase(ForceAlignment.Allied);
+        assertTrue(airBaseLines(ONE_IN_TWO).contains(employerLine));
+        assertTrue(StratConFacilityEffectStatus.getSectorEffectLines(track, ONE_IN_TWO).contains(sectorLine));
+
+        airBase.setOwner(ForceAlignment.Player);
+        assertFalse(airBaseLines(ONE_IN_TWO).contains(employerLine));
+        assertFalse(StratConFacilityEffectStatus.getSectorEffectLines(track, ONE_IN_TWO).contains(sectorLine));
     }
 
     @Test

@@ -168,6 +168,8 @@ public class StratConRulesManager {
 
     private static final int NO_FACILITY_MODIFIER = 0;
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
+    // a facility your employer holds answers a fight's draw for support only 1 time in this many
+    public static final int EMPLOYER_LEND_DIE_SIZE = 2;
     public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
@@ -3386,7 +3388,9 @@ public class StratConRulesManager {
      *
      * <p>A chance value of {@code 0} always fails, a value of {@code 1} always succeeds, and any higher value gives a
      * {@code 1 / facilityModifierChance} chance of success. On success, one facility is selected at random from
-     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
+     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects. A facility your
+     * employer holds answers only 1 time in {@link #EMPLOYER_LEND_DIE_SIZE}; when it does not, the fight gets no support
+     * and the facility stays ready.</p>
      *
      * @param scenario                the scenario receiving the facility modifiers
      * @param track                   the scenario's sector
@@ -3414,6 +3418,13 @@ public class StratConRulesManager {
         if (successfullyRolledForFacility) {
             final StratConFacility randomFacility = ObjectUtility.getRandomItem(availableFacilities.values());
             if (randomFacility == null) {
+                return;
+            }
+
+            // Your employer decides where its own support goes: a facility it holds answers only half the time, so
+            // a facility you hold is the more dependable lender.
+            boolean isEmployerHeld = randomFacility.getOwner() == ForceAlignment.Allied;
+            if (isEmployerHeld && (randomInt(EMPLOYER_LEND_DIE_SIZE) != 0)) {
                 return;
             }
 

@@ -323,7 +323,8 @@ public class StratConFacilityDialog extends JDialog {
         row.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4), 0));
 
         StringBuilder html = new StringBuilder("<html><body><b>")
-                                   .append(StratConFacilityAdvisor.getOperationLabel(operation))
+                                   .append(StratConFacilityAdvisor.getOperationLabel(contract.getStratConCampaignState(),
+                                         operation))
                                    .append("</b><br>")
                                    .append(getTextAt(RESOURCE_BUNDLE, "operation.tooltip." + operation.name()));
         if (!option.isAvailable()) {

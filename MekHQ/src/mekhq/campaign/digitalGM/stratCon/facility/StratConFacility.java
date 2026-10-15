@@ -210,6 +210,9 @@ public class StratConFacility {
     // whether the facility has been on its holder's supply lines; see StratConFacilitySupply
     @XmlElement
     private boolean networked;
+    // whether the player's side raised it with a Build order; see StratConFacilityOperations
+    @XmlElement
+    private boolean playerBuilt;
     @XmlElement(name = "additionalLocalModifier")
     private List<String> additionalLocalModifiers = new ArrayList<>();
     @XmlElement(name = "trait")
@@ -356,9 +359,26 @@ public class StratConFacility {
         // its old holder's, not the new one's.
         if (isSideChanged) {
             networked = false;
+            // Once lost, it is no longer the player's own construction; retaken, it is simply captured.
+            playerBuilt = false;
             getTraits().removeIf(FacilityTrait::isGarrisonTrait);
             additionalLocalModifiers.clear();
         }
+    }
+
+    /**
+     * @return {@code true} if the player's side raised this facility with a Build order and still holds it. Such a
+     *       facility costs upkeep each month and makes the next Build dearer.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isPlayerBuilt() {
+        return playerBuilt;
+    }
+
+    public void setPlayerBuilt(boolean playerBuilt) {
+        this.playerBuilt = playerBuilt;
     }
 
     /**

@@ -49,6 +49,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 
 /**
@@ -193,6 +194,11 @@ public final class StratConFacilityEffectStatus {
         }
         addSupportLines(track, facility, rules, lines);
         addNumericLines(facility, lines);
+        if (facility.isPlayerBuilt()) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "effect.upkeep",
+                  StratConFacilityOperations.BUILT_FACILITY_UPKEEP));
+        }
         return lines;
     }
 
@@ -235,6 +241,11 @@ public final class StratConFacilityEffectStatus {
                   support,
                   rules.getDieSize(true),
                   countReadyLenders(track, true, rules)));
+            if (facility.getOwner() == ForceAlignment.Allied) {
+                lines.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "effect.support.employer",
+                      StratConRulesManager.EMPLOYER_LEND_DIE_SIZE));
+            }
         } else {
             // How many other enemy facilities are ready would give away ones the player hasn't found.
             lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "effect.support.ready.enemy", support));
@@ -279,7 +290,8 @@ public final class StratConFacilityEffectStatus {
 
     /**
      * What a sector's facilities add up to: the scan range and chance of fights they give it, whether they keep air
-     * and space fights out or reveal it, and how much of your side's support is ready this week. Enemy facilities the
+     * and space fights out or reveal it, how much of your side's support is ready this week, and the upkeep of the
+     * facilities you built there. Enemy facilities the
      * player hasn't found still count, as one share, so the player can tell something is at work without learning
      * where.
      *
@@ -333,14 +345,30 @@ public final class StratConFacilityEffectStatus {
         }
 
         addSectorSupportLine(track, rules, lines);
+
+        int builtCount = 0;
+        for (StratConFacility facility : track.getFacilities().values()) {
+            if (facility.isPlayerBuilt()) {
+                builtCount++;
+            }
+        }
+        if (builtCount > 0) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "sector.upkeep",
+                  builtCount * StratConFacilityOperations.BUILT_FACILITY_UPKEEP));
+        }
         return lines;
     }
 
     private static void addSectorSupportLine(StratConTrackState track, SupportRules rules, List<String> lines) {
         int lenderCount = 0;
+        int employerLenderCount = 0;
         for (StratConFacility facility : track.getFacilities().values()) {
             if (facility.isOwnerAlliedToPlayer() && !facility.getProfile().getSharedModifierIds().isEmpty()) {
                 lenderCount++;
+                if (facility.getOwner() == ForceAlignment.Allied) {
+                    employerLenderCount++;
+                }
             }
         }
         if (lenderCount == 0) {
@@ -356,6 +384,11 @@ public final class StratConFacilityEffectStatus {
               countReadyLenders(track, true, rules),
               lenderCount,
               rules.alliedDieSize()));
+        if (employerLenderCount > 0) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "sector.support.employer",
+                  StratConRulesManager.EMPLOYER_LEND_DIE_SIZE));
+        }
     }
 
     /**

@@ -915,7 +915,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private JMenu buildFacilityOrderMenu(StratConCoords coords, AbstractContract contract,
           FacilityOperation operation) {
-        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(operation));
+        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(contract.getStratConCampaignState(),
+              operation));
 
         String reasonKey = StratConFacilityOperations.getUnavailableReasonKey(campaign,
               contract,
