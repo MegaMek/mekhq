@@ -5900,8 +5900,8 @@ public class Person implements ILocatable {
      * <p>The calculation varies depending on the person's role and campaign options:</p>
      * <ul>
      *     <li>
-     *         <b>Vehicle Gunners:</b> If artillery usage is enabled in the campaign, calculates the maximum
-     *         experience level between Gunnery (Vee) and Artillery skills. Otherwise, uses the profession's
+     *         <b>MekWarriors and Vehicle Crews:</b> If artillery usage is enabled in the campaign, the better of their
+     *         gunnery skill and Artillery is used in place of their gunnery skill. Otherwise, uses the profession's
      *         associated skills and campaign averaging option.
      *     </li>
      *     <li>
@@ -6030,7 +6030,8 @@ public class Person implements ILocatable {
     /**
      * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
-     * settings, such as whether artillery skills are enabled.
+     * settings, such as whether artillery skills are enabled. When artillery is enabled, the better of the
+     * profession's gunnery skill and Artillery is used in place of the gunnery skill.
      *
      * @param campaignOptions  the current {@link CampaignOptions}
      * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
@@ -6060,7 +6061,57 @@ public class Person implements ILocatable {
             professionSkills = List.of(bestSkill == null ? S_SMALL_ARMS : bestSkill);
         }
 
+        if (professionSkills.contains(S_ARTILLERY)) {
+            professionSkills = getProfessionSkillsWithBestGunnery(professionSkills);
+        }
+
         return professionSkills;
+    }
+
+    /**
+     * Replaces the gunnery and Artillery skills in a profession's skill list with whichever of the two is better.
+     *
+     * <p>Artillery is an alternative to a profession's normal gunnery skill, not an additional requirement. So only
+     * the higher of the two counts towards the profession, and a character without Artillery simply uses their normal
+     * gunnery skill.</p>
+     *
+     * @param professionSkills the profession's skills, including {@link SkillType#S_ARTILLERY}
+     *
+     * @return a new list where the gunnery skill is replaced by Artillery if Artillery is better, and Artillery is
+     *       otherwise removed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private List<String> getProfessionSkillsWithBestGunnery(List<String> professionSkills) {
+        List<String> skillsWithBestGunnery = new ArrayList<>(professionSkills);
+        skillsWithBestGunnery.remove(S_ARTILLERY);
+
+        Skill artillerySkill = getSkill(S_ARTILLERY);
+        if (artillerySkill == null) {
+            return skillsWithBestGunnery;
+        }
+
+        int gunneryIndex = -1;
+        for (String gunnerySkillName : List.of(S_GUN_MEK, S_GUN_VEE)) {
+            gunneryIndex = skillsWithBestGunnery.indexOf(gunnerySkillName);
+            if (gunneryIndex != -1) {
+                break;
+            }
+        }
+
+        if (gunneryIndex == -1) {
+            return skillsWithBestGunnery;
+        }
+
+        Skill gunnerySkill = getSkill(skillsWithBestGunnery.get(gunneryIndex));
+        SkillModifierData skillModifierData = getSkillModifierData();
+        if ((gunnerySkill == null) || (artillerySkill.getTotalSkillLevel(skillModifierData) >
+                                             gunnerySkill.getTotalSkillLevel(skillModifierData))) {
+            skillsWithBestGunnery.set(gunneryIndex, S_ARTILLERY);
+        }
+
+        return skillsWithBestGunnery;
     }
 
     /**
