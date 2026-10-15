@@ -50,9 +50,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;

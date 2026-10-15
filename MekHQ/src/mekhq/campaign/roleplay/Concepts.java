@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Rolls on up to {@value #MAXIMUM_TABLES} {@link OracleTable}s at once to give the player combined story suggestions.

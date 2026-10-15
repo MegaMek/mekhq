@@ -105,8 +105,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.EnhancedTabbedPane;

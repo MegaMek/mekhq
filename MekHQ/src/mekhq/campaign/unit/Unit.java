@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
@@ -82,7 +83,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.MPCalculationSetting;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.*;
 import megamek.common.compute.Compute;

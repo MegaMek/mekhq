@@ -36,7 +36,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntBiFunction;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;

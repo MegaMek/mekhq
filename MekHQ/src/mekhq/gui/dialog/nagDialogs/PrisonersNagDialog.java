@@ -39,7 +39,7 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoner
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 

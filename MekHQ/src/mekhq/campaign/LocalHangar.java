@@ -33,8 +33,8 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;

@@ -48,13 +48,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ExistingLift;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.bays.Bay;
 import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.Transporter;

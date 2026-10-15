@@ -39,7 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;

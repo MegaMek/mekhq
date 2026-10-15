@@ -52,11 +52,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;

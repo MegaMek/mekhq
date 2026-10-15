@@ -36,7 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;

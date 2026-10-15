@@ -65,12 +65,12 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;

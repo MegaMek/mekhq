@@ -47,8 +47,8 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 

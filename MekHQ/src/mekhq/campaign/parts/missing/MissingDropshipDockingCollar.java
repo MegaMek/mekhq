@@ -35,8 +35,8 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

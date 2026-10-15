@@ -70,8 +70,8 @@ import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

@@ -47,9 +47,9 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.client.IClient;
 import megamek.common.CriticalSlot;
-import megamek.common.annotations.Nullable;
 import megamek.common.autoResolve.acar.SimulatedClient;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;

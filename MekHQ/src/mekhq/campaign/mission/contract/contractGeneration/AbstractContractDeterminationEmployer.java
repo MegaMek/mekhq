@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
@@ -62,7 +63,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Determines the employer for a generated Chaos contract: who is paying the unit, whose territory the conflict sits in,
@@ -171,7 +171,7 @@ public abstract class AbstractContractDeterminationEmployer {
         };
     }
 
-    protected @NonNull ChaosEmployerType getCivilianEmployer() {
+    protected @Nonnull ChaosEmployerType getCivilianEmployer() {
         int roll = d6(1);
         return switch (roll) {
             case 1 -> ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS;
@@ -192,7 +192,7 @@ public abstract class AbstractContractDeterminationEmployer {
      * takeover fronts a {@link ChaosEmployerType#CORPORATION} while ComStar itself stays in the shadows as anchor and
      * sponsor &mdash; so the caller reads the effective type from here rather than the one it rolled.</p>
      */
-    record EmployerFactions(@NonNull ChaosEmployerType type, @NonNull Faction flavor, @NonNull Faction anchor,
+    record EmployerFactions(@Nonnull ChaosEmployerType type, @Nonnull Faction flavor, @Nonnull Faction anchor,
           @Nullable Faction sponsor) {}
 
     /**

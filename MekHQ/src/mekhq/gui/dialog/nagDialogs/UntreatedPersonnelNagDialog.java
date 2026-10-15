@@ -39,7 +39,7 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.ca
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 

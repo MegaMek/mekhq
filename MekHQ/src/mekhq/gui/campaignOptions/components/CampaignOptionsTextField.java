@@ -35,7 +35,7 @@ package mekhq.gui.campaignOptions.components;
 import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.campaignTextProvider;
 import static mekhq.gui.campaignOptions.components.CampaignOptionsComponentSupport.textProvider;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.settings.SettingsTextField;
 
 /** Campaign-specific resource-key adapter over {@link SettingsTextField}. */

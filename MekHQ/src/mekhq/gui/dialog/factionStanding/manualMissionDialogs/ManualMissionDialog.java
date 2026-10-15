@@ -36,8 +36,8 @@ import java.time.LocalDate;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.universe.Faction;
 

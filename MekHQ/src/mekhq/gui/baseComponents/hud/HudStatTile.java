@@ -55,7 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A deep-surface stat tile - a small key, a large coloured value, and a faint sub-line - matching the debrief

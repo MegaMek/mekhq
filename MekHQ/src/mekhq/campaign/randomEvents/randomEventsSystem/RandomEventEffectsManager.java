@@ -58,8 +58,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -88,7 +89,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Manages the resolution and effects of random events during a campaign.
@@ -141,7 +141,7 @@ public class RandomEventEffectsManager {
         eventReport = report.toString();
     }
 
-    private @NonNull StringBuilder buildMechanicalEffectsReport(RandomEventData eventData,
+    private @Nonnull StringBuilder buildMechanicalEffectsReport(RandomEventData eventData,
           List<RandomEventResult> results) {
         StringBuilder report = new StringBuilder();
         for (RandomEventResult result : results) {

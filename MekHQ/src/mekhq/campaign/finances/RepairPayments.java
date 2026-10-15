@@ -34,7 +34,7 @@ package mekhq.campaign.finances;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;

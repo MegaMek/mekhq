@@ -38,7 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.Arrays;
 import java.util.Locale;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 
 public enum WorkTime {

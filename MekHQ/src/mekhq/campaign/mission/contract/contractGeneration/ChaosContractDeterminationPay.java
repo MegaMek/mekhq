@@ -35,6 +35,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static java.lang.Math.ceil;
 import static java.lang.Math.round;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -45,7 +46,6 @@ import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
-import org.jspecify.annotations.NonNull;
 
 /**
  * The default Chaos Campaign pay scheme: monthly and combat pay are derived from the contract's abstract scale and
@@ -60,7 +60,7 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
     public final static int DEFAULT_COMBAT_PAY_MULTIPLIER = 500; // Draconis Reach first printing pg 26
 
     @Override
-    public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract) {
         double economicScale = contract.getEconomicScale(campaign.getCampaignOptions()
                                                                .get(CampaignOption.USE_FRACTIONAL_SCALE));
         double combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * economicScale;
@@ -103,7 +103,7 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
      * scaled by the contract's base pay multiplier.
      */
     @Override
-    public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
         boolean isConvertSupportPoints = shouldConvertSupportPoints(campaign);
 
         if (campaign.getCampaignOptions().get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE)) {

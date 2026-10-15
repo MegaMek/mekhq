@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.events.parts;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 

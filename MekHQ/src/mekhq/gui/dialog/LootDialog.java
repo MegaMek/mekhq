@@ -39,11 +39,11 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;

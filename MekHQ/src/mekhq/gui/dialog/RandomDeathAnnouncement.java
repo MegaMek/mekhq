@@ -42,6 +42,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -53,7 +54,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Displays an immersive notification dialog when a person dies from random causes during campaign advancement and
@@ -189,7 +189,7 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
      * @author Illiani
      * @since 0.51.01
      */
-    private static @NonNull String getCampFollowerDeathReport(Person deceased, Campaign campaign,
+    private static @Nonnull String getCampFollowerDeathReport(Person deceased, Campaign campaign,
           String causeOfDeathLabel, String professions, LocalDate today) {
         return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.inCharacter.unemployed",
               deceased.getHyperlinkedFullTitle(),
@@ -216,7 +216,7 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
      * @author Illiani
      * @since 0.51.01
      */
-    private static @NonNull String getEmployeeDeathReport(Person deceased, Campaign campaign,
+    private static @Nonnull String getEmployeeDeathReport(Person deceased, Campaign campaign,
           String causeOfDeathLabel, String professions, LocalDate today) {
         return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.inCharacter.employed",
               deceased.getHyperlinkedFullTitle(),
@@ -243,7 +243,7 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
      * @author Illiani
      * @since 0.51.01
      */
-    private static @NonNull String getPrimaryProfessionLabel(Person deceased, Campaign campaign) {
+    private static @Nonnull String getPrimaryProfessionLabel(Person deceased, Campaign campaign) {
         String primaryProfession = deceased.getPrimaryRoleDesc();
         SkillLevel primarySkillLevel = deceased.getSkillLevel(campaign, false, true);
         String primarySkillLabel = SkillType.getColoredExperienceLevelName(primarySkillLevel);

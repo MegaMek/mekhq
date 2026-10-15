@@ -53,11 +53,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;

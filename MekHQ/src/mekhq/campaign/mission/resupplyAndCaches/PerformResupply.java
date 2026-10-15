@@ -65,8 +65,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.units.Entity;

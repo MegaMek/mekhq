@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

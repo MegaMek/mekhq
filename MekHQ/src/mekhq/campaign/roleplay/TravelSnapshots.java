@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;

@@ -52,8 +52,8 @@ import java.time.LocalDate;
 import java.util.*;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.contract.AbstractContract;

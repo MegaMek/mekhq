@@ -47,9 +47,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;

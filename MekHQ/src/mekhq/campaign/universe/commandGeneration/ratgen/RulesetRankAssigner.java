@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;

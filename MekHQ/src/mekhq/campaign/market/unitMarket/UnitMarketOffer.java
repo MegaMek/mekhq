@@ -34,8 +34,8 @@ package mekhq.campaign.market.unitMarket;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;

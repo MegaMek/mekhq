@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.roleplay;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;

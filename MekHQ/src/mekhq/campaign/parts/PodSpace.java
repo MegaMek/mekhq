@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;

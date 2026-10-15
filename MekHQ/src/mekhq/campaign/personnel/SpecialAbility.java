@@ -45,10 +45,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Faction;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;

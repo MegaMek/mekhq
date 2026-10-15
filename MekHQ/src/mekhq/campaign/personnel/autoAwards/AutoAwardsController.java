@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

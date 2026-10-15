@@ -64,12 +64,12 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;

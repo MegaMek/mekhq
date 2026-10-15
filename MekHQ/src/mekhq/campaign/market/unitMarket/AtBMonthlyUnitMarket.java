@@ -52,9 +52,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
