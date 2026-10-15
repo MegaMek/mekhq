@@ -56,6 +56,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.*;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor.OrderOption;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -253,6 +254,17 @@ public class StratConFacilityDialog extends JDialog {
         if (currentDescription != null) {
             html.append("<h3>").append(getTextAt(RESOURCE_BUNDLE, "dialog.effects")).append("</h3>")
                   .append("<p>").append(currentDescription).append("</p>");
+        }
+
+        List<String> effectLines = StratConFacilityEffectStatus.getFacilityEffectLines(track,
+              coords,
+              SupportRules.from(campaign, contract));
+        if (!effectLines.isEmpty()) {
+            html.append("<h3>").append(getTextAt(RESOURCE_BUNDLE, "dialog.effectsNow")).append("</h3><ul>");
+            for (String line : effectLines) {
+                html.append("<li>").append(line).append("</li>");
+            }
+            html.append("</ul>");
         }
 
         if (facility.isOwnerAlliedToPlayer() || facility.isDefinitionMissing()) {

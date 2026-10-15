@@ -101,6 +101,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
@@ -3301,10 +3302,11 @@ public class StratConRulesManager {
     /**
      * Applies scenario modifiers provided by facilities on the track.
      *
-     * <p>If the scenario is located directly on a facility, that facility's local or shared modifiers are applied and
-     * no additional modifier is rolled for facilities with the same ownership alignment. The method may then roll once
-     * for an available allied facility and once for an available enemy facility, allowing remote facilities to
-     * contribute shared modifiers to the scenario.</p>
+     * <p>If the scenario is located directly on a facility, that facility's local modifiers and its synergy partners'
+     * shared modifiers are applied. Either way, the method then rolls once for an available allied facility and once
+     * for an available enemy facility, allowing remote facilities to contribute shared modifiers to the scenario. The
+     * facility the scenario is on, and its partners, have already been marked unavailable by then, so they are never
+     * drawn a second time.</p>
      *
      * <p>Facilities that provide modifiers are marked unavailable by
      * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean, boolean, boolean)} and will not be
@@ -3325,8 +3327,10 @@ public class StratConRulesManager {
           boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
 
-        boolean rollForAllied = true;
-        boolean rollForEnemy = true;
+        // Recorded so the player can see which facilities lent support to the fight, and why none did.
+        scenario.setFacilitySupportRecorded(true);
+        scenario.getAlliedFacilitySupport().clear();
+        scenario.getHostileFacilitySupport().clear();
 
         StratConFacility localFacility = allFacilities.get(coords);
         boolean scenarioAtFacility = localFacility != null;
@@ -3344,30 +3348,32 @@ public class StratConRulesManager {
                 if (partner.getSharedModifiers().isEmpty()) {
                     continue;
                 }
-                getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers);
-            }
-
-            if (localFacility.isOwnerAlliedToPlayer()) {
-                rollForAllied = false;
-            } else {
-                rollForEnemy = false;
+                if (getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers)) {
+                    recordFacilitySupport(scenario, track, partner);
+                }
             }
         }
 
         Map<StratConCoords, StratConFacility> availableAlliedFacilities = new HashMap<>();
         Map<StratConCoords, StratConFacility> availableEnemyFacilities = new HashMap<>();
-        filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
+        filterAvailableFacilities(allFacilities,
+              availableAlliedFacilities,
+              availableEnemyFacilities,
+              restrictAlliedModifiers,
+              restrictEnemyModifiers);
 
-        if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
+        if (!availableAlliedFacilities.isEmpty()) {
             rollForFacilityModifier(scenario,
+                  track,
                   alliedFacilityModifierChance,
                   availableAlliedFacilities,
                   restrictAlliedModifiers,
                   restrictEnemyModifiers);
         }
 
-        if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
+        if (!availableEnemyFacilities.isEmpty()) {
             rollForFacilityModifier(scenario,
+                  track,
                   enemyFacilityModifierChance,
                   availableEnemyFacilities,
                   restrictAlliedModifiers,
@@ -3383,6 +3389,7 @@ public class StratConRulesManager {
      * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
      *
      * @param scenario                the scenario receiving the facility modifiers
+     * @param track                   the scenario's sector
      * @param facilityModifierChance  the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
      *                                success, and values greater than {@code 1} succeed when a random roll returns
      *                                {@code 0}
@@ -3392,7 +3399,8 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
      *                                be blocked
      */
-    private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
+    private static void rollForFacilityModifier(StratConScenario scenario, StratConTrackState track,
+          int facilityModifierChance,
           Map<StratConCoords, StratConFacility> availableFacilities, boolean restrictAlliedModifiers,
           boolean restrictEnemyModifiers) {
         boolean autoFailRoll = facilityModifierChance == NO_FACILITY_MODIFIER;
@@ -3410,11 +3418,41 @@ public class StratConRulesManager {
             }
 
             final boolean isLocalFacility = false;
-            getFacilityModifiers(scenario,
+            if (getFacilityModifiers(scenario,
                   randomFacility,
                   isLocalFacility,
                   restrictAlliedModifiers,
-                  restrictEnemyModifiers);
+                  restrictEnemyModifiers)) {
+                recordFacilitySupport(scenario, track, randomFacility);
+            }
+        }
+    }
+
+    /**
+     * Notes on the scenario that a facility elsewhere in the sector lent it support: your side's by name, the enemy's
+     * by hex, so one the player hasn't found can be shown without naming it.
+     *
+     * @param scenario the scenario that received the support
+     * @param track    the sector
+     * @param facility the facility that lent it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void recordFacilitySupport(StratConScenario scenario, StratConTrackState track,
+          StratConFacility facility) {
+        if (facility.isOwnerAlliedToPlayer()) {
+            if (!scenario.getAlliedFacilitySupport().contains(facility.getDisplayableName())) {
+                scenario.getAlliedFacilitySupport().add(facility.getDisplayableName());
+            }
+            return;
+        }
+
+        for (Entry<StratConCoords, StratConFacility> facilityEntry : track.getFacilities().entrySet()) {
+            if ((facilityEntry.getValue() == facility)
+                      && !scenario.getHostileFacilitySupport().contains(facilityEntry.getKey())) {
+                scenario.getHostileFacilitySupport().add(facilityEntry.getKey());
+            }
         }
     }
 
@@ -3435,10 +3473,12 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
      *                                be blocked
      *
+     * @return {@code true} if at least one modifier was applied
+     *
      * @author Illiani
      * @since 0.51.0
      */
-    private static void getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
+    private static boolean getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
           boolean isLocal, boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         List<String> relevantModifiers = new ArrayList<>();
         List<String> localModifiers = facility.getLocalModifiers();
@@ -3450,6 +3490,7 @@ public class StratConRulesManager {
             relevantModifiers.addAll(globalModifiers);
         }
 
+        boolean isAnyApplied = false;
         for (String modifierID : relevantModifiers) {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
             if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
@@ -3457,9 +3498,11 @@ public class StratConRulesManager {
             }
 
             applyModifierToScenario(scenario, facility, modifierID);
+            isAnyApplied = true;
         }
 
         facility.setIsAvailable(false);
+        return isAnyApplied;
     }
 
     /**
@@ -3495,24 +3538,35 @@ public class StratConRulesManager {
     }
 
     /**
-     * Creates a map containing only facilities that are currently available for use.
+     * Creates a map containing only facilities that are currently available to lend support.
      *
-     * <p>Facilities marked as unavailable are excluded from the returned maps. The filtered maps preserve the
-     * original coordinate-to-facility associations.</p>
+     * <p>Facilities marked as unavailable, and those with nothing they could lend (see
+     * {@link StratConFacilityEffectStatus#getLendableModifiers}), are excluded from the returned maps. The filtered
+     * maps preserve the original coordinate-to-facility associations.</p>
      *
      * @param allFacilities             the complete map of facilities indexed by their coordinates
      * @param availableAlliedFacilities an array of all allied facilities that are available
      * @param availableEnemyFacilities  an array of all enemy facilities that are available
+     * @param restrictAlliedModifiers   {@code true} if facility modifiers which add forces that benefit the player
+     *                                  should be blocked
+     * @param restrictEnemyModifiers    {@code true} if facility modifiers which add forces that benefit the enemy
+     *                                  should be blocked
      */
     private static void filterAvailableFacilities(
           Map<StratConCoords, StratConFacility> allFacilities,
           Map<StratConCoords, StratConFacility> availableAlliedFacilities,
-          Map<StratConCoords, StratConFacility> availableEnemyFacilities) {
+          Map<StratConCoords, StratConFacility> availableEnemyFacilities,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         for (Entry<StratConCoords, StratConFacility> facilityEntry : allFacilities.entrySet()) {
             StratConFacility facility = facilityEntry.getValue();
             StratConCoords facilityCoords = facilityEntry.getKey();
 
-            if (facility.isAvailable()) {
+            // A facility with nothing to lend, such as a Sensor Post or a damaged Air Base, must not use up a
+            // fight's draw: the draw would land on it and the fight would get nothing.
+            boolean hasSupportToLend = !StratConFacilityEffectStatus.getLendableModifiers(facility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers).isEmpty();
+            if (facility.isAvailable() && hasSupportToLend) {
                 if (facility.isOwnerAlliedToPlayer()) {
                     availableAlliedFacilities.put(facilityCoords, facility);
                 } else {
