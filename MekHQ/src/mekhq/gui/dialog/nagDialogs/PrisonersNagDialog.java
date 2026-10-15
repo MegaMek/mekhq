@@ -42,7 +42,6 @@ import java.util.UUID;
 import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;

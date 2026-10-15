@@ -123,7 +123,7 @@ public abstract class AbstractBase implements IPlace {
     public LocalHangar getBaseHangar() {
         return baseHangar;
     }
-    
+
     @Override
     public LocalWarehouse getWarehouse() {
         return baseWarehouse;
