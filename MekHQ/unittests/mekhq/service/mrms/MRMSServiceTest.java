@@ -32,6 +32,7 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,6 +72,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -151,6 +153,7 @@ public class MRMSServiceTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_SALVAGE)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_NEED_TOOL_KIT)).thenReturn(false);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         when(mockCampaign.getPartInventory(any(Part.class))).thenReturn(mockPartInventory);
@@ -353,6 +356,92 @@ public class MRMSServiceTest {
 
         verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
         verify(mockCampaign, times(2)).addReport(any(), any(String.class));
+    }
+
+    @Test
+    public void testMRMSUnitsWithNoTechsNamesTechsWithoutToolKit() {
+        when(mockCampaignOptions.get(CampaignOption.MRMS_USE_REPAIR)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_NEED_TOOL_KIT)).thenReturn(true);
+        // A MekTech whose only kit is a Descartes scanner, which does not count as a tool kit
+        Person descartesOnlyTech = mock(Person.class);
+        when(descartesOnlyTech.hasRepairKit(EquipmentKitCatalog.KIT_DESCARTES_MK_XXI)).thenReturn(true);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any(),
+                         ArgumentMatchers.anyBoolean())).thenReturn(new ArrayList<>());
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any())).thenReturn(List.of(descartesOnlyTech));
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+        for (Part part : unit.getParts()) {
+            if (part instanceof Armor armor) {
+                breakArmor(armor);
+            }
+        }
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        String toolKitNote = getFormattedTextAt("mekhq.resources.MRMS", "MRMS.TechsWithoutToolKit.report", 1);
+        verify(mockCampaign).addReport(any(), argThat((String report) -> report.contains(toolKitNote)));
+    }
+
+    @Test
+    public void testMRMSUnitsWithNoTechsSaysNothingOfToolKitsWhenNotRequired() {
+        when(mockCampaignOptions.get(CampaignOption.MRMS_USE_REPAIR)).thenReturn(true);
+        Person descartesOnlyTech = mock(Person.class);
+        when(descartesOnlyTech.hasRepairKit(EquipmentKitCatalog.KIT_DESCARTES_MK_XXI)).thenReturn(true);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any(),
+                         ArgumentMatchers.anyBoolean())).thenReturn(new ArrayList<>());
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any())).thenReturn(List.of(descartesOnlyTech));
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+        for (Part part : unit.getParts()) {
+            if (part instanceof Armor armor) {
+                breakArmor(armor);
+            }
+        }
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        String toolKitNote = getFormattedTextAt("mekhq.resources.MRMS", "MRMS.TechsWithoutToolKit.report", 1);
+        verify(mockCampaign, times(0)).addReport(any(), argThat((String report) -> report.contains(toolKitNote)));
     }
 
     @Test

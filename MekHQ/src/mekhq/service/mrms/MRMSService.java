@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.HandheldWeapon;
@@ -225,6 +226,12 @@ public class MRMSService {
         if (statusKey != null) {
             msg += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, statusKey, unitAction.getPartSet().countRepairs());
         }
+        if (unitAction.isStatusNoTechs()) {
+            String toolKitNote = describeTechsWithoutToolKit(campaign, unit);
+            if (!toolKitNote.isEmpty()) {
+                msg += ' ' + toolKitNote;
+            }
+        }
 
         campaign.addReport(TECHNICAL, msg);
 
@@ -399,6 +406,12 @@ public class MRMSService {
             sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithNoTechs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.NO_TECHS));
+            if (unitActionsByStatus.containsKey(MRMSUnitAction.STATUS.NO_TECHS)) {
+                String toolKitNote = describeTechsWithoutToolKit(campaign, null);
+                if (!toolKitNote.isEmpty()) {
+                    sb.append("<br/>").append(toolKitNote);
+                }
+            }
             sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithUnfixableLimbs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
@@ -456,6 +469,33 @@ public class MRMSService {
                 campaign.removeUnit(unit.getId());
             }
         }
+    }
+
+    /**
+     * When Mass Repair found no valid techs and the campaign requires a tool kit, says how many techs carry none. Without
+     * this the report only says there were no valid techs, and a tech holding a Descartes scanner looks equipped.
+     *
+     * @param campaign the campaign
+     * @param unit     the unit worked on, or {@code null} for a summary across units
+     *
+     * @return the note, or an empty string when tool kits are not required or every tech carries one
+     */
+    private static String describeTechsWithoutToolKit(Campaign campaign, @Nullable Unit unit) {
+        if (!EquipmentKitCatalog.isToolKitRequired(campaign.getCampaignOptions(), unit)) {
+            return "";
+        }
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate());
+        int techsWithoutToolKit = EquipmentKitCatalog.countWithoutToolKit(techs);
+        LOGGER.debug("[MRMS] No valid techs; {} of {} techs carry no tool kit", techsWithoutToolKit, techs.size());
+        if (techsWithoutToolKit == 0) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.TechsWithoutToolKit.report", techsWithoutToolKit);
     }
 
     /**
