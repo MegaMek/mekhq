@@ -383,7 +383,6 @@ public class MissingMekLocation extends MissingPart {
     private void install(Part actualReplacement) {
         unit.addPart(actualReplacement);
         campaign.getQuartermaster().addPart(actualReplacement, 0, false);
-        // TODO : if this is a mek head, check to see if it had components
         if ((loc == Mek.LOC_HEAD) && (actualReplacement instanceof MekLocation headLocation)) {
             updateHeadComponents(headLocation);
             headLocation.setSensors(false);
