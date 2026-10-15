@@ -61,7 +61,6 @@ import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
-import megamek.common.units.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -881,6 +880,8 @@ public final class CommandGenerator {
 
         Money minimumStartingFloat = Money.of(options.getMinimumStartingFloat());
         Money loan = Money.zero();
+        Money deductedSetupCosts = Money.zero();
+        boolean isFlooredToMinimumFloat = false;
 
         if (options.isPayForSetup()) {
             Money costs = Money.zero();
@@ -914,17 +915,19 @@ public final class CommandGenerator {
             Money maximumPreLoanCosts = startingCash.minus(minimumStartingFloat);
             if (maximumPreLoanCosts.isGreaterOrEqualThan(costs)) {
                 startingCash = startingCash.minus(costs);
+                deductedSetupCosts = costs;
             } else {
                 // Cash floors at the minimum float; the shortfall becomes a loan if enabled.
                 startingCash = minimumStartingFloat;
+                isFlooredToMinimumFloat = true;
                 if (options.isStartingLoan()) {
                     loan = costs.minus(maximumPreLoanCosts).round();
                 }
             }
             startingCash = startingCash.round();
-        } else {
-            startingCash = startingCash.isGreaterOrEqualThan(minimumStartingFloat)
-                                 ? startingCash : minimumStartingFloat;
+        } else if (!startingCash.isGreaterOrEqualThan(minimumStartingFloat)) {
+            startingCash = minimumStartingFloat;
+            isFlooredToMinimumFloat = true;
         }
 
         if (startingCash.isPositive()) {
@@ -937,14 +940,30 @@ public final class CommandGenerator {
                   100, campaign.getLocalDate()));
         }
 
-        if (loan.isZero()) {
-            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "CommandGenerator.startingCapital.report",
-                  startingCash.toAmountAndSymbolString(), percent));
-        } else {
+        if (!loan.isZero()) {
             campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
                   "CommandGenerator.startingCapital.reportWithLoan",
                   startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString()));
+        } else if (isFlooredToMinimumFloat) {
+            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CommandGenerator.startingCapital.reportMinimumFloat",
+                  startingCash.toAmountAndSymbolString()));
+        } else {
+            String basis = options.isRandomizeStartingCash()
+                                 ? getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.random",
+                                       options.getRandomStartingCashDiceCount())
+                                 : getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.percent",
+                                       percent);
+            if (deductedSetupCosts.isPositive()) {
+                campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CommandGenerator.startingCapital.reportLessSetup",
+                      startingCash.toAmountAndSymbolString(), basis,
+                      deductedSetupCosts.toAmountAndSymbolString()));
+            } else {
+                campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CommandGenerator.startingCapital.report",
+                      startingCash.toAmountAndSymbolString(), basis));
+            }
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 9: credited {} starting capital, loan {}",
               startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString());
@@ -952,11 +971,11 @@ public final class CommandGenerator {
 
     /**
      * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
-     * will price them once materialized: the entity cost (alternate cost for conventional infantry)
-     * times the campaign's tech-base price multiplier. Used by the Command Designer's starting-cash
-     * preview to price the design model before anything is committed.
+     * will price them once materialized (see {@link Unit#estimateBuyCost}), including Battle Value
+     * pricing when {@link CampaignOption#USE_ALTERNATE_UNIT_COST} is on. Used by the Command
+     * Designer's starting-cash preview to price the design model before anything is committed.
      *
-     * @param campaign the campaign supplying the price multipliers
+     * @param campaign the campaign supplying the pricing rules and multipliers
      * @param entities the rolled entities to price (e.g. from {@link #collectEntities})
      *
      * @return the estimated total purchase value
@@ -965,17 +984,7 @@ public final class CommandGenerator {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Money total = Money.zero();
         for (Entity entity : entities) {
-            Money cost = Money.of((entity instanceof Infantry)
-                                        ? entity.getAlternateCost()
-                                        : entity.getCost(false));
-            if (entity.isMixedTech()) {
-                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER));
-            } else if (entity.isClan()) {
-                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
-            } else {
-                cost = cost.multipliedBy(campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
-            }
-            total = total.plus(cost);
+            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));
         }
         return total;
     }

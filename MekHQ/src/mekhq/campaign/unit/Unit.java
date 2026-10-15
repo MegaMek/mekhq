@@ -3076,11 +3076,46 @@ public class Unit implements ITechnology, ILocatable {
             return getAlternateUnitCost();
         }
 
-        Money cost = Money.of((getEntity() instanceof Infantry) ?
-                                    getEntity().getAlternateCost() :
-                                    getEntity().getCost(false));
+        return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions());
+    }
 
-        return cost.multipliedBy(getUnitPriceMultiplier());
+    /**
+     * Estimates what {@link #getBuyCost()} will return for an entity that has not yet been made into a unit, such as
+     * one rolled by the command generator. Under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the entity is valued by
+     * its Battle Value in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
+     *
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     *
+     * @return the entity's purchase value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            return calculateAlternateUnitCost(unitEntity, unitEntity.calculateBattleValue(true, true, true),
+                  campaignOptions);
+        }
+        return getTraditionalBuyCost(unitEntity, campaignOptions);
+    }
+
+    /**
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the unit price multipliers
+     *
+     * @return the entity's construction cost (alternate cost for conventional infantry) times the unit price
+     *       multiplier for its tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money getTraditionalBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
+        Money cost = Money.of((unitEntity instanceof Infantry) ?
+                                    unitEntity.getAlternateCost() :
+                                    unitEntity.getCost(false));
+
+        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions));
     }
 
     /**
@@ -3090,8 +3125,19 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     private double getUnitPriceMultiplier() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        Entity unitEntity = getEntity();
+        return getUnitPriceMultiplier(getEntity(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * @param unitEntity      the entity whose tech base picks the multiplier
+     * @param campaignOptions the campaign options holding the multipliers
+     *
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching the entity's tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
         if (unitEntity.isMixedTech()) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
         } else if (unitEntity.isClan()) {
@@ -3171,9 +3217,27 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getAlternateUnitCost() {
-        int battleValue = getUnitBattleValue();
-        double valueInSupportPoints = battleValue * getUnitPriceMultiplier() * getQuirkPriceMultiplier(getEntity());
-        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
+        return calculateAlternateUnitCost(getEntity(), getUnitBattleValue(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * Values an entity under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * {@link #getAlternateUnitCost()}).
+     *
+     * @param unitEntity      the entity to value
+     * @param battleValue     the entity's Battle Value, excluding pilot skill, C3, and TAG
+     * @param campaignOptions the campaign options supplying the multipliers and support point conversion
+     *
+     * @return the entity's Battle Value-based value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money calculateAlternateUnitCost(Entity unitEntity, int battleValue,
+          CampaignOptions campaignOptions) {
+        double valueInSupportPoints = battleValue * getUnitPriceMultiplier(unitEntity, campaignOptions)
+                                            * getQuirkPriceMultiplier(unitEntity);
+        if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
             return Money.of(valueInSupportPoints);
         }
         // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
