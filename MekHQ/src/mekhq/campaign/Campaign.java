@@ -251,6 +251,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.campaign.work.RepairAsTechTime;
 import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTaskHold;
@@ -2390,9 +2391,7 @@ public class Campaign implements ITechManager {
           PlanetarySystem system) {
         SkillCheck skillCheck = checkAcquisition(acquisition, person);
         boolean inherentFailure = skillCheck.getTargetNumber().isImpossible();
-        List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
-              getLocalDate(), getCampaignOptions(), getPlayerForce().getFaction(), acquisition.getTechBase() == TechBase.CLAN);
-        skillCheck.withExternalModifiers(acquisitionMods);
+        skillCheck.withExternalModifiers(PlanetaryAcquisitionModifiers.forSystem(this, acquisition, system));
 
         // if it's already impossible, don't bother with the rest
         if (skillCheck.getTargetNumber().isImpossible()) {
@@ -2472,10 +2471,7 @@ public class Campaign implements ITechManager {
             extraModifiers.add(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase"));
         }
 
-        if (system != null) {
-            extraModifiers.addAll(system.getPrimaryPlanet().getAcquisitionMods(
-                  getLocalDate(), getCampaignOptions(), getPlayerForce().getFaction(), acquisition.getTechBase() == TechBase.CLAN));
-        }
+        extraModifiers.addAll(PlanetaryAcquisitionModifiers.forSystem(this, acquisition, system));
         report += "attempts to find " + acquisition.getAcquisitionName();
 
         SkillCheck skillCheck = checkAcquisition(acquisition, person).withExternalModifiers(extraModifiers);
