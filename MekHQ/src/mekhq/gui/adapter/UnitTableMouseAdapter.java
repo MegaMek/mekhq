@@ -119,6 +119,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.BombUnloader;
+import mekhq.campaign.unit.EditedDamage;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -767,6 +768,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_EDIT_DAMAGE)) { // Single Unit only
             UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), selectedUnit.getEntity());
             med.setVisible(true);
+            EditedDamage.reinstateRestoredLocations(selectedUnit);
             selectedUnit.runDiagnostic(false);
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_FLUFF_NAME)) { // Single Unit only
