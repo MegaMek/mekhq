@@ -226,6 +226,16 @@ public enum UnitFixture {
      */
     LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
     /**
+     * Union (3055), a DropShip with Artemis LRM-20 ammunition in its nose and both side arcs. Source:
+     * {@code dropships/TRO3057R/IS/Union (3055).blk}.
+     */
+    UNION_3055_DROPSHIP("Union (3055)", true, Dropship.class),
+    /**
+     * Union (2708b), which carries the same Artemis LRM-20 ammunition in its nose and aft arcs instead. Source:
+     * {@code dropships/TRO3057R/IS/Union (2708b).blk}.
+     */
+    UNION_2708B_DROPSHIP("Union (2708b)", true, Dropship.class),
+    /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
      */
