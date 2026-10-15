@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  * affiliated with Microsoft.
  */
 package mekhq.campaign.parts.equipment;
+
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.util.Objects;
@@ -187,6 +189,10 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     @Override
     public @Nullable String checkFixable() {
         final Mounted<?> m = getMounted();
+        if ((m == null) && (getUnit() != null)) {
+            // The new bin would have no slot to fill, so it would be reloaded every day without end
+            return getTextAt("mekhq.resources.Parts", "AmmoBin.noSlot");
+        }
         if (m != null) {
             final int location = m.getLocation();
             if (location == Entity.LOC_NONE) {
