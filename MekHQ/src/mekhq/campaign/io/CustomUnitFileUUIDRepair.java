@@ -42,26 +42,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.loaders.MtfFile;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.UUIDUtil;
 import megamek.logging.MMLogger;
 
 /**
- * Repairs custom unit files that share their unit-file UUID with another unit file.
+ * Repairs custom unit files that share their unit-file UUID with a differently named unit file.
  *
  * <p>Before refits started generating their own UUID, a customized refit saved by MekHQ kept the UUID of the design
  * it was edited from. The unit cache then reports an ambiguous UUID, and a UUID-first lookup can load the source
- * design instead of the custom. This repair gives each such custom file in the MekHQ customs directory a fresh UUID,
- * written in place so nothing else in the file changes, and records the shared UUID as the file's refit-from
- * reference when it has none.</p>
+ * design instead of the custom. This repair gives each such custom file a fresh UUID, written in place so nothing else
+ * in the file changes, and records the shared UUID as the file's refit-from reference when it has none.</p>
  *
- * <p>In each group of files sharing a UUID one file keeps it: a file outside the customs directory when there is one
- * (normally the canon design), otherwise the oldest custom file, which is the design the others were refit from.</p>
+ * <p>Custom files are the plain unit files in the user unit directories: the MekHQ customs directory, the user data
+ * unit directory and the external user directory. Official unit files outside the customs directory are never
+ * rewritten, even when a user directory contains them. In each group of files sharing a UUID one file keeps it: a file
+ * outside those directories when there is one (normally the canon design), otherwise the oldest custom file, which is
+ * the design the others were refit from. A custom with the same chassis and model as that file is left alone, since
+ * MegaMekLab deliberately keeps the UUID when a design is re-saved under its own name (for example as an override of a
+ * canon unit).</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -80,8 +87,8 @@ public final class CustomUnitFileUUIDRepair {
     }
 
     /**
-     * Repairs every custom unit file in the MekHQ customs directory whose UUID collides with another unit file, then
-     * rescans the unit cache if any file was changed. Blocks until the unit cache has finished loading.
+     * Repairs every custom unit file in the user unit directories whose UUID collides with a differently named unit
+     * file, then rescans the unit cache if any file was changed. Blocks until the unit cache has finished loading.
      *
      * @return the number of custom unit files that were given a new UUID
      *
@@ -90,7 +97,7 @@ public final class CustomUnitFileUUIDRepair {
      */
     public static int repairCustomUnitFiles() {
         MekSummaryCache cache = MekSummaryCache.getInstance();
-        int repairedCount = repairCustomUnitFiles(cache.getAllMeks(), CUSTOMS_DIRECTORY);
+        int repairedCount = repairCustomUnitFiles(cache.getAllMeks(), getUserUnitDirectories());
         if (repairedCount > 0) {
             LOGGER.info("Gave {} custom unit file(s) a new unit-file UUID; rescanning unit files.", repairedCount);
             cache.loadMekData();
@@ -99,20 +106,83 @@ public final class CustomUnitFileUUIDRepair {
     }
 
     /**
-     * Repairs every custom unit file under {@code customsDirectory} whose UUID collides with another of the
-     * {@code summaries}. Does not touch the unit cache.
+     * Lists the directories holding the player's own unit files, matching the user directories the unit cache scans:
+     * the MekHQ customs directory, the unit directory inside the user data directory, and the external user directory
+     * from the client preferences when one is set.
      *
-     * @param summaries        the unit summaries to check
-     * @param customsDirectory the directory whose unit files may be rewritten
+     * @return the user unit directories; some may not exist
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static UserUnitDirectories getUserUnitDirectories() {
+        List<Path> userDirectories = new ArrayList<>();
+        userDirectories.add(new File(Configuration.userDataDir(), Configuration.unitsDir().toString()).toPath());
+        String externalUserDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if ((externalUserDirectory != null) && !externalUserDirectory.isBlank()) {
+            userDirectories.add(Path.of(externalUserDirectory));
+        }
+        return new UserUnitDirectories(CUSTOMS_DIRECTORY, Configuration.unitsDir().toPath(), userDirectories);
+    }
+
+    /**
+     * The directories whose unit files the repair may rewrite.
+     *
+     * @param customsDirectory      the MekHQ customs directory; always eligible, even inside the official units
+     * @param officialUnitDirectory the official unit directory; nothing in it outside the customs directory is ever
+     *                              eligible, even when a user directory contains it
+     * @param userDirectories       the other user unit directories
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record UserUnitDirectories(Path customsDirectory, Path officialUnitDirectory, List<Path> userDirectories) {
+        UserUnitDirectories {
+            customsDirectory = customsDirectory.toAbsolutePath().normalize();
+            officialUnitDirectory = officialUnitDirectory.toAbsolutePath().normalize();
+            List<Path> normalizedUserDirectories = new ArrayList<>();
+            for (Path userDirectory : userDirectories) {
+                normalizedUserDirectories.add(userDirectory.toAbsolutePath().normalize());
+            }
+            userDirectories = normalizedUserDirectories;
+        }
+
+        /**
+         * @return {@code true} if the file lies in the customs directory, or in a user directory but outside the
+         *       official unit directory
+         */
+        boolean contains(File file) {
+            Path normalizedPath = file.toPath().toAbsolutePath().normalize();
+            if (normalizedPath.startsWith(customsDirectory)) {
+                return true;
+            }
+            if (normalizedPath.startsWith(officialUnitDirectory)) {
+                return false;
+            }
+            for (Path userDirectory : userDirectories) {
+                if (normalizedPath.startsWith(userDirectory)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Repairs every custom unit file under {@code userUnitDirectories} whose UUID collides with a differently named
+     * unit file among the {@code summaries}. Does not touch the unit cache.
+     *
+     * @param summaries           the unit summaries to check
+     * @param userUnitDirectories the directories whose unit files may be rewritten
      *
      * @return the number of custom unit files that were given a new UUID
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static int repairCustomUnitFiles(MekSummary[] summaries, Path customsDirectory) {
+    static int repairCustomUnitFiles(MekSummary[] summaries, UserUnitDirectories userUnitDirectories) {
         int repairedCount = 0;
-        for (MekSummary summary : findCustomsToRepair(summaries, customsDirectory)) {
+        for (MekSummary summary : findCustomsToRepair(summaries, userUnitDirectories)) {
             File sourceFile = summary.getSourceFile();
             String sharedUUID = summary.getUnitFileUUID();
             String newUUID = UUIDUtil.newUUIDv7().toString();
@@ -133,18 +203,18 @@ public final class CustomUnitFileUUIDRepair {
     }
 
     /**
-     * Finds the custom unit files that need a new UUID: those under {@code customsDirectory} that share their UUID
-     * with another unit file and are not the file chosen to keep it.
+     * Finds the custom unit files that need a new UUID: those under {@code userUnitDirectories} that share their UUID
+     * with another unit file, are not the file chosen to keep it, and are named differently from that file.
      *
-     * @param summaries        the unit summaries to check
-     * @param customsDirectory the directory whose unit files may be rewritten
+     * @param summaries           the unit summaries to check
+     * @param userUnitDirectories the directories whose unit files may be rewritten
      *
      * @return the summaries of the custom unit files to repair
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static List<MekSummary> findCustomsToRepair(MekSummary[] summaries, Path customsDirectory) {
+    static List<MekSummary> findCustomsToRepair(MekSummary[] summaries, UserUnitDirectories userUnitDirectories) {
         Map<String, List<MekSummary>> summariesByUUID = new HashMap<>();
         for (MekSummary summary : summaries) {
             String unitFileUUID = summary.getUnitFileUUID();
@@ -154,16 +224,17 @@ public final class CustomUnitFileUUIDRepair {
             summariesByUUID.computeIfAbsent(unitFileUUID, key -> new ArrayList<>()).add(summary);
         }
 
-        Path normalizedCustomsDirectory = customsDirectory.toAbsolutePath().normalize();
         List<MekSummary> customsToRepair = new ArrayList<>();
         for (List<MekSummary> sharingSummaries : summariesByUUID.values()) {
             if (sharingSummaries.size() < 2) {
                 continue;
             }
 
-            MekSummary keeper = chooseUUIDKeeper(sharingSummaries, normalizedCustomsDirectory);
+            MekSummary keeper = chooseUUIDKeeper(sharingSummaries, userUnitDirectories);
             for (MekSummary summary : sharingSummaries) {
-                if ((summary != keeper) && isRepairableCustom(summary, normalizedCustomsDirectory)) {
+                if ((summary != keeper)
+                      && !Objects.equals(summary.getName(), keeper.getName())
+                      && isRepairableCustom(summary, userUnitDirectories)) {
                     customsToRepair.add(summary);
                 }
             }
@@ -175,10 +246,11 @@ public final class CustomUnitFileUUIDRepair {
      * Picks the file in a group sharing a UUID that keeps it: the first file that is not a repairable custom, or else
      * the least recently modified custom.
      */
-    private static MekSummary chooseUUIDKeeper(List<MekSummary> sharingSummaries, Path normalizedCustomsDirectory) {
+    private static MekSummary chooseUUIDKeeper(List<MekSummary> sharingSummaries,
+          UserUnitDirectories userUnitDirectories) {
         MekSummary oldestCustom = null;
         for (MekSummary summary : sharingSummaries) {
-            if (!isRepairableCustom(summary, normalizedCustomsDirectory)) {
+            if (!isRepairableCustom(summary, userUnitDirectories)) {
                 return summary;
             }
             if ((oldestCustom == null)
@@ -189,7 +261,7 @@ public final class CustomUnitFileUUIDRepair {
         return oldestCustom;
     }
 
-    private static boolean isRepairableCustom(MekSummary summary, Path normalizedCustomsDirectory) {
+    private static boolean isRepairableCustom(MekSummary summary, UserUnitDirectories userUnitDirectories) {
         File sourceFile = summary.getSourceFile();
         if ((sourceFile == null) || (summary.getEntryName() != null) || !sourceFile.isFile()) {
             // Units inside archives cannot be rewritten in place
@@ -199,7 +271,7 @@ public final class CustomUnitFileUUIDRepair {
         if (!fileName.endsWith(".mtf") && !fileName.endsWith(".blk")) {
             return false;
         }
-        return sourceFile.toPath().toAbsolutePath().normalize().startsWith(normalizedCustomsDirectory);
+        return userUnitDirectories.contains(sourceFile);
     }
 
     /**

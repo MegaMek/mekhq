@@ -57,8 +57,25 @@ class CustomUnitFileUUIDRepairTest {
     @TempDir
     Path tempDirectory;
 
+    private Path officialDirectory() {
+        return tempDirectory.resolve("mekfiles");
+    }
+
     private Path customsDirectory() {
-        return tempDirectory.resolve("customs");
+        return officialDirectory().resolve("customs");
+    }
+
+    private Path userDataUnitDirectory() {
+        return tempDirectory.resolve("userdata/data/mekfiles");
+    }
+
+    private Path externalUserDirectory() {
+        return tempDirectory.resolve("external");
+    }
+
+    private CustomUnitFileUUIDRepair.UserUnitDirectories directories() {
+        return new CustomUnitFileUUIDRepair.UserUnitDirectories(customsDirectory(), officialDirectory(),
+              List.of(userDataUnitDirectory(), externalUserDirectory()));
     }
 
     private File writeFile(Path path, String contents) throws IOException {
@@ -77,10 +94,11 @@ class CustomUnitFileUUIDRepairTest {
               + "\n</Name>\n\n<UUID>\n" + unitFileUUID + "\n</UUID>\n\n<Model>\nCargo\n</Model>\n";
     }
 
-    private static MekSummary summaryFor(File sourceFile, String unitFileUUID) {
+    private static MekSummary summaryFor(File sourceFile, String unitFileUUID, String name) {
         MekSummary summary = new MekSummary();
         summary.setSourceFile(sourceFile);
         summary.setUnitFileUUID(unitFileUUID);
+        summary.setName(name);
         return summary;
     }
 
@@ -143,7 +161,7 @@ class CustomUnitFileUUIDRepairTest {
     @Test
     void customsSharingCanonUUIDAreRepairedAndCanonIsNot() throws IOException {
         String sharedUUID = UUIDUtil.newUUIDv7().toString();
-        File canon = writeFile(tempDirectory.resolve("mekfiles/Charger CGR-1A5.mtf"),
+        File canon = writeFile(officialDirectory().resolve("Charger CGR-1A5.mtf"),
               mtfContents("CGR-1A5", sharedUUID));
         File firstCustom = writeFile(customsDirectory().resolve("Alpha/Charger CGR-1A5 Mk II.mtf"),
               mtfContents("CGR-1A5 Mk II", sharedUUID));
@@ -151,14 +169,15 @@ class CustomUnitFileUUIDRepairTest {
               mtfContents("CGR-1A5 Mk III", sharedUUID));
         File uniqueCustom = writeFile(customsDirectory().resolve("Alpha/Charger CGR-1A5 Mk IV.mtf"),
               mtfContents("CGR-1A5 Mk IV", UUIDUtil.newUUIDv7().toString()));
-        MekSummary canonSummary = summaryFor(canon, sharedUUID);
-        MekSummary firstCustomSummary = summaryFor(firstCustom, sharedUUID);
-        MekSummary secondCustomSummary = summaryFor(secondCustom, sharedUUID);
-        MekSummary uniqueCustomSummary = summaryFor(uniqueCustom, UUIDUtil.newUUIDv7().toString());
+        MekSummary canonSummary = summaryFor(canon, sharedUUID, "Charger CGR-1A5");
+        MekSummary firstCustomSummary = summaryFor(firstCustom, sharedUUID, "Charger CGR-1A5 Mk II");
+        MekSummary secondCustomSummary = summaryFor(secondCustom, sharedUUID, "Charger CGR-1A5 Mk III");
+        MekSummary uniqueCustomSummary = summaryFor(uniqueCustom, UUIDUtil.newUUIDv7().toString(),
+              "Charger CGR-1A5 Mk IV");
 
         List<MekSummary> customsToRepair = CustomUnitFileUUIDRepair.findCustomsToRepair(
               new MekSummary[] { firstCustomSummary, canonSummary, secondCustomSummary, uniqueCustomSummary },
-              customsDirectory());
+              directories());
 
         assertEquals(2, customsToRepair.size());
         assertTrue(customsToRepair.contains(firstCustomSummary));
@@ -174,10 +193,11 @@ class CustomUnitFileUUIDRepairTest {
               mtfContents("Custom Mk II", sharedUUID));
         assertTrue(sourceCustom.setLastModified(1_000_000L));
         assertTrue(refitCustom.setLastModified(2_000_000L));
-        MekSummary refitSummary = summaryFor(refitCustom, sharedUUID);
+        MekSummary refitSummary = summaryFor(refitCustom, sharedUUID, "Charger Custom Mk II");
 
         List<MekSummary> customsToRepair = CustomUnitFileUUIDRepair.findCustomsToRepair(
-              new MekSummary[] { refitSummary, summaryFor(sourceCustom, sharedUUID) }, customsDirectory());
+              new MekSummary[] { refitSummary, summaryFor(sourceCustom, sharedUUID, "Charger Custom") },
+              directories());
 
         assertEquals(List.of(refitSummary), customsToRepair, "The design the refit was made from keeps the UUID");
     }
@@ -185,17 +205,18 @@ class CustomUnitFileUUIDRepairTest {
     @Test
     void repairGivesEachCustomItsOwnUUID() throws IOException {
         String sharedUUID = UUIDUtil.newUUIDv7().toString();
-        File canon = writeFile(tempDirectory.resolve("mekfiles/Condor Heavy Hover Tank.blk"),
+        File canon = writeFile(officialDirectory().resolve("Condor Heavy Hover Tank.blk"),
               blkContents("Condor Heavy Hover Tank", sharedUUID));
         String canonContents = readFile(canon);
         File firstCustom = writeFile(customsDirectory().resolve("Alpha/Condor Heavy Hover Tank Cargo.blk"),
               blkContents("Condor Heavy Hover Tank", sharedUUID));
-        File secondCustom = writeFile(customsDirectory().resolve("Beta/Condor Heavy Hover Tank Cargo.blk"),
+        File secondCustom = writeFile(userDataUnitDirectory().resolve("Condor Heavy Hover Tank Cargo.blk"),
               blkContents("Condor Heavy Hover Tank", sharedUUID));
 
         int repairedCount = CustomUnitFileUUIDRepair.repairCustomUnitFiles(new MekSummary[] {
-              summaryFor(canon, sharedUUID), summaryFor(firstCustom, sharedUUID),
-              summaryFor(secondCustom, sharedUUID) }, customsDirectory());
+              summaryFor(canon, sharedUUID, "Condor Heavy Hover Tank"),
+              summaryFor(firstCustom, sharedUUID, "Condor Heavy Hover Tank Cargo"),
+              summaryFor(secondCustom, sharedUUID, "Condor Heavy Hover Tank Cargo") }, directories());
 
         assertEquals(2, repairedCount);
         assertEquals(canonContents, readFile(canon), "The canon file is never rewritten");
@@ -205,6 +226,60 @@ class CustomUnitFileUUIDRepairTest {
         assertNotEquals(sharedUUID, secondUUID);
         assertNotEquals(firstUUID, secondUUID);
         assertTrue(readFile(firstCustom).contains("<refitFromUUID>\n" + sharedUUID + "\n</refitFromUUID>"));
+    }
+
+    @Test
+    void customsInUserDirectoriesAreRepaired() throws IOException {
+        String sharedUUID = UUIDUtil.newUUIDv7().toString();
+        File canon = writeFile(officialDirectory().resolve("Anhur Transport.blk"),
+              blkContents("Anhur Transport", sharedUUID));
+        File userDataCustom = writeFile(userDataUnitDirectory().resolve("Anhur Transport Mk II.blk"),
+              blkContents("Anhur Transport", sharedUUID));
+        File externalCustom = writeFile(externalUserDirectory().resolve("Ships/Anhur Transport Mk III.blk"),
+              blkContents("Anhur Transport", sharedUUID));
+        MekSummary userDataSummary = summaryFor(userDataCustom, sharedUUID, "Anhur Transport Mk II");
+        MekSummary externalSummary = summaryFor(externalCustom, sharedUUID, "Anhur Transport Mk III");
+
+        List<MekSummary> customsToRepair = CustomUnitFileUUIDRepair.findCustomsToRepair(new MekSummary[] {
+              summaryFor(canon, sharedUUID, "Anhur Transport"), userDataSummary, externalSummary }, directories());
+
+        assertEquals(2, customsToRepair.size());
+        assertTrue(customsToRepair.contains(userDataSummary));
+        assertTrue(customsToRepair.contains(externalSummary));
+    }
+
+    @Test
+    void sameNamedOverrideKeepsCanonUUID() throws IOException {
+        String sharedUUID = UUIDUtil.newUUIDv7().toString();
+        File canon = writeFile(officialDirectory().resolve("Charger CGR-1A5.mtf"),
+              mtfContents("CGR-1A5", sharedUUID));
+        File override = writeFile(externalUserDirectory().resolve("Charger CGR-1A5.mtf"),
+              mtfContents("CGR-1A5", sharedUUID));
+
+        List<MekSummary> customsToRepair = CustomUnitFileUUIDRepair.findCustomsToRepair(new MekSummary[] {
+              summaryFor(canon, sharedUUID, "Charger CGR-1A5"),
+              summaryFor(override, sharedUUID, "Charger CGR-1A5") }, directories());
+
+        assertTrue(customsToRepair.isEmpty(), "A design re-saved under its own name is meant to keep its UUID");
+    }
+
+    @Test
+    void userDirectoryContainingOfficialUnitsNeverRewritesCanon() throws IOException {
+        String sharedUUID = UUIDUtil.newUUIDv7().toString();
+        File canon = writeFile(officialDirectory().resolve("Drillson Heavy Hover Tank.blk"),
+              blkContents("Drillson Heavy Hover Tank", sharedUUID));
+        File custom = writeFile(tempDirectory.resolve("Drillson Heavy Hover Tank Cargo.blk"),
+              blkContents("Drillson Heavy Hover Tank", sharedUUID));
+        assertTrue(custom.setLastModified(1_000_000L), "The custom is older than the canon file");
+        MekSummary customSummary = summaryFor(custom, sharedUUID, "Drillson Heavy Hover Tank Cargo");
+        CustomUnitFileUUIDRepair.UserUnitDirectories wholeTreeAsUserDirectory =
+              new CustomUnitFileUUIDRepair.UserUnitDirectories(customsDirectory(), officialDirectory(),
+                    List.of(tempDirectory));
+
+        List<MekSummary> customsToRepair = CustomUnitFileUUIDRepair.findCustomsToRepair(new MekSummary[] {
+              summaryFor(canon, sharedUUID, "Drillson Heavy Hover Tank"), customSummary }, wholeTreeAsUserDirectory);
+
+        assertEquals(List.of(customSummary), customsToRepair);
     }
 
     private static String uuidInBlk(String contents) {
