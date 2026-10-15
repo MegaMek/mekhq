@@ -56,6 +56,9 @@ class PersonnelOptionsModel {
     boolean useSpaTrainingCosts;
     boolean capTotalSpas;
     boolean skillImprovementsCostCBills;
+    double professionSkillTrainingCostMultiplier;
+    double utilitySkillTrainingCostMultiplier;
+    double roleplaySkillTrainingCostMultiplier;
     boolean onlyCommandersMatterVehicles;
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
@@ -166,6 +169,9 @@ class PersonnelOptionsModel {
         useSpaTrainingCosts = options.get(CampaignOption.USE_SPA_TRAINING_COSTS);
         capTotalSpas = options.get(CampaignOption.CAP_TOTAL_SPAS);
         skillImprovementsCostCBills = options.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS);
+        professionSkillTrainingCostMultiplier = options.get(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER);
+        utilitySkillTrainingCostMultiplier = options.get(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER);
+        roleplaySkillTrainingCostMultiplier = options.get(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER);
         onlyCommandersMatterVehicles = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES);
         onlyCommandersMatterInfantry = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY);
         onlyCommandersMatterBattleArmor = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR);
@@ -277,6 +283,9 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_SPA_TRAINING_COSTS, useSpaTrainingCosts);
         options.set(CampaignOption.CAP_TOTAL_SPAS, capTotalSpas);
         options.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, skillImprovementsCostCBills);
+        options.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, professionSkillTrainingCostMultiplier);
+        options.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, utilitySkillTrainingCostMultiplier);
+        options.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, roleplaySkillTrainingCostMultiplier);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES, onlyCommandersMatterVehicles);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY, onlyCommandersMatterInfantry);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR, onlyCommandersMatterBattleArmor);

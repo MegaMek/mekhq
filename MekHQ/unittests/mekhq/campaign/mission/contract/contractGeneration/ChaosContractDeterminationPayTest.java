@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -50,11 +51,13 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
+import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.unit.Unit;
 import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -84,6 +87,7 @@ class ChaosContractDeterminationPayTest {
     private CampaignOptions campaignOptions;
     private Accountant accountant;
     private LocalHangar hangar;
+    private MockedStatic<ContractExpenseProjection> projection;
 
     @BeforeEach
     void setUp() {
@@ -102,8 +106,14 @@ class ChaosContractDeterminationPayTest {
         when(accountant.getPayRoll()).thenReturn(Money.zero());
         when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.zero());
         when(accountant.getOverheadExpenses()).thenReturn(Money.zero());
-        when(accountant.getMonthlyFoodAndHousingExpenses()).thenReturn(Money.zero());
         when(campaign.getAccountant()).thenReturn(accountant);
+
+        // Maintenance and food and housing are projected for the contract; each test stubs only what it checks
+        projection = mockStatic(ContractExpenseProjection.class);
+        projection.when(() -> ContractExpenseProjection.getMonthlyContractMaintenance(any(), any()))
+              .thenReturn(Money.zero());
+        projection.when(() -> ContractExpenseProjection.getMonthlyContractFoodAndHousing(any(), any()))
+              .thenReturn(Money.zero());
 
         hangar = mock(LocalHangar.class);
         List<Unit> noUnits = List.of();
@@ -111,9 +121,17 @@ class ChaosContractDeterminationPayTest {
         when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
     }
 
-    private static AbstractContract contract(int scale, double basePayMultiplier) {
+    @AfterEach
+    void tearDown() {
+        projection.close();
+    }
+
+    private static AbstractContract contract(double exactScale, double basePayMultiplier) {
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(scale);
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(exactScale));
+        when(contract.getExactScale()).thenReturn(exactScale);
+        when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
+              ChaosContractDeterminationScale.getEconomicScale(exactScale, invocation.getArgument(0)));
         when(contract.getBasePayMultiplier()).thenReturn(basePayMultiplier);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
         return contract;
@@ -123,14 +141,14 @@ class ChaosContractDeterminationPayTest {
         return Money.of(supportPoints * SUPPORT_POINTS_TO_C_BILLS);
     }
 
-    private void unitsWithWeeklyMaintenance(int... weeklyCosts) {
-        Unit[] units = new Unit[weeklyCosts.length];
-        for (int index = 0; index < weeklyCosts.length; index++) {
-            units[index] = mock(Unit.class);
-            when(units[index].getWeeklyMaintenanceCost()).thenReturn(Money.of(weeklyCosts[index]));
-        }
-        List<Unit> unitList = List.of(units);
-        when(hangar.getUnits()).thenReturn(unitList);
+    private void projectedMonthlyMaintenance(int monthlyCost) {
+        projection.when(() -> ContractExpenseProjection.getMonthlyContractMaintenance(any(), any()))
+              .thenReturn(Money.of(monthlyCost));
+    }
+
+    private void projectedMonthlyFoodAndHousing(int monthlyCost) {
+        projection.when(() -> ContractExpenseProjection.getMonthlyContractFoodAndHousing(any(), any()))
+              .thenReturn(Money.of(monthlyCost));
     }
 
     @Test
@@ -184,7 +202,7 @@ class ChaosContractDeterminationPayTest {
 
             try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
                 generation.when(() -> AbstractContractGeneration.determineUncappedScale(any(), any(), any(), any()))
-                      .thenReturn(8);
+                      .thenReturn(8.0);
 
                 assertEquals(Money.of(1_000), payScheme.getMonthlyPay(campaign, contract(2, 1.0)));
             }
@@ -230,17 +248,19 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void maintenanceIsCoveredAsFourWeeksOfTheWholeHangar() {
+        void maintenanceIsCoveredAsProjectedForTheContract() {
             campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
-            unitsWithWeeklyMaintenance(1_000, 2_500);
+            projectedMonthlyMaintenance(14_000);
+            AbstractContract contract = contract(3, 1.0);
 
-            assertEquals(Money.of(14_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+            assertEquals(Money.of(14_000), payScheme.getMonthlyPay(campaign, contract));
+            projection.verify(() -> ContractExpenseProjection.getMonthlyContractMaintenance(campaign, contract));
         }
 
         @Test
         void maintenanceIsNotCoveredWhenNotCharged() {
             campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
-            unitsWithWeeklyMaintenance(1_000, 2_500);
+            projectedMonthlyMaintenance(14_000);
 
             assertEquals(Money.zero(), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
         }
@@ -250,7 +270,7 @@ class ChaosContractDeterminationPayTest {
         void maintenanceIsNotCoveredAlongsideUpkeep() {
             campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
             campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, true);
-            unitsWithWeeklyMaintenance(1_000);
+            projectedMonthlyMaintenance(4_000);
             when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.of(5_000_000));
 
             assertEquals(Money.of(5_000_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
@@ -260,7 +280,7 @@ class ChaosContractDeterminationPayTest {
         void upkeepOverheadAndFoodAndHousingAreAllCovered() {
             when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.of(5_000_000));
             when(accountant.getOverheadExpenses()).thenReturn(Money.of(30_000));
-            when(accountant.getMonthlyFoodAndHousingExpenses()).thenReturn(Money.of(12_000));
+            projectedMonthlyFoodAndHousing(12_000);
 
             assertEquals(Money.of(5_042_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
         }
@@ -270,13 +290,14 @@ class ChaosContractDeterminationPayTest {
             campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
             campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
             when(accountant.getPayRoll()).thenReturn(Money.of(100_000));
-            unitsWithWeeklyMaintenance(500);
+            projectedMonthlyMaintenance(2_000);
             when(accountant.getOverheadExpenses()).thenReturn(Money.of(5_000));
-            when(accountant.getMonthlyFoodAndHousingExpenses()).thenReturn(Money.of(3_000));
+            projectedMonthlyFoodAndHousing(3_000);
+            AbstractContract contract = contract(3, 1.0);
 
-            // 100,000 + 4 x 500 + 5,000 + 3,000
-            assertEquals(Money.of(110_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign));
-            assertEquals(Money.of(110_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+            // 100,000 + 2,000 + 5,000 + 3,000
+            assertEquals(Money.of(110_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign, contract));
+            assertEquals(Money.of(110_000), payScheme.getMonthlyPay(campaign, contract));
         }
 
         @ParameterizedTest
@@ -327,7 +348,7 @@ class ChaosContractDeterminationPayTest {
             when(accountant.getPayRoll()).thenReturn(Money.of(1_000_000));
         }
 
-        private void uncappedScaleOf(int uncappedScale, Runnable test) {
+        private void uncappedScaleOf(double uncappedScale, Runnable test) {
             try (MockedStatic<AbstractContractGeneration> mockedGeneration =
                        mockStatic(AbstractContractGeneration.class)) {
                 generation = mockedGeneration;
@@ -452,7 +473,7 @@ class ChaosContractDeterminationPayTest {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
             campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
-            // Scale 5 tapers to 2000, divided across 5 x the scenarios; Scale 7 tapers to 2500, / 7 (integer division)
+            // Scale 5 tapers to 2000, divided across 5 x the scenarios; Scale 7 tapers to 2500, / 7 (rounded)
             assertEquals(Money.of(400), payScheme.getCombatPay(campaign, contract(5, 1.0)));
             assertEquals(Money.of(357), payScheme.getCombatPay(campaign, contract(7, 1.0)));
         }
@@ -526,6 +547,85 @@ class ChaosContractDeterminationPayTest {
 
             assertEquals(1.0,
                   new CamOpsContractDeterminationPay().getSalvageTaperMultiplier(campaign, contract(10, 1.0)), DELTA);
+        }
+    }
+
+    /** The unofficial Fractional Scale option: pay follows the exact Scale rather than jumping a whole point. */
+    @Nested
+    class FractionalScale {
+        @Test
+        void withoutTheOptionPayRoundsScaleUp() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
+
+            // Scale 2.3 is paid as Scale 3
+            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void combatPayFollowsTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            assertEquals(Money.of(1_150), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void scaleBasedBasePayFollowsTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, true);
+
+            // 500 x 2.3 x 1.5
+            assertEquals(Money.of(1_725), payScheme.getMonthlyPay(campaign, contract(2.3, 1.5)));
+        }
+
+        @Test
+        void exactScaleNeverFallsBelowTheMinimum() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            // Paid as Scale 0.1
+            assertEquals(Money.of(50), payScheme.getCombatPay(campaign, contract(0.02, 1.0)));
+        }
+
+        @Test
+        void trackIntensityStillDividesByTheWholeScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
+
+            // Scale 2.3 rolls 3 times the tracks: 1150 / 3 (rounded)
+            assertEquals(Money.of(383), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+        }
+
+        @Test
+        void trackIntensityDivisionRoundsRatherThanTruncates() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
+
+            // Scale 2.5 rolls 3 times the tracks: 1250 / 3 = 416.67, paid as 417
+            assertEquals(Money.of(417), payScheme.getCombatPay(campaign, contract(2.5, 1.0)));
+        }
+
+        @Test
+        void taperUsesTheExactScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
+
+            // Scale 4.5 tapers to 3 + (1.5 x 0.5) = 3.75
+            assertEquals(Money.of(1_875), payScheme.getCombatPay(campaign, contract(4.5, 1.0)));
+            assertEquals(3.75 / 4.5, payScheme.getSalvageTaperMultiplier(campaign, contract(4.5, 1.0)), DELTA);
+        }
+
+        @Test
+        void jobShareUsesTheExactScales() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+
+            try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
+                generation.when(() -> AbstractContractGeneration.determineUncappedScale(any(), any(), any(), any()))
+                      .thenReturn(7.5);
+
+                // Without the option this would be 2 / 8
+                assertEquals(2.0 / 7.5, ChaosContractDeterminationPay.getJobShare(campaign, contract(2.0, 1.0)),
+                      DELTA);
+            }
         }
     }
 

@@ -48,7 +48,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
-import megamek.common.equipment.Mounted;
 import megamek.common.interfaces.ILocationExposureStatus;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
@@ -70,8 +69,8 @@ import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -399,10 +398,7 @@ public class MekLocation extends Part {
                 }
 
                 slot.setMissing(false);
-                Mounted<?> m = slot.getMount();
-                if (null != m) {
-                    m.setMissing(false);
-                }
+                SlotMounts.forEach(slot, mount -> mount.setMissing(false));
             }
         } else if ((unit != null) && isBreached()) {
             setBreached(false);
@@ -416,10 +412,7 @@ public class MekLocation extends Part {
                 }
 
                 slot.setBreached(false);
-                Mounted<?> m = slot.getMount();
-                if (null != m) {
-                    m.setBreached(false);
-                }
+                SlotMounts.forEach(slot, mount -> mount.setBreached(false));
             }
         } else {
             setPercent(1.0);
@@ -694,13 +687,12 @@ public class MekLocation extends Part {
                     slot.setHit(false);
                     slot.setRepairable(true);
                     slot.setMissing(false);
-                    Mounted<?> m = slot.getMount();
-                    if (m != null) {
-                        m.setHit(false);
-                        m.setDestroyed(false);
-                        m.setMissing(false);
-                        m.setRepairable(true);
-                    }
+                    SlotMounts.forEach(slot, mount -> {
+                        mount.setHit(false);
+                        mount.setDestroyed(false);
+                        mount.setMissing(false);
+                        mount.setRepairable(true);
+                    });
                 }
             }
         }
@@ -953,15 +945,11 @@ public class MekLocation extends Part {
               .append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
+            toReturn.append(getTimeLeftText());
             if (isBlownOff()) {
-                toReturn.append(" <b>TN:</b> ")
-                      .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                      .append(getAllMods(null).getValueAsString());
+                toReturn.append(' ').append(getTargetNumberText());
             }
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getWorkModeText());
         }
         toReturn.append("</html>");
         return toReturn.toString();

@@ -32,9 +32,11 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -43,8 +45,10 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.LocationNode;
@@ -55,7 +59,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.WorkTimeEstimate;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * An abstraction of all the pod-mounted equipment within a single location of an omni unit. Used to group them together
@@ -64,10 +72,12 @@ import mekhq.utilities.ReportingUtilities;
  * @author Neoancient
  */
 public class PodSpace implements IPartWork {
+    private static final MMLogger LOGGER = MMLogger.create(PodSpace.class);
+
     protected Campaign campaign;
     protected Unit unit;
     protected int location;
-    protected List<Integer> childPartIds = new ArrayList<>();
+    protected List<UUID> childPartIds = new ArrayList<>();
     private final LocationNode locationNode = new LocationNode(this);
 
     protected Person tech;
@@ -76,6 +86,9 @@ public class PodSpace implements IPartWork {
     protected int shorthandedMod = 0;
 
     protected boolean repairInPlace = false;
+
+    /** The tech a saved job named, until {@link #fixReferences(Campaign)} finds them in the loaded campaign. */
+    private UUID savedTechId;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public PodSpace() {
@@ -95,6 +108,15 @@ public class PodSpace implements IPartWork {
         }
     }
 
+    /**
+     * Finds one of the pod-mounted parts by its identity, wherever it is kept: with the unit, which may be at a base.
+     *
+     * @return the part, or {@code null} if it is no longer in the campaign
+     */
+    private @Nullable Part findChildPart(UUID childPartId) {
+        return campaign.getCampaignLocationManager().findPartAnywhere(campaign, childPartId);
+    }
+
     @Override
     public int getBaseTime() {
         return 30;
@@ -103,7 +125,7 @@ public class PodSpace implements IPartWork {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Part> getPartList() {
         return childPartIds.stream()
-                     .map(id -> getWarehouse().getPart(id))
+                     .map(this::findChildPart)
                      .filter(Objects::nonNull)
                      .collect(Collectors.toList());
     }
@@ -113,7 +135,7 @@ public class PodSpace implements IPartWork {
         childPartIds.clear();
         for (Part part : getUnit().getParts()) {
             if (part.isOmniPodded() && part.getLocation() == location) {
-                childPartIds.add(part.getId());
+                childPartIds.add(part.getUniqueId());
             }
         }
     }
@@ -123,12 +145,99 @@ public class PodSpace implements IPartWork {
         //nothing to do here
     }
 
+    /**
+     * @return {@code true} if this pod space holds anything a save has to keep: a tech on the job, time already spent
+     *       on it, or the repair-in-place choice made for it
+     */
+    public boolean hasWorkInProgress() {
+        return (tech != null) || (timeSpent > 0) || repairInPlace;
+    }
+
+    /**
+     * Takes over the job from an earlier copy of this pod space. A unit's pod spaces are built again whenever its parts
+     * are, which includes every load, so the job in progress is handed from the old copy to the new one.
+     *
+     * @param earlier the pod space for the same location before the rebuild, or a job read from a save
+     */
+    public void continueWorkFrom(PodSpace earlier) {
+        tech = earlier.tech;
+        timeSpent = earlier.timeSpent;
+        workingOvertime = earlier.workingOvertime;
+        shorthandedMod = earlier.shorthandedMod;
+        repairInPlace = earlier.repairInPlace;
+    }
+
+    /**
+     * Saves the job in progress on this pod space. Only called for a pod space that {@link #hasWorkInProgress()}.
+     */
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "podSpace");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "location", location);
+        if (tech != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "workingOvertime", workingOvertime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "repairInPlace", repairInPlace);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "podSpace");
+    }
+
+    /**
+     * Reads a saved job. The result only carries the job: the unit's real pod spaces are built when its parts are
+     * initialized, and take the job over with {@link #continueWorkFrom(PodSpace)}.
+     *
+     * @return the saved job, or {@code null} if it could not be read, in which case the unit loads without it
+     */
+    public static @Nullable PodSpace generateInstanceFromXML(Node podSpaceNode, Unit unit) {
+        PodSpace savedJob = new PodSpace(Entity.LOC_NONE, null);
+        savedJob.unit = unit;
+        NodeList childNodes = podSpaceNode.getChildNodes();
+        try {
+            for (int index = 0; index < childNodes.getLength(); index++) {
+                Node childNode = childNodes.item(index);
+                String value = childNode.getTextContent().trim();
+                switch (childNode.getNodeName()) {
+                    case "location" -> savedJob.location = Integer.parseInt(value);
+                    case "techId" -> savedJob.savedTechId = UUID.fromString(value);
+                    case "timeSpent" -> savedJob.timeSpent = Integer.parseInt(value);
+                    case "workingOvertime" -> savedJob.workingOvertime = Boolean.parseBoolean(value);
+                    case "shorthandedMod" -> savedJob.shorthandedMod = Integer.parseInt(value);
+                    case "repairInPlace" -> savedJob.repairInPlace = Boolean.parseBoolean(value);
+                    default -> {
+                        // whitespace between the tags
+                    }
+                }
+            }
+        } catch (IllegalArgumentException exception) {
+            LOGGER.error(exception, "[PodSpace] A saved pod job on {} could not be read and was dropped",
+                  unit.getName());
+            return null;
+        }
+        return savedJob;
+    }
+
+    /**
+     * Finds the tech a saved job named among the loaded personnel.
+     */
+    public void fixReferences(Campaign campaign) {
+        if (savedTechId == null) {
+            return;
+        }
+        tech = campaign.getPlayerForce().getHumanResources().getPerson(savedTechId);
+        if (tech == null) {
+            LOGGER.error("[PodSpace] The pod job at location {} on {} names missing tech {}", location,
+                  unit.getName(), savedTechId);
+        }
+        savedTechId = null;
+    }
+
     @Override
     public void remove(boolean salvage) {
         shorthandedMod = 0;
         //Iterate through all pod-mounted equipment in space and remove them.
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             // Don't remove missing parts! We'll need to fix them.
             if (part != null && !(part instanceof MissingPart)) {
                 part.remove(salvage);
@@ -141,8 +250,8 @@ public class PodSpace implements IPartWork {
     @Override
     public void fix() {
         shorthandedMod = 0;
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             if (part != null &&
                       !(part instanceof MissingPart) &&
                       !(part instanceof AmmoBin) &&
@@ -153,8 +262,8 @@ public class PodSpace implements IPartWork {
             }
         }
         updateConditionFromEntity(false);
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             if (part instanceof MissingPart) {
                 part.fix();
                 MekHQ.triggerEvent(new PartChangedEvent(part));
@@ -171,9 +280,9 @@ public class PodSpace implements IPartWork {
     @Override
     public @Nullable String checkFixable() {
         if ((isSalvaging() && !childPartIds.isEmpty()) || location < 0) {
-            for (int partId : childPartIds) {
+            for (UUID partId : childPartIds) {
                 // If all remaining parts are already missing, we don't need to keep salvaging
-                if (!(getWarehouse().getPart(partId) instanceof MissingPart)) {
+                if (!(findChildPart(partId) instanceof MissingPart)) {
                     return null;
                 }
             }
@@ -189,8 +298,8 @@ public class PodSpace implements IPartWork {
             }
             if (repairInPlace) {
                 boolean hasMissingPart = false;
-                for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
+                for (UUID id : childPartIds) {
+                    final Part p = findChildPart(id);
                     if (p instanceof MissingPart missing) {
                         hasMissingPart = true;
                         // Only fixable if a replacement is actually in stock. This check prevents an infinite loop
@@ -207,8 +316,8 @@ public class PodSpace implements IPartWork {
                 }
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
-                for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
+                for (UUID id : childPartIds) {
+                    final Part p = findChildPart(id);
                     if (p == null || !p.needsFixing()) {
                         continue;
                     }
@@ -233,7 +342,7 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean needsFixing() {
         return childPartIds.stream()
-                     .map(id -> getWarehouse().getPart(id))
+                     .map(this::findChildPart)
                      .filter(Objects::nonNull)
                      .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
     }
@@ -294,8 +403,8 @@ public class PodSpace implements IPartWork {
         timeSpent = 0;
         shorthandedMod = 0;
         boolean replacing = false;
-        for (int id : childPartIds) {
-            final Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part part = findChildPart(id);
             if (part != null && (isSalvaging() || (!(part instanceof AmmoBin) && part.needsFixing()))) {
                 part.fail(rating);
                 replacing |= part instanceof MissingPart;
@@ -322,14 +431,30 @@ public class PodSpace implements IPartWork {
         return (unit != null) ? unit.getLocationNode() : locationNode;
     }
 
+    /**
+     * Pod work draws on the stock kept with the unit, which is a base's for a unit at a base.
+     */
     @Override
-    public mekhq.campaign.LocalWarehouse getWarehouse() {
-        return campaign.getPlayerForce().getWarehouse();
+    public LocalWarehouse getWarehouse() {
+        LocalWarehouse unitWarehouse = (unit == null) ? null : unit.getWarehouse();
+        return (unitWarehouse != null) ? unitWarehouse : campaign.getPlayerForce().getWarehouse();
     }
 
     @Override
     public boolean isBeingWorkedOn() {
         return getTech() != null;
+    }
+
+    /**
+     * When the job ends, finished or abandoned, the repair-in-place choice made for it goes too, so the next job on
+     * this pod space starts from the usual swap. A job put on hold keeps it.
+     */
+    @Override
+    public void cancelAssignment(boolean resetTime) {
+        IPartWork.super.cancelAssignment(resetTime);
+        if (resetTime) {
+            repairInPlace = false;
+        }
     }
 
     @Override
@@ -340,8 +465,8 @@ public class PodSpace implements IPartWork {
     @Override
     public int getSkillMin() {
         int minSkill = SkillType.EXP_GREEN;
-        for (int id : childPartIds) {
-            final Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part part = findChildPart(id);
             if (part != null) {
                 if ((isSalvaging() && !(part instanceof MissingPart)) ||
                           (!isSalvaging() && (part instanceof MissingPart) ||
@@ -432,12 +557,9 @@ public class PodSpace implements IPartWork {
               .append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(getTech() != null ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
+            toReturn.append(WorkTimeEstimate.describeTimeLeft(campaign, this))
+                  .append(' ')
+                  .append(Part.formatTargetNumberText(getAllMods(null)));
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -454,8 +576,8 @@ public class PodSpace implements IPartWork {
         int replacements = 0;
         int inTransit = 0;
         int onOrder = 0;
-        for (int id : childPartIds) {
-            Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            Part part = findChildPart(id);
             if (part != null) {
                 if (!isSalvaging() && !(part instanceof AmmoBin) && part.needsFixing()) {
                     allParts++;
@@ -512,6 +634,13 @@ public class PodSpace implements IPartWork {
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean shouldRepairInPlace() {
+        return isRepairInPlace();
+    }
+
+    /**
+     * @return {@code true} if damaged pod equipment is repaired where it is, {@code false} if it is swapped for a spare
+     */
+    public boolean isRepairInPlace() {
         return repairInPlace;
     }
 
@@ -520,8 +649,8 @@ public class PodSpace implements IPartWork {
     }
 
     public boolean hasSalvageableParts() {
-        for (int id : childPartIds) {
-            final Part p = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part p = findChildPart(id);
             if (p != null && p.isSalvaging()) {
                 return true;
             }
@@ -529,18 +658,26 @@ public class PodSpace implements IPartWork {
         return false;
     }
 
+    /**
+     * Holds a spare for each piece of missing pod equipment, in the name of the tech on this job, so the spare is still
+     * there when the job carries over to the next day.
+     */
     @Override
     public void reservePart() {
-        childPartIds.stream()
-              .map(id -> getWarehouse().getPart(id))
-              .filter(Objects::nonNull)
-              .forEach(Part::reservePart);
+        if (tech == null) {
+            return;
+        }
+        for (UUID childPartId : childPartIds) {
+            if (findChildPart(childPartId) instanceof MissingPart missingPart) {
+                missingPart.reserveReplacementFor(tech);
+            }
+        }
     }
 
     @Override
     public void cancelReservation() {
         childPartIds.stream()
-              .map(id -> getWarehouse().getPart(id))
+              .map(this::findChildPart)
               .filter(Objects::nonNull)
               .forEach(Part::cancelReservation);
     }

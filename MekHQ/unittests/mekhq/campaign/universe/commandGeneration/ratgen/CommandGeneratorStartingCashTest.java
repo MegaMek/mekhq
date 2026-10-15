@@ -32,7 +32,14 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Set;
@@ -49,6 +56,7 @@ import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -86,6 +94,113 @@ class CommandGeneratorStartingCashTest {
         Set<UUID> rolled = CommandGenerator.snapshotHangarUnitIds(campaign);
         rolled.removeAll(preExisting);
         return rolled;
+    }
+
+    /**
+     * @param campaign a spied campaign that {@link CommandGenerator#processStartingCash} has run against
+     *
+     * @return the last report the starting-cash stage posted to the Finances log
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static String lastFinancesReport(Campaign campaign) {
+        ArgumentCaptor<String> reportCaptor = ArgumentCaptor.forClass(String.class);
+        verify(campaign, atLeastOnce()).addReport(eq(FINANCES), reportCaptor.capture());
+        return reportCaptor.getValue();
+    }
+
+    /**
+     * A dice-rolled starting cash must not be reported as a percentage of unit value (#10475).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void randomizedStartingCash_reportsTheDiceRolledNotAPercentage() {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+
+        CommandGenerationOptions options = optionsWithPercent(10);
+        options.setRandomizeStartingCash(true);
+        options.setRandomStartingCashDiceCount(18);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting),
+              List.of(), CommandGenerator.SpareCosts.zero());
+
+        String report = lastFinancesReport(campaign);
+        assertTrue(report.contains("18d6 million C-bills"), "the report names the dice rolled: " + report);
+        assertFalse(report.contains("%"), "the report does not mention the unused percentage: " + report);
+    }
+
+    /**
+     * The percentage report keeps its apostrophe through MessageFormat.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void percentageStartingCash_reportsThePercentageOfUnitValue() {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+
+        CommandGenerator.processStartingCash(campaign, optionsWithPercent(10), preExisting,
+              rolledSince(campaign, preExisting), List.of(), CommandGenerator.SpareCosts.zero());
+
+        String report = lastFinancesReport(campaign);
+        assertTrue(report.contains("(10% of its units' value)"), "the report names the percentage: " + report);
+        assertFalse(report.contains("setup costs"), "nothing was deducted, so none is reported: " + report);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void payForSetupWithCoveringBase_reportsTheDeductedCosts() {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+
+        CommandGenerationOptions options = optionsWithPercent(200);
+        options.setPayForSetup(true);
+        options.setPayForPersonnel(false);
+        options.setPayForUnits(true);
+        options.setPayForParts(false);
+        options.setPayForArmour(false);
+        options.setPayForAmmunition(false);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting),
+              List.of(), CommandGenerator.SpareCosts.zero());
+
+        String report = lastFinancesReport(campaign);
+        assertTrue(report.contains("200% of its units' value"), "the report names the base: " + report);
+        assertTrue(report.contains("less " + generated.getBuyCost().toAmountAndSymbolString() + " in setup costs"),
+              "the report names the setup costs deducted from the base: " + report);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void baseBelowMinimumFloat_reportsTheMinimumFloat() {
+        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
+        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
+        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Money balanceBefore = balance(campaign);
+
+        // A 0% base is below the float, so the float is what the command starts with.
+        CommandGenerationOptions options = optionsWithPercent(0);
+        options.setMinimumStartingFloat(1_000_000);
+        CommandGenerator.processStartingCash(campaign, options, preExisting, rolledSince(campaign, preExisting),
+              List.of(), CommandGenerator.SpareCosts.zero());
+
+        assertEquals(Money.of(1_000_000), balance(campaign).minus(balanceBefore),
+              "cash floors at the minimum float");
+        String report = lastFinancesReport(campaign);
+        assertTrue(report.contains("minimum starting float"), "the report says the float was used: " + report);
+        assertFalse(report.contains("%"), "the report does not claim a percentage was granted: " + report);
     }
 
     @Test

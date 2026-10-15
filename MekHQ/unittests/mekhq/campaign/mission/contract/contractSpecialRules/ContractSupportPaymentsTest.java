@@ -148,7 +148,7 @@ class ContractSupportPaymentsTest {
 
         String expectedNote = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.straightSupport.note", "Repairs");
         verify(finances).credit(TransactionType.CONTRACT_PAYMENT, DATE, Money.of(500), expectedNote);
-        // Straight support is credited silently: it fires on every repair/maintenance charge.
+        // Straight support is credited silently: it fires on every repair charge.
         verify(campaign, never()).addReport(any(), anyString());
     }
 

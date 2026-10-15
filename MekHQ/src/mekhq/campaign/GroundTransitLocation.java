@@ -131,7 +131,7 @@ public class GroundTransitLocation extends AbstractMobileLocation {
             } else if (child instanceof Unit unit) {
                 MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "unitId", unit.getId().toString());
             } else if (child instanceof Part part) {
-                MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "partId", String.valueOf(part.getId()));
+                MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "partUniqueId", part.getUniqueId().toString());
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "groundTransitLocation");
@@ -166,6 +166,8 @@ public class GroundTransitLocation extends AbstractMobileLocation {
                     returnValue.pendingPersonIds.add(UUID.fromString(workingNode2.getTextContent().trim()));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("unitId")) {
                     returnValue.pendingUnitIds.add(UUID.fromString(workingNode2.getTextContent().trim()));
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("partUniqueId")) {
+                    returnValue.pendingPartUniqueIds.add(UUID.fromString(workingNode2.getTextContent().trim()));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("partId")) {
                     returnValue.pendingPartIds.add(Integer.parseInt(workingNode2.getTextContent().trim()));
                 }

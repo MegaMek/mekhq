@@ -256,16 +256,40 @@ class RepairEngineCharacterizationTest {
     }
 
     @Test
-    void payForRepairsWithAnEmptyAccountRepairsForFree() {
+    void payForRepairsReportsTheCostThatWasPaid() {
+        campaign.getCampaignOptions().set(CampaignOption.PAY_FOR_REPAIRS, true);
+        campaign.getPlayerForce().getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
+              Money.of(100_000), "test funds");
+        EquipmentPart laser = damagedMediumLaser();
+
+        String report = fixWithEveryDieShowing(laser, 3);
+
+        assertEquals(0, laser.getHits());
+        assertTrue(report.contains("Repairs cost " + Money.of(4_000).toAmountAndSymbolString()), report);
+    }
+
+    @Test
+    void payForRepairsWithAnEmptyAccountDoesNotRepairTheUnit() {
         campaign.getCampaignOptions().set(CampaignOption.PAY_FOR_REPAIRS, true);
         EquipmentPart laser = damagedMediumLaser();
 
         String report = fixWithEveryDieShowing(laser, 3);
 
-        // Current behaviour: the refused debit is ignored, so the part is fixed and the report still quotes a cost
-        assertEquals(0, laser.getHits());
-        assertTrue(report.contains("Repairs cost"), report);
+        assertEquals(1, laser.getHits());
+        assertFalse(report.contains("Repairs cost"), report);
+        assertTrue(campaign.getTargetFor(laser, tech).getDesc().startsWith("Cannot afford"));
         assertEquals(Money.of(0), campaign.getPlayerForce().getFinances().getBalance());
+        assertEquals(FULL_SHIFT_MINUTES, tech.getMinutesLeft());
+    }
+
+    @Test
+    void withoutPayForRepairsAnEmptyAccountDoesNotStopARepair() {
+        campaign.getCampaignOptions().set(CampaignOption.PAY_FOR_REPAIRS, false);
+        EquipmentPart laser = damagedMediumLaser();
+
+        fixWithEveryDieShowing(laser, 3);
+
+        assertEquals(0, laser.getHits());
     }
 
     @Test

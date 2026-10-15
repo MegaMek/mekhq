@@ -234,6 +234,17 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
         spent = false;
     }
 
+    /**
+     * A reload succeeds automatically, so only a removal while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
+    }
+
     @Override
     public @Nullable String checkFixable() {
         WeaponMounted mount = findDisposableMount();

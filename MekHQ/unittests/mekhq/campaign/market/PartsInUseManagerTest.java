@@ -51,6 +51,7 @@ import java.util.stream.Stream;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -71,12 +72,18 @@ import mekhq.campaign.parts.meks.MekCockpit;
 import mekhq.campaign.parts.meks.MekGyro;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import testUtilities.MHQTestUtilities;
@@ -841,6 +848,51 @@ class PartsInUseManagerTest {
 
                 // Only one of these should be the desired stock percent
                 assertEquals(1, afterChangeAllPercents.stream().filter(i -> i == DESIRED_STOCK_LEVEL).toArray().length);
+            }
+
+            /**
+             * @return each ProtoMek part paired with the campaign option that should set its default stock percent
+             *
+             * @author Illiani
+             * @since 0.51.01
+             */
+            public static Stream<Arguments> protoMekDefaultStockPercentParts() {
+                return Stream.of(
+                      Arguments.of(new ProtoMekLocation(ProtoMek.LOC_HEAD, 5, 0, false, false, null),
+                            CampaignOption.AUTO_LOGISTICS_MEK_HEAD),
+                      Arguments.of(new ProtoMekLocation(ProtoMek.LOC_TORSO, 5, 0, false, false, null),
+                            CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION),
+                      Arguments.of(new ProtoMekLocation(ProtoMek.LOC_LEFT_ARM, 5, 0, false, false, null),
+                            CampaignOption.AUTO_LOGISTICS_MEK_LOCATION),
+                      Arguments.of(new ProtoMekLocation(ProtoMek.LOC_LEG, 5, 0, false, false, null),
+                            CampaignOption.AUTO_LOGISTICS_MEK_LOCATION),
+                      Arguments.of(new ProtoMekLocation(ProtoMek.LOC_MAIN_GUN, 5, 0, false, false, null),
+                            CampaignOption.AUTO_LOGISTICS_MEK_LOCATION),
+                      Arguments.of(new ProtoMekArmActuator(5, ProtoMek.LOC_LEFT_ARM, null),
+                            CampaignOption.AUTO_LOGISTICS_ACTUATORS),
+                      Arguments.of(new ProtoMekLegActuator(5, null), CampaignOption.AUTO_LOGISTICS_ACTUATORS),
+                      Arguments.of(new ProtoMekJumpJet(5, null), CampaignOption.AUTO_LOGISTICS_JUMP_JETS),
+                      Arguments.of(new ProtoMekSensor(5, null), CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS));
+            }
+
+            @ParameterizedTest
+            @MethodSource(value = "protoMekDefaultStockPercentParts")
+            public void testGetDefaultStockPercentProtoMekParts(Part protoMekPart, CampaignOption expectedOption) {
+                // Act
+                try {
+                    initialStockPercent = (int) method.invoke(partsInUseManager, protoMekPart);
+
+                    // Let's change it and make sure that it uses the new value
+                    when(mockCampaignOptions.get(expectedOption)).thenReturn(DESIRED_STOCK_LEVEL);
+
+                    desiredStockPercent = (int) method.invoke(partsInUseManager, protoMekPart);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Assert
+                assertEquals(INCORRECT_STOCK_LEVEL, initialStockPercent);
+                assertEquals(DESIRED_STOCK_LEVEL, desiredStockPercent);
             }
 
             private List<Integer> getAllDefaultStockPercents() {

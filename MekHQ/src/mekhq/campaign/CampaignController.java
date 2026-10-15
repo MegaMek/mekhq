@@ -39,6 +39,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
+import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.campaignOptions.optionChangeDialogs.SupportTeamsCampaignOptionsChangedConfirmationDialog;
 
 /**
@@ -73,6 +74,8 @@ public class CampaignController {
         // here, after loading. One idempotent pass catches up anyone the events would have placed, and marks carriers
         // in campaigns saved before carriers were tracked.
         SupportCarrierReconciler.reconcileAll(localCampaign);
+        // Support formations granted before grants drew icons were filed blank; draw them, support teams or not.
+        SupportUnitGenerator.decorateGrantedSupportFormations(localCampaign);
 
         // A campaign that predates support teams has its staff on the roster and no Support Command, so the sweep
         // above found nothing to manage. Offer to organize them, once: declining switches the option off, which is

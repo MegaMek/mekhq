@@ -180,6 +180,34 @@ public abstract class AbstractLocation implements IPlace {
         this.currentPlanet = currentPlanet;
     }
 
+    /**
+     * Rebinds planetary references after campaign overrides change, without moving this location or changing its
+     * travel progress. A world removed by an override falls back to the primary world, as it does on campaign load.
+     */
+    void refreshPlanetarySystems(Campaign campaign) {
+        if (currentSystem != null) {
+            PlanetarySystem updatedSystem = campaign.getSystemById(currentSystem.getId());
+            if (updatedSystem == null) {
+                logger.warn("Couldn't refresh system {}; retaining the location's existing system.",
+                      currentSystem.getId());
+            } else {
+                currentSystem = updatedSystem;
+                if (currentPlanet != null) {
+                    String planetId = currentPlanet.getId();
+                    currentPlanet = currentSystem.getPlanetById(planetId);
+                    if (currentPlanet == null) {
+                        logger.warn("Couldn't find world {} in system {}; falling back to the primary world.",
+                              planetId, currentSystem.getId());
+                    }
+                }
+            }
+        }
+        JumpPath jumpPath = getJumpPath();
+        if (jumpPath != null) {
+            jumpPath.refreshPlanetarySystems(campaign);
+        }
+    }
+
     @Override
     @Nullable
     public @Nonnull LocationNode getLocationNode() {

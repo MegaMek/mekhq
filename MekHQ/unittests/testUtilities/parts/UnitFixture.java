@@ -82,6 +82,8 @@ public enum UnitFixture {
     LOCUST_LCT_5V("Locust LCT-5V", false, Mek.class),
     /** Wolverine WVR-6R, a medium Mek. Source: {@code meks/3039u/Wolverine WVR-6R.mtf}. */
     WOLVERINE_WVR_6R("Wolverine WVR-6R", false, Mek.class),
+    /** Longbow LGB-8C, a heavy fire support Mek. Source: {@code meks/Rec Guides ilClan/Vol 20/Longbow LGB-8C.mtf}. */
+    LONGBOW_LGB_8C("Longbow LGB-8C", false, Mek.class),
     /** Wolverine WVR-6M, the refit target of the WVR-6R. Source: {@code meks/3039u/Wolverine WVR-6M.mtf}. */
     WOLVERINE_WVR_6M("Wolverine WVR-6M", false, Mek.class),
     /** Hunchback HBK-4G, a medium Mek. Source: {@code meks/3039u/Hunchback HBK-4G.mtf}. */
@@ -172,6 +174,11 @@ public enum UnitFixture {
     FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", true, Infantry.class),
     /** The same DCMS foot platoon armed with machine guns. Source: {@code infantry/Foot Platoon (DCMS) (MG 2620+).blk}. */
     FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", true, Infantry.class),
+    /**
+     * A motorized platoon towing three AC/5 field guns, each with its own ammunition. Source:
+     * {@code infantry/AFFS/Field Gun Platoon (AFFS) (Motorized AC5 3067+).blk}.
+     */
+    FIELD_GUN_PLATOON_AC5("Field Gun Platoon (AFFS) (Motorized AC5 3067+)", true, Infantry.class),
     /** Minotaur, a ProtoMek. Source: {@code protomeks/3060/Minotaur.blk}. */
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
@@ -194,6 +201,11 @@ public enum UnitFixture {
      * {@code fighters/TRO3055U/Batu D.blk}.
      */
     BATU_D("Batu D", true, AeroSpaceFighter.class),
+    /**
+     * Turk A, a Clan OmniFighter whose pod-mounted ammunition sits in the fuselage. Source:
+     * {@code fighters/TRO3055U/Turk A.blk}.
+     */
+    TURK_A("Turk A", true, AeroSpaceFighter.class),
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
@@ -213,6 +225,16 @@ public enum UnitFixture {
      * {@code dropships/XTRs/Pirates/Leopard PA.blk}.
      */
     LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
+    /**
+     * Union (3055), a DropShip with Artemis LRM-20 ammunition in its nose and both side arcs. Source:
+     * {@code dropships/TRO3057R/IS/Union (3055).blk}.
+     */
+    UNION_3055_DROPSHIP("Union (3055)", true, Dropship.class),
+    /**
+     * Union (2708b), which carries the same Artemis LRM-20 ammunition in its nose and aft arcs instead. Source:
+     * {@code dropships/TRO3057R/IS/Union (2708b).blk}.
+     */
+    UNION_2708B_DROPSHIP("Union (2708b)", true, Dropship.class),
     /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.

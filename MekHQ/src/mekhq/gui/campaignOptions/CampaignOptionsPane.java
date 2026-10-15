@@ -861,7 +861,7 @@ public class CampaignOptionsPane extends JPanel {
         // Human Resources
         if (personnelPages != null) {
             personnelPages.applyCampaignOptionsToCampaign(campaign, options);
-            biographyPages.applyCampaignOptionsToCampaign(options);
+            biographyPages.applyCampaignOptionsToCampaign(options, isSaveAction);
             relationshipsPages.applyCampaignOptionsToCampaign(options);
             salariesPages.applyCampaignOptionsToCampaign(options);
             turnoverAndRetentionPages.applyCampaignOptionsToCampaign(options);
@@ -884,7 +884,7 @@ public class CampaignOptionsPane extends JPanel {
         // Operations
         if (financesPages != null) {
             financesPages.applyCampaignOptionsToCampaign(options);
-            marketsPages.applyCampaignOptionsToCampaign(options);
+            marketsPages.applyCampaignOptionsToCampaign(options, isSaveAction);
             rulesetsPages.applyCampaignOptionsToCampaign(options);
             systemsPages.applyCampaignOptionsToCampaign(options);
         }

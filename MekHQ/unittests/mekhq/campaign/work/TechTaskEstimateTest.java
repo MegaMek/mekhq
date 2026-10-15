@@ -41,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.meks.MekActuator;
 import mekhq.campaign.personnel.Person;
@@ -148,5 +150,27 @@ class TechTaskEstimateTest {
         TechTaskEstimate.estimate(campaign, laser, tech);
 
         assertNull(laser.getTech());
+    }
+    @Test
+    void aRefitIsEstimatedWithoutOvertimeBecauseRefitsNeverUseIt() throws Exception {
+        PartsScenario refitScenario = PartsScenario.create();
+        Campaign refitCampaign = refitScenario.getCampaign();
+        refitCampaign.setOvertime(true);
+        Unit wolverine = refitScenario.withUnit(UnitFixture.WOLVERINE_WVR_6M);
+        Person refitTech = refitScenario.withTech(EXP_REGULAR);
+        Refit refit = new Refit(wolverine, UnitFixture.WOLVERINE_WVR_6R.loadEntity(), false, false, false);
+        boolean techsUseAdministration = refitCampaign.getCampaignOptions()
+                                               .get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        int minutesPerDay = refitTech.getDailyAvailableTechTime(techsUseAdministration);
+        // Leave 100 minutes past a whole number of days after today: overtime (240 minutes) would cover them
+        int minutesToday = (refit.getTimeLeft() - 100) % minutesPerDay;
+        assertTrue(minutesToday > 0, "The refit runs past today");
+        refitTech.setMinutesLeft(minutesToday);
+        int fullDaysAfterToday = (refit.getTimeLeft() - minutesToday) / minutesPerDay;
+
+        TechTaskEstimate estimate = TechTaskEstimate.estimate(refitCampaign, refit, refitTech);
+
+        assertEquals(fullDaysAfterToday + 1, estimate.daysToFinish(),
+              "The last 100 minutes need another day; counting overtime would have hidden it");
     }
 }

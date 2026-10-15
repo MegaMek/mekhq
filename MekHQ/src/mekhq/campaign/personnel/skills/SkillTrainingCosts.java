@@ -25,14 +25,18 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
@@ -42,12 +46,15 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  *
  * <p>Hot Spots skill levels are mapped onto experience levels: Regular = 4, Veteran = 3, Elite = 2, Heroic = 1,
  * Legendary = 0. An improvement is only charged when it raises the skill into a new, priced experience level; Green and
- * Ultra-Green cost nothing.</p>
+ * Ultra-Green cost nothing. Profession, Utility, and Roleplay skill costs are each scaled by their own campaign option
+ * (see {@link SkillTrainingCategory}).</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
 public final class SkillTrainingCosts {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillTrainingCosts";
+
     private SkillTrainingCosts() {
     }
 
@@ -104,7 +111,8 @@ public final class SkillTrainingCosts {
      */
     public static Money getSkillImprovementCost(Campaign campaign, Person person, String skillName,
           boolean isRoleSkill, SkillModifierData skillModifierData) {
-        if (!campaign.getCampaignOptions().get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
             return Money.zero();
         }
 
@@ -123,55 +131,122 @@ public final class SkillTrainingCosts {
             return Money.zero();
         }
 
-        boolean isProfessionSkill = isRoleSkill || skillType.isUtilitySkill() || skillType.isRoleplaySkill();
-        int[] costTable = isProfessionSkill
-                                ? PROFESSION_COSTS_IN_SUPPORT_POINTS
-                                : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
+        SkillTrainingCategory category = SkillTrainingCategory.getCategory(isRoleSkill, skillType);
+        int[] costTable = getCostTable(category);
         int cappedExperienceLevel = Math.min(nextExperienceLevel, EXP_LEGENDARY);
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(costTable[cappedExperienceLevel]);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(costTable[cappedExperienceLevel])
+                     .multipliedBy(category.getTrainingCostMultiplier(campaignOptions));
     }
 
     /**
-     * Gets the combined C-bill cost of every priced experience level a person's skills have reached, as though each
-     * skill had been trained up from scratch. Used to price recruits. Roleplay skills are left out; profession and
-     * utility skills use the profession table. Unlike {@link #getSkillImprovementCost(Campaign, Person, String)},
-     * this doesn't check {@link CampaignOption#SKILL_IMPROVEMENTS_COST_C_BILLS}; the caller decides whether it applies.
+     * Charges the C-bill cost of improving a person's skill by one level, if skill improvement costs are enabled. Call
+     * this before improving the skill, as the cost depends on the skill's current level.
      *
-     * @param campaign the campaign, for the profession skill and skill modifier options
-     * @param person   the person whose skills are priced
+     * @param campaign  the campaign whose funds pay for the training
+     * @param person    the person improving the skill
+     * @param skillName the name of the skill being improved (or gained)
      *
-     * @return the combined cost of the person's skill levels
+     * @return {@code true} if the improvement was free or has been paid for, or {@code false} if the force couldn't
+     *       afford it, in which case nothing is charged
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money getAccumulatedSkillTrainingCost(Campaign campaign, Person person) {
+    public static boolean payForSkillImprovement(Campaign campaign, Person person, String skillName) {
+        return payForSkillImprovement(campaign, person, skillName,
+              getSkillImprovementCost(campaign, person, skillName));
+    }
+
+    /**
+     * As {@link #payForSkillImprovement(Campaign, Person, String)}, for callers that have already priced the
+     * improvement.
+     *
+     * @param campaign     the campaign whose funds pay for the training
+     * @param person       the person improving the skill
+     * @param skillName    the name of the skill being improved (or gained)
+     * @param trainingCost the cost of the improvement, from {@link #getSkillImprovementCost(Campaign, Person, String)}
+     *
+     * @return {@code true} if the improvement was free or has been paid for, or {@code false} if the force couldn't
+     *       afford it, in which case nothing is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean payForSkillImprovement(Campaign campaign, Person person, String skillName,
+          Money trainingCost) {
+        if (trainingCost.isZero()) {
+            return true;
+        }
+
+        return campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
+              campaign.getLocalDate(),
+              trainingCost,
+              getFormattedTextAt(RESOURCE_BUNDLE, "skillTraining.transaction", person.getFullTitle(), skillName));
+    }
+
+    /**
+     * Gets the combined C-bill cost of every priced experience level a person's skills have reached, as though each
+     * skill had been trained up from scratch, split by {@link SkillTrainingCategory}. Used to price recruits, so the
+     * improvement cost multipliers are not applied; the caller applies the recruitment multiplier of each category.
+     * Unlike {@link #getSkillImprovementCost(Campaign, Person, String)}, this doesn't check
+     * {@link CampaignOption#SKILL_IMPROVEMENTS_COST_C_BILLS}; the caller decides whether it applies.
+     *
+     * @param campaign the campaign, for the profession skill and skill modifier options
+     * @param person   the person whose skills are priced
+     *
+     * @return the combined cost of the person's skill levels in each category; every category is present
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Map<SkillTrainingCategory, Money> getAccumulatedSkillTrainingCosts(Campaign campaign,
+          Person person) {
         SkillModifierData skillModifierData = getSkillModifierData(campaign, person);
         List<String> roleSkills = getRoleSkills(campaign, person.getPrimaryRole());
         roleSkills.addAll(getRoleSkills(campaign, person.getSecondaryRole()));
 
-        long totalSupportPoints = 0;
+        Map<SkillTrainingCategory, Long> supportPointsByCategory = new EnumMap<>(SkillTrainingCategory.class);
+        for (SkillTrainingCategory category : SkillTrainingCategory.values()) {
+            supportPointsByCategory.put(category, 0L);
+        }
+
         for (String skillName : person.getSkills().getSkillNames()) {
             SkillType skillType = SkillType.getType(skillName);
             Skill skill = person.getSkill(skillName);
-            if (skillType == null || skill == null || skillType.isRoleplaySkill()) {
+            if (skillType == null || skill == null) {
                 continue;
             }
 
-            boolean isProfessionSkill = roleSkills.contains(skillName) || skillType.isUtilitySkill();
-            int[] costTable = isProfessionSkill
-                                    ? PROFESSION_COSTS_IN_SUPPORT_POINTS
-                                    : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
+            SkillTrainingCategory category = SkillTrainingCategory.getCategory(roleSkills.contains(skillName),
+                  skillType);
+            int[] costTable = getCostTable(category);
             int experienceLevel = Math.min(
                   skillType.getExperienceLevel(skill.getTotalSkillLevel(skillModifierData)), EXP_LEGENDARY);
+            long skillSupportPoints = 0;
             for (int level = EXP_REGULAR; level <= experienceLevel; level++) {
-                totalSupportPoints += costTable[level];
+                skillSupportPoints += costTable[level];
             }
+            supportPointsByCategory.put(category, supportPointsByCategory.get(category) + skillSupportPoints);
         }
 
-        // Converted here, as a long, rather than through ChaosCampaignUtilities, whose int maths could overflow
-        return Money.of((double) totalSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
+        Map<SkillTrainingCategory, Money> costsByCategory = new EnumMap<>(SkillTrainingCategory.class);
+        for (Map.Entry<SkillTrainingCategory, Long> entry : supportPointsByCategory.entrySet()) {
+            // Converted here, as a long, rather than through ChaosCampaignUtilities, whose int maths could overflow
+            costsByCategory.put(entry.getKey(),
+                  Money.of((double) entry.getValue() * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION));
+        }
+        return costsByCategory;
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int[] getCostTable(SkillTrainingCategory category) {
+        return category.isUsingProfessionCostTable()
+                     ? PROFESSION_COSTS_IN_SUPPORT_POINTS
+                     : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
     }
 
     /**

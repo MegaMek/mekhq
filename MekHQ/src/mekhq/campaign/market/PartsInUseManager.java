@@ -50,6 +50,7 @@ import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.units.Entity;
 import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
@@ -76,6 +77,11 @@ import mekhq.campaign.parts.meks.MekLifeSupport;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.parts.protomeks.ProtoMekArmActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
+import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
@@ -249,6 +255,16 @@ public class PartsInUseManager {
             }
 
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
+        } else if (part instanceof ProtoMekLocation protoMekLocation) {
+            if (protoMekLocation.getLoc() == ProtoMek.LOC_HEAD) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD);
+            }
+
+            if (protoMekLocation.getLoc() == ProtoMek.LOC_TORSO) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
+            }
+
+            return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION);
         } else if (part instanceof TankLocation) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION);
         } else if (part instanceof AmmoBin || part instanceof AmmoStorage) {
@@ -258,15 +274,20 @@ public class PartsInUseManager {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION);
         } else if (part instanceof Armor) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR);
-        } else if (part instanceof MekActuator) {
+        } else if (part instanceof MekActuator
+                         || part instanceof ProtoMekArmActuator
+                         || part instanceof ProtoMekLegActuator) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS);
-        } else if (part instanceof JumpJet) {
+        } else if (part instanceof JumpJet || part instanceof ProtoMekJumpJet) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS);
         } else if (part instanceof EnginePart) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ENGINES);
         } else if (part instanceof MekGyro) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_GYROS);
-        } else if (part instanceof MekCockpit || part instanceof MekSensor || part instanceof MekLifeSupport) {
+        } else if (part instanceof MekCockpit
+                         || part instanceof MekSensor
+                         || part instanceof MekLifeSupport
+                         || part instanceof ProtoMekSensor) {
             return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS);
         } else if (part instanceof EquipmentPart equipmentPart) {
             if (equipmentPart.getType() instanceof WeaponType) {

@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.HandheldWeapon;
@@ -58,6 +59,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -75,6 +77,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.RepairLocationCheck;
+import mekhq.campaign.work.RepairTechEligibility;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
@@ -103,24 +106,23 @@ public class MRMSService {
 
     /**
      * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
-     * right-click menu all ask this, so they offer the same units. A self-crewed unit looks after itself; any other
-     * unit qualifies when it is a type a tech can be assigned to, the same types {@link Person#canTech} accepts.
+     * right-click menu all ask this, so they offer the same units. A unit qualifies when it is a type a tech can be
+     * assigned to, the same types {@link Person#canTech} accepts. A DropShip, JumpShip, WarShip or space station
+     * qualifies too: its engineer does the work, as in the Repair tab. So does conventional infantry: when it maintains
+     * itself its ranking soldier does the work, such as reloading its field guns, and otherwise a Mechanic does.
      *
      * @param unit the unit
      *
      * @return {@code true} if Mass Repair can work on the unit
      */
     public static boolean isMassRepairableUnit(Unit unit) {
-        if (unit.isSelfCrewed()) {
-            return false;
-        }
         Entity entity = unit.getEntity();
         boolean isMekTechWork = (entity instanceof Mek) || (entity instanceof ProtoMek)
                                       || (entity instanceof HandheldWeapon);
         boolean isOtherTechWork = (entity instanceof Aero) || (entity instanceof BattleArmor)
                                         || (entity instanceof Tank);
-        boolean isTechMaintainedInfantry = (entity != null) && entity.isConventionalInfantry();
-        return isMekTechWork || isOtherTechWork || isTechMaintainedInfantry;
+        boolean isConventionalInfantry = (entity != null) && entity.isConventionalInfantry();
+        return isMekTechWork || isOtherTechWork || isConventionalInfantry;
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
@@ -131,13 +133,7 @@ public class MRMSService {
         }
         campaign.addReport(TECHNICAL, resources.getString("MRMS.StartWarehouse.report"));
 
-        List<Person> techs = campaign.getPlayerForce()
-                                   .getHumanResources()
-                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
-                                         campaign.getCampaignOptions(),
-                                         campaign.getPlayerForce().isClanForce(),
-                                         campaign.getLocalDate(),
-                                         true);
+        List<Person> techs = getTechsWithTimeLeftToday(campaign);
 
         MRMSPartSet partSet = new MRMSPartSet();
 
@@ -216,32 +212,25 @@ public class MRMSService {
               configuredOptions);
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
-        String msg = String.format(
-              "<font color='" + ReportingUtilities.getPositiveColor()
-                    + "'>Mass %s complete on %s.</font>",
-              actionDescriptor,
-              unit.getName());
+        String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.UnitComplete.report",
+              ReportingUtilities.getPositiveColor(), actionDescriptor, unit.getName());
 
-        switch (unitAction.getStatus()) {
-            case ACTIONS_PERFORMED:
-                int count = unitAction.getPartSet().countRepairs();
-                msg += String.format(" There were %s action%s performed.", count, (count == 1 ? "" : "s"));
-                break;
-            case NO_PARTS:
-                msg += " No actions were performed because there are currently no valid parts.";
-                break;
-            case ALL_PARTS_IN_PROCESS:
-                msg += " No actions were performed because all parts are being worked on.";
-                break;
-            case NO_TECHS:
-                msg += " No actions were performed because there are currently no valid techs.";
-                break;
-            case UNFIXABLE_LIMB:
-                msg += " No actions were performed because there is at least one unfixable limb and configured settings do not allow location repairs.";
-                break;
-            case NO_ACTIONS:
-            default:
-                break;
+        String statusKey = switch (unitAction.getStatus()) {
+            case ACTIONS_PERFORMED -> "MRMS.UnitActionsPerformed.report";
+            case NO_PARTS -> "MRMS.UnitNoMatchingParts.report";
+            case ALL_PARTS_IN_PROCESS -> "MRMS.UnitAllPartsInProcess.report";
+            case NO_TECHS -> "MRMS.UnitNoTechs.report";
+            case UNFIXABLE_LIMB -> "MRMS.UnitUnfixableLimb.report";
+            case NO_ACTIONS -> null;
+        };
+        if (statusKey != null) {
+            msg += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, statusKey, unitAction.getPartSet().countRepairs());
+        }
+        if (unitAction.isStatusNoTechs()) {
+            String toolKitNote = describeTechsWithoutToolKit(campaign, unit);
+            if (!toolKitNote.isEmpty()) {
+                msg += ' ' + toolKitNote;
+            }
         }
 
         campaign.addReport(TECHNICAL, msg);
@@ -275,22 +264,11 @@ public class MRMSService {
 
     public static void performSingleLocationMRMS(Campaign campaign, Unit unit, IPartWork part) {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
-        List<Person> techs = campaign.getPlayerForce()
-                                   .getHumanResources()
-                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
-                                         campaign.getCampaignOptions(),
-                                         campaign.getPlayerForce().isClanForce(),
-                                         campaign.getLocalDate(),
-                                         true);
-        if (!configuredOptions.isEnabled()) {
-            campaign.addReport(TECHNICAL, getTextAt(RESOURCE_BUNDLE, "MRMS.CompleteDisabled.report"));
-            return;
-        } else if (!configuredOptions.useSalvage()) {
-            String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
-                  getTextAt(RESOURCE_BUNDLE, "Salvage"));
-            campaign.addReport(TECHNICAL, msg);
-            return;
-        } else if (campaign.getPlayerForce()
+        List<Person> techs = getTechsWithTimeLeftToday(campaign);
+        // Quick Strip is a direct order on one location, so the force-wide Use Repair and Use Salvage switches do not
+        // apply to it
+        LOGGER.debug("[MRMS] Quick Strip of {} on {}", part.getPartName(), unit.getName());
+        if (campaign.getPlayerForce()
                          .getHumanResources()
                          .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             String message = getTextAt(RESOURCE_BUNDLE, "MRMS.InsufficientAstechs.report");
@@ -411,29 +389,30 @@ public class MRMSService {
                 }
             }
 
-            StringBuilder sb = new StringBuilder(
-                  String.format("<font color='" + ReportingUtilities.getPositiveColor()
-                                      + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
+            StringBuilder sb = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.Summary.report",
+                  ReportingUtilities.getPositiveColor(), totalCount));
 
             if (actionsPerformed > 0) {
-                sb.append(String.format(" %s repair/salvage action%s performed.",
-                      actionsPerformed,
-                      (actionsPerformed == 1 ? "" : "s")));
+                sb.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.Summary.actionsPerformed",
+                      actionsPerformed));
             }
 
-            sb.append(generateUnitRepairSummary("<br/>- %s unit%s had repairs/parts salvaged.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWorkedOn",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.ACTIONS_PERFORMED));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were no valid parts.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithNoMatchingParts",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.NO_PARTS));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were no valid techs.",
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithNoTechs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.NO_TECHS));
-            sb.append(generateUnitRepairSummary(
-                  "<br/>- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
+            if (unitActionsByStatus.containsKey(MRMSUnitAction.STATUS.NO_TECHS)) {
+                String toolKitNote = describeTechsWithoutToolKit(campaign, null);
+                if (!toolKitNote.isEmpty()) {
+                    sb.append("<br/>").append(toolKitNote);
+                }
+            }
+            sb.append(generateUnitRepairSummary("MRMS.Summary.unitsWithUnfixableLimbs",
                   unitActionsByStatus,
                   MRMSUnitAction.STATUS.UNFIXABLE_LIMB));
 
@@ -442,15 +421,15 @@ public class MRMSService {
 
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.NO_PARTS,
-              "Units with no valid parts:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.noMatchingParts"),
               campaign);
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.NO_TECHS,
-              "Units with no valid techs:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.noTechs"),
               campaign);
         generateCampaignLogForUnitStatus(unitActionsByStatus,
               MRMSUnitAction.STATUS.UNFIXABLE_LIMB,
-              "Units with unfixable limbs:",
+              getTextAt(RESOURCE_BUNDLE, "MRMS.UnitList.unfixableLimbs"),
               campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
@@ -478,17 +457,8 @@ public class MRMSService {
                 }
 
                 if (count > 0) {
-                    if (count == 1) {
-                        campaign.addReport(TECHNICAL, "<font color='" +
-                                                            ReportingUtilities.getNegativeColor()
-                                                            +
-                                                            "'>There is still 1 part that is not being worked on.</font>");
-                    } else {
-                        campaign.addReport(TECHNICAL, String.format(
-                              "<font color='" + ReportingUtilities.getNegativeColor()
-                                    + "'>There are still %s parts that are not being worked on %s unit%s.</font>",
-                              count, unitCount, (unitCount == 1) ? "" : "s"));
-                    }
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.StillNotWorkedOn.report",
+                          ReportingUtilities.getNegativeColor(), count, unitCount));
                 }
             }
         }
@@ -501,7 +471,40 @@ public class MRMSService {
         }
     }
 
-    private static String generateUnitRepairSummary(String baseDescription,
+    /**
+     * When Mass Repair found no valid techs and the campaign requires a tool kit, says how many techs carry none. Without
+     * this the report only says there were no valid techs, and a tech holding a Descartes scanner looks equipped.
+     *
+     * @param campaign the campaign
+     * @param unit     the unit worked on, or {@code null} for a summary across units
+     *
+     * @return the note, or an empty string when tool kits are not required or every tech carries one
+     */
+    private static String describeTechsWithoutToolKit(Campaign campaign, @Nullable Unit unit) {
+        if (!EquipmentKitCatalog.isToolKitRequired(campaign.getCampaignOptions(), unit)) {
+            return "";
+        }
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate());
+        int techsWithoutToolKit = EquipmentKitCatalog.countWithoutToolKit(techs);
+        LOGGER.debug("[MRMS] No valid techs; {} of {} techs carry no tool kit", techsWithoutToolKit, techs.size());
+        if (techsWithoutToolKit == 0) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.TechsWithoutToolKit.report", techsWithoutToolKit);
+    }
+
+    /**
+     * @param resourceKey the summary line's key in the MRMS resources; it takes the number of units as {@code {0}}
+     *
+     * @return the summary line, on a new line, for the units that ended with the given status, or an empty string
+     *       when none did
+     */
+    private static String generateUnitRepairSummary(String resourceKey,
           Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus, MRMSUnitAction.STATUS status) {
 
         if (!unitActionsByStatus.containsKey(status)) {
@@ -510,7 +513,7 @@ public class MRMSService {
 
         int count = unitActionsByStatus.get(status).size();
 
-        return String.format(baseDescription, count, count == 1 ? "" : "s");
+        return "<br/>" + getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, count);
     }
 
     private static void generateCampaignLogForUnitStatus(
@@ -534,13 +537,9 @@ public class MRMSService {
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
           List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
-        List<Person> techs = campaign.getPlayerForce()
-                                   .getHumanResources()
-                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
-                                         campaign.getCampaignOptions(),
-                                         campaign.getPlayerForce().isClanForce(),
-                                         campaign.getLocalDate(),
-                                         true);
+        List<Person> techs = unit.isSelfCrewed()
+                                   ? getEngineerWithTimeLeftToday(campaign, unit)
+                                   : getTechsWithTimeLeftToday(campaign);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
@@ -548,12 +547,15 @@ public class MRMSService {
 
         MRMSUnitAction unitAction = new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_ACTIONS);
 
-        // Filter our tech list to only our techs that can work on this unit
-        for (int i = techs.size() - 1; i >= 0; i--) {
-            Person tech = techs.get(i);
+        // Filter our tech list to only our techs that can work on this unit. A self-crewed unit's engineer is its only
+        // tech whatever their training, as in the Repair tab: infantry that maintains itself is led by a soldier
+        if (!unit.isSelfCrewed()) {
+            for (int i = techs.size() - 1; i >= 0; i--) {
+                Person tech = techs.get(i);
 
-            if (!tech.canTech(unit.getEntity())) {
-                techs.remove(i);
+                if (!tech.canTech(unit.getEntity())) {
+                    techs.remove(i);
+                }
             }
         }
 
@@ -598,11 +600,30 @@ public class MRMSService {
           MRMSConfiguredOptions configuredOptions) {
         boolean wasSalvaging = unit.isSalvage();
         boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        Map<PodSpace, Boolean> repairInPlaceBefore = new HashMap<>();
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            repairInPlaceBefore.put(podSpace, podSpace.isRepairInPlace());
+        }
         try {
             return performUnitMassTechActionOnce(campaign, unit, techs, mrmsOptionsByType, salvaging,
                   configuredOptions);
         } finally {
             restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+            restoreRepairInPlace(unit, repairInPlaceBefore);
+        }
+    }
+
+    /**
+     * Mass Repair picks repair-in-place or swap for every pod space of an Omni unit. A pod space it left without a job
+     * goes back to its earlier setting, so a pod job started by hand afterwards is not steered by Mass Repair's
+     * choice. A pod job Mass Repair started and carried over keeps the choice until the job ends.
+     */
+    private static void restoreRepairInPlace(Unit unit, Map<PodSpace, Boolean> repairInPlaceBefore) {
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            Boolean wasRepairInPlace = repairInPlaceBefore.get(podSpace);
+            if ((wasRepairInPlace != null) && !podSpace.isBeingWorkedOn()) {
+                podSpace.setRepairInPlace(wasRepairInPlace);
+            }
         }
     }
 
@@ -654,8 +675,11 @@ public class MRMSService {
         }
 
         if (unit.getEntity().isOmni() && !unit.isSalvage()) {
-            for (PodSpace ps : unit.getPodSpace()) {
-                ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
+            for (PodSpace podSpace : unit.getPodSpace()) {
+                // a pod job already under way keeps the choice it was started with
+                if (!podSpace.isBeingWorkedOn()) {
+                    podSpace.setRepairInPlace(!configuredOptions.isReplacePodParts());
+                }
             }
 
             // Damaged pod equipment with a spare in stock is left to the pod swap, but only when the swap will
@@ -687,10 +711,12 @@ public class MRMSService {
          * Pre-checking for hips/shoulders on repairable meks. If we have a bad
          * hip or shoulder, we're not going to do anything until we get those
          * parts out of the location and scrap it. Once we're at a happy place,
-         * we'll proceed.
+         * we'll proceed. A salvage run takes every part off anyway, so the limb
+         * needs no special handling and the check would only stop the strip.
          */
 
-        if ((unit.getEntity() instanceof Mek)) {
+        boolean isRepairingMek = !salvaging && (unit.getEntity() instanceof Mek);
+        if (isRepairingMek) {
             Map<Integer, Part> locationMap = new HashMap<>();
 
             for (IPartWork partWork : parts) {
@@ -1087,7 +1113,7 @@ public class MRMSService {
             debugLog("Checking tech %s", "repairPart", tech.getFullName());
 
             // If this tech has less time than required, ignore them for this part
-            if (tech.getMinutesLeft() < mrmsOptions.getDailyTimeMin()) {
+            if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < mrmsOptions.getDailyTimeMin()) {
                 debugLog("... doesn't have enough time left due to configuration", "repairPart");
                 continue;
             }
@@ -1202,8 +1228,10 @@ public class MRMSService {
             WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech, experienceLevel);
             int expectedTime = getExpectedWorkTime((partWork), workTime);
 
-            if ((tech.getMinutesLeft() < expectedTime)) {
-                if (!configuredOptions.isAllowCarryover()) {
+            if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < expectedTime) {
+                boolean isCarryoverAllowed = configuredOptions.isAllowCarryover()
+                                                   || isCrewJobLongerThanAFullDay(campaign, unit, tech, expectedTime);
+                if (!isCarryoverAllowed) {
                     debugLog("... would carry over day and configuration doesn't allow", "repairPart");
 
                     continue;
@@ -1277,7 +1305,7 @@ public class MRMSService {
 
         // If this tech has no time left, filter them out so we don't
         // spend cycles on them in the future
-        if (tech.getMinutesLeft() <= 0) {
+        if (RepairTechEligibility.getTimeLeftToday(campaign, tech) <= 0) {
             techs.remove(tech);
         }
 
@@ -1401,7 +1429,8 @@ public class MRMSService {
                 techCache.put(skillName, tech);
             }
 
-            TargetRoll roll = campaign.getTargetFor(partWork, tech);
+            // The stand-in tech belongs to no unit and no place, so only the skill side of the check applies
+            TargetRoll roll = campaign.getSkillTargetFor(partWork, tech);
 
             if ((roll.getValue() == TargetRoll.IMPOSSIBLE) ||
                       (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) ||
@@ -1413,6 +1442,76 @@ public class MRMSService {
         }
 
         return newParts;
+    }
+
+    /**
+     * Whether a self-crewed unit's job runs past its engineer's whole working day, overtime included when the campaign
+     * allows it. The crew is the unit's only tech team, so such a job, common on ships, can only ever be done over
+     * several days, and Mass Repair starts it even with carryover off. Any other unit, and a job that fits in one day,
+     * follows the setting.
+     *
+     * @return {@code true} if the unit is self-crewed and the job is longer than its engineer's full day
+     */
+    private static boolean isCrewJobLongerThanAFullDay(Campaign campaign, Unit unit, Person tech, int expectedTime) {
+        if (!unit.isSelfCrewed()) {
+            return false;
+        }
+        boolean isTechsUseAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        int fullDay = tech.getDailyAvailableTechTime(isTechsUseAdministration);
+        if (campaign.isOvertimeAllowed()) {
+            fullDay += (int) Math.round(Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME
+                                              * tech.calculateTechTimeMultiplier(isTechsUseAdministration));
+        }
+        boolean isLongerThanAFullDay = expectedTime > fullDay;
+        if (isLongerThanAFullDay) {
+            LOGGER.debug("[MRMS] {}: a {} minute job is longer than the engineer's {} minute day, so it carries over",
+                  unit.getName(), expectedTime, fullDay);
+        }
+        return isLongerThanAFullDay;
+    }
+
+    /**
+     * A ship's crew is its only tech team (Campaign Operations, pp. 190-191), and infantry that maintains itself is
+     * led by its ranking soldier. So Mass Repair on a self-crewed unit works through its engineer alone, the same
+     * person the Repair tab offers for it.
+     *
+     * @return the unit's engineer if they can still work today, otherwise an empty list
+     */
+    private static List<Person> getEngineerWithTimeLeftToday(Campaign campaign, Unit unit) {
+        List<Person> techs = new ArrayList<>();
+        Person engineer = unit.getEngineer();
+        if (engineer == null) {
+            LOGGER.debug("[MRMS] {}: no engineer, so its crew cannot repair it", unit.getName());
+            return techs;
+        }
+        if (RepairTechEligibility.getTimeLeftToday(campaign, engineer) <= 0) {
+            LOGGER.debug("[MRMS] {}: engineer {} has no time left today", unit.getName(), engineer.getFullName());
+            return techs;
+        }
+        techs.add(engineer);
+        return techs;
+    }
+
+    /**
+     * @return the techs who can still work today, counting overtime when the campaign allows it, as the Repair tab
+     *       does
+     */
+    private static List<Person> getTechsWithTimeLeftToday(Campaign campaign) {
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.getPlayerForce().isClanForce(),
+                                         campaign.getLocalDate(),
+                                         false);
+        // Techs with no regular minutes are kept here and dropped below only if they have no overtime either
+        List<Person> techsWithTimeLeft = new ArrayList<>();
+        for (Person tech : techs) {
+            if (RepairTechEligibility.getTimeLeftToday(campaign, tech) > 0) {
+                techsWithTimeLeft.add(tech);
+            }
+        }
+        return techsWithTimeLeft;
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
@@ -1433,7 +1532,7 @@ public class MRMSService {
         for (int i = techs.size() - 1; i >= 0; i--) {
             Person tech = techs.get(i);
 
-            if (tech.getMinutesLeft() <= 0) {
+            if (RepairTechEligibility.getTimeLeftToday(campaign, tech) <= 0) {
                 continue;
             }
 
@@ -1464,11 +1563,8 @@ public class MRMSService {
                 continue;
             }
 
-            if (partWork.getSkillMin() > skill.getExperienceLevel(skillModifierData)) {
-                continue;
-            }
-
-            // Check if we can actually even repair this part
+            // Check if we can actually even repair this part. This also applies the task's minimum skill, with the
+            // work mode's penalty, except under Destroy by Margin, where any tech may try
             TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
 
             if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) ||

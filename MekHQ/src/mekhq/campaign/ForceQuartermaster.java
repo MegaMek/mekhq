@@ -33,6 +33,7 @@
 package mekhq.campaign;
 
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,8 @@ import mekhq.campaign.unit.UnitAcquisitionType;
  * Manages machines and material for a campaign.
  */
 public record ForceQuartermaster(Campaign campaign) {
+    private static final String FINANCES_RESOURCE_BUNDLE = "mekhq.resources.Finances";
+
     private static final MMLogger LOGGER = MMLogger.create(ForceQuartermaster.class);
 
     public enum PartAcquisitionResult {
@@ -131,7 +134,10 @@ public record ForceQuartermaster(Campaign campaign) {
      * the location tree), falling back to the campaign warehouse.
      */
     private LocalWarehouse warehouseFor(Part part) {
-        LocalWarehouse partWarehouse = part.getWarehouse();
+        // a spare bought or set aside for a refit is kept with the unit being refitted, which may be at a base
+        Unit refitUnit = part.getRefitUnit();
+        boolean isForARefit = (part.getUnit() == null) && (refitUnit != null);
+        LocalWarehouse partWarehouse = isForARefit ? refitUnit.getWarehouse() : part.getWarehouse();
         return (partWarehouse != null) ? partWarehouse : getWarehouse();
     }
 
@@ -507,14 +513,27 @@ public record ForceQuartermaster(Campaign campaign) {
      * @return The number of shots available of the given ammo type.
      */
     public int getAmmoAvailable(AmmoType ammoType) {
+        return getAmmoAvailable(getWarehouse(), ammoType);
+    }
+
+    /**
+     * Gets the amount of ammo of a given type available in a warehouse, such as a base's.
+     *
+     * @param warehouse The warehouse to count in; the main force's when {@code null}.
+     * @param ammoType  The type of ammo.
+     *
+     * @return The number of shots available of the given ammo type.
+     */
+    public int getAmmoAvailable(@Nullable LocalWarehouse warehouse, AmmoType ammoType) {
         Objects.requireNonNull(ammoType);
+        LocalWarehouse stock = (warehouse != null) ? warehouse : getWarehouse();
 
         if (!getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE)) {
             // We can't just use findSpareAmmo, that will return the first
             // matching ammo. There may be multiple instances of matching
             // ammo that have different qualities, so we should return
             // all of those counts as viable and not just the first we find.
-            return getWarehouse()
+            return stock
                          .streamSpareParts()
                          .filter(ForceQuartermaster::isAvailableAsSpareAmmo)
                          .mapToInt(part -> {
@@ -529,7 +548,7 @@ public record ForceQuartermaster(Campaign campaign) {
         } else {
             // If we're using ammo by type, stream through all
             // the ammo that matches strictly or is compatible.
-            return getWarehouse()
+            return stock
                          .streamSpareParts()
                          .filter(ForceQuartermaster::isAvailableAsSpareAmmo)
                          .mapToInt(part -> {
@@ -713,10 +732,11 @@ public record ForceQuartermaster(Campaign campaign) {
 
         Money sellValue = unit.getSellValue();
 
-        campaign().getPlayerForce().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
-              sellValue, "Sale of " + unit.getName());
-
-        campaign().removeUnit(unit.getId());
+        // a unit the campaign cannot find is not sold, so nothing is paid for it
+        if (campaign().removeUnit(unit.getId())) {
+            campaign().getPlayerForce().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
+                  sellValue, getFormattedTextAt(FINANCES_RESOURCE_BUNDLE, "UnitSale.finances", unit.getName()));
+        }
     }
 
     /**

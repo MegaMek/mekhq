@@ -341,15 +341,10 @@ public class TankLocation extends Part {
             return super.getDesc();
         }
         String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
         toReturn += ">";
         toReturn += "<b>Seal " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeftText();
         toReturn += "</font></html>";
         return toReturn;
     }

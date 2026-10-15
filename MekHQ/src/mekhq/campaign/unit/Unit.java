@@ -111,7 +111,6 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -132,8 +131,6 @@ import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.*;
@@ -251,6 +248,8 @@ public class Unit implements ITechnology, ILocatable {
     private Person tech;
     // blob crew - temporary personnel not represented by Person objects
     private Map<PersonnelRole, Integer> tempPersonnelRoleMap;
+    // which person wears which battle armor suit
+    private final TrooperSlots trooperSlots = new TrooperSlots();
 
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
@@ -267,6 +266,8 @@ public class Unit implements ITechnology, ILocatable {
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
     private final ArrayList<PodSpace> podSpace;
+    /** Pod jobs read from a save, held until the pod spaces are built when the unit's parts are initialized. */
+    private final List<PodSpace> savedPodJobs = new ArrayList<>();
 
     private Refit refit;
 
@@ -311,7 +312,9 @@ public class Unit implements ITechnology, ILocatable {
         this.repairLog = new ArrayList<>();
         this.lastMaintenanceReport = "";
         this.fluffName = "";
-        this.maintenanceMultiplier = 4;
+        // Large vessels are maintained by their own crew and always use x1; at x4 a DropShip needs more minutes than
+        // its engineer has in a day. Nothing else sets their multiplier, as every setter skips self-crewed units.
+        this.maintenanceMultiplier = ((entity instanceof Dropship) || (entity instanceof Jumpship)) ? 1 : 4;
         this.tempPersonnelRoleMap = new HashMap<>();
         initializeAllTransportSpace();
         reCalc();
@@ -524,8 +527,14 @@ public class Unit implements ITechnology, ILocatable {
                       campaignTransportType.name(),
                       e.toString(),
                       e.getCause());
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error("Could not find constructor to initialize transport space for {} Error: {} Cause: {}",
+            } catch (InvocationTargetException e) {
+                // The constructor was found and called, but threw; log what it threw rather than the reflection wrapper
+                Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+                LOGGER.error(cause, "Failed to initialize transport space for {} on {}",
+                      campaignTransportType.name(),
+                      (entity != null) ? entity.getShortName() : "a unit with no entity");
+            } catch (InstantiationException | IllegalAccessException e) {
+                LOGGER.error("Could not instantiate transport space for {} Error: {} Cause: {}",
                       campaignTransportType.name(),
                       e,
                       e.getCause());
@@ -990,6 +999,12 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
+        if (en instanceof ProtoMek) {
+            // a ProtoMek is destroyed along with its torso
+            if (en.isLocationBad(ProtoMek.LOC_TORSO)) {
+                return false;
+            }
+        }
         if (en instanceof Tank tank) {
             for (int i = 0; i < en.locations(); i++) {
                 boolean isTurretOrRotor = VehicleLocations.isTurret(tank, i) || VehicleLocations.isRotor(tank, i);
@@ -1028,6 +1043,12 @@ public class Unit implements ITechnology, ILocatable {
         if (en instanceof Mek) {
             // you can repair anything so long as one point of CT is left
             if (en.getInternal(Mek.LOC_CENTER_TORSO) <= 0) {
+                return false;
+            }
+        }
+        if (en instanceof ProtoMek) {
+            // like a Mek's center torso, a ProtoMek torso can't be replaced
+            if (en.getInternal(ProtoMek.LOC_TORSO) <= 0) {
                 return false;
             }
         }
@@ -1074,7 +1095,7 @@ public class Unit implements ITechnology, ILocatable {
      * @return <code>true</code> if the location is destroyed
      */
     public boolean isLocationDestroyed(int loc) {
-        if (loc > entity.locations() || loc < 0) {
+        if (!isLocationOnEntity(loc)) {
             return false;
         }
         /*
@@ -1087,8 +1108,27 @@ public class Unit implements ITechnology, ILocatable {
         return entity.isLocationTrulyDestroyed(loc);
     }
 
+    /**
+     * Is the given location on the entity breached?
+     *
+     * @param loc the location; one the entity does not have, such as a fighter's fuselage pod space at
+     *            {@link Entity#LOC_NONE}, is never breached
+     *
+     * @return {@code true} if the location is breached
+     */
     public boolean isLocationBreached(int loc) {
+        if (!isLocationOnEntity(loc)) {
+            return false;
+        }
         return entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED;
+    }
+
+    /**
+     * @return {@code true} if the entity has the given location; {@link Entity#LOC_NONE} and numbers past its last
+     *       location are not on it
+     */
+    private boolean isLocationOnEntity(int location) {
+        return (location >= 0) && (location < entity.locations());
     }
 
     public boolean hasBadHipOrShoulder(int loc) {
@@ -1391,6 +1431,24 @@ public class Unit implements ITechnology, ILocatable {
             return new Turret(location, tonnage, getCampaign());
         }
         return new TankLocation(location, tonnage, getCampaign());
+    }
+
+    /**
+     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
+     */
+    private void discardPart(Part part) {
+        removePart(part);
+        // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
+        LocalWarehouse warehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                         ? holdingWarehouse
+                                         : part.getWarehouse();
+        if ((warehouse != null) && (warehouse.getPart(part.getId()) == part)) {
+            warehouse.removePart(part);
+        } else {
+            LOGGER.warn("[UnitParts] {}: could not find the warehouse keeping {} #{}", getName(), part.getName(),
+                  part.getId());
+        }
+        part.setUnit(null);
     }
 
     public void removePart(Part part) {
@@ -3037,11 +3095,46 @@ public class Unit implements ITechnology, ILocatable {
             return getAlternateUnitCost();
         }
 
-        Money cost = Money.of((getEntity() instanceof Infantry) ?
-                                    getEntity().getAlternateCost() :
-                                    getEntity().getCost(false));
+        return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions());
+    }
 
-        return cost.multipliedBy(getUnitPriceMultiplier());
+    /**
+     * Estimates what {@link #getBuyCost()} will return for an entity that has not yet been made into a unit, such as
+     * one rolled by the command generator. Under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the entity is valued by
+     * its Battle Value in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
+     *
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     *
+     * @return the entity's purchase value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            return calculateAlternateUnitCost(unitEntity, unitEntity.calculateBattleValue(true, true, true),
+                  campaignOptions);
+        }
+        return getTraditionalBuyCost(unitEntity, campaignOptions);
+    }
+
+    /**
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the unit price multipliers
+     *
+     * @return the entity's construction cost (alternate cost for conventional infantry) times the unit price
+     *       multiplier for its tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money getTraditionalBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
+        Money cost = Money.of((unitEntity instanceof Infantry) ?
+                                    unitEntity.getAlternateCost() :
+                                    unitEntity.getCost(false));
+
+        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions));
     }
 
     /**
@@ -3051,8 +3144,19 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     private double getUnitPriceMultiplier() {
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        Entity unitEntity = getEntity();
+        return getUnitPriceMultiplier(getEntity(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * @param unitEntity      the entity whose tech base picks the multiplier
+     * @param campaignOptions the campaign options holding the multipliers
+     *
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching the entity's tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
         if (unitEntity.isMixedTech()) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
         } else if (unitEntity.isClan()) {
@@ -3132,9 +3236,27 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getAlternateUnitCost() {
-        int battleValue = getUnitBattleValue();
-        double valueInSupportPoints = battleValue * getUnitPriceMultiplier() * getQuirkPriceMultiplier(getEntity());
-        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
+        return calculateAlternateUnitCost(getEntity(), getUnitBattleValue(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * Values an entity under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * {@link #getAlternateUnitCost()}).
+     *
+     * @param unitEntity      the entity to value
+     * @param battleValue     the entity's Battle Value, excluding pilot skill, C3, and TAG
+     * @param campaignOptions the campaign options supplying the multipliers and support point conversion
+     *
+     * @return the entity's Battle Value-based value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money calculateAlternateUnitCost(Entity unitEntity, int battleValue,
+          CampaignOptions campaignOptions) {
+        double valueInSupportPoints = battleValue * getUnitPriceMultiplier(unitEntity, campaignOptions)
+                                            * getQuirkPriceMultiplier(unitEntity);
+        if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
             return Money.of(valueInSupportPoints);
         }
         // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
@@ -3245,6 +3367,7 @@ public class Unit implements ITechnology, ILocatable {
             }
             pw.println(MHQXMLUtility.indentStr(--indent) + "</tempCrewMap>");
         }
+        trooperSlots.writeToXML(pw, indent);
 
         // If this entity is assigned to a transport ship, write that
         if (hasTransportShipAssignment()) {
@@ -3432,6 +3555,12 @@ public class Unit implements ITechnology, ILocatable {
             refit.writeToXML(pw, indent);
         }
 
+        for (PodSpace podSpaceWithJob : podSpace) {
+            if (podSpaceWithJob.hasWorkInProgress()) {
+                podSpaceWithJob.writeToXML(pw, indent);
+            }
+        }
+
         if ((lastMaintenanceReport != null) &&
                   !lastMaintenanceReport.isEmpty() &&
                   getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
@@ -3539,6 +3668,8 @@ public class Unit implements ITechnology, ILocatable {
                             }
                         }
                     }
+                } else if (TrooperSlots.isTrooperSlotsNode(wn2.getNodeName())) {
+                    retVal.trooperSlots.readFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportShip")) {
                     NamedNodeMap attributes = wn2.getAttributes();
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
@@ -3619,6 +3750,11 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("podSpace")) {
+                    PodSpace savedJob = PodSpace.generateInstanceFromXML(wn2, retVal);
+                    if (savedJob != null) {
+                        retVal.savedPodJobs.add(savedJob);
+                    }
                 }
                 // Set up bay space values after we've loaded everything from the unit record
                 // Used for older campaign
@@ -4250,9 +4386,13 @@ public class Unit implements ITechnology, ILocatable {
 
             part.updateConditionFromPart();
         }
-        // Remove invalid Aero parts due to changes after 0.45.4
+        // Parts the unit has no place for, such as heat sink parts for the sinks a fusion engine provides, leave the
+        // campaign rather than staying in the warehouse tied to the unit, where they turned into free spares once it left
         for (Part part : partsToRemove) {
-            removePart(part);
+            discardPart(part);
+        }
+        if (!partsToRemove.isEmpty()) {
+            LOGGER.debug("[UnitParts] {}: {} parts it has no place for were discarded", getName(), partsToRemove.size());
         }
 
         LocalWarehouse warehouse = getWarehouse();
@@ -4586,6 +4726,9 @@ public class Unit implements ITechnology, ILocatable {
 
         // Transport Bays
         for (Bay bay : entity.getTransportBays()) {
+            if (!TransportBayPart.isWorthAPart(bay)) {
+                continue;
+            }
             bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = bays.get(bay.getBayNumber());
@@ -5204,13 +5347,46 @@ public class Unit implements ITechnology, ILocatable {
                                            .findAny();
             bayPart.ifPresent(part -> bayPartsToAdd.get(bayNum).forEach(part::addChildPart));
         }
+        rebuildPodSpaces();
+    }
+
+    /**
+     * Builds the pod spaces of an Omni unit again, handing any job in progress, including one read from a save, to
+     * the new pod space for the same location.
+     */
+    private void rebuildPodSpaces() {
+        List<PodSpace> earlierPodSpaces = new ArrayList<>(podSpace);
+        earlierPodSpaces.addAll(savedPodJobs);
+        savedPodJobs.clear();
+        podSpace.clear();
         if (getEntity().isOmni()) {
-            podSpace.clear();
-            for (int loc = 0; loc < getEntity().locations(); loc++) {
-                podSpace.add(new PodSpace(loc, this));
+            for (int location = 0; location < getEntity().locations(); location++) {
+                podSpace.add(new PodSpace(location, this));
             }
-            podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+            podSpace.forEach(newPodSpace -> newPodSpace.updateConditionFromEntity(false));
         }
+        for (PodSpace earlier : earlierPodSpaces) {
+            if (!earlier.hasWorkInProgress()) {
+                continue;
+            }
+            PodSpace successor = findPodSpace(earlier.getLocation());
+            if (successor != null) {
+                successor.continueWorkFrom(earlier);
+            } else {
+                LOGGER.warn("[PodSpace] {} has no pod space at location {} any more; its job there is dropped",
+                      getName(), earlier.getLocation());
+                earlier.cancelAssignment(true);
+            }
+        }
+    }
+
+    private @Nullable PodSpace findPodSpace(int location) {
+        for (PodSpace candidate : podSpace) {
+            if (candidate.getLocation() == location) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     public List<Part> getParts() {
@@ -6018,6 +6194,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
+        List<UUID> gunnerIds = new ArrayList<>();
         for (Person person : relevantCrew) {
             if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
@@ -6032,6 +6209,7 @@ public class Unit implements ITechnology, ILocatable {
                 sumGunnery += person.getSkill(tempGunType)
                                     .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
                 nGunners++;
+                gunnerIds.add(person.getId());
             }
             if (person.hasSkill(SkillType.S_ARTILLERY) &&
                       person.getSkill(SkillType.S_ARTILLERY)
@@ -6097,41 +6275,8 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (entity instanceof Infantry) {
-            if (entity instanceof BattleArmor) {
-                int numTroopers = 0;
-                // OK, we want to reorder the way we move through suits, so that we always put BA in the suits with
-                // more armor. Otherwise, we may put a soldier in a suit with no armor when a perfectly good suit is
-                // waiting further down the line.
-                Map<String, Integer> bestSuits = new HashMap<>();
-                for (int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor) entity).getSquadSize(); i++) {
-                    bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
-                    if (entity.getInternal(i) < 0) {
-                        bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
-                    }
-                    bestSuits = Utilities.sortMapByValue(bestSuits, true);
-                }
-                // Get temp BA count up front so it can fill suits after real troopers are placed
-                int tempBACount = getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)
-                                        ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
-                int tempBAUsed = 0;
-                for (String key : bestSuits.keySet()) {
-                    int i = Integer.parseInt(key);
-                    if (!isBattleArmorSuitOperable(i)) {
-                        // no suit here move along
-                        continue;
-                    }
-                    if (numTroopers < nGunners) {
-                        entity.setInternal(1, i);
-                        numTroopers++;
-                    } else if (tempBACount > 0) {
-                        entity.setInternal(1, i);
-                        tempBACount--;
-                        tempBAUsed++;
-                    } else {
-                        entity.setInternal(0, i);
-                    }
-                }
-                nGunners += tempBAUsed;
+            if (entity instanceof BattleArmor battleArmor) {
+                nGunners += seatBattleArmorTroopers(battleArmor, gunnerIds);
             }
 
             // Add temp crew to fill shortfall for conventional infantry
@@ -6298,6 +6443,50 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Puts a battle armor unit's troopers in its suits. Each person keeps the suit they wear while it can still be
+     * worn, anyone else takes the free suit with the most armor, and temporary troopers fill the suits left over. Any
+     * other suit that can be worn is left empty.
+     *
+     * @param battleArmor the unit's entity
+     * @param trooperIds  the people able to fight, in the order they choose a suit
+     *
+     * @return how many temporary troopers were put in suits
+     */
+    private int seatBattleArmorTroopers(BattleArmor battleArmor, List<UUID> trooperIds) {
+        List<Integer> usableSlots = new ArrayList<>();
+        for (int slot = BattleArmor.LOC_TROOPER_1; slot <= battleArmor.getSquadSize(); slot++) {
+            if (isBattleArmorSuitOperable(slot)) {
+                usableSlots.add(slot);
+            }
+        }
+        // the suits with the most armor first, so nobody is put in a stripped suit while a good one is free
+        usableSlots.sort(Comparator.comparingInt((Integer slot) -> battleArmor.getArmorForReal(slot)).reversed());
+
+        List<Integer> wornSlots = trooperSlots.seat(trooperIds, usableSlots);
+        int tempTroopersLeft = getCampaign().getCampaignOptions().get(CampaignOption.USE_BLOB_BATTLE_ARMOR)
+                                     ? getTempCrewByPersonnelRole(PersonnelRole.BATTLE_ARMOUR) : 0;
+        int tempTroopersSeated = 0;
+        for (int slot : usableSlots) {
+            if (wornSlots.contains(slot)) {
+                battleArmor.setInternal(1, slot);
+            } else if (tempTroopersSeated < tempTroopersLeft) {
+                battleArmor.setInternal(1, slot);
+                tempTroopersSeated++;
+            } else {
+                battleArmor.setInternal(0, slot);
+            }
+        }
+        return tempTroopersSeated;
+    }
+
+    /**
+     * @return which person wears which suit, for a battle armor unit
+     */
+    public TrooperSlots getTrooperSlots() {
+        return trooperSlots;
+    }
+
+    /**
      * LAMs require a pilot that is cross-trained for meks and fighters
      */
     private void refreshLAMPilot() {
@@ -6442,6 +6631,9 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
+     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer.</p>
+     *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
      *
@@ -6466,6 +6658,9 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
+        if (engineer != null) {
+            engineer.setEngineer(false);
+        }
         engineer = null; // Unassign engineer
 
         if (getEntity() instanceof Infantry) {
@@ -6491,11 +6686,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
+            engineer.setEngineer(true);
             // change reference for any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.setTech(engineer);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.setTech(engineer);
             }
             // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
             // the new engineer is refused as "another team"
@@ -6508,12 +6702,28 @@ public class Unit implements ITechnology, ILocatable {
                 mothballTime = 0;
             }
             // cancel any scheduled tasks
-            for (Part part : getParts()) {
-                if (part.isBeingWorkedOn()) {
-                    part.cancelAssignment(true);
-                }
+            for (IPartWork scheduledWork : getScheduledWork()) {
+                scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * @return the parts and pod spaces on this unit that have a tech assigned
+     */
+    private List<IPartWork> getScheduledWork() {
+        List<IPartWork> scheduledWork = new ArrayList<>();
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn()) {
+                scheduledWork.add(part);
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.isBeingWorkedOn()) {
+                scheduledWork.add(pod);
+            }
+        }
+        return scheduledWork;
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
@@ -6671,18 +6881,44 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} is assigned to fill
-     * that slot, then refreshes the unit's crew state.
+     * Reports whether this unit has an empty seat for a real crew member of the given role, counting temporary
+     * ("blob") crew as filling seats. Call it before the person is added.
      *
-     * <p>This mirrors the temp crew handling already performed by {@link #addPilotOrSoldier(Person, Unit, boolean)}
-     * for infantry and solo-piloted units.</p>
+     * <p>Vessel roles each have their own seats and their own temp crew, so they are checked per position. Every
+     * other role is checked against the whole unit, because a vehicle's temp crew are one pool shared by its driver,
+     * gunner and crew seats rather than tied to any one of them.</p>
      *
-     * @param role the temp crew role to release; when {@code null} or when no temp crew of that role is present, the
-     *             crew state is simply refreshed
+     * @param role the role of the seat being filled, or {@code null} to check the whole unit
+     *
+     * @return {@code true} if a seat is free, so assigning someone must not release a temp crew member
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role) {
+    private boolean hasFreeSeatFor(final @Nullable PersonnelRole role) {
+        if (role == PersonnelRole.VESSEL_PILOT) {
+            return drivers.size() + getTempCrewByPersonnelRole(role) < getTotalDriverNeeds();
+        } else if (role == PersonnelRole.VESSEL_GUNNER) {
+            return gunners.size() + getTempCrewByPersonnelRole(role) < getTotalGunnerNeeds();
+        } else if (role == PersonnelRole.VESSEL_CREW) {
+            return vesselCrew.size() + getTempCrewByPersonnelRole(role) < getTotalCrewNeeds();
+        }
+        return getTotalCrewSize() < getFullCrewSize();
+    }
+
+    /**
+     * Releases a single temporary ("blob") crew member of the given role when a real {@link Person} took a seat that
+     * was already filled, so the unit is not left with more crew than seats, then refreshes the unit's crew state.
+     *
+     * @param role        the temp crew role to release; when {@code null} or when no temp crew of that role is present,
+     *                    the crew state is simply refreshed
+     * @param hadFreeSeat whether the unit had an empty seat before the person was added (see
+     *                    {@link #hasFreeSeatFor(PersonnelRole)}); when {@code true} the person filled it and no temp
+     *                    crew is released
+     */
+    private void releaseTempCrewForAssignedRole(final @Nullable PersonnelRole role, final boolean hadFreeSeat) {
         final int currentTempCrew = (role == null) ? 0 : getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
+        if (!hadFreeSeat && currentTempCrew > 0) {
             // setTempCrew() also refreshes the unit's crew state via resetPilotAndEntity()
             setTempCrew(role, currentTempCrew - 1);
         } else {
@@ -6702,9 +6938,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole driverRole = getDriverRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(driverRole);
         drivers.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getDriverRole());
+        releaseTempCrewForAssignedRole(driverRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6726,9 +6964,11 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final PersonnelRole gunnerRole = getGunnerRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(gunnerRole);
         gunners.add(person);
         person.setUnit(this);
-        releaseTempCrewForAssignedRole(getGunnerRole());
+        releaseTempCrewForAssignedRole(gunnerRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6750,12 +6990,13 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
-        vesselCrew.add(person);
-        person.setUnit(this);
         final PersonnelRole crewRole = (entity instanceof Aero && !(entity instanceof ConvFighter)) ?
                                              PersonnelRole.VESSEL_CREW :
                                              getDriverRole();
-        releaseTempCrewForAssignedRole(crewRole);
+        final boolean hadFreeSeat = hasFreeSeatFor(crewRole);
+        vesselCrew.add(person);
+        person.setUnit(this);
+        releaseTempCrewForAssignedRole(crewRole, hadFreeSeat);
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
@@ -6885,6 +7126,7 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
+        final boolean hadFreeSeat = hasFreeSeatFor(getDriverRole());
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
@@ -6892,14 +7134,8 @@ public class Unit implements ITechnology, ILocatable {
         }
         person.setUnit(this);
 
-        // Remove one temp crew member when adding a real Person
-        PersonnelRole role = person.getPrimaryRole();
-        int currentTempCrew = getTempCrewByPersonnelRole(role);
-        if (currentTempCrew > 0) {
-            setTempCrew(role, currentTempCrew - 1);
-        } else {
-            resetPilotAndEntity();
-        }
+        // Replace one temp crew member only if the real Person took a seat that was already filled
+        releaseTempCrewForAssignedRole(person.getPrimaryRole(), hadFreeSeat);
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
@@ -6958,10 +7194,12 @@ public class Unit implements ITechnology, ILocatable {
 
         if (person.equals(engineer)) {
             wasCrew = true;
+            person.setEngineer(false);
             engineer = null;
         }
 
         if (wasCrew) {
+            trooperSlots.release(person.getId());
             resetPilotAndEntity();
             // the departure is part of the unit's service history whether or not the person's own logs record it, as
             // a transfer still leaves this unit without that crew member
@@ -7654,12 +7892,13 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
 
-        for (Part part : getParts()) {
-            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
-                part.cancelAssignment(true);
+        for (IPartWork scheduledWork : getScheduledWork()) {
+            if (engineer.equals(scheduledWork.getTech())) {
+                scheduledWork.cancelAssignment(true);
             }
         }
 
+        engineer.setEngineer(false);
         engineer = null;
     }
 
@@ -7883,18 +8122,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        List<AbstractContract> activeMissions = campaign.getActiveContracts();
-        double timeIncrease = 0.25;
-
-        for (AbstractContract mission : activeMissions) {
-            ContractObjectiveType objectiveType = mission.getObjectiveType();
-            if (objectiveType.isGarrisonDuty() || objectiveType.isRetainer()) {
-                continue;
-            }
-
-            timeIncrease = 1;
-            break;
-        }
+        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;
@@ -8102,6 +8330,11 @@ public class Unit implements ITechnology, ILocatable {
      * re-assigned.
      */
     public void removeParts() {
+        // A pod job is work on the parts being removed, so it ends with them and gives back any spare it holds
+        for (PodSpace pod : podSpace) {
+            pod.cancelAssignment(true);
+        }
+
         for (Part part : parts) {
             part.setUnit(null);
 
@@ -8320,17 +8553,10 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
-        // Handle cost for quirks if used
-        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(0.8);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(1.25);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_NON_STANDARD)) {
-            partsCost = partsCost.multipliedBy(2.0);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_POS_UBIQUITOUS_IS)) {
-            partsCost = partsCost.multipliedBy(0.75);
+        // Quirks multiply the spare parts cost in turn (CO p.24), when the campaign uses quirks
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS)) {
+            partsCost = partsCost.multipliedBy(SparePartsQuirkMultiplier.find(entity, getCampaign().getGameYear()));
         }
-        // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
         if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER)) {
@@ -8765,6 +8991,8 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void fixReferences(Campaign campaign) {
+        savedPodJobs.forEach(savedJob -> savedJob.fixReferences(campaign));
+
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
             tech = campaign.getPlayerForce().getHumanResources().getPerson(id);

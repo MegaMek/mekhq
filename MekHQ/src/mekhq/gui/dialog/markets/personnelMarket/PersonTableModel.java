@@ -78,6 +78,7 @@ import mekhq.gui.sorter.LevelSorter;
  *     <li><b>EXPERIENCE: Formatted and colored experience level (HTML), sorted by custom level order.</b></li>
  *     <li><b>AGE: Age as string, sorted with integer-aware sorting.</b></li>
  *     <li><b>GENDER: Capitalized gender descriptor, sorted naturally.</b></li>
+ *     <li><b>HIRING_COST: Money value, sorted numerically and formatted by the table renderer.</b></li>
  * </ul>
  *
  * <p>Usage:</p>
@@ -124,6 +125,12 @@ public class PersonTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         return columns.get(column).getLabel();
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return columns.get(columnIndex) == ApplicantTableColumns.HIRING_COST ? Money.class :
+                     super.getColumnClass(columnIndex);
     }
 
     @Override
@@ -195,10 +202,7 @@ public class PersonTableModel extends AbstractTableModel {
             case POSITIVE_ABILITIES -> positiveSPAs;
             case NEGATIVE_ABILITIES -> negativeSPAs;
             case PERFORMANCE_EXAM -> person.getPerformanceExamScore();
-            case HIRING_COST -> {
-                Money hiringCost = market.getHiringCost(person);
-                yield hiringCost.toAmountString();
-            }
+            case HIRING_COST -> market.getHiringCost(person);
         };
     }
 
@@ -215,8 +219,8 @@ public class PersonTableModel extends AbstractTableModel {
     public Comparator<?> getComparator(int columnIndex) {
         ApplicantTableColumns column = columns.get(columnIndex);
         return switch (column) {
-            case AGE, HIRING_COST -> new IntegerStringSorter();
-            case POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM, REPUTATION -> Comparator.naturalOrder();
+            case AGE -> new IntegerStringSorter();
+            case HIRING_COST, POSITIVE_ABILITIES, NEGATIVE_ABILITIES, PERFORMANCE_EXAM, REPUTATION -> Comparator.naturalOrder();
             case EXPERIENCE -> new LevelSorter();
             default -> new NaturalOrderComparator();
         };

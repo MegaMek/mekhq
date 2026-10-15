@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -58,6 +59,14 @@ class CampaignGUIRefitTextTest {
         assertFalse(text.startsWith("!"), key + " is missing from the bundle");
     }
 
+    @Test
+    void cannotBuyWarningNamesThePartsAndKeepsItsApostrophe() {
+        String text = getFormattedTextAt(BUNDLE, "refitConfirm.cannotBuy.text", "ER Medium Laser");
+
+        assertFalse(text.contains("{"), text);
+        assertEquals(true, text.contains("ER Medium Laser") && text.contains("campaign's"), text);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = { "refitConfirm.refit.text", "refitConfirm.refurbish.text" })
     void refitConfirmationNamesTheClassAndTheUnit(String key) {
@@ -70,9 +79,11 @@ class CampaignGUIRefitTextTest {
     @ParameterizedTest
     @ValueSource(strings = { "refitSelectTech.techLabel" })
     void techLabelFillsEveryField(String key) {
-        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", "7", "1480", "480");
+        String estimate = "This job: 24 h 40 min of work, needs 7+ (58%). Finishes 3151-01-05, in 3 days";
+        String techDay = "Free today: 8 h of 8 h";
+        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", estimate, techDay);
 
         assertFalse(text.contains("{"), text);
-        assertEquals(true, text.contains("1480/480 minutes"), text);
+        assertEquals(true, text.contains(estimate) && text.contains(techDay), text);
     }
 }

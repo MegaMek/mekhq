@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,6 +46,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -85,6 +84,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -946,6 +946,44 @@ public class AmmoBinTest {
         // We should have not changed how many shots are needed
         assertEquals(shotsNeeded, ammoBin.getShotsNeeded());
         verify(mockMounted, times(1)).setShotsLeft(eq(0));
+    }
+
+    @Test
+    public void clearImpossibleDifficultyResetsBinAboveLegendary() {
+        Campaign mockCampaign = mockCampaign();
+        AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
+        AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
+        ammoBin.setSkillMin(SkillType.EXP_LEGENDARY + 1);
+
+        assertTrue(ammoBin.clearImpossibleDifficulty());
+        assertEquals(SkillType.EXP_GREEN, ammoBin.getSkillMin());
+    }
+
+    @Test
+    public void clearImpossibleDifficultyKeepsPossibleDifficulty() {
+        Campaign mockCampaign = mockCampaign();
+        AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
+        AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
+        ammoBin.setSkillMin(SkillType.EXP_LEGENDARY);
+
+        assertFalse(ammoBin.clearImpossibleDifficulty());
+        assertEquals(SkillType.EXP_LEGENDARY, ammoBin.getSkillMin());
+    }
+
+    @Test
+    public void clearImpossibleDifficultyKeepsFailedUnloadWhileSalvaging() {
+        Campaign mockCampaign = mockCampaign();
+        AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
+        AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, 0, false, false, mockCampaign);
+        Unit mockUnit = mock(Unit.class);
+        Entity mockEntity = mock(Entity.class);
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockUnit.isSalvage()).thenReturn(true);
+        ammoBin.setUnit(mockUnit);
+        ammoBin.setSkillMin(SkillType.EXP_LEGENDARY + 1);
+
+        assertFalse(ammoBin.clearImpossibleDifficulty());
+        assertEquals(SkillType.EXP_LEGENDARY + 1, ammoBin.getSkillMin());
     }
 
     @Test

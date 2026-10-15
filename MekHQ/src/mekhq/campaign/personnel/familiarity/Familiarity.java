@@ -221,8 +221,8 @@ public enum Familiarity {
      *
      * <p>Normally this happens on the first of each month. While the campaign is on an offensive contract, or on a
      * defensive contract whose enemy morale isn't Routed, it happens every Monday instead. Each unit gains Familiarity
-     * as if it had returned from a scenario, following all the usual restrictions (eligible chassis, single-unit
-     * techs, trait modifiers, and the mode's cap).</p>
+     * as if it had returned from a scenario, following all the usual restrictions (eligible chassis, single-unit techs,
+     * trait modifiers, and the mode's cap).</p>
      *
      * @param campaign the current campaign
      * @param today    the date being processed
@@ -368,7 +368,7 @@ public enum Familiarity {
         boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
 
         if (!alreadyCapped && nowCapped) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.cappedFamiliarity",
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "FamiliarityMode.cappedFamiliarity",
                   crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
                   CLOSING_SPAN_TAG,
                   chassis);

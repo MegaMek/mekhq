@@ -107,6 +107,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -115,6 +116,7 @@ import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.io.LegacyContractConverter;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
@@ -160,6 +162,7 @@ import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
+import mekhq.campaign.unit.cleanup.WithdrawnInfernoSrmAmmoCleanup;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -444,10 +447,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      *
      * <p>For each person in JOURNEY_TO_CAMPUS or JOURNEY_FROM_CAMPUS whose location chain contains
      * no {@link CurrentLocation}, a new {@code CurrentLocation} is created at the target system (academy system for
-     * outbound, campaign current system for return). Transit time is set from the jump-point approach time so they
-     * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
+     * outbound, campaign current system for return). Transit time is the legacy journey's remaining days, and the
+     * node is given an in-system path so normal {@code newDay()} processing carries it to the planet. Return nodes
+     * are parented under the main force, outbound nodes under the academy campus.</p>
      */
-    private static void migrateLegacyEducationTravel(Campaign campaign) {
+    static void migrateLegacyEducationTravel(Campaign campaign) {
         // Phase 1: scan for persons that need migration. All per-person logging here is DEBUG
         // so post-refactor saves (where everyone is skipped) produce no INFO noise.
         List<Person> toMigrate = new ArrayList<>();
@@ -554,18 +558,23 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            // Journey stages
+            // Journey stages: outbound travel arrives at the academy, return travel at the main force
             String systemId = resolveAcademySystemId(campaign, person);
             if (systemId == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
                                   + " — skipping travel node creation", person.getFullTitle(), stage);
                 continue;
             }
-            PlanetarySystem targetSystem = campaign.getSystemById(systemId);
-            if (targetSystem == null) {
+            PlanetarySystem academySystem = campaign.getSystemById(systemId);
+            if (academySystem == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: system '{}' not found for {} (stage={})"
                                   + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
                 continue;
+            }
+            boolean isReturning = stage == EducationStage.JOURNEY_FROM_CAMPUS;
+            PlanetarySystem targetSystem = academySystem;
+            if (isReturning && (campaign.getCurrentSystem() != null)) {
+                targetSystem = campaign.getCurrentSystem();
             }
 
             double transitTime = Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
@@ -577,19 +586,24 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                   transitTime);
 
             CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager()
-                                                         .getOrCreateCampusLocation(campaign,
-                                                               person.getEduAcademySet(),
-                                                               person.getEduAcademyNameInSet(),
-                                                               systemId);
-            if (campusLocation != null) {
-                LOGGER.info("migrateLegacyEducationTravel: parenting travel node under campus '{}' for {}",
-                      person.getEduAcademyNameInSet(), person.getFullTitle());
-                travelLocation.setParent(campusLocation);
-            } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
-                LOGGER.info("migrateLegacyEducationTravel: no campus found for {} (JOURNEY_FROM_CAMPUS)"
-                                  + " — parenting travel node under the main force", person.getFullTitle());
+            if (transitTime > 0) {
+                travelLocation.setJumpPath(LocationUtils.inSystemPath(targetSystem));
+            }
+            if (isReturning) {
+                LOGGER.info("migrateLegacyEducationTravel: parenting return travel node under the main force for {}",
+                      person.getFullTitle());
                 travelLocation.setParent(campaign.getPlayerForce().getForceDetachment());
+            } else {
+                AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager()
+                                                             .getOrCreateCampusLocation(campaign,
+                                                                   person.getEduAcademySet(),
+                                                                   person.getEduAcademyNameInSet(),
+                                                                   systemId);
+                if (campusLocation != null) {
+                    LOGGER.info("migrateLegacyEducationTravel: parenting travel node under campus '{}' for {}",
+                          person.getEduAcademyNameInSet(), person.getFullTitle());
+                    travelLocation.setParent(campusLocation);
+                }
             }
             person.setParent(travelLocation);
             campaign.getCampaignLocationManager().addLocation(travelLocation);
@@ -737,6 +751,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
+        WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
         final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
         final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
@@ -882,6 +897,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * Inferno ammo for infantry SRM launchers was withdrawn (TechManual pp. 350-352 errata); turn any left in a
+     * warehouse into standard ammo for the same launcher.
+     */
+    private static void cleanWithdrawnInfernoSrmStock(Campaign campaign) {
+        WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(campaign.getPlayerForce().getWarehouse());
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(base.getBaseWarehouse());
+        }
+    }
+
     private static void performEdgeConversion(Campaign campaign, Person person) {
         for (Enumeration<IOption> i = person.getOptions().getOptions(); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
@@ -994,12 +1020,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                               + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
-                    for (int partId : travelLocation.drainPendingPartIds()) {
-                        Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                        if (part != null && !part.isParented()) {
+                    for (Part part : drainPendingParts(campaign, travelLocation)) {
+                        if (!part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getPlayerForce().getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main warehouse", partId);
+                                              + "(orphaned arrived node); re-homed to main warehouse", part.getId());
                         }
                     }
                     continue;
@@ -1024,11 +1049,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
 
                 // Parts in transit — in base warehouse data structure, but LocationNode under the travel node
-                for (int partId : travelLocation.drainPendingPartIds()) {
-                    Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                    if (part != null) {
-                        LocationNode.LocationManager.setLocation(part, travelLocation);
-                    }
+                for (Part part : drainPendingParts(campaign, travelLocation)) {
+                    LocationNode.LocationManager.setLocation(part, travelLocation);
                 }
 
             }
@@ -1135,11 +1157,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     Unit unit = campaign.getUnit(parseUuidOrNull(text));
                     addIfNotNull(travelers, unit, "unit", text);
                 }
-                case "partId" -> {
-                    Integer partId = parsePartId(text);
-                    Part part = partId == null
+                case "partUniqueId" -> {
+                    UUID partId = parseUuidOrNull(text);
+                    Part part = (partId == null)
                                       ? null
                                       : campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
+                    addIfNotNull(travelers, part, "part", text);
+                }
+                case "partId" -> {
+                    Integer partId = parsePartId(text);
+                    Part part = (partId == null)
+                                      ? null
+                                      : campaign.getCampaignLocationManager().findPartByLegacyNumber(campaign, partId);
                     addIfNotNull(travelers, part, "part", text);
                 }
                 default -> { /* destination tags and whitespace */ }
@@ -1163,6 +1192,28 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         } catch (IllegalArgumentException ex) {
             return null;
         }
+    }
+
+    /**
+     * The parts a travel location named in the save, by identity or, in an older save, by number. Each name is used
+     * once; a part that is no longer in the campaign is skipped.
+     */
+    private static List<Part> drainPendingParts(Campaign campaign, AbstractMobileLocation travelLocation) {
+        List<Part> parts = new ArrayList<>();
+        CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
+        for (UUID partId : travelLocation.drainPendingPartUniqueIds()) {
+            Part part = locationManager.findPartAnywhere(campaign, partId);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        for (int legacyNumber : travelLocation.drainPendingPartIds()) {
+            Part part = locationManager.findPartByLegacyNumber(campaign, legacyNumber);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        return parts;
     }
 
     private static @Nullable Integer parsePartId(String text) {
@@ -1357,6 +1408,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // Spare Ammo bins are useless
             if ((prt instanceof AmmoBin) && prt.isSpare()) {
                 removeParts.add(prt);
+            }
+
+            if (!prt.isSpare() && prt.clearImpossibleDifficulty()) {
+                LOGGER.info("Cleared impossible task difficulty on {}", prt.getName());
             }
         }
     }
@@ -2466,6 +2521,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(campaign, version);
         rehomeBaseHangarUnitParts(campaign);
+        cleanWithdrawnInfernoSrmStock(campaign);
 
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -2502,6 +2558,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // possible that these might have changed if changes were made to
             // the ordering of equipment in the underlying data file for the unit.
             // We're not checking for refit here.
+            WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
             final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
             final EquipmentUnscramblerResult result = unscrambler.unscramble();
             if (!result.succeeded()) {
@@ -2645,6 +2702,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             });
         }
+
+        // Units an older version left with duplicate or scattered parts, at a base or after a move, are put right
+        UnitPartsRepair.repair(campaign);
 
         // Spares reserved by tasks on units that have since left the campaign are freed
         ReservedSpares.releaseOrphanedReservations(campaign);
@@ -2801,6 +2861,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Settle the remaining balance of any legacy contracts closed out on load; deferred to here so the force is
         // populated and the campaign's contract base can be computed.
         LegacyContractConverter.settlePendingLegacyContracts(campaign);
+        // Free any forces stranded on the scenarios of contracts whose completion was interrupted in earlier versions.
+        MissionCompletionManager.releaseCompletedContractDeployments(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

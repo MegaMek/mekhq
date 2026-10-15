@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.board.Board;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -261,10 +262,13 @@ public class AtBDynamicScenario extends AtBScenario {
     public int getStartingPos() {
         // If we've assigned at least one force
         // and there's a player force template associated with the first force
+        // and that template's deployment zone has been generated (the scenario has been finalized)
         // then return the generated deployment zone associated with the first force
-        if (!getForceIDs().isEmpty() &&
-                  playerForceTemplates.containsKey(getForceIDs().getFirst())) {
-            return playerForceTemplates.get(getForceIDs().getFirst()).getActualDeploymentZone();
+        if (!getForceIDs().isEmpty()) {
+            ScenarioForceTemplate forceTemplate = playerForceTemplates.get(getForceIDs().getFirst());
+            if ((forceTemplate != null) && (forceTemplate.getActualDeploymentZone() != Board.START_NONE)) {
+                return forceTemplate.getActualDeploymentZone();
+            }
         }
 
         return super.getStartingPos();
