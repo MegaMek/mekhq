@@ -1472,6 +1472,20 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public TargetRoll getSiteMod() {
+        return getSiteMod(site);
+    }
+
+    /**
+     * Returns the repair modifier for the given repair site.
+     *
+     * @param site the repair site, one of the {@code SITE_*} constants
+     *
+     * @return the target roll modifier for repairs performed at that site
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static TargetRoll getSiteMod(int site) {
         return switch (site) {
             case SITE_IMPROVISED -> new TargetRoll(2, "Improvised");
             case SITE_FIELD_WORKSHOP -> new TargetRoll(1, "Field Workshop");
