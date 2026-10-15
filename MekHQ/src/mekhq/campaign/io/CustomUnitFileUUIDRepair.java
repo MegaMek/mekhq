@@ -1,0 +1,288 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.io;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.loaders.MtfFile;
+import megamek.common.util.UUIDUtil;
+import megamek.logging.MMLogger;
+
+/**
+ * Repairs custom unit files that share their unit-file UUID with another unit file.
+ *
+ * <p>Before refits started generating their own UUID, a customized refit saved by MekHQ kept the UUID of the design
+ * it was edited from. The unit cache then reports an ambiguous UUID, and a UUID-first lookup can load the source
+ * design instead of the custom. This repair gives each such custom file in the MekHQ customs directory a fresh UUID,
+ * written in place so nothing else in the file changes, and records the shared UUID as the file's refit-from
+ * reference when it has none.</p>
+ *
+ * <p>In each group of files sharing a UUID one file keeps it: a file outside the customs directory when there is one
+ * (normally the canon design), otherwise the oldest custom file, which is the design the others were refit from.</p>
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public final class CustomUnitFileUUIDRepair {
+    private static final MMLogger LOGGER = MMLogger.create(CustomUnitFileUUIDRepair.class);
+
+    // TODO : Remove inline file path (matches Refit#saveCustomization and CampaignXmlParser#processCustom)
+    private static final Path CUSTOMS_DIRECTORY = Path.of("data", "mekfiles", "customs");
+
+    // Unit files are rewritten as bytes-in, bytes-out; ISO-8859-1 maps every byte to one character and back, so any
+    // non-UTF-8 text in a file survives the round trip unchanged.
+    private static final Charset FILE_CHARSET = StandardCharsets.ISO_8859_1;
+
+    private CustomUnitFileUUIDRepair() {
+    }
+
+    /**
+     * Repairs every custom unit file in the MekHQ customs directory whose UUID collides with another unit file, then
+     * rescans the unit cache if any file was changed. Blocks until the unit cache has finished loading.
+     *
+     * @return the number of custom unit files that were given a new UUID
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int repairCustomUnitFiles() {
+        MekSummaryCache cache = MekSummaryCache.getInstance();
+        int repairedCount = repairCustomUnitFiles(cache.getAllMeks(), CUSTOMS_DIRECTORY);
+        if (repairedCount > 0) {
+            LOGGER.info("Gave {} custom unit file(s) a new unit-file UUID; rescanning unit files.", repairedCount);
+            cache.loadMekData();
+        }
+        return repairedCount;
+    }
+
+    /**
+     * Repairs every custom unit file under {@code customsDirectory} whose UUID collides with another of the
+     * {@code summaries}. Does not touch the unit cache.
+     *
+     * @param summaries        the unit summaries to check
+     * @param customsDirectory the directory whose unit files may be rewritten
+     *
+     * @return the number of custom unit files that were given a new UUID
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int repairCustomUnitFiles(MekSummary[] summaries, Path customsDirectory) {
+        int repairedCount = 0;
+        for (MekSummary summary : findCustomsToRepair(summaries, customsDirectory)) {
+            File sourceFile = summary.getSourceFile();
+            String sharedUUID = summary.getUnitFileUUID();
+            String newUUID = UUIDUtil.newUUIDv7().toString();
+            try {
+                if (rewriteUnitFileUUID(sourceFile, newUUID, sharedUUID)) {
+                    LOGGER.info("Custom unit file {} shared unit-file UUID {} with another unit; it now has UUID {}.",
+                          sourceFile, sharedUUID, newUUID);
+                    repairedCount++;
+                } else {
+                    LOGGER.warn("Custom unit file {} shares unit-file UUID {} with another unit, but no UUID entry "
+                          + "was found to replace.", sourceFile, sharedUUID);
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex, "Could not give custom unit file {} a new unit-file UUID.", sourceFile);
+            }
+        }
+        return repairedCount;
+    }
+
+    /**
+     * Finds the custom unit files that need a new UUID: those under {@code customsDirectory} that share their UUID
+     * with another unit file and are not the file chosen to keep it.
+     *
+     * @param summaries        the unit summaries to check
+     * @param customsDirectory the directory whose unit files may be rewritten
+     *
+     * @return the summaries of the custom unit files to repair
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<MekSummary> findCustomsToRepair(MekSummary[] summaries, Path customsDirectory) {
+        Map<String, List<MekSummary>> summariesByUUID = new HashMap<>();
+        for (MekSummary summary : summaries) {
+            String unitFileUUID = summary.getUnitFileUUID();
+            if ((unitFileUUID == null) || unitFileUUID.isBlank() || summary.isBattlefieldSupportAsset()) {
+                continue;
+            }
+            summariesByUUID.computeIfAbsent(unitFileUUID, key -> new ArrayList<>()).add(summary);
+        }
+
+        Path normalizedCustomsDirectory = customsDirectory.toAbsolutePath().normalize();
+        List<MekSummary> customsToRepair = new ArrayList<>();
+        for (List<MekSummary> sharingSummaries : summariesByUUID.values()) {
+            if (sharingSummaries.size() < 2) {
+                continue;
+            }
+
+            MekSummary keeper = chooseUUIDKeeper(sharingSummaries, normalizedCustomsDirectory);
+            for (MekSummary summary : sharingSummaries) {
+                if ((summary != keeper) && isRepairableCustom(summary, normalizedCustomsDirectory)) {
+                    customsToRepair.add(summary);
+                }
+            }
+        }
+        return customsToRepair;
+    }
+
+    /**
+     * Picks the file in a group sharing a UUID that keeps it: the first file that is not a repairable custom, or else
+     * the least recently modified custom.
+     */
+    private static MekSummary chooseUUIDKeeper(List<MekSummary> sharingSummaries, Path normalizedCustomsDirectory) {
+        MekSummary oldestCustom = null;
+        for (MekSummary summary : sharingSummaries) {
+            if (!isRepairableCustom(summary, normalizedCustomsDirectory)) {
+                return summary;
+            }
+            if ((oldestCustom == null)
+                  || (summary.getSourceFile().lastModified() < oldestCustom.getSourceFile().lastModified())) {
+                oldestCustom = summary;
+            }
+        }
+        return oldestCustom;
+    }
+
+    private static boolean isRepairableCustom(MekSummary summary, Path normalizedCustomsDirectory) {
+        File sourceFile = summary.getSourceFile();
+        if ((sourceFile == null) || (summary.getEntryName() != null) || !sourceFile.isFile()) {
+            // Units inside archives cannot be rewritten in place
+            return false;
+        }
+        String fileName = sourceFile.getName().toLowerCase();
+        if (!fileName.endsWith(".mtf") && !fileName.endsWith(".blk")) {
+            return false;
+        }
+        return sourceFile.toPath().toAbsolutePath().normalize().startsWith(normalizedCustomsDirectory);
+    }
+
+    /**
+     * Replaces the unit-file UUID in an MTF or BLK file in place, leaving every other line unchanged. When the file
+     * has no refit-from reference yet, {@code refitFromUUID} is added directly after the UUID entry.
+     *
+     * @param unitFile      the {@code .mtf} or {@code .blk} file to rewrite
+     * @param newUUID       the new unit-file UUID
+     * @param refitFromUUID the refit-from reference to add if the file has none, or {@code null} to add none
+     *
+     * @return {@code true} if the file had a UUID entry and was rewritten
+     *
+     * @throws IOException if the file cannot be read or written
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean rewriteUnitFileUUID(File unitFile, String newUUID, @Nullable String refitFromUUID)
+          throws IOException {
+        String contents = Files.readString(unitFile.toPath(), FILE_CHARSET);
+        String lineSeparator = contents.contains("\r\n") ? "\r\n" : "\n";
+        List<String> lines = new ArrayList<>(List.of(contents.split("\r?\n", -1)));
+
+        boolean replaced = unitFile.getName().toLowerCase().endsWith(".mtf")
+              ? rewriteMtfLines(lines, newUUID, refitFromUUID)
+              : rewriteBlkLines(lines, newUUID, refitFromUUID);
+        if (!replaced) {
+            return false;
+        }
+
+        Files.writeString(unitFile.toPath(), String.join(lineSeparator, lines), FILE_CHARSET);
+        return true;
+    }
+
+    private static boolean rewriteMtfLines(List<String> lines, String newUUID, @Nullable String refitFromUUID) {
+        int uuidLineIndex = -1;
+        boolean hasRefitFromUUID = false;
+        for (int index = 0; index < lines.size(); index++) {
+            String lowerCaseLine = lines.get(index).trim().toLowerCase();
+            if ((uuidLineIndex < 0) && lowerCaseLine.startsWith(MtfFile.UUID)) {
+                uuidLineIndex = index;
+            } else if (lowerCaseLine.startsWith(MtfFile.REFIT_FROM_UUID)) {
+                hasRefitFromUUID = true;
+            }
+        }
+        if (uuidLineIndex < 0) {
+            return false;
+        }
+
+        lines.set(uuidLineIndex, MtfFile.UUID + newUUID);
+        if (!hasRefitFromUUID && (refitFromUUID != null)) {
+            lines.add(uuidLineIndex + 1, MtfFile.REFIT_FROM_UUID + refitFromUUID);
+        }
+        return true;
+    }
+
+    private static boolean rewriteBlkLines(List<String> lines, String newUUID, @Nullable String refitFromUUID) {
+        String uuidStartTag = '<' + BLKFile.UNIT_FILE_UUID + '>';
+        String uuidEndTag = "</" + BLKFile.UNIT_FILE_UUID + '>';
+        String refitFromStartTag = '<' + BLKFile.REFIT_FROM_UUID + '>';
+
+        int uuidStartIndex = -1;
+        boolean hasRefitFromUUID = false;
+        for (int index = 0; index < lines.size(); index++) {
+            String trimmedLine = lines.get(index).trim();
+            if ((uuidStartIndex < 0) && trimmedLine.equalsIgnoreCase(uuidStartTag)) {
+                uuidStartIndex = index;
+            } else if (trimmedLine.equalsIgnoreCase(refitFromStartTag)) {
+                hasRefitFromUUID = true;
+            }
+        }
+        if ((uuidStartIndex < 0) || (uuidStartIndex + 2 >= lines.size())
+              || !lines.get(uuidStartIndex + 2).trim().equalsIgnoreCase(uuidEndTag)) {
+            return false;
+        }
+
+        lines.set(uuidStartIndex + 1, newUUID);
+        if (!hasRefitFromUUID && (refitFromUUID != null)) {
+            int insertIndex = uuidStartIndex + 3;
+            lines.add(insertIndex, "");
+            lines.add(insertIndex + 1, refitFromStartTag);
+            lines.add(insertIndex + 2, refitFromUUID);
+            lines.add(insertIndex + 3, "</" + BLKFile.REFIT_FROM_UUID + '>');
+        }
+        return true;
+    }
+}
