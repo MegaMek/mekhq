@@ -120,6 +120,7 @@ public final class UnitPartsRepair {
         }
         int duplicateCount = removeDuplicates(campaign, unit, homeWarehouse);
         int surplusBayCount = removeSurplusBays(campaign, unit);
+        int reattachedDoorCount = reattachOrphanedDoors(campaign, unit);
         int surplusDoorCount = removeSurplusMissingDoors(campaign, unit);
         int movedCount = 0;
         for (Part part : List.copyOf(unit.getParts())) {
@@ -129,11 +130,12 @@ public final class UnitPartsRepair {
                 movedCount++;
             }
         }
-        boolean isRepaired = (duplicateCount + surplusBayCount + surplusDoorCount + movedCount) > 0;
+        boolean isRepaired = (duplicateCount + surplusBayCount + reattachedDoorCount + surplusDoorCount + movedCount)
+                                   > 0;
         if (isRepaired) {
-            LOGGER.info("[PartIdentity] {}: removed {} duplicate parts, {} surplus bays and {} surplus missing doors, "
-                              + "moved {} parts to its warehouse", unit.getName(), duplicateCount, surplusBayCount,
-                  surplusDoorCount, movedCount);
+            LOGGER.info("[PartIdentity] {}: removed {} duplicate parts and {} surplus bays, put {} bay doors back in "
+                              + "their bays, removed {} surplus missing doors, moved {} parts to its warehouse",
+                  unit.getName(), duplicateCount, surplusBayCount, reattachedDoorCount, surplusDoorCount, movedCount);
         }
         return isRepaired;
     }
@@ -233,6 +235,72 @@ public final class UnitPartsRepair {
     }
 
     /**
+     * Puts working bay doors back in their bays. Versions before 0.49.4 dropped a replacement door's link to its bay,
+     * so after a reload the bay listed that door as missing again and asked for it to be replaced once more. Each
+     * door with no bay now fills one of the bay's missing doors. Doors left over once every bay is whole stay on the
+     * unit as they were.
+     *
+     * @return how many doors were put back in a bay
+     */
+    private static int reattachOrphanedDoors(Campaign campaign, Unit unit) {
+        List<BayDoor> orphanedDoors = new ArrayList<>();
+        for (Part part : unit.getParts()) {
+            if ((part instanceof BayDoor door) && !isListedByABay(door)) {
+                orphanedDoors.add(door);
+            }
+        }
+        if (orphanedDoors.isEmpty()) {
+            return 0;
+        }
+        int reattachedCount = 0;
+        for (Part part : List.copyOf(unit.getParts())) {
+            if ((part instanceof TransportBayPart bay) && !orphanedDoors.isEmpty()) {
+                reattachedCount += fillMissingDoors(campaign, unit, bay, orphanedDoors);
+            }
+        }
+        if (!orphanedDoors.isEmpty()) {
+            LOGGER.debug("[PartIdentity] {}: {} bay doors with no bay are left, as every bay has its doors",
+                  unit.getName(), orphanedDoors.size());
+        }
+        return reattachedCount;
+    }
+
+    /**
+     * Swaps each of the bay's missing doors for one of the doors with no bay, then counts the bay's working doors
+     * again so the unit agrees with its parts.
+     *
+     * @return how many doors were put in this bay
+     */
+    private static int fillMissingDoors(Campaign campaign, Unit unit, TransportBayPart bay,
+          List<BayDoor> orphanedDoors) {
+        int filledCount = 0;
+        for (Part childPart : List.copyOf(bay.getChildParts())) {
+            if ((childPart instanceof MissingBayDoor missingDoor) && !orphanedDoors.isEmpty()) {
+                removeFromCampaign(campaign, unit, missingDoor);
+                bay.addChildPart(orphanedDoors.removeFirst());
+                filledCount++;
+            }
+        }
+        if ((filledCount > 0) && (bay.getBay() != null)) {
+            int workingDoors = 0;
+            for (Part childPart : bay.getChildParts()) {
+                if ((childPart instanceof BayDoor) && !childPart.needsFixing()) {
+                    workingDoors++;
+                }
+            }
+            bay.getBay().setCurrentDoors(Math.min(workingDoors, bay.getBay().getDoors()));
+        }
+        return filledCount;
+    }
+
+    /**
+     * @return {@code true} if the part's bay lists it among its parts
+     */
+    private static boolean isListedByABay(Part part) {
+        return (part.getParentPart() != null) && part.getParentPart().getChildParts().contains(part);
+    }
+
+    /**
      * Removes missing doors beyond what the unit's bays have: a bay keeps its doors, present ones first, up to its
      * number of doors, and once every bay has all its doors, missing doors no bay lists are removed.
      */
@@ -246,9 +314,7 @@ public final class UnitPartsRepair {
         }
         if (doorsStillNeeded == 0) {
             for (Part part : unit.getParts()) {
-                boolean isListedByABay = (part.getParentPart() != null)
-                                               && part.getParentPart().getChildParts().contains(part);
-                if ((part instanceof MissingBayDoor) && !isListedByABay && !surplusDoors.contains(part)) {
+                if ((part instanceof MissingBayDoor) && !isListedByABay(part) && !surplusDoors.contains(part)) {
                     surplusDoors.add(part);
                 }
             }
