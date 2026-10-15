@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.bays.BayType;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.units.Entity;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.Part;
@@ -50,7 +49,6 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class MissingCubicle extends MissingPart {
-    private static final MMLogger LOGGER = MMLogger.create(MissingCubicle.class);
 
     private BayType bayType;
 
@@ -138,12 +136,7 @@ public class MissingCubicle extends MissingPart {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
-                String bayRawValue = wn2.getTextContent();
-                bayType = BayType.parse(bayRawValue);
-                if (null == bayType) {
-                    LOGGER.error("Could not parse bay type {} treating as BayType.Mek", wn2.getTextContent());
-                    bayType = BayType.MEK;
-                }
+                bayType = Cubicle.readStoredBayType(wn2.getTextContent());
                 name = bayType.getDisplayName() + " Cubicle";
             }
         }

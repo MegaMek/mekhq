@@ -233,6 +233,25 @@ public class GroundTransitLocationTest {
             assertEquals(personId, ids.get(0));
         }
 
+        @Test
+        void generateInstanceFromXmlReadsPartsInTransitByIdentityAndOlderNumbers() throws Exception {
+            UUID partId = UUID.randomUUID();
+            String xml = "<groundTransitLocation><currentSystemId>Outreach</currentSystemId>"
+                               + "<transitTime>1.0</transitTime>"
+                               + "<partUniqueId>" + partId + "</partUniqueId>"
+                               + "<partId>12</partId></groundTransitLocation>";
+            Node node = parseXml(xml);
+
+            Campaign mockCampaign = mockCampaign();
+            when(mockCampaign.getSystemById("Outreach")).thenReturn(system);
+
+            GroundTransitLocation loc = GroundTransitLocation.generateInstanceFromXML(node, mockCampaign);
+            assertNotNull(loc);
+
+            assertEquals(List.of(partId), loc.drainPendingPartUniqueIds());
+            assertEquals(List.of(12), loc.drainPendingPartIds(), "A part number from an older save is still read");
+        }
+
         private Node parseXml(String xml) throws Exception {
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();

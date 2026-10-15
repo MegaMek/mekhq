@@ -38,6 +38,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.bays.BayType;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingCubicle;
@@ -53,6 +54,7 @@ import org.w3c.dom.NodeList;
  * @author Neoancient
  */
 public class Cubicle extends Part {
+    private static final MMLogger LOGGER = MMLogger.create(Cubicle.class);
 
     private BayType bayType;
 
@@ -152,14 +154,39 @@ public class Cubicle extends Part {
         return -1;
     }
 
+    /**
+     * Reads the bay type a cubicle was saved with. Saves made before MegaMek renamed its Mek and ProtoMek bay types
+     * store the older names, which are translated to {@link BayType#MEK} and {@link BayType#PROTOMEK}. A value that
+     * still cannot be read is logged and treated as a Mek bay, so the cubicle loads with its unit and bay rather than
+     * broken.
+     *
+     * @param storedValue the bay type as written in the save
+     *
+     * @return the bay type, never {@code null}
+     */
+    public static BayType readStoredBayType(String storedValue) {
+        String trimmedValue = storedValue.trim();
+        BayType bayType = BayType.parse(trimmedValue);
+        if (bayType == null) {
+            // the older name only appears in saves made before the rename, so it is matched here and nowhere else
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
+            bayType = BayType.parse(trimmedValue.toUpperCase().replace("MECH", "MEK"));
+        }
+        if (bayType == null) {
+            LOGGER.error("[Cubicle] Unknown bay type '{}' in the save; treating it as a Mek bay", trimmedValue);
+            return BayType.MEK;
+        }
+        return bayType;
+    }
+
     @Override
     public Money getStickerPrice() {
-        return Money.of(bayType.getCost());
+        return (bayType == null) ? Money.zero() : Money.of(bayType.getCost());
     }
 
     @Override
     public double getTonnage() {
-        return bayType.getWeight();
+        return (bayType == null) ? 0 : bayType.getWeight();
     }
 
     @Override
@@ -170,7 +197,9 @@ public class Cubicle extends Part {
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayType", bayType.toString());
+        if (bayType != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayType", bayType.toString());
+        }
         writeToXMLEnd(pw, indent);
     }
 
@@ -181,8 +210,7 @@ public class Cubicle extends Part {
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
-                String bayRawValue = wn2.getTextContent();
-                bayType = BayType.parse(bayRawValue);
+                bayType = readStoredBayType(wn2.getTextContent());
                 name = bayType.getDisplayName() + " Cubicle";
             }
         }

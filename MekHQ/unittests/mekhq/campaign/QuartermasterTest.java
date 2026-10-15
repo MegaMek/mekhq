@@ -541,6 +541,7 @@ public class QuartermasterTest {
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
         Money sellValue = Money.of(42.0);
         when(mockUnit.getSellValue()).thenReturn(sellValue);
+        when(mockCampaign.removeUnit(mockUnit.getId())).thenReturn(true);
 
         // When you sell a unit with a certain value...
         quartermaster.sellUnit(mockUnit);

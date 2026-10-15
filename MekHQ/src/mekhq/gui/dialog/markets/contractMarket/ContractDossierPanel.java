@@ -44,6 +44,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,6 +53,8 @@ import javax.swing.*;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
@@ -550,15 +553,23 @@ public class ContractDossierPanel extends JPanel {
         panel.add(title, titleGbc);
 
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.income"),
-              "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), hexColor(positiveColor()), false);
+              "+" + estimate.guaranteedIncome().toAmountAndSymbolString(), hexColor(positiveColor()), false, null);
+        String expensesBreakdown = getFormattedTextAt(RESOURCE_BUNDLE,
+              "dossier.contractMarket.profit.expenses.tooltip",
+              estimate.salaries().toAmountAndSymbolString(),
+              estimate.maintenance().toAmountAndSymbolString(),
+              estimate.runningCosts().toAmountAndSymbolString(),
+              estimate.foodAndHousing().toAmountAndSymbolString());
         addProfitRow(panel, getFormattedTextAt(RESOURCE_BUNDLE,
                     "dossier.contractMarket.profit.expenses",
                     contract.getLengthInMonths(),
                     estimate.transitDays()),
-              "-" + estimate.operatingCosts().toAmountAndSymbolString(), hexColor(dangerColor()), false);
+              "-" + estimate.operatingCosts().toAmountAndSymbolString(), hexColor(dangerColor()), false,
+              expensesBreakdown);
         addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
               estimate.estimatedNet().toAmountAndSymbolString(),
-              hexColor(estimate.estimatedNet().isPositive() ? positiveColor() : dangerColor()), true);
+              hexColor(estimate.estimatedNet().isPositive() ? positiveColor() : dangerColor()), true, null);
+        addCombatPayRows(panel, estimate);
 
         // A JTextArea wraps to whatever width the layout gives it, so the caveat spans the full panel width instead of
         // being confined to a fixed HTML body width like a JLabel would be.
@@ -586,7 +597,35 @@ public class ContractDossierPanel extends JPanel {
         return panel;
     }
 
-    private void addProfitRow(JPanel panel, String label, String value, Color valueColor, boolean emphasize) {
+    /**
+     * Adds the combat pay the contract can bring if every chance at the bonus is won, and the net with it, kept apart
+     * from the guaranteed estimate above. Nothing is added when the contract pays no combat bonus.
+     */
+    private void addCombatPayRows(JPanel panel, ContractProfitEstimate estimate) {
+        if (!estimate.potentialCombatPay().isPositive()) {
+            return;
+        }
+
+        StratConCombatBonusProjection combatBonus = estimate.combatBonus();
+        String bonusCount = new DecimalFormat("0.#").format(combatBonus.bonusCount());
+        String combatPayTooltip = getFormattedTextAt(RESOURCE_BUNDLE,
+              combatBonus.isFromNavPoint()
+                    ? "dossier.contractMarket.profit.combatPay.navPoint.tooltip"
+                    : "dossier.contractMarket.profit.combatPay.essential.tooltip",
+              bonusCount,
+              contract.getContractFinanceData().combatPay().toAmountAndSymbolString());
+        addProfitRow(panel, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.combatPay", bonusCount),
+              "+" + estimate.potentialCombatPay().toAmountAndSymbolString(), hexColor(positiveColor()), false,
+              combatPayTooltip);
+
+        Money netWithCombatPay = estimate.getNetWithCombatPay();
+        addProfitRow(panel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.netWithCombatPay"),
+              netWithCombatPay.toAmountAndSymbolString(),
+              hexColor(netWithCombatPay.isPositive() ? positiveColor() : dangerColor()), true, null);
+    }
+
+    private void addProfitRow(JPanel panel, String label, String value, Color valueColor, boolean emphasize,
+          @Nullable String tooltip) {
         int row = panel.getComponentCount();
 
         GridBagConstraints labelGbc = new GridBagConstraints();
@@ -617,6 +656,11 @@ public class ContractDossierPanel extends JPanel {
                                                                                         + 1f));
         }
         panel.add(valueComponent, valueGbc);
+
+        if (tooltip != null) {
+            labelComponent.setToolTipText(tooltip);
+            valueComponent.setToolTipText(tooltip);
+        }
     }
 
     private JPanel metricTile(String labelKey, String value) {

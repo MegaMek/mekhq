@@ -58,6 +58,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
@@ -101,7 +102,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
     public static final int COL_DESTINATION_SYSTEM = 27;
     public static final int COL_DESTINATION_PLANET = 28;
     public static final int COL_DESTINATION_NAME = 29;
-    public static final int N_COL = 30;
+    public static final int COL_REPAIR_TIME = 30;
+    public static final int N_COL = 31;
 
     private final Campaign campaign;
     //endregion Variable Declarations
@@ -149,6 +151,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_DESTINATION_NAME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationName");
             case COL_DESTINATION_SYSTEM -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationSystem");
             case COL_DESTINATION_PLANET -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationPlanet");
+            case COL_REPAIR_TIME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.repairTime");
             default -> "?";
         };
     }
@@ -156,7 +159,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
     public int getColumnWidth(final int columnId) {
         return switch (columnId) {
             case COL_NAME, COL_TECH, COL_PILOT, COL_FORCE, COL_TECH_CRW -> 150;
-            case COL_TYPE, COL_WEIGHT_CLASS, COL_SITE -> 50;
+            case COL_TYPE, COL_WEIGHT_CLASS, COL_SITE, COL_REPAIR_TIME -> 50;
             case COL_COST, COL_STATUS, COL_MODE, COL_CREW -> 40;
             case COL_PARTS -> 10;
             case COL_LOCATION_NAME, COL_DESTINATION_NAME -> 130;
@@ -168,7 +171,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
     public int getAlignment(int col) {
         return switch (col) {
-            case COL_WEIGHT, COL_COST, COL_MAINTAIN, COL_MAINTAIN_CYCLE, COL_BV, COL_REPAIR, COL_PARTS ->
+            case COL_WEIGHT, COL_COST, COL_MAINTAIN, COL_MAINTAIN_CYCLE, COL_BV, COL_REPAIR, COL_PARTS,
+                  COL_REPAIR_TIME ->
                   SwingConstants.RIGHT;
             case COL_QUALITY, COL_CREW, COL_QUIRKS, COL_MODE -> SwingConstants.CENTER;
             default -> SwingConstants.LEFT;
@@ -195,6 +199,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
             case COL_CREW -> getCrewTooltip(unit);
             case COL_QUIRKS -> unit.getQuirksListHTML();
+            case COL_REPAIR_TIME -> WorkTimeEstimate.describeUnitRepairTimeToolTip(unit);
             default -> null;
         };
     }
@@ -417,6 +422,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_DESTINATION_SYSTEM -> LocationDisplay.getDestinationSystem(unit, campaign.getLocalDate());
             case COL_DESTINATION_PLANET -> LocationDisplay.getDestinationPlanet(unit, campaign.getLocalDate());
             case COL_DESTINATION_NAME -> LocationDisplay.getDestinationName(unit, campaign, campaign.getLocalDate());
+            case COL_REPAIR_TIME -> WorkTimeEstimate.describeUnitRepairTime(campaign, unit);
             default -> "?";
         };
     }

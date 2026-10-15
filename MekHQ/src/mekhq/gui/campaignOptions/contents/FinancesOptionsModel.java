@@ -64,6 +64,9 @@ class FinancesOptionsModel {
     boolean payForTransport;
     boolean payForRecruitment;
     double recruitmentTrainingCostMultiplier;
+    double recruitmentProfessionSkillCostMultiplier;
+    double recruitmentUtilitySkillCostMultiplier;
+    double recruitmentRoleplaySkillCostMultiplier;
     boolean payForFood;
     boolean payForHousing;
     boolean sellUnits;
@@ -115,6 +118,10 @@ class FinancesOptionsModel {
         payForTransport = options.get(CampaignOption.PAY_FOR_TRANSPORT);
         payForRecruitment = options.get(CampaignOption.PAY_FOR_RECRUITMENT);
         recruitmentTrainingCostMultiplier = options.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
+        recruitmentProfessionSkillCostMultiplier =
+              options.get(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER);
+        recruitmentUtilitySkillCostMultiplier = options.get(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER);
+        recruitmentRoleplaySkillCostMultiplier = options.get(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER);
         payForFood = options.get(CampaignOption.PAY_FOR_FOOD);
         payForHousing = options.get(CampaignOption.PAY_FOR_HOUSING);
         sellUnits = options.get(CampaignOption.SELL_UNITS);
@@ -168,6 +175,10 @@ class FinancesOptionsModel {
         options.set(CampaignOption.PAY_FOR_TRANSPORT, payForTransport);
         options.set(CampaignOption.PAY_FOR_RECRUITMENT, payForRecruitment);
         options.set(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER, recruitmentTrainingCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER,
+              recruitmentProfessionSkillCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER, recruitmentUtilitySkillCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, recruitmentRoleplaySkillCostMultiplier);
         options.set(CampaignOption.PAY_FOR_FOOD, payForFood);
         options.set(CampaignOption.PAY_FOR_HOUSING, payForHousing);
         options.set(CampaignOption.SELL_UNITS, sellUnits);

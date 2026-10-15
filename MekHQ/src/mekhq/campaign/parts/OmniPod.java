@@ -330,27 +330,12 @@ public class OmniPod extends Part {
         }
     }
 
+    /**
+     * An OmniPod holds nothing until equipment is put in it, so it reads as empty rather than functional.
+     */
     @Override
-    public String getStatus() {
-        String toReturn = "Empty";
-        if (isReservedForRefit()) {
-            toReturn = "Reserved for Refit";
-        }
-        if (isReservedForReplacement()) {
-            toReturn = "Reserved for Repair";
-        }
-        if (isBeingWorkedOn()) {
-            toReturn = "Being worked on";
-        }
-        if (!isPresent()) {
-            // toReturn = "" + getDaysToArrival() + " days to arrival";
-            String dayName = "day";
-            if (getDaysToArrival() > 1) {
-                dayName += "s";
-            }
-            toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
-        }
-        return toReturn;
+    protected String getConditionStatus() {
+        return getTextAt(RESOURCE_BUNDLE, "OmniPod.status.empty");
     }
 
     @Override

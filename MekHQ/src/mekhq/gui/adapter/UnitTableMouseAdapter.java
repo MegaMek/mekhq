@@ -118,6 +118,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.unit.BombUnloader;
+import mekhq.campaign.unit.EditedDamage;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -199,6 +201,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_MAINTENANCE_REPORT = "MAINTENANCE_REPORT";
     public static final String COMMAND_QUIRKS = "QUIRKS";
     public static final String COMMAND_BOMBS = "BOMBS";
+    public static final String COMMAND_UNLOAD_ALL_BOMBS = "UNLOAD_ALL_BOMBS";
     public static final String COMMAND_SUPPLY_COST = "SUPPLY_COST";
     public static final String COMMAND_PARTS_REPORT = "PARTS_REPORT";
     public static final String COMMAND_TAG_CUSTOM = "TAG_CUSTOM";
@@ -686,12 +689,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                            .multipliedBy(gui.getCampaign()
                                                                .getCampaignOptions()
                                                                .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER));
-                gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign().getPlayerForce().getFinances()
-                      .credit(TransactionType.EQUIPMENT_PURCHASE,
-                            gui.getCampaign().getLocalDate(),
-                            refundAmount,
-                            "refund for cancelled equipment sale");
+                if (gui.getCampaign().removeUnit(u.getId())) {
+                    gui.getCampaign().getPlayerForce().getFinances()
+                          .credit(TransactionType.EQUIPMENT_PURCHASE,
+                                gui.getCampaign().getLocalDate(),
+                                refundAmount,
+                                "refund for cancelled equipment sale");
+                }
             }
         } else if (command.equals(COMMAND_ARRIVE)) {
             for (Unit u : units) {
@@ -750,6 +754,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             BombsDialog dialog = new BombsDialog((IBomber) selectedUnit.getEntity(), gui.getCampaign(), gui.getFrame());
             dialog.setVisible(true);
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+        } else if (command.equals(COMMAND_UNLOAD_ALL_BOMBS)) {
+            for (Unit unit : units) {
+                if (BombUnloader.hasBombsToUnload(unit)) {
+                    BombUnloader.unloadAll(gui.getCampaign(), unit);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                }
+            }
         } else if (command.equals(COMMAND_QUIRKS)) { // Single Unit only
             QuirksDialog dialog = new QuirksDialog(selectedUnit.getEntity(), gui.getFrame());
             dialog.setVisible(true);
@@ -757,6 +768,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_EDIT_DAMAGE)) { // Single Unit only
             UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), selectedUnit.getEntity());
             med.setVisible(true);
+            EditedDamage.reinstateRestoredLocations(selectedUnit);
             selectedUnit.runDiagnostic(false);
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_FLUFF_NAME)) { // Single Unit only
@@ -874,6 +886,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private boolean isSelfCrewedButHasNoTech(Unit unit) {
         return unit.isSelfCrewed() && unit.engineerResponsible().isEmpty();
+    }
+
+    /** @return {@code true} if any of the units carries a bomb that can be unloaded */
+    private static boolean isAnyCarryingBombs(Unit[] units) {
+        for (Unit unit : units) {
+            if (BombUnloader.hasBombsToUnload(unit)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -1081,6 +1103,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             if (oneSelected && unit.getEntity().isBomber()) {
                 menuItem = new JMenuItem("Select Bombs");
                 menuItem.setActionCommand(COMMAND_BOMBS);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            // Unload all bombs, from one aircraft or a whole selection
+            if (isAnyCarryingBombs(units)) {
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "unloadAllBombs.text"));
+                menuItem.setActionCommand(COMMAND_UNLOAD_ALL_BOMBS);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }

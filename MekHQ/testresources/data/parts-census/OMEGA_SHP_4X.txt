@@ -45,7 +45,7 @@ MekActuator | Upper Leg Actuator | location LL (7) | equipment - | quantity 1
 MekActuator | Upper Leg Actuator | location RL (6) | equipment - | quantity 1
 MekCockpit | Superheavy Cockpit | location HD (0) | equipment - | quantity 1
 MekGyro | Superheavy Gyro | location CT (1) | equipment - | quantity 1
-MekLifeSupport | Mech Life Support System | location HD (0) | equipment - | quantity 1
+MekLifeSupport | Mek Life Support System | location HD (0) | equipment - | quantity 1
 MekLocation | Mek Center Torso (IS Endo Steel) | location CT (1) | equipment - | quantity 1
 MekLocation | Mek Head (IS Endo Steel) | location HD (0) | equipment - | quantity 1
 MekLocation | Mek Left Arm (IS Endo Steel) | location LA (5) | equipment - | quantity 1

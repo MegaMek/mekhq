@@ -68,9 +68,9 @@ class MRMSUnitRuleAndOptionRowsTest {
           "MINOTAUR_PROTOMEK, true",
           "EPONA_PURSUIT_TANK_PRIME, true",
           "ELEMENTAL_BATTLE_ARMOR_LASER, true",
-          "LEOPARD_DROPSHIP, false"
+          "LEOPARD_DROPSHIP, true"
     })
-    void massRepairAcceptsEveryUnitATechCanWorkOnButNotSelfCrewedOnes(UnitFixture fixture, boolean isExpected) {
+    void massRepairAcceptsEveryUnitATechOrACrewCanWorkOn(UnitFixture fixture, boolean isExpected) {
         PartsScenario scenario = PartsScenario.create();
         Campaign campaign = scenario.getCampaign();
         campaign.getCampaignOptions().set(CampaignOption.MRMS_USE_REPAIR, true);

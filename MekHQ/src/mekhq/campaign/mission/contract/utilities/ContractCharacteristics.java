@@ -54,6 +54,7 @@ import mekhq.campaign.mission.contract.contractData.ContractCharacteristic.Categ
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 
@@ -198,6 +199,26 @@ public final class ContractCharacteristics {
                 }
             }
         }
+
+        if (contract.getCharacteristic(Category.INTENSITY) != null) {
+            refreshCombatPayForTrackCount(contract, campaign);
+        }
+    }
+
+    /**
+     * Combat pay was worked out from the track count before the intensity characteristic stepped it, and under the
+     * minimum-track and weekly-rolling options combat pay depends on the track count. So it is recomputed from the
+     * final track count, with the combat-pay characteristic baked back on top.
+     *
+     * @param contract the contract whose track count has changed
+     * @param campaign the campaign, for the pay scheme and its options
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void refreshCombatPayForTrackCount(final AbstractContract contract, final Campaign campaign) {
+        contract.updateCombatPay(bakeCombatPay(AbstractContractGeneration.determineCombatPay(campaign, contract),
+              contract));
     }
 
     /**

@@ -73,9 +73,11 @@ import mekhq.campaign.mission.contract.contractData.NegotiationData;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.NegotiationStepMath;
 import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 import mekhq.campaign.personnel.Person;
@@ -295,7 +297,10 @@ public class ContractNegotiationDialog extends JDialog {
                                                  "negotiate.contractMarket.subtitle",
                                                  contract.getName(),
                                                  contract.getEmployerMarketDisplayName(),
-                                                 scale)) +
+                                                 ChaosContractDeterminationScale.formatScale(
+                                                       contract.getExactScale(),
+                                                       campaign.getCampaignOptions()
+                                                             .get(CampaignOption.USE_FRACTIONAL_SCALE)))) +
                                            "</span></html>");
 
         JPanel budgets = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(16), 0));
@@ -955,13 +960,18 @@ public class ContractNegotiationDialog extends JDialog {
         dispose();
     }
 
-    /** Writes the current proposed term steps onto the contract and recomputes its pay from them. */
+    /**
+     * Writes the current proposed term steps onto the contract and recomputes its pay from them. The pay and combat pay
+     * characteristics are baked back on, as generation did, since the recomputed pay starts from the scheme's base.
+     */
     private void commitTermsAndPay() {
         contract.setContractTerms(new ContractTermsData(step(Clause.PAY), step(Clause.SUPPORT), step(Clause.TRANSPORT),
               step(Clause.SALVAGE), step(Clause.COMMAND)));
         AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
-        contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
-        contract.updateCombatPay(payScheme.getContractCombatPay(campaign, contract));
+        contract.updateMonthlyPay(ContractCharacteristics.bakeMonthlyPay(
+              payScheme.getContractMonthlyPay(campaign, contract), contract));
+        contract.updateCombatPay(ContractCharacteristics.bakeCombatPay(
+              payScheme.getContractCombatPay(campaign, contract), contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
     }

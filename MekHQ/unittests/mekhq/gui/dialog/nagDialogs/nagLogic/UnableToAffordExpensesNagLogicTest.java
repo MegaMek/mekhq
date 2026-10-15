@@ -93,6 +93,8 @@ class UnableToAffordExpensesNagLogicTest {
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(false);
     }
 
     @Test

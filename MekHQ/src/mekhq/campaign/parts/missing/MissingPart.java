@@ -59,7 +59,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -128,15 +127,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
               .append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getTimeAndTargetText());
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -556,21 +547,26 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
 
     @Override
     public void reservePart() {
-        // this is being set as an overnight repair, so
-        // we also need to reserve the replacement. If the
-        // quantity of the replacement is more than one, we will
-        // also need to split off a separate one
-        // shouldn't be null, but it never hurts to check
+        reserveReplacementFor(getTech());
+    }
+
+    /**
+     * Holds the replacement for an overnight job. If the replacement is one of a stack, one is split off to be held.
+     *
+     * @param reservingTech the tech doing the job; this part's own tech, or the tech on the pod swap it belongs to.
+     *                      Nothing is held when {@code null}.
+     */
+    public void reserveReplacementFor(@Nullable Person reservingTech) {
         Part replacement = findReplacement(false);
-        if ((null != replacement) && (null != getTech())) {
+        if ((null != replacement) && (null != reservingTech)) {
             if (replacement.getQuantity() > 1) {
                 Part actualReplacement = replacement.clone();
-                actualReplacement.setReservedBy(getTech());
+                actualReplacement.setReservedBy(reservingTech);
                 replacement.getWarehouse().addPart(actualReplacement, true);
                 setReplacementPart(actualReplacement);
                 replacement.changeQuantity(-1);
             } else {
-                replacement.setReservedBy(getTech());
+                replacement.setReservedBy(reservingTech);
                 setReplacementPart(replacement);
             }
         }

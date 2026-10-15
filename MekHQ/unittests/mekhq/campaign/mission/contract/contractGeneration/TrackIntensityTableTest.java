@@ -245,4 +245,33 @@ class TrackIntensityTableTest {
     void combatPayIsUnchangedByTheMinimumTrackWhenTracksWereRolled() {
         assertEquals(1.0, TrackIntensityTable.getCombatPayMultiplier(2, true, false), 0.0001);
     }
+
+    @Test
+    void expectedMonthlyTotalIsRollsTimesTracks() {
+        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 2, false, false), 0.0001);
+    }
+
+    @Test
+    void expectedTotalClampsToTheWidestColumn() {
+        // The three-month table's widest column is three tracks
+        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(3, 5, 2, false, false), 0.0001);
+    }
+
+    @Test
+    void expectedTotalIsZeroWithoutTracksOrRolls() {
+        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 3, false, false), 0.0001);
+        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 0, false, false), 0.0001);
+    }
+
+    @Test
+    void expectedTotalHonorsTheMinimumTrack() {
+        assertEquals(2.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 2, true, false), 0.0001);
+    }
+
+    @Test
+    void expectedWeeklyTotalAveragesTheCutShortBlock() {
+        // 3 months = 13 weeks = four full three-week blocks (one track each) plus the first slot of a fifth, which
+        // holds a track on one row in six; two rolls double it
+        assertEquals(2 * (4 + 1.0 / 6), TrackIntensityTable.getExpectedScheduleTotal(3, 1, 2, false, true), 0.0001);
+    }
 }

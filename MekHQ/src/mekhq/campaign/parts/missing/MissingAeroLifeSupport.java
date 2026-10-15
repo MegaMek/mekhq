@@ -42,6 +42,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.Part;
@@ -49,7 +50,6 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -117,8 +117,12 @@ public class MissingAeroLifeSupport extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
-                     && (cost.equals(part.getStickerPrice()));
+        if (!(part instanceof AeroLifeSupport lifeSupport) || (fighter != lifeSupport.isForFighter())) {
+            return false;
+        }
+        // A fighter's life support has one flat price, so one that went missing while saved at the old price still
+        // takes a new one
+        return fighter || cost.equals(lifeSupport.getStickerPrice());
     }
 
     @Override

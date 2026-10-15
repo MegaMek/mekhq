@@ -32,6 +32,7 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,6 +58,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceQuartermaster;
@@ -70,6 +72,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -86,6 +89,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 /**
  * JUnit Tests for {@link MRMSService}
@@ -149,6 +153,7 @@ public class MRMSServiceTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.MRMS_USE_SALVAGE)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_NEED_TOOL_KIT)).thenReturn(false);
         when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         when(mockCampaign.getPartInventory(any(Part.class))).thenReturn(mockPartInventory);
@@ -156,7 +161,8 @@ public class MRMSServiceTest {
         when(mockCampaign.fixPart(any(IPartWork.class), any(Person.class))).thenReturn("Part Fixed");
 
         when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(mockBaseTargetRoll);
-        doAnswer(inv -> {
+        // Mass Repair asks the skill-only check for its stand-in tech, and the full check for real techs
+        Answer<TargetRoll> targetRollByWorkMode = inv -> {
             Part part = inv.getArgument(0);
             if (part.equals(lastPartWork) && part.getMode() == lastPartWork.getMode()) {
                 return mockBaseTargetRoll;
@@ -177,7 +183,9 @@ public class MRMSServiceTest {
                 when(mockBaseTargetRoll.getValue()).thenReturn(targetRoll);
             }
             return mockBaseTargetRoll;
-        }).when(mockCampaign).getTargetFor(any(Part.class), any(Person.class));
+        };
+        doAnswer(targetRollByWorkMode).when(mockCampaign).getTargetFor(any(Part.class), any(Person.class));
+        doAnswer(targetRollByWorkMode).when(mockCampaign).getSkillTargetFor(any(Part.class), any(Person.class));
     }
 
 
@@ -229,16 +237,19 @@ public class MRMSServiceTest {
     }
 
     @Test
-    public void testIsValidMRMSUnitRejectsSelfCrewedUnit() {
+    public void testIsValidMRMSUnitAcceptsSelfMaintainedInfantry() {
         Unit unit = mock(Unit.class);
         MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+        Infantry infantry = mock(Infantry.class);
 
         when(unit.isSelfCrewed()).thenReturn(true);
-        when(unit.getEntity()).thenReturn(mock(Mek.class));
+        when(unit.isSelfMaintainedInfantry()).thenReturn(true);
+        when(infantry.isConventionalInfantry()).thenReturn(true);
+        when(unit.getEntity()).thenReturn(infantry);
         when(options.useRepair()).thenReturn(true);
         when(options.useSalvage()).thenReturn(true);
 
-        assertFalse(MRMSService.isValidMRMSUnit(unit, options));
+        assertTrue(MRMSService.isValidMRMSUnit(unit, options));
     }
 
     @Test
@@ -345,6 +356,92 @@ public class MRMSServiceTest {
 
         verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
         verify(mockCampaign, times(2)).addReport(any(), any(String.class));
+    }
+
+    @Test
+    public void testMRMSUnitsWithNoTechsNamesTechsWithoutToolKit() {
+        when(mockCampaignOptions.get(CampaignOption.MRMS_USE_REPAIR)).thenReturn(true);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_NEED_TOOL_KIT)).thenReturn(true);
+        // A MekTech whose only kit is a Descartes scanner, which does not count as a tool kit
+        Person descartesOnlyTech = mock(Person.class);
+        when(descartesOnlyTech.hasRepairKit(EquipmentKitCatalog.KIT_DESCARTES_MK_XXI)).thenReturn(true);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any(),
+                         ArgumentMatchers.anyBoolean())).thenReturn(new ArrayList<>());
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any())).thenReturn(List.of(descartesOnlyTech));
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+        for (Part part : unit.getParts()) {
+            if (part instanceof Armor armor) {
+                breakArmor(armor);
+            }
+        }
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        String toolKitNote = getFormattedTextAt("mekhq.resources.MRMS", "MRMS.TechsWithoutToolKit.report", 1);
+        verify(mockCampaign).addReport(any(), argThat((String report) -> report.contains(toolKitNote)));
+    }
+
+    @Test
+    public void testMRMSUnitsWithNoTechsSaysNothingOfToolKitsWhenNotRequired() {
+        when(mockCampaignOptions.get(CampaignOption.MRMS_USE_REPAIR)).thenReturn(true);
+        Person descartesOnlyTech = mock(Person.class);
+        when(descartesOnlyTech.hasRepairKit(EquipmentKitCatalog.KIT_DESCARTES_MK_XXI)).thenReturn(true);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any(),
+                         ArgumentMatchers.anyBoolean())).thenReturn(new ArrayList<>());
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getTechs(any(),
+                         any(),
+                         anyBoolean(),
+                         any())).thenReturn(List.of(descartesOnlyTech));
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+        for (Part part : unit.getParts()) {
+            if (part instanceof Armor armor) {
+                breakArmor(armor);
+            }
+        }
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        String toolKitNote = getFormattedTextAt("mekhq.resources.MRMS", "MRMS.TechsWithoutToolKit.report", 1);
+        verify(mockCampaign, times(0)).addReport(any(), argThat((String report) -> report.contains(toolKitNote)));
     }
 
     @Test

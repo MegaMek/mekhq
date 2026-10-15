@@ -37,7 +37,7 @@ MekActuator | Upper Leg Actuator | location LL (7) | equipment - | quantity 1
 MekActuator | Upper Leg Actuator | location RL (6) | equipment - | quantity 1
 MekCockpit | Primitive Industrial Cockpit | location HD (0) | equipment - | quantity 1
 MekGyro | Standard Gyro | location CT (1) | equipment - | quantity 1
-MekLifeSupport | Mech Life Support System | location HD (0) | equipment - | quantity 1
+MekLifeSupport | Mek Life Support System | location HD (0) | equipment - | quantity 1
 MekLocation | Mek Center Torso (Industrial) | location CT (1) | equipment - | quantity 1
 MekLocation | Mek Head (Industrial) | location HD (0) | equipment - | quantity 1
 MekLocation | Mek Left Arm (Industrial) | location LA (5) | equipment - | quantity 1

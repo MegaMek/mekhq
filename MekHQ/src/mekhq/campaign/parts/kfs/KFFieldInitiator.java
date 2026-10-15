@@ -225,17 +225,8 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public Money getStickerPrice() {
-        if ((unit != null) && (unit.getEntity() instanceof Jumpship)) {
-            int cost = (25000000 + (5000000 * unit.getEntity().getDocks()));
-            if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT
-                      && ((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 15;
-            } else if (((Jumpship) unit.getEntity()).hasLF()) {
-                cost *= 3;
-            } else if (((Jumpship) unit.getEntity()).getDriveCoreType() == Jumpship.DRIVE_CORE_COMPACT) {
-                cost *= 5;
-            }
-            return Money.of(cost);
+        if ((unit != null) && (unit.getEntity() instanceof Jumpship jumpship)) {
+            return KFDrivePrice.onShip(jumpship, 25_000_000.0 + (5_000_000.0 * jumpship.getDocks()));
         }
         return Money.of(25000000);
     }

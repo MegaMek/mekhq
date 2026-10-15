@@ -125,6 +125,7 @@ class HotSpotsUpkeepExclusionTest {
               CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS,
               CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL,
               CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE,
+              CampaignOption.USE_FRACTIONAL_SCALE,
               CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
 
         for (CampaignOption<Boolean> option : newOptions) {

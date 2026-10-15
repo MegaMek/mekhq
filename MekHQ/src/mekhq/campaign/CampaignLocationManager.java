@@ -396,7 +396,7 @@ public class CampaignLocationManager {
         return switch (traveler) {
             case Person person -> {yield campaign.getPlayerForce().getHumanResources().getPerson(person.getId()) != null;}
             case Unit unit -> campaign.getUnit(unit.getId()) != null;
-            case Part part -> findPartAnywhere(campaign, part.getId()) != null;
+            case Part part -> findPartAnywhere(campaign, part.getUniqueId()) != null;
             default -> true;
         };
     }
@@ -420,7 +420,76 @@ public class CampaignLocationManager {
         campaign.getPlayerForce().getDetachmentLocationManager().processArrivals(campaign);
     }
 
-    /** Searches the campaign warehouse then all base warehouses for a part by ID. */
+    /**
+     * Finds a part in the campaign warehouse or any base warehouse by its campaign-wide identity.
+     *
+     * @param campaign the campaign
+     * @param uniqueId the part's identity
+     *
+     * @return the part, or {@code null} if no warehouse holds it
+     */
+    public @Nullable Part findPartAnywhere(Campaign campaign, UUID uniqueId) {
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, uniqueId);
+        return (holdingWarehouse == null) ? null : holdingWarehouse.getPart(uniqueId);
+    }
+
+    /**
+     * Finds the warehouse whose stock holds this exact part: the campaign warehouse or a base's. This is where the
+     * part is kept, which can differ from where its unit is.
+     *
+     * @param campaign the campaign
+     * @param part     the part
+     *
+     * @return the warehouse holding the part, or {@code null} if none does
+     */
+    public @Nullable LocalWarehouse findHoldingWarehouse(Campaign campaign, Part part) {
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, part.getUniqueId());
+        boolean isThisPart = (holdingWarehouse != null) && (holdingWarehouse.getPart(part.getUniqueId()) == part);
+        return isThisPart ? holdingWarehouse : null;
+    }
+
+    private @Nullable LocalWarehouse warehouseContaining(Campaign campaign, UUID uniqueId) {
+        LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
+        if (mainWarehouse.getPart(uniqueId) != null) {
+            return mainWarehouse;
+        }
+        for (PlayerBase base : playerBases) {
+            if (base.getBaseWarehouse().getPart(uniqueId) != null) {
+                return base.getBaseWarehouse();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a part named by its number in an older save, which did not say which warehouse the number belongs to.
+     * The campaign warehouse is searched first, then each base's; when more than one warehouse has a part with that
+     * number the choice is logged, because it may be the wrong part.
+     *
+     * @param campaign     the campaign
+     * @param legacyNumber the part number from the older save
+     *
+     * @return the first part with that number, or {@code null} if none has it
+     */
+    public @Nullable Part findPartByLegacyNumber(Campaign campaign, int legacyNumber) {
+        Part part = findPartAnywhere(campaign, legacyNumber);
+        int warehousesWithThatNumber = (campaign.getPlayerForce().getWarehouse().getPart(legacyNumber) == null) ? 0 : 1;
+        for (PlayerBase base : playerBases) {
+            if (base.getBaseWarehouse().getPart(legacyNumber) != null) {
+                warehousesWithThatNumber++;
+            }
+        }
+        if (warehousesWithThatNumber > 1) {
+            LOGGER.warn("[PartIdentity] Part number {} from an older save is used in {} warehouses; took {}",
+                  legacyNumber, warehousesWithThatNumber, (part == null) ? "none" : part.getName());
+        }
+        return part;
+    }
+
+    /**
+     * Searches the campaign warehouse then all base warehouses for a part by number. Numbers repeat between
+     * warehouses, so this can find the wrong part; prefer {@link #findPartAnywhere(Campaign, UUID)}.
+     */
     public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
         Part part = campaign.getPlayerForce().getWarehouse().getPart(partId);
         if (part != null) {
@@ -663,7 +732,8 @@ public class CampaignLocationManager {
                               MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
                         case Unit unit ->
                               MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
-                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", part.getId());
+                        case Part part ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId());
                         default -> LOGGER.error(
                               "writePendingTravel: cannot serialize queued traveler of type {} bound for {} — skipping",
                               traveler.getClass().getSimpleName(), destination.getClass().getSimpleName());
