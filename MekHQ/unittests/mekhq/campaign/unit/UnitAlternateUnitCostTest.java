@@ -218,6 +218,40 @@ class UnitAlternateUnitCostTest {
 
                 assertEquals(Money.of(expected), unit.getBuyCost());
             }
+
+            /**
+             * The Command Designer's starting-cash preview prices rolled entities before they become units, so it must
+             * value them exactly as the units will be valued once built.
+             *
+             * @author Illiani
+             * @since 0.51.01
+             */
+            @ParameterizedTest
+            @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 1.5", "true, true, 1.5" })
+            void estimateBuyCostMatchesTheBattleValueBuyCost(boolean isClan, boolean isMixedTech,
+                  double multiplier) {
+                when(entity.isClan()).thenReturn(isClan);
+                when(entity.isMixedTech()).thenReturn(isMixedTech);
+
+                Money estimate = Unit.estimateBuyCost(entity, campaignOptions);
+                assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS), estimate);
+                assertEquals(unit.getBuyCost(), estimate);
+            }
+
+            /**
+             * @author Illiani
+             * @since 0.51.01
+             */
+            @ParameterizedTest
+            @CsvSource({ "false, false", "true, false", "false, true", "true, true" })
+            void estimateBuyCostMatchesTheConstructionBuyCostWithTheOptionOff(boolean isClan, boolean isMixedTech) {
+                campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+                when(entity.isClan()).thenReturn(isClan);
+                when(entity.isMixedTech()).thenReturn(isMixedTech);
+
+                assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+                verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
+            }
         }
 
         /** A WarShip's BV times 10,000 is well past the range of an int. */
