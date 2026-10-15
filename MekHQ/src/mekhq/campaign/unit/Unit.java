@@ -1095,7 +1095,7 @@ public class Unit implements ITechnology, ILocatable {
      * @return <code>true</code> if the location is destroyed
      */
     public boolean isLocationDestroyed(int loc) {
-        if (loc > entity.locations() || loc < 0) {
+        if (!isLocationOnEntity(loc)) {
             return false;
         }
         /*
@@ -1108,8 +1108,27 @@ public class Unit implements ITechnology, ILocatable {
         return entity.isLocationTrulyDestroyed(loc);
     }
 
+    /**
+     * Is the given location on the entity breached?
+     *
+     * @param loc the location; one the entity does not have, such as a fighter's fuselage pod space at
+     *            {@link Entity#LOC_NONE}, is never breached
+     *
+     * @return {@code true} if the location is breached
+     */
     public boolean isLocationBreached(int loc) {
+        if (!isLocationOnEntity(loc)) {
+            return false;
+        }
         return entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED;
+    }
+
+    /**
+     * @return {@code true} if the entity has the given location; {@link Entity#LOC_NONE} and numbers past its last
+     *       location are not on it
+     */
+    private boolean isLocationOnEntity(int location) {
+        return (location >= 0) && (location < entity.locations());
     }
 
     public boolean hasBadHipOrShoulder(int loc) {

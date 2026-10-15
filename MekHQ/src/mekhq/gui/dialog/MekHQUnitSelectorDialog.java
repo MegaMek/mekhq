@@ -66,13 +66,14 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private final Campaign campaign;
@@ -320,7 +321,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             if (addToCampaign) {
                 buttonBuy.setEnabled(true);
                 buttonAddGM.setEnabled(true);
-                TargetRoll target = campaign.checkAcquisition(selectedUnit).getTargetNumber();
+                TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, selectedUnit,
+                      campaign.checkAcquisition(selectedUnit)).getTargetNumber();
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonBuy.setToolTipText(target.getDesc());
             }

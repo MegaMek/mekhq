@@ -580,8 +580,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
                 if (movedPart instanceof EquipmentPart) {
-                    // Use equivalent MissingEquipmentPart install time
-                    time += movedPart.getMissingPart().getBaseTime();
+                    time += getMoveTime(movedPart);
                 }
 
             } else {
@@ -1469,6 +1468,19 @@ public class Refit extends Part implements IAcquisitionWork {
                                                                         newArmorSupplies.isClanTechBase() &&
                                                                   !part.isReservedForRefit() &&
                                                                   part.isPresent());
+    }
+
+    /**
+     * @return the time to move a part to another location, which is as long as installing it. Large craft ammunition
+     *       is bay capacity rather than a part that can be removed, so it has no install time and adds none.
+     */
+    private static int getMoveTime(Part movedPart) {
+        Part missingPart = movedPart.getMissingPart();
+        if (missingPart == null) {
+            LOGGER.trace("[Refit] {} has no install time, so moving it adds none", movedPart.getName());
+            return 0;
+        }
+        return missingPart.getBaseTime();
     }
 
     /**
