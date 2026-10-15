@@ -63,9 +63,10 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 
 /**
  * @author Taharqa
@@ -372,7 +373,9 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
             } else if (col == COL_TARGET) {
-                return campaign.checkAcquisition(r).getTargetNumber().getValueAsString();
+                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, r, campaign.checkAcquisition(r))
+                             .getTargetNumber()
+                             .getValueAsString();
             } else {
                 return "?";
             }
@@ -412,7 +415,9 @@ public class ChooseRefitDialog extends JDialog {
             }
 
             if (col == COL_TARGET) {
-                return campaign.checkAcquisition(r).getTargetNumber().getDesc();
+                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, r, campaign.checkAcquisition(r))
+                             .getTargetNumber()
+                             .getDesc();
             }
 
             return null;

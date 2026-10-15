@@ -244,15 +244,19 @@ class PersonnelGeneralPage {
         chkUseArtillery.addMouseListener(createTipPanelUpdater("UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater("UseAbilities"));
-        chkUseSpaTrainingCosts = new CampaignOptionsCheckBox("UseSpaTrainingCosts");
+        chkUseSpaTrainingCosts = new CampaignOptionsCheckBox("UseSpaTrainingCosts",
+              getMetadata(new Version(0, 51, 1)));
         chkUseSpaTrainingCosts.addMouseListener(createTipPanelUpdater("UseSpaTrainingCosts"));
-        chkCapTotalSpas = new CampaignOptionsCheckBox("CapTotalSpas");
+        chkCapTotalSpas = new CampaignOptionsCheckBox("CapTotalSpas",
+              getMetadata(new Version(0, 51, 1)));
         chkCapTotalSpas.addMouseListener(createTipPanelUpdater("CapTotalSpas"));
-        chkSkillImprovementsCostCBills = new CampaignOptionsCheckBox("SkillImprovementsCostCBills");
+        chkSkillImprovementsCostCBills = new CampaignOptionsCheckBox("SkillImprovementsCostCBills",
+              getMetadata(new Version(0, 51, 1)));
         chkSkillImprovementsCostCBills.addMouseListener(createTipPanelUpdater("SkillImprovementsCostCBills"));
 
         JLabel lblProfessionSkillTrainingCostMultiplier =
-              new CampaignOptionsLabel("ProfessionSkillTrainingCostMultiplier");
+              new CampaignOptionsLabel("ProfessionSkillTrainingCostMultiplier",
+                    getMetadata(new Version(0, 51, 1)));
         lblProfessionSkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
         spnProfessionSkillTrainingCostMultiplier = new CampaignOptionsSpinner("ProfessionSkillTrainingCostMultiplier",
@@ -260,7 +264,8 @@ class PersonnelGeneralPage {
         spnProfessionSkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
 
-        JLabel lblUtilitySkillTrainingCostMultiplier = new CampaignOptionsLabel("UtilitySkillTrainingCostMultiplier");
+        JLabel lblUtilitySkillTrainingCostMultiplier = new CampaignOptionsLabel("UtilitySkillTrainingCostMultiplier",
+              getMetadata(new Version(0, 51, 1)));
         lblUtilitySkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("UtilitySkillTrainingCostMultiplier"));
         spnUtilitySkillTrainingCostMultiplier = new CampaignOptionsSpinner("UtilitySkillTrainingCostMultiplier",
@@ -269,7 +274,8 @@ class PersonnelGeneralPage {
               .addMouseListener(createTipPanelUpdater("UtilitySkillTrainingCostMultiplier"));
 
         JLabel lblRoleplaySkillTrainingCostMultiplier =
-              new CampaignOptionsLabel("RoleplaySkillTrainingCostMultiplier");
+              new CampaignOptionsLabel("RoleplaySkillTrainingCostMultiplier",
+                    getMetadata(new Version(0, 51, 1)));
         lblRoleplaySkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RoleplaySkillTrainingCostMultiplier"));
         spnRoleplaySkillTrainingCostMultiplier = new CampaignOptionsSpinner("RoleplaySkillTrainingCostMultiplier",

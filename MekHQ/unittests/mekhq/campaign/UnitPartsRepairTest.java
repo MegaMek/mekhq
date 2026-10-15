@@ -227,4 +227,67 @@ class UnitPartsRepairTest {
 
         assertEquals(bayPartCount, PartsScenario.unitParts(leopard, TransportBayPart.class).size());
     }
+
+    /** A bay on the Leopard with at least one door. */
+    private TransportBayPart bayWithADoor(Unit leopard) {
+        for (TransportBayPart bayPart : PartsScenario.unitParts(leopard, TransportBayPart.class)) {
+            boolean hasADoor = bayPart.getChildParts().stream().anyMatch(BayDoor.class::isInstance);
+            if (hasADoor) {
+                return bayPart;
+            }
+        }
+        throw new IllegalStateException("The Leopard fixture has no bay with a door");
+    }
+
+    /**
+     * Leaves a working door on the unit but out of its bay, as versions before 0.49.4 did when a door was replaced,
+     * then loads the unit the way a save is loaded: the bay counts a door short and lists it as missing.
+     */
+    private BayDoor orphanADoorAndReload(Unit leopard, TransportBayPart bayPart) {
+        BayDoor door = (BayDoor) bayPart.getChildParts()
+                                        .stream()
+                                        .filter(BayDoor.class::isInstance)
+                                        .findFirst()
+                                        .orElseThrow();
+        bayPart.removeChildPart(door);
+        leopard.initializeParts(true);
+        leopard.runDiagnostic(false);
+        boolean isDoorListedMissing = bayPart.getChildParts().stream().anyMatch(MissingBayDoor.class::isInstance);
+        assertTrue(isDoorListedMissing, "The bay asks for the door to be replaced again");
+        return door;
+    }
+
+    @Test
+    void aReplacedDoorAnOlderVersionLeftOutOfItsBayIsPutBack() {
+        Unit leopard = scenario.withUnit(UnitFixture.LEOPARD_DROPSHIP);
+        TransportBayPart bayPart = bayWithADoor(leopard);
+        BayDoor door = orphanADoorAndReload(leopard, bayPart);
+
+        assertTrue(UnitPartsRepair.repair(campaign, leopard));
+
+        assertSame(bayPart, door.getParentPart(), "The door is back in its bay");
+        assertTrue(PartsScenario.unitParts(leopard, MissingBayDoor.class).isEmpty(), "No door is asked for again");
+        Bay bay = bayPart.getBay();
+        assertEquals(bay.getDoors(), bay.getCurrentDoors(), "Every door of the bay works");
+    }
+
+    @Test
+    void aSecondDoorWithNoBayIsLeftOnTheUnitOnceTheBayIsWhole() {
+        Unit leopard = scenario.withUnit(UnitFixture.LEOPARD_DROPSHIP);
+        TransportBayPart bayPart = bayWithADoor(leopard);
+        BayDoor extraDoor = new BayDoor((int) leopard.getEntity().getWeight(), campaign);
+        extraDoor.setUnit(leopard);
+        mainWarehouse.addPart(extraDoor, false);
+        leopard.addPart(extraDoor);
+        orphanADoorAndReload(leopard, bayPart);
+
+        UnitPartsRepair.repair(campaign, leopard);
+
+        assertTrue(PartsScenario.unitParts(leopard, MissingBayDoor.class).isEmpty(), "The missing door was filled");
+        long doorsWithNoBay = PartsScenario.unitParts(leopard, BayDoor.class)
+                                    .stream()
+                                    .filter(bayDoor -> bayDoor.getParentPart() == null)
+                                    .count();
+        assertEquals(1, doorsWithNoBay, "One door filled the gap and the other is kept as it was");
+    }
 }

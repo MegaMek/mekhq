@@ -45,6 +45,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -230,10 +231,12 @@ class FinancesGeneralPage {
         payForOverheadBox.addMouseListener(createTipPanelUpdater("PayForOverheadBox"));
         payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
         payForMaintainBox.addMouseListener(createTipPanelUpdater("PayForMaintainBox"));
-        payForHotSpotsUpkeepBox = new CampaignOptionsCheckBox("PayForHotSpotsUpkeepBox");
+        payForHotSpotsUpkeepBox = new CampaignOptionsCheckBox("PayForHotSpotsUpkeepBox",
+                getMetadata(new Version(0, 51, 1)));
         payForHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("PayForHotSpotsUpkeepBox"));
         payForHotSpotsUpkeepBox.addItemListener(event -> updateHotSpotsUpkeepExclusions());
-        escalatingHotSpotsUpkeepBox = new CampaignOptionsCheckBox("EscalatingHotSpotsUpkeepBox");
+        escalatingHotSpotsUpkeepBox = new CampaignOptionsCheckBox("EscalatingHotSpotsUpkeepBox",
+                getMetadata(new Version(0, 51, 1)));
         escalatingHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("EscalatingHotSpotsUpkeepBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
         payForTransportBox.addMouseListener(createTipPanelUpdater("PayForTransportBox"));
@@ -246,7 +249,8 @@ class FinancesGeneralPage {
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
-        lblRecruitmentTrainingCostMultiplier = new CampaignOptionsLabel("RecruitmentTrainingCostMultiplier");
+        lblRecruitmentTrainingCostMultiplier = new CampaignOptionsLabel("RecruitmentTrainingCostMultiplier",
+                getMetadata(new Version(0, 51, 1)));
         lblRecruitmentTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
         spnRecruitmentTrainingCostMultiplier = new CampaignOptionsSpinner("RecruitmentTrainingCostMultiplier",
@@ -254,7 +258,8 @@ class FinancesGeneralPage {
         spnRecruitmentTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
         lblRecruitmentProfessionSkillCostMultiplier =
-              new CampaignOptionsLabel("RecruitmentProfessionSkillCostMultiplier");
+              new CampaignOptionsLabel("RecruitmentProfessionSkillCostMultiplier",
+                    getMetadata(new Version(0, 51, 1)));
         lblRecruitmentProfessionSkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
         spnRecruitmentProfessionSkillCostMultiplier =
@@ -262,14 +267,16 @@ class FinancesGeneralPage {
                     CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
         spnRecruitmentProfessionSkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
-        lblRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentUtilitySkillCostMultiplier");
+        lblRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentUtilitySkillCostMultiplier",
+                getMetadata(new Version(0, 51, 1)));
         lblRecruitmentUtilitySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
         spnRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsSpinner("RecruitmentUtilitySkillCostMultiplier",
               CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER.defaultValue(), 0.0, 10.0, 0.1);
         spnRecruitmentUtilitySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
-        lblRecruitmentRoleplaySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentRoleplaySkillCostMultiplier");
+        lblRecruitmentRoleplaySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentRoleplaySkillCostMultiplier",
+                getMetadata(new Version(0, 51, 1)));
         lblRecruitmentRoleplaySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentRoleplaySkillCostMultiplier"));
         spnRecruitmentRoleplaySkillCostMultiplier =
@@ -341,18 +348,23 @@ class FinancesGeneralPage {
         chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater("SimulateGrayMonday"));
 
-        chkUsePlanetaryCostReductions = new CampaignOptionsCheckBox("UsePlanetaryCostReductions");
+        chkUsePlanetaryCostReductions = new CampaignOptionsCheckBox("UsePlanetaryCostReductions",
+                getMetadata(new Version(0, 51, 1)));
         chkUsePlanetaryCostReductions.addMouseListener(createTipPanelUpdater("UsePlanetaryCostReductions"));
         chkUsePlanetaryCostReductions.addItemListener(event -> updatePlanetaryCostReductionDependents());
-        chkPlanetaryCostReductionsOnContract = new CampaignOptionsCheckBox("PlanetaryCostReductionsOnContract");
+        chkPlanetaryCostReductionsOnContract = new CampaignOptionsCheckBox("PlanetaryCostReductionsOnContract",
+                getMetadata(new Version(0, 51, 1)));
         chkPlanetaryCostReductionsOnContract.addMouseListener(
               createTipPanelUpdater("PlanetaryCostReductionsOnContract"));
-        chkPlanetaryCostReductionsForMaintenance = new CampaignOptionsCheckBox("PlanetaryCostReductionsForMaintenance");
+        chkPlanetaryCostReductionsForMaintenance = new CampaignOptionsCheckBox("PlanetaryCostReductionsForMaintenance",
+                getMetadata(new Version(0, 51, 1)));
         chkPlanetaryCostReductionsForMaintenance.addMouseListener(
               createTipPanelUpdater("PlanetaryCostReductionsForMaintenance"));
-        chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts");
+        chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts",
+                getMetadata(new Version(0, 51, 1)));
         chkIncreaseClanRepairCosts.addMouseListener(createTipPanelUpdater("IncreaseClanRepairCosts"));
-        chkUseAlternateUnitCost = new CampaignOptionsCheckBox("UseAlternateUnitCost");
+        chkUseAlternateUnitCost = new CampaignOptionsCheckBox("UseAlternateUnitCost",
+                getMetadata(new Version(0, 51, 1)));
         chkUseAlternateUnitCost.addMouseListener(createTipPanelUpdater("UseAlternateUnitCost"));
 
         // Layout the Panel
