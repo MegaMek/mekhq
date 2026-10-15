@@ -444,7 +444,7 @@ public class PartsStore {
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, false));
                         }
-                        if (engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
+                        if (engine.getTechLevel(year) != TechConstants.T_ALLOWED_ALL) {
                             engine = new Engine(rating, i, Engine.CLAN_ENGINE);
                             if (engine.engineValid) {
                                 parts.add(new EnginePart(ton, engine, c, false));
@@ -462,7 +462,7 @@ public class PartsStore {
                         }
                     }
                     engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
-                    if (engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
+                    if (engine.getTechLevel(year) != TechConstants.T_ALLOWED_ALL) {
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, false));
                         }

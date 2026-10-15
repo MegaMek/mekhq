@@ -175,7 +175,7 @@ public class EnginePart extends Part {
         return part instanceof EnginePart && getName().equals(part.getName())
                      && getEngine().getEngineType() == ((EnginePart) part).getEngine().getEngineType()
                      && getEngine().getRating() == ((EnginePart) part).getEngine().getRating()
-                     && getEngine().getTechType(year) == ((EnginePart) part).getEngine().getTechType(year)
+                     && getEngine().getTechLevel(year) == ((EnginePart) part).getEngine().getTechLevel(year)
                      && getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine()
                                                                          .hasFlag(Engine.TANK_ENGINE)
                      && getUnitTonnage() == part.getUnitTonnage()
