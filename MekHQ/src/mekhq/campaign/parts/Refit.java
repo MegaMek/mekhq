@@ -100,6 +100,7 @@ import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekActuator;
@@ -599,7 +600,12 @@ public class Refit extends Part implements IAcquisitionWork {
         // same time, check spare parts for new equipment
 
         // first put oldUnitParts in a new arraylist so they can be removed as we find them
+        // An infantry weapon's ammunition clip is carried with the weapon and takes no slot, so it never frees one
         List<Part> tempOldParts = new ArrayList<>(oldUnitParts);
+        tempOldParts.removeIf(oldPart -> oldPart instanceof InfantryAmmoBin);
+        long newInfantryClips = newPartList.stream().filter(InfantryAmmoBin.class::isInstance).count();
+        LOGGER.debug("[Refit] {}: {} new infantry weapon clips leave the refit class to their weapons",
+              newEntity.getShortName(), newInfantryClips);
 
         armorNeeded = 0;
         Map<ArmorFace, Integer> newArmorPointsByFace = new HashMap<>();
@@ -723,6 +729,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             } else if (RefitSpacecraftSystems.isNewShipComponent(newPart)) {
                 updateRefitClass(CLASS_C);
+
+            } else if (newPart instanceof InfantryAmmoBin) {
+                // The clip comes with its infantry weapon and takes no slot, so the weapon alone sets the class
 
             } else {
                 // determine whether this is A, B, or C
