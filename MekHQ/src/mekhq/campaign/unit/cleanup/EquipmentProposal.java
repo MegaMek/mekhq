@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,7 +42,9 @@ import jakarta.annotation.Nullable;
 import megamek.common.equipment.Mounted;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.InfantryWeaponPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.MissingInfantryWeaponPart;
 import mekhq.campaign.unit.Unit;
 
 public class EquipmentProposal {
@@ -63,7 +65,17 @@ public class EquipmentProposal {
         return unit;
     }
 
+    /**
+     * Adds a part to the proposal so it is matched to a mount. A conventional infantry trooper's weapon is left out:
+     * each trooper has a weapon part of its own while the platoon has one mount for its primary weapon, so these parts
+     * are tracked by type and never by mount.
+     *
+     * @param part a part of the unit
+     */
     public void consider(final Part part) {
+        if ((part instanceof InfantryWeaponPart) || (part instanceof MissingInfantryWeaponPart)) {
+            return;
+        }
         if (part instanceof EquipmentPart) {
             original.put(part, ((EquipmentPart) part).getEquipmentNum());
         } else if (part instanceof MissingEquipmentPart) {
