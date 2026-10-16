@@ -135,6 +135,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -186,6 +187,7 @@ import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.CrewSeat;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -333,6 +335,8 @@ public class Person implements ILocatable {
 
     // assignments
     private Unit unit;
+    private UUID lastAssignedUnitId;
+    private CrewSeat lastAssignedCrewSeat;
     private UUID doctorId;
     private List<Unit> techUnits;
 
@@ -591,6 +595,8 @@ public class Person implements ILocatable {
         setManeiDominiRankDirect(ManeiDominiRank.NONE);
         nTasks = 0;
         doctorId = null;
+        lastAssignedUnitId = null;
+        lastAssignedCrewSeat = null;
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
@@ -1258,6 +1264,9 @@ public class Person implements ILocatable {
         // Finally, we can set the primary role
         setPrimaryRoleDirect(primaryRole);
 
+        // A retrained character no longer fits the seat they left
+        clearLastAssignedUnit();
+
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
@@ -1294,6 +1303,9 @@ public class Person implements ILocatable {
 
         // Finally, we can set the primary role
         setPrimaryRoleDirect(primaryRole);
+
+        // A retrained character no longer fits the seat they left
+        clearLastAssignedUnit();
 
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1880,12 +1892,20 @@ public class Person implements ILocatable {
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getPlayerForce().getHumanResources().getProcreation().birth(campaign, getDueDate(), this);
             }
+
+            // Runs before the status change event below, so the Support Teams reconciler sees this person already
+            // seated and does not move them into a support squad instead
+            if (status.isActive()) {
+                returnToLastAssignedUnit(campaign);
+            }
         } else {
             setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
 
-            // If we're assigned to a unit, remove us from it
-            if (getUnit() != null) {
-                getUnit().remove(this, true);
+            // If we're assigned to a unit, remove us from it, remembering where we were so we can return later
+            Unit currentUnit = getUnit();
+            if (currentUnit != null) {
+                rememberLastAssignedUnit(currentUnit);
+                currentUnit.remove(this, true);
             }
 
             // Clear Tech Setup
@@ -3880,6 +3900,11 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", getUnit().getId());
             }
 
+            if ((lastAssignedUnitId != null) && (lastAssignedCrewSeat != null)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastAssignedUnitId", lastAssignedUnitId);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastAssignedCrewSeat", lastAssignedCrewSeat.name());
+            }
+
             if (!salary.equals(Money.of(-1))) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salary", salary);
             }
@@ -4510,6 +4535,10 @@ public class Person implements ILocatable {
                     if (!wn2.getTextContent().equals("null")) {
                         person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent().trim()));
                     }
+                } else if (nodeName.equalsIgnoreCase("lastAssignedUnitId")) {
+                    person.lastAssignedUnitId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("lastAssignedCrewSeat")) {
+                    person.lastAssignedCrewSeat = CrewSeat.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("status")) {
                     person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prisonerStatus")) {
@@ -7295,6 +7324,122 @@ public class Person implements ILocatable {
 
     public void setUnit(final @Nullable Unit unit) {
         this.unit = unit;
+    }
+
+    /**
+     * @return the id of the unit this person was crewing when they went off active duty, or {@code null} if there
+     *       is none to return to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable UUID getLastAssignedUnitId() {
+        return lastAssignedUnitId;
+    }
+
+    /**
+     * @return the crew seat this person held in their last assigned unit, or {@code null} if there is none to return
+     *       to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable CrewSeat getLastAssignedCrewSeat() {
+        return lastAssignedCrewSeat;
+    }
+
+    /**
+     * Sets the unit and crew seat this person will try to return to when they next come back to active duty.
+     *
+     * @param lastAssignedUnitId   the id of the unit, or {@code null} to forget it
+     * @param lastAssignedCrewSeat the seat they held in it, or {@code null} to forget it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setLastAssignedUnit(final @Nullable UUID lastAssignedUnitId,
+          final @Nullable CrewSeat lastAssignedCrewSeat) {
+        this.lastAssignedUnitId = lastAssignedUnitId;
+        this.lastAssignedCrewSeat = lastAssignedCrewSeat;
+    }
+
+    /**
+     * Forgets the unit this person would return to when they next come back to active duty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void clearLastAssignedUnit() {
+        setLastAssignedUnit(null, null);
+    }
+
+    /**
+     * Remembers the unit and seat this person is crewing, so they can return to it when they come back to active
+     * duty.
+     *
+     * @param currentUnit the unit this person is about to be removed from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void rememberLastAssignedUnit(final Unit currentUnit) {
+        CrewSeat crewSeat = currentUnit.getCrewSeat(this);
+        if (crewSeat == null) {
+            return;
+        }
+
+        setLastAssignedUnit(currentUnit.getId(), crewSeat);
+    }
+
+    /**
+     * Returns this person to the unit and seat they held before they went off active duty, if they still can.
+     *
+     * <p>The return fails if the unit has left the campaign, is deployed, mothballed or elsewhere, or if someone
+     * else has taken the seat. The remembered unit is forgotten either way, so a failed return is never retried
+     * later.</p>
+     *
+     * @param campaign the campaign this person belongs to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void returnToLastAssignedUnit(final Campaign campaign) {
+        final UUID unitId = lastAssignedUnitId;
+        final CrewSeat crewSeat = lastAssignedCrewSeat;
+        clearLastAssignedUnit();
+
+        if ((unitId == null) || (crewSeat == null) || (getUnit() != null)) {
+            return;
+        }
+
+        if (!getPrisonerStatus().isFreeOrBondsman()) {
+            return;
+        }
+
+        final Unit lastUnit = campaign.getUnit(unitId);
+        if (lastUnit == null) {
+            LOGGER.info("{} cannot return to their last unit {}: it is no longer in the campaign", getFullName(),
+                  unitId);
+            return;
+        }
+
+        // A refitting unit keeps its crew, so returning to one is fine; deployed, mothballed and absent units are not
+        final boolean canReturn = lastUnit.isAvailable(true)
+                                        && lastUnit.hasOpenCrewSeat(crewSeat)
+                                        && LocationUtils.areSameEffectiveLocation(lastUnit, this);
+        if (canReturn) {
+            lastUnit.addToCrewSeat(this, crewSeat);
+        }
+
+        if (lastUnit.equals(getUnit())) {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "returnedToLastUnit.report",
+                  getHyperlinkedFullTitle(), lastUnit.getHyperlinkedName()));
+        } else {
+            LOGGER.info("{} cannot return to their last unit {}: it is unavailable or the {} seat is taken",
+                  getFullName(), lastUnit.getName(), crewSeat);
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "cannotReturnToLastUnit.report",
+                  getHyperlinkedFullTitle(), lastUnit.getHyperlinkedName()));
+        }
     }
 
     public void removeTechUnit(final Unit unit) {
