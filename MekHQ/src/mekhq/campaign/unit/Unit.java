@@ -98,6 +98,7 @@ import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ILocationExposureStatus;
 import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MekSummary;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -3199,10 +3200,38 @@ public class Unit implements ITechnology, ILocatable {
      */
     public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
         if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
-            return calculateAlternateUnitCost(unitEntity, unitEntity.calculateBattleValue(true, true, true),
+            return calculateAlternateUnitCost(unitEntity.calculateBattleValue(true, true, true),
+                  getUnitPriceMultiplier(unitEntity, campaignOptions), getQuirkPriceMultiplier(unitEntity),
                   campaignOptions);
         }
         return getTraditionalBuyCost(unitEntity, campaignOptions);
+    }
+
+    /**
+     * Estimates what {@link #getBuyCost()} will return for a unit from its {@link MekSummary} alone, without loading
+     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. Under
+     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the unit is valued by the summary's Battle Value; the summary does
+     * not carry quirks, so the Good Reputation price multiplier is left out (see {@link #getQuirkPriceMultiplier}).
+     *
+     * @param summary         the unit to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     *
+     * @return the unit's estimated purchase value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions) {
+        double unitPriceMultiplier = getUnitPriceMultiplier(summary.isMixedTech(), summary.isClan(), campaignOptions);
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
+        }
+
+        // Infantry, battle armor included, is priced by its alternate cost, as getTraditionalBuyCost does
+        int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
+        boolean isInfantry = (unitTypeCode == UnitType.INFANTRY) || (unitTypeCode == UnitType.BATTLE_ARMOR);
+        Money cost = Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
+        return cost.multipliedBy(unitPriceMultiplier);
     }
 
     /**
@@ -3243,9 +3272,24 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     private static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
-        if (unitEntity.isMixedTech()) {
+        return getUnitPriceMultiplier(unitEntity.isMixedTech(), unitEntity.isClan(), campaignOptions);
+    }
+
+    /**
+     * @param isMixedTech     whether the unit is mixed tech, which takes priority over Clan
+     * @param isClan          whether the unit is Clan tech
+     * @param campaignOptions the campaign options holding the multipliers
+     *
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier for that tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
+          CampaignOptions campaignOptions) {
+        if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
-        } else if (unitEntity.isClan()) {
+        } else if (isClan) {
             return campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
         }
         return campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
@@ -3322,26 +3366,27 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getAlternateUnitCost() {
-        return calculateAlternateUnitCost(getEntity(), getUnitBattleValue(), getCampaign().getCampaignOptions());
+        return calculateAlternateUnitCost(getUnitBattleValue(), getUnitPriceMultiplier(),
+              getQuirkPriceMultiplier(getEntity()), getCampaign().getCampaignOptions());
     }
 
     /**
-     * Values an entity under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * Values a unit under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
      * {@link #getAlternateUnitCost()}).
      *
-     * @param unitEntity      the entity to value
-     * @param battleValue     the entity's Battle Value, excluding pilot skill, C3, and TAG
-     * @param campaignOptions the campaign options supplying the multipliers and support point conversion
+     * @param battleValue          the unit's Battle Value, excluding pilot skill, C3, and TAG
+     * @param unitPriceMultiplier  the unit price multiplier for the unit's tech base
+     * @param quirkPriceMultiplier the price multiplier from the unit's quirks
+     * @param campaignOptions      the campaign options supplying the support point conversion
      *
-     * @return the entity's Battle Value-based value
+     * @return the unit's Battle Value-based value
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static Money calculateAlternateUnitCost(Entity unitEntity, int battleValue,
-          CampaignOptions campaignOptions) {
-        double valueInSupportPoints = battleValue * getUnitPriceMultiplier(unitEntity, campaignOptions)
-                                            * getQuirkPriceMultiplier(unitEntity);
+    private static Money calculateAlternateUnitCost(int battleValue, double unitPriceMultiplier,
+          double quirkPriceMultiplier, CampaignOptions campaignOptions) {
+        double valueInSupportPoints = battleValue * unitPriceMultiplier * quirkPriceMultiplier;
         if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
             return Money.of(valueInSupportPoints);
         }
