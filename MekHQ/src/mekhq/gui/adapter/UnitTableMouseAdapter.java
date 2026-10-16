@@ -706,7 +706,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
-                if (tech != null) {
+                if (tech != null || selectedUnit.isSelfMaintainedInfantry()) {
                     Campaign campaign1 = selectedUnit.getCampaign();
                     if ((!selectedUnit.getActiveCrew().isEmpty()) ||
                               (campaign1.getPlayerForce().getFormationFor(selectedUnit)) != null ||

@@ -1311,8 +1311,9 @@ public class CampaignGUI extends JPanel {
 
                 if (unit.getEntity().isLargeCraft()) {
                     Unit techUnit = tech.getUnit();
-                    // This stops vessel crew from other vessels appearing in the list
-                    if (techUnit != null && !techUnit.equals(unit)) {
+                    // This stops vessel crew from other vessels appearing in the list. A support carrier seat is a
+                    // holding assignment, not a vessel, so its crew remain available.
+                    if (techUnit != null && !techUnit.equals(unit) && !techUnit.isCarrier()) {
                         continue;
                     }
                 }
