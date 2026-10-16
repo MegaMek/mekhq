@@ -70,7 +70,6 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.common.TechConstants;
 import megamek.common.compute.Compute;
-import megamek.common.options.PilotOptions;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import mekhq.EventSpy;
@@ -2537,8 +2536,13 @@ public class PersonTest {
             person = new Person(mockCampaign);
         }
 
+        /**
+         * Sets the option directly, rather than through {@link PersonnelOptions#acquireAbility}, as acquiring an
+         * ability removes its opposite (such as Glass Jaw and Toughness). Characters can still end up with both, so
+         * the multiplier has to handle it.
+         */
         private void giveAbility(String ability) {
-            person.getOptions().acquireAbility(PilotOptions.LVL3_ADVANTAGES, ability, true);
+            person.getOptions().getOption(ability).setValue(true);
         }
 
         @ParameterizedTest(name = "Glass Jaw {0}, Toughness {1}, Unfit {2}, Fit {3}: +{4} -> {5}")
