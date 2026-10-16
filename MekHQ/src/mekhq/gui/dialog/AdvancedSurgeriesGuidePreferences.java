@@ -32,14 +32,9 @@
  */
 package mekhq.gui.dialog;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import megamek.client.ui.preferences.PreferenceElement;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.codeUtilities.MathUtility;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.gui.preferences.PreferenceFlags;
 
 /**
  * The {@link AdvancedSurgeriesDialog}'s tutorial settings: whether the player has seen its guide, and whether the guide
@@ -53,21 +48,20 @@ import mekhq.MekHQ;
  * @since 0.51.01
  */
 public final class AdvancedSurgeriesGuidePreferences {
-    private static final MMLogger LOGGER = MMLogger.create(AdvancedSurgeriesGuidePreferences.class);
-
     static final String GUIDE_SEEN = "guideSeen";
     static final String GUIDE_ALWAYS_OPEN = "guideAlwaysOpen";
 
     private static AdvancedSurgeriesGuidePreferences instance;
 
-    private final Map<String, Flag> flags = new LinkedHashMap<>();
+    private final PreferenceFlags flags;
 
     /**
      * @param node the preferences node to store the settings under
      */
     AdvancedSurgeriesGuidePreferences(final PreferencesNode node) {
-        register(node, GUIDE_SEEN, false);
-        register(node, GUIDE_ALWAYS_OPEN, false);
+        flags = new PreferenceFlags(node);
+        flags.register(GUIDE_SEEN, false);
+        flags.register(GUIDE_ALWAYS_OPEN, false);
     }
 
     /**
@@ -81,73 +75,25 @@ public final class AdvancedSurgeriesGuidePreferences {
         return instance;
     }
 
-    private void register(final PreferencesNode node, final String name, final boolean defaultValue) {
-        try {
-            Flag flag = new Flag(name, defaultValue);
-            flags.put(name, flag);
-            // Managing the flag loads any value saved in an earlier session and saves it again on exit.
-            node.manage(flag);
-        } catch (Exception exception) {
-            LOGGER.error(exception, "Failed to register Advanced Surgery tutorial preference {}", name);
-        }
-    }
-
-    private boolean get(final String name) {
-        Flag flag = flags.get(name);
-        return flag != null && flag.value;
-    }
-
-    private void set(final String name, final boolean value) {
-        Flag flag = flags.get(name);
-        if (flag != null) {
-            flag.value = value;
-        }
-    }
-
     /**
      * @return {@code true} once the player has seen the guide
      */
     public boolean isGuideSeen() {
-        return get(GUIDE_SEEN);
+        return flags.get(GUIDE_SEEN);
     }
 
     public void setGuideSeen(final boolean seen) {
-        set(GUIDE_SEEN, seen);
+        flags.set(GUIDE_SEEN, seen);
     }
 
     /**
      * @return {@code true} if the guide opens every time the dialog does, rather than only the first time
      */
     public boolean isGuideAlwaysOpen() {
-        return get(GUIDE_ALWAYS_OPEN);
+        return flags.get(GUIDE_ALWAYS_OPEN);
     }
 
     public void setGuideAlwaysOpen(final boolean alwaysOpen) {
-        set(GUIDE_ALWAYS_OPEN, alwaysOpen);
-    }
-
-    /** One on/off setting, saved in the preferences file as {@code true} or {@code false}. */
-    private static final class Flag extends PreferenceElement {
-        private boolean value;
-
-        private Flag(final String name, final boolean defaultValue) throws Exception {
-            super(name);
-            this.value = defaultValue;
-        }
-
-        @Override
-        protected String getValue() {
-            return Boolean.toString(value);
-        }
-
-        @Override
-        protected void initialize(final String saved) {
-            value = MathUtility.parseBoolean(saved.strip());
-        }
-
-        @Override
-        protected void dispose() {
-            // Nothing to release: the flag is not tied to a component.
-        }
+        flags.set(GUIDE_ALWAYS_OPEN, alwaysOpen);
     }
 }

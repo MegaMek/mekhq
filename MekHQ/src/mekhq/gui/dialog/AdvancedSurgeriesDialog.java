@@ -43,19 +43,8 @@ import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_BIONIC_HATE;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADVANCED_SURGERY;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_BIOLOGICAL_MACHINIST;
 import static mekhq.campaign.personnel.medical.BodyLocation.*;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.CLONED_LIMB_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.EI_IMPLANT_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FAILED_SURGERY_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FRACTURE_REPAIR_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.PAIN_SHUNT_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.FRACTURE_REPAIR;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.PAIN_SHUNT;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -94,7 +83,6 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -117,15 +105,14 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalc
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.Risk;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.SurgeryOdds;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.roleplay.CheckOdds;
 import mekhq.campaign.roleplay.CheckTarget;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.ActionScheduler;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
@@ -174,8 +161,6 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private static final int RISK_WIDTH = 300;
     /** The narrowest the dock's plan column may become before the risk and action columns are squeezed. */
     private static final int PLAN_MINIMUM_WIDTH = 200;
-    /** Dims the dialog behind the guide, as the Oracle Console does. */
-    private static final Color SCRIM = new Color(2, 7, 13, 160);
     private static final int ACTION_WIDTH = 240;
     /** Text width for one half of an expanded procedure. */
     private static final int HALF_TEXT_WIDTH = 330;
@@ -200,6 +185,10 @@ public class AdvancedSurgeriesDialog extends JDialog {
     /** Stands in for spaces inside markup tags while {@code wordWrap} runs, so it can't break a tag in two. */
     private static final String TAG_SPACE = "\u0001";
     private static final Pattern MARKUP_TAG = Pattern.compile("<[^>]*>");
+    /** The average character width of each font {@link #wrapToPixels(String, int, Font)} has measured. */
+    private static final Map<Font, Double> AVERAGE_CHARACTER_WIDTHS = new HashMap<>();
+    /** How long typing must pause before the catalogue is narrowed to the search, in milliseconds. */
+    private static final int SEARCH_DELAY = 150;
     private static final int LOCAL_SURGEON_COST_MULTIPLIER = 10;
     private static final int MACHINIST_MODIFIER = -2;
 
@@ -369,8 +358,11 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private final List<Treatment> catalogue = new ArrayList<>();
     private final Map<BodyLocation, PlanEntry> plan = new LinkedHashMap<>();
     private final Map<Integer, Person> localSurgeons = new HashMap<>();
-    // Requirements don't change while the dialog is open, and every catalogue rebuild asks for them
+    // The patient, their injuries and the requirements don't change while the dialog is open, and every catalogue
+    // rebuild asks for these
     private final Map<Treatment, List<Requirement>> requirementCache = new HashMap<>();
+    private final Map<Treatment, List<Injury>> clearedInjuryCache = new HashMap<>();
+    private final Map<ProstheticType, Optional<Money>> costCache = new EnumMap<>(ProstheticType.class);
 
     // Catalogue filters
     private Region region = Region.ALL;
@@ -391,6 +383,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
     // Components
     private BodyMap bodyMap;
     private final List<RailRow> railRows = new ArrayList<>();
+    private final ActionScheduler searchScheduler = new ActionScheduler(this::refreshCatalogue, SEARCH_DELAY);
     private final Map<Region, HudChip> regionChips = new EnumMap<>(Region.class);
     private HudChip treatsChip;
     private HudChip hideUnavailableChip;
@@ -403,7 +396,6 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private HudButton beginButton;
     private HudButton gmSkipButton;
     private HudGuideDrawer guideDrawer;
-    private JPanel scrim;
 
     /**
      * Creates and displays a new {@link AdvancedSurgeriesDialog} for the given patient.
@@ -489,7 +481,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
         content.add(body, BorderLayout.CENTER);
         content.add(dock, BorderLayout.SOUTH);
         setContentPane(content);
-        buildGuide(content);
+        buildGuide();
 
         acknowledgeRisk.setText(getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.acknowledge",
               patient.getGivenName()));
@@ -640,7 +632,19 @@ public class AdvancedSurgeriesDialog extends JDialog {
             JPanel content = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
             content.add(marker, BorderLayout.WEST);
             content.add(text, BorderLayout.CENTER);
-            addRailRow(rail, content, treatableAt, where);
+            if (treatableAt.isEmpty()) {
+                // Nothing in the catalogue treats it (such as a recovery injury), so there is nothing to narrow to
+                JPanel row = new JPanel(new BorderLayout());
+                row.setOpaque(true);
+                row.setBackground(GROUND);
+                row.setBorder(rowBorder(DIVIDER));
+                row.setToolTipText(getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.rail.untreatable.toolTipText"));
+                row.add(content, BorderLayout.CENTER);
+                rail.add(leftAligned(row));
+                rail.add(Box.createVerticalStrut(scaleForGUI(4)));
+            } else {
+                addRailRow(rail, content, treatableAt, where);
+            }
         }
 
         JScrollPane scroll = scroll(rail, GROUND);
@@ -689,7 +693,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
         for (Region value : Region.values()) {
             HudChip chip = new HudChip(value.getLabel(), () -> {
                 region = value;
-                refreshCatalogue();
+                // A region and a body location rarely overlap, so choosing a region replaces the location filter
+                clearLocationFilter();
             });
             regionChips.put(value, chip);
             toolbar.add(chip);
@@ -774,7 +779,9 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
     private void refreshRail() {
         for (RailRow railRow : railRows) {
-            boolean isActive = Objects.equals(railRow.locations(), locationFilter);
+            // Each row owns its set of locations, so comparing by identity tells apart rows with equal sets (such
+            // as two injuries on one arm), and never matches a filter set from the body map
+            boolean isActive = railRow.locations() == locationFilter;
             railRow.row().setBackground(isActive ? SURFACE_HIGHLIGHT : GROUND);
             railRow.row().setBorder(rowBorder(isActive ? ACCENT : DIVIDER));
         }
@@ -865,7 +872,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
     private void onSearch(String text) {
         query = text;
-        refreshCatalogue();
+        searchScheduler.schedule();
     }
 
     private void setLocationFilter(Set<BodyLocation> locations, String label) {
@@ -946,7 +953,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
             tags.add(tag(getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.tag.fixable"), AMBER));
         }
 
-        Money cost = type.getCost(getFaction(), campaign.getGameYear());
+        Money cost = getCost(type);
         JLabel costLabel = new JLabel(cost == null ? "—" : cost.toAmountString());
         costLabel.setForeground(TEXT);
         costLabel.setFont(hudFont(Font.BOLD, 0.88f, 0.0f));
@@ -1002,7 +1009,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
         left.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.detail.fixes"))));
         left.add(Box.createVerticalStrut(scaleForGUI(4)));
         List<Injury> treated = getTreatedInjuries(treatment);
-        List<Injury> replaced = getInjuriesClearedBy(type, treatment.location())
+        List<Injury> replaced = getInjuriesClearedBy(treatment)
                                       .stream()
                                       .filter(injury -> injury.getSubType().isPermanentModification())
                                       .toList();
@@ -1022,7 +1029,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
         }
         left.add(Box.createVerticalStrut(scaleForGUI(8)));
 
-        double chance = getSuccessChance(type, Math.max(type.getSurgeryLevel(), getTodaySurgeryLevel()));
+        double chance = getPlannedSuccessChance(treatment);
         int hitsCleared = getHitsCleared(treatment);
         int net = SurgeryRiskCalculator.RECOVERY_INJURY_HITS - hitsCleared;
         HudStatTile success = new HudStatTile(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1057,7 +1064,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
         // Bottom: full details and the plan action
         double healingTimeMultiplier = campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
-        List<String> lines = type.getDetailLines(getFaction(), campaign.getGameYear(), healingTimeMultiplier);
+        List<String> lines = type.getDetailLines(getFaction(), campaign.getGameYear(), healingTimeMultiplier,
+              treatment.location());
         JComponent action = buildRowAction(treatment);
         JLabel details = new JLabel();
         details.setForeground(TEXT_MUTED);
@@ -1410,7 +1418,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
               BorderFactory.createEmptyBorder(0, scaleForGUI(14), 0, 0)));
 
         List<PlannedSurgery> today = getTodaySurgeries();
-        int longest = today.stream().mapToInt(surgery -> getRecoveryDays(surgery.type())).max().orElse(0);
+        int longest = today.stream().mapToInt(this::getRecoveryDays).max().orElse(0);
         String totals = today.isEmpty() ?
                               getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.total.none") :
                               getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.total",
@@ -1580,11 +1588,22 @@ public class AdvancedSurgeriesDialog extends JDialog {
     }
 
     /**
+     * @return the injuries a successful surgery would remove from the patient, as they stand while the dialog is open
+     */
+    private List<Injury> getInjuriesClearedBy(Treatment treatment) {
+        return clearedInjuryCache.computeIfAbsent(treatment,
+              key -> findInjuriesClearedBy(key.type(), key.location()));
+    }
+
+    /**
+     * Works out the injuries a successful surgery would remove, from the patient's injuries as they are now. Surgery
+     * calls this directly, as each surgery changes the injuries the next one finds.
+     *
      * @return the injuries a successful surgery of this type at this location removes from the patient: for an
      *       implant, any identical or mutually exclusive implant it replaces; otherwise the injuries at that location
      *       (only burns, for surgeries that only remove burns)
      */
-    private List<Injury> getInjuriesClearedBy(ProstheticType type, BodyLocation location) {
+    private List<Injury> findInjuriesClearedBy(ProstheticType type, BodyLocation location) {
         InjuryType surgeryInjuryType = type.getInjuryType();
         InjurySubType subType = surgeryInjuryType.getSubType();
 
@@ -1617,14 +1636,14 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
     /** @return the injuries (as opposed to existing prosthetics) a procedure would fix */
     private List<Injury> getTreatedInjuries(Treatment treatment) {
-        return getInjuriesClearedBy(treatment.type(), treatment.location())
+        return getInjuriesClearedBy(treatment)
                      .stream()
                      .filter(injury -> !injury.getSubType().isPermanentModification())
                      .toList();
     }
 
     private int getHitsCleared(Treatment treatment) {
-        return getInjuriesClearedBy(treatment.type(), treatment.location())
+        return getInjuriesClearedBy(treatment)
                      .stream()
                      .mapToInt(Injury::getHits)
                      .sum();
@@ -1663,7 +1682,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
         }
 
         // Era
-        if (type.getCost(faction, year) != null) {
+        if (getCost(type) != null) {
             requirements.add(requirement(RequirementStatus.MET, "year",
                   getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.requirement.year.met", year)));
         } else {
@@ -1766,16 +1785,38 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
     /** @return today's surgeries (those not set aside), ordered so the most important ones are rolled first */
     private List<PlannedSurgery> getTodaySurgeries() {
+        return getTodaySurgeries(null);
+    }
+
+    /**
+     * @param candidate a surgery to put in today's plan in place of whatever is planned at its location, as adding it
+     *                  would, or {@code null} for the plan as it is
+     *
+     * @return today's surgeries (those not set aside), ordered so the most important ones are rolled first
+     */
+    private List<PlannedSurgery> getTodaySurgeries(@Nullable PlannedSurgery candidate) {
         List<PlannedSurgery> surgeries = new ArrayList<>();
+        boolean isCandidatePlaced = false;
         for (Map.Entry<BodyLocation, PlanEntry> entry : plan.entrySet()) {
-            if (!entry.getValue().isDeferred) {
+            // Adding a surgery where one is already planned replaces it in place, so the candidate takes its turn
+            if (candidate != null && entry.getKey() == candidate.location()) {
+                surgeries.add(candidate);
+                isCandidatePlaced = true;
+            } else if (!entry.getValue().isDeferred) {
                 surgeries.add(new PlannedSurgery(entry.getValue().type, entry.getKey()));
             }
+        }
+        if (candidate != null && !isCandidatePlaced) {
+            surgeries.add(candidate);
         }
         // Prioritize surgeries based on difficulty and expense. This is so that any available Edge is used on the
         // more important surgeries first.
         surgeries.sort(this::compareCosts);
         return surgeries;
+    }
+
+    private static int getHighestSurgeryLevel(List<PlannedSurgery> surgeries) {
+        return surgeries.stream().mapToInt(surgery -> surgery.type().getSurgeryLevel()).max().orElse(0);
     }
 
     private int getTodaySurgeryLevel() {
@@ -1794,18 +1835,28 @@ public class AdvancedSurgeriesDialog extends JDialog {
      * risk.
      */
     private List<SurgeryPreview> previewToday() {
-        List<PlannedSurgery> surgeries = getTodaySurgeries();
+        return preview(getTodaySurgeries());
+    }
+
+    /**
+     * Works out what each surgery in a plan will do, as {@link #previewToday()} does for today's plan.
+     *
+     * @param surgeries the plan's surgeries, in the order they are rolled
+     *
+     * @return what each surgery will do, in the same order
+     */
+    private List<SurgeryPreview> preview(List<PlannedSurgery> surgeries) {
         if (surgeries.isEmpty()) {
             return List.of();
         }
-        Person operatingSurgeon = getOperatingSurgeon(getTodaySurgeryLevel());
+        Person operatingSurgeon = getOperatingSurgeon(getHighestSurgeryLevel(surgeries));
         int edge = isUseEdge(operatingSurgeon) ? operatingSurgeon.getCurrentEdge() : 0;
         Set<Injury> claimed = Collections.newSetFromMap(new IdentityHashMap<>());
 
         List<SurgeryPreview> previews = new ArrayList<>();
         for (PlannedSurgery surgery : surgeries) {
             int hitsCleared = 0;
-            for (Injury injury : getInjuriesClearedBy(surgery.type(), surgery.location())) {
+            for (Injury injury : getInjuriesClearedBy(new Treatment(surgery.type(), surgery.location()))) {
                 if (claimed.add(injury)) {
                     hitsCleared += injury.getHits();
                 }
@@ -1817,10 +1868,23 @@ public class AdvancedSurgeriesDialog extends JDialog {
         return previews;
     }
 
+    /**
+     * @return the chance of a procedure succeeding if it were in today's plan: the same surgeon, surgery level and
+     *       share of Edge the dock would show once it is added
+     */
+    private double getPlannedSuccessChance(Treatment treatment) {
+        PlannedSurgery candidate = new PlannedSurgery(treatment.type(), treatment.location());
+        return preview(getTodaySurgeries(candidate)).stream()
+                     .filter(preview -> preview.surgery().equals(candidate))
+                     .mapToDouble(SurgeryPreview::successChance)
+                     .findFirst()
+                     .orElse(0);
+    }
+
     private Money getCost(List<PlannedSurgery> surgeries) {
         Money total = Money.zero();
         for (PlannedSurgery surgery : surgeries) {
-            Money cost = surgery.type().getCost(getFaction(), campaign.getGameYear());
+            Money cost = getCost(surgery.type());
             if (cost != null) {
                 total = total.plus(cost);
             }
@@ -1831,9 +1895,19 @@ public class AdvancedSurgeriesDialog extends JDialog {
         return total;
     }
 
-    private int getRecoveryDays(ProstheticType type) {
+    /** @return the days a successful surgery keeps the patient out of action, from the recovery injury it leaves */
+    private int getRecoveryDays(PlannedSurgery surgery) {
         double multiplier = campaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER);
-        return Math.max(1, (int) Math.round(type.getInjuryType().getBaseRecoveryTime() * multiplier));
+        return surgery.type().getRecoveryDays(surgery.location(), multiplier);
+    }
+
+    /**
+     * @return the procedure's cost to the campaign's faction this year, or {@code null} if it can't be bought this
+     *       year
+     */
+    private @Nullable Money getCost(ProstheticType type) {
+        return costCache.computeIfAbsent(type,
+              key -> Optional.ofNullable(key.getCost(getFaction(), campaign.getGameYear()))).orElse(null);
     }
 
     private int compareCosts(PlannedSurgery s1, PlannedSurgery s2) {
@@ -1843,10 +1917,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
         }
 
         // Cost can be null when the prosthetic isn't available this year, which GM Mode allows to be selected
-        Money cost1 = Objects.requireNonNullElse(s1.type().getCost(getFaction(), campaign.getGameYear()),
-              Money.zero());
-        Money cost2 = Objects.requireNonNullElse(s2.type().getCost(getFaction(), campaign.getGameYear()),
-              Money.zero());
+        Money cost1 = Objects.requireNonNullElse(getCost(s1.type()), Money.zero());
+        Money cost2 = Objects.requireNonNullElse(getCost(s2.type()), Money.zero());
         return cost2.compareTo(cost1);
     }
 
@@ -1930,19 +2002,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
     /** @return the number the surgeon must roll for a surgery of this type, as the real check works it out */
     private CheckTarget getCheckTarget(Person operatingSurgeon, @Nullable ProstheticType type) {
         int modifier = type == null ? 0 : getMachinistModifier(operatingSurgeon, type);
-        TargetRoll targetRoll = operatingSurgeon.checkSkill(S_SURGERY, campaign)
-                                      .withMiscModifier(modifier)
-                                      .getTargetNumber();
-        Skill skill = operatingSurgeon.getSkill(S_SURGERY);
-        RollType rollType = skill != null && skill.getHasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL;
-        return new CheckTarget(targetRoll.getValue(), SkillType.getType(S_SURGERY).isCountUp(),
-              targetRoll.cannotSucceed(), rollType);
-    }
-
-    private double getSuccessChance(ProstheticType type, int surgeryLevelNeeded) {
-        Person operatingSurgeon = getOperatingSurgeon(surgeryLevelNeeded);
-        boolean hasEdge = isUseEdge(operatingSurgeon) && operatingSurgeon.getCurrentEdge() > 0;
-        return CheckOdds.chance(getCheckTarget(operatingSurgeon, type), hasEdge);
+        return operatingSurgeon.checkSkill(S_SURGERY, campaign).withMiscModifier(modifier).getCheckTarget();
     }
 
     private String describeOperatingSurgeon() {
@@ -1962,12 +2022,9 @@ public class AdvancedSurgeriesDialog extends JDialog {
     // region Guide
 
     /**
-     * Builds the guide drawer and the scrim that dims the dialog behind it. Both float over the dialog on the layered
-     * pane, and Escape or a click on the scrim closes the guide.
-     *
-     * @param content the dialog's content pane, for the Escape key binding
+     * Builds the guide drawer, which floats over the dialog above a scrim; Escape or a click on the scrim closes it.
      */
-    private void buildGuide(JComponent content) {
+    private void buildGuide() {
         AdvancedSurgeriesGuidePreferences preferences = AdvancedSurgeriesGuidePreferences.getInstance();
         HudCheckBox alwaysOpen = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.guide.alwaysOpen"));
         alwaysOpen.setSelected(preferences.isGuideAlwaysOpen());
@@ -1976,41 +2033,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.guide.tab.example"),
               getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.guide.tab.terms")), alwaysOpen,
               getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.guide.close"), this::closeGuide);
-
-        scrim = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics graphics) {
-                graphics.setColor(SCRIM);
-                graphics.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        scrim.setOpaque(false);
-        scrim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent event) {
-                closeGuide();
-            }
-        });
-
-        getLayeredPane().add(scrim, JLayeredPane.MODAL_LAYER);
-        getLayeredPane().add(guideDrawer, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1));
-        scrim.setVisible(false);
-        guideDrawer.setVisible(false);
-        getLayeredPane().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent event) {
-                layoutGuide();
-            }
-        });
-
-        content.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-              "closeGuide");
-        content.getActionMap().put("closeGuide", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                closeGuide();
-            }
-        });
+        guideDrawer.install(getRootPane());
     }
 
     /** Opens the guide if the player hasn't seen it yet, or has asked to see it every time. */
@@ -2023,25 +2046,11 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
     private void openGuide() {
         AdvancedSurgeriesGuidePreferences.getInstance().setGuideSeen(true);
-        guideDrawer.showGuide(createGuide());
-        scrim.setVisible(true);
-        guideDrawer.setVisible(true);
-        layoutGuide();
-        guideDrawer.focusClose();
+        guideDrawer.open(createGuide());
     }
 
     private void closeGuide() {
-        scrim.setVisible(false);
-        guideDrawer.setVisible(false);
-    }
-
-    private void layoutGuide() {
-        int width = getLayeredPane().getWidth();
-        int height = getLayeredPane().getHeight();
-        scrim.setBounds(0, 0, width, height);
-        int drawerWidth = Math.min(HudGuideDrawer.drawerWidth(), width);
-        guideDrawer.setBounds(width - drawerWidth, 0, drawerWidth, height);
-        guideDrawer.revalidate();
+        guideDrawer.close();
     }
 
     /**
@@ -2216,7 +2225,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
             addMarkerInjury(type, location);
 
             // Add recovery period injuries
-            InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
+            InjuryType recoveryInjuryType = type.getRecoveryInjuryType(location);
             Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, GENERIC, 1);
             patient.addInjury(recoveryInjury);
 
@@ -2280,7 +2289,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
      */
     private void processOldInjuryRemoval(ProstheticType type, BodyLocation location) {
         LocalDate today = campaign.getLocalDate();
-        for (Injury injury : getInjuriesClearedBy(type, location)) {
+        for (Injury injury : findInjuriesClearedBy(type, location)) {
             patient.removeInjury(injury, today);
         }
     }
@@ -2295,40 +2304,6 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private void checkForDeath() {
         if (patient.getTotalInjurySeverity() >= DEATH) {
             patient.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
-        }
-    }
-
-    /**
-     * Selects the appropriate recovery injury type to apply after a successful surgery, based on prosthetic generation
-     * and whether a limb or organ was treated.
-     *
-     * @param surgery the planned surgery
-     *
-     * @return the corresponding recovery {@link InjuryType}
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static InjuryType getRecoveryInjuryType(PlannedSurgery surgery) {
-        ProstheticType type = surgery.type();
-        if (type == COSMETIC_SURGERY) {
-            return COSMETIC_SURGERY_RECOVERY;
-        } else if (type == FRACTURE_REPAIR) {
-            return FRACTURE_REPAIR_RECOVERY;
-        } else if (surgery.location().isLimb()) {
-            if (type.isElectiveImplant()) {
-                return ELECTIVE_IMPLANT_RECOVERY;
-            } else if (type.getProstheticType() >= 6) {
-                return CLONED_LIMB_RECOVERY;
-            } else {
-                return REPLACEMENT_LIMB_RECOVERY;
-            }
-        } else if (type == PAIN_SHUNT) {
-            return PAIN_SHUNT_RECOVERY;
-        } else if (type == ENHANCED_IMAGING) {
-            return EI_IMPLANT_RECOVERY;
-        } else {
-            return REPLACEMENT_ORGAN_RECOVERY;
         }
     }
 
@@ -2507,9 +2482,10 @@ public class AdvancedSurgeriesDialog extends JDialog {
      * @return the wrapped text, as HTML for a label
      */
     private static String wrapToPixels(String text, int pixels, Font font) {
-        FontMetrics metrics = new JLabel().getFontMetrics(font.deriveFont(Font.BOLD));
-        double averageCharacterWidth = metrics.stringWidth(CHARACTER_WIDTH_SAMPLE) /
-                                             (double) CHARACTER_WIDTH_SAMPLE.length();
+        double averageCharacterWidth = AVERAGE_CHARACTER_WIDTHS.computeIfAbsent(font, key -> {
+            FontMetrics metrics = new JLabel().getFontMetrics(key.deriveFont(Font.BOLD));
+            return metrics.stringWidth(CHARACTER_WIDTH_SAMPLE) / (double) CHARACTER_WIDTH_SAMPLE.length();
+        });
         int characters = Math.max(MINIMUM_WRAP_CHARACTERS,
               (int) (pixels / Math.max(1.0, averageCharacterWidth)));
         // wordWrap breaks lines at spaces, so spaces inside tags are hidden from it and put back afterwards

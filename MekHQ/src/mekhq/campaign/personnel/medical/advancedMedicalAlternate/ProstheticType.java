@@ -1369,6 +1369,55 @@ public enum ProstheticType {
                      this == ELECTIVE_MYOMER_LEG;
     }
 
+    /**
+     * Selects the recovery injury a successful surgery of this type leaves on the patient, based on prosthetic
+     * generation and whether a limb or organ was treated.
+     *
+     * <p>This is the injury the patient heals from, unlike {@link #getInjuryType()}, which is the permanent record of
+     * the procedure.</p>
+     *
+     * @param location the body location being treated
+     *
+     * @return the corresponding recovery {@link InjuryType}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public InjuryType getRecoveryInjuryType(BodyLocation location) {
+        if (this == COSMETIC_SURGERY) {
+            return AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
+        } else if (this == FRACTURE_REPAIR) {
+            return AlternateInjuries.FRACTURE_REPAIR_RECOVERY;
+        } else if (location.isLimb()) {
+            if (isElectiveImplant()) {
+                return AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
+            } else if (getProstheticType() >= 6) {
+                return AlternateInjuries.CLONED_LIMB_RECOVERY;
+            } else {
+                return AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
+            }
+        } else if (this == PAIN_SHUNT) {
+            return AlternateInjuries.PAIN_SHUNT_RECOVERY;
+        } else if (this == ENHANCED_IMAGING) {
+            return AlternateInjuries.EI_IMPLANT_RECOVERY;
+        } else {
+            return AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
+        }
+    }
+
+    /**
+     * @param location              the body location being treated
+     * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     *
+     * @return the estimated days a successful surgery of this type at this location keeps the patient out of action
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getRecoveryDays(BodyLocation location, double healingTimeMultiplier) {
+        return max(1, (int) round(getRecoveryInjuryType(location).getBaseRecoveryTime() * healingTimeMultiplier));
+    }
+
     public boolean isClanOnly() {
         return isClanOnly;
     }
@@ -1708,31 +1757,36 @@ public enum ProstheticType {
      *                              affiliation-based restrictions
      * @param currentYear           the current in-game year
      * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     * @param location              the body location being treated, which decides the recovery time
      *
      * @return a fully formatted HTML-compatible tooltip string suitable for display in Swing-based UI components
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public String getTooltip(Faction campaignFaction, int currentYear, double healingTimeMultiplier) {
-        return "- " + String.join("<br>- ", getDetailLines(campaignFaction, currentYear, healingTimeMultiplier));
+    public String getTooltip(Faction campaignFaction, int currentYear, double healingTimeMultiplier,
+          BodyLocation location) {
+        return "- " + String.join("<br>- ",
+              getDetailLines(campaignFaction, currentYear, healingTimeMultiplier, location));
     }
 
     /**
-     * Builds the individual lines shown by {@link #getTooltip(Faction, int, double)}, so they can also be laid out as
-     * a visible list.
+     * Builds the individual lines shown by {@link #getTooltip(Faction, int, double, BodyLocation)}, so they can also
+     * be laid out as a visible list.
      *
      * @param campaignFaction       the faction requesting the details, used to determine cost availability and any
      *                              affiliation-based restrictions
      * @param currentYear           the current in-game year
      * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     * @param location              the body location being treated, which decides the recovery time
      *
      * @return the detail lines, in display order; each may contain HTML
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public List<String> getDetailLines(Faction campaignFaction, int currentYear, double healingTimeMultiplier) {
+    public List<String> getDetailLines(Faction campaignFaction, int currentYear, double healingTimeMultiplier,
+          BodyLocation location) {
         List<String> detailLines = new ArrayList<>();
 
         // 1) Surgery level required
@@ -1765,8 +1819,7 @@ public enum ProstheticType {
               adjustedLegality.getDescription(), adjustedLegality.name()));
 
         // 7) Estimated recovery time
-        int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * healingTimeMultiplier);
-        recoveryTime = max(recoveryTime, 1);
+        int recoveryTime = getRecoveryDays(location, healingTimeMultiplier);
         detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
         // 8) Misc
