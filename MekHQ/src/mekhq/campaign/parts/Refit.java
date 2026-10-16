@@ -379,16 +379,7 @@ public class Refit extends Part implements IAcquisitionWork {
             return;
         }
         time = 0;
-        sameArmorType = newEntity.getArmorType(newEntity.firstArmorIndex()) ==
-                              oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex());
-        // SVs with standard SV armor need to check for change in BAR/tech rating
-        if (newEntity.isSupportVehicle() &&
-                  (newEntity.getArmorType(newEntity.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD)) {
-
-            sameArmorType = (newEntity.getBARRating(newEntity.firstArmorIndex()) ==
-                                   oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex())) &&
-                                  (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
-        }
+        sameArmorType = hasSameArmor(oldUnit.getEntity(), newEntity);
         int recycledArmorPoints = 0;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
         boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
@@ -900,7 +891,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         if (armorNeeded > 0) {
-            if (newEntity.isSupportVehicle() && (armorType == EquipmentType.T_ARMOR_STANDARD)) {
+            if (SVArmor.usesBarArmor(newEntity, newEntity.firstArmorIndex())) {
                 newArmorSupplies = new SVArmor(newEntity.getBARRating(newEntity.firstArmorIndex()),
                       newEntity.getArmorTechRating(),
                       0,
@@ -1460,13 +1451,48 @@ public class Refit extends Part implements IAcquisitionWork {
             return null;
         }
 
-        return (Armor) getWarehouse().findSparePart(part -> part instanceof Armor &&
-                                                                  ((Armor) part).getType() ==
-                                                                        newArmorSupplies.getType() &&
-                                                                  part.isClanTechBase() ==
-                                                                        newArmorSupplies.isClanTechBase() &&
+        return (Armor) getWarehouse().findSparePart(part -> isSameArmorSupply(part) &&
                                                                   !part.isReservedForRefit() &&
                                                                   part.isPresent());
+    }
+
+    /**
+     * @return {@code true} when a warehouse part is the armor this refit buys. Support vehicle armor must also have the
+     *       same BAR and armor tech rating, which its armor type alone does not tell.
+     */
+    private boolean isSameArmorSupply(Part part) {
+        if (newArmorSupplies instanceof SVArmor supportVehicleSupplies) {
+            return (part instanceof SVArmor) && part.isSamePartType(supportVehicleSupplies);
+        }
+        return (part instanceof Armor armor) &&
+                     (armor.getType() == newArmorSupplies.getType()) &&
+                     (part.isClanTechBase() == newArmorSupplies.isClanTechBase());
+    }
+
+    /**
+     * Tells whether a refit keeps the same kind of armor, so the armor already on the unit can be reused. Support
+     * vehicle armor is the same only when both the BAR and the armor tech rating are unchanged.
+     *
+     * @param oldEntity the unit as it is now
+     * @param newEntity the unit as the refit builds it
+     *
+     * @return {@code true} when the old armor can be reused
+     */
+    static boolean hasSameArmor(Entity oldEntity, Entity newEntity) {
+        int oldLocation = oldEntity.firstArmorIndex();
+        int newLocation = newEntity.firstArmorIndex();
+        boolean oldUsesBarArmor = SVArmor.usesBarArmor(oldEntity, oldLocation);
+        boolean newUsesBarArmor = SVArmor.usesBarArmor(newEntity, newLocation);
+        if (!oldUsesBarArmor && !newUsesBarArmor) {
+            return newEntity.getArmorType(newLocation) == oldEntity.getArmorType(oldLocation);
+        }
+        boolean isSameBar = newEntity.getBARRating(newLocation) == oldEntity.getBARRating(oldLocation);
+        boolean isSameTechRating = newEntity.getArmorTechRating() == oldEntity.getArmorTechRating();
+        boolean isSameArmor = oldUsesBarArmor && newUsesBarArmor && isSameBar && isSameTechRating;
+        LOGGER.debug("[Refit] {}: BAR {} at {} to BAR {} at {}, same armor {}", newEntity.getShortName(),
+              oldEntity.getBARRating(oldLocation), oldEntity.getArmorTechRating(),
+              newEntity.getBARRating(newLocation), newEntity.getArmorTechRating(), isSameArmor);
+        return isSameArmor;
     }
 
     /**
@@ -2034,7 +2060,7 @@ public class Refit extends Part implements IAcquisitionWork {
         Armor armor;
         Entity en = oldUnit.getEntity();
         boolean isClanArmor = en.isClanArmor(en.firstArmorIndex());
-        if (en.isSupportVehicle() && en.getArmorType(en.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD) {
+        if (SVArmor.usesBarArmor(en, en.firstArmorIndex())) {
             armor = new SVArmor(en.getBARRating(en.firstArmorIndex()),
                   en.getArmorTechRating(),
                   -armorNeeded,
