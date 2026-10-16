@@ -1,0 +1,181 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ea70-7299-ac6b-32f4589a1a2b
+</UUID>
+
+<UnitType>
+SupportTank
+</UnitType>
+
+<Name>
+Trike
+</Name>
+
+<Model>
+
+</Model>
+
+<mul id:>
+7810
+</mul id:>
+
+<year>
+2469
+</year>
+
+<type>
+IS Level 2
+</type>
+
+<role>
+Striker
+</role>
+
+<motion_type>
+Wheeled
+</motion_type>
+
+<transporters>
+cargobay:0.06:1:1::-1:0
+pillionseats:1.0:0:-1::-1:0
+</transporters>
+
+<cruiseMP>
+6
+</cruiseMP>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+48
+</armor_type>
+
+<armor_tech_rating>
+3
+</armor_tech_rating>
+
+<armor_tech_level>
+1
+</armor_tech_level>
+
+<armor>
+2
+1
+1
+1
+</armor>
+
+<Body Equipment>
+BicycleChassisMod
+ISOffRoadChassis
+Advanced Fire Control
+</Body Equipment>
+
+<Front Equipment>
+Flamer (Heavy):SIZE:1.0
+</Front Equipment>
+
+<Right Equipment>
+</Right Equipment>
+
+<Left Equipment>
+</Left Equipment>
+
+<Rear Equipment>
+</Rear Equipment>
+
+<barrating>
+7
+</barrating>
+
+<structural_tech_rating>
+3
+</structural_tech_rating>
+
+<engine_tech_rating>
+3
+</engine_tech_rating>
+
+<capabilities>
+<p>The Trike reaches a top speed of just under 100 kph, though it is less maneuverable than the hoverbike. Its cargo capacity is typically sacrificed to improve armor protection to levels rivaling the military-grade hoverbike. The standard armament is a heavy flamer. It is not as common in service as the minigun cycle or the hoverbike.</p>
+</capabilities>
+
+<overview>
+<p>The Trike is a militarized adaptation of a common civilian three-wheeled vehicle, introduced in 2469. It represents an affordable step up from unmodified civilian transport for forces that lack access to purpose-built military ground vehicles, and is favored by mercenaries and some militia organizations.</p>
+</overview>
+
+<deployment>
+<p>The Trike serves with mercenary companies and planetary militia. It is considered a versatile unit despite being less common than the hoverbike or minigun cycle.</p>
+</deployment>
+
+<history>
+<p>The Trike entered service in 2469. Beyond its introduction date and general service pattern with mercenary and militia forces, little detailed manufacturing or operational history has been documented.</p>
+</history>
+
+<manufacturer>
+Unknown
+</manufacturer>
+
+<primaryFactory>
+Unknown
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemModels>
+
+<source>
+TR:I
+</source>
+
+<published>
+TR:I
+</published>
+
+<tonnage>
+0.5
+</tonnage>
+
+<bv>
+11
+</bv>
+
+<fuel>
+0.007
+</fuel>
+
+<fuelType>
+PETROCHEMICALS
+</fuelType>
+
