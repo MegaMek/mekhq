@@ -61,8 +61,8 @@ import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
-import megamek.common.units.Aero;
 import megamek.common.units.Entity;
+import megamek.common.units.IAero;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
@@ -88,6 +88,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.unit.AerospaceRefueling;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -273,13 +274,11 @@ public class CamOpsSalvageUtilities {
             // Adding the unit to the campaign resets its camouflage to our own, so grab it first
             Camouflage fieldedCamouflage = salvageUnit.getEntity().getCamouflage().clone();
 
-            if (salvageUnit.getEntity() instanceof Aero aero) {
-                // Refuel from a fresh copy of the unit. This is only needed for aerospace units, and building the
-                // status parses the unit's file, so it isn't done for anything else.
+            if (salvageUnit.getEntity() instanceof IAero) {
+                // Refuel from a fresh copy of the unit. This is only needed for aerospace units and LAMs, and building
+                // the status parses the unit's file, so it isn't done for anything else.
                 ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
-                if (salvageStatus.getBaseEntity() instanceof Aero baseAero) {
-                    aero.setFuelTonnage(baseAero.getFuelTonnage());
-                }
+                AerospaceRefueling.refuel(salvageUnit.getEntity(), salvageStatus.getBaseEntity());
             }
 
             campaign.clearGameData(salvageUnit.getEntity());

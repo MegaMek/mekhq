@@ -1435,6 +1435,25 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Tells whether an armor part on a support vehicle is not the armor its location carries: a plain armor part,
+     * which older versions gave every support vehicle with BAR armor, or support vehicle armor left with the BAR or
+     * armor tech rating the unit had before a refit.
+     */
+    private boolean isWrongSupportVehicleArmor(Part part) {
+        int location = part.getLocation();
+        if ((location < 0) || !SVArmor.usesBarArmor(entity, location)) {
+            return false;
+        }
+        boolean isWrongArmor = !(part instanceof SVArmor supportVehicleArmor)
+                                     || !supportVehicleArmor.matchesArmorOf(entity, location);
+        if (isWrongArmor) {
+            LOGGER.debug("[UnitParts] {}: replacing {} in {} with BAR {} armor", getName(), part.getName(),
+                  entity.getLocationName(location), entity.getBARRating(location));
+        }
+        return isWrongArmor;
+    }
+
+    /**
      * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
      */
     private void discardPart(Part part) {
@@ -4193,7 +4212,10 @@ public class Unit implements ITechnology, ILocatable {
                 }
             } else if (part instanceof Armor) {
                 if (part.getLocation() < armor.length) {
-                    if (((Armor) part).isRearMounted()) {
+                    if (isWrongSupportVehicleArmor(part)) {
+                        // Rebuilt below as the armor the location carries
+                        partsToRemove.add(part);
+                    } else if (((Armor) part).isRearMounted()) {
                         armorRear[part.getLocation()] = part;
                     } else {
                         armor[part.getLocation()] = part;
@@ -4527,7 +4549,7 @@ public class Unit implements ITechnology, ILocatable {
                           getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
-                } else if (entity.isSupportVehicle() && (entity.getArmorType(i) == EquipmentType.T_ARMOR_STANDARD)) {
+                } else if (SVArmor.usesBarArmor(entity, i)) {
                     Armor a = new SVArmor(entity.getBARRating(i),
                           entity.getArmorTechRating(),
                           getEntity().getOArmor(i, false),
