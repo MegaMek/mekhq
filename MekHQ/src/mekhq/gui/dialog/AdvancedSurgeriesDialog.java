@@ -52,7 +52,6 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.PAIN_SHUNT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.FRACTURE_REPAIR;
@@ -155,6 +154,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
           RIGHT_HAND,
           CHEST,
           RIBS,
+          SPINE,
           HEART,
           LUNGS,
           ORGANS,
@@ -931,8 +931,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
         boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
         InjuryType surgeryInjuryType = type.getInjuryType();
         InjurySubType subType = surgeryInjuryType.getSubType();
-        boolean surgeryIsImplant = subType.isImplant(); // Includes VDNI implants
-        boolean surgeryIsVDNI = subType == IMPLANT_VDNI;
+        boolean surgeryIsImplant = subType.isImplant(); // Includes VDNI implants and wings
+        boolean surgeryIsExclusive = subType.isMutuallyExclusiveImplant();
         LocalDate today = campaign.getLocalDate();
 
         // Implants remove any other instances of the same implant, otherwise no removal occurs. Non-implants remove
@@ -941,8 +941,9 @@ public class AdvancedSurgeriesDialog extends JDialog {
             for (Injury injury : patient.getInjuries()) {
                 InjurySubType injurySubType = injury.getSubType();
                 if (injurySubType.isImplant()) {
-                    // We only remove implants if we're adding an identical implant, or another VDNI implant
-                    if ((surgeryIsVDNI && injurySubType == IMPLANT_VDNI) ||
+                    // We only remove implants if we're adding an identical implant, or another of a mutually
+                    // exclusive kind (VDNI implants, wings)
+                    if ((surgeryIsExclusive && injurySubType == subType) ||
                               (injury.getType() == surgeryInjuryType)) {
                         patient.removeInjury(injury, today);
                     }

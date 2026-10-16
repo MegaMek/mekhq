@@ -35,6 +35,8 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_EI_IMPLANT;
+import static megamek.common.options.OptionsConstants.MD_PL_MASC;
+import static megamek.common.options.OptionsConstants.MD_TSM_IMPLANT;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
@@ -343,6 +345,49 @@ class AdvancedMedicalAlternateImplantsTest {
 
         verify(armorOption).setValue(false);
         verify(camoOption).setValue(false);
+    }
+
+    @Test
+    @DisplayName("checkForDermalEligibility enables triple-strength myomer with four limbs and leg MASC with two legs")
+    void checkForDermalEligibility_enablesTripleStrengthAndLegMasc() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        IOption tsmOption = mock(IOption.class);
+        IOption mascOption = mock(IOption.class);
+
+        List<Injury> prostheticInjuries = List.of(
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE),
+              prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC),
+              prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
+        when(person.getOptions()).thenReturn(options);
+        when(options.getOption(MD_TSM_IMPLANT)).thenReturn(tsmOption);
+        when(options.getOption(MD_PL_MASC)).thenReturn(mascOption);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        verify(tsmOption).setValue(true);
+        verify(mascOption).setValue(true);
+    }
+
+    @Test
+    @DisplayName("checkForDermalEligibility disables leg MASC when only one leg carries it")
+    void checkForDermalEligibility_disablesLegMascWithOneLeg() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        IOption mascOption = mock(IOption.class);
+
+        List<Injury> prostheticInjuries = List.of(prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
+        when(person.getOptions()).thenReturn(options);
+        when(options.getOption(MD_PL_MASC)).thenReturn(mascOption);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        verify(mascOption).setValue(false);
     }
     // endregion checkForDermalEligibility
 
