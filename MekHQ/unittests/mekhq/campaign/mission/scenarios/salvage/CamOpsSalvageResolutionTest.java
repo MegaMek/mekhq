@@ -497,7 +497,7 @@ class CamOpsSalvageResolutionTest {
             // e.g. at 30%, buying a 10M wreck costs 7M: 3M is the player's, 7M the employer's
             resolve(new PurchaseSalvageSettlement(playerShare), List.of(wreck(10_000_000)), List.of(), List.of());
 
-            assertEquals(0, ContractSettlement.salvageOverage(contract, TODAY).compareTo(Money.zero()));
+            assertEquals(0, ContractSettlement.salvageOverage(contract, campaign).compareTo(Money.zero()));
             assertEquals(0, salvagedByUnit[0].compareTo(Money.of(10_000_000).multipliedBy(playerShare)));
         }
 

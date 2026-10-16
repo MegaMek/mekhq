@@ -35,8 +35,6 @@ package mekhq.campaign.mission.scenarios.salvage;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.time.LocalDate;
-
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -101,17 +99,17 @@ public abstract sealed class SalvageSettlement
      * claim, unless salvage is treated as exchange (see {@link AbstractContract#isSalvageTreatedAsExchange}).
      *
      * @param contract the contract the salvage was recovered under
-     * @param today    the current campaign date
+     * @param campaign the current campaign
      *
      * @return a capped or exchange settlement
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static SalvageSettlement forCappedSalvageRights(AbstractContract contract, LocalDate today) {
+    public static SalvageSettlement forCappedSalvageRights(AbstractContract contract, Campaign campaign) {
         double playerShare = contract.getSalvageRightsMultiplier();
-        return contract.isSalvageTreatedAsExchange(today) ?
-                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(today)) :
+        return contract.isSalvageTreatedAsExchange(campaign) ?
+                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(campaign)) :
                      new CappedSalvageSettlement(playerShare);
     }
 
@@ -122,17 +120,17 @@ public abstract sealed class SalvageSettlement
      * share.
      *
      * @param contract the contract the salvage was recovered under
-     * @param today    the current campaign date
+     * @param campaign the current campaign
      *
      * @return a purchase or exchange settlement
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static SalvageSettlement forSalvagePurchases(AbstractContract contract, LocalDate today) {
+    public static SalvageSettlement forSalvagePurchases(AbstractContract contract, Campaign campaign) {
         double playerShare = contract.getSalvageRightsMultiplier();
-        return contract.isSalvageTreatedAsExchange(today) ?
-                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(today)) :
+        return contract.isSalvageTreatedAsExchange(campaign) ?
+                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(campaign)) :
                      new PurchaseSalvageSettlement(playerShare);
     }
 

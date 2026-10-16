@@ -32,8 +32,7 @@
  */
 package mekhq.campaign.mission.scenarios.salvage;
 
-import java.time.LocalDate;
-
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
@@ -51,8 +50,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  */
 public class MekHQSalvage extends CamOpsRevisedSalvage {
     @Override
-    public SalvageSettlement createSettlement(AbstractContract contract, LocalDate today) {
-        return SalvageSettlement.forSalvagePurchases(contract, today);
+    public SalvageSettlement createSettlement(AbstractContract contract, Campaign campaign) {
+        return SalvageSettlement.forSalvagePurchases(contract, campaign);
     }
 
     @Override

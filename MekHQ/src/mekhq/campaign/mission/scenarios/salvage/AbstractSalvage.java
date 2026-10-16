@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.scenarios.salvage;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
@@ -59,7 +58,7 @@ import mekhq.campaign.unit.Unit;
  *   <li><b>Which units can recover them</b>: what a unit needs to take part in salvage operations (see
  *   {@link #canSalvage(Unit, boolean)} and {@link #isAvailableForSalvage(Unit, boolean)}).</li>
  *   <li><b>How salvage is paid for</b>: how the contract's salvage rights divide the salvage between the player and
- *   their employer (see {@link #createSettlement(AbstractContract, LocalDate)}).</li>
+ *   their employer (see {@link #createSettlement(AbstractContract, Campaign)}).</li>
  * </ul>
  *
  * <p>Where a rule has a sensible default, it is that of {@link CamOpsStrictSalvage CamOps (Strict)}.</p>
@@ -262,15 +261,15 @@ public abstract class AbstractSalvage {
      * is treated as exchange, set the player's cash share of the employer's salvage.</p>
      *
      * @param contract the contract the salvage was recovered under
-     * @param today    the current campaign date
+     * @param campaign the current campaign
      *
      * @return the salvage settlement for the contract
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public SalvageSettlement createSettlement(AbstractContract contract, LocalDate today) {
-        return SalvageSettlement.forCappedSalvageRights(contract, today);
+    public SalvageSettlement createSettlement(AbstractContract contract, Campaign campaign) {
+        return SalvageSettlement.forCappedSalvageRights(contract, campaign);
     }
 
     /**

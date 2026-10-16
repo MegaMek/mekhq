@@ -48,7 +48,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,7 +76,7 @@ import org.mockito.MockedStatic;
  * units may salvage, the settlement it creates, and how it resolves a scenario's salvage.
  */
 class SalvageRulesTest {
-    private static final LocalDate TODAY = LocalDate.of(3060, 1, 1);
+    private static final Campaign CAMPAIGN = mock(Campaign.class);
 
     private static final AbstractSalvage LEGACY = new LegacySalvage();
     private static final AbstractSalvage STRICT = new CamOpsStrictSalvage();
@@ -158,7 +157,7 @@ class SalvageRulesTest {
             assertEquals(isClaimedInWizard, rules.isSalvageClaimedInResolveWizard(), "claimed in wizard");
             assertEquals(isCombatAllowed, rules.isSalvageFormationCombatAllowed(), "salvage formation combat");
             assertEquals(isMultipleAllowed, rules.isMultipleSalvagePerUnitAllowed(), "multiple salvage per unit");
-            assertEquals(isPurchases, rules.createSettlement(contract(), TODAY).isKeptSalvageBought(), "purchases");
+            assertEquals(isPurchases, rules.createSettlement(contract(), CAMPAIGN).isKeptSalvageBought(), "purchases");
         }
 
         @Test
@@ -248,15 +247,15 @@ class SalvageRulesTest {
     class Settlements {
         @Test
         void campaignOperationsSystemsCapSalvage() {
-            assertInstanceOf(CappedSalvageSettlement.class, LEGACY.createSettlement(contract(), TODAY));
-            assertInstanceOf(CappedSalvageSettlement.class, STRICT.createSettlement(contract(), TODAY));
-            assertInstanceOf(CappedSalvageSettlement.class, REVISED.createSettlement(contract(), TODAY));
+            assertInstanceOf(CappedSalvageSettlement.class, LEGACY.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(CappedSalvageSettlement.class, STRICT.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(CappedSalvageSettlement.class, REVISED.createSettlement(contract(), CAMPAIGN));
         }
 
         @Test
         void purchaseSystemsSellSalvage() {
-            assertInstanceOf(PurchaseSalvageSettlement.class, CHAOS.createSettlement(contract(), TODAY));
-            assertInstanceOf(PurchaseSalvageSettlement.class, MEKHQ.createSettlement(contract(), TODAY));
+            assertInstanceOf(PurchaseSalvageSettlement.class, CHAOS.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(PurchaseSalvageSettlement.class, MEKHQ.createSettlement(contract(), CAMPAIGN));
         }
     }
 

@@ -248,7 +248,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // Salvage gauge for a normal salvage percentage; the exchange / no-salvage cases are shown as text among the
         // reference terms below.
-        final boolean salvageIsMeter = !mission.isSalvageTreatedAsExchange(campaign.getLocalDate()) &&
+        final boolean salvageIsMeter = !mission.isSalvageTreatedAsExchange(campaign) &&
                                              (mission.getSalvageRightsMultiplier() > 0);
         if (salvageIsMeter) {
             addGaugeRow(ContractMeterBar.salvage(SalvageUtilities.calculateSalvagePercentage(mission.getSalvagedByUnitValue(),
@@ -332,7 +332,7 @@ public class MissionViewPanel extends JScrollablePanel {
             JLabel lblSalvagePct = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvage.text"));
             JLabel txtSalvagePct = new JLabel();
             txtSalvagePct.setName("txtSalvagePct");
-            if (mission.isSalvageTreatedAsExchange(campaign.getLocalDate())) {
+            if (mission.isSalvageTreatedAsExchange(campaign)) {
                 txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") +
                                             " (" +
                                             SalvageUtilities.calculateSalvagePercentage(mission.getSalvagedByUnitValue(),

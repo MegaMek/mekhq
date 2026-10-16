@@ -846,7 +846,7 @@ public class MHQMorale {
         // Check for emergency clause (this can trigger multiple times if the enemy faction keeps changing to a Clan
         // faction. This can be seen as the employer getting increasingly desperate and wanting to keep the player on
         // side.
-        checkForSpecialClanSalvageClause(campaign, today, contract);
+        checkForSpecialClanSalvageClause(campaign, contract);
     }
 
     /**
@@ -854,18 +854,16 @@ public class MHQMorale {
      * or during the Battle of Tukayyid.
      *
      * <p>The contract's salvage terms are left unchanged: while the clause is in effect, salvage is treated as
-     * exchange (see {@link AbstractContract#isEmployerEvokingClanSalvageClause(LocalDate)}).</p>
+     * exchange (see {@link AbstractContract#isEmployerEvokingClanSalvageClause(Campaign)}).</p>
      *
      * @param campaign The current campaign instance.
-     * @param today    The current game date to check against the Tukayyid threshold.
      * @param contract The contract whose enemy has just changed.
      *
      * @author Illiani
      * @since 0.50.11
      */
-    private static void checkForSpecialClanSalvageClause(Campaign campaign, LocalDate today,
-          AbstractContract contract) {
-        if (contract.isEmployerEvokingClanSalvageClause(today)) {
+    private static void checkForSpecialClanSalvageClause(Campaign campaign, AbstractContract contract) {
+        if (contract.isEmployerEvokingClanSalvageClause(campaign)) {
             String message = getFormattedTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message",
                   campaign.getCommanderAddress());
             new ImmersiveDialogSimple(campaign,

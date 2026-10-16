@@ -105,7 +105,7 @@ public final class SalvageRecoverySessionFactory {
             return null;
         }
 
-        SalvageSettlement settlement = salvageRules.createSettlement(contract, campaign.getLocalDate());
+        SalvageSettlement settlement = salvageRules.createSettlement(contract, campaign);
         return new SalvageRecoverySession(salvageRules, settlement, isInSpace, wrecks, recoveryUnits,
               getRecoveryTimes(campaign, scenario, wrecks), availableMinutes, contract.getSalvagedByUnitValue(),
               contract.getSalvagedByEmployerValue(), campaign.getPlayerForce().getFinances().getBalance());

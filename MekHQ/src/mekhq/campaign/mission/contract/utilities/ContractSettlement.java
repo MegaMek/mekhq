@@ -35,8 +35,6 @@ package mekhq.campaign.mission.contract.utilities;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.time.LocalDate;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Finances;
@@ -67,15 +65,15 @@ public final class ContractSettlement {
      * payment.
      *
      * @param contract the contract being completed
-     * @param today    the current campaign date
+     * @param campaign the current campaign
      *
      * @return the salvage overage owed, or {@link Money#zero()} when none is owed
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money salvageOverage(AbstractContract contract, LocalDate today) {
-        if (contract.isSalvageTreatedAsExchange(today)) {
+    public static Money salvageOverage(AbstractContract contract, Campaign campaign) {
+        if (contract.isSalvageTreatedAsExchange(campaign)) {
             return Money.zero();
         }
 

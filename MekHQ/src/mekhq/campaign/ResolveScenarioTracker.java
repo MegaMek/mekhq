@@ -2510,16 +2510,16 @@ public class ResolveScenarioTracker {
      * Determines whether a salvage exchange is used based on the current contract's conditions.
      *
      * <p>Salvage is exchange if the contract has salvage exchange rights, or if the employer is evoking the special
-     * Clan salvage clause (see {@link AbstractContract#isSalvageTreatedAsExchange(java.time.LocalDate)}).</p>
+     * Clan salvage clause (see {@link AbstractContract#isSalvageTreatedAsExchange(Campaign)}).</p>
      *
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
-        return (getMission() != null) && getMission().isSalvageTreatedAsExchange(campaign.getLocalDate());
+        return (getMission() != null) && getMission().isSalvageTreatedAsExchange(campaign);
     }
 
     public boolean isEmployerEvokingSpecialClause() {
-        return (getMission() != null) && getMission().isEmployerEvokingClanSalvageClause(campaign.getLocalDate());
+        return (getMission() != null) && getMission().isEmployerEvokingClanSalvageClause(campaign);
     }
 
     /**

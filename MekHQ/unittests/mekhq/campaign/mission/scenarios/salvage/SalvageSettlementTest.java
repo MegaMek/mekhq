@@ -66,7 +66,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 
 class SalvageSettlementTest {
-    private static final LocalDate TODAY = LocalDate.of(3060, 1, 1);
+    private static final Campaign CAMPAIGN = mock(Campaign.class);
 
     private static AbstractContract contract(double salvageRights, boolean isExchange) {
         AbstractContract contract = mock(AbstractContract.class);
@@ -77,8 +77,8 @@ class SalvageSettlementTest {
 
     private static AbstractContract clanSalvageClauseContract(double salvageRights) {
         AbstractContract contract = contract(salvageRights, false);
-        when(contract.isEmployerEvokingClanSalvageClause(TODAY)).thenReturn(true);
-        when(contract.isSalvageTreatedAsExchange(TODAY)).thenReturn(true);
+        when(contract.isEmployerEvokingClanSalvageClause(CAMPAIGN)).thenReturn(true);
+        when(contract.isSalvageTreatedAsExchange(CAMPAIGN)).thenReturn(true);
         return contract;
     }
 
@@ -102,38 +102,38 @@ class SalvageSettlementTest {
         @Test
         void cappedRightsWithoutExchangeAreCapped() {
             assertInstanceOf(CappedSalvageSettlement.class,
-                  SalvageSettlement.forCappedSalvageRights(contract(0.4, false), TODAY));
+                  SalvageSettlement.forCappedSalvageRights(contract(0.4, false), CAMPAIGN));
         }
 
         @Test
         void cappedRightsWithExchangeAreExchange() {
             assertInstanceOf(ExchangeSalvageSettlement.class,
-                  SalvageSettlement.forCappedSalvageRights(contract(0.4, true), TODAY));
+                  SalvageSettlement.forCappedSalvageRights(contract(0.4, true), CAMPAIGN));
         }
 
         @Test
         void purchasesWithoutExchangeArePurchases() {
             assertInstanceOf(PurchaseSalvageSettlement.class,
-                  SalvageSettlement.forSalvagePurchases(contract(0.4, false), TODAY));
+                  SalvageSettlement.forSalvagePurchases(contract(0.4, false), CAMPAIGN));
         }
 
         @Test
         void purchasesWithExchangeAreExchange() {
             assertInstanceOf(ExchangeSalvageSettlement.class,
-                  SalvageSettlement.forSalvagePurchases(contract(0.4, true), TODAY));
+                  SalvageSettlement.forSalvagePurchases(contract(0.4, true), CAMPAIGN));
         }
 
         @Test
         void salvageSystemsCreateTheirSettlements() {
             AbstractContract contract = contract(0.4, false);
-            assertInstanceOf(CappedSalvageSettlement.class, new LegacySalvage().createSettlement(contract, TODAY));
+            assertInstanceOf(CappedSalvageSettlement.class, new LegacySalvage().createSettlement(contract, CAMPAIGN));
             assertInstanceOf(CappedSalvageSettlement.class,
-                  new CamOpsStrictSalvage().createSettlement(contract, TODAY));
+                  new CamOpsStrictSalvage().createSettlement(contract, CAMPAIGN));
             assertInstanceOf(CappedSalvageSettlement.class,
-                  new CamOpsRevisedSalvage().createSettlement(contract, TODAY));
+                  new CamOpsRevisedSalvage().createSettlement(contract, CAMPAIGN));
             assertInstanceOf(PurchaseSalvageSettlement.class,
-                  new ChaosCampaignSalvage().createSettlement(contract, TODAY));
-            assertInstanceOf(PurchaseSalvageSettlement.class, new MekHQSalvage().createSettlement(contract, TODAY));
+                  new ChaosCampaignSalvage().createSettlement(contract, CAMPAIGN));
+            assertInstanceOf(PurchaseSalvageSettlement.class, new MekHQSalvage().createSettlement(contract, CAMPAIGN));
         }
     }
 
@@ -141,7 +141,8 @@ class SalvageSettlementTest {
     class ClanSalvageClause {
         @Test
         void clauseMakesPurchasesExchange() {
-            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4), TODAY);
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4),
+                  CAMPAIGN);
 
             assertInstanceOf(ExchangeSalvageSettlement.class, settlement);
             assertTrue(settlement.isClanSalvageClause());
@@ -151,7 +152,7 @@ class SalvageSettlementTest {
         @Test
         void clauseMakesCappedRightsExchange() {
             SalvageSettlement settlement = SalvageSettlement.forCappedSalvageRights(clanSalvageClauseContract(0.4),
-                  TODAY);
+                  CAMPAIGN);
 
             assertInstanceOf(ExchangeSalvageSettlement.class, settlement);
             assertTrue(settlement.isClanSalvageClause());
@@ -159,7 +160,7 @@ class SalvageSettlementTest {
 
         @Test
         void exchangeWithoutTheClauseDoesntDoubleValues() {
-            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(0.4, true), TODAY);
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(0.4, true), CAMPAIGN);
 
             assertFalse(settlement.isClanSalvageClause());
             assertMoney(1000, settlement.getSalvageValue(wreck(1000, true, false)));
@@ -168,7 +169,8 @@ class SalvageSettlementTest {
         @ParameterizedTest(name = "Clan {0}, mixed {1}")
         @CsvSource({ "true, false, 2000", "false, true, 2000", "true, true, 2000", "false, false, 1000" })
         void clauseDoublesClanAndMixedTechValues(boolean isClan, boolean isMixedTech, double expectedValue) {
-            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4), TODAY);
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4),
+                  CAMPAIGN);
 
             assertMoney(expectedValue, settlement.getSalvageValue(wreck(1000, isClan, isMixedTech)));
         }
@@ -179,7 +181,8 @@ class SalvageSettlementTest {
         @ParameterizedTest
         @CsvSource({ "0.4, 0.4, 40", "-0.5, 0.0, 0", "1.5, 1.0, 100", "0.25, 0.25, 25" })
         void shareIsClampedAndRounded(double salvageRights, double expectedShare, int expectedPercent) {
-            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(salvageRights, false), TODAY);
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(salvageRights, false),
+                  CAMPAIGN);
             assertEquals(expectedShare, settlement.getPlayerShare(), 0.0001);
             assertEquals(expectedPercent, settlement.getPlayerSharePercent());
         }

@@ -5543,7 +5543,7 @@ public class Campaign implements ITechManager {
      */
     private Money getNetFinalContractPayment(AbstractContract mission, Money grossPayment) {
         if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
-            return grossPayment.minus(ContractSettlement.salvageOverage(mission, getLocalDate()));
+            return grossPayment.minus(ContractSettlement.salvageOverage(mission, this));
         }
 
         return grossPayment;
