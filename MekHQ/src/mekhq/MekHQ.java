@@ -62,6 +62,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
 
 import io.sentry.Sentry;
+import jakarta.annotation.Nullable;
 import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
@@ -78,7 +79,6 @@ import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.autoResolve.acar.SimulatedClient;
 import megamek.common.autoResolve.converter.SetupForces;
 import megamek.common.autoResolve.converter.SingletonForces;

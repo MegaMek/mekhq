@@ -40,9 +40,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;

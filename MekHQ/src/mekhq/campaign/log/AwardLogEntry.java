@@ -34,7 +34,7 @@ package mekhq.campaign.log;
 
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 

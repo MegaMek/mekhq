@@ -45,7 +45,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A HUD-styled date field that takes an ISO date ({@code YYYY-MM-DD}). A blank field means "no date"; a date that

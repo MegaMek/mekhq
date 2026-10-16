@@ -1733,14 +1733,31 @@ public class AccountantTest {
         @Test
         void testGetWeeklyMaintenanceTotal_sumsAllUnitsRegardlessOfMaintenanceSettings() {
             Unit unitA = mock(Unit.class);
+            when(unitA.requiresMaintenance()).thenReturn(true);
             when(unitA.getWeeklyMaintenanceCost()).thenReturn(Money.of(10));
 
             Unit unitB = mock(Unit.class);
+            when(unitB.requiresMaintenance()).thenReturn(true);
             when(unitB.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
 
             Money actual = getWeeklyMaintenanceTotal(List.of(unitA, unitB));
 
             assertEquals(Money.of(30), actual);
+        }
+
+        @Test
+        void testGetWeeklyMaintenanceTotal_excludesUnitsThatDontRequireMaintenance() {
+            Unit maintainedUnit = mock(Unit.class);
+            when(maintainedUnit.requiresMaintenance()).thenReturn(true);
+            when(maintainedUnit.getWeeklyMaintenanceCost()).thenReturn(Money.of(10));
+
+            Unit mothballedUnit = mock(Unit.class);
+            when(mothballedUnit.requiresMaintenance()).thenReturn(false);
+            when(mothballedUnit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
+
+            Money actual = getWeeklyMaintenanceTotal(List.of(maintainedUnit, mothballedUnit));
+
+            assertEquals(Money.of(10), actual);
         }
 
         @Test
@@ -2496,6 +2513,7 @@ public class AccountantTest {
         @Test
         void testGetWeeklyMaintenanceCosts_delegatesToStaticTotal() {
             Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(true);
             when(unit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
             when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
 

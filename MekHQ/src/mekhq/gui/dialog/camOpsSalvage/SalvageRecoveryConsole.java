@@ -56,12 +56,12 @@ import java.util.Locale;
 import java.util.Map;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.FilteredComboBoxModel;
 import megamek.client.ui.comboBoxes.SearchableComboBox;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

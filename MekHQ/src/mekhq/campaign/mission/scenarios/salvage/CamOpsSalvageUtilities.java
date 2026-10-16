@@ -54,8 +54,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;

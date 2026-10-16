@@ -36,6 +36,7 @@ import static java.lang.Math.round;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -48,7 +49,6 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for the contract pay schemes: given a generated contract, each scheme decides how much the employer pays
@@ -86,7 +86,7 @@ public abstract class AbstractContractDeterminationPay {
      * Returns the pay scheme the campaign has opted into: the CamOps force-value scheme when
      * {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the default Chaos scheme.
      */
-    public static @NonNull AbstractContractDeterminationPay forCampaign(Campaign campaign) {
+    public static @Nonnull AbstractContractDeterminationPay forCampaign(Campaign campaign) {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
             return new CamOpsContractDeterminationPay();
         }
@@ -125,10 +125,10 @@ public abstract class AbstractContractDeterminationPay {
     }
 
     /** The monthly retainer the employer pays. */
-    public abstract @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract);
+    public abstract @Nonnull Money getMonthlyPay(Campaign campaign, AbstractContract contract);
 
     /** The per-battle combat bonus the employer pays; some schemes fold this into the monthly retainer and return zero. */
-    public abstract @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract);
+    public abstract @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract);
 
     /**
      * The monthly retainer actually owed for this contract: the active scheme's {@link #getMonthlyPay monthly pay}, plus
@@ -138,7 +138,7 @@ public abstract class AbstractContractDeterminationPay {
      * @author Illiani
      * @since 0.51.01
      */
-    public @NonNull Money getContractMonthlyPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getContractMonthlyPay(Campaign campaign, AbstractContract contract) {
         return applyFalseFlagPremium(contract, getMonthlyPay(campaign, contract));
     }
 
@@ -153,7 +153,7 @@ public abstract class AbstractContractDeterminationPay {
      * @author Illiani
      * @since 0.51.01
      */
-    public @NonNull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
         ContractObjectiveType objectiveType = contract.getObjectiveType();
         ChaosObjectiveType chaosObjectiveType = objectiveType == null ? null : objectiveType.getChaosObjectiveType();
         if ((chaosObjectiveType == ChaosObjectiveType.PIRATE_RAID) && !contract.isCovertOperation()) {
@@ -187,7 +187,7 @@ public abstract class AbstractContractDeterminationPay {
      * Up-front transport compensation for the journey from the player's current location to the contract's target,
      * derived from the contract's scale, transport terms, and jump count. Shared by every pay scheme.
      */
-    public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+    public @Nonnull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
 

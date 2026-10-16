@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.function.IntUnaryOperator;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;

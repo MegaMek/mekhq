@@ -55,11 +55,11 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -2544,7 +2544,7 @@ public class ForceHumanResources {
         LocalDate currentDay = campaign.getLocalDate();
         Finances finances = campaign.getPlayerForce().getFinances();
 
-        if (employ && !person.isEmployed()) {
+        if (employ && !person.isEmployed() && prisonerStatus.isFree()) {
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd
                       && !isRecruitmentPrepaid) {
                 if (!finances.debit(TransactionType.RECRUITMENT,

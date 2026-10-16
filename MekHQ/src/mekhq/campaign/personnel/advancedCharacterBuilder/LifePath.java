@@ -41,8 +41,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.ATOWTraits;

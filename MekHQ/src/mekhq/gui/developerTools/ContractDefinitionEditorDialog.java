@@ -45,8 +45,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;

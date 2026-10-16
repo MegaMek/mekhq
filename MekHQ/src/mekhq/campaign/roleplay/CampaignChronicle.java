@@ -46,7 +46,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Writes what happens in the campaign into the Oracle log, so the journal records the story MekHQ plays out as well as

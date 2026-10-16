@@ -52,8 +52,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.base.PlayerBase;

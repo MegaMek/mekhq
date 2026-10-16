@@ -37,7 +37,7 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.AbstractMobileLocation;

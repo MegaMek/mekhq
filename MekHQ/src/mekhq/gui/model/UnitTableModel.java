@@ -44,8 +44,8 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;

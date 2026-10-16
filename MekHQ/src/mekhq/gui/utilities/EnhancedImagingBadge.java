@@ -32,7 +32,7 @@
  */
 package mekhq.gui.utilities;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;

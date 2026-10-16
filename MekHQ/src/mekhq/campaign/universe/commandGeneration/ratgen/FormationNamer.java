@@ -45,10 +45,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FormationNamingConvention.DesignatorStyle;
 import megamek.client.ratgenerator.FormationNamingConvention.Tier;
 import megamek.client.ratgenerator.Ruleset;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.universe.enums.Alphabet;

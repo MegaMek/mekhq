@@ -58,8 +58,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

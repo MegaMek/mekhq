@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import static java.lang.Math.round;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Light;

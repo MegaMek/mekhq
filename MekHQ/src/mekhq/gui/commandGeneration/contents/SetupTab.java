@@ -44,9 +44,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

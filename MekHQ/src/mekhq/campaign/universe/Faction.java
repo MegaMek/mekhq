@@ -44,8 +44,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionLeaderData;
 import megamek.common.universe.FactionTag;

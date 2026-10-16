@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Faction;
 
 class AltLocation extends FactionHint {

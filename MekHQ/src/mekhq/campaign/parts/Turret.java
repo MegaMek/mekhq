@@ -35,8 +35,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;

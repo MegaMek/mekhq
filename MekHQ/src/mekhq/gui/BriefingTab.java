@@ -57,13 +57,13 @@ import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
 import megamek.common.game.Game;

@@ -53,7 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A guide panel that slides over the right of a HUD window to teach the page beneath it, with three tabs: numbered

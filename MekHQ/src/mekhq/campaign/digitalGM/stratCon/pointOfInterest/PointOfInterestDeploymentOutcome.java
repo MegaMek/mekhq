@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * What a point of interest does to the random scenario roll when a player formation deploys onto its hex (see

@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;

@@ -42,10 +42,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -92,7 +93,6 @@ import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn implements MHQTableColumn {
 
@@ -832,7 +832,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         return "";
     }
 
-    private static @NonNull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
+    private static @Nonnull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SkillModifierData skillModifierData = person.getSkillModifierData(
               campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
@@ -840,7 +840,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                                   person.getSkill(skillName).getFinalSkillValue(skillModifierData);
     }
 
-    private static @NonNull Function<String, String> getStringSkillValue(Person person, Campaign campaign) {
+    private static @Nonnull Function<String, String> getStringSkillValue(Person person, Campaign campaign) {
         return skillName -> skillToText(getSkillValue(person, campaign).apply(skillName));
     }
 
@@ -1108,7 +1108,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
               Comparator.comparing(SkillAttributeCell::value).thenComparing(SkillAttributeCell::cap);
 
         @Override
-        @NonNull
+        @Nonnull
         public String toString() {
             StringBuilder result = new StringBuilder();
             result.append(value).append(" / ").append(cap);
@@ -1141,7 +1141,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public String toString() {
             String primaryString = primaryValue == null ? "-" : primaryValue.toString();
             String secondaryString = secondaryValue == null ? "-" : secondaryValue.toString();

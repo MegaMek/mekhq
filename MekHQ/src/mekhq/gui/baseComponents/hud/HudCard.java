@@ -56,7 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A board card in the style of the StratCon deployment wizard: a leading status ring, a bold name followed by a muted

@@ -65,12 +65,12 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
@@ -2311,6 +2311,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Only reload unit data if we updated files on disk
         if (reloadUnitData) {
             MekSummaryCache.getInstance().loadMekData();
+            // Custom files restored from older saves can still carry the UUID of the design they were refit from
+            CustomUnitFileUUIDRepair.repairCustomUnitFiles();
         }
 
         // the second time to check for any null entities
@@ -2332,7 +2334,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
                 if (xn.equalsIgnoreCase("units")) {
                     String missingList = checkUnits(wn);
-                    if (null != missingList) {
+                    if ((missingList != null) && !reloadUnitData) {
+                        // The unit cache is only scanned when MekHQ starts, so custom unit files added since then (for
+                        // example copied into the user directory after an earlier failed load) are not in it yet.
+                        // Rescan once before giving up on them.
+                        LOGGER.info("Rescanning unit files for the missing units...");
+                        MekSummaryCache.getInstance().loadMekData();
+                        missingList = checkUnits(wn);
+                    }
+                    if (missingList != null) {
                         throw new NullEntityException(missingList);
                     }
                 }

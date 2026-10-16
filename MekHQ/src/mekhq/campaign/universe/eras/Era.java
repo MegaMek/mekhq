@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.eras.EraFlag;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;

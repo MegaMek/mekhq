@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

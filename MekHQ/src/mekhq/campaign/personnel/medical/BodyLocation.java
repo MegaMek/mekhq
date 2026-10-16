@@ -40,9 +40,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.medical.BodyLocation.XMLAdapter;
 

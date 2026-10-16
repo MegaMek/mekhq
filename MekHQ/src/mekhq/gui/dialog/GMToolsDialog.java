@@ -52,6 +52,7 @@ import java.util.function.Predicate;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.buttons.MMButton;
@@ -64,7 +65,6 @@ import megamek.client.ui.preferences.JTextFieldPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Messages;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.loaders.MekFileParser;

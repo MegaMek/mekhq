@@ -41,8 +41,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;

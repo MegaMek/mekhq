@@ -87,7 +87,8 @@ public interface IFacilityStrategy {
     void processSieges(StratConTrackState track, Campaign campaign);
 
     /**
-     * Gives the enemy facilities on a track their monthly upkeep: repairs and reinforcements.
+     * Gives the enemy facilities on a track their monthly upkeep: repairs and reinforcements; and charges the upkeep of
+     * the facilities the player's side has built there.
      *
      * @param track    the track whose facilities are processed
      * @param campaign the current campaign

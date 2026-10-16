@@ -39,7 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQPanel;

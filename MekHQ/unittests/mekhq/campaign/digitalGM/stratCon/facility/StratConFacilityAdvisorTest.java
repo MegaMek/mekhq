@@ -295,6 +295,13 @@ class StratConFacilityAdvisorTest {
         }
 
         @Test
+        void anUnderstrengthEmployerFacilitySaysYourEmployerRestoresIt() {
+            placeFacility(ForceAlignment.Allied).setGarrison(0);
+
+            assertEquals(List.of(getTextAt(RESOURCE_BUNDLE, "hint.understrength.employer")), hints());
+        }
+
+        @Test
         void aFullFacilityYourSideHoldsNeedsNothing() {
             placeFacility(ForceAlignment.Player);
 

@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;

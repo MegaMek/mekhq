@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.IntFunction;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
