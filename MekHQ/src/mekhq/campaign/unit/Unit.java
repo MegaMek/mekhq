@@ -1728,10 +1728,18 @@ public class Unit implements ITechnology, ILocatable {
         return hits;
     }
 
+    /**
+     * Marks critical slots of a system or piece of equipment as damaged until it has the given number of damaged
+     * slots. Slots already damaged count toward that number and are left as they are, so applying a part's hits to a
+     * unit whose slots were hit in battle does not add damage on top of the battle damage.
+     *
+     * @param type         {@link CriticalSlot#TYPE_SYSTEM} or {@link CriticalSlot#TYPE_EQUIPMENT}
+     * @param equipmentNum the system index or equipment number
+     * @param hits         how many slots should be damaged in all
+     */
     public void damageSystem(int type, int equipmentNum, int hits) {
-        // make sure we take note of existing hits to start and as we cycle through
-        // locations
-        int existingHits = getHitCriticalSlots(type, equipmentNum);
+        // Battle damage marks a slot hit but not destroyed, so count every damaged slot, not only destroyed ones
+        int existingHits = getDamagedCriticalSlots(type, equipmentNum);
         int neededHits = max(0, hits - existingHits);
         int usedHits = 0;
         for (int loc = 0; loc < getEntity().locations(); loc++) {
@@ -1741,6 +1749,17 @@ public class Unit implements ITechnology, ILocatable {
         }
     }
 
+    /**
+     * Marks up to the given number of undamaged critical slots of a system or piece of equipment in one location as
+     * damaged.
+     *
+     * @param type         {@link CriticalSlot#TYPE_SYSTEM} or {@link CriticalSlot#TYPE_EQUIPMENT}
+     * @param equipmentNum the system index or equipment number
+     * @param loc          the location
+     * @param hits         how many slots to mark at most
+     *
+     * @return how many slots were marked
+     */
     public int damageSystem(int type, int equipmentNum, int loc, int hits) {
         int numHits = 0;
         for (int i = 0; i < getEntity().getNumberOfCriticalSlots(loc); i++) {
@@ -1753,7 +1772,8 @@ public class Unit implements ITechnology, ILocatable {
             Mounted<?> m1 = cs.getMount();
             Mounted<?> m2 = cs.getMount2();
             if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
-                if (numHits < hits) {
+                // A slot already damaged in battle is not damaged again
+                if ((numHits < hits) && !cs.isDamaged()) {
                     cs.setHit(true);
                     cs.setDestroyed(true);
                     cs.setRepairable(true);
@@ -1763,6 +1783,39 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
         return numHits;
+    }
+
+    /**
+     * @return how many critical slots of a system or piece of equipment are damaged, hit or destroyed, in all
+     *       locations
+     */
+    private int getDamagedCriticalSlots(int type, int equipmentNum) {
+        Mounted<?> mounted = (type == CriticalSlot.TYPE_EQUIPMENT) ? entity.getEquipment(equipmentNum) : null;
+        int damagedSlots = 0;
+        for (int location = 0; location < entity.locations(); location++) {
+            for (int slot = 0; slot < entity.getNumberOfCriticalSlots(location); slot++) {
+                CriticalSlot criticalSlot = entity.getCritical(location, slot);
+                if ((criticalSlot != null) && criticalSlot.isDamaged()
+                          && isSlotOf(criticalSlot, type, equipmentNum, mounted)) {
+                    damagedSlots++;
+                }
+            }
+        }
+        return damagedSlots;
+    }
+
+    /**
+     * @return {@code true} when a critical slot holds the given system, or the given equipment (superheavy units can
+     *       hold two pieces of equipment in one slot)
+     */
+    private static boolean isSlotOf(CriticalSlot criticalSlot, int type, int index, @Nullable Mounted<?> mounted) {
+        if (criticalSlot.getType() != type) {
+            return false;
+        }
+        if (type == CriticalSlot.TYPE_SYSTEM) {
+            return criticalSlot.getIndex() == index;
+        }
+        return (mounted != null) && (mounted.equals(criticalSlot.getMount()) || mounted.equals(criticalSlot.getMount2()));
     }
 
     public void destroySystem(int type, int equipmentNum) {
