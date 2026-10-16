@@ -87,6 +87,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.StratConAmbushedDialog;
@@ -2115,6 +2116,58 @@ class StratConRulesManagerTest {
             assertTrue(standardOnly.contains(frontlineDropShip));
             assertTrue(standardOnly.contains(reserveDropShip));
             assertFalse(standardOnly.contains(supportDropShip));
+        }
+    }
+
+    @Nested
+    class IncreaseFatigue {
+        private static final int FORCE_ID = 7;
+
+        private Campaign campaign;
+        private CampaignOptions campaignOptions;
+        private Person crewMember;
+
+        private void setUp(boolean useFatigue, int fatigueRate) {
+            campaign = MHQTestUtilities.mockCampaign();
+            campaignOptions = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(useFatigue);
+            when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(fatigueRate);
+
+            Formation formation = mock(Formation.class);
+            when(campaign.getPlayerForce().getFormation(FORCE_ID)).thenReturn(formation);
+
+            UUID unitId = UUID.randomUUID();
+            when(formation.getAllUnits(false)).thenReturn(new Vector<>(List.of(unitId)));
+
+            crewMember = mock(Person.class);
+            Unit unit = mock(Unit.class);
+            when(campaign.getUnit(unitId)).thenReturn(unit);
+            when(unit.getCrew()).thenReturn(List.of(crewMember));
+        }
+
+        @Test
+        void addsFatigueRateToEveryCrewMember() {
+            setUp(true, 2);
+
+            try (MockedStatic<Fatigue> fatigue = mockStatic(Fatigue.class)) {
+                StratConRulesManager.increaseFatigue(FORCE_ID, campaign);
+
+                verify(crewMember).changeFatigue(2);
+                fatigue.verify(() -> Fatigue.processFatigueActions(campaign, crewMember));
+            }
+        }
+
+        @Test
+        void doesNothingWhenFatigueDisabled() {
+            setUp(false, 2);
+
+            try (MockedStatic<Fatigue> fatigue = mockStatic(Fatigue.class)) {
+                StratConRulesManager.increaseFatigue(FORCE_ID, campaign);
+
+                verify(crewMember, never()).changeFatigue(anyInt());
+                fatigue.verifyNoInteractions();
+            }
         }
     }
 }
