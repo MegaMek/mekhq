@@ -58,7 +58,7 @@ class BattleArmorSuitInTransitTest {
     private void assertReplacementInTransit(UnitFixture fixture) {
         MissingBattleArmorSuit missingSuit = destroyOneSuit(fixture);
 
-        scenario.getCampaign().getQuartermaster().addPart(missingSuit.getNewPart(), TRANSIT_DAYS);
+        scenario.getCampaign().getQuartermaster().addPart(missingSuit.getNewPart(), TRANSIT_DAYS, true);
 
         assertEquals(1, missingSuit.getReplacementInventory().getTransit(), fixture.name());
     }
@@ -72,7 +72,7 @@ class BattleArmorSuitInTransitTest {
     void aSuitThatHasArrivedIsOnHand() {
         MissingBattleArmorSuit missingSuit = destroyOneSuit(UnitFixture.IS_STANDARD_BATTLE_ARMOR_LASER);
 
-        scenario.getCampaign().getQuartermaster().addPart(missingSuit.getNewPart(), 0);
+        scenario.getCampaign().getQuartermaster().addPart(missingSuit.getNewPart(), 0, true);
 
         assertEquals(1, missingSuit.getReplacementInventory().getSupply());
         assertEquals(0, missingSuit.getReplacementInventory().getTransit());
