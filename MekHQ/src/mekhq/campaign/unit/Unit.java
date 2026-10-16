@@ -8366,14 +8366,16 @@ public class Unit implements ITechnology, ILocatable {
         maintenanceMultiplier = value;
     }
 
+    /**
+     * @return the unit's quality: the average quality of the parts that are maintained, or D when there are none.
+     *       Missing parts have no quality and are left out, as they are from the maintenance report; counting them as
+     *       quality A pulled a unit whose parts are all F down to E or D.
+     */
     public PartQuality getQuality() {
         int nParts = 0;
         int sumQuality = 0;
         for (Part p : getParts()) {
-            // no rules about this but let's assume missing parts are quality A
-            if (p instanceof MissingPart) {
-                nParts++;
-            } else if (p.needsMaintenance()) {
+            if (p.needsMaintenance()) {
                 nParts++;
                 sumQuality += p.getQuality().toNumeric();
             }
