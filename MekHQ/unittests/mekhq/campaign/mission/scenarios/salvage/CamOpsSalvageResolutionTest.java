@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -343,7 +342,7 @@ class CamOpsSalvageResolutionTest {
             when(wreck.getEntity()).thenReturn(aero);
             when(wreck.getSellValue()).thenReturn(Money.of(1000));
             Aero freshCopy = mock(AeroSpaceFighter.class);
-            when(freshCopy.getFuelTonnage()).thenReturn(5.0);
+            when(freshCopy.getFuel()).thenReturn(400);
 
             try (MockedConstruction<ResolveScenarioTracker.UnitStatus> ignored =
                        mockConstruction(ResolveScenarioTracker.UnitStatus.class,
@@ -351,24 +350,25 @@ class CamOpsSalvageResolutionTest {
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
             }
 
-            verify(aero).setFuelTonnage(5.0);
+            verify(aero).setFuel(400);
         }
 
         @Test
-        void aerospaceSalvageWithoutAFreshCopyKeepsItsFuel() {
+        void aerospaceSalvageWithoutAFreshCopyIsRefueledToItsOwnCapacity() {
             Aero aero = mock(AeroSpaceFighter.class);
             when(aero.getCamouflage()).thenReturn(new Camouflage());
+            when(aero.getFuel()).thenReturn(300);
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(aero);
             when(wreck.getSellValue()).thenReturn(Money.of(1000));
 
-            // The unit's file couldn't be found, so there's nothing to refuel from
+            // The unit's file couldn't be found, so it is refuelled to its own capacity
             try (MockedConstruction<ResolveScenarioTracker.UnitStatus> ignored =
                        mockConstruction(ResolveScenarioTracker.UnitStatus.class)) {
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
             }
 
-            verify(aero, never()).setFuelTonnage(anyDouble());
+            verify(aero).setFuel(300);
             verify(campaign).addTestUnit(same(wreck), eq(0));
         }
 

@@ -94,6 +94,7 @@ import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
+import mekhq.campaign.unit.AerospaceRefueling;
 import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -2355,11 +2356,7 @@ public class ResolveScenarioTracker {
                 campaign.removeUnit(unit.getId());
             } else {
                 campaign.clearGameData(en);
-                // FIXME: Need to implement a "fuel" part just like the "armor" part
-                // Without a base entity (unit not in the unit cache) the unit keeps its current fuel
-                if (en.isAero() && (unitStatus.getBaseEntity() instanceof IAero baseAero)) {
-                    ((IAero) en).setFuelTonnage(baseAero.getFuelTonnage());
-                }
+                AerospaceRefueling.refuel(en, unitStatus.getBaseEntity());
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
                     new AdjustLargeCraftAmmoAction().execute(campaign, unit);
