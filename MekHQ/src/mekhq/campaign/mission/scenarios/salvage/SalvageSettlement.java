@@ -61,7 +61,7 @@ import mekhq.campaign.unit.TestUnit;
  * {@link #getSalvageValue(TestUnit)}).</p>
  *
  * <p>Settlements are created by the campaign's salvage system (see
- * {@link AbstractSalvage#createSettlement(AbstractContract)}).</p>
+ * {@link AbstractSalvage#createSettlement(AbstractContract, Campaign)})</p>
  *
  * @author Illiani
  * @since 0.51.01
