@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.scenarios.salvage;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
@@ -57,8 +58,8 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
     }
 
     @Override
-    public SalvageSettlement createSettlement(AbstractContract contract) {
-        return SalvageSettlement.forSalvagePurchases(contract);
+    public SalvageSettlement createSettlement(AbstractContract contract, LocalDate today) {
+        return SalvageSettlement.forSalvagePurchases(contract, today);
     }
 
     /**

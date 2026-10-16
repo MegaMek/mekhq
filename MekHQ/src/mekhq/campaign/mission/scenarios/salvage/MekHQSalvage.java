@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission.scenarios.salvage;
 
+import java.time.LocalDate;
+
 import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
@@ -42,12 +44,19 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * share in cash unless they buy the unit from the employer (see {@link SalvageSettlement#forSalvagePurchases}).
  * Wrecks the salvage teams don't recover are lost.</p>
  *
+ * <p>The player may also steal the salvage they claim (see {@link #isSalvageTheftAllowed()}).</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
 public class MekHQSalvage extends CamOpsRevisedSalvage {
     @Override
-    public SalvageSettlement createSettlement(AbstractContract contract) {
-        return SalvageSettlement.forSalvagePurchases(contract);
+    public SalvageSettlement createSettlement(AbstractContract contract, LocalDate today) {
+        return SalvageSettlement.forSalvagePurchases(contract, today);
+    }
+
+    @Override
+    public boolean isSalvageTheftAllowed() {
+        return true;
     }
 }

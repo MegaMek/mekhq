@@ -49,6 +49,8 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
+import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
@@ -56,6 +58,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.unit.TestUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -63,11 +66,30 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 
 class SalvageSettlementTest {
+    private static final LocalDate TODAY = LocalDate.of(3060, 1, 1);
+
     private static AbstractContract contract(double salvageRights, boolean isExchange) {
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getSalvageRightsMultiplier()).thenReturn(salvageRights);
         when(contract.isSalvageExchange()).thenReturn(isExchange);
         return contract;
+    }
+
+    private static AbstractContract clanSalvageClauseContract(double salvageRights) {
+        AbstractContract contract = contract(salvageRights, false);
+        when(contract.isEmployerEvokingClanSalvageClause(TODAY)).thenReturn(true);
+        when(contract.isSalvageTreatedAsExchange(TODAY)).thenReturn(true);
+        return contract;
+    }
+
+    private static TestUnit wreck(double sellValue, boolean isClan, boolean isMixedTech) {
+        Entity entity = mock(Mek.class);
+        when(entity.isClan()).thenReturn(isClan);
+        when(entity.isMixedTech()).thenReturn(isMixedTech);
+        TestUnit wreck = mock(TestUnit.class);
+        when(wreck.getEntity()).thenReturn(entity);
+        when(wreck.getSellValue()).thenReturn(Money.of(sellValue));
+        return wreck;
     }
 
     /** Money compares by scale in {@code equals}, so compare by value instead. */
@@ -80,35 +102,75 @@ class SalvageSettlementTest {
         @Test
         void cappedRightsWithoutExchangeAreCapped() {
             assertInstanceOf(CappedSalvageSettlement.class,
-                  SalvageSettlement.forCappedSalvageRights(contract(0.4, false)));
+                  SalvageSettlement.forCappedSalvageRights(contract(0.4, false), TODAY));
         }
 
         @Test
         void cappedRightsWithExchangeAreExchange() {
             assertInstanceOf(ExchangeSalvageSettlement.class,
-                  SalvageSettlement.forCappedSalvageRights(contract(0.4, true)));
+                  SalvageSettlement.forCappedSalvageRights(contract(0.4, true), TODAY));
         }
 
         @Test
         void purchasesWithoutExchangeArePurchases() {
             assertInstanceOf(PurchaseSalvageSettlement.class,
-                  SalvageSettlement.forSalvagePurchases(contract(0.4, false)));
+                  SalvageSettlement.forSalvagePurchases(contract(0.4, false), TODAY));
         }
 
         @Test
         void purchasesWithExchangeAreExchange() {
             assertInstanceOf(ExchangeSalvageSettlement.class,
-                  SalvageSettlement.forSalvagePurchases(contract(0.4, true)));
+                  SalvageSettlement.forSalvagePurchases(contract(0.4, true), TODAY));
         }
 
         @Test
         void salvageSystemsCreateTheirSettlements() {
             AbstractContract contract = contract(0.4, false);
-            assertInstanceOf(CappedSalvageSettlement.class, new LegacySalvage().createSettlement(contract));
-            assertInstanceOf(CappedSalvageSettlement.class, new CamOpsStrictSalvage().createSettlement(contract));
-            assertInstanceOf(CappedSalvageSettlement.class, new CamOpsRevisedSalvage().createSettlement(contract));
-            assertInstanceOf(PurchaseSalvageSettlement.class, new ChaosCampaignSalvage().createSettlement(contract));
-            assertInstanceOf(PurchaseSalvageSettlement.class, new MekHQSalvage().createSettlement(contract));
+            assertInstanceOf(CappedSalvageSettlement.class, new LegacySalvage().createSettlement(contract, TODAY));
+            assertInstanceOf(CappedSalvageSettlement.class,
+                  new CamOpsStrictSalvage().createSettlement(contract, TODAY));
+            assertInstanceOf(CappedSalvageSettlement.class,
+                  new CamOpsRevisedSalvage().createSettlement(contract, TODAY));
+            assertInstanceOf(PurchaseSalvageSettlement.class,
+                  new ChaosCampaignSalvage().createSettlement(contract, TODAY));
+            assertInstanceOf(PurchaseSalvageSettlement.class, new MekHQSalvage().createSettlement(contract, TODAY));
+        }
+    }
+
+    @Nested
+    class ClanSalvageClause {
+        @Test
+        void clauseMakesPurchasesExchange() {
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4), TODAY);
+
+            assertInstanceOf(ExchangeSalvageSettlement.class, settlement);
+            assertTrue(settlement.isClanSalvageClause());
+            assertEquals(0.4, settlement.getPlayerShare(), 0.0001);
+        }
+
+        @Test
+        void clauseMakesCappedRightsExchange() {
+            SalvageSettlement settlement = SalvageSettlement.forCappedSalvageRights(clanSalvageClauseContract(0.4),
+                  TODAY);
+
+            assertInstanceOf(ExchangeSalvageSettlement.class, settlement);
+            assertTrue(settlement.isClanSalvageClause());
+        }
+
+        @Test
+        void exchangeWithoutTheClauseDoesntDoubleValues() {
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(0.4, true), TODAY);
+
+            assertFalse(settlement.isClanSalvageClause());
+            assertMoney(1000, settlement.getSalvageValue(wreck(1000, true, false)));
+        }
+
+        @ParameterizedTest(name = "Clan {0}, mixed {1}")
+        @CsvSource({ "true, false, 2000", "false, true, 2000", "true, true, 2000", "false, false, 1000" })
+        void clauseDoublesClanAndMixedTechValues(boolean isClan, boolean isMixedTech, double expectedValue) {
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(clanSalvageClauseContract(0.4), TODAY);
+
+            assertMoney(expectedValue, settlement.getSalvageValue(wreck(1000, isClan, isMixedTech)));
         }
     }
 
@@ -117,7 +179,7 @@ class SalvageSettlementTest {
         @ParameterizedTest
         @CsvSource({ "0.4, 0.4, 40", "-0.5, 0.0, 0", "1.5, 1.0, 100", "0.25, 0.25, 25" })
         void shareIsClampedAndRounded(double salvageRights, double expectedShare, int expectedPercent) {
-            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(salvageRights, false));
+            SalvageSettlement settlement = SalvageSettlement.forSalvagePurchases(contract(salvageRights, false), TODAY);
             assertEquals(expectedShare, settlement.getPlayerShare(), 0.0001);
             assertEquals(expectedPercent, settlement.getPlayerSharePercent());
         }
