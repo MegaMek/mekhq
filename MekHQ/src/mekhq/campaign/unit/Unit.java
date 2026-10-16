@@ -1456,6 +1456,18 @@ public class Unit implements ITechnology, ILocatable {
     /**
      * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
      */
+    /**
+     * @return {@code true} for a Mek built without a gyro, such as one with an Interface Cockpit, which has no gyro
+     *       part to repair, replace or buy
+     */
+    private boolean isBuiltWithoutGyro() {
+        boolean isBuiltWithoutGyro = (entity instanceof Mek mek) && (mek.getGyroType() == Mek.GYRO_NONE);
+        if (isBuiltWithoutGyro) {
+            LOGGER.debug("[UnitParts] {}: built without a gyro, so it has no gyro part", getName());
+        }
+        return isBuiltWithoutGyro;
+    }
+
     private void discardPart(Part part) {
         removePart(part);
         // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
@@ -4184,7 +4196,12 @@ public class Unit implements ITechnology, ILocatable {
 
         for (Part part : parts) {
             if (part instanceof MekGyro || part instanceof MissingMekGyro) {
-                gyro = part;
+                if (isBuiltWithoutGyro()) {
+                    // Older versions gave a Mek with no gyro a gyro part, which a refit then tried to buy
+                    partsToRemove.add(part);
+                } else {
+                    gyro = part;
+                }
             } else if (part instanceof EnginePart || part instanceof MissingEnginePart) {
                 // reverse compatibility check, spaceships get different engines
                 if (!(entity instanceof SmallCraft || entity instanceof Jumpship)) {
@@ -4917,7 +4934,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (entity instanceof Mek mek) {
-            if (null == gyro) {
+            if ((null == gyro) && !isBuiltWithoutGyro()) {
                 gyro = new MekGyro((int) entity.getWeight(),
                       entity.getGyroType(),
                       MekGyro.getGyroTonnage(mek),
