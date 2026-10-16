@@ -96,7 +96,6 @@ import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.log.UnitLogger;
-import mekhq.campaign.parts.Part.PartRef;
 import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -2183,6 +2182,8 @@ public class Refit extends Part implements IAcquisitionWork {
                                             ". Please choose a different name. (Unit name and/or model)");
             }
 
+            assignCustomUnitFileIdentity(newEntity);
+
             if (newEntity instanceof Mek) {
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                       PrintStream p = new PrintStream(out)) {
@@ -2222,6 +2223,23 @@ public class Refit extends Part implements IAcquisitionWork {
 
             throw ex;
         }
+    }
+
+    /**
+     * Gives a customized refit design its own unit-file identity before it is written to the customs directory. The
+     * design is edited from a copy of the source unit's file, so it still carries that file's UUID; writing it
+     * unchanged would leave the custom and its source sharing a UUID, and UUID-first lookups would resolve to the
+     * source design instead of the custom. The source design's UUID is recorded as the refit-from reference (or
+     * cleared when the source file had no UUID), and a fresh UUID is generated for the custom.
+     *
+     * @param customEntity the refit design about to be saved as a custom unit file
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void assignCustomUnitFileIdentity(Entity customEntity) {
+        customEntity.setRefitFromUUID(customEntity.getOriginalUnitFileUUID());
+        customEntity.regenerateUnitFileUUID();
     }
 
     /**

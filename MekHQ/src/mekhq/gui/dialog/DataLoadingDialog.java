@@ -86,6 +86,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.campaign.io.CustomUnitFileUUIDRepair;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
@@ -338,6 +339,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 }
             }
+            CustomUnitFileUUIDRepair.repairCustomUnitFiles();
             // endregion Progress 5
 
             setProgress(6);
