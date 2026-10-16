@@ -44,12 +44,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -94,6 +96,12 @@ public class PersonnelTablePanel extends JPanel {
         setLayout(new BorderLayout());
         PersonTableModel model = new PersonTableModel(campaign, people);
         table = new JTable(model);
+        table.setDefaultRenderer(Money.class, new DefaultTableCellRenderer() {
+            @Override
+            protected void setValue(Object value) {
+                super.setValue(value instanceof Money money ? money.toAmountString() : value);
+            }
+        });
         rowCount = people.size();
 
         if (rowCount > 0) {

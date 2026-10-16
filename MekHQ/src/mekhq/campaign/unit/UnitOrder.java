@@ -46,6 +46,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -55,7 +56,6 @@ import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -127,15 +127,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     /**
      * @param quantity - the number of parts of this type
      *
-     * @return a string that gives a grammatical correct name based on the quantity
+     * @return the quantity and name for a report, worded as for a part
      */
     @Override
     public String getQuantityName(int quantity) {
-        String answer = quantity + " " + getName();
-        if (quantity > 1) {
-            answer += "s";
-        }
-        return answer;
+        return Part.formatQuantityName(quantity, getName());
     }
 
     @Override

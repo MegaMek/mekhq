@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -81,6 +82,7 @@ import org.w3c.dom.NodeList;
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabricatable {
     private static final MMLogger LOGGER = MMLogger.create(AmmoBin.class);
+    private static final String PARTS_BUNDLE = "mekhq.resources.Parts";
 
     protected int shotsNeeded;
     protected boolean oneShot;
@@ -303,6 +305,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     @Override
     public void fix() {
         loadBin();
+    }
+
+    /**
+     * A routine reload succeeds automatically, and a failed fabrication never raises the difficulty, so only an unload
+     * while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
     }
 
     @Override
@@ -685,9 +699,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
                      "</b><br/>" +
                      getDetails() +
                      "<br/>" +
-                     getTimeLeft() +
-                     " minutes" +
-                     (null != getTech() ? " (scheduled) " : "") +
+                     getTimeLeftText() +
                      "</html>";
     }
 
@@ -745,6 +757,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     public @Nullable String checkFixable() {
         if (null == unit) {
             return "Ammo bins can only be loaded when installed on units";
+        }
+        // A bin that lost its slot, as a salvaged bin whose munition no longer matched could, never fills; letting the
+        // job run would reload it every day without end
+        if (getMounted() == null) {
+            LOGGER.trace("[AmmoBin] {} on {} has no slot on the unit", getName(), unit.getName());
+            return getTextAt(PARTS_BUNDLE, "AmmoBin.noSlot");
         }
         // Fabrication manufactures the shots for money, so it does not require any ammo in stock.
         if (!isSalvaging() && !isFabricating() && (getAmountAvailable() == 0)) {

@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -165,9 +166,33 @@ public record Accountant(Campaign campaign) {
      */
     public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
           AbstractLocation location) {
+        return getMonthlyFoodAndHousingExpenses(campaign,
+              personnel,
+              location.isOnPlanet(),
+              location.getCurrentSystem(),
+              campaign.getActiveContracts());
+    }
+
+    /**
+     * As {@link #getMonthlyFoodAndHousingExpenses(Campaign, List, AbstractLocation)}, for a given situation rather than
+     * the force's current one, so the expenses somewhere the force is going can be projected.
+     *
+     * @param campaign        the campaign, used to resolve options, faction standings, and the current date
+     * @param personnel       the personnel to evaluate
+     * @param isOnPlanet      whether the force is on a planet; housing is only charged on a planet
+     * @param currentSystem   the system the force is in, used for the faction-standing barrack cost multiplier
+     * @param activeContracts the contracts active in that situation, used for the faction-standing barrack cost
+     *                        multiplier
+     *
+     * @return a {@link Money} object representing the total monthly food and housing expenses
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
+          boolean isOnPlanet, @Nullable PlanetarySystem currentSystem, List<AbstractContract> activeContracts) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean payForFood = campaignOptions.get(CampaignOption.PAY_FOR_FOOD);
-        boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = campaignOptions.get(CampaignOption.PAY_FOR_HOUSING) && isOnPlanet;
 
         if (!payForFood && !payForHousing) {
@@ -175,10 +200,10 @@ public record Accountant(Campaign campaign) {
         }
 
         double barrackCostMultiplier = 1.0;
-        if (isOnPlanet && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
+        if (isOnPlanet && (currentSystem != null) && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
             barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(campaign.getPlayerForce()
                                                                                   .getFactionStandings(),
-                  location.getCurrentSystem(), campaign.getActiveContracts(), campaign.getLocalDate());
+                  currentSystem, activeContracts, campaign.getLocalDate());
         }
 
         return getFoodAndHousingTotal(personnel, payForFood, payForHousing, barrackCostMultiplier);
@@ -395,14 +420,15 @@ public record Accountant(Campaign campaign) {
             return Money.zero();
         }
 
-        int scale = ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign());
-        int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
+        double scale = ChaosContractDeterminationScale.getEconomicScale(
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign()),
+              campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
         if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
-            upkeepInSupportPoints = (int) Math.round(upkeepInSupportPoints
-                                                           * ChaosScaleLimits.getUpkeepEscalationMultiplier(scale));
+            upkeepInSupportPoints *= ChaosScaleLimits.getUpkeepEscalationMultiplier(scale);
         }
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(upkeepInSupportPoints,
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints((int) Math.round(upkeepInSupportPoints),
               campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION));
     }
 

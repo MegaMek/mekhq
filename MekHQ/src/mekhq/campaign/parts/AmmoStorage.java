@@ -317,15 +317,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getDesc() {
         String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
         toReturn += ">";
         toReturn += "<b>Reload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeftText();
         toReturn += "</font></html>";
         return toReturn;
     }

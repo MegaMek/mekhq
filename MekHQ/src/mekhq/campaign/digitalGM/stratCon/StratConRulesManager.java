@@ -66,6 +66,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.EntityUtilities.hasActiveProbe;
+import static mekhq.utilities.EntityUtilities.hasImprovedCommunications;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
 import static mekhq.utilities.EntityUtilities.hasReconCamera;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -2227,8 +2228,8 @@ public class StratConRulesManager {
     /**
      * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
      *
-     * <p>Improved Sensors, Active Probes, and Recon Cameras (mounted or carried as a pod) all count as sensor
-     * equipment. They do not stack.</p>
+     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), and the Improved
+     * Communications quirk all count as sensor equipment. They do not stack.</p>
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
@@ -2325,7 +2326,10 @@ public class StratConRulesManager {
             if (entity != null) {
                 unitWeight = entity.getWeight();
                 unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
-                hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity) || hasReconCamera(entity);
+                hasSensorEquipment = hasImprovedSensors(entity)
+                                           || hasActiveProbe(entity)
+                                           || hasReconCamera(entity)
+                                           || hasImprovedCommunications(entity);
 
                 if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
                     Person commander = unit.getCommander();

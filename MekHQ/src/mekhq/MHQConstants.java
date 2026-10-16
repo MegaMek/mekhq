@@ -70,6 +70,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String DISPLAY_NODE = "mekhq/prefs/display";
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
+    public static final String WORK_TIME_DISPLAY = "workTimeDisplay";
     public static final String HIDE_UNIT_FLUFF = "hideUnitFluff";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,

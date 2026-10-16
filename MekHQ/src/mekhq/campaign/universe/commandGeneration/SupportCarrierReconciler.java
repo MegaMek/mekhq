@@ -247,10 +247,14 @@ public final class SupportCarrierReconciler {
                                                        .getHumanResources()
                                                        .getActivePersonnel(false, false));
 
+        // Walked from the carriers, not from the active roster: a camp follower is not on that roster, and one seated
+        // before the eligibility rule excluded them must still be released.
         int released = 0;
-        for (Person person : personnel) {
-            Unit unit = person.getUnit();
-            if ((unit != null) && unit.isCarrier()) {
+        for (Unit unit : new ArrayList<>(campaign.getUnits())) {
+            if (!unit.isCarrier()) {
+                continue;
+            }
+            for (Person person : new ArrayList<>(unit.getCrew())) {
                 int before = unit.getCrew().size();
                 releaseIfIneligible(campaign, person);
                 if (unit.getCrew().size() < before) {
@@ -506,7 +510,9 @@ public final class SupportCarrierReconciler {
         if (SupportPersonnelToTOE.sectionFor(person.getPrimaryRole()) == null) {
             return false;
         }
-        if (!person.getStatus().isActiveFlexible()) {
+        // On duty only. A camp follower is "active" for most purposes, but is not on the payroll and is never counted
+        // or seated by the load sweep; seating one from a status event left a camp-follower medic in a squad.
+        if (!person.getStatus().isActive()) {
             return false;
         }
         return person.getPrisonerStatus().isFreeOrBondsman();
@@ -715,7 +721,10 @@ public final class SupportCarrierReconciler {
 
     private static void repackUnguarded(Campaign campaign, PersonnelRole profession, List<Unit> oldCarriers,
           List<SupportPersonnelToTOE.CarrierSpec> ideal, Formation supportCommand) {
-        Formation parent = supportCommand;
+        // A profession with no carriers left gets its first one in its own section, where generation files it - not at
+        // the top of Support Command, where a lone medic's squad once ended up beside the sections.
+        Formation parent = SupportPersonnelToTOE.sectionHome(campaign, supportCommand,
+              SupportPersonnelToTOE.sectionFor(profession));
         if (!oldCarriers.isEmpty()) {
             Formation existing = campaign.getPlayerForce().getFormation(oldCarriers.get(0).getFormationId());
             if (existing != null) {

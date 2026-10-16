@@ -65,6 +65,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpDriveProfile;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.JumpPathItinerary;
@@ -168,8 +169,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private LocalDateTime arrivalDeadline;
     private CircuitPlan circuitPlan;
     private JumpDriveProfile jumpDriveProfile;
+    private Double originRechargeHours;
     private PathAssessment navigationAssessment;
     private CircuitPlan customCircuitPlan = CircuitPlan.custom(Set.of());
+    private JLabel nextJumpValue;
     private JLabel startingTransitValue;
     private JLabel endingTransitValue;
     private JLabel rechargeValue;
@@ -298,6 +301,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         int metricIndex = 0;
         addMetric(summary, metricIndex++, "metric.jumps.text", Integer.toString(path.getJumps()));
+        String nextJumpKey = path.size() == 1 ? "metric.arrival" : "metric.nextJump";
+        nextJumpValue = addMetric(summary, metricIndex++, nextJumpKey + ".text",
+              formatDays(getNextJumpDays()));
+        nextJumpValue.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, nextJumpKey + ".tooltip"));
         startingTransitValue = addMetric(summary, metricIndex++, "metric.startTransit.text",
               formatDays(itineraryPlan.startingTransitDays()));
         endingTransitValue = addMetric(summary, metricIndex++, "metric.endTransit.text",
@@ -311,7 +318,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             TransportCostCalculations calculations = campaign.getTransportCostCalculation(EXP_REGULAR);
             int duration = (int) ceil(itineraryPlan.totalDays());
             Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
-            addMetric(summary, metricIndex, "metric.cost.text", journeyCost.toAmountAndSymbolString());
+            addMetric(summary, metricIndex++, "metric.cost.text", journeyCost.toAmountAndSymbolString());
         }
         if (jumpFeeSummaryHandler != null) {
             FramedCommandButton jumpFees = new FramedCommandButton(
@@ -1188,7 +1195,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         AbstractLocation currentLocation = getCurrentLocation();
         RequiredAcceleration result = JumpPathItinerary.solveRequiredAcceleration(path, campaign.getLocalDate(),
               desiredTotalDays, getFleetSystem(currentLocation), getCurrentTransit(currentLocation),
-              circuitPlan, getJumpDriveProfile());
+              circuitPlan, getJumpDriveProfile(), getOriginRechargeHours());
         String resultText;
         if (result.isPossible()) {
             resultText = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "planning.requiredAcceleration.format",
@@ -1205,6 +1212,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void refreshPlanPresentation() {
         schedule = calculateSchedule();
+        nextJumpValue.setText(formatDays(getNextJumpDays()));
         startingTransitValue.setText(formatDays(itineraryPlan.startingTransitDays()));
         endingTransitValue.setText(formatDays(itineraryPlan.endingTransitDays()));
         rechargeValue.setText(formatDays(itineraryPlan.rechargeDays()));
@@ -1298,7 +1306,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                     formatScheduleMoment(scheduledEntry.arrival(), locale));
                 addTimelineEvent(waypoint, eventRow++,
                     MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.jumpDeparture.format",
-                        formatDuration(itineraryPlan.startingTransitDays())),
+                        formatDuration(entry.departureElapsedDays())),
                     formatScheduleMoment(scheduledEntry.departure(), locale));
             } else {
                 addTimelineEvent(waypoint, eventRow++, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.jumpArrival.text"),
@@ -1489,7 +1497,25 @@ public class JumpPathViewPanel extends JScrollablePanel {
         AbstractLocation currentLocation = getCurrentLocation();
         return JumpPathItinerary.calculate(path, campaign.getLocalDate(), accelerationG,
               getFleetSystem(currentLocation), getCurrentTransit(currentLocation), circuitPlan,
-              getJumpDriveProfile());
+              getJumpDriveProfile(), getOriginRechargeHours());
+    }
+
+    private double getNextJumpDays() {
+        if (path.size() == 1) {
+            // No jump remains: an active final leg's transit time is the time left to arrival
+            return isActiveRoute() ? getCurrentTransit(getCurrentLocation()) : itineraryPlan.totalDays();
+        }
+        return itineraryPlan.entries().isEmpty() ? 0.0 : itineraryPlan.entries().getFirst().departureElapsedDays();
+    }
+
+    /** Hours the drive must still charge at the fleet's system; cached because it walks the hangar. */
+    private double getOriginRechargeHours() {
+        if (originRechargeHours == null) {
+            originRechargeHours = (getCurrentLocation() instanceof CurrentLocation location)
+                  ? Math.max(0.0, location.getNeededRechargeTime(campaign) - location.getRechargeTime())
+                  : 0.0;
+        }
+        return originRechargeHours;
     }
 
     /**

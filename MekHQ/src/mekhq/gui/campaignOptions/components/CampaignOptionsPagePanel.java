@@ -39,7 +39,6 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.settingsBadges;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,7 +117,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private String introResourceName;
         private JComponent introComponent;
         private String quoteResourceName;
-        private boolean sectionsExpandedByDefault;
+        private Boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
         private boolean standardContentWidth;
         private final java.util.List<BodyItem> bodyItems = new java.util.ArrayList<>();
@@ -214,8 +213,10 @@ public class CampaignOptionsPagePanel extends JPanel {
             SettingsTextProvider textProvider = CampaignOptionsComponentSupport.textProvider(resourceBundleName);
             SettingsPagePanel.Builder builder = SettingsPagePanel.builder(name, textProvider,
                   "lbl" + headerResourceName + ".text", headerPanel == null ? headerIcon() : null)
-                  .showDetailsPanel(showDetailsPanel)
-                  .sectionsExpandedByDefault(sectionsExpandedByDefault);
+                  .showDetailsPanel(showDetailsPanel);
+            if (sectionsExpandedByDefault != null) {
+                builder.sectionsExpandedByDefault(sectionsExpandedByDefault);
+            }
             if (headerPanel != null) {
                 builder.header(headerPanel);
             }

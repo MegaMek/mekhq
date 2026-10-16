@@ -34,6 +34,9 @@ package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -52,15 +55,17 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -324,6 +329,130 @@ class EducationControllerTest {
             }
 
             assertEquals(0, person.getEduDaysOfTravel());
+        }
+    }
+
+    /** Tests for resuming {@link EducationStage#JOURNEY_FROM_CAMPUS} travel stranded without a jump path. */
+    @Nested
+    class StrandedJourneyHome {
+
+        Academy academy;
+        Person person;
+        Campaign campaign;
+        Detachment forceDetachment;
+        PlanetarySystem academySystem;
+        PlanetarySystem campaignSystem;
+
+        @BeforeEach
+        void setUp() {
+            academy = buildAcademy(false, false);
+            person = buildStudentPerson();
+            person.setEduAcademySet(ACADEMY_SET);
+            person.setEduAcademyNameInSet(ACADEMY_NAME);
+            person.setEduAcademySystem("TestSystem");
+            person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+            person.setEduJourneyTime(92);
+            person.setEduDaysOfTravel(2817);
+
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            forceDetachment = mock(Detachment.class);
+            when(playerForce.getForceDetachment()).thenReturn(forceDetachment);
+            when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3050, 12, 16));
+
+            academySystem = mock(PlanetarySystem.class);
+            when(academySystem.getId()).thenReturn("TestSystem");
+            when(campaign.getSystemById("TestSystem")).thenReturn(academySystem);
+            campaignSystem = mock(PlanetarySystem.class);
+            when(campaignSystem.getId()).thenReturn("CurrentSystem");
+        }
+
+        private CurrentLocation strandTravelerAt(PlanetarySystem system) {
+            CurrentLocation travelNode = new CurrentLocation(system, 28.0);
+            person.setParent(travelNode);
+            return travelNode;
+        }
+
+        private void runNewDay() {
+            try (MockedStatic<AcademyFactory> mockFactory = mockStatic(AcademyFactory.class)) {
+                AcademyFactory factory = mock(AcademyFactory.class);
+                mockFactory.when(AcademyFactory::getInstance).thenReturn(factory);
+                when(factory.getAllSetNames()).thenReturn(List.of(ACADEMY_SET));
+                when(factory.getAllAcademiesForSet(ACADEMY_SET)).thenReturn(List.of(academy));
+
+                EducationController.processNewDay(campaign, person, false);
+            }
+        }
+
+        @Test
+        void strandedInTargetSystem_resumesInSystemTransit() {
+            when(campaign.getCurrentSystem()).thenReturn(academySystem);
+            CurrentLocation travelNode = strandTravelerAt(academySystem);
+
+            runNewDay();
+
+            assertNotNull(travelNode.getJumpPath());
+            assertEquals(List.of(academySystem), travelNode.getJumpPath().getSystems());
+            assertEquals(28, person.getEduJourneyTime());
+            assertEquals(0, person.getEduDaysOfTravel());
+        }
+
+        @Test
+        void strandedInOtherSystem_resumesAlongPlannedRoute() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            CurrentLocation travelNode = strandTravelerAt(academySystem);
+            JumpPath route = new JumpPath();
+            route.addSystem(academySystem);
+            route.addSystem(campaignSystem);
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, campaignSystem, campaign))
+                      .thenReturn(route);
+                mockUtils.when(() -> LocationUtils.computeJourneyDays(any(JumpPath.class), any(LocalDate.class),
+                      anyDouble())).thenReturn(40);
+
+                runNewDay();
+            }
+
+            assertSame(route, travelNode.getJumpPath());
+            assertEquals(40, person.getEduJourneyTime());
+            assertEquals(0, person.getEduDaysOfTravel());
+        }
+
+        @Test
+        void strandedWithNoRoute_arrivesHomeImmediately() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            CurrentLocation travelNode = strandTravelerAt(academySystem);
+            Detachment homeDetachment = new Detachment();
+            homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+            CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, campaignSystem, campaign))
+                      .thenReturn(null);
+
+                runNewDay();
+            }
+
+            assertSame(homeDetachment.getPersonnel(), person.getParentLocation());
+            assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+            assertNull(travelNode.getJumpPath());
+            assertNull(travelNode.getParentLocation());
+            verify(locationManager).removeLocation(travelNode);
+        }
+
+        @Test
+        void mainForceLocationWithoutPath_isLeftUntouched() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            CurrentLocation mainForceLocation = strandTravelerAt(academySystem);
+            when(forceDetachment.getCurrentLocation()).thenReturn(mainForceLocation);
+
+            runNewDay();
+
+            assertNull(mainForceLocation.getJumpPath());
         }
     }
 

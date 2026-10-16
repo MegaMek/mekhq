@@ -165,6 +165,29 @@ class AccountantHotSpotsUpkeepTest {
         }
 
         @Test
+        void fractionalScaleChargesThePartScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            tableOfOrganizationWithBattleValue(BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2));
+
+            assertEquals(supportPoints(750), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void fractionalScaleChargesAtLeastTheMinimum() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            tableOfOrganizationWithBattleValue(1);
+
+            assertEquals(supportPoints(50), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void fractionalScaleStillChargesNothingForAnEmptyTableOfOrganization() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            assertEquals(Money.zero(), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
         void upkeepStaysInSupportPointsWithoutTheConversion() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
             tableOfOrganizationOfScale(3);

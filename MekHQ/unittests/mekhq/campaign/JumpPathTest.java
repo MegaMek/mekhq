@@ -34,6 +34,8 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -65,6 +67,59 @@ class JumpPathTest {
             jumpPath.addSystem(system);
         }
         return jumpPath;
+    }
+
+    @Test
+    void refreshPlanetarySystemsRebindsEveryWaypointAndTheSpecificDestination() {
+        Campaign campaign = mock(Campaign.class);
+        PlanetarySystem origin = system("ORIGIN", ORIGIN_TRANSIT);
+        PlanetarySystem intermediate = system("INTERMEDIATE", 5.0);
+        PlanetarySystem destination = system("DEST", PRIMARY_TRANSIT);
+        PlanetarySystem updatedOrigin = system("ORIGIN", ORIGIN_TRANSIT);
+        PlanetarySystem updatedIntermediate = system("INTERMEDIATE", 5.0);
+        PlanetarySystem updatedDestination = system("DEST", PRIMARY_TRANSIT);
+        Planet updatedTarget = new Planet("target");
+        when(campaign.getSystemById("ORIGIN")).thenReturn(updatedOrigin);
+        when(campaign.getSystemById("INTERMEDIATE")).thenReturn(updatedIntermediate);
+        when(campaign.getSystemById("DEST")).thenReturn(updatedDestination);
+        when(updatedDestination.getPlanetById("target")).thenReturn(updatedTarget);
+        JumpPath jumpPath = pathOf(origin, intermediate, destination);
+        jumpPath.setTargetPlanet(new Planet("target"));
+
+        jumpPath.refreshPlanetarySystems(campaign);
+
+        assertEquals(3, jumpPath.size());
+        assertSame(updatedOrigin, jumpPath.get(0));
+        assertSame(updatedIntermediate, jumpPath.get(1));
+        assertSame(updatedDestination, jumpPath.get(2));
+        assertSame(updatedTarget, jumpPath.getTargetPlanet());
+    }
+
+    @Test
+    void refreshPlanetarySystemsFallsBackToPrimaryWhenTheDestinationWorldWasRemoved() {
+        Campaign campaign = mock(Campaign.class);
+        PlanetarySystem updatedDestination = system("DEST", PRIMARY_TRANSIT);
+        when(campaign.getSystemById("DEST")).thenReturn(updatedDestination);
+        JumpPath jumpPath = pathOf(system("DEST", PRIMARY_TRANSIT));
+        jumpPath.setTargetPlanet(new Planet("removed-world"));
+
+        jumpPath.refreshPlanetarySystems(campaign);
+
+        assertNull(jumpPath.getTargetPlanet());
+        assertEquals(PRIMARY_TRANSIT, jumpPath.getEndTime(), 1.0e-9);
+    }
+
+    @Test
+    void refreshPlanetarySystemsPreservesAnUnspecifiedDestinationWorld() {
+        Campaign campaign = mock(Campaign.class);
+        PlanetarySystem updatedDestination = system("DEST", PRIMARY_TRANSIT);
+        when(campaign.getSystemById("DEST")).thenReturn(updatedDestination);
+        JumpPath jumpPath = pathOf(system("DEST", PRIMARY_TRANSIT));
+
+        jumpPath.refreshPlanetarySystems(campaign);
+
+        assertSame(updatedDestination, jumpPath.getLastSystem());
+        assertNull(jumpPath.getTargetPlanet());
     }
 
     @Test

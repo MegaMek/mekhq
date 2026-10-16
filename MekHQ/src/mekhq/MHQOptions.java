@@ -40,11 +40,15 @@ import javax.swing.UIManager;
 import megamek.SuiteOptions;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
+import megamek.logging.MMLogger;
+import mekhq.campaign.work.WorkTimeDisplay;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 import mekhq.gui.utilities.ComponentColors;
 
 public final class MHQOptions extends SuiteOptions {
+    private static final MMLogger LOGGER = MMLogger.create(MHQOptions.class);
+
     // region Display Tab
     public String getDisplayDateFormat() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
@@ -77,6 +81,25 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setLongDisplayDateFormat(String value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).put(MHQConstants.LONG_DISPLAY_DATE_FORMAT, value);
+    }
+
+    /**
+     * @return how repair, refit and reload times are shown; an unknown stored value falls back to
+     *       {@link WorkTimeDisplay#AUTOMATIC}
+     */
+    public WorkTimeDisplay getWorkTimeDisplay() {
+        String storedValue = userPreferences.node(MHQConstants.DISPLAY_NODE)
+                                   .get(MHQConstants.WORK_TIME_DISPLAY, WorkTimeDisplay.AUTOMATIC.name());
+        try {
+            return WorkTimeDisplay.valueOf(storedValue);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("Unknown work time display '{}', using {}", storedValue, WorkTimeDisplay.AUTOMATIC.name());
+            return WorkTimeDisplay.AUTOMATIC;
+        }
+    }
+
+    public void setWorkTimeDisplay(WorkTimeDisplay value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).put(MHQConstants.WORK_TIME_DISPLAY, value.name());
     }
 
     public boolean getHideUnitFluff() {
