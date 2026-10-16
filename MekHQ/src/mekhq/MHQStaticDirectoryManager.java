@@ -37,6 +37,7 @@ import static mekhq.MHQConstants.AWARDS_IMAGE_DIRECTORY_PATH;
 import java.io.File;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.fileUtils.AbstractDirectory;
@@ -106,10 +107,38 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     DirectoryItems userDirFormationIcon = new DirectoryItems(formationIconUserDir, new ImageFileFactory());
                     formationIconDirectory.merge(userDirFormationIcon);
                 }
+                addFactionLogos(formationIconDirectory);
 
             } catch (Exception e) {
                 LOGGER.error("Could not parse the formation icon directory!", e);
             }
+        }
+    }
+
+    /**
+     * Adds the faction icons from {@link RATGenerator#FACTION_LOGO_DIRECTORY} to the formation icon logos, under the
+     * {@link MHQConstants#LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY} category, so they can be used as a formation
+     * icon's logo layer.
+     *
+     * @param formationIcons the parsed formation icon directory
+     */
+    private static void addFactionLogos(AbstractDirectory formationIcons) {
+        File factionLogoDirectory = new File(RATGenerator.FACTION_LOGO_DIRECTORY);
+        AbstractDirectory logos = formationIcons.getCategory(MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH);
+        if (!factionLogoDirectory.isDirectory() || (logos == null)) {
+            LOGGER.warn("Could not add the faction icons to the formation icon logos");
+            return;
+        }
+
+        DirectoryItems factionLogos = new DirectoryItems(factionLogoDirectory, new ImageFileFactory());
+        factionLogos.setRootName(MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY);
+        factionLogos.setRootPath(MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH
+                                       + MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY + '/');
+        AbstractDirectory existing = logos.getCategories()
+                                           .putIfAbsent(MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY,
+                                                 factionLogos);
+        if (existing != null) {
+            existing.merge(factionLogos);
         }
     }
 

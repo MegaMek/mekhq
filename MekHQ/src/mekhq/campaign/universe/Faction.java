@@ -90,8 +90,6 @@ public class Faction {
     private final String currencyCode = ""; // Currency of the faction, if any
     private String layeredFormationIconBackgroundCategory;
     private String layeredFormationIconBackgroundFilename;
-    private String layeredFormationIconLogoCategory;
-    private String layeredFormationIconLogoFilename;
     private Set<FactionTag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
@@ -115,8 +113,6 @@ public class Faction {
         eraMods = null;
         setLayeredFormationIconBackgroundCategory("");
         setLayeredFormationIconBackgroundFilename(null);
-        setLayeredFormationIconLogoCategory("");
-        setLayeredFormationIconLogoFilename(null);
         tags = EnumSet.noneOf(FactionTag.class);
         start = 0;
         end = 9999;
@@ -138,13 +134,6 @@ public class Faction {
                 layeredFormationIconBackgroundCategory = backgroundPath.getParent().toString();
             }
             layeredFormationIconBackgroundFilename = backgroundPath.getFileName().toString();
-        }
-        if (faction2.getLogo() != null) {
-            Path logoPath = Path.of(faction2.getLogo());
-            if (logoPath.getParent() != null) {
-                layeredFormationIconLogoCategory = logoPath.getParent().toString();
-            }
-            layeredFormationIconLogoFilename = logoPath.getFileName().toString();
         }
         alternativeFactionCodes = faction2.getFallBackFactions().toArray(new String[0]);
         nameChanges = faction2.getNameChanges();
@@ -369,22 +358,6 @@ public class Faction {
     public void setLayeredFormationIconBackgroundFilename(
           final @Nullable String layeredFormationIconBackgroundFilename) {
         this.layeredFormationIconBackgroundFilename = layeredFormationIconBackgroundFilename;
-    }
-
-    public String getLayeredFormationIconLogoCategory() {
-        return layeredFormationIconLogoCategory;
-    }
-
-    public void setLayeredFormationIconLogoCategory(final String layeredFormationIconLogoCategory) {
-        this.layeredFormationIconLogoCategory = layeredFormationIconLogoCategory;
-    }
-
-    public @Nullable String getLayeredFormationIconLogoFilename() {
-        return layeredFormationIconLogoFilename;
-    }
-
-    public void setLayeredFormationIconLogoFilename(final @Nullable String layeredFormationIconLogoFilename) {
-        this.layeredFormationIconLogoFilename = layeredFormationIconLogoFilename;
     }
 
     // region Checks
