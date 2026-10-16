@@ -348,6 +348,9 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getWeeklyMaintenanceCosts()}.
      *
+     * <p>Units that do not require maintenance (e.g. mothballed, deployed, or self-maintained infantry) are skipped,
+     * as they are never charged.</p>
+     *
      * @param units the units to total weekly maintenance costs for
      *
      * @return the total {@link Money} weekly cost of maintenance
@@ -355,7 +358,9 @@ public record Accountant(Campaign campaign) {
     public static Money getWeeklyMaintenanceTotal(Collection<Unit> units) {
         Money total = Money.zero();
         for (Unit unit : units) {
-            total = total.plus(unit.getWeeklyMaintenanceCost());
+            if (unit.requiresMaintenance()) {
+                total = total.plus(unit.getWeeklyMaintenanceCost());
+            }
         }
 
         return total;
