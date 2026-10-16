@@ -45,6 +45,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
@@ -56,7 +57,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.unit.Unit;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -632,17 +632,17 @@ class ChaosContractDeterminationPayTest {
     /** Chaos pay with fixed pay components, so only the salvage taper wiring is under test. */
     private static class FixedChaosPay extends ChaosContractDeterminationPay {
         @Override
-        public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
+        public @Nonnull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
             return Money.of(1);
         }
 
         @Override
-        public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
+        public @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract) {
             return Money.of(1);
         }
 
         @Override
-        public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+        public @Nonnull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
               AbstractLocation currentLocation) {
             return Money.of(1);
         }

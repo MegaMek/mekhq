@@ -39,8 +39,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.EntityMovementMode;

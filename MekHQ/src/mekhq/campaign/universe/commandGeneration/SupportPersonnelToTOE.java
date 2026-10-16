@@ -43,7 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.IntFunction;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;

@@ -35,7 +35,7 @@ package mekhq.campaign.universe.commandGeneration;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

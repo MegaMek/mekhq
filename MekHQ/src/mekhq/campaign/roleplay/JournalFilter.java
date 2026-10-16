@@ -37,7 +37,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Criteria for narrowing the journal. Every criterion is optional: a {@code null} (or blank search text) matches

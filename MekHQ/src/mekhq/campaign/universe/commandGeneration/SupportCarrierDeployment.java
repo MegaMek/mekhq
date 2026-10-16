@@ -39,7 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;

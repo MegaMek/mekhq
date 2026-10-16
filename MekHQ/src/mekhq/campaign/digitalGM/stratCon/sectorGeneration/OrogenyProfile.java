@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A single orogeny (mountain-building) profile's tunable parameters, deserialized from {@code OrogenyProfiles.yaml}.

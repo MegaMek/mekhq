@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.Transporter;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

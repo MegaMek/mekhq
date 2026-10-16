@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

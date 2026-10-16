@@ -40,8 +40,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.loaders.MULParser;

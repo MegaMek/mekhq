@@ -35,8 +35,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.bays.Bay;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

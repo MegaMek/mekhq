@@ -48,10 +48,10 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Era;
 import megamek.common.enums.Faction;
@@ -75,6 +75,7 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -1117,6 +1118,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (this instanceof MissingMekActuator))) {
                 mods.addModifier(2, "prototype TSM");
             }
+        } else {
+            // Parts repaired in the warehouse work under the same conditions a unit would be assigned on arrival,
+            // otherwise pulling a component out of a unit would dodge the contract's repair site penalty.
+            int warehouseSite = ContractRepairLocation.getBestRepairLocation(getCampaign().getActiveContracts());
+            mods.append(Unit.getSiteMod(warehouseSite));
         }
 
         if (tech != null) {

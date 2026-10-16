@@ -42,7 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -55,6 +55,7 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConEnemyEngineersB
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * Works out what the player can do about the facilities on a StratCon map, and what needs their attention, so the
@@ -135,7 +136,7 @@ public final class StratConFacilityAdvisor {
                 }
             }
             options.add(new OrderOption(operation,
-                  StratConFacilityOperations.getSupportPointCost(operation),
+                  StratConFacilityOperations.getSupportPointCost(contract.getStratConCampaignState(), operation),
                   reasonKey,
                   getGuidanceKey(reasonKey, operation),
                   formationIds));
@@ -244,7 +245,11 @@ public final class StratConFacilityAdvisor {
         if (facility.isOwnerAlliedToPlayer()) {
             if ((facility.getGarrison() < facility.getGarrisonMaximum())
                       && !StratConFacilitySupply.isCutOff(track, coords)) {
-                hints.add(getTextAt(RESOURCE_BUNDLE, "hint.understrength"));
+                // Only a facility the player holds takes a Reinforce order; the employer restores its own.
+                hints.add(getTextAt(RESOURCE_BUNDLE,
+                      (facility.getOwner() == ForceAlignment.Player) ?
+                            "hint.understrength" :
+                            "hint.understrength.employer"));
             }
             return hints;
         }
@@ -383,16 +388,18 @@ public final class StratConFacilityAdvisor {
      * @since 0.51.01
      */
     /**
-     * @param operation an order
+     * @param campaignState the contract's StratCon campaign state, or {@code null} for the base cost
+     * @param operation     an order
      *
-     * @return the order's name, followed by what it costs unless it is free
+     * @return the order's name, followed by what it costs right now unless it is free
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static String getOperationLabel(FacilityOperation operation) {
+    public static String getOperationLabel(@Nullable StratConCampaignState campaignState,
+          FacilityOperation operation) {
         String name = getTextAt(RESOURCE_BUNDLE, "operation." + operation.name());
-        int cost = StratConFacilityOperations.getSupportPointCost(operation);
+        int cost = StratConFacilityOperations.getSupportPointCost(campaignState, operation);
         return (cost == 0) ? name : getFormattedTextAt(RESOURCE_BUNDLE, "operation.label", name, cost);
     }
 

@@ -42,7 +42,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Function;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Writes journal entries out as a Markdown or plain-text document, for sharing or backup.

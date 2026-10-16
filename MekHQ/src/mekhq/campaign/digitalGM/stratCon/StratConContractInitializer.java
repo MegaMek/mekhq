@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
@@ -2523,6 +2523,19 @@ public class StratConContractInitializer {
      */
     public static boolean hasRoomForFacility(StratConTrackState track) {
         return track.getOccupiedHexCount() < facilityCapacity(track);
+    }
+
+    /**
+     * @param track a sector
+     *
+     * @return how many hexes the sector lets facilities, scenarios and points of interest take up (see
+     *       {@link #hasRoomForFacility})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getFacilityCapacity(StratConTrackState track) {
+        return facilityCapacity(track);
     }
 
     private static int facilityCapacity(StratConTrackState trackState) {

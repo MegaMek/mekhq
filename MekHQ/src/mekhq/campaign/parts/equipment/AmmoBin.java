@@ -45,9 +45,9 @@ import java.io.PrintWriter;
 import java.util.EnumSet;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.equipment.AmmoMounted;

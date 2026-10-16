@@ -32,18 +32,17 @@
  */
 package mekhq.gui.campaignOptions;
 
-import megamek.Version;
-import megamek.client.ui.settings.SettingsBadge;
-import megamek.common.annotations.Nullable;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.MissingResourceException;
-
 import java.util.Set;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsBadge;
 
 /**
  * Metadata for campaign options, tracking when options were added and their special characteristics.

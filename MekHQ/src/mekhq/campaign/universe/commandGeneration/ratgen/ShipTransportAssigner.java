@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Transporter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;

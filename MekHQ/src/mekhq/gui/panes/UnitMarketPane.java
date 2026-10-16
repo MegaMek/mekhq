@@ -46,6 +46,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.iconChooser.EntityImagePanel;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityViewPane;
 import megamek.client.ui.models.XTableColumnModel;
@@ -54,7 +55,6 @@ import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
 import megamek.common.ui.FastJScrollPane;

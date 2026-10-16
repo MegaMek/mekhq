@@ -49,7 +49,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -58,7 +59,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Automatically assigns available tech personnel to unmaintained units.
@@ -339,7 +339,7 @@ public class AutomatedTechAssignments {
      * @author Illiani
      * @since 0.50.11
      */
-    private @NonNull PriorityQueue<Person> getPersonPriorityQueue(String techSkill) {
+    private @Nonnull PriorityQueue<Person> getPersonPriorityQueue(String techSkill) {
         Comparator<Person> bestTechFirst = Comparator
                                                  .comparingInt((Person p) -> getTechLevel(p, techSkill))
                                                  .reversed() // highest tech level first

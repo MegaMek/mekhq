@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;

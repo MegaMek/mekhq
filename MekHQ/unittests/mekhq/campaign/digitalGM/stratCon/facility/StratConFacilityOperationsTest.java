@@ -334,6 +334,15 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
+        void yourEmployersFacilitiesTakeNoFortifyOrReinforceOrders() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            facility.setGarrison(0);
+
+            assertEquals("reason.employerHeld", reason(FacilityOperation.FORTIFY));
+            assertEquals("reason.employerHeld", reason(FacilityOperation.REINFORCE));
+        }
+
+        @Test
         void fortifyStopsAtAStrongholdAndReinforceAtAFullGarrison() {
             StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
             assertEquals("reason.garrisonFull", reason(FacilityOperation.REINFORCE));
@@ -374,7 +383,7 @@ class StratConFacilityOperationsTest {
 
         @Test
         void reinforceFillsTheGarrison() {
-            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
             facility.setGarrison(0);
             deployFormationAt(FACILITY_COORDS);
 
@@ -855,7 +864,7 @@ class StratConFacilityOperationsTest {
     class CutOffAndObjectives {
         @Test
         void aCutOffFacilityCannotBeReinforcedOrFortified() {
-            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
             facility.setGarrison(0);
             track.getCutOffFacilities().add(FACILITY_COORDS);
 
@@ -1012,6 +1021,179 @@ class StratConFacilityOperationsTest {
 
             when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
             assertFalse(StratConRulesManager.isCaptureChoiceOffered(campaign, true, facility));
+        }
+    }
+
+    @Nested
+    class BuildLimits {
+        private static final StratConCoords OTHER_COORDS = new StratConCoords(6, 6);
+
+        private StratConFacility placeBuiltFacility(StratConCoords coords) {
+            StratConFacility facility = StratConTestData.facility(ForceAlignment.Player,
+                  FacilityType.SensorPost,
+                  new LocalModifiersEffect(List.of("MekGarrison.json")));
+            facility.setPlayerBuilt(true);
+            track.addFacility(coords, facility);
+            return facility;
+        }
+
+        @Test
+        void onlyFieldWorksCanBeBuilt() {
+            List<StratConFacilityDefinition> buildable = StratConFacilityOperations.getBuildableDefinitions();
+
+            assertFalse(buildable.isEmpty());
+            for (StratConFacilityDefinition definition : buildable) {
+                assertTrue(StratConFacilityOperations.BUILDABLE_TYPES.contains(definition.getFacilityType()),
+                      definition.getId());
+            }
+        }
+
+        @Test
+        void eachFacilityBuiltOrBeingBuiltMakesTheNextBuildDearer() {
+            assertEquals(3, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+
+            StratConFacility built = placeBuiltFacility(OTHER_COORDS);
+            assertEquals(4, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID + 1,
+                  new StratConCoords(1, 1),
+                  TODAY.plusDays(5),
+                  "SensorPost"));
+            assertEquals(5, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+
+            // Lost to the enemy, it is no longer the player's own; retaken, it would simply be captured.
+            built.setOwner(ForceAlignment.Opposing);
+            assertFalse(built.isPlayerBuilt());
+            assertEquals(4, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+            // Other orders cost what they always have.
+            assertEquals(1, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.RAID));
+        }
+
+        @Test
+        void aSectorAtItsFacilityCapCannotBeBuiltIn() {
+            StratConTrackState smallTrack = new StratConTrackState();
+            smallTrack.setWidth(2);
+            smallTrack.setHeight(2);
+            campaignState.addTrack(smallTrack);
+            // Four dry hexes allow two to be taken up: one facility and one build under way fill it.
+            smallTrack.addFacility(new StratConCoords(0, 0), StratConTestData.facility(ForceAlignment.Allied,
+                  FacilityType.SensorPost));
+            assertNull(StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  smallTrack,
+                  new StratConCoords(1, 1),
+                  FacilityOperation.BUILD));
+
+            smallTrack.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID + 1,
+                  new StratConCoords(1, 0),
+                  TODAY.plusDays(5),
+                  "SensorPost"));
+            assertEquals("reason.sectorFull", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  smallTrack,
+                  new StratConCoords(1, 1),
+                  FacilityOperation.BUILD));
+        }
+
+        @Test
+        void builtFacilitiesArePaidForEachMonthAndDecayWhenTheyCannotBe() {
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+            StratConFacility first = placeBuiltFacility(FACILITY_COORDS);
+            StratConFacility second = placeBuiltFacility(OTHER_COORDS);
+            // A captured facility costs nothing to keep.
+            track.addFacility(new StratConCoords(1, 1), StratConTestData.facility(ForceAlignment.Player,
+                  FacilityType.MekBase));
+            campaignState.setSupportPoints(1);
+
+            StratConFacilityOperations.payBuiltFacilityUpkeep(track, campaign);
+
+            assertEquals(0, campaignState.getSupportPoints());
+            int damagedCount = 0;
+            for (StratConFacility facility : List.of(first, second)) {
+                if (facility.getCondition() == FacilityCondition.DAMAGED) {
+                    damagedCount++;
+                }
+            }
+            assertEquals(1, damagedCount);
+        }
+
+        @Test
+        void aBuildChargesTheRaisedCost() {
+            placeBuiltFacility(OTHER_COORDS);
+            deployFormationAt(FACILITY_COORDS);
+            StratConFacilityDefinition sensorPost = StratConFacilityFactory.getDefinitionForType(
+                  FacilityType.SensorPost);
+            assertNotNull(sensorPost);
+
+            assertTrue(StratConFacilityOperations.issueOrder(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  FacilityOperation.BUILD,
+                  sensorPost));
+
+            assertEquals(10 - 4, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aBuildThatCannotFinishRefundsWhatItCost() {
+            placeBuiltFacility(OTHER_COORDS);
+            deployFormationAt(FACILITY_COORDS);
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  "NoSuchFacility"));
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            // One built facility already stood, so this one was charged 4.
+            assertEquals(10 + 4, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aFinishedBuildIsAPlayerBuiltOutpost() {
+            // A finished build joins the road grid, which asks which sector generator is in use.
+            when(options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN)).thenReturn(false);
+            deployFormationAt(FACILITY_COORDS);
+            StratConFacilityDefinition sensorPost = StratConFacilityFactory.getDefinitionForType(
+                  FacilityType.SensorPost);
+            assertNotNull(sensorPost);
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  sensorPost.getId()));
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            StratConFacility built = track.getFacility(FACILITY_COORDS);
+            assertNotNull(built);
+            assertTrue(built.isPlayerBuilt());
+            assertEquals(ForceAlignment.Player, built.getOwner());
+            assertEquals(FacilityTier.OUTPOST, built.getTier());
+            assertEquals(4, StratConFacilityOperations.getSupportPointCost(campaignState, FacilityOperation.BUILD));
+        }
+
+        @Test
+        void builtFlagRoundTripsThroughTheSave() throws JAXBException {
+            StratConFacility facility = placeBuiltFacility(OTHER_COORDS);
+
+            Marshaller marshaller = JAXBContext.newInstance(StratConFacility.class).createMarshaller();
+            StringWriter writer = new StringWriter();
+            marshaller.marshal(new JAXBElement<>(new QName("facility"), StratConFacility.class, facility), writer);
+            StratConFacility loaded = JAXBContext.newInstance(StratConFacility.class)
+                                            .createUnmarshaller()
+                                            .unmarshal(new StreamSource(new StringReader(writer.toString())),
+                                                  StratConFacility.class)
+                                            .getValue();
+
+            assertTrue(loaded.isPlayerBuilt());
         }
     }
 }

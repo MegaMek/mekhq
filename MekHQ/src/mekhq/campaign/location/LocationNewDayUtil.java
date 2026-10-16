@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.JOptionPane;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;

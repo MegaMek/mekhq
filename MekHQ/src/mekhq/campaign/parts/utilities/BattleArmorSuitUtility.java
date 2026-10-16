@@ -34,8 +34,8 @@ package mekhq.campaign.parts.utilities;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.battleValue.BVCalculator;
 import megamek.common.battleValue.BattleArmorBVCalculator;

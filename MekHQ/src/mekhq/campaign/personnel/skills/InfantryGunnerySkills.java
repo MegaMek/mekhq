@@ -34,7 +34,7 @@ package mekhq.campaign.personnel.skills;
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
 
 /**

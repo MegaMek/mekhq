@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 
 import io.sentry.Sentry;
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.BehaviorSettings;
@@ -59,7 +60,6 @@ import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.CommanderGUI;
 import megamek.client.ui.clientGUI.ILocalBots;
 import megamek.common.Player;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.loaders.MapSettings;
 import megamek.common.units.Entity;

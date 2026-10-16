@@ -42,8 +42,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.utilities.MHQXMLUtility;

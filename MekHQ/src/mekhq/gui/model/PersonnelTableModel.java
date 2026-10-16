@@ -52,8 +52,8 @@ import javax.swing.SortOrder;
 import javax.swing.UIManager;
 
 import io.sentry.util.Objects;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.tileset.EntityImage;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;

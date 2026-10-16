@@ -38,7 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Aero;

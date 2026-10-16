@@ -33,7 +33,15 @@
 package mekhq.gui.baseComponents.hud;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
+import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.GROUND;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_FAINT;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
+import static mekhq.gui.baseComponents.hud.HudStyle.translucent;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -50,7 +58,7 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import javax.swing.JComponent;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A plot thread's progress track, drawn like the paper track sheet: numbered cells in rows of five, with flashpoints

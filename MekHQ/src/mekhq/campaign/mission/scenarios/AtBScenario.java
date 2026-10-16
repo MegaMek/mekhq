@@ -44,11 +44,11 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.WeatherRestriction;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.BoardDimensions;
 import megamek.common.compute.Compute;

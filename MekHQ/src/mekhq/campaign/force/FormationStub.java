@@ -37,8 +37,8 @@ import java.io.PrintWriter;
 import java.util.UUID;
 import java.util.Vector;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredFormationIcon;
