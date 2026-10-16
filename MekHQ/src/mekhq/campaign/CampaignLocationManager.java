@@ -37,7 +37,7 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;

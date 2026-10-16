@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

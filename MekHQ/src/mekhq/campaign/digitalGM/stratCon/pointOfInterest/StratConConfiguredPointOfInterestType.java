@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConContestedPointOfInterestBehavior.NoScenarioOutcome;
 
 /**

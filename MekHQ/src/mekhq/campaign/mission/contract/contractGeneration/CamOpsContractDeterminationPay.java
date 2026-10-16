@@ -32,11 +32,11 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Determines contract pay the Campaign Operations (CamOps) way, as an alternative to the default Chaos Campaign scheme
@@ -67,14 +67,14 @@ public class CamOpsContractDeterminationPay extends AbstractContractDeterminatio
      * base-pay multiplier.
      */
     @Override
-    public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
         Money base = campaign.getAccountant().getContractBase();
         return base.multipliedBy(contract.getBasePayMultiplier());
     }
 
     /** CamOps folds combat compensation into the monthly retainer, so there is no separate combat bonus. */
     @Override
-    public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract) {
         return Money.zero();
     }
 }

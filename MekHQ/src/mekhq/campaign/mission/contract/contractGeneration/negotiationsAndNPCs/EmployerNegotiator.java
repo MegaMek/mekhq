@@ -43,6 +43,7 @@ import static mekhq.campaign.universe.enums.HiringHallLevel.QUESTIONABLE;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -57,7 +58,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Generates the employer's negotiator for a contract. The negotiator's role is chosen from the campaign type, employer
@@ -138,7 +138,7 @@ public class EmployerNegotiator {
         };
     }
 
-    private static @NonNull PersonnelRole getMercenaryNegotiatorType(HiringHallLevel hiringHallLevel,
+    private static @Nonnull PersonnelRole getMercenaryNegotiatorType(HiringHallLevel hiringHallLevel,
           boolean employerIsClan) {
         if (employerIsClan) {
             return MERCENARY_NEGOTIATOR_CLAN;

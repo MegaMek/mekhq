@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
@@ -45,7 +45,6 @@ import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.TransportCalculator;
 import megamek.client.ratgenerator.TransportCalculator.CargoCapacity;
 import megamek.client.ratgenerator.UnitTable;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;

@@ -35,9 +35,9 @@ package mekhq.campaign.unit.cleanup;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.Mounted;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;

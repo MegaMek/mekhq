@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.digitalGM.IOpForDeploymentStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;

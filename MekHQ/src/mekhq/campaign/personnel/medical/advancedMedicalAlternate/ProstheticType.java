@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;

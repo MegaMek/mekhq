@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.work.IPartWork;

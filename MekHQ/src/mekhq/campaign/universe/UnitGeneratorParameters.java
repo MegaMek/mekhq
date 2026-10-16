@@ -37,11 +37,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.Parameters;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;

@@ -38,7 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.time.LocalDate;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.PlanetarySystem;

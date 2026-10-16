@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;

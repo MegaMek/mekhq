@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;

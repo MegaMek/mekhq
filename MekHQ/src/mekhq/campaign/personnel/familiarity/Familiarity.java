@@ -45,7 +45,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;

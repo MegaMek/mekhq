@@ -75,10 +75,10 @@ import javax.swing.plaf.basic.BasicMenuItemUI;
 import javax.swing.plaf.basic.BasicMenuUI;
 import javax.vecmath.Vector2d;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.FontHandler;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;

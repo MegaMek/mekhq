@@ -41,13 +41,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.IntFunction;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.unit.Unit;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class responsible for inserting support units into a campaign's TOE.
@@ -434,7 +434,7 @@ public class AddSupportUnitsToTOE {
                      || formation.isFormationType(FormationType.SECURITY);
     }
 
-    static @NonNull Formation getHqFormation(Campaign campaign) {
+    static @Nonnull Formation getHqFormation(Campaign campaign) {
         final Formation ORIGIN_FORMATION = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
 
         // I would prefer to not use string comparison here, but we don't have a more reliable option

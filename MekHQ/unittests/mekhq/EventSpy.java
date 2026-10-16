@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.event.MMEvent;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.events.parts.PartArrivedEvent;

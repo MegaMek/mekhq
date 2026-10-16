@@ -38,10 +38,9 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.cam
 import java.util.Collection;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;

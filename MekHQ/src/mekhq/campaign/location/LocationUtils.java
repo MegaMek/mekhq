@@ -35,7 +35,7 @@ package mekhq.campaign.location;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;

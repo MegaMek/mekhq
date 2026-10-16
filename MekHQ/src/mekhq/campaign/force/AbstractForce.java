@@ -54,8 +54,8 @@ import java.util.UUID;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;

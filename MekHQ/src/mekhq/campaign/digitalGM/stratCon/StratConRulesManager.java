@@ -78,9 +78,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
@@ -152,7 +153,6 @@ import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains "rules" logic for the AtB-StratCon state
@@ -898,7 +898,7 @@ public class StratConRulesManager {
         }
     }
 
-    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+    private static @Nonnull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
           ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
         List<Unit> vettedUnits = new ArrayList<>();
         MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();

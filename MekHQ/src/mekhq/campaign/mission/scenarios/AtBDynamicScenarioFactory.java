@@ -70,6 +70,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jakarta.annotation.Nullable;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomGenderGenerator;
@@ -84,7 +85,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.OffBoardDirection;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;

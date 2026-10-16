@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.bays.Bay;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.universe.Faction;

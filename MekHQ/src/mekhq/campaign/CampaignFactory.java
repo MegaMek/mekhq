@@ -43,11 +43,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.common.Player;
-import megamek.common.annotations.Nullable;
 import megamek.common.game.Game;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;

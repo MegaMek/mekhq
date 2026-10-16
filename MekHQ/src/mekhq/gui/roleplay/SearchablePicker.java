@@ -33,7 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -44,8 +48,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.SearchableComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.hud.Hud;
 
 /**

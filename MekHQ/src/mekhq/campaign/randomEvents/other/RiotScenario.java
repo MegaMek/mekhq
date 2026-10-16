@@ -43,7 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;

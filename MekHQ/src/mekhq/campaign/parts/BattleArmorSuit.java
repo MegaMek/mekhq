@@ -37,8 +37,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;

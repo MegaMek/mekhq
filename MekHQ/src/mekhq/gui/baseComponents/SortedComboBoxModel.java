@@ -38,7 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 
 /**

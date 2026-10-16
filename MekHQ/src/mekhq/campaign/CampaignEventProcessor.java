@@ -32,7 +32,7 @@
  */
 package mekhq.campaign;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;

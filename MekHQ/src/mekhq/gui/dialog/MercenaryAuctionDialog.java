@@ -44,10 +44,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
-import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

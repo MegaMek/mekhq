@@ -34,7 +34,7 @@ package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.Person;
 

@@ -47,7 +47,7 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilder;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.rolls.TargetRoll;

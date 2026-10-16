@@ -36,20 +36,11 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.roleplay.TravelRecord.Kind;
 import mekhq.campaign.roleplay.TravelRecord.Party;
 import mekhq.utilities.MHQXMLUtility;

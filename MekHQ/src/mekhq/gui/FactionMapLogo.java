@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;

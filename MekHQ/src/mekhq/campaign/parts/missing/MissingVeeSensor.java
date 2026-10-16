@@ -33,8 +33,8 @@
  */
 package mekhq.campaign.parts.missing;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;

@@ -35,7 +35,7 @@ package mekhq.gui.utilities;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 
 /**
