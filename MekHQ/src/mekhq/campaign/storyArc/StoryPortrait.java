@@ -35,8 +35,8 @@ package mekhq.campaign.storyArc;
 import java.awt.Image;
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.tileset.MMStaticDirectoryManager;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;

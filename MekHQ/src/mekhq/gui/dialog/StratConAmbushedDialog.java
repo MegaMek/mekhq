@@ -38,11 +38,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import org.jspecify.annotations.NonNull;
 
 public class StratConAmbushedDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConAmbushedDialog";
@@ -66,11 +66,11 @@ public class StratConAmbushedDialog {
         return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
     }
 
-    private static @NonNull List<String> getResponseText() {
+    private static @Nonnull List<String> getResponseText() {
         return List.of(getText("Unfortunate.button"));
     }
 
-    private static @NonNull String getOutOfCharacterMessage() {
+    private static @Nonnull String getOutOfCharacterMessage() {
         return getTextAt(RESOURCE_BUNDLE, "StratConAmbushedDialog.ooc");
     }
 }

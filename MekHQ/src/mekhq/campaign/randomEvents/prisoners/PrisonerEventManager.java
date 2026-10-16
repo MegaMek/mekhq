@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

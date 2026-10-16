@@ -36,7 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collection;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;

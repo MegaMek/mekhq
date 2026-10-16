@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;

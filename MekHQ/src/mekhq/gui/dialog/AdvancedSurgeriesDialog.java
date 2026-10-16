@@ -82,9 +82,9 @@ import java.util.Map;
 import java.util.Objects;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.IconPackage;
 import mekhq.MekHQ;

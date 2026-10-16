@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 class Fraction {
     private int numerator;

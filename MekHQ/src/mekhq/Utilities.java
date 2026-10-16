@@ -60,6 +60,7 @@ import java.util.function.Consumer;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.ObjectUtility;
@@ -67,7 +68,6 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.Player;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;

@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.loaders.*;
 import megamek.common.units.Entity;
 import megamek.common.util.BuildingBlock;

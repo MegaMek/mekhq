@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;

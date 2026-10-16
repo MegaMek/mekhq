@@ -40,12 +40,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
-import megamek.common.annotations.Nullable;
 import megamek.common.bays.CargoBay;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;

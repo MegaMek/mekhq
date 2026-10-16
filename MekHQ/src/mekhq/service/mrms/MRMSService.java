@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.HandheldWeapon;

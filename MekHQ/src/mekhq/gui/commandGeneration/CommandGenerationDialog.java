@@ -65,6 +65,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.client.ui.buttons.MMButton;
@@ -73,7 +74,6 @@ import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;

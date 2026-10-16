@@ -39,10 +39,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.InfantryClass;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

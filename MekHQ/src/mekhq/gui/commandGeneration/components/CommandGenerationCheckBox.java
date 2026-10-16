@@ -39,7 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JCheckBox;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A specialized {@link JCheckBox} for the Command Generation dialog.

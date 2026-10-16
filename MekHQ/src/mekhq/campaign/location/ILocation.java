@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.FixedLocation;

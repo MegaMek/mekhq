@@ -35,7 +35,7 @@ package mekhq.campaign.universe.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 
 /**

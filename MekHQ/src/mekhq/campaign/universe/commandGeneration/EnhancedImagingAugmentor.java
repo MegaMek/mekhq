@@ -37,10 +37,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ClanEnhancedImagingAugmentor;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.AugmentedUnitType;
 import megamek.common.options.OptionsConstants;

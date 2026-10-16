@@ -59,8 +59,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.units.EntityWeightClass;

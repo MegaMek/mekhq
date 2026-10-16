@@ -35,20 +35,20 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

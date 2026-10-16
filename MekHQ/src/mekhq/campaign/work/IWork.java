@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.personnel.Person;

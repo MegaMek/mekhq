@@ -63,11 +63,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;

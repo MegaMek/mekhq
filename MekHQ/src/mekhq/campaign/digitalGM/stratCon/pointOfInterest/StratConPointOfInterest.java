@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState.LocalDateAdapter;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;

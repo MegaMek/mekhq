@@ -38,8 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.utilities.MHQXMLUtility;

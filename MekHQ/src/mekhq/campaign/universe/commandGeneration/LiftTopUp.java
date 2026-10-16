@@ -38,11 +38,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ExistingLift;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.TransportCalculator;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

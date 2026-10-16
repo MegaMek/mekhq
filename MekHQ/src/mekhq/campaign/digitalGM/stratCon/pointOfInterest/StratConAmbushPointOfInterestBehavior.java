@@ -34,7 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;

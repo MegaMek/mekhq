@@ -55,8 +55,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

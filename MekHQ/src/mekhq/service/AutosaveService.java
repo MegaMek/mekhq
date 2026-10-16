@@ -48,8 +48,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;

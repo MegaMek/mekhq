@@ -46,10 +46,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.loaders.MapSettings;
 import megamek.common.planetaryConditions.Atmosphere;

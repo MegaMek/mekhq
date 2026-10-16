@@ -39,8 +39,10 @@ import java.util.ResourceBundle;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Checks that every resource key built from an enum constant exists, so a constant added without its text fails here
@@ -84,6 +86,40 @@ class StratConFacilityResourceKeysTest {
     void everyCaptureChoiceHasAButtonAndAReport(FacilityCaptureChoice choice) {
         assertHasKey(OPERATIONS, "capture.button." + choice.name());
         assertHasKey(OPERATIONS, "report.capture." + choice.name());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "reason.employerHeld", "reason.sectorFull", "hint.understrength.employer",
+                             "report.builtUpkeep", "report.builtUpkeep.unpaid", "dialog.effectsNow",
+                             "effect.defenders", "effect.defenders.noGarrison", "effect.defenders.none",
+                             "effect.support.condition.allied", "effect.support.condition.enemy",
+                             "effect.support.batchall.allied", "effect.support.batchall.enemy",
+                             "effect.support.disabled", "effect.support.spent.allied", "effect.support.spent.enemy",
+                             "effect.support.ready.allied", "effect.support.ready.enemy", "effect.support.employer",
+                             "effect.scanRange", "effect.scenarioOdds", "effect.supportPoints", "effect.weakened",
+                             "effect.revealTrack", "effect.revealTrack.off", "effect.preventAerospace",
+                             "effect.preventAerospace.off", "effect.upkeep", "sector.scanRange", "sector.scanRadius",
+                             "sector.scenarioOdds", "sector.preventAerospace", "sector.revealTrack", "sector.support",
+                             "sector.support.employer", "sector.support.disabled", "sector.upkeep", "sector.source",
+                             "sector.source.unknown", "sector.source.other", "sector.source.unknownFacility",
+                             "scenario.support.allied", "scenario.support.none", "scenario.support.enemy",
+                             "scenario.support.enemy.unknown" })
+    void everyFacilityEffectAndBuildTextExists(String key) {
+        assertHasKey(OPERATIONS, key);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "stratConTab.hexInfo.facilityEffect", "stratConTab.facilityEffects.title",
+                             "stratConTab.facility.label.garrison", "stratConTab.facility.label.cutOff",
+                             "stratConTab.facility.label.besieged" })
+    void everyMapTextExists(String key) {
+        assertHasKey(STRATCON, key);
+    }
+
+    @Test
+    void theEmployerUpkeepReportExists() {
+        assertHasKey(ResourceBundle.getBundle("mekhq.resources.StratConEnemyFacilityActivity"),
+              "report.upkeep.employer");
     }
 
     @ParameterizedTest

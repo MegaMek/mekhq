@@ -40,8 +40,8 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;

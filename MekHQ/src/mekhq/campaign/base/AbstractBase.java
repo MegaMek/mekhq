@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
@@ -123,7 +123,7 @@ public abstract class AbstractBase implements IPlace {
     public LocalHangar getBaseHangar() {
         return baseHangar;
     }
-    
+
     @Override
     public LocalWarehouse getWarehouse() {
         return baseWarehouse;

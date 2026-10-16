@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.InjuryType;
 
 public enum CanonicalDiseaseType {
@@ -321,7 +321,10 @@ public enum CanonicalDiseaseType {
                 "Ningpo", "Algol", "Buchlau", "Demeter", "Berenson", "Menkalinan", "New Canton", "Zion", "Asuncion",
                 "Pleione", "Poznan", "Halloran V", "Algot", "New Aragon", "Menkar", "Wei"),
           LocalDate.of(3079, 1, 1),
-          LocalDate.of(9999, 1, 1),
+          // This is a non-canon end date. There is no known canonical end date, and the outbreak is unlikely to be
+          // revisited in a canonical source, but leaving it open-ended across this many core worlds proved too
+          // disruptive to play.
+          LocalDate.of(3130, 1, 1),
           LocalDate.of(9999, 1, 1),
           AlternateInjuries.REDBURN_VIRUS),
     ROCKLAND_FEVER("ROCKLAND_FEVER",

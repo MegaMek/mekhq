@@ -40,7 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -52,7 +53,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import org.jspecify.annotations.NonNull;
 
 
 public class FactionStandingUtilities {
@@ -672,7 +672,7 @@ public class FactionStandingUtilities {
         return addNamePrefix(baseName, capitalize);
     }
 
-    public static @NonNull String addNamePrefix(String baseName, boolean capitalize) {
+    public static @Nonnull String addNamePrefix(String baseName, boolean capitalize) {
         final String CLAN = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.clan");
         final String COMSTAR = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.comStar");
         final String THE = getTextAt(RESOURCE_BUNDLE, "FactionStandingUtilities.the");

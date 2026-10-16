@@ -35,7 +35,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 

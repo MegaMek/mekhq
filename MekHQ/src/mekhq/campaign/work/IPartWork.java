@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.TargetRoll;

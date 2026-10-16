@@ -43,7 +43,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 

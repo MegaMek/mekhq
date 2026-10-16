@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConTerrainCategory;

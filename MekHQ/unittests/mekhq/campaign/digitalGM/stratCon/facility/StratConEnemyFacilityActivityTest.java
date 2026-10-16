@@ -198,12 +198,12 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void onlyEnemyFacilitiesWithNoFightUnderWayGetUpkeep() {
-            StratConFacility allied = placeFacility(ForceAlignment.Allied);
-            allied.setGarrison(0);
+        void facilitiesYouHoldGetNoUpkeepAndAFightBlocksIt() {
+            StratConFacility held = placeFacility(ForceAlignment.Player);
+            held.setGarrison(0);
 
             StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
-            assertEquals(0, allied.getGarrison());
+            assertEquals(0, held.getGarrison());
 
             track.removeFacility(FACILITY_COORDS);
             StratConFacility enemy = placeFacility(ForceAlignment.Opposing);
@@ -216,6 +216,24 @@ class StratConEnemyFacilityActivityTest {
             track.removeScenario(track.getScenario(FACILITY_COORDS));
             StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
             assertEquals(1, enemy.getGarrison());
+        }
+
+        @Test
+        void yourEmployersFacilitiesRecoverOneStepAMonthWhateverTheEnemyDoes() {
+            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
+            StratConFacility employerHeld = placeFacility(ForceAlignment.Allied);
+            employerHeld.setCondition(FacilityCondition.CRIPPLED);
+            employerHeld.setGarrison(0);
+
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
+
+            assertEquals(FacilityCondition.DAMAGED, employerHeld.getCondition());
+            assertEquals(1, employerHeld.getGarrison());
+
+            // Cut off from its supply lines, it gets nothing.
+            track.getCutOffFacilities().add(FACILITY_COORDS);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
+            assertEquals(1, employerHeld.getGarrison());
         }
 
         @Test

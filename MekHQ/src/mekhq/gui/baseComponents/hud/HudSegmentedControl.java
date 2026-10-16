@@ -56,7 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A segmented, mutually exclusive choice. Each segment has a tracked title and an optional sub-line that explains its

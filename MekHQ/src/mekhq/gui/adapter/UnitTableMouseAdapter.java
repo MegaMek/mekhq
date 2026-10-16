@@ -72,11 +72,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.abstractDialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.GunEmplacement;

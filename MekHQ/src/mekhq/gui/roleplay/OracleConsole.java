@@ -62,11 +62,11 @@ import java.util.UUID;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;

@@ -35,7 +35,7 @@ package mekhq.campaign.work;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

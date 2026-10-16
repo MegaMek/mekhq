@@ -34,8 +34,8 @@ package mekhq.campaign.work;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

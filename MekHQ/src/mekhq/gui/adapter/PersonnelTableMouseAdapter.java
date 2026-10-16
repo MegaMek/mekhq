@@ -111,13 +111,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;

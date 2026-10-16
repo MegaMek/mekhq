@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;

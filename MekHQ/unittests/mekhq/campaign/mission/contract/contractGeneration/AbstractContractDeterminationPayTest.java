@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -55,7 +56,6 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -110,12 +110,12 @@ class AbstractContractDeterminationPayTest {
         }
 
         @Override
-        public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
+        public @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract) {
             return COMBAT;
         }
 
         @Override
-        public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+        public @Nonnull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
               AbstractLocation currentLocation) {
             return TRANSPORT;
         }
