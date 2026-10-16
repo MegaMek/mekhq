@@ -47,8 +47,8 @@ import java.awt.Toolkit;
 import java.io.File;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;

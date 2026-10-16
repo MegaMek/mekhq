@@ -35,9 +35,9 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static java.lang.Math.clamp;
 import static megamek.common.compute.Compute.d6;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
-import org.jspecify.annotations.NonNull;
 
 public class ChaosContractDeterminationObjective {
     /**
@@ -85,7 +85,7 @@ public class ChaosContractDeterminationObjective {
         };
     }
 
-    private static @NonNull ContractObjectiveType getInvasionOpposingObjective() {
+    private static @Nonnull ContractObjectiveType getInvasionOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
             case 2, 3, 4 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();
@@ -100,7 +100,7 @@ public class ChaosContractDeterminationObjective {
         return ChaosObjectiveType.INVASION.getCamOpsObjectiveType();
     }
 
-    private static @NonNull ContractObjectiveType getRaidPlayerObjective() {
+    private static @Nonnull ContractObjectiveType getRaidPlayerObjective() {
         return ChaosObjectiveType.RAID.getCamOpsObjectiveType();
     }
 
@@ -115,7 +115,7 @@ public class ChaosContractDeterminationObjective {
         };
     }
 
-    private static @NonNull ContractObjectiveType getGarrisonOpposingObjective() {
+    private static @Nonnull ContractObjectiveType getGarrisonOpposingObjective() {
         int roll = d6(2);
         return switch (roll) {
             case 2, 3, 4 -> ChaosObjectiveType.EXPEDITION.getCamOpsObjectiveType();

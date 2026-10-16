@@ -44,8 +44,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MHQConstants;

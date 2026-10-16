@@ -47,7 +47,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Faction;
 
 /**

@@ -38,7 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;

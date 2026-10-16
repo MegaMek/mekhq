@@ -59,6 +59,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
+import jakarta.annotation.Nonnull;
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -83,7 +84,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Manages the daily training progression of combat teams and their personnel within a campaign.
@@ -483,7 +483,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static @NonNull String processCompletedTraining(Campaign campaign, Person educator, Person trainee,
+    private static @Nonnull String processCompletedTraining(Campaign campaign, Person educator, Person trainee,
           boolean isLogSkillChange, LocalDate today, Skill targetSkill, int baseCostToImprove, String skillName,
           int targetSkillLevel) {
         improveSkill(campaign, trainee, targetSkill, baseCostToImprove);

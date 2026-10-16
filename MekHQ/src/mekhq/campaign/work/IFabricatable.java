@@ -36,7 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;

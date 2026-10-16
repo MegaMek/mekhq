@@ -49,8 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;

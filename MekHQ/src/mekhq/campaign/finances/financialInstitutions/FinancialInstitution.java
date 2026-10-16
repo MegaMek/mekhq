@@ -35,7 +35,7 @@ package mekhq.campaign.finances.financialInstitutions;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

@@ -40,10 +40,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;

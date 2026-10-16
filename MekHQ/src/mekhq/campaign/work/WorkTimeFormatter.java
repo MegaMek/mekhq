@@ -39,7 +39,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Turns minutes of work into text a player can read.

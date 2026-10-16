@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * One sector shape a generated map can take, loaded from {@code SectorShapeProfiles.yaml}.

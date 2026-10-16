@@ -61,7 +61,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;

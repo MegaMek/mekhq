@@ -35,10 +35,10 @@ package mekhq.campaign.parts.protomeks;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;

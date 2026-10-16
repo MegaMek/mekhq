@@ -45,8 +45,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

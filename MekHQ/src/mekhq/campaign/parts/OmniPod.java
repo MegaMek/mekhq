@@ -37,9 +37,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.io.PrintWriter;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.EquipmentType;

@@ -34,7 +34,7 @@ package mekhq.campaign.log;
 
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

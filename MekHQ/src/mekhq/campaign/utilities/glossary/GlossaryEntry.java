@@ -36,8 +36,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 
 /**

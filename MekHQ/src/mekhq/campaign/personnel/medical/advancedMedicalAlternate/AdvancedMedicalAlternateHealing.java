@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DailyReportType;

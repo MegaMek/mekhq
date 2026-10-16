@@ -37,8 +37,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.logging.MMLogger;
 import mekhq.campaign.work.WorkTimeDisplay;

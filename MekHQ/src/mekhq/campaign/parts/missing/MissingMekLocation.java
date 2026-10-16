@@ -38,9 +38,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;

@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;

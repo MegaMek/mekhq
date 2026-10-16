@@ -49,8 +49,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;

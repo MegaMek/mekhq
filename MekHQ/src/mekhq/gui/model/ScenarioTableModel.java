@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;

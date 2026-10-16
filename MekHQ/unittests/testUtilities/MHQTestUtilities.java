@@ -43,9 +43,9 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Base64;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.common.Player;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.game.Game;
 import megamek.common.loaders.MekSummary;

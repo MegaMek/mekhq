@@ -46,10 +46,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Editor panel for a scenario template's objectives: the objective list plus add/edit (via {@link ObjectiveEditPanel})
@@ -160,7 +160,7 @@ public class ObjectivesPanel extends JPanel {
         editPanel.setVisible(true);
     }
 
-    private @NonNull ObjectiveEditPanel createObjectiveEditPanel() {
+    private @Nonnull ObjectiveEditPanel createObjectiveEditPanel() {
         return new ObjectiveEditPanel(template, objectiveList.getSelectedValue(), this, this::refresh);
     }
 }

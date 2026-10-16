@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.roleplay;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * The outcome of consulting the {@link FateChart}.

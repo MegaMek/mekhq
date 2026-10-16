@@ -34,7 +34,7 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.bays.BayType;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.units.Entity;

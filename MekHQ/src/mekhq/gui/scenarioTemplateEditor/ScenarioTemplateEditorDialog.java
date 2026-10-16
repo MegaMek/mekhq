@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -65,7 +66,6 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -328,7 +328,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(forceListContainer, constraints);
     }
 
-    private static int @NonNull [] getColumnWidths() {
+    private static @Nonnull int[] getColumnWidths() {
         return new int[] { scaleForGUI(50), scaleForGUI(130), scaleForGUI(90), scaleForGUI(120), scaleForGUI(150),
                            scaleForGUI(150), scaleForGUI(100), scaleForGUI(70), scaleForGUI(120), scaleForGUI(100),
                            scaleForGUI(90), scaleForGUI(80), scaleForGUI(60), scaleForGUI(100), scaleForGUI(90) };

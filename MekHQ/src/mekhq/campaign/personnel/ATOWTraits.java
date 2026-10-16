@@ -34,7 +34,7 @@ package mekhq.campaign.personnel;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.enums.ExtraIncome;

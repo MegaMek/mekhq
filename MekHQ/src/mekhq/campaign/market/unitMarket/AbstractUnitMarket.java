@@ -42,22 +42,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.EntityMovementMode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public abstract class AbstractUnitMarket {
     private static final MMLogger LOGGER = MMLogger.create(AbstractUnitMarket.class);

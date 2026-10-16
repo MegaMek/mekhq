@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
 
 public class NoCommanderNagLogic {

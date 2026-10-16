@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;

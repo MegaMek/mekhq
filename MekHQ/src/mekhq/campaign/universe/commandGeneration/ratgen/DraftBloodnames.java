@@ -38,9 +38,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ratgenerator.ForceDescriptor;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;

@@ -34,8 +34,8 @@ package mekhq.gui.dialog.iconDialogs;
 
 import javax.swing.JFrame;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.gui.dialog.AbstractMHQIconChooserDialog;

@@ -42,8 +42,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;

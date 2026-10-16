@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
@@ -66,7 +67,6 @@ import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseEntry;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import org.jspecify.annotations.NonNull;
 
 public class RandomEventDialog {
     private static final String RESOURCES_RANDOM_EVENT_DIALOG = "mekhq.resources.RandomEventDialog";
@@ -257,7 +257,7 @@ public class RandomEventDialog {
         modifierArray.add(new TargetRollModifier(modifier, modifierLabel));
     }
 
-    private static @NonNull String getOutOfCharacterMessage() {
+    private static @Nonnull String getOutOfCharacterMessage() {
         return getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, RESULT_OOC);
     }
 
@@ -273,7 +273,7 @@ public class RandomEventDialog {
         return options;
     }
 
-    private @NonNull String getOptionText(String eventName, int responseIndex) {
+    private @Nonnull String getOptionText(String eventName, int responseIndex) {
         String resourceKey = RESPONSE_PREFIX + "." + responseIndex + "." + eventName + BUTTON_SUFFIX;
         String optionText = getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, resourceKey);
 
@@ -289,7 +289,7 @@ public class RandomEventDialog {
         return optionText;
     }
 
-    private @NonNull String getAttributeAddendum(AttributeCheck attributeCheck, String optionText) {
+    private @Nonnull String getAttributeAddendum(AttributeCheck attributeCheck, String optionText) {
         SkillAttribute attribute = attributeCheck.getFirstAttribute();
         String attributeName = attribute.getLabel();
         String attributeLevel = Attributes.getAttributeLevel(activeEventParticipant, attribute);
@@ -299,7 +299,7 @@ public class RandomEventDialog {
         return optionText;
     }
 
-    private @NonNull String getSkillAddendum(SkillCheck skillCheck, String optionText) {
+    private @Nonnull String getSkillAddendum(SkillCheck skillCheck, String optionText) {
         SkillType skillType = skillCheck.getSkillType();
         String skillName = skillType.getName();
 
@@ -317,7 +317,7 @@ public class RandomEventDialog {
         return optionText;
     }
 
-    private static @NonNull String getInCharacterMessage(String eventName, String commanderAddress) {
+    private static @Nonnull String getInCharacterMessage(String eventName, String commanderAddress) {
         String resourceKey = EVENT_PREFIX + eventName + MESSAGE_SUFFIX;
         return getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, resourceKey, commanderAddress);
     }

@@ -53,11 +53,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.MekSummary;
 import megamek.common.rolls.TargetRoll;

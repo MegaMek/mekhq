@@ -44,7 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;

@@ -35,8 +35,8 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.CrewDescriptor;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;

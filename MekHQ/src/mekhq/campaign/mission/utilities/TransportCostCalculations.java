@@ -53,8 +53,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.BattleArmorBay;
 import megamek.common.bays.Bay;

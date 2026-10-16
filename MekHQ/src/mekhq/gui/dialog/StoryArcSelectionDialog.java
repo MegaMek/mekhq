@@ -40,8 +40,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.storyArc.StoryArcStub;
