@@ -56,7 +56,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
@@ -1337,6 +1336,11 @@ public enum ProstheticType {
         return surgeryLevel;
     }
 
+    /** @return the planetary sophistication a world needs before this prosthetic can be installed there. */
+    public PlanetarySystem.PlanetarySophistication getRequiredPlanetarySophistication() {
+        return requiredPlanetarySophistication;
+    }
+
     /**
      * Retrieves all valid body locations this prosthetic can replace, as defined by its associated {@link InjuryType}.
      *
@@ -1711,90 +1715,108 @@ public enum ProstheticType {
      * @since 0.50.10
      */
     public String getTooltip(Faction campaignFaction, int currentYear, double healingTimeMultiplier) {
-        StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
+        return "- " + String.join("<br>- ", getDetailLines(campaignFaction, currentYear, healingTimeMultiplier));
+    }
+
+    /**
+     * Builds the individual lines shown by {@link #getTooltip(Faction, int, double)}, so they can also be laid out as
+     * a visible list.
+     *
+     * @param campaignFaction       the faction requesting the details, used to determine cost availability and any
+     *                              affiliation-based restrictions
+     * @param currentYear           the current in-game year
+     * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     *
+     * @return the detail lines, in display order; each may contain HTML
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<String> getDetailLines(Faction campaignFaction, int currentYear, double healingTimeMultiplier) {
+        List<String> detailLines = new ArrayList<>();
 
         // 1) Surgery level required
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
 
         // 2) ATOW Type
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.type",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.type",
               prostheticType.toString()));
 
         // 3) Base cost
         Money cost = getCost(campaignFaction, currentYear);
         if (cost != null) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
                   cost.toAmountString()));
         }
 
         // 4) Required planetary tech rating
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
               requiredPlanetarySophistication.getName()));
 
         // 5) Availability
         boolean isWrongAffiliation = isWrongAffiliation(campaignFaction);
         AvailabilityValue adjustedAvailability = getAdjustedAvailability(currentYear, isWrongAffiliation);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.availability",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.availability",
               adjustedAvailability.getDescription(), adjustedAvailability.getName()));
 
         // 6) Legality
         ATOWLegalityRating adjustedLegality = getAdjustedLegality(isWrongAffiliation);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legality",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legality",
               adjustedLegality.getDescription(), adjustedLegality.name()));
 
         // 7) Estimated recovery time
         int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * healingTimeMultiplier);
         recoveryTime = max(recoveryTime, 1);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
         // 8) Misc
         InjuryEffect effect = injuryType.getInjuryEffect();
         int toughness = effect.getToughnessModifier();
         if (toughness != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
         }
 
         // 9) Skills
         int gunnery = effect.getGunneryModifier();
         if (gunnery != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
         }
 
         int leadership = effect.getLeadershipModifier();
         if (leadership != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.leadership", leadership));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.leadership", leadership));
         }
 
         int negotiation = effect.getNegotiationModifier();
         if (negotiation != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.negotiation", negotiation));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.negotiation", negotiation));
         }
 
         int perception = effect.getPerceptionModifier();
         if (perception != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
         }
 
         int survival = effect.getSurvivalModifier();
         if (survival != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.survival", survival));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.survival", survival));
         }
 
         int interrogation = effect.getInterrogationModifier();
         if (interrogation != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE,
                   "ProstheticType.tooltip.interrogation",
                   interrogation));
         }
 
         int acting = effect.getActingModifier();
         if (acting != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acting", acting));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acting", acting));
         }
 
         int acrobatics = effect.getAcrobaticsModifier();
         if (acrobatics != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
         }
 
         // 10) Attribute modifiers
@@ -1811,7 +1833,7 @@ public enum ProstheticType {
         for (SkillAttribute attribute : SkillAttribute.values()) {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
-                tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "ProstheticType.tooltip.attribute", modifier, attribute.getLabel()));
             }
         }
@@ -1833,19 +1855,19 @@ public enum ProstheticType {
                 default -> {}
             }
 
-            tooltipPortion.add("<b>" + label + ":</b> " + description);
+            detailLines.add("<b>" + label + ":</b> " + description);
         }
 
         switch (this) { // Covers special cases
             case DERMAL_MYOMER_ARM_ARMOR, DERMAL_MYOMER_LEG_ARMOR ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
             case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
             case DERMAL_MYOMER_ARM_TRIPLE, DERMAL_MYOMER_LEG_TRIPLE ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.triple"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.triple"));
             case PROSTHETIC_LEG_MASC ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legMasc"));
-            case POWER_SUPPLY -> tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.powerSupply"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legMasc"));
+            case POWER_SUPPLY -> detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.powerSupply"));
         }
 
         // 12) Abilities
@@ -1853,10 +1875,10 @@ public enum ProstheticType {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();
             String description = ability == null ? "-" : ability.getDescription();
-            tooltipPortion.add("<b>" + label + ":</b> " + description);
+            detailLines.add("<b>" + label + ":</b> " + description);
         }
 
-        return tooltipPortion.toString();
+        return detailLines;
     }
 
     /**
