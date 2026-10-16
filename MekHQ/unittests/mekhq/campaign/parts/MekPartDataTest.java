@@ -46,7 +46,8 @@ import testUtilities.parts.UnitFixture;
 
 /**
  * Part data for Meks and ProtoMeks: a ProtoMek keeps one jump jet part per jump jet through a reload, and a gyro weighs
- * and costs what the rules say for superheavy, gyro-less and primitive-engine Meks (issue #10206).
+ * and costs what the rules say for superheavy and primitive-engine Meks (issue #10206). A Mek built without a gyro has
+ * no gyro part at all (issue #8618).
  */
 class MekPartDataTest {
     private final PartsScenario scenario = PartsScenario.create();
@@ -104,12 +105,11 @@ class MekPartDataTest {
     }
 
     @Test
-    void aMekWithoutAGyroHasAWeightlessFreeGyroPart() {
+    void aMekWithoutAGyroHasNoGyroPart() {
         // The Skinwalker's interface cockpit is what lets it go without a gyro; such Meks are rare
-        MekGyro gyro = gyroOf(UnitFixture.SKINWALKER_A);
+        Unit skinwalker = scenario.withUnit(UnitFixture.SKINWALKER_A);
 
-        assertEquals(0.0, gyro.getTonnage());
-        assertEquals(Money.zero(), gyro.getStickerPrice());
+        assertTrue(PartsScenario.unitParts(skinwalker, MekGyro.class).isEmpty());
     }
 
     @Test

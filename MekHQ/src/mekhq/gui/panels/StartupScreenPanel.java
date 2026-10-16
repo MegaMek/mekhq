@@ -61,6 +61,7 @@ import megamek.client.ui.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.widget.SkinXMLHandler;
 import megamek.common.Configuration;
 import megamek.common.preference.PreferenceManager;
+import megamek.common.ui.AppIcons;
 import megamek.common.util.ImageUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
@@ -100,6 +101,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     public StartupScreenPanel(final MekHQ app) {
         super(new JFrame(MHQConstants.PROJECT_NAME), "StartupScreenPanel");
 
+        AppIcons.apply(getFrame(), "mekhq");
         this.app = app;
         lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(), saveFilter);
         newPlayerQuickstartFile = new File(LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);

@@ -457,6 +457,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     /**
+     * @return the weapon this bin feeds, or {@code null} when the bin feeds no weapon or is not on a unit
+     */
+    public @Nullable EquipmentType getLauncherType() {
+        Mounted<?> mounted = getMounted();
+        if ((mounted == null) || (mounted.getLinkedBy() == null)) {
+            return null;
+        }
+        return mounted.getLinkedBy().getType();
+    }
+
+    /**
      * Gets the underlying {@link Mounted} which manages this {@code AmmoBin} on the {@link Unit}.
      *
      * @return The {@code Mounted} or {@code null} if no valid piece of equipment exists on the {@code Unit}.
