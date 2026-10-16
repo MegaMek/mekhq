@@ -72,6 +72,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.AppIcons;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -335,6 +336,7 @@ public class CampaignGUI extends JPanel {
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        AppIcons.apply(frame, "mekhq");
 
         tabMain = new EnhancedTabbedPane(true, true);
         tabMain.setToolTipText("");
