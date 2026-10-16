@@ -2544,7 +2544,7 @@ public class ForceHumanResources {
         LocalDate currentDay = campaign.getLocalDate();
         Finances finances = campaign.getPlayerForce().getFinances();
 
-        if (employ && !person.isEmployed()) {
+        if (employ && !person.isEmployed() && prisonerStatus.isFree()) {
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd
                       && !isRecruitmentPrepaid) {
                 if (!finances.debit(TransactionType.RECRUITMENT,
