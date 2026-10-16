@@ -76,6 +76,7 @@ class RefitBattleArmorSquadShrinkTest {
     private PartsScenario scenario;
     private Campaign campaign;
     private Unit elementals;
+    private final List<Person> troopers = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
@@ -93,6 +94,7 @@ class RefitBattleArmorSquadShrinkTest {
             trooper.addSkill(SkillType.S_ANTI_MEK, 5, 0);
             campaign.importPerson(trooper);
             elementals.addPilotOrSoldier(trooper);
+            troopers.add(trooper);
         }
     }
 
@@ -163,6 +165,23 @@ class RefitBattleArmorSquadShrinkTest {
         }
         BattleArmor point = (BattleArmor) elementals.getEntity();
         assertDoesNotThrow(() -> elementals.getTrooperSlots().findWearersOfLostSuits(point));
+    }
+
+    @Test
+    void troopersLeftWithoutASuitStayInTheCampaignUnassigned() throws Exception {
+        refitToThreeTroopers();
+
+        int stillInTheSquad = 0;
+        for (Person trooper : troopers) {
+            assertNotNull(campaign.getPlayerForce().getHumanResources().getPerson(trooper.getId()), trooper.getFullName() + " is still in the campaign");
+            assertTrue(trooper.getStatus().isActive(), trooper.getFullName() + " is still active");
+            if (trooper.getUnit() == elementals) {
+                stillInTheSquad++;
+            } else {
+                assertNull(trooper.getUnit(), trooper.getFullName() + " is unassigned, not moved elsewhere");
+            }
+        }
+        assertEquals(elementals.getCrew().size(), stillInTheSquad);
     }
 
     @Test
