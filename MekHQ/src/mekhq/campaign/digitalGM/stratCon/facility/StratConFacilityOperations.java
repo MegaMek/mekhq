@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
@@ -92,7 +93,18 @@ public final class StratConFacilityOperations {
     static final int ASSAULT_COST = 0;
     static final int FORTIFY_COST = 3;
     static final int REINFORCE_COST = 1;
+    /** What the first Build costs; each facility your side has built and still holds, or is building, adds one. */
     static final int BUILD_COST = 3;
+    /** What each facility your side has built costs each month to keep up. */
+    static final int BUILT_FACILITY_UPKEEP = 1;
+    /**
+     * What a formation can put up in two weeks in the field. Strategic sites - space ports, industry, command posts -
+     * only change hands by capture.
+     */
+    static final Set<FacilityType> BUILDABLE_TYPES = Set.of(FacilityType.SupplyDepot,
+          FacilityType.FieldFortifications,
+          FacilityType.SensorPost,
+          FacilityType.JammingStation);
     static final int INTERDICT_COST = 1;
     /** Pays for a siege's first week; each later week costs {@link StratConFacilitySiege#SIEGE_WEEKLY_COST}. */
     static final int SIEGE_COST = 1;
@@ -134,9 +146,73 @@ public final class StratConFacilityOperations {
     }
 
     /**
+     * @param campaignState the contract's StratCon campaign state, or {@code null} for the base cost
+     * @param operation     an order
+     *
+     * @return what the order costs in support points right now: for a Build, the base cost plus one for each facility
+     *       your side has built and still holds, or is building
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getSupportPointCost(@Nullable StratConCampaignState campaignState, FacilityOperation operation) {
+        int cost = getSupportPointCost(operation);
+        if ((operation == FacilityOperation.BUILD) && (campaignState != null)) {
+            cost += countBuiltFacilities(campaignState);
+        }
+        return cost;
+    }
+
+    /**
+     * @param campaignState the contract's StratCon campaign state
+     *
+     * @return how many facilities your side has built and still holds, plus those being built, across the contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int countBuiltFacilities(StratConCampaignState campaignState) {
+        int count = 0;
+        for (StratConTrackState track : campaignState.getTracks()) {
+            count += countBuildOrders(track);
+            for (StratConFacility facility : track.getFacilities().values()) {
+                if (facility.isPlayerBuilt()) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int countBuildOrders(StratConTrackState track) {
+        int count = 0;
+        for (StratConFacilityOrder order : track.getFacilityOrders()) {
+            if (order.getOperation() == FacilityOperation.BUILD) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * @param track a sector
+     *
+     * @return {@code true} if the sector has room for one more facility, counting those already being built, under
+     *       the same cap that limits facilities placed at the start of the contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean hasRoomToBuild(StratConTrackState track) {
+        return (track.getOccupiedHexCount() + countBuildOrders(track))
+                     < StratConContractInitializer.getFacilityCapacity(track);
+    }
+
+    /**
      * @param operation an order
      *
-     * @return what the order costs in support points
+     * @return what the order costs in support points before anything raises it (see
+     *       {@link #getSupportPointCost(StratConCampaignState, FacilityOperation)})
      *
      * @author Illiani
      * @since 0.51.01
@@ -255,7 +331,8 @@ public final class StratConFacilityOperations {
     public static @Nullable String getUnavailableReasonKey(Campaign campaign, AbstractContract contract,
           StratConTrackState track, StratConCoords coords, FacilityOperation operation) {
         StratConCampaignState campaignState = contract.getStratConCampaignState();
-        if ((campaignState == null) || (campaignState.getSupportPoints() < getSupportPointCost(operation))) {
+        if ((campaignState == null)
+                  || (campaignState.getSupportPoints() < getSupportPointCost(campaignState, operation))) {
             return "reason.supportPoints";
         }
 
@@ -269,6 +346,9 @@ public final class StratConFacilityOperations {
                                           || isBuildUnderway(track, coords);
             if (isHexOccupied) {
                 return "reason.hexOccupied";
+            }
+            if (!hasRoomToBuild(track)) {
+                return "reason.sectorFull";
             }
             return getBuildableDefinitions().isEmpty() ? "reason.nothingToBuild" : null;
         }
@@ -284,6 +364,10 @@ public final class StratConFacilityOperations {
         if (operation.isOnOwnFacility()) {
             if (!facility.isOwnerAlliedToPlayer()) {
                 return "reason.notHeld";
+            }
+            // What the employer holds, the employer manages (see StratConEnemyFacilityActivity#applyMonthlyUpkeep).
+            if (facility.getOwner() != ForceAlignment.Player) {
+                return "reason.employerHeld";
             }
             // Building up a facility, or bringing in fresh troops, needs the supplies a cut-off one can't get.
             if (StratConFacilitySupply.isCutOff(track, coords)) {
@@ -428,13 +512,20 @@ public final class StratConFacilityOperations {
     }
 
     /**
-     * @return the facility definitions a Build order can raise: those with a profile for the player's side
+     * @return the facility definitions a Build order can raise: those of a field-built type (see
+     *       {@link #BUILDABLE_TYPES}) with a profile for the player's side
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static List<StratConFacilityDefinition> getBuildableDefinitions() {
-        return StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Player);
+        List<StratConFacilityDefinition> buildable = new ArrayList<>();
+        for (StratConFacilityDefinition definition : StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Player)) {
+            if (BUILDABLE_TYPES.contains(definition.getFacilityType())) {
+                buildable.add(definition);
+            }
+        }
+        return buildable;
     }
 
     /**
@@ -466,7 +557,7 @@ public final class StratConFacilityOperations {
             return false;
         }
 
-        int cost = getSupportPointCost(operation);
+        int cost = getSupportPointCost(campaignState, operation);
         campaignState.changeSupportPoints(-cost);
 
         boolean isGiven = switch (operation) {
@@ -708,13 +799,15 @@ public final class StratConFacilityOperations {
                   order.getDefinitionId());
             StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
-                campaignState.changeSupportPoints(getSupportPointCost(FacilityOperation.BUILD));
+                // The order has already ended, so this is what it cost when it was given.
+                campaignState.changeSupportPoints(getSupportPointCost(campaignState, FacilityOperation.BUILD));
             }
             report(campaign, "report.buildFailed");
             return;
         }
 
         StratConFacility facility = new StratConFacility(definition, ForceAlignment.Player);
+        facility.setPlayerBuilt(true);
         facility.setTier(FacilityTier.OUTPOST);
         facility.setGarrison(facility.getGarrisonMaximum());
         track.addFacility(order.getTargetCoords(), facility);
@@ -722,6 +815,51 @@ public final class StratConFacilityOperations {
         // A new base belongs on the road grid, as one placed by any other means does.
         StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
         report(campaign, "report.built", facility.getDisplayableName());
+    }
+
+    /**
+     * Charges the month's upkeep for each facility the player's side has built in a sector (see
+     * {@link #BUILT_FACILITY_UPKEEP}). A facility the player cannot pay for falls into disrepair: its condition drops
+     * one step. Both are reported.
+     *
+     * @param track    the sector
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void payBuiltFacilityUpkeep(StratConTrackState track, Campaign campaign) {
+        AbstractContract contract = StratConPointOfInterestRules.getContract(track, campaign);
+        StratConCampaignState campaignState = (contract == null) ? null : contract.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        int paidCount = 0;
+        for (StratConFacility facility : track.getFacilities().values()) {
+            if (!facility.isPlayerBuilt()) {
+                continue;
+            }
+
+            if (campaignState.getSupportPoints() >= BUILT_FACILITY_UPKEEP) {
+                campaignState.changeSupportPoints(-BUILT_FACILITY_UPKEEP);
+                paidCount++;
+            } else {
+                facility.setCondition(facility.getCondition().worsened());
+                report(campaign,
+                      "report.builtUpkeep.unpaid",
+                      facility.getDisplayableName(),
+                      track.getDisplayableName());
+            }
+        }
+
+        if (paidCount > 0) {
+            report(campaign,
+                  "report.builtUpkeep",
+                  paidCount,
+                  track.getDisplayableName(),
+                  paidCount * BUILT_FACILITY_UPKEEP);
+        }
     }
 
     /**

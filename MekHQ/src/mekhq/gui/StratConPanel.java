@@ -61,6 +61,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -91,6 +92,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.*;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -913,7 +915,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private JMenu buildFacilityOrderMenu(StratConCoords coords, AbstractContract contract,
           FacilityOperation operation) {
-        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(operation));
+        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(contract.getStratConCampaignState(),
+              operation));
 
         String reasonKey = StratConFacilityOperations.getUnavailableReasonKey(campaign,
               contract,
@@ -1206,14 +1209,51 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
-     * box pinned to the top-right of the visible map area. Skipped for legacy sectors that carry no profile data.
+     * box pinned to the top-right of the visible map area, then the sector's facility effects under it. The environment
+     * box is skipped for legacy sectors that carry no profile data.
      */
     private void drawSectorEnvironment(Graphics2D g2D) {
-        if ((currentTrack == null) || (currentTrack.getLatitudeBand() == null)) {
+        if (currentTrack == null) {
             return;
         }
 
-        String[] lines = {
+        int nextBoxY = getVisibleRect().y;
+        if (currentTrack.getLatitudeBand() != null) {
+            nextBoxY = drawHudBox(g2D, getSectorEnvironmentLines(), nextBoxY);
+        }
+        drawSectorFacilityEffects(g2D, nextBoxY);
+    }
+
+    /**
+     * Draws what the sector's facilities add up to - scan range, chance of fights, air and space fights kept out, and
+     * how much of your side's support is ready this week - as a translucent box under the sector environment. Skipped
+     * when the facilities do nothing worth reporting.
+     *
+     * @param g2D  the surface
+     * @param topY the top of the space left under the boxes above it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void drawSectorFacilityEffects(Graphics2D g2D, int topY) {
+        SupportRules supportRules = getSupportRules();
+        if (supportRules == null) {
+            return;
+        }
+
+        List<String> effectLines = StratConFacilityEffectStatus.getSectorEffectLines(currentTrack, supportRules);
+        if (effectLines.isEmpty()) {
+            return;
+        }
+
+        List<String> lines = new ArrayList<>();
+        lines.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityEffects.title"));
+        lines.addAll(effectLines);
+        drawHudBox(g2D, lines.toArray(new String[0]), topY);
+    }
+
+    private String[] getSectorEnvironmentLines() {
+        return new String[] {
               getTextAt(RESOURCE_BUNDLE, "stratConTab.environment.title"),
               getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.latitude",
                     prettifyProfile(currentTrack.getLatitudeBand())),
@@ -1226,7 +1266,21 @@ public class StratConPanel extends JPanel implements ActionListener {
               getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.settlement",
                     currentTrack.getCities().size(), prettifyProfile(currentTrack.getUrbanProfile()))
         };
+    }
 
+    /**
+     * Draws a translucent box of text pinned to the right of the visible map area, its first line a title.
+     *
+     * @param g2D   the surface
+     * @param lines the title, then the body lines
+     * @param topY  the top of the space the box goes under; the box sits a margin below it
+     *
+     * @return the bottom of the box
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int drawHudBox(Graphics2D g2D, String[] lines, int topY) {
         Font bodyFont = getFont().deriveFont(Font.PLAIN, UIUtil.scaleForGUI(12));
         Font titleFont = bodyFont.deriveFont(Font.BOLD);
         FontMetrics bodyMetrics = g2D.getFontMetrics(bodyFont);
@@ -1246,7 +1300,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         Rectangle visible = getVisibleRect();
         int boxX = (visible.x + visible.width) - boxWidth - margin;
-        int boxY = visible.y + margin;
+        int boxY = topY + margin;
 
         g2D.setColor(new Color(0, 0, 0, 190));
         g2D.fillRoundRect(boxX, boxY, boxWidth, boxHeight, arc, arc);
@@ -1266,6 +1320,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             g2D.drawString(lines[i], textX, textY);
             textY += lineHeight;
         }
+        return boxY + boxHeight;
     }
 
     /**
@@ -1970,40 +2025,36 @@ public class StratConPanel extends JPanel implements ActionListener {
      * @param facility a facility on the map
      * @param coords   the facility's hex
      *
-     * @return the facility's map label: its name, marked if it is cut off from its supply lines or besieged, then as
-     *       much of its tier, condition and garrison as the player knows
+     * @return the second line of the facility's map label, under its name: as much of its tier, condition and garrison
+     *       as the player knows, then whether it is cut off from its supply lines or besieged; {@code null} if there is
+     *       nothing to show
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private String getFacilityLabel(StratConFacility facility, StratConCoords coords) {
-        String name = facility.getFormattedDisplayableName();
-        // The broken-link mark shows as soon as the player can see the facility.
+    private @Nullable String getFacilityAttributesLabel(StratConFacility facility, StratConCoords coords) {
+        List<String> attributes = new ArrayList<>();
+        FacilityIntel intel = facility.getIntel();
+        if (intel.isAtLeast(FacilityIntel.SCOUTED)) {
+            attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name()));
+            attributes.add(getTextAt(RESOURCE_BUNDLE,
+                  "stratConTab.facilityCondition." + facility.getCondition().name()));
+            if (intel.isAtLeast(FacilityIntel.DETAILED)) {
+                attributes.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "stratConTab.facility.label.garrison",
+                      facility.getGarrison(),
+                      facility.getGarrisonMaximum()));
+            }
+        }
+
+        // The cut-off and siege marks show as soon as the player can see the facility.
         if (StratConFacilitySupply.isCutOff(currentTrack, coords)) {
-            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.cutOff", name);
+            attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.cutOff"));
         }
         if (StratConFacilitySiege.isBesieged(currentTrack, coords)) {
-            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged", name);
+            attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged"));
         }
-        FacilityIntel intel = facility.getIntel();
-        if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
-            return name;
-        }
-
-        String tier = getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name());
-        String condition = getTextAt(RESOURCE_BUNDLE,
-              "stratConTab.facilityCondition." + facility.getCondition().name());
-        if (!intel.isAtLeast(FacilityIntel.DETAILED)) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.scouted", name, tier, condition);
-        }
-
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              "stratConTab.facility.label.detailed",
-              name,
-              tier,
-              condition,
-              facility.getGarrison(),
-              facility.getGarrisonMaximum());
+        return attributes.isEmpty() ? null : String.join(", ", attributes);
     }
 
     /**
@@ -2079,6 +2130,38 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Adds what a facility is doing right now, and why any part of it is not working, to the hex information.
+     *
+     * @param infoBuilder the hex information being built
+     * @param coords      the facility's hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityEffects(StringBuilder infoBuilder, StratConCoords coords) {
+        SupportRules supportRules = getSupportRules();
+        if (supportRules == null) {
+            return;
+        }
+        for (String line : StratConFacilityEffectStatus.getFacilityEffectLines(currentTrack, coords, supportRules)) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityEffect", line));
+        }
+    }
+
+    /**
+     * @return the campaign's rules for facility support on the shown contract, or {@code null} if no contract is shown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nullable SupportRules getSupportRules() {
+        if ((campaignState == null) || (campaignState.getContract() == null)) {
+            return null;
+        }
+        return SupportRules.from(campaign, campaignState.getContract());
+    }
+
+    /**
      * Worker function to render facility icons to the given surface.
      */
     private void drawFacilities(Graphics2D g2D) {
@@ -2112,7 +2195,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, getFacilityLabel(facility, currentCoords), currentCoords);
+                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
+                    String attributesLabel = getFacilityAttributesLabel(facility, currentCoords);
+                    if (attributesLabel != null) {
+                        // Directly under the name, with no leader line of its own, so it reads as part of the label.
+                        drawTextEffect(g2D, facilityMarker, attributesLabel, currentCoords, false);
+                    }
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2196,6 +2284,24 @@ public class StratConPanel extends JPanel implements ActionListener {
      * other if they're all drawn in the same hex.
      */
     private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratConCoords coords) {
+        drawTextEffect(g2D, marker, text, coords, true);
+    }
+
+    /**
+     * Draws a label off a hex marker, under any labels already drawn off that hex.
+     *
+     * @param g2D        the surface
+     * @param marker     the marker the label belongs to
+     * @param text       the label
+     * @param coords     the hex
+     * @param drawLeader {@code false} to leave out the line from the marker, for a label that continues the one above
+     *                   it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void drawTextEffect(Graphics2D g2D, Shape marker, String text, StratConCoords coords,
+          boolean drawLeader) {
         int verticalOffsetIndex = numIconsInHex.getOrDefault(coords, 0);
 
         double startX = marker.getBounds().getMaxX();
@@ -2204,8 +2310,10 @@ public class StratConPanel extends JPanel implements ActionListener {
         double midPointY = startY - HEX_Y_RADIUS / 4.0 + g2D.getFontMetrics().getHeight() * verticalOffsetIndex;
         double endPointX = midPointX + HEX_X_RADIUS / 2.0;
 
-        g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
-        g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
+        if (drawLeader) {
+            g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
+            g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
+        }
 
         // Save the original font
         Font originalFont = g2D.getFont();
@@ -2557,6 +2665,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
                 appendFacilityStatus(infoBuilder, facility);
                 appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords());
+                appendFacilityEffects(infoBuilder, boardState.getSelectedCoords());
 
                 infoBuilder.append("<span>");
                 appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
@@ -2585,7 +2694,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
 
             if (coordsRevealed || !backingScenario.isCloaked() || currentTrack.isGmRevealed()) {
-                infoBuilder.append(selectedScenario.getInfo(campaign));
+                infoBuilder.append(selectedScenario.getInfo(campaign,
+                      StratConFacilityEffectStatus.getScenarioSupportLines(currentTrack, selectedScenario)));
             }
         }
 

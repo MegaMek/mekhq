@@ -2525,6 +2525,19 @@ public class StratConContractInitializer {
         return track.getOccupiedHexCount() < facilityCapacity(track);
     }
 
+    /**
+     * @param track a sector
+     *
+     * @return how many hexes the sector lets facilities, scenarios and points of interest take up (see
+     *       {@link #hasRoomForFacility})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getFacilityCapacity(StratConTrackState track) {
+        return facilityCapacity(track);
+    }
+
     private static int facilityCapacity(StratConTrackState trackState) {
         int placeable = 0;
         for (int x = 0; x < trackState.getWidth(); x++) {

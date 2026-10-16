@@ -56,6 +56,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.*;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor.OrderOption;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -255,6 +256,17 @@ public class StratConFacilityDialog extends JDialog {
                   .append("<p>").append(currentDescription).append("</p>");
         }
 
+        List<String> effectLines = StratConFacilityEffectStatus.getFacilityEffectLines(track,
+              coords,
+              SupportRules.from(campaign, contract));
+        if (!effectLines.isEmpty()) {
+            html.append("<h3>").append(getTextAt(RESOURCE_BUNDLE, "dialog.effectsNow")).append("</h3><ul>");
+            for (String line : effectLines) {
+                html.append("<li>").append(line).append("</li>");
+            }
+            html.append("</ul>");
+        }
+
         if (facility.isOwnerAlliedToPlayer() || facility.isDefinitionMissing()) {
             return;
         }
@@ -311,7 +323,8 @@ public class StratConFacilityDialog extends JDialog {
         row.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4), 0));
 
         StringBuilder html = new StringBuilder("<html><body><b>")
-                                   .append(StratConFacilityAdvisor.getOperationLabel(operation))
+                                   .append(StratConFacilityAdvisor.getOperationLabel(contract.getStratConCampaignState(),
+                                         operation))
                                    .append("</b><br>")
                                    .append(getTextAt(RESOURCE_BUNDLE, "operation.tooltip." + operation.name()));
         if (!option.isAvailable()) {

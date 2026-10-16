@@ -110,6 +110,8 @@ public final class StratConEnemyFacilityActivity {
 
     /** The 2d6 roll, after modifiers, an employer's garrison must meet to hold off an ignored counterattack. */
     static final int OFF_SCREEN_DEFENSE_TARGET = 9;
+    /** The condition and garrison steps your employer restores to each facility it holds every month. */
+    static final int EMPLOYER_UPKEEP_STEPS = 1;
 
     /** How many points of scale bring one enemy engineers point of interest a month. */
     static final int ENGINEER_SCALE_DIVISOR = 3;
@@ -162,8 +164,9 @@ public final class StratConEnemyFacilityActivity {
 
     /**
      * Gives every enemy facility in a sector its monthly upkeep: for each step (see {@link #getUpkeepSteps}), one
-     * condition step repaired and one garrison step reinforced. A facility being fought over gets none. Each facility
-     * the player can see that changed is reported.
+     * condition step repaired and one garrison step reinforced. Your employer's facilities get one step each month,
+     * however active the enemy is, since only facilities you hold take your Fortify and Reinforce orders. A facility
+     * being fought over, cut off or besieged gets none. Each facility the player can see that changed is reported.
      *
      * @param track    the sector
      * @param campaign the current campaign
@@ -173,24 +176,25 @@ public final class StratConEnemyFacilityActivity {
      */
     public static void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
         double activity = getActivity(campaign);
-        if (activity <= 0) {
-            return;
-        }
 
         for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
             StratConFacility facility = entry.getValue();
+            boolean isEmployerHeld = facility.getOwner() == ForceAlignment.Allied;
+            boolean isEnemyHeld = facility.getOwner() == ForceAlignment.Opposing;
             // A facility being fought over, cut off from its supply lines, or under siege cannot be repaired.
-            if ((facility.getOwner() != ForceAlignment.Opposing)
+            if ((!isEmployerHeld && !isEnemyHeld)
+                      || (isEnemyHeld && (activity <= 0))
                       || (track.getScenario(entry.getKey()) != null)
                       || StratConFacilitySupply.isCutOff(track, entry.getKey())
                       || StratConFacilitySiege.isBesieged(track, entry.getKey())) {
                 continue;
             }
 
-            boolean isChanged = applyUpkeep(facility, getUpkeepSteps(activity, Compute.randomInt(100)));
+            int steps = isEmployerHeld ? EMPLOYER_UPKEEP_STEPS : getUpkeepSteps(activity, Compute.randomInt(100));
+            boolean isChanged = applyUpkeep(facility, steps);
             if (isChanged && facility.getVisible()) {
                 campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
-                      "report.upkeep",
+                      isEmployerHeld ? "report.upkeep.employer" : "report.upkeep",
                       facility.getDisplayableName(),
                       track.getDisplayableName(),
                       entry.getKey().toBTString()));
