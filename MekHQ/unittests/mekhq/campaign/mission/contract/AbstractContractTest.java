@@ -402,6 +402,8 @@ class AbstractContractTest {
      */
     private static AbstractContract clanEnemyContract(ContractObjectiveType objectiveType, Faction backingEmployer) {
         AbstractContract contract = spy(contract());
+        // Ordinary salvage rights, so any exchange comes from the clause
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_FIVE));
         contract.setObjectiveData(new ContractObjectiveData(objectiveType, ContractObjectiveType.GARRISON_DUTY));
         doReturn(faction("FS", false)).when(contract).getEmployerFaction();
         doReturn(backingEmployer).when(contract).getStandingEmployerFaction();
