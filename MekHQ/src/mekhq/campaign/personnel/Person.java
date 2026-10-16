@@ -2780,19 +2780,36 @@ public class Person implements ILocatable {
      *
      * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
      * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
-     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
-     * fatigue, are applied directly without modification.</p>
+     * using {@link Math#floor(double)}, to a minimum of 1. Negative values, which indicate a reduction in fatigue, are
+     * applied directly without modification.</p>
      *
      * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
      *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
     public void changeFatigue(int delta) {
-        if (delta > 0) {
+        changeFatigue(delta, true);
+    }
+
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>If {@code isApplyMultiplier} is {@code true}, positive values are scaled by the result of
+     * {@link #getFatigueMultiplier()} and rounded down, to a minimum of 1. Otherwise, and for all negative values, the
+     * change is applied as-is.</p>
+     *
+     * @param delta             The amount to adjust the fatigue by.
+     * @param isApplyMultiplier {@code true} if fatigue gain should be scaled by the character's fatigue multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeFatigue(int delta, boolean isApplyMultiplier) {
+        if ((delta > 0) && isApplyMultiplier) {
             // Only fatigue gain is modified by SPAs, not reduction.
-            delta = (int) floor(delta * getFatigueMultiplier());
+            delta = max(1, (int) floor(delta * getFatigueMultiplier()));
         }
 
-        fatigue += MathUtility.roundAwayFromZero(delta);
+        fatigue += delta;
 
         fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }

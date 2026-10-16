@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.skills.ActionCheckRoll;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.DisplayName;
@@ -463,7 +464,8 @@ class AdvancedMedicalAlternateHealingTest {
         when(injury.getName()).thenReturn("Burn");
 
         try (MockedStatic<Compute> compute = mockStatic(Compute.class);
-              MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class)) {
+              MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class);
+              MockedStatic<Fatigue> fatigue = mockStatic(Fatigue.class)) {
             compute.when(() -> Compute.d6(1)).thenReturn(5);
             HealingMarginOfSuccessEffects effect = invokePrivateStatic("processHealingEffects",
                   new Class<?>[] { Campaign.class, Person.class, Injury.class, int.class },
@@ -472,6 +474,7 @@ class AdvancedMedicalAlternateHealingTest {
             assertSame(HealingMarginOfSuccessEffects.RECOVERY_DELAYED, effect);
             verify(injury).changeTime(5);
             verify(patient).changeFatigue(15);
+            fatigue.verify(() -> Fatigue.processFatigueActions(campaign, patient));
             medicalLogger.verifyNoInteractions();
         }
     }

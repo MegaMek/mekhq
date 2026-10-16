@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 
 
 /**
@@ -543,7 +544,11 @@ public class AdvancedMedicalAlternateHealing {
         // The following effects are universal and can apply even if the original injury is healed
         if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
             int fatigueRate = campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE);
-            patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
+            int fatigueDamage = healingEffect.getFatigueDamage() * fatigueRate;
+            patient.changeFatigue(fatigueDamage);
+            if (fatigueDamage > 0) {
+                Fatigue.processFatigueActions(campaign, patient);
+            }
         }
 
         if (healingEffect.isHasComplication()) {

@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 
 /**
  * Provides utilities for handling escape attempts by prisoners with the "Acting", "Escape Artist", "Disguise", or
@@ -201,8 +202,12 @@ public class EscapeSkills {
         int injuries = (int) floor(roll / 2.0);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE),
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
+        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, isUseInjuryFatigue,
               campaignOptions.get(CampaignOption.FATIGUE_RATE), injuries);
+        if (isUseInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, prisoner);
+        }
 
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {
