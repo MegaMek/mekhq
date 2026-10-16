@@ -72,6 +72,7 @@ class SalvageSettlementTest {
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getSalvageRightsMultiplier()).thenReturn(salvageRights);
         when(contract.isSalvageExchange()).thenReturn(isExchange);
+        when(contract.isSalvageTreatedAsExchange(CAMPAIGN)).thenReturn(isExchange);
         return contract;
     }
 
