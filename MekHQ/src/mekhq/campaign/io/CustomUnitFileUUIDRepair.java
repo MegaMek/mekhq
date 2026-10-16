@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.common.Configuration;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
