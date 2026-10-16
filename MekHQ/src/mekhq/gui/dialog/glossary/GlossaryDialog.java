@@ -35,6 +35,7 @@ package mekhq.gui.dialog.glossary;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -43,6 +44,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.FlatLafStyleBuilder;
@@ -51,7 +53,6 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -246,7 +247,7 @@ public class GlossaryDialog extends JDialog {
      */
     private static ImageIcon getImage() {
         // game year is largely irrelevant for the glossary dialog
-        ImageIcon baseImage = Factions.getFactionLogo(3025, "CS");
+        ImageIcon baseImage = RATGenerator.getFactionLogo(3025, "CS", Color.BLACK);
 
         return ImageUtilities.scaleImageIcon(baseImage, 100, false);
     }

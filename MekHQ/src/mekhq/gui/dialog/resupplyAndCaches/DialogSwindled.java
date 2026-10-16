@@ -32,8 +32,8 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -54,10 +54,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.universe.Factions;
 
 /**
  * The {@code DialogSwindled} class provides functionality to display a dialog related to swindling events during
@@ -65,9 +65,9 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply;
  * logos and contextual details about enemy factions.
  */
 public class DialogSwindled extends JDialog {
-    final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
-    final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
-    final int INSERT_SIZE = UIUtil.scaleForGUI(10);
+    final int LEFT_WIDTH = scaleForGUI(200);
+    final int RIGHT_WIDTH = scaleForGUI(400);
+    final int INSERT_SIZE = scaleForGUI(10);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
@@ -132,8 +132,8 @@ public class DialogSwindled extends JDialog {
         String smugglerTitle = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
         String speakerName = String.format("<b>'%s'</b><br>%s", smugglerCallSign, smugglerTitle);
 
-        ImageIcon speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
-        speakerIcon = scaleImageIcon(speakerIcon, 100, true);
+        ImageIcon speakerIcon = Factions.getFactionLogoWithScaling(campaign.getGameYear(), PIRATE_FACTION_CODE, scaleForGUI(100));
+
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -55,13 +55,13 @@ import javax.imageio.ImageIO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +80,7 @@ class FactionMapLogoTest {
     private ClientPreferences preferences;
     private MockedStatic<Factions2> factionsMock;
     private MockedStatic<PreferenceManager> preferencesMock;
-    private MockedStatic<Factions> logosMock;
+    private MockedStatic<RATGenerator> logosMock;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -96,10 +96,10 @@ class FactionMapLogoTest {
         factionsMock.when(Factions2::getInstance).thenReturn(factions);
         preferencesMock = mockStatic(PreferenceManager.class);
         preferencesMock.when(PreferenceManager::getClientPreferences).thenReturn(preferences);
-        logosMock = mockStatic(Factions.class);
-        logosMock.when(() -> Factions.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
+        logosMock = mockStatic(RATGenerator.class);
+        logosMock.when(() -> RATGenerator.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
               .thenReturn(fallback.toString());
-        logosMock.when(() -> Factions.getFactionLogoAddress(3080, "CUSTOM"))
+        logosMock.when(() -> RATGenerator.getFactionLogoAddress(3080, "CUSTOM"))
               .thenReturn(fallback.toString());
     }
 
@@ -186,7 +186,7 @@ class FactionMapLogoTest {
 
     @Test
     void unreadableFallbackDoesNotProduceAnImage() {
-        logosMock.when(() -> Factions.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
+        logosMock.when(() -> RATGenerator.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
               .thenReturn(temporaryDirectory.resolve("missing-fallback.png").toString());
 
         assertNull(FactionMapLogo.load(GAME_YEAR, "CUSTOM"));
@@ -237,7 +237,7 @@ class FactionMapLogoTest {
         writeImage(userLogo("Custom/Replacement.png"), CUSTOM_PIXEL);
         Path canonicalImage = temporaryDirectory.resolve("canonical.png");
         writeImage(canonicalImage, FALLBACK_PIXEL);
-        logosMock.when(() -> Factions.getCanonicalFactionLogoAddress(GAME_YEAR, "FS"))
+        logosMock.when(() -> RATGenerator.getCanonicalFactionLogoAddress(GAME_YEAR, "FS"))
               .thenReturn(canonicalImage.toString());
 
         BufferedImage image = FactionMapLogo.load(GAME_YEAR, "FS");
