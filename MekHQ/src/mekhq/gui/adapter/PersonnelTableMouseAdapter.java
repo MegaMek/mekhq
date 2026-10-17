@@ -4352,6 +4352,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             });
             menu.add(miSecondInCommand);
+
+            final JCheckBoxMenuItem miLeadNegotiator = new JCheckBoxMenuItem(getText("miLeadNegotiator.text"));
+            miLeadNegotiator.setToolTipText(getText("miLeadNegotiator.toolTipText"));
+            miLeadNegotiator.setName("miLeadNegotiator");
+            miLeadNegotiator.setSelected(person.isLeadNegotiator());
+            miLeadNegotiator.addActionListener(evt -> {
+                getCampaign().getPlayerForce().getPersonnel()
+                      .values()
+                      .stream()
+                      .filter(Person::isLeadNegotiator)
+                      .forEach(leadNegotiator -> {
+                          leadNegotiator.setLeadNegotiator(false);
+                          getCampaign().addReport(PERSONNEL, getFormattedText("removedLeadNegotiator.format",
+                                leadNegotiator.getHyperlinkedFullTitle()));
+                          MekHQ.triggerEvent(new PersonChangedEvent(leadNegotiator));
+                      });
+                if (miLeadNegotiator.isSelected()) {
+                    person.setLeadNegotiator(true);
+                    getCampaign().addReport(PERSONNEL, getFormattedText("setAsLeadNegotiator.format",
+                          person.getHyperlinkedFullTitle()));
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+            });
+            menu.add(miLeadNegotiator);
         }
 
         addFlagMenuItem(menu, selected, "blockMaternityLeave", null, Person::isBlockMaternityLeave,

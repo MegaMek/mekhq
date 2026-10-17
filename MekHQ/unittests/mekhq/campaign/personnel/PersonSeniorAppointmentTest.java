@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
@@ -247,6 +246,33 @@ class PersonSeniorAppointmentTest {
         Person loaded = Person.generateInstanceFromXML(written, campaign, VERSION);
         assertNotNull(loaded);
         assertTrue(loaded.isDepartmentHead(), "the department head flag should survive a save and load");
+    }
+
+    @Test
+    void aLeadNegotiatorFlagSurvivesTheSaveAndLoadRoundTrip() throws Exception {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        person.setLeadNegotiator(true);
+
+        Campaign campaign = campaign();
+        Element written = roundTrip(person, campaign);
+        assertTrue(containsTag(written, "leadNegotiator"));
+
+        Person loaded = Person.generateInstanceFromXML(written, campaign, VERSION);
+        assertNotNull(loaded);
+        assertTrue(loaded.isLeadNegotiator(), "the lead negotiator flag should survive a save and load");
+    }
+
+    @Test
+    void aPersonWhoIsNotLeadNegotiatorWritesNoTagAndLoadsClean() throws Exception {
+        Person person = new Person("", "Jane", "Smith", "", campaign(), "MERC");
+        assertFalse(person.isLeadNegotiator());
+
+        Element written = roundTrip(person, campaign());
+        assertFalse(containsTag(written, "leadNegotiator"));
+
+        Person loaded = Person.generateInstanceFromXML(written, campaign(), VERSION);
+        assertNotNull(loaded);
+        assertFalse(loaded.isLeadNegotiator());
     }
 
     @Test
