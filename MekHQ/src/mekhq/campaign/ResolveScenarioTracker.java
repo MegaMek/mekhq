@@ -1237,7 +1237,8 @@ public class ResolveScenarioTracker {
 
     /**
      * Applies all blob (temp) crew losses queued in {@link #pendingBlobCrewLosses} to the given unit, making a single
-     * update per {@link PersonnelRole}, then clears the queue.
+     * update per {@link PersonnelRole}, then clears the queue. Under {@code SIMULATED_DAMAGE} the losses are discarded
+     * instead, as no one actually dies in a simulated battle.
      *
      * @param unit the unit the queued losses were rolled against
      *
@@ -1245,6 +1246,11 @@ public class ResolveScenarioTracker {
      * @since 0.51.01
      */
     private void applyPendingBlobCrewLosses(Unit unit) {
+        if (voidsCombatDamage()) {
+            pendingBlobCrewLosses.clear();
+            return;
+        }
+
         for (Map.Entry<PersonnelRole, Integer> entry : pendingBlobCrewLosses.entrySet()) {
             PersonnelRole role = entry.getKey();
             int losses = entry.getValue();
@@ -2272,8 +2278,8 @@ public class ResolveScenarioTracker {
             processFamiliarity(familiarityDice, familiarity);
         }
 
-        // Process payouts for killed temp crew (blob crew)
-        if (!killedTempCrew.isEmpty()) {
+        // Process payouts for killed temp crew (blob crew).
+        if (!voidsCombatDamage && !killedTempCrew.isEmpty()) {
             processTempCrewDeathPayouts();
         }
 
