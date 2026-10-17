@@ -56,6 +56,8 @@ import mekhq.campaign.unit.Unit;
  * anything, stops the player confirming (see {@link ConfirmBlocker}). It holds no user interface; the recovery
  * console renders it.</p>
  *
+ * <p>Where the salvage system allows it, the player may instead steal the salvage they keep (see {@link #steal()}).</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
@@ -70,6 +72,7 @@ public class SalvageRecoverySession {
     private final Money unitSalvageInitial;
     private final Money employerSalvageInitial;
     private final Money availableFunds;
+    private boolean isStolen;
 
     /**
      * What happens to a recovered wreck.
@@ -80,7 +83,10 @@ public class SalvageRecoverySession {
     public enum SalvageClaim {
         /** The wreck goes to the employer; under some settlements the player is paid a share of its value. */
         EMPLOYER,
-        /** The player keeps the wreck. Under salvage purchases, this means buying it. */
+        /**
+         * The player keeps the wreck. Under salvage purchases, this means buying it. Where the settlement doesn't let
+         * the player keep salvage, the wreck can only be stolen.
+         */
         KEEP,
         /** The player sells the wreck straight away. */
         SELL
@@ -99,6 +105,8 @@ public class SalvageRecoverySession {
         OVER_SALVAGE_CAP,
         /** The player can't afford the salvage they're buying. */
         UNAFFORDABLE_PURCHASES,
+        /** The player is keeping salvage the settlement only lets them steal. */
+        KEPT_SALVAGE_NOT_ALLOWED,
         /** The recoveries need more tech time than the salvage techs have. */
         NOT_ENOUGH_TECH_TIME
     }
@@ -131,7 +139,7 @@ public class SalvageRecoverySession {
         this.availableFunds = availableFunds;
 
         List<TestUnit> sortedWrecks = new ArrayList<>(wrecks);
-        sortedWrecks.sort(Comparator.comparing(TestUnit::getSellValue).reversed()); // Most valuable first
+        sortedWrecks.sort(Comparator.comparing(settlement::getSalvageValue).reversed()); // Most valuable first
         for (TestUnit wreck : sortedWrecks) {
             claims.put(plan.addWreck(wreck), SalvageClaim.EMPLOYER);
         }
@@ -172,6 +180,20 @@ public class SalvageRecoverySession {
 
     public Money getAvailableFunds() {
         return availableFunds;
+    }
+
+    /**
+     * @return {@code true} if the player stole the salvage they kept (see {@link #steal()})
+     */
+    public boolean isStolen() {
+        return isStolen;
+    }
+
+    /**
+     * @return {@code true} if the salvage system lets the player steal the salvage they keep
+     */
+    public boolean isTheftAllowed() {
+        return salvageRules.isSalvageTheftAllowed();
     }
 
     /**
@@ -349,13 +371,20 @@ public class SalvageRecoverySession {
     public List<SalvageClaim> getAvailableClaims() {
         List<SalvageClaim> availableClaims = new ArrayList<>();
         availableClaims.add(SalvageClaim.EMPLOYER);
-        if (settlement.canKeepSalvage()) {
+        if (settlement.canKeepSalvage() || isTheftAllowed()) {
             availableClaims.add(SalvageClaim.KEEP);
         }
         if (settlement.canSellSalvage()) {
             availableClaims.add(SalvageClaim.SELL);
         }
         return availableClaims;
+    }
+
+    /**
+     * @return {@code true} if the player may keep salvage only by stealing it
+     */
+    public boolean isKeptSalvageStealOnly() {
+        return !settlement.canKeepSalvage() && isTheftAllowed();
     }
 
     /**
@@ -513,10 +542,10 @@ public class SalvageRecoverySession {
         return sumValue(getEmployerSalvage());
     }
 
-    private static Money sumValue(List<TestUnit> salvage) {
+    private Money sumValue(List<TestUnit> salvage) {
         Money value = Money.zero();
         for (TestUnit unit : salvage) {
-            value = value.plus(unit.getSellValue());
+            value = value.plus(settlement.getSalvageValue(unit));
         }
         return value;
     }
@@ -609,6 +638,9 @@ public class SalvageRecoverySession {
         if (!settlement.canAfford(getKeptValue(), availableFunds)) {
             blockers.add(ConfirmBlocker.UNAFFORDABLE_PURCHASES);
         }
+        if (!settlement.canKeepSalvage() && !getKeptSalvage().isEmpty()) {
+            blockers.add(ConfirmBlocker.KEPT_SALVAGE_NOT_ALLOWED);
+        }
         if (getUsedMinutes() > availableMinutes) {
             blockers.add(ConfirmBlocker.NOT_ENOUGH_TECH_TIME);
         }
@@ -620,5 +652,45 @@ public class SalvageRecoverySession {
      */
     public boolean canConfirm() {
         return getConfirmBlockers().isEmpty();
+    }
+
+    /**
+     * Checks whether the player can steal their salvage.
+     *
+     * <p>Stealing ignores the settlement's terms (salvage caps, purchase costs, and salvage the settlement doesn't let
+     * the player keep), but the salvage still has to be recovered: assignments must be able to recover their wrecks,
+     * and the salvage techs must have the time.</p>
+     *
+     * @return {@code true} if the salvage system allows theft and nothing stops the recovery
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean canSteal() {
+        if (!isTheftAllowed()) {
+            return false;
+        }
+
+        List<ConfirmBlocker> blockers = getConfirmBlockers();
+        return !blockers.contains(ConfirmBlocker.UNRECOVERABLE_ASSIGNMENTS) &&
+                     !blockers.contains(ConfirmBlocker.NOT_ENOUGH_TECH_TIME);
+    }
+
+    /**
+     * Steals the salvage the player keeps: they keep it without paying anything, but breach their contract (see
+     * {@link CamOpsSalvageUtilities#breachContractForSalvageTheft}).
+     *
+     * @return {@code true} if the salvage was stolen; {@code false} if the player can't steal it (see
+     *       {@link #canSteal()})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean steal() {
+        if (!canSteal()) {
+            return false;
+        }
+        isStolen = true;
+        return true;
     }
 }

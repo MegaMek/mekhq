@@ -164,6 +164,8 @@ public class SalvageRecoveryConsole extends JDialog {
 
     // Buttons
     private HudButton confirmButton;
+    /** The steal button, or {@code null} under salvage systems that don't allow theft. */
+    private HudButton stealButton;
 
     /** The board's filters. */
     private enum BoardFilter {
@@ -264,6 +266,12 @@ public class SalvageRecoveryConsole extends JDialog {
         }
         if (session.getSettlement().isKeptSalvageBought()) {
             instructions += formatted("instructions.purchases", session.getSettlement().getPlayerSharePercent());
+        }
+        if (session.getSettlement().isClanSalvageClause()) {
+            instructions += text("instructions.clanSalvageClause");
+        }
+        if (session.isTheftAllowed()) {
+            instructions += text("instructions.theft");
         }
         return "<html>" + instructions + "</html>";
     }
@@ -548,6 +556,13 @@ public class SalvageRecoveryConsole extends JDialog {
             actions.add(clearButton);
         }
 
+        if (requireSession().isTheftAllowed()) {
+            stealButton = new HudButton(text("button.steal").toUpperCase(Locale.ROOT), false);
+            stealButton.setToolTipText(text("button.steal.tooltip"));
+            stealButton.addActionListener(event -> steal());
+            actions.add(stealButton);
+        }
+
         confirmButton = new HudButton(text("button.confirm").toUpperCase(Locale.ROOT), true);
         confirmButton.addActionListener(event -> confirm());
         actions.add(confirmButton);
@@ -584,6 +599,9 @@ public class SalvageRecoveryConsole extends JDialog {
             refreshInspector();
             refreshFleet();
             confirmButton.setArmed(requireSession().canConfirm());
+            if (stealButton != null) {
+                stealButton.setArmed(requireSession().canSteal());
+            }
         } finally {
             isRefreshing = false;
         }
@@ -657,6 +675,7 @@ public class SalvageRecoveryConsole extends JDialog {
                       session.getSettlement().getPlayerSharePercent());
                 case UNAFFORDABLE_PURCHASES -> formatted("blocker." + blocker.name(),
                       session.getPurchaseCost().toAmountString(), session.getAvailableFunds().toAmountString());
+                case KEPT_SALVAGE_NOT_ALLOWED -> text("blocker." + blocker.name());
                 case NOT_ENOUGH_TECH_TIME -> formatted("blocker." + blocker.name(), session.getUsedMinutes(),
                       session.getAvailableMinutes());
             });
@@ -712,7 +731,8 @@ public class SalvageRecoveryConsole extends JDialog {
 
         TestUnit wreck = recovery.getWreck();
         dossierTitle.setText(wreck.getName());
-        String sub = formatted("dossier.sub", wreckWeight(wreck), wreck.getSellValue().toAmountString());
+        String sub = formatted("dossier.sub", wreckWeight(wreck),
+              session.getSettlement().getSalvageValue(wreck).toAmountString());
         if (session.isUsingSalvageOperations()) {
             sub += formatted("dossier.sub.minutes", session.getRecoveryMinutes(recovery));
         }
@@ -829,7 +849,7 @@ public class SalvageRecoveryConsole extends JDialog {
     private void refreshClaim(WreckRecovery recovery) {
         SalvageRecoverySession session = requireSession();
         SalvageSettlement settlement = session.getSettlement();
-        Money value = recovery.getWreck().getSellValue();
+        Money value = settlement.getSalvageValue(recovery.getWreck());
         boolean isRecovered = recovery.isRecovered();
 
         List<Segment<SalvageClaim>> segments = new ArrayList<>();
@@ -848,6 +868,9 @@ public class SalvageRecoveryConsole extends JDialog {
                     if (settlement.isKeptSalvageBought()) {
                         title = text("claim.BUY");
                         sub = formatted("claim.BUY.sub", compactMoney(settlement.getPurchaseCost(value)));
+                    } else if (session.isKeptSalvageStealOnly()) {
+                        title = text("claim.KEEP");
+                        sub = text("claim.KEEP.steal.sub");
                     } else {
                         title = text("claim.KEEP");
                         sub = text("claim.KEEP.sub");
@@ -972,6 +995,29 @@ public class SalvageRecoveryConsole extends JDialog {
             setVisible(true);
             return;
         }
+        dispose();
+    }
+
+    /**
+     * Steals the salvage the player keeps, once they confirm they're willing to breach their contract to do it.
+     */
+    private void steal() {
+        if (!requireSession().canSteal()) {
+            LOGGER.debug("[Salvage] Steal refused: {}", requireSession().getConfirmBlockers());
+            return;
+        }
+        setVisible(false);
+        Person speaker = campaign.getPlayerForce()
+              .getHumanResources()
+              .getSeniorTechPerson(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate());
+        ImmersiveDialogSimple confirmationDialog = new ImmersiveDialogSimple(campaign, speaker, null,
+              text("stealConfirmation"), List.of(getText("Cancel.text"), text("button.steal")), null, null, false);
+        if (confirmationDialog.getDialogChoice() == 0) { // Cancelled
+            setVisible(true);
+            return;
+        }
+        requireSession().steal();
         dispose();
     }
 
@@ -1102,7 +1148,8 @@ public class SalvageRecoveryConsole extends JDialog {
             }
 
             return card.show(statusColor(recovery), recovery.isRecovered(), wreck.getName(), null, tags,
-                  sub.toString(), compactMoney(wreck.getSellValue()), text("money.unit"), isSelected);
+                  sub.toString(), compactMoney(session.getSettlement().getSalvageValue(wreck)), text("money.unit"),
+                  isSelected);
         }
 
         private Tag claimTag(SalvageClaim claim) {

@@ -76,6 +76,8 @@ import org.mockito.MockedStatic;
  * units may salvage, the settlement it creates, and how it resolves a scenario's salvage.
  */
 class SalvageRulesTest {
+    private static final Campaign CAMPAIGN = mock(Campaign.class);
+
     private static final AbstractSalvage LEGACY = new LegacySalvage();
     private static final AbstractSalvage STRICT = new CamOpsStrictSalvage();
     private static final AbstractSalvage REVISED = new CamOpsRevisedSalvage();
@@ -155,7 +157,7 @@ class SalvageRulesTest {
             assertEquals(isClaimedInWizard, rules.isSalvageClaimedInResolveWizard(), "claimed in wizard");
             assertEquals(isCombatAllowed, rules.isSalvageFormationCombatAllowed(), "salvage formation combat");
             assertEquals(isMultipleAllowed, rules.isMultipleSalvagePerUnitAllowed(), "multiple salvage per unit");
-            assertEquals(isPurchases, rules.createSettlement(contract()).isKeptSalvageBought(), "purchases");
+            assertEquals(isPurchases, rules.createSettlement(contract(), CAMPAIGN).isKeptSalvageBought(), "purchases");
         }
 
         @Test
@@ -245,15 +247,15 @@ class SalvageRulesTest {
     class Settlements {
         @Test
         void campaignOperationsSystemsCapSalvage() {
-            assertInstanceOf(CappedSalvageSettlement.class, LEGACY.createSettlement(contract()));
-            assertInstanceOf(CappedSalvageSettlement.class, STRICT.createSettlement(contract()));
-            assertInstanceOf(CappedSalvageSettlement.class, REVISED.createSettlement(contract()));
+            assertInstanceOf(CappedSalvageSettlement.class, LEGACY.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(CappedSalvageSettlement.class, STRICT.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(CappedSalvageSettlement.class, REVISED.createSettlement(contract(), CAMPAIGN));
         }
 
         @Test
         void purchaseSystemsSellSalvage() {
-            assertInstanceOf(PurchaseSalvageSettlement.class, CHAOS.createSettlement(contract()));
-            assertInstanceOf(PurchaseSalvageSettlement.class, MEKHQ.createSettlement(contract()));
+            assertInstanceOf(PurchaseSalvageSettlement.class, CHAOS.createSettlement(contract(), CAMPAIGN));
+            assertInstanceOf(PurchaseSalvageSettlement.class, MEKHQ.createSettlement(contract(), CAMPAIGN));
         }
     }
 
@@ -312,7 +314,7 @@ class SalvageRulesTest {
         private void verifyConfirmedSalvageSettled(MockedStatic<CamOpsSalvageUtilities> utilities,
               Campaign campaign, AbstractContract contract, Scenario scenario) {
             utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(same(campaign), same(contract),
-                  same(scenario), same(settlement), same(kept), same(keptForSale), same(leftForEmployer)));
+                  same(scenario), same(settlement), same(kept), same(keptForSale), same(leftForEmployer), eq(false)));
         }
 
         @Test
@@ -328,7 +330,7 @@ class SalvageRulesTest {
 
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(same(campaign), same(contract),
                       same(scenario), any(CappedSalvageSettlement.class), same(claimed), same(sold),
-                      same(unclaimed)));
+                      same(unclaimed), eq(false)));
                 factory.verifyNoInteractions();
                 assertEquals(0, presentedCount);
             }
@@ -341,7 +343,7 @@ class SalvageRulesTest {
                       sold, unclaimed, presenter);
 
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(), anyList(),
-                      anyList(), anyList()));
+                      anyList(), anyList(), anyBoolean()));
             }
         }
 
@@ -392,7 +394,7 @@ class SalvageRulesTest {
                   MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(confirmedSession())) {
                 SalvageRecoveryPresenter checkingPresenter = (shownCampaign, shownScenario, session) -> {
                     utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(),
-                          anyList(), anyList(), anyList()), never());
+                          anyList(), anyList(), anyList(), anyBoolean()), never());
                     presentedCount++;
                 };
 
@@ -417,7 +419,7 @@ class SalvageRulesTest {
                 assertEquals(0, presentedCount);
                 List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(), anyList(),
-                      anyList(), anyList()), never());
+                      anyList(), anyList(), anyBoolean()), never());
                 utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
                       eq(0)));
                 utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(0)));
