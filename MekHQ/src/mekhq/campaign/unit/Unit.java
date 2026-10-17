@@ -6818,21 +6818,13 @@ public class Unit implements ITechnology, ILocatable {
             if (isUnmanned()) {
                 engineer = null;
             } else {
-                for (Person person : getActiveCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getActiveCrew());
             }
         } else {
             if (vesselCrew.isEmpty()) {
                 engineer = null;
             } else {
-                for (Person person : getVesselCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getVesselCrew());
             }
         }
 
@@ -6857,6 +6849,45 @@ public class Unit implements ITechnology, ILocatable {
                 scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * Picks the highest-ranked crew member who is actually serving aboard this unit. A crew list can still hold someone
+     * who has since left, for example a crew member who retired in an older version of MekHQ, and such a person must
+     * not become the engineer.
+     *
+     * @param crew the crew members to choose from
+     *
+     * @return the chosen engineer, or {@code null} if nobody in the crew is serving aboard
+     */
+    private @Nullable Person selectEngineer(List<Person> crew) {
+        Person chosenEngineer = null;
+        int departedCrewCount = 0;
+        for (Person person : crew) {
+            if (!isServingAboard(person)) {
+                departedCrewCount++;
+                continue;
+            }
+
+            if ((chosenEngineer == null) || person.outRanksUsingSkillTiebreaker(campaign, chosenEngineer)) {
+                chosenEngineer = person;
+            }
+        }
+
+        if (departedCrewCount > 0) {
+            LOGGER.debug("[Engineer] {}: {} listed crew member(s) no longer serve aboard and cannot be the engineer",
+                  getName(), departedCrewCount);
+        }
+        return chosenEngineer;
+    }
+
+    /**
+     * @param person a person on this unit's crew list
+     *
+     * @return {@code true} if the person is assigned to this unit
+     */
+    private boolean isServingAboard(Person person) {
+        return equals(person.getUnit());
     }
 
     /**

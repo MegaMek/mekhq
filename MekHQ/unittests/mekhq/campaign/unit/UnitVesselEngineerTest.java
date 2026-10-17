@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -119,6 +120,30 @@ class UnitVesselEngineerTest {
         verify(captain).setEngineer(false);
         verify(commodore).setEngineer(true);
         assertSame(commodore, unit.getEngineer());
+    }
+
+    @Test
+    void crewMemberWhoNoLongerServesAboardIsNotEngineer() {
+        // Issue #10538: a crew member who retired years ago was still on the ship's crew list. As the highest rank they
+        // became the engineer, and the daily maintenance check crashed looking up the unit they no longer serve on.
+        Person retiredCaptain = vesselCrew(10);
+        when(retiredCaptain.getUnit()).thenReturn(null);
+        Person mate = vesselCrew(5);
+
+        unit.resetEngineer();
+
+        assertSame(mate, unit.getEngineer());
+        verify(retiredCaptain, never()).setEngineer(true);
+    }
+
+    @Test
+    void vesselWhoseOnlyCrewNoLongerServesAboardHasNoEngineer() {
+        Person retiredCaptain = vesselCrew(10);
+        when(retiredCaptain.getUnit()).thenReturn(null);
+
+        unit.resetEngineer();
+
+        assertNull(unit.getEngineer());
     }
 
     @Test
