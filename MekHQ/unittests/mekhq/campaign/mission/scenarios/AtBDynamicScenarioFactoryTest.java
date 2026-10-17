@@ -516,6 +516,50 @@ class AtBDynamicScenarioFactoryTest {
     }
 
     @Test
+    void calculateEffectiveBVResupplyUsesNPCConvoyInsteadOfSeedlessBudget() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        AtBDynamicScenario scenario = mockScenarioWithAlliedBotForce(campaign, 4500, 3000);
+        when(scenario.getStratConScenarioType()).thenReturn(ScenarioType.SPECIAL_RESUPPLY);
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(3000, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVResupplyPlayerOnlyIgnoresSeedlessBudget() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        AtBDynamicScenario scenario = mockScenarioWithAlliedBotForce(campaign, 4500, 3000);
+        when(scenario.getStratConScenarioType()).thenReturn(ScenarioType.SPECIAL_RESUPPLY);
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false, false);
+
+        assertEquals(0, actual);
+    }
+
+    @Test
+    void calculateEffectiveBVResupplyUsesPlayerConvoyWhenNoNPCConvoy() {
+        Campaign campaign = mockCampaignWithNoSeedForces();
+        PlayerForce playerForce = mock(PlayerForce.class);
+        Formation convoy = mockFormationWithBV(campaign, mock(LocalHangar.class), false, 3000);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getFormation(1)).thenReturn(convoy);
+
+        ScenarioForceTemplate playerTemplate = new ScenarioForceTemplate();
+        playerTemplate.setContributesToBV(true);
+
+        AtBDynamicScenario scenario = mockScenario(T_GROUND);
+        when(scenario.getStratConScenarioType()).thenReturn(ScenarioType.SPECIAL_RESUPPLY);
+        when(scenario.getEffectivePlayerBVMultiplier()).thenReturn(2.0);
+        when(scenario.getForceIDs()).thenReturn(List.of(1));
+        when(scenario.getPlayerForceTemplates()).thenReturn(Map.of(1, playerTemplate));
+
+        int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+
+        assertEquals(3000, actual);
+    }
+
+    @Test
     void removeModifierForceTemplatesRemovesModifierAddedForces() {
         ScenarioTemplate template = new ScenarioTemplate();
         ScenarioForceTemplate playerForce = createNamedForceTemplate("Player");
@@ -635,6 +679,7 @@ class AtBDynamicScenarioFactoryTest {
         AtBDynamicScenario scenario = mock(AtBDynamicScenario.class);
 
         when(scenario.getBoardType()).thenReturn(boardType);
+        when(scenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
         when(scenario.getEffectivePlayerBVMultiplier()).thenReturn(0.0);
         when(scenario.getNumBots()).thenReturn(0);
 

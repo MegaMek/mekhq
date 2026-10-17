@@ -637,7 +637,7 @@ public class AtBDynamicScenarioFactory {
                 factionCode = contract.getEnemyFactionCode();
 
                 // We only want the difficulty multipliers applying to enemy forces
-                double difficultyMultiplier = getDifficultyMultiplier(campaign);
+                double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
                 effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
                 effectiveUnitCount = (int) round(effectiveUnitCount * difficultyMultiplier);
 
@@ -1307,7 +1307,7 @@ public class AtBDynamicScenarioFactory {
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
-                double difficultyMultiplier = getDifficultyMultiplier(campaign);
+                double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
                 forceBVBudget = (int) (playerBattleValue * forceMultiplier * difficultyMultiplier);
 
                 LOGGER.info("Base bidding budget is {} BV2. This is seed force multiplied by scenario force " +
@@ -3737,9 +3737,13 @@ public class AtBDynamicScenarioFactory {
      */
     public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
           boolean forceStandardBattleValue, boolean includeAlliedBotForces) {
+        if (scenario.getStratConScenarioType().isResupply()) {
+            return calculateResupplyConvoyBV(scenario, campaign, forceStandardBattleValue, includeAlliedBotForces);
+        }
+
         // for each deployed player and bot force that's marked as contributing to the
         // BV budget
-        int bvBudget = 0;
+        int bvBudget;
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isGenericBattleValue = campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !forceStandardBattleValue;
@@ -3755,30 +3759,7 @@ public class AtBDynamicScenarioFactory {
             bvBudget = getBVBudgetWithoutUsingASeedForce(campaign, campaign.getPlayerForce(),
                   forceStandardBattleValue, scenario);
         } else {
-            // deployed player forces
-            for (int forceID : scenario.getForceIDs()) {
-                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    Formation formation = campaign.getPlayerForce().getFormation(forceID);
-                    if (formation != null) {
-                        bvBudget += formation.getTotalBV(campaign, forceStandardBattleValue);
-                        LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), bvBudget);
-                    }
-                }
-            }
-
-            // deployed individual player units
-            for (UUID unitID : scenario.getIndividualUnitIDs()) {
-                ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
-                if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                    if (isGenericBattleValue) {
-                        bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
-                    } else {
-                        bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
-                    }
-                }
-            }
-
+            bvBudget = getDeployedPlayerBV(scenario, campaign, forceStandardBattleValue);
             LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
         }
 
@@ -3794,6 +3775,110 @@ public class AtBDynamicScenarioFactory {
 
         // allied bot forces that contribute to BV do not get multiplied by the
         // difficulty even if the player is perfect, the AI doesn't get any better
+        bvBudget += getContributingBotForceBV(scenario, campaign, forceStandardBattleValue);
+
+        LOGGER.info("Total Base {} Budget: {} (may be adjusted by Effective Player BV Multiplier)",
+              generationMethod,
+              bvBudget);
+
+        return bvBudget;
+    }
+
+    /**
+     * Calculates the BV budget for convoy interception scenarios spawned by the Resupply system.
+     *
+     * <p>These scenarios ignore the normal seed force, seedless, and StratCon Singles budgets, as well as the
+     * scenario's effective player BV multiplier. Instead, the OpFor is sized against the convoy itself: the allied NPC
+     * convoy if one is present, otherwise the player's own convoy (the player forces contributing to BV). The convoy
+     * interception templates split the OpFor into two waves, each with a force multiplier of 1.0, so the total OpFor
+     * budget is twice the BV of the convoy.</p>
+     *
+     * <p>When {@code includeAlliedBotForces} is {@code false} (used when sizing the NPC convoy itself), only the BV
+     * of the player forces actually deployed to the scenario is returned.</p>
+     *
+     * @param scenario                 The resupply scenario to process.
+     * @param campaign                 The campaign in which the scenario resides.
+     * @param forceStandardBattleValue whether to calculate BV using standard Battle Value rather than Generic BV
+     * @param includeAlliedBotForces   {@code true} to return the BV of the convoy, {@code false} to return the BV of
+     *                                 the deployed player forces
+     *
+     * @return the BV budget for the resupply scenario
+     */
+    private static int calculateResupplyConvoyBV(AtBDynamicScenario scenario, Campaign campaign,
+          boolean forceStandardBattleValue, boolean includeAlliedBotForces) {
+        int playerBV = getDeployedPlayerBV(scenario, campaign, forceStandardBattleValue);
+
+        if (!includeAlliedBotForces) {
+            LOGGER.info("Total Resupply Budget (player only): {}", playerBV);
+            return playerBV;
+        }
+
+        int npcConvoyBV = getContributingBotForceBV(scenario, campaign, forceStandardBattleValue);
+        int convoyBV = npcConvoyBV > 0 ? npcConvoyBV : playerBV;
+
+        LOGGER.info("Total Resupply Budget (convoy only): {}", convoyBV);
+        return convoyBV;
+    }
+
+    /**
+     * Calculates the BV of the player forces and individual units deployed to the scenario that are marked as
+     * contributing to BV.
+     *
+     * @param scenario                 The scenario to process.
+     * @param campaign                 The campaign in which the scenario resides.
+     * @param forceStandardBattleValue whether to calculate BV using standard Battle Value rather than Generic BV
+     *
+     * @return the BV of the deployed, contributing, player forces
+     */
+    private static int getDeployedPlayerBV(AtBDynamicScenario scenario, Campaign campaign,
+          boolean forceStandardBattleValue) {
+        boolean isGenericBattleValue = campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
+                                             !forceStandardBattleValue;
+        int battleValue = 0;
+
+        // deployed player forces
+        for (int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                Formation formation = campaign.getPlayerForce().getFormation(forceID);
+                if (formation != null) {
+                    battleValue += formation.getTotalBV(campaign, forceStandardBattleValue);
+                    LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), battleValue);
+                }
+            }
+        }
+
+        // deployed individual player units
+        for (UUID unitID : scenario.getIndividualUnitIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
+            if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
+                if (isGenericBattleValue) {
+                    battleValue += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
+                } else {
+                    battleValue += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+                }
+            }
+        }
+
+        return battleValue;
+    }
+
+    /**
+     * Calculates the BV of the bot forces in the scenario that are marked as contributing to BV.
+     *
+     * @param scenario                 The scenario to process.
+     * @param campaign                 The campaign in which the scenario resides.
+     * @param forceStandardBattleValue whether to calculate BV using standard Battle Value rather than Generic BV
+     *
+     * @return the BV of the contributing bot forces
+     */
+    private static int getContributingBotForceBV(AtBDynamicScenario scenario, Campaign campaign,
+          boolean forceStandardBattleValue) {
+        boolean isGenericBattleValue = campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
+                                             !forceStandardBattleValue;
+        String generationMethod = isGenericBattleValue ? "Generic BV" : "BV2";
+        int battleValue = 0;
+
         for (int index = 0; index < scenario.getNumBots(); index++) {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
@@ -3804,11 +3889,11 @@ public class AtBDynamicScenarioFactory {
                             LOGGER.error("Null entity when calculating the BV a bot force, we should never find a " +
                                                "null here. Please investigate");
                         } else {
-                            bvBudget += entity.getGenericBattleValue();
+                            battleValue += entity.getGenericBattleValue();
                         }
                     }
                 } else {
-                    bvBudget += botForce.getTotalBV(campaign);
+                    battleValue += botForce.getTotalBV(campaign);
                 }
 
                 LOGGER.info("{} {}: {}",
@@ -3818,11 +3903,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        LOGGER.info("Total Base {} Budget: {} (may be adjusted by Effective Player BV Multiplier)",
-              generationMethod,
-              bvBudget);
-
-        return bvBudget;
+        return battleValue;
     }
 
     /**
@@ -4174,6 +4255,25 @@ public class AtBDynamicScenarioFactory {
      *
      * @return the difficulty multiplier
      */
+    /**
+     * Returns the difficulty multiplier to apply to OpFor BV budgets in the given scenario.
+     *
+     * <p>Convoy interception scenarios spawned by the Resupply system are always sized at twice the convoy's BV, so
+     * the campaign difficulty is not applied to them.</p>
+     *
+     * @param scenario The scenario for which the OpFor is being generated.
+     * @param campaign The current campaign.
+     *
+     * @return the difficulty multiplier, or {@code 1.0} for resupply scenarios
+     */
+    private static double getOpForDifficultyMultiplier(AtBDynamicScenario scenario, Campaign campaign) {
+        if (scenario.getStratConScenarioType().isResupply()) {
+            return 1.0;
+        }
+
+        return getDifficultyMultiplier(campaign);
+    }
+
     private static double getDifficultyMultiplier(Campaign campaign) {
         return switch (campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL)) {
             case NONE, ULTRA_GREEN -> 0.5;
