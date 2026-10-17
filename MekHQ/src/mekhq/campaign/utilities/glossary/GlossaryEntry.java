@@ -64,6 +64,7 @@ public enum GlossaryEntry {
     ATB("ATB", new Version("0.50.10")),
     ATTRIBUTE_SCORES("ATTRIBUTE_SCORES", new Version("0.50.06")),
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
+    BATCHALL("BATCHALL", new Version("0.51.01")),
     BLOODHOUSE("BLOODHOUSE", new Version("0.51.01")),
     BLOODMARK("BLOODMARK", new Version("0.51.00")),
     BLOODNAME("BLOODNAME", new Version("0.51.01")),
