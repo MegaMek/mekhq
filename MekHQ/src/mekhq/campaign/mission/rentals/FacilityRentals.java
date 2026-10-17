@@ -424,6 +424,31 @@ public class FacilityRentals {
     }
 
     /**
+     * Returns whether maintenance bays and factory conditions can be rented: only while planetside, and only when the
+     * campaign is off contract or on a garrison-type contract.
+     *
+     * @param campaign the current campaign context
+     *
+     * @return {@code true} if bays can be rented here and now
+     */
+    public static boolean isBayRentalAllowed(Campaign campaign) {
+        if (!campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
+            return false;
+        }
+
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        if (activeContracts.isEmpty()) {
+            return true;
+        }
+        for (AbstractContract contract : activeContracts) {
+            if (contract.getObjectiveType().isGarrisonType()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Processes a request to change bay assignments for the specified units, offering bay rental opportunities if
      * allowed by the current campaign state.
      * <p>
@@ -441,17 +466,7 @@ public class FacilityRentals {
      *       or location restrictions)
      */
     public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
-        List<AbstractContract> activeAtBContracts = campaign.getActiveContracts();
-        boolean isBayRentalAllowed = activeAtBContracts.isEmpty();
-
-        for (AbstractContract atBContract : activeAtBContracts) {
-            if (atBContract.getObjectiveType().isGarrisonType()) {
-                isBayRentalAllowed = true;
-                break;
-            }
-        }
-
-        if (!isBayRentalAllowed || !campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
+        if (!isBayRentalAllowed(campaign)) {
             BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
             return false;
         }

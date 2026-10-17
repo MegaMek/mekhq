@@ -231,6 +231,7 @@ import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.HangarStatistics;
+import mekhq.campaign.unit.NewUnitRepairSite;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitAcquisitionType;
@@ -1392,6 +1393,7 @@ public class Campaign implements ITechManager {
     public Unit addTestUnit(TestUnit testUnit, int deliveryTime) {
         // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(testUnit.getEntity(), this);
+        int repairSite = NewUnitRepairSite.getSite(this);
         getPlayerForce().getHangar().addUnit(unit);
 
         // record who the unit was salvaged from before we take ownership of it
@@ -1424,6 +1426,10 @@ public class Campaign implements ITechManager {
 
         // The unit isn't available until it has been delivered, just like its parts
         unit.setDaysToArrival(Math.max(0, deliveryTime));
+        // A unit still in transit is given its site when it arrives (see LocationNewDayUtil)
+        if (unit.isPresent()) {
+            unit.setSite(repairSite);
+        }
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == unit.getEntity().getId()) {
@@ -1498,6 +1504,7 @@ public class Campaign implements ITechManager {
         if (!unit.isSelfCrewed()) {
             unit.setMaintenanceMultiplier(getCampaignOptions().get(CampaignOption.DEFAULT_MAINTENANCE_TIME));
         }
+        int repairSite = NewUnitRepairSite.getSite(this);
         getPlayerForce().getHangar().addUnit(unit);
 
         // reset the game object
@@ -1515,6 +1522,10 @@ public class Campaign implements ITechManager {
         }
 
         unit.setDaysToArrival(days);
+        // A unit still in transit is given its site when it arrives (see LocationNewDayUtil)
+        if (unit.isPresent()) {
+            unit.setSite(repairSite);
+        }
 
         if (days > 0) {
             unit.setMothballed(campaignOptions.get(CampaignOption.MOTHBALL_UNIT_MARKET_DELIVERIES));

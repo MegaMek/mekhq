@@ -53,12 +53,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
+import mekhq.campaign.unit.NewUnitRepairSite;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 
@@ -170,7 +170,7 @@ public final class LocationNewDayUtil {
 
         if (hangar != null) {
             // ok now we can check for other stuff we might need to do to units
-            int defaultRepairSite = ContractRepairLocation.getBestRepairLocation(campaign.getActiveContracts());
+            int defaultRepairSite = NewUnitRepairSite.getSite(campaign, hangar.getUnits());
             List<UUID> unitsToRemove = new ArrayList<>();
             int podSwapsCarriedOver = 0;
             for (Unit unit : hangar.getUnits()) {

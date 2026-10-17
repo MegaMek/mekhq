@@ -81,7 +81,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -286,10 +285,6 @@ public class CamOpsSalvageUtilities {
             Unit salvagedUnit = campaign.addTestUnit(salvageUnit, deliveryTime);
             if (isKeepEnemyCamouflage && !fieldedCamouflage.hasDefaultCategory()) {
                 salvagedUnit.getEntity().setCamouflage(fieldedCamouflage);
-            }
-            // Units still in transit are given the best repair site when they arrive (see LocationNewDayUtil)
-            if (salvagedUnit.isPresent()) {
-                salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
             }
 
             keptSalvageValue = keptSalvageValue.plus(salvageUnit.getSellValue());

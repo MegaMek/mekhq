@@ -238,8 +238,6 @@ class CamOpsSalvageResolutionTest {
         private final AbstractContract contract = mock(AbstractContract.class);
         private final Scenario scenario = mock(Scenario.class);
         private final List<Unit> addedUnits = new ArrayList<>();
-        // Salvage delivered on the day it is resolved is present; salvage still in transit is not
-        private boolean isAddedUnitPresent = true;
 
         ResolveSalvage() {
             when(campaign.getCampaignOptions()).thenReturn(options);
@@ -253,7 +251,6 @@ class CamOpsSalvageResolutionTest {
                 Entity entity = testUnit.getEntity();
                 Unit unit = mock(Unit.class);
                 when(unit.getEntity()).thenReturn(entity);
-                when(unit.isPresent()).thenReturn(isAddedUnitPresent);
                 addedUnits.add(unit);
                 return unit;
             });
@@ -278,27 +275,14 @@ class CamOpsSalvageResolutionTest {
         }
 
         @Test
-        void keptSalvageJoinsTheCampaignAtTheContractRepairSite() {
+        void keptSalvageJoinsTheCampaign() {
             TestUnit wreck = wreck(1000);
 
             resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
 
             verify(campaign).clearGameData(wreck.getEntity());
             verify(campaign).addTestUnit(same(wreck), eq(0));
-            // The campaign keeps a new unit, not the test unit, so that's the one that must be at the repair site
-            verify(addedUnits.getFirst()).setSite(Unit.SITE_FIELD_WORKSHOP);
             verify(contract).changeSalvagedByUnitValue(moneyOf(1000));
-        }
-
-        @Test
-        void keptSalvageStillInTransitIsLeftForItsArrivalToPlace() {
-            isAddedUnitPresent = false;
-            TestUnit wreck = wreck(1000);
-
-            resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
-
-            // A unit in transit is given the best repair site when it arrives (LocationNewDayUtil), not here
-            verify(addedUnits.getFirst(), never()).setSite(anyInt());
         }
 
         @Test
