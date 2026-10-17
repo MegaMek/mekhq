@@ -2183,6 +2183,22 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Uses the unit already saved under the new design's name instead of saving a copy. The player picked a name that
+     * is taken, and {@link RefitDesignMatch} found the saved unit to be this same design. A saved custom unit is listed
+     * among the campaign's customs, so the campaign file keeps its design as it would for a newly saved one.
+     *
+     * @param savedDesign the summary of the unit saved under the new design's name
+     */
+    public void useSavedDesign(MekSummary savedDesign) {
+        isSavingFile = false;
+        if (!savedDesign.isCanon()) {
+            getCampaign().addCustom(newEntity.getShortNameRaw());
+        }
+        LOGGER.info("[Refit] {} uses the design saved in {} instead of saving a copy", newEntity.getShortNameRaw(),
+              savedDesign.getSourceFile());
+    }
+
+    /**
      * Writes the configuration for the new side of the refit to a .mtf or .blk file in the customs directory.
      *
      */
