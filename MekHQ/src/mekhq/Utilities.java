@@ -149,7 +149,20 @@ public class Utilities {
         return result;
     }
 
-    public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
+    /**
+     * Lists the munitions a bin can be switched to. They must have the Clan or Inner Sphere tech base of the weapon the
+     * bin feeds. Comparing with the ammunition in the bin instead left a Clan launcher holding Inner Sphere ammunition,
+     * as a salvaged mixed tech unit can, unable to switch to any Clan round, such as Artemis V ammunition.
+     *
+     * @param entity          the unit
+     * @param launcherType    the weapon the bin feeds, or {@code null} to use the tech base of the ammunition in it
+     * @param currentAmmoType the ammunition in the bin
+     * @param techLvl         the campaign's tech level
+     *
+     * @return the munitions the bin can hold
+     */
+    public static List<AmmoType> getMunitionsFor(Entity entity, @Nullable EquipmentType launcherType,
+          AmmoType currentAmmoType, int techLvl) {
         if (currentAmmoType == null) {
             return Collections.emptyList();
         }
@@ -162,6 +175,8 @@ public class Utilities {
             return Collections.emptyList();
         }
 
+        EquipmentType techBaseSource = (launcherType != null) ? launcherType : currentAmmoType;
+        boolean isClanTechBase = TechConstants.isClan(techBaseSource.getTechLevel(entity.getTechLevelYear()));
         List<AmmoType> ammoTypes = new ArrayList<>();
         for (AmmoType ammoType : munitions) {
             // this is an abbreviated version of setupMunitions in the CustomMekDialog
@@ -179,9 +194,7 @@ public class Utilities {
                 lvl = 0;
             }
 
-            if ((techLvl < Utilities.getSimpleTechLevel(lvl)) ||
-                      (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) !=
-                             TechConstants.isClan(lvl))) {
+            if ((techLvl < Utilities.getSimpleTechLevel(lvl)) || (isClanTechBase != TechConstants.isClan(lvl))) {
                 continue;
             }
 

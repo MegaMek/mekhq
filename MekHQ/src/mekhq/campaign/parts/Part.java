@@ -405,6 +405,13 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return unitTonnageMatters;
     }
 
+    /**
+     * @return {@code true} when the part's details name the weight of the unit it is for
+     */
+    protected boolean showsUnitTonnageInDetails() {
+        return isUnitTonnageMatters();
+    }
+
     public abstract double getTonnage();
 
     public boolean isOmniPodded() {
@@ -1483,7 +1490,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             details.add("OmniPod");
         }
 
-        if (isUnitTonnageMatters()) {
+        if (showsUnitTonnageInDetails()) {
             details.add(getUnitTonnage() + " tons");
         }
 

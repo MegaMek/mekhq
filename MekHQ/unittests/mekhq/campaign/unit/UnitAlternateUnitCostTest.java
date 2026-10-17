@@ -52,10 +52,12 @@ import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
+import megamek.common.loaders.MekSummary;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -67,6 +69,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -533,6 +536,88 @@ class UnitAlternateUnitCostTest {
             // Meks cost 2% of their value a year, spread over 52 weeks
             assertEquals(Money.of(5_000_000).multipliedBy(0.02).dividedBy(52.0), alternateMaintenance);
             assertEquals(Money.of(3_000_000).multipliedBy(0.02).dividedBy(52.0), constructionMaintenance);
+        }
+    }
+
+    /**
+     * Pricing from a unit summary alone, as the Purchase Unit dialog's price column does for every row.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class FromSummary {
+        private CampaignOptions campaignOptions;
+        private MekSummary summary;
+
+        @BeforeEach
+        void setUp() {
+            campaignOptions = new CampaignOptions();
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, true);
+            campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
+            campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.1);
+            campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
+            campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.5);
+
+            summary = mock(MekSummary.class);
+            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
+            when(summary.getBV()).thenReturn(500);
+            when(summary.getCost()).thenReturn(3_000_000L);
+            when(summary.getAlternateCost()).thenReturn(400_000L);
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @ParameterizedTest
+        @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 1.5", "true, true, 1.5" })
+        void alternateUnitCostPricesTheSummaryBattleValue(boolean isClan, boolean isMixedTech, double multiplier) {
+            when(summary.isClan()).thenReturn(isClan);
+            when(summary.isMixedTech()).thenReturn(isMixedTech);
+
+            assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS),
+                  Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void withoutConversionTheSummaryIsPricedInRawSupportPoints() {
+            campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
+
+            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @ParameterizedTest
+        @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 4500000", "true, true, 4500000" })
+        void optionOffPricesTheConstructionCost(boolean isClan, boolean isMixedTech, int expected) {
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            when(summary.isClan()).thenReturn(isClan);
+            when(summary.isMixedTech()).thenReturn(isMixedTech);
+
+            assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * Infantry, battle armor included, is priced by its alternate cost, as a unit of it is.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @ParameterizedTest
+        @ValueSource(ints = { UnitType.INFANTRY, UnitType.BATTLE_ARMOR })
+        void optionOffPricesInfantryByItsAlternateCost(int unitType) {
+            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
+
+            assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions));
         }
     }
 

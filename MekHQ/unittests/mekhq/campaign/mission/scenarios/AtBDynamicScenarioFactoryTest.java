@@ -52,10 +52,12 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.CardinalEdge;
@@ -73,6 +75,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -461,6 +464,46 @@ class AtBDynamicScenarioFactoryTest {
         AtBDynamicScenarioFactory.setDestinationZone(force, createForceTemplate(storedEdge.getIndex()));
 
         assertEquals(CardinalEdge.NEAREST, force.getBehaviorSettings().getRetreatEdge());
+    }
+
+    @Test
+    void defaultReinforcementsTemplateIsSyncedToPlayerArc() {
+        ScenarioForceTemplate reinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+
+        assertEquals(SynchronizedDeploymentType.SameArc, reinforcements.getSyncDeploymentType());
+        assertEquals(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, reinforcements.getSyncedForceName());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "2, 1 2 3", "3, 2 3 4", "4, 3 4 5", "6, 5 6 7", "8, 7 8 1", "9, 9", "10, 10" })
+    void defaultReinforcementsDeployInPlayerArc(int playerZone, String expectedArc) {
+        Set<Integer> expectedZones = Arrays.stream(expectedArc.split(" "))
+                                           .map(Integer::valueOf)
+                                           .collect(Collectors.toSet());
+
+        for (int attempt = 0; attempt < 100; attempt++) {
+            ScenarioForceTemplate playerTemplate = new ScenarioForceTemplate();
+            playerTemplate.setForceName(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+            playerTemplate.setDeploymentZones(List.of(playerZone));
+            playerTemplate.setActualDeploymentZone(Board.START_NONE);
+            playerTemplate.setSyncDeploymentType(SynchronizedDeploymentType.None);
+
+            ScenarioForceTemplate reinforcements = ScenarioForceTemplate.getDefaultReinforcementsTemplate();
+
+            ScenarioTemplate scenarioTemplate = new ScenarioTemplate();
+            scenarioTemplate.getScenarioForces().put(playerTemplate.getForceName(), playerTemplate);
+            scenarioTemplate.getScenarioForces().put(reinforcements.getForceName(), reinforcements);
+
+            AtBDynamicScenario scenario = new AtBDynamicScenario();
+            scenario.setTemplate(scenarioTemplate);
+
+            int zone = AtBDynamicScenarioFactory.calculateDeploymentZone(reinforcements,
+                  scenario,
+                  reinforcements.getForceName());
+
+            assertTrue(expectedZones.contains(zone),
+                  "Reinforcements deployed to " + zone + " outside player arc " + expectedZones);
+        }
     }
 
     /**
