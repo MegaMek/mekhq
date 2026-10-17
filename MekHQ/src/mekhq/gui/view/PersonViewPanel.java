@@ -70,39 +70,17 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.jfree.chart.ChartColor.DARK_BLUE;
 import static org.jfree.chart.ChartColor.DARK_RED;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nullable;
@@ -285,33 +263,24 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
-        GridBagConstraints tabbedPaneConstraints = new GridBagConstraints();
-        tabbedPaneConstraints.gridx = 0;
-        tabbedPaneConstraints.gridy = gridY;
-        tabbedPaneConstraints.fill = GridBagConstraints.BOTH;
-        tabbedPaneConstraints.anchor = GridBagConstraints.NORTHWEST;
-        tabbedPaneConstraints.insets = new Insets(0, 5, 0, 10);
-        tabbedPaneConstraints.weightx = 1.0;
-        tabbedPaneConstraints.weighty = 1.0;
-        tabbedPaneConstraints.gridwidth = 2;
-        add(tabbedPane, tabbedPaneConstraints);
-        gridY++;
+        // Each entry is one section of the person's details: shown as a tab normally, or stacked on one
+        // scrolling page when the player has turned the tabs off in the client options.
+        Map<String, JPanel> sections = new LinkedHashMap<>();
 
         JPanel pnlProfileTab = new JPanel();
         pnlProfileTab.setLayout(new GridBagLayout());
         initializeMechanics(pnlProfileTab);
-        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlProfileTab.title"), pnlProfileTab);
+        sections.put(getTextAt(RESOURCE_BUNDLE, "pnlProfileTab.title"), pnlProfileTab);
 
         JPanel pnlBiographyTab = new JPanel();
         pnlBiographyTab.setLayout(new GridBagLayout());
         initializeBiography(pnlBiographyTab, pnlPortrait);
-        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlBiographyTab.title"), pnlBiographyTab);
+        sections.put(getTextAt(RESOURCE_BUNDLE, "pnlBiographyTab.title"), pnlBiographyTab);
 
         JPanel pnlGenealogy = new JPanel();
         pnlGenealogy.setLayout(new GridBagLayout());
         initializeGenealogy(pnlGenealogy);
-        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlGenealogy.title"), pnlGenealogy);
+        sections.put(getTextAt(RESOURCE_BUNDLE, "pnlGenealogy.title"), pnlGenealogy);
 
         // The Clan counterpart to Genealogy, for whom descent runs through a Bloodname House rather
         // than a family. Added alongside Genealogy rather than in place of it, because Clan characters
@@ -324,20 +293,35 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlBloodname = new JPanel();
             pnlBloodname.setLayout(new GridBagLayout());
             initializeBloodname(pnlBloodname);
-            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlBloodname.title"), pnlBloodname);
+            sections.put(getTextAt(RESOURCE_BUNDLE, "pnlBloodname.title"), pnlBloodname);
         }
 
         JPanel pnlPersonnelRecordTab = new JPanel();
         pnlPersonnelRecordTab.setLayout(new GridBagLayout());
         initializeLogs(pnlPersonnelRecordTab);
-        tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlPersonnelRecordTab.title"), pnlPersonnelRecordTab);
+        sections.put(getTextAt(RESOURCE_BUNDLE, "pnlPersonnelRecordTab.title"), pnlPersonnelRecordTab);
 
         if (campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
             JPanel pnlFamiliarityTab = new JPanel();
             pnlFamiliarityTab.setLayout(new GridBagLayout());
             initializeFamiliarity(pnlFamiliarityTab);
-            tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.title"), pnlFamiliarityTab);
+            sections.put(getTextAt(RESOURCE_BUNDLE, "pnlFamiliarityTab.title"), pnlFamiliarityTab);
         }
+
+        JComponent pnlSections = MekHQ.getMHQOptions().isPersonViewSinglePage() ?
+                                       stackSections(sections) :
+                                       tabSections(sections);
+        GridBagConstraints sectionsConstraints = new GridBagConstraints();
+        sectionsConstraints.gridx = 0;
+        sectionsConstraints.gridy = gridY;
+        sectionsConstraints.fill = GridBagConstraints.BOTH;
+        sectionsConstraints.anchor = GridBagConstraints.NORTHWEST;
+        sectionsConstraints.insets = new Insets(0, 5, 0, 10);
+        sectionsConstraints.weightx = 1.0;
+        sectionsConstraints.weighty = 1.0;
+        sectionsConstraints.gridwidth = 2;
+        add(pnlSections, sectionsConstraints);
+        gridY++;
 
         // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
@@ -348,6 +332,78 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    /**
+     * Places each section on its own tab, which is the default way of showing a person's details.
+     *
+     * @param sections the section panels, keyed by their titles, in display order
+     *
+     * @return the tabbed pane holding the sections
+     */
+    private static JComponent tabSections(Map<String, JPanel> sections) {
+        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
+        for (Map.Entry<String, JPanel> section : sections.entrySet()) {
+            tabbedPane.addTab(section.getKey(), section.getValue());
+        }
+        return tabbedPane;
+    }
+
+    /**
+     * Stacks every section on one page under a heading, for players who would rather scroll than switch
+     * tabs. Sections with nothing to show are left out, as an empty heading would only be noise.
+     *
+     * @param sections the section panels, keyed by their titles, in display order
+     *
+     * @return the panel holding the stacked sections
+     */
+    private static JComponent stackSections(Map<String, JPanel> sections) {
+        JPanel pnlStacked = new JPanel(new GridBagLayout());
+        int gridY = 0;
+        for (Map.Entry<String, JPanel> section : sections.entrySet()) {
+            if (!hasContent(section.getValue())) {
+                continue;
+            }
+
+            JLabel lblHeading = new JLabel(section.getKey());
+            lblHeading.setFont(lblHeading.getFont().deriveFont(Font.BOLD, lblHeading.getFont().getSize2D() + 2f));
+            GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets((gridY == 0) ? 0 : 10, 0, 2, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStacked.add(lblHeading, gridBagConstraints);
+            gridY++;
+
+            gridBagConstraints.gridy = gridY++;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            pnlStacked.add(new JSeparator(), gridBagConstraints);
+
+            gridBagConstraints.gridy = gridY++;
+            gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            pnlStacked.add(section.getValue(), gridBagConstraints);
+        }
+        addGlue(gridY, pnlStacked);
+        return pnlStacked;
+    }
+
+    /**
+     * Whether a section shows anything beyond the glue every section ends with.
+     *
+     * @param section the section panel to check
+     *
+     * @return {@code true} if the section holds at least one real component
+     */
+    private static boolean hasContent(JPanel section) {
+        for (Component component : section.getComponents()) {
+            if (!(component instanceof Box.Filler)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void initializeFamiliarity(JPanel pnlFamiliarityTab) {

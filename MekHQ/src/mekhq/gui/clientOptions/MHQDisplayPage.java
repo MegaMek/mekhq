@@ -109,6 +109,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkPersonnelFilterOnPrimaryRole;
     private SettingsCheckBox chkUnifiedDailyReport;
     private SettingsCheckBox chkEnableDailyReportAggregateTab;
+    private SettingsCheckBox chkPersonViewSinglePage;
 
     MHQDisplayPage(MHQOptionsModel model) {
         super(model);
@@ -418,12 +419,14 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkUnifiedDailyReport = checkBox("chkUnifiedDailyReport", model.unifiedDailyReport);
         chkEnableDailyReportAggregateTab = checkBox("chkEnableDailyReportAggregateTab", model.aggregateDailyReport,
               getMetadata(null, CampaignOptionFlag.IMPORTANT));
+        chkPersonViewSinglePage = checkBox("chkPersonViewSinglePage", model.personViewSinglePage,
+              getMetadata(new Version(0, 51, 1)));
 
         SettingsFormPanel panel = new SettingsFormPanel("MHQDisplayPersonnelContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addRow(filterStyleLabel, comboPersonnelFilterStyle);
         panel.addCheckBoxGrid(2, chkPersonnelFilterOnPrimaryRole, chkUnifiedDailyReport,
-              chkEnableDailyReportAggregateTab);
+              chkEnableDailyReportAggregateTab, chkPersonViewSinglePage);
 
         return panel;
     }
@@ -481,5 +484,6 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.personnelFilterOnPrimaryRole = chkPersonnelFilterOnPrimaryRole.isSelected();
         model.unifiedDailyReport = chkUnifiedDailyReport.isSelected();
         model.aggregateDailyReport = chkEnableDailyReportAggregateTab.isSelected();
+        model.personViewSinglePage = chkPersonViewSinglePage.isSelected();
     }
 }
