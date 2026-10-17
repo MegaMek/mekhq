@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static megamek.client.ratgenerator.RATGenerator.getFactionLogo;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
@@ -65,10 +66,10 @@ import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -6208,7 +6209,7 @@ public class Campaign implements ITechManager {
         StandardFormationIcon campaignIcon = getPlayerForce().getUnitIcon();
 
         if (campaignIcon.getFilename() == null) {
-            icon = getFactionLogo(currentDay.getYear(), getPlayerForce().getFaction().getShortName());
+            icon = getFactionLogo(currentDay.getYear(), getPlayerForce().getFaction().getShortName(), Color.BLACK);
         } else {
             icon = campaignIcon.getImageIcon();
         }

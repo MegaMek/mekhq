@@ -6711,7 +6711,7 @@ public class InterstellarMapPanel extends JPanel {
         if ((priority >= 0) || faction.isIndependent() || faction.is(FactionTag.ABANDONED)) {
             return priority;
         }
-        return FactionMapLogo.hasCustomLogo(gameYear, faction.getShortName()) ? 1 : -1;
+        return FactionMapLogo.hasIcon(gameYear, faction.getShortName()) ? 1 : -1;
     }
 
     static int resolveLogoSize(double size, int minimumSize, int maximumSize) {

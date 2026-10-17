@@ -106,6 +106,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
@@ -1238,7 +1239,7 @@ public class PersonViewPanel extends JScrollablePanel {
         lblEmblem.setName("lblClanEmblem" + gridX);
         // Matches how faction emblems are rendered elsewhere - fetch, then scale - rather than the
         // combined call, which is not the path the rest of the GUI uses.
-        ImageIcon emblem = Factions.getFactionLogo(campaign.getGameYear(), faction.getShortName());
+        ImageIcon emblem = RATGenerator.getFactionLogo(campaign.getGameYear(), faction.getShortName(), BLACK);
         emblem = ImageUtilities.scaleImageIcon(emblem, CLAN_EMBLEM_WIDTH, true);
         if ((emblem == null) || (emblem.getIconWidth() <= 0)) {
             LOGGER.warn("[Bloodhouse][Emblem] no usable emblem image for {} in {}",

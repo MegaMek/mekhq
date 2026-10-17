@@ -1209,21 +1209,6 @@ public class Person implements ILocatable {
                      portrait.getImageIcon(targetPixelWidth);
     }
 
-    /**
-     * Retrieves a fallback portrait image when no specific portrait is available.
-     *
-     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
-     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
-     *
-     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private ImageIcon getFallbackPortrait() {
-        return Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
-    }
-
     private ImageIcon getFallbackPortrait(int targetPixelWidth) {
         return Factions.getFactionLogoWithScaling(birthday.getYear(), originFaction.getShortName(),
               targetPixelWidth);

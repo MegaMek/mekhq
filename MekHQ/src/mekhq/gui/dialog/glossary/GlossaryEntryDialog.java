@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import static mekhq.gui.dialog.glossary.GlossaryDialog.glossaryEntries;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -45,6 +46,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.FlatLafStyleBuilder;
@@ -55,7 +57,6 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MekHQ;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -82,7 +83,7 @@ public class GlossaryEntryDialog extends JDialog {
     /**
      * The list of faction codes eligible for random selection as glossary tab images.
      *
-     * @see Factions#getFactionLogo(int, String)
+     * @see RATGenerator#getFactionLogo(int, String, Color)
      */
     private final List<String> FACTION_CODES_FOR_IMAGE = List.of("ARC",
           "ARD",
@@ -374,7 +375,7 @@ public class GlossaryEntryDialog extends JDialog {
         String randomFactionCode = ObjectUtility.getRandomItem(FACTION_CODES_FOR_IMAGE);
 
         // game year is largely irrelevant for the glossary dialog
-        ImageIcon baseImage = Factions.getFactionLogo(3025, randomFactionCode);
+        ImageIcon baseImage = RATGenerator.getFactionLogo(3025, randomFactionCode, Color.BLACK);
 
         return ImageUtilities.scaleImageIcon(baseImage, 100, false);
     }

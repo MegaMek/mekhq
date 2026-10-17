@@ -38,11 +38,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import jakarta.annotation.Nullable;
-import megamek.common.preference.PreferenceManager;
-import megamek.common.universe.Factions2;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
-import mekhq.campaign.universe.Factions;
 
 /** Resolves Java2D territory emblems without changing logos used by other screens or renderers. */
 final class FactionMapLogo {
@@ -51,41 +48,15 @@ final class FactionMapLogo {
     private FactionMapLogo() {
     }
 
-    static boolean hasCustomLogo(int gameYear, String factionCode) {
-        return Factions.getCanonicalFactionLogoAddress(gameYear, factionCode) == null
-                     && getConfiguredLogo(gameYear, factionCode) != null;
+    /**
+     * @return {@code true} if the faction (or, for a command, one of its parents) has an icon for the given year
+     */
+    static boolean hasIcon(int gameYear, String factionCode) {
+        return RATGenerator.getCanonicalFactionLogoAddress(gameYear, factionCode) != null;
     }
 
     static @Nullable BufferedImage load(int gameYear, String factionCode) {
-        String canonicalAddress = Factions.getCanonicalFactionLogoAddress(gameYear, factionCode);
-        if (canonicalAddress != null) {
-            return readImage(new File(canonicalAddress));
-        }
-
-        String configuredLogo = getConfiguredLogo(gameYear, factionCode);
-        if (configuredLogo != null) {
-            File logoDirectory = new File(MHQConstants.FORCE_ICON_PATH, MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH);
-            File logoFile = new File(logoDirectory, configuredLogo);
-            String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-            if (!userDirectory.isBlank()) {
-                File userLogo = new File(userDirectory, logoFile.toString());
-                if (userLogo.isFile()) {
-                    logoFile = userLogo;
-                }
-            }
-            BufferedImage image = readImage(logoFile);
-            if (image != null) {
-                return image;
-            }
-        }
-        return readImage(new File(Factions.getFactionLogoAddress(gameYear, factionCode)));
-    }
-
-    private static @Nullable String getConfiguredLogo(int gameYear, String factionCode) {
-        return Factions2.getInstance().getFaction(factionCode)
-                     .map(faction -> faction.getLogo(gameYear))
-                     .filter(logo -> !logo.isBlank())
-                     .orElse(null);
+        return readImage(new File(RATGenerator.getFactionLogoAddress(gameYear, factionCode)));
     }
 
     private static @Nullable BufferedImage readImage(File file) {
