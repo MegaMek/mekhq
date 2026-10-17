@@ -43,7 +43,6 @@ MekActuator | Upper Arm Actuator | location RA (4) | equipment - | quantity 1
 MekActuator | Upper Leg Actuator | location LL (7) | equipment - | quantity 1
 MekActuator | Upper Leg Actuator | location RL (6) | equipment - | quantity 1
 MekCockpit | Interface Cockpit | location HD (0) | equipment - | quantity 1
-MekGyro | None | location CT (1) | equipment - | quantity 1
 MekLifeSupport | Mek Life Support System | location HD (0) | equipment - | quantity 1
 MekLocation | Mek Center Torso (Clan Endo Steel) | location CT (1) | equipment - | quantity 1
 MekLocation | Mek Head (Clan Endo Steel) | location HD (0) | equipment - | quantity 1

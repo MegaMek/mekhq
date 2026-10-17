@@ -1,0 +1,203 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-d537-71b8-98a3-1ec713e23677
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Doloire
+model:DLR-OC
+mul id:6681
+
+Config:Biped OmniMek
+techbase:Mixed (IS Chassis)
+era:3121
+source:TR:3145:RotS,TR:DA
+published:RS:DA
+rules level:3
+role:Juggernaut
+
+quirk:command_mech
+quirk:multi_trac
+
+mass:80
+engine:320 XL (Clan) Engine
+structure:IS Endo-Composite
+myomer:Standard
+
+heat sinks:12 IS Double
+base chassis heat sinks:12
+walk mp:4
+jump mp:0
+
+armor:Standard(Inner Sphere)
+LA armor:24
+RA armor:24
+LT armor:26
+RT armor:26
+CT armor:38
+HD armor:9
+LL armor:30
+RL armor:30
+RTL armor:7
+RTR armor:7
+RTC armor:11
+
+Weapons:8
+Streak SRM 6, Left Leg
+Streak SRM 6, Right Leg
+LRM 20, Right Arm
+ER Small Pulse Laser, Left Torso
+C3 Computer (Master), Left Torso
+Streak SRM 6, Right Torso
+ER Medium Laser, Center Torso
+ER Medium Laser, Center Torso
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+IS Lance (OMNIPOD)
+IS Lance (OMNIPOD)
+IS Lance (OMNIPOD)
+IS Lance (OMNIPOD)
+ISAES
+ISAES
+ISAES
+ISAES
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+CLLRM20 (OMNIPOD)
+CLLRM20 (OMNIPOD)
+CLLRM20 (OMNIPOD)
+CLLRM20 (OMNIPOD)
+CLArtemisV (OMNIPOD)
+CLArtemisV (OMNIPOD)
+ISAES
+ISAES
+ISAES
+ISAES
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+CLERSmallPulseLaser (OMNIPOD)
+ISC3MasterUnit (OMNIPOD)
+ISC3MasterUnit (OMNIPOD)
+ISC3MasterUnit (OMNIPOD)
+ISC3MasterUnit (OMNIPOD)
+ISC3MasterUnit (OMNIPOD)
+IS Endo-Composite
+IS Endo-Composite
+IS Endo-Composite
+IS Endo-Composite
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+CLStreakSRM6 (OMNIPOD)
+CLStreakSRM6 (OMNIPOD)
+Clan Streak SRM 6 Ammo (OMNIPOD)
+Clan Streak SRM 6 Ammo (OMNIPOD)
+Clan Ammo LRM-20 (Clan) Artemis V-capable (OMNIPOD)
+Clan Ammo LRM-20 (Clan) Artemis V-capable (OMNIPOD)
+Clan Ammo LRM-20 (Clan) Artemis V-capable (OMNIPOD)
+ISCASEII (OMNIPOD)
+IS Endo-Composite
+IS Endo-Composite
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+CLERMediumLaser
+CLERMediumLaser
+
+Head:
+Life Support
+Sensors
+Cockpit
+IS Endo-Composite
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+CLStreakSRM6 (OMNIPOD)
+CLStreakSRM6 (OMNIPOD)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+CLStreakSRM6 (OMNIPOD)
+CLStreakSRM6 (OMNIPOD)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Doloire is an eighty-ton assault OmniMech introduced in 3121 as the flagship design of the Republic Armed Forces. Produced by StarCorps Industries on Terra, the Doloire was conceived as a tangible symbol of cooperation between the Republic of the Sphere's Inner Sphere and Clan populations, drawing on scientists from the Clan enclaves within Republican borders to create a design blending both technological traditions. Built with mixed Inner Sphere and Clan technology, the Doloire was intended to serve as a prestigious command platform, frequently assigned to promising young officers seeking to distinguish themselves in battle. Its status as both a military asset and a political statement ensured that the Doloire received attention and resources far exceeding those afforded to more common assault designs.</p>
+
+capabilities:<p>The Doloire's chassis is built around a Clan-manufactured 320-rated extra-light engine, which provides a respectable top speed of sixty-four kilometers per hour while offering greater survivability than a comparable Inner Sphere XL engine. The use of an endo-composite internal structure saves weight without fully committing to either Clan or Inner Sphere engineering paradigms, freeing up mass for nearly fifteen tons of ArcShield VII Mk.7 standard armor that provides substantial protection across all locations. Twelve double heat sinks handle baseline thermal loads, while thirty-two tons of pod space give technicians considerable latitude in tailoring the design to specific mission profiles.</p><p>Two Clan Series 2f extended-range medium lasers are permanently mounted in the center torso, ensuring the Doloire is never completely disarmed regardless of pod configuration. All configurations benefit from integrated actuator enhancement systems built into the arm assemblies, improving weapon accuracy during close engagements. In its Prime configuration, the Doloire carries a pair of Clan large pulse lasers augmented by these actuator enhancements, a Clan Gauss rifle for long-range striking power, and an Angel ECM suite providing electronic warfare capability. This combination of accurate energy weapons, ballistic firepower, and electronic protection makes the Prime a versatile command platform well-suited to leading combined-arms formations.</p>
+
+deployment:<p>Alternate Configuration C serves as a missile-heavy command variant designed to provide fire support while coordinating lance-level operations. A Clan twenty-tube long-range missile launcher with Artemis V fire control in the right arm delivers accurate indirect fire, supplemented by three Clan Streak SRM-6 launchers distributed across both legs and the right torso for close-range defense. A lance mounted on the left arm provides a melee option against opponents that close to physical combat range, while an extended-range small pulse laser augments the fixed laser array. A C3 master computer fitted in the left torso enables the pilot to coordinate targeting data across a networked lance, making this configuration a natural choice for officers directing combined operations.</p>
+
+history:<p>The Doloire emerged from the Republic of the Sphere's ambitious effort to forge a unified military identity from the diverse populations within its borders. Following the Republic's founding, officials recognized that a prestige OmniMech incorporating both Inner Sphere and Clan technology would serve as a powerful symbol of their cooperative vision. StarCorps Industries on Terra was selected as the manufacturer, leveraging scientists from the Clan enclaves established within Republican territory. When the design entered production in 3121, it represented one of the most sophisticated mixed-technology platforms of its era, and the Republic Armed Forces quickly adopted it as a flagship assault 'Mech assigned to its most promising officers.</p><p>The Doloire saw widespread deployment across every regiment of the RAF during the Republic's peak, serving as both a potent battlefield asset and a visible embodiment of Republican ideals. Its status as a command platform made it a high-priority target in engagements, and the design's reputation as both a powerful and prestigious machine ensured that captured examples were highly prized by opposing forces. When Fortress Republic was raised and the Republic withdrew behind its protective barrier, StarCorps continued and even accelerated Doloire production as part of the clandestine military buildup occurring behind the Fortress walls.</p><p>Outside the Fortress, the Doloire's fortunes became more fragmented. Republic Remnant units retained several examples, while mercenary commands that had served alongside the RAF managed to hold onto their machines. During the Capellan Confederation's expansion into former Republican territory in the mid-3130s, several engagements featured Doloires on the defensive. The Capellan assault on Azha in 3136, where a small mercenary unit attempted to hold a critical river crossing against advancing Confederation forces, demonstrated both the design's combat effectiveness and the limitations of isolated units facing superior numbers. At least one Doloire was subsequently salvaged by Capellan forces, and the Confederation's growing access to advanced technology ensured these captured machines could be maintained and deployed.</p><p>The Blessed Order's revival of ComStar's First Division saw the Doloire adopted in a custom configuration optimized for the Order's networked combat doctrine, further demonstrating the design's adaptability to different organizational philosophies. As the ilClan era dawned and the political theater of the Inner Sphere continued to shift, the Doloire remained a respected if relatively uncommon assault platform, its mixed-technology heritage serving as a lasting reminder of the Republic's attempt to bridge the divide between Inner Sphere and Clan traditions.</p>
+
+manufacturer:StarCorps Industries
+
+primaryfactory:Terra
+
+fluffdate:2026-02-21 18:07:19
+
+systemmanufacturer:CHASSIS:Titan
+systemmode:CHASSIS:Special-DAA Endo-Composite
+systemmanufacturer:ENGINE:Light Force
+systemmode:ENGINE:320 XL
+systemmanufacturer:ARMOR:ArcShield
+systemmode:ARMOR:VII Mk.7
+systemmanufacturer:COMMUNICATIONS:Telestar
+systemmode:COMMUNICATIONS:Model XTD-131
+systemmanufacturer:TARGETING:Starlight
+systemmode:TARGETING:Adjustable LX-8

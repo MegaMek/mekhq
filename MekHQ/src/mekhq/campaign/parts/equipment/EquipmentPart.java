@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
@@ -591,6 +592,12 @@ public class EquipmentPart extends Part {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder details = new StringBuilder(super.getDetails(includeRepairDetails));
 
+        if (hasVariableTonnage(type)) {
+            appendDetail(details, getFormattedTextAt("mekhq.resources.Parts", "EquipmentPart.tonnage", getTonnage()));
+        }
+        if (isBattleArmorOnly(type)) {
+            appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.battleArmor"));
+        }
         if (isArmored()) {
             appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.armored"));
         }
@@ -601,6 +608,30 @@ public class EquipmentPart extends Part {
             appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.directionalMountLocked"));
         }
         return details.toString();
+    }
+
+    /**
+     * A targeting computer, club, talon or shield comes in many weights, and its price follows its own weight, so its
+     * details show that weight rather than the weight of the unit it is for. Store stock has no unit, so it showed
+     * "0 tons" for every weight.
+     */
+    @Override
+    protected boolean showsUnitTonnageInDetails() {
+        return super.showsUnitTonnageInDetails() && !hasVariableTonnage(type);
+    }
+
+    /**
+     * @return {@code true} for equipment only battle armor can mount. Some of it shares its name with the equipment
+     *       other units mount, such as the battle armor Small VSP Laser, which weighs 0.5 tons to the Mek version's 2.
+     */
+    private static boolean isBattleArmorOnly(@Nullable EquipmentType equipmentType) {
+        if (equipmentType instanceof WeaponType) {
+            return equipmentType.hasFlag(WeaponType.F_BA_WEAPON) && !equipmentType.hasFlag(WeaponType.F_MEK_WEAPON);
+        }
+        if (equipmentType instanceof MiscType) {
+            return equipmentType.hasFlag(MiscType.F_BA_EQUIPMENT) && !equipmentType.hasFlag(MiscType.F_MEK_EQUIPMENT);
+        }
+        return false;
     }
 
     private static void appendDetail(StringBuilder details, String note) {
