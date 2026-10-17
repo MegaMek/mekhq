@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.parts;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -160,6 +162,42 @@ class RefitDesignMatchTest {
         Unit refittedPlatoon = mock(Unit.class);
         when(refittedPlatoon.getEntity()).thenReturn(refit.getNewEntity());
         assertFalse(campaign.isCustom(refittedPlatoon));
+    }
+
+    /**
+     * A refitted unit is a new design, so it must not keep the unit file identity of the design it was refitted from.
+     * It takes the identity of the saved design it now uses, so a campaign reload finds that exact file.
+     */
+    @Test
+    void refitUsingASavedDesignTakesThatDesignsIdentity() {
+        PartsScenario scenario = PartsScenario.create();
+        Unit platoon = scenario.withUnit(UnitFixture.FOOT_PLATOON_MG);
+        Entity designed = UnitFixture.FOOT_PLATOON_LASER.loadEntity();
+        String identityBeforeRefit = designed.getUnitFileUUID();
+        Refit refit = new Refit(platoon, designed, true, false, false);
+        String savedDesignIdentity = renamed(UnitFixture.FOOT_PLATOON_LASER).getUnitFileUUID();
+        MekSummary savedDesign = mock(MekSummary.class);
+        when(savedDesign.getUnitFileUUID()).thenReturn(savedDesignIdentity);
+
+        refit.useSavedDesign(savedDesign);
+
+        assertEquals(savedDesignIdentity, refit.getNewEntity().getUnitFileUUID());
+        assertNotEquals(identityBeforeRefit, refit.getNewEntity().getUnitFileUUID());
+    }
+
+    /** An older saved file may have no identity yet; the refitted unit then gets a fresh one of its own. */
+    @Test
+    void refitUsingASavedDesignWithoutAnIdentityGetsANewOne() {
+        PartsScenario scenario = PartsScenario.create();
+        Unit platoon = scenario.withUnit(UnitFixture.FOOT_PLATOON_MG);
+        Entity designed = UnitFixture.FOOT_PLATOON_LASER.loadEntity();
+        String identityBeforeRefit = designed.getUnitFileUUID();
+        Refit refit = new Refit(platoon, designed, true, false, false);
+        MekSummary savedDesign = mock(MekSummary.class);
+
+        refit.useSavedDesign(savedDesign);
+
+        assertNotEquals(identityBeforeRefit, refit.getNewEntity().getUnitFileUUID());
     }
 
     @Test

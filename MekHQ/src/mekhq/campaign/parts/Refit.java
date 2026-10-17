@@ -50,6 +50,7 @@ import java.util.*;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.battleArmor.BattleArmor;
@@ -2187,10 +2188,20 @@ public class Refit extends Part implements IAcquisitionWork {
      * is taken, and {@link RefitDesignMatch} found the saved unit to be this same design. A saved custom unit is listed
      * among the campaign's customs, so the campaign file keeps its design as it would for a newly saved one.
      *
+     * <p>A refitted unit is a new design, so it never keeps the unit file identity of the design it was refitted
+     * from. It takes the saved design's identity, so a campaign reload finds that exact file, or a fresh one if the
+     * saved file has none yet.</p>
+     *
      * @param savedDesign the summary of the unit saved under the new design's name
      */
     public void useSavedDesign(MekSummary savedDesign) {
         isSavingFile = false;
+        String savedUnitFileUUID = savedDesign.getUnitFileUUID();
+        if (StringUtility.isNullOrBlank(savedUnitFileUUID)) {
+            newEntity.regenerateUnitFileUUID();
+        } else {
+            newEntity.setUnitFileUUID(savedUnitFileUUID);
+        }
         if (!savedDesign.isCanon()) {
             getCampaign().addCustom(newEntity.getShortNameRaw());
         }
