@@ -129,10 +129,6 @@ public class EasyBugReport {
     private static final String ROLLED_LOG_EXTENSION = ".log.gz";
 
     /**
-     * The game dataset log MegaMek's server writes per game when dataset logging is on, as
-     * {@code game_actions_<counter>.tsv} or with a date stamp. See {@code megamek.common.game.GameDatasetLogger}.
-     */
-    /**
      * Archive sub-directory for MegaMek's newest in-battle autosave, kept apart from the campaign save at the root so
      * the two cannot be confused. Kept the same as MegaMek's own bug report bundle.
      */
@@ -146,6 +142,10 @@ public class EasyBugReport {
     private static final String BATTLE_AUTOSAVE_MARKER = "autosave";
     private static final String BATTLE_AUTOSAVE_EXTENSION = ".sav.gz";
 
+    /**
+     * The game dataset log MegaMek's server writes per game when dataset logging is on, as
+     * {@code game_actions_<counter>.tsv} or with a date stamp. See {@code megamek.common.game.GameDatasetLogger}.
+     */
     private static final String GAME_DATASET_PREFIX = "game_actions_";
     private static final String GAME_DATASET_EXTENSION = ".tsv";
 
