@@ -5834,6 +5834,10 @@ public class Unit implements ITechnology, ILocatable {
             processUnitSPAs(commander);
         }
 
+        // A ship or infantry unit that maintains itself needs its engineer chosen again whenever its crew changes,
+        // whatever the ability options are, or it is left with no tech until the next day
+        resetEngineer();
+
         if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
             convInfantry.setArmorKit(EquipmentType.get(armorKitName));
         }
@@ -6201,11 +6205,6 @@ public class Unit implements ITechnology, ILocatable {
             if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
-
-            // Reset the composite technician used by spacecraft and infantry
-            // Important if you just changed technician edge options for members of either
-            // unit type
-            resetEngineer();
 
             // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect the unit's current
             //  crew size vs its required crew size. There's also the question of what to do with extra crew quarters
