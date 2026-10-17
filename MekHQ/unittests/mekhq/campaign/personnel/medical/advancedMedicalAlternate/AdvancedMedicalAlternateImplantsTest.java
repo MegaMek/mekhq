@@ -35,12 +35,15 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_EI_IMPLANT;
+import static megamek.common.options.OptionsConstants.MD_PL_MASC;
+import static megamek.common.options.OptionsConstants.MD_TSM_IMPLANT;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PAINKILLER_ADDICTION;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_UNFIT;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,10 +63,14 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
+import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -73,6 +80,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheck;
@@ -81,7 +89,10 @@ import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
+import testUtilities.MHQTestUtilities;
 
 class AdvancedMedicalAlternateImplantsTest {
     // region getFrequency
@@ -344,7 +355,224 @@ class AdvancedMedicalAlternateImplantsTest {
         verify(armorOption).setValue(false);
         verify(camoOption).setValue(false);
     }
+
+    @Test
+    @DisplayName("checkForDermalEligibility enables triple-strength myomer with four limbs and leg MASC with two legs")
+    void checkForDermalEligibility_enablesTripleStrengthAndLegMasc() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        IOption tsmOption = mock(IOption.class);
+        IOption mascOption = mock(IOption.class);
+
+        List<Injury> prostheticInjuries = List.of(
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE),
+              prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC),
+              prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
+        when(person.getOptions()).thenReturn(options);
+        when(options.getOption(MD_TSM_IMPLANT)).thenReturn(tsmOption);
+        when(options.getOption(MD_PL_MASC)).thenReturn(mascOption);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        verify(tsmOption).setValue(true);
+        verify(mascOption).setValue(true);
+    }
+
+    @Test
+    @DisplayName("checkForDermalEligibility disables leg MASC when only one leg carries it")
+    void checkForDermalEligibility_disablesLegMascWithOneLeg() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        IOption mascOption = mock(IOption.class);
+
+        List<Injury> prostheticInjuries = List.of(prostheticInjury(AlternateInjuries.PROSTHETIC_LEG_MASC));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
+        when(person.getOptions()).thenReturn(options);
+        when(options.getOption(MD_PL_MASC)).thenReturn(mascOption);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        verify(mascOption).setValue(false);
+    }
+
+    @Test
+    @DisplayName("checkForDermalEligibility disables triple-strength myomer when fewer than four limbs are covered")
+    void checkForDermalEligibility_disablesTripleStrengthWithThreeLimbs() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        IOption tsmOption = mock(IOption.class);
+
+        List<Injury> prostheticInjuries = List.of(
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE),
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_TRIPLE));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
+        when(person.getOptions()).thenReturn(options);
+        when(options.getOption(MD_TSM_IMPLANT)).thenReturn(tsmOption);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        verify(tsmOption).setValue(false);
+    }
+
+    @Test
+    @DisplayName("checkForDermalEligibility skips implants the person's options do not carry")
+    void checkForDermalEligibility_toleratesMissingOptions() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        when(person.getProstheticInjuries()).thenReturn(List.of());
+        when(person.getOptions()).thenReturn(options);
+
+        assertDoesNotThrow(() -> AdvancedMedicalAlternateImplants.checkForDermalEligibility(person));
+    }
     // endregion checkForDermalEligibility
+
+    // region recordImplantProsthetics
+    /**
+     * Every implant the Manei Domini catalogue issues, bar the triple-core processor, which only has a prosthetic
+     * alongside a buffered VDNI.
+     */
+    static Stream<String> recordableImplants() {
+        return Stream.of(OptionsConstants.MD_BOOST_COMM_IMPLANT, OptionsConstants.MD_BVDNI,
+              OptionsConstants.MD_COMM_IMPLANT, OptionsConstants.MD_CYBER_IMP_AUDIO,
+              OptionsConstants.MD_CYBER_IMP_LASER, OptionsConstants.MD_CYBER_IMP_TELE,
+              OptionsConstants.MD_CYBER_IMP_VISUAL, OptionsConstants.MD_ENH_MM_IMPLANTS,
+              OptionsConstants.MD_MM_IMPLANTS, OptionsConstants.MD_PAIN_SHUNT, OptionsConstants.MD_VDNI,
+              OptionsConstants.MD_DERMAL_ARMOR, OptionsConstants.MD_DERMAL_CAMO_ARMOR, MD_TSM_IMPLANT,
+              OptionsConstants.MD_GAS_EFFUSER_PHEROMONE, OptionsConstants.MD_GAS_EFFUSER_TOXIN,
+              OptionsConstants.MD_PL_ENHANCED, OptionsConstants.MD_PL_I_ENHANCED, MD_PL_MASC,
+              OptionsConstants.MD_PL_EXTRA_LIMBS, OptionsConstants.MD_PL_TAIL, OptionsConstants.MD_PL_GLIDER,
+              OptionsConstants.MD_PL_FLIGHT, OptionsConstants.MD_SUICIDE_IMPLANTS);
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "recordableImplants")
+    @DisplayName("recordImplantProsthetics puts every Manei Domini implant into the medical record")
+    void recordImplantProsthetics_recordsEveryImplant(String implant) {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+
+        int recorded = AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person, List.of(implant));
+
+        assertTrue(recorded > 0, implant + " has no prosthetic in the medical record");
+        assertEquals(recorded, person.getProstheticInjuries().size());
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics records nothing new when called twice")
+    void recordImplantProsthetics_isIdempotent() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+        List<String> implants = List.of(MD_TSM_IMPLANT, OptionsConstants.MD_PL_GLIDER);
+
+        int first = AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person, implants);
+        int second = AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person, implants);
+
+        assertEquals(5, first, "four limbs of triple-strength myomer, plus one set of wings");
+        assertEquals(0, second);
+        assertEquals(5, person.getProstheticInjuries().size());
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics covers both ears and eyes for multi-modal implants")
+    void recordImplantProsthetics_multiModalCoversEarsAndEyes() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+
+        AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person,
+              List.of(OptionsConstants.MD_MM_IMPLANTS));
+
+        Set<InjuryType> types = person.getProstheticInjuries().stream().map(Injury::getType)
+                                      .collect(Collectors.toSet());
+        assertEquals(Set.of(AlternateInjuries.CYBERNETIC_EAR_MULTI, AlternateInjuries.CYBERNETIC_EYE_MULTI), types);
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics fits leg MASC to both legs")
+    void recordImplantProsthetics_legMascCoversBothLegs() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+
+        AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person, List.of(MD_PL_MASC));
+
+        Set<BodyLocation> locations = person.getProstheticInjuries().stream().map(Injury::getLocation)
+                                            .collect(Collectors.toSet());
+        assertEquals(Set.of(BodyLocation.LEFT_LEG, BodyLocation.RIGHT_LEG), locations);
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics records a triple-core processor with a standard VDNI as the VDNI alone")
+    void recordImplantProsthetics_processorWithStandardVdni() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+
+        int recorded = AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person,
+              List.of(OptionsConstants.MD_VDNI, OptionsConstants.MD_TRIPLE_CORE_PROCESSOR));
+
+        assertEquals(1, recorded);
+        assertEquals(AlternateInjuries.VEHICULAR_DNI, person.getProstheticInjuries().getFirst().getType());
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics ignores options with no prosthetic")
+    void recordImplantProsthetics_ignoresUnmappedOptions() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+
+        int recorded = AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person,
+              List.of("not_an_implant"));
+
+        assertEquals(0, recorded);
+        assertTrue(person.getProstheticInjuries().isEmpty());
+    }
+    // endregion recordImplantProsthetics
+
+    // region recordMissingDerivedImplantProsthetics
+    @Test
+    @DisplayName("recordMissingDerivedImplantProsthetics records missing leg MASC prosthetics, keeping the implant")
+    void recordMissingDerivedImplantProsthetics_grandfathersLegMasc() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+        person.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_PL_MASC, true);
+
+        int recorded = AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(person);
+
+        assertEquals(2, recorded);
+        assertTrue(person.getOptions().booleanOption(MD_PL_MASC));
+    }
+
+    @Test
+    @DisplayName("recordMissingDerivedImplantProsthetics leaves partial coverage for the daily check to resolve")
+    void recordMissingDerivedImplantProsthetics_leavesPartialCoverageAlone() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+        person.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_TSM_IMPLANT, true);
+        person.addInjury(AlternateInjuries.DERMAL_MYOMER_ARM_TRIPLE.newInjury(campaign, person,
+              BodyLocation.LEFT_ARM, 0));
+
+        int recorded = AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+
+        assertEquals(0, recorded, "someone with one limb done has had surgery the daily check already reads");
+        assertEquals(1, person.getProstheticInjuries().size());
+    }
+
+    @Test
+    @DisplayName("recordMissingDerivedImplantProsthetics ignores implants that are not derived from limb coverage")
+    void recordMissingDerivedImplantProsthetics_ignoresOtherImplants() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Person person = new Person(campaign);
+        person.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, OptionsConstants.MD_PAIN_SHUNT, true);
+
+        int recorded = AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+
+        assertEquals(0, recorded, "the pain shunt is never cleared by the daily check, so needs no migration");
+    }
+    // endregion recordMissingDerivedImplantProsthetics
 
     // region giveEIImplant
     @Test

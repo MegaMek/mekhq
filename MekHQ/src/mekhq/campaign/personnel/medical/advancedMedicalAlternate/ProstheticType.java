@@ -56,7 +56,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
@@ -259,7 +258,7 @@ public enum ProstheticType {
           Money.of(2000000),
           PlanetarySystem.PlanetarySophistication.A,
           ATOWLegalityRating.F,
-          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
           false,
           false,
           true,
@@ -357,7 +356,7 @@ public enum ProstheticType {
           List.of(),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_BEAUTY_ENHANCEMENT("COSMETIC_BEAUTY_ENHANCEMENT",
-          STANDARD,
+          ENHANCED,
           5,
           AlternateInjuries.COSMETIC_BEAUTY_ENHANCEMENT,
           Money.of(15000),
@@ -371,7 +370,7 @@ public enum ProstheticType {
           List.of(),
           List.of(ATOW_ATTRACTIVE, COMPULSION_PAINKILLER_ADDICTION)),
     COSMETIC_HORROR_ENHANCEMENT("COSMETIC_HORROR_ENHANCEMENT",
-          STANDARD,
+          ENHANCED,
           5,
           AlternateInjuries.COSMETIC_HORROR_ENHANCEMENT,
           Money.of(15000),
@@ -397,13 +396,13 @@ public enum ProstheticType {
           false,
           List.of()),
     COSMETIC_TAIL_PROSTHETIC("COSMETIC_TAIL_PROSTHETIC",
-          STANDARD,
+          ENHANCED,
           5,
           AlternateInjuries.COSMETIC_TAIL_PROSTHETIC,
           Money.of(60000),
           PlanetarySystem.PlanetarySophistication.B,
           ATOWLegalityRating.B,
-          AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
+          AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E,
           false,
           false,
           false,
@@ -529,7 +528,7 @@ public enum ProstheticType {
           Money.of(17000000),
           PlanetarySystem.PlanetarySophistication.B,
           ATOWLegalityRating.B,
-          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
           false,
           true,
@@ -704,6 +703,62 @@ public enum ProstheticType {
           List.of(),
           List.of(UNOFFICIAL_EI_IMPLANT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    ENHANCED_PROSTHETIC_LIMB("ENHANCED_PROSTHETIC_LIMB",
+          ADVANCED,
+          5,
+          AlternateInjuries.ENHANCED_PROSTHETIC_LIMB,
+          Money.of(50000),
+          PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.D,
+          AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.E,
+          false,
+          false,
+          false,
+          List.of(),
+          List.of(MD_PL_ENHANCED),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    ENHANCED_TAIL_PROSTHETIC("ENHANCED_TAIL_PROSTHETIC",
+          ENHANCED,
+          5,
+          AlternateInjuries.ENHANCED_TAIL_PROSTHETIC,
+          Money.of(60000),
+          PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.F,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of("CC"),
+          List.of(MD_PL_TAIL),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    EXPLOSIVE_SUICIDE_IMPLANT("EXPLOSIVE_SUICIDE_IMPLANT",
+          STANDARD,
+          3,
+          AlternateInjuries.EXPLOSIVE_SUICIDE_IMPLANT,
+          Money.of(250),
+          PlanetarySystem.PlanetarySophistication.D,
+          ATOWLegalityRating.F,
+          AvailabilityValue.B, AvailabilityValue.B, AvailabilityValue.B,
+          false,
+          false,
+          false,
+          List.of(),
+          List.of(MD_SUICIDE_IMPLANTS),
+          List.of()),
+    EXTRANEOUS_PROSTHETIC_LIMBS("EXTRANEOUS_PROSTHETIC_LIMBS",
+          ENHANCED,
+          5,
+          AlternateInjuries.EXTRANEOUS_PROSTHETIC_LIMBS,
+          Money.of(400000),
+          PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of("CC"),
+          List.of(MD_PL_EXTRA_LIMBS),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     EYE_IMPLANT("EYE_IMPLANT",
           SIMPLE,
           2,
@@ -728,6 +783,20 @@ public enum ProstheticType {
           false,
           false,
           List.of()),
+    GLIDER_WINGS("GLIDER_WINGS",
+          ENHANCED,
+          5,
+          AlternateInjuries.GLIDER_WINGS,
+          Money.of(90000),
+          PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.E,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
+          false,
+          false,
+          false,
+          List.of("CC"),
+          List.of(MD_PL_GLIDER),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     HOOK_HAND("HOOK_HAND",
           CRUDE,
           2,
@@ -740,6 +809,20 @@ public enum ProstheticType {
           false,
           false,
           List.of()),
+    IMPROVED_ENHANCED_PROSTHETIC_LIMB("IMPROVED_ENHANCED_PROSTHETIC_LIMB",
+          ENHANCED,
+          5,
+          AlternateInjuries.IMPROVED_ENHANCED_PROSTHETIC_LIMB,
+          Money.of(101000),
+          PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.D,
+          AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of(),
+          List.of(MD_PL_I_ENHANCED),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     LIVER_FILTRATION_IMPLANT("LIVER_FILTRATION_IMPLANT",
           ENHANCED,
           5,
@@ -840,14 +923,14 @@ public enum ProstheticType {
           false,
           true,
           List.of(),
-          List.of(),
+          List.of(MD_GAS_EFFUSER_PHEROMONE),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     POWER_SUPPLY("POWER_SUPPLY",
-          CRUDE,
+          ADVANCED,
           2,
           AlternateInjuries.SECONDARY_POWER_SUPPLY,
           Money.of(4500),
-          PlanetarySystem.PlanetarySophistication.D,
+          PlanetarySystem.PlanetarySophistication.B,
           ATOWLegalityRating.E,
           AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E,
           false,
@@ -855,6 +938,20 @@ public enum ProstheticType {
           true,
           List.of(),
           List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    POWERED_FLIGHT_WINGS("POWERED_FLIGHT_WINGS",
+          ENHANCED,
+          5,
+          AlternateInjuries.POWERED_FLIGHT_WINGS,
+          Money.of(120000),
+          PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of("CC"),
+          List.of(MD_PL_FLIGHT),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     PROSTHETIC_ARM("PROSTHETIC_ARM",
           STANDARD,
@@ -904,6 +1001,20 @@ public enum ProstheticType {
           false,
           false,
           List.of()),
+    PROSTHETIC_LEG_MASC("PROSTHETIC_LEG_MASC",
+          ENHANCED,
+          5,
+          AlternateInjuries.PROSTHETIC_LEG_MASC,
+          Money.of(127500),
+          PlanetarySystem.PlanetarySophistication.B,
+          ATOWLegalityRating.E,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          false,
+          List.of("WOB", "CC"),
+          List.of(),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
     REMOVE_ARM("REMOVE_ARM",
           CRUDE,
           2,
@@ -1035,6 +1146,20 @@ public enum ProstheticType {
           false,
           List.of(),
           List.of(MD_PROTO_DNI),
+          List.of(COMPULSION_PAINKILLER_ADDICTION)),
+    TOXIN_EFFUSER("TOXIN_EFFUSER",
+          ENHANCED,
+          5,
+          AlternateInjuries.TOXIN_EFFUSER,
+          Money.of(10000),
+          PlanetarySystem.PlanetarySophistication.A,
+          ATOWLegalityRating.F,
+          AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F,
+          false,
+          false,
+          true,
+          List.of(),
+          List.of(MD_GAS_EFFUSER_TOXIN),
           List.of(COMPULSION_PAINKILLER_ADDICTION)),
     VDNI("VDNI",
           ENHANCED,
@@ -1211,6 +1336,11 @@ public enum ProstheticType {
         return surgeryLevel;
     }
 
+    /** @return the planetary sophistication a world needs before this prosthetic can be installed there. */
+    public PlanetarySystem.PlanetarySophistication getRequiredPlanetarySophistication() {
+        return requiredPlanetarySophistication;
+    }
+
     /**
      * Retrieves all valid body locations this prosthetic can replace, as defined by its associated {@link InjuryType}.
      *
@@ -1237,6 +1367,55 @@ public enum ProstheticType {
         return this == ELECTIVE_MYOMER_ARM ||
                      this == ELECTIVE_MYOMER_HAND ||
                      this == ELECTIVE_MYOMER_LEG;
+    }
+
+    /**
+     * Selects the recovery injury a successful surgery of this type leaves on the patient, based on prosthetic
+     * generation and whether a limb or organ was treated.
+     *
+     * <p>This is the injury the patient heals from, unlike {@link #getInjuryType()}, which is the permanent record of
+     * the procedure.</p>
+     *
+     * @param location the body location being treated
+     *
+     * @return the corresponding recovery {@link InjuryType}
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public InjuryType getRecoveryInjuryType(BodyLocation location) {
+        if (this == COSMETIC_SURGERY) {
+            return AlternateInjuries.COSMETIC_SURGERY_RECOVERY;
+        } else if (this == FRACTURE_REPAIR) {
+            return AlternateInjuries.FRACTURE_REPAIR_RECOVERY;
+        } else if (location.isLimb()) {
+            if (isElectiveImplant()) {
+                return AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
+            } else if (getProstheticType() >= 6) {
+                return AlternateInjuries.CLONED_LIMB_RECOVERY;
+            } else {
+                return AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
+            }
+        } else if (this == PAIN_SHUNT) {
+            return AlternateInjuries.PAIN_SHUNT_RECOVERY;
+        } else if (this == ENHANCED_IMAGING) {
+            return AlternateInjuries.EI_IMPLANT_RECOVERY;
+        } else {
+            return AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
+        }
+    }
+
+    /**
+     * @param location              the body location being treated
+     * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     *
+     * @return the estimated days a successful surgery of this type at this location keeps the patient out of action
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getRecoveryDays(BodyLocation location, double healingTimeMultiplier) {
+        return max(1, (int) round(getRecoveryInjuryType(location).getBaseRecoveryTime() * healingTimeMultiplier));
     }
 
     public boolean isClanOnly() {
@@ -1578,97 +1757,119 @@ public enum ProstheticType {
      *                              affiliation-based restrictions
      * @param currentYear           the current in-game year
      * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     * @param location              the body location being treated, which decides the recovery time
      *
      * @return a fully formatted HTML-compatible tooltip string suitable for display in Swing-based UI components
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public String getTooltip(Faction campaignFaction, int currentYear, double healingTimeMultiplier) {
-        StringJoiner tooltipPortion = new StringJoiner("<br>- ", "- ", "");
+    public String getTooltip(Faction campaignFaction, int currentYear, double healingTimeMultiplier,
+          BodyLocation location) {
+        return "- " + String.join("<br>- ",
+              getDetailLines(campaignFaction, currentYear, healingTimeMultiplier, location));
+    }
+
+    /**
+     * Builds the individual lines shown by {@link #getTooltip(Faction, int, double, BodyLocation)}, so they can also
+     * be laid out as a visible list.
+     *
+     * @param campaignFaction       the faction requesting the details, used to determine cost availability and any
+     *                              affiliation-based restrictions
+     * @param currentYear           the current in-game year
+     * @param healingTimeMultiplier A multiplier applied to the recovery time to account for campaign options
+     * @param location              the body location being treated, which decides the recovery time
+     *
+     * @return the detail lines, in display order; each may contain HTML
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<String> getDetailLines(Faction campaignFaction, int currentYear, double healingTimeMultiplier,
+          BodyLocation location) {
+        List<String> detailLines = new ArrayList<>();
 
         // 1) Surgery level required
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.skill", surgeryLevel));
 
         // 2) ATOW Type
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.type",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.type",
               prostheticType.toString()));
 
         // 3) Base cost
         Money cost = getCost(campaignFaction, currentYear);
         if (cost != null) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.cost",
                   cost.toAmountString()));
         }
 
         // 4) Required planetary tech rating
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.sophistication",
               requiredPlanetarySophistication.getName()));
 
         // 5) Availability
         boolean isWrongAffiliation = isWrongAffiliation(campaignFaction);
         AvailabilityValue adjustedAvailability = getAdjustedAvailability(currentYear, isWrongAffiliation);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.availability",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.availability",
               adjustedAvailability.getDescription(), adjustedAvailability.getName()));
 
         // 6) Legality
         ATOWLegalityRating adjustedLegality = getAdjustedLegality(isWrongAffiliation);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legality",
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legality",
               adjustedLegality.getDescription(), adjustedLegality.name()));
 
         // 7) Estimated recovery time
-        int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * healingTimeMultiplier);
-        recoveryTime = max(recoveryTime, 1);
-        tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
+        int recoveryTime = getRecoveryDays(location, healingTimeMultiplier);
+        detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
         // 8) Misc
         InjuryEffect effect = injuryType.getInjuryEffect();
         int toughness = effect.getToughnessModifier();
         if (toughness != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
         }
 
         // 9) Skills
         int gunnery = effect.getGunneryModifier();
         if (gunnery != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.gunnery", gunnery));
         }
 
         int leadership = effect.getLeadershipModifier();
         if (leadership != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.leadership", leadership));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.leadership", leadership));
         }
 
         int negotiation = effect.getNegotiationModifier();
         if (negotiation != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.negotiation", negotiation));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.negotiation", negotiation));
         }
 
         int perception = effect.getPerceptionModifier();
         if (perception != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.perception", perception));
         }
 
         int survival = effect.getSurvivalModifier();
         if (survival != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.survival", survival));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.survival", survival));
         }
 
         int interrogation = effect.getInterrogationModifier();
         if (interrogation != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE,
                   "ProstheticType.tooltip.interrogation",
                   interrogation));
         }
 
         int acting = effect.getActingModifier();
         if (acting != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acting", acting));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acting", acting));
         }
 
         int acrobatics = effect.getAcrobaticsModifier();
         if (acrobatics != 0) {
-            tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.acrobatics", acrobatics));
         }
 
         // 10) Attribute modifiers
@@ -1685,7 +1886,7 @@ public enum ProstheticType {
         for (SkillAttribute attribute : SkillAttribute.values()) {
             int modifier = attributeTotals.getOrDefault(attribute, 0);
             if (modifier != 0) {
-                tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "ProstheticType.tooltip.attribute", modifier, attribute.getLabel()));
             }
         }
@@ -1707,15 +1908,19 @@ public enum ProstheticType {
                 default -> {}
             }
 
-            tooltipPortion.add("<b>" + label + ":</b> " + description);
+            detailLines.add("<b>" + label + ":</b> " + description);
         }
 
         switch (this) { // Covers special cases
             case DERMAL_MYOMER_ARM_ARMOR, DERMAL_MYOMER_LEG_ARMOR ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.armor"));
             case DERMAL_MYOMER_ARM_CAMO, DERMAL_MYOMER_LEG_CAMO ->
-                  tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
-            case POWER_SUPPLY -> tooltipPortion.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.powerSupply"));
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.camo"));
+            case DERMAL_MYOMER_ARM_TRIPLE, DERMAL_MYOMER_LEG_TRIPLE ->
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.dermal.triple"));
+            case PROSTHETIC_LEG_MASC ->
+                  detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.legMasc"));
+            case POWER_SUPPLY -> detailLines.add(getTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.powerSupply"));
         }
 
         // 12) Abilities
@@ -1723,10 +1928,10 @@ public enum ProstheticType {
             IOption ability = options.getOption(lookupName);
             String label = ability == null ? lookupName : ability.getDisplayableName();
             String description = ability == null ? "-" : ability.getDescription();
-            tooltipPortion.add("<b>" + label + ":</b> " + description);
+            detailLines.add("<b>" + label + ":</b> " + description);
         }
 
-        return tooltipPortion.toString();
+        return detailLines;
     }
 
     /**

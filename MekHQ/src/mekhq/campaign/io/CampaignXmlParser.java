@@ -145,6 +145,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -416,6 +417,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                   && !campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
             for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                 TechnicianSkills.addMissingSkills(person);
+            }
+        }
+
+        // <51.02 compatibility handler: triple-strength myomer and prosthetic leg MASC are now worked out each day from
+        // the prosthetics a person carries, as dermal armour already was. Anyone holding one of these implants with
+        // none of the prosthetics behind it has them recorded, so the daily check doesn't take the implant away.
+        if (version.isLowerThan(new Version("0.51.02"))
+                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+                AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
             }
         }
 

@@ -48,6 +48,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.roleplay.CheckTarget;
 
 /**
  * Base abstract class for configuring character skill, attribute, and other action checks.
@@ -214,6 +215,24 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
+     * @return the dice this check rolls: the type forced with {@link #withRollType(RollType)} if any, otherwise
+     *       {@link RollType#ADVANTAGE} for natural aptitude or {@link RollType#NORMAL}
+     */
+    public RollType getRollType() {
+        return (rollTypeOverride != null)
+                     ? rollTypeOverride
+                     : (hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL);
+    }
+
+    /**
+     * @return the target this check rolls against, exactly as {@link #resolve(boolean, String)} rolls it, so its odds
+     *       can be worked out before rolling
+     */
+    public CheckTarget getCheckTarget() {
+        return new CheckTarget(targetNumber.getValue(), isCountUp(), targetNumber.cannotSucceed(), getRollType());
+    }
+
+    /**
      * Adds a results-line log performed by {@link #resolve(boolean, String)}.
      *
      * @return updated action check
@@ -276,9 +295,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * @param reason  the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
-        RollType rollType = (rollTypeOverride != null)
-                                  ? rollTypeOverride
-                                  : (hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL);
+        RollType rollType = getRollType();
 
         ActionCheckRoll roll = ActionCheckRoll.perform(rollType);
         boolean usedEdge = false;
