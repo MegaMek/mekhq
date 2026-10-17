@@ -134,6 +134,8 @@ public class RefitTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+        // Read when a unit's crew gets its Fatigue
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(1d);

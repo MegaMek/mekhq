@@ -88,6 +88,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.AerospaceRefueling;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -427,7 +428,7 @@ public class CamOpsSalvageUtilities {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         final int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
-        final boolean useInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        final boolean useInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
 
         int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits);
 
@@ -513,6 +514,9 @@ public class CamOpsSalvageUtilities {
           boolean isUseAdvancedMedical) {
         int newHits = d6(1);
         newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
+        if (useInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, victim);
+        }
 
         if (isUseAdvancedMedical) {
             InjuryUtil.resolveCombatDamage(campaign, victim, newHits);

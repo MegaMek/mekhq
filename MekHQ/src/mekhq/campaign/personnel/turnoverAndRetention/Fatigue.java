@@ -181,16 +181,18 @@ public class Fatigue {
      * their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is updated to
      * {@link PersonnelStatus#ON_LEAVE}.</p>
      *
+     * <p>This should be called whenever a person gains Fatigue.</p>
+     *
      * @param campaign the campaign context in which the person operates.
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person, campaign);
-
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (!campaignOptions.get(CampaignOption.USE_FATIGUE)) {
             return;
         }
+
+        int effectiveFatigue = getEffectiveFatigue(person, campaign);
 
         if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
             campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueTired.text",
@@ -206,7 +208,7 @@ public class Fatigue {
                   CLOSING_SPAN_TAG));
 
             person.setIsRecoveringFromFatigue(true);
-        } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
+        } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 17)) {
             campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueExhausted.text",
                   person.getHyperlinkedFullTitle(),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
@@ -222,11 +224,26 @@ public class Fatigue {
             person.setIsRecoveringFromFatigue(true);
         }
 
-        int fatigueThreshold = campaignOptions.get(CampaignOption.FATIGUE_LEAVE_THRESHOLD);
+        processFatigueLeave(campaign, person, effectiveFatigue);
+    }
+
+    /**
+     * Sends a person on leave if their effective fatigue has reached the campaign's leave threshold, and they are an
+     * active, free member of the campaign who isn't busy or injured. Does nothing if the threshold is 0.
+     *
+     * @param campaign         the campaign context in which the person operates.
+     * @param person           the person to check.
+     * @param effectiveFatigue the person's effective fatigue.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void processFatigueLeave(Campaign campaign, Person person, int effectiveFatigue) {
+        int fatigueThreshold = campaign.getCampaignOptions().get(CampaignOption.FATIGUE_LEAVE_THRESHOLD);
         boolean hasThreshold = fatigueThreshold != 0;
 
         boolean isFatigued = effectiveFatigue >= fatigueThreshold;
-        boolean isCampFollower = person.getStatus().isCampFollower();
+        boolean isActive = person.getStatus().isActive() && person.getPrisonerStatus().isFreeOrBondsman();
         boolean isFree = !person.isBusy();
 
         int hits = person.getNonPermanentInjurySeverity();
@@ -236,9 +253,25 @@ public class Fatigue {
                   isFatigued &&
                   isFree &&
                   !isInjured &&
-                  !isCampFollower) {
+                  isActive) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
+    }
+
+    /**
+     * Calculates the modifier that a person's fatigue applies to their turnover target number.
+     *
+     * <p>Effective fatigue of 0-8 gives no modifier, 9-12 gives +1, 13-16 gives +2, and 17 or more gives +3.</p>
+     *
+     * @param effectiveFatigue the person's effective fatigue, see {@link #getEffectiveFatigue(Person, Campaign)}.
+     *
+     * @return the turnover target number modifier, between 0 and 3.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getTurnoverModifier(int effectiveFatigue) {
+        return Math.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
     }
 
     /**
@@ -319,9 +352,9 @@ public class Fatigue {
      *
      * <p>The base fatigue level is adjusted by factors such as:</p>
      * <ul>
+     *     <li>Any permanent fatigue the person has.</li>
      *     <li>Whether the person is classified as Clan personnel.</li>
      *     <li>The person's skill level, with higher-skilled personnel suffering less fatigue.</li>
-     *     <li>Whether field kitchens are operating within their required capacity.</li>
      * </ul>
      *
      * @param fatigue              the base fatigue level of the person.
@@ -354,9 +387,9 @@ public class Fatigue {
      *
      * <p>The base fatigue level is adjusted by factors such as:</p>
      * <ul>
+     *     <li>Any permanent fatigue the person has.</li>
      *     <li>Whether the person is classified as Clan personnel.</li>
      *     <li>The person's skill level, with higher-skilled personnel suffering less fatigue.</li>
-     *     <li>Whether field kitchens are operating within their required capacity.</li>
      * </ul>
      *
      * @param person   the {@link Person} to get the fatigue level for
@@ -375,12 +408,13 @@ public class Fatigue {
     }
 
     /**
-     * Handles daily fatigue recovery for a specific person in the campaign.
+     * Handles weekly fatigue recovery for a specific person in the campaign.
      *
      * <p>If the person has fatigue, their fatigue is reduced based on a standard recovery rate,
-     * with additional adjustments if they are on leave or if the campaign has no active contracts. If fatigue becomes
-     * zero or less, the person's recovery state is cleared, and their status may be updated to {@code ACTIVE} if they
-     * were previously on leave.</p>
+     * with additional adjustments if they are on leave or if the campaign has no active contracts, and if field
+     * kitchens are within capacity. If fatigue becomes zero or less, the person's recovery state is cleared, and their
+     * status may be updated to {@code ACTIVE} if they were previously on leave. People who are already recovering are
+     * still sent on leave if their fatigue has reached the leave threshold.</p>
      *
      * @param campaign                       the campaign context in which the fatigue recovery occurs.
      * @param person                         the person whose fatigue recovery is being handled.
@@ -403,8 +437,12 @@ public class Fatigue {
         }
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
-            if ((!person.getStatus().isOnLeave()) && (!person.getIsRecoveringFromFatigue())) {
-                processFatigueActions(campaign, person);
+            if (!person.getStatus().isOnLeave()) {
+                if (person.getIsRecoveringFromFatigue()) {
+                    processFatigueLeave(campaign, person, getEffectiveFatigue(person, campaign));
+                } else {
+                    processFatigueActions(campaign, person);
+                }
             }
 
             if (person.getIsRecoveringFromFatigue()) {

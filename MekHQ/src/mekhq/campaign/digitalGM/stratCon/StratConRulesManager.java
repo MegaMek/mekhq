@@ -2379,22 +2379,22 @@ public class StratConRulesManager {
     }
 
     /**
-     * Increases the fatigue for all crew members per Unit in a force.
+     * Increases the fatigue for all crew members per Unit in a force. Does nothing if Fatigue is disabled.
      *
      * @param forceID  the ID of the force
      * @param campaign the campaign
      */
     public static void increaseFatigue(int forceID, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        if (!campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            return;
+        }
+
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID unit : campaign.getPlayerForce().getFormation(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.changeFatigue(fatigueRate);
-
-                if (isUseFatigue) {
-                    Fatigue.processFatigueActions(campaign, person);
-                }
+                Fatigue.processFatigueActions(campaign, person);
             }
         }
     }

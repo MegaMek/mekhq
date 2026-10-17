@@ -33,6 +33,11 @@
 package mekhq.campaign.personnel;
 
 import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
+import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_UNFIT;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_DOBROWSKI_SYNDROME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -106,6 +111,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -2514,5 +2521,117 @@ public class PersonTest {
         Field declaredField = target.getClass().getDeclaredField(fieldName);
         declaredField.setAccessible(true);
         declaredField.set(target, value);
+    }
+
+    @Nested
+    class FatigueChanges {
+        private Person person;
+
+        @BeforeEach
+        void setUp() {
+            Campaign mockCampaign = mockCampaign();
+            Faction mockFaction = mock(Faction.class);
+            when(mockCampaign.getPlayerForce().getFaction()).thenReturn(mockFaction);
+            when(mockFaction.getShortName()).thenReturn("MERC");
+            person = new Person(mockCampaign);
+        }
+
+        /**
+         * Sets the option directly, rather than through {@link PersonnelOptions#acquireAbility}, as acquiring an
+         * ability removes its opposite (such as Glass Jaw and Toughness). Characters can still end up with both, so
+         * the multiplier has to handle it.
+         */
+        private void giveAbility(String ability) {
+            person.getOptions().getOption(ability).setValue(true);
+        }
+
+        @ParameterizedTest(name = "Glass Jaw {0}, Toughness {1}, Unfit {2}, Fit {3}: +{4} -> {5}")
+        @CsvSource({
+              // No traits: x1
+              "false, false, false, false, 3, 3",
+              // Glass Jaw or Unfit: x2
+              "true, false, false, false, 2, 4",
+              "false, false, true, false, 2, 4",
+              // Glass Jaw and Unfit: x3
+              "true, false, true, false, 2, 6",
+              // Toughness or Fit: x0.5, rounded down, minimum 1
+              "false, true, false, false, 1, 1",
+              "false, true, false, false, 3, 1",
+              "false, true, false, false, 4, 2",
+              "false, false, false, true, 1, 1",
+              // Toughness and Fit: x0.25, rounded down, minimum 1
+              "false, true, false, true, 1, 1",
+              "false, true, false, true, 3, 1",
+              "false, true, false, true, 8, 2",
+              // Opposing pairs cancel out
+              "true, true, false, false, 3, 3",
+              "false, false, true, true, 3, 3",
+              "true, true, true, true, 3, 3"
+        })
+        void gainIsScaledByMultiplier(boolean glassJaw, boolean toughness, boolean unfit, boolean fit, int gain,
+              int expected) {
+            if (glassJaw) {
+                giveAbility(FLAW_GLASS_JAW);
+            }
+            if (toughness) {
+                giveAbility(ATOW_TOUGHNESS);
+            }
+            if (unfit) {
+                giveAbility(FLAW_UNFIT);
+            }
+            if (fit) {
+                giveAbility(ATOW_FIT);
+            }
+
+            person.changeFatigue(gain);
+
+            assertEquals(expected, person.getFatigueDirect());
+        }
+
+        @Test
+        void gainWithoutMultiplierIsUnscaled() {
+            giveAbility(FLAW_GLASS_JAW);
+
+            person.changeFatigue(2, false);
+
+            assertEquals(2, person.getFatigueDirect());
+        }
+
+        @Test
+        void reductionIsNeverScaled() {
+            giveAbility(FLAW_GLASS_JAW);
+            person.setFatigue(10);
+
+            person.changeFatigue(-3);
+
+            assertEquals(7, person.getFatigueDirect());
+        }
+
+        @Test
+        void fatigueIsCappedAtThirty() {
+            person.setFatigue(29);
+
+            person.changeFatigue(5);
+
+            assertEquals(30, person.getFatigueDirect());
+        }
+
+        @Test
+        void fatigueCannotGoBelowZero() {
+            person.setFatigue(2);
+
+            person.changeFatigue(-5);
+
+            assertEquals(0, person.getFatigueDirect());
+        }
+
+        @Test
+        void dobrowskiSyndromeAddsTwoAdjustedFatigue() {
+            giveAbility(UNOFFICIAL_DOBROWSKI_SYNDROME);
+            person.setFatigue(3);
+
+            assertEquals(3, person.getFatigueDirect());
+            assertEquals(5, person.getAdjustedFatigue());
+        }
     }
 }

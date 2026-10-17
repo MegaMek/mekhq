@@ -166,6 +166,7 @@ import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
@@ -5822,6 +5823,7 @@ public class Unit implements ITechnology, ILocatable {
 
         // Update crew data
         updateCrew(isOnlyCommandersMatter(campaignOptions));
+        updateCrewFatigue(campaignOptions);
 
         // commander can be null at this point, but that's ok because both of the following calls include null
         // handling built into their methods.
@@ -5841,6 +5843,30 @@ public class Unit implements ITechnology, ILocatable {
 
         if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
             convInfantry.setArmorKit(EquipmentType.get(armorKitName));
+        }
+    }
+
+    /**
+     * Copies the crew's campaign Fatigue onto every slot of the entity's crew, so MegaMek can apply its fatigue rules.
+     * Every slot uses the highest effective Fatigue among the unit's active crew, as the most tired crew member
+     * limits the whole unit. If Fatigue is disabled, every slot is set to 0.
+     *
+     * @param campaignOptions the campaign's options
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateCrewFatigue(CampaignOptions campaignOptions) {
+        int highestFatigue = 0;
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            for (Person person : getActiveCrew()) {
+                highestFatigue = max(highestFatigue, Fatigue.getEffectiveFatigue(person, getCampaign()));
+            }
+        }
+
+        Crew crew = entity.getCrew();
+        for (int slot = 0; slot < crew.getSlotCount(); slot++) {
+            crew.setCrewFatigue(highestFatigue, slot);
         }
     }
 
