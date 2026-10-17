@@ -68,6 +68,7 @@ import java.awt.Image;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -6861,6 +6862,10 @@ public class Unit implements ITechnology, ILocatable {
      * @return the chosen engineer, or {@code null} if nobody in the crew is serving aboard
      */
     private @Nullable Person selectEngineer(List<Person> crew) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        final LocalDate today = campaign.getLocalDate();
+
         Person chosenEngineer = null;
         int departedCrewCount = 0;
         for (Person person : crew) {
@@ -6869,7 +6874,8 @@ public class Unit implements ITechnology, ILocatable {
                 continue;
             }
 
-            if ((chosenEngineer == null) || person.outRanksUsingSkillTiebreaker(campaign, chosenEngineer)) {
+            if ((chosenEngineer == null)
+                      || person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, chosenEngineer)) {
                 chosenEngineer = person;
             }
         }

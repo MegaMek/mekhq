@@ -36,6 +36,7 @@ package mekhq.campaign.unit;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -161,8 +162,8 @@ class UnitVesselEngineerTest {
         when(person.getUnit()).thenReturn(unit);
         when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
         ranks.put(person, rank);
-        when(person.outRanksUsingSkillTiebreaker(any(Campaign.class), any())).thenAnswer(invocation -> {
-            Person otherPerson = invocation.getArgument(1);
+        when(person.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenAnswer(invocation -> {
+            Person otherPerson = invocation.getArgument(3);
             return (otherPerson == null) || (rank > ranks.get(otherPerson));
         });
 
