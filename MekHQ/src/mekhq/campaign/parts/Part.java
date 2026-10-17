@@ -94,6 +94,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.campaign.work.WorkTime;
 import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.utilities.MHQXMLUtility;
@@ -1016,6 +1017,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         if ((getUnit() != null) && (getUnit().hasPrototypeTSM())) {
             time *= 2;
         }
+        time *= PlanetaryWorkConditions.getTimeMultiplier(getCampaign(), getUnit());
         return (int) Math.ceil(time);
     }
 

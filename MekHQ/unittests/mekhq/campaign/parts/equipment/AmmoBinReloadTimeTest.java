@@ -39,11 +39,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
+
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.units.Entity;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,6 +60,7 @@ import org.junit.jupiter.api.Test;
  */
 class AmmoBinReloadTimeTest {
     private static final int EQUIPMENT_NUMBER = 7;
+    private static final LocalDate COLMAR_DATE = LocalDate.of(3067, 3, 1);
 
     /**
      * Builds a bin on a unit whose mount holds the given ammunition, so the bin is reloading rather than swapping
@@ -60,10 +68,15 @@ class AmmoBinReloadTimeTest {
      */
     private static AmmoBin bin(AmmoType binAmmo, AmmoType mountedAmmo, boolean isOneShot, boolean isOmniPodded,
           boolean isSalvage) {
-        Campaign campaign = mockCampaign();
+        return bin(mockCampaign(), binAmmo, mountedAmmo, isOneShot, isOmniPodded, isSalvage);
+    }
+
+    private static AmmoBin bin(Campaign campaign, AmmoType binAmmo, AmmoType mountedAmmo, boolean isOneShot,
+          boolean isOmniPodded, boolean isSalvage) {
         AmmoBin ammoBin = new AmmoBin(0, binAmmo, EQUIPMENT_NUMBER, 0, isOneShot, isOmniPodded, campaign);
         Unit unit = mock(Unit.class);
         when(unit.isSalvage()).thenReturn(isSalvage);
+        when(unit.getSite()).thenReturn(Unit.SITE_FIELD_WORKSHOP);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
         Mounted<?> mounted = mock(Mounted.class);
@@ -100,6 +113,28 @@ class AmmoBinReloadTimeTest {
         AmmoType infernoAmmo = getAmmoType("ISSRM4 Inferno Ammo");
 
         assertEquals(8, bin(infernoAmmo, srm4Ammo(), true, false, false).getActualTime());
+    }
+
+    /**
+     * The reported world: Colmar, at 1.27 G, adds half the time again. The one-shot launcher takes 6 minutes and a
+     * standard bin 23.
+     */
+    @Test
+    void highGravityLengthensReloads() {
+        Campaign colmar = mockCampaign();
+        when(colmar.getCampaignOptions()).thenReturn(new CampaignOptions());
+        when(colmar.getLocalDate()).thenReturn(COLMAR_DATE);
+        Planet planet = mock(Planet.class);
+        when(planet.getGravity()).thenReturn(1.27);
+        when(planet.getAtmosphere(COLMAR_DATE)).thenReturn(AtmosphericTaint.BREATHABLE);
+        when(planet.getPressure(COLMAR_DATE)).thenReturn(Atmosphere.STANDARD);
+        AbstractLocation location = mock(AbstractLocation.class);
+        when(location.isOnPlanet()).thenReturn(true);
+        when(location.getPlanet()).thenReturn(planet);
+        when(colmar.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
+
+        assertEquals(6, bin(colmar, srm4Ammo(), srm4Ammo(), true, false, false).getActualTime());
+        assertEquals(23, bin(colmar, srm4Ammo(), srm4Ammo(), false, false, false).getActualTime());
     }
 
     /** Salvaging the bin is not a reload, so it takes the full time. */

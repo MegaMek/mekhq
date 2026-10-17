@@ -36,8 +36,6 @@ package mekhq.campaign.unit;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
-import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -56,8 +54,6 @@ import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryConditions.Atmosphere;
-import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -80,8 +76,8 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -698,45 +694,7 @@ public class Maintenance {
             target.addModifier(campaign.getPlayerForce().getFaction().getEraMod(campaign.getGameYear()), "era");
         }
 
-        if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
-                      campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-                AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-                Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
-                int temperature = planet.getTemperature(campaign.getLocalDate());
-
-                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
-                int zeroGSkillLevel = 0;
-                if (zeroGSkill != null) {
-                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
-                }
-
-                // getGravity() is nullable (a planet may record no gravity); default to standard Terran gravity so
-                // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
-                Double recordedGravity = planet.getGravity();
-                double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
-                GravityModifier gravityModifier = getGravityModifier(gravity);
-                if (gravityModifier != null) {
-                    target.addModifier(gravityModifier.modifier(), gravityModifier.description());
-                    addZeroGOperationsModifier(zeroGSkillLevel, gravityModifier.modifier(), target);
-                }
-
-                if (atmosphere.isTainted() || atmosphere.isToxic()) {
-                    target.addModifier(2, "Tainted or Toxic Atmosphere");
-                } else if (planetaryConditions.isVacuum()) {
-                    target.addModifier(2, "Vacuum");
-                }
-
-                if (planetaryConditions.isTrace() || planetaryConditions.isVeryHigh()) {
-                    target.addModifier(1, "Trace or Very High Pressure Atmosphere");
-                }
-
-                if (temperature < -30 || temperature > 50) {
-                    target.addModifier(1, "Extreme Temperature");
-                }
-            }
-        }
+        PlanetaryWorkConditions.addRollModifiers(campaign, partUnit, tech, target);
 
         if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
@@ -764,57 +722,6 @@ public class Maintenance {
         }
 
         return target;
-    }
-
-    /**
-     * A penalty for working outside under unusual surface gravity.
-     *
-     * @param modifier    the target number modifier
-     * @param description the name the modifier is shown under
-     */
-    record GravityModifier(int modifier, String description) {}
-
-    /**
-     * Returns the penalty for working outside at the given surface gravity, from the Planetary Conditions Modifiers
-     * table (Campaign Operations p. 193): +1 below 0.8 G, +2 above 1.2 G and +4 at 2 G or more.
-     *
-     * @param gravity the surface gravity, in multiples of Terran standard
-     *
-     * @return the penalty, or {@code null} at standard gravity
-     */
-    static @Nullable GravityModifier getGravityModifier(double gravity) {
-        if (gravity < 0.8) {
-            return new GravityModifier(1, "Low Gravity");
-        } else if (gravity >= 2.0) {
-            return new GravityModifier(4, "Very High Gravity");
-        } else if (gravity > 1.2) {
-            return new GravityModifier(2, "High Gravity");
-        }
-        return null;
-    }
-
-    /**
-     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
-     * gravityModifier.
-     *
-     * <ul>
-     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
-     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
-     * </ul>
-     *
-     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
-     *                        gravityModifier
-     * @param gravityModifier the penalty modifier value to offset
-     * @param target          the {@link TargetRoll} instance to modify
-     */
-    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
-        if (zeroGSkillLevel > 0) {
-            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
-
-            if (effectiveModifier < 0) {
-                target.addModifier(effectiveModifier, "Zero-G Operations");
-            }
-        }
     }
 
     /**

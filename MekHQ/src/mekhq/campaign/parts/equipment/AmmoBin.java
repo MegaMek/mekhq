@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -642,7 +643,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     /**
      * The time to reload, swap or remove this bin's ammunition. An omni pod is swapped out whole in half the time, and a
      * one-shot weapon reloads in a quarter of the time (Rearm Time Table, Campaign Operations p. 209). Salvage is not a
-     * reload, so a one-shot bin is salvaged in the full time.
+     * reload, so a one-shot bin is salvaged in the full time. Harsh planetary conditions slow the work further.
      */
     @Override
     public int getActualTime() {
@@ -653,6 +654,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
         if (isOneShot() && !isSalvaging()) {
             timeMultiplier *= ONE_SHOT_RELOAD_TIME_MULTIPLIER;
         }
+        timeMultiplier *= PlanetaryWorkConditions.getTimeMultiplier(getCampaign(), getUnit());
         int time = (int) Math.ceil(getBaseTime() * timeMultiplier);
         // Fabricating ammunition takes ten times as long as a routine reload.
         return time * fabricationTimeMultiplier();
