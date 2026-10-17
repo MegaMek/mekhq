@@ -447,7 +447,7 @@ public final class ChaosContractMarketAvailability {
         final StringBuilder report = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
               "skillCheck.contractMarket.header",
               systemName,
-              level.name()));
+              level.getLabel()));
 
         for (final ContractSearchType type : REPORTED_TYPES) {
             final OfferRoll roll = rolls.get(type);
