@@ -7437,6 +7437,48 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Drops this unit's crew entries for people whose own record no longer places them on this unit. Older versions
+     * could leave such entries behind, such as a crew member who retired or moved to another unit but stayed on this
+     * unit's crew list. Only the entries are dropped: the people stay in the campaign and keep their own assignment.
+     *
+     * @return the people whose entries were dropped
+     */
+    public Set<Person> removeDepartedCrew() {
+        Predicate<Person> hasDeparted = person -> !equals(person.getUnit());
+        Set<Person> departedCrew = new LinkedHashSet<>();
+        for (Person person : getCrew()) {
+            if (hasDeparted.test(person)) {
+                departedCrew.add(person);
+            }
+        }
+        for (Person gunner : gunners) {
+            if (hasDeparted.test(gunner)) {
+                departedCrew.add(gunner);
+            }
+        }
+        if (departedCrew.isEmpty()) {
+            return departedCrew;
+        }
+
+        drivers.removeIf(hasDeparted);
+        gunners.removeIf(hasDeparted);
+        vesselCrew.removeIf(hasDeparted);
+        if ((navigator != null) && hasDeparted.test(navigator)) {
+            navigator = null;
+        }
+        if ((techOfficer != null) && hasDeparted.test(techOfficer)) {
+            techOfficer = null;
+        }
+        if ((engineer != null) && hasDeparted.test(engineer)) {
+            engineer = null;
+        }
+        for (Person person : departedCrew) {
+            trooperSlots.release(person.getId());
+        }
+        return departedCrew;
+    }
+
+    /**
      * Removes all crew members from this unit, including the assigned technician and engineer.
      *
      * <p>This is a convenience overload equivalent to calling {@link #clearCrew(boolean) clearCrew(false)}.</p>
