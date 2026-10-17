@@ -153,6 +153,7 @@ class MHQOptionsModel {
     boolean personnelFilterOnPrimaryRole;
     boolean unifiedDailyReport;
     boolean aggregateDailyReport;
+    boolean personViewSinglePage;
     // endregion Display - Personnel List
 
     // region Colours (keyed by the control's resource name)
@@ -270,6 +271,7 @@ class MHQOptionsModel {
         personnelFilterOnPrimaryRole = options.getPersonnelFilterOnPrimaryRole();
         unifiedDailyReport = options.getUnifiedDailyReport();
         aggregateDailyReport = options.isUseAggregateDailyReport();
+        personViewSinglePage = options.isPersonViewSinglePage();
 
         // Colours
         statusColours.put("optionDeployedForeground", options.getDeployedForeground());
@@ -463,6 +465,7 @@ class MHQOptionsModel {
         options.setPersonnelFilterOnPrimaryRole(personnelFilterOnPrimaryRole);
         options.setUnifiedDailyReport(unifiedDailyReport);
         options.setAggregateDailyReport(aggregateDailyReport);
+        options.setPersonViewSinglePage(personViewSinglePage);
 
         // Colours
         options.setDeployedForeground(statusColours.get("optionDeployedForeground"));
