@@ -1,0 +1,87 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-b6b5-7dd1-8018-baf1bf0a5c35
+</UUID>
+
+<UnitType>
+Infantry
+</UnitType>
+
+<Name>
+Field Gun Platoon (AFFS)
+</Name>
+
+<Model>
+(Motorized UAC5 3067+)
+</Model>
+
+<year>
+3067
+</year>
+
+<type>
+IS Level 3
+</type>
+
+<role>
+Sniper
+</role>
+
+<motion_type>
+Motorized
+</motion_type>
+
+<Troopers Equipment>
+Fed Suns Infantry Kit (3067+)
+</Troopers Equipment>
+
+<Field Guns Equipment>
+ISUltraAC5
+IS Ultra AC/5 Ammo
+ISUltraAC5
+IS Ultra AC/5 Ammo
+ISUltraAC5
+IS Ultra AC/5 Ammo
+</Field Guns Equipment>
+
+<overview>
+<p>The AFFS treats its infantry as professionals rather than expendable garrison filler, drawing soldiers from single worlds or neighboring systems to build the unit cohesion that the Federated Suns considers essential to effective combined-arms operations. Towing ultra autocannon that can fire at twice normal rate, these field gun crews provide burst-fire capability that increases their punch against armored targets at the cost of increased ammunition consumption.</p>
+</overview>
+
+<notes>
+Intro date based on production date of AFFS 3067+ advanced infantry kit.  Federated Long Rifle is the classic long arm of the AFFS.
+</notes>
+
+<squad_size>
+7
+</squad_size>
+
+<squadn>
+4
+</squadn>
+
+<Primary>
+Rifle (Federated Long)
+</Primary>
+
+<encumberingarmor>
+true
+</encumberingarmor>
+

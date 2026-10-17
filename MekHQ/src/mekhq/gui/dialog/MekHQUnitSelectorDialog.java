@@ -68,6 +68,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
@@ -109,6 +110,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         updateOptionValues();
         initialize();
+        // The preview's Cost line shows what the campaign would charge, matching the table's price column
+        panePreview.setCostProvider(entity -> Unit.estimateBuyCost(entity, campaign.getCampaignOptions())
+                                                    .getAmount()
+                                                    .doubleValue());
         if (!addToCampaign) {
             setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
@@ -345,6 +350,22 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         }
 
         return selectedEntity;
+    }
+
+    /**
+     * Shows each unit at the price the campaign would charge for it, rather than MegaMek's construction cost, so the
+     * unit price multipliers and {@link CampaignOption#USE_ALTERNATE_UNIT_COST} are reflected.
+     *
+     * @param summary the unit to price
+     *
+     * @return the campaign's purchase price for the unit, in C-bills
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected long getDisplayedPrice(MekSummary summary) {
+        return Unit.estimateBuyCost(summary, campaign.getCampaignOptions()).round().getAmount().longValue();
     }
 
     static boolean isPersistentCampaignUnitSummary(@Nullable MekSummary unitSummary) {

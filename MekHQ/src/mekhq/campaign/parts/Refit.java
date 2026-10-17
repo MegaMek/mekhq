@@ -706,6 +706,14 @@ public class Refit extends Part implements IAcquisitionWork {
             } else if (newPart instanceof MissingMekGyro) {
                 updateRefitClass(CLASS_D);
 
+            } else if (newPart instanceof MissingMekActuator) {
+                // An added actuator, such as a hand or lower arm, is a new component where there was none
+                updateRefitClass(CLASS_D);
+                int location = newPart.getLocation();
+                if ((location > -1) && (location < newEntity.locations())) {
+                    locationHasNewStuff[location] = true;
+                }
+
             } else if (newPart instanceof MissingMekLocation) {
                 replacingLocations = true;
 
