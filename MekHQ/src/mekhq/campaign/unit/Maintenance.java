@@ -1093,6 +1093,11 @@ public class Maintenance {
      */
     private static String performEngineerCheck(Person tech, int dailyWorkMinutes) {
         Unit techUnit = tech.getUnit();
+        if (techUnit == null) {
+            LOGGER.warn("[Maintenance] {} is flagged as an engineer but serves on no unit; skipping the engineer check",
+                  tech.getFullName());
+            return "";
+        }
         int maintenanceTime = techUnit.getMaintenanceTime();
         if (techUnit.requiresMaintenance() && maintenanceTime > dailyWorkMinutes) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.largeVessel",
