@@ -389,7 +389,9 @@ public class EducationController {
         if (spouse != null) {
             if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
                 person.addEduTagAlong(spouse.getId());
-                spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                if (!spouse.getStatus().isCampFollower()) {
+                    spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                }
             }
 
             hasActiveParent = spouse.getStatus().isActiveFlexible();
@@ -400,7 +402,9 @@ public class EducationController {
                 if (child.getStatus().isActiveFlexible()) {
                     if (child.isChild(campaign.getLocalDate())) {
                         person.addEduTagAlong(child.getId());
-                        child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                        if (!child.getStatus().isCampFollower()) {
+                            child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                        }
                     }
                 }
             }
@@ -1007,7 +1011,9 @@ public class EducationController {
             Person companion = campaign.getPlayerForce().getHumanResources().getPerson(tagAlong);
             if (companion != null) {
                 companion.setParent(arrivingAtPersonnel);
-                companion.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+                if (companion.getStatus().isOnLeave()) {
+                    companion.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+                }
             }
         }
 
