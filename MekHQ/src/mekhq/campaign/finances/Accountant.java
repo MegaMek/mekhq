@@ -667,6 +667,19 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
+     * The units that {@link #getPeacetimeCost(boolean)} charges for: every unit assigned to the player force's
+     * formations. Units outside the TO&amp;E are not included.
+     *
+     * @return every unit assigned to the player force's formations and their sub-formations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Collection<Unit> getUnitsInFormations() {
+        return getUnitsInFormations(this.campaign().getPlayerForce().getFormations().getSubFormations(), getHangar());
+    }
+
+    /**
      * Resolves every unit assigned to the given formations, recursing into their sub-formations.
      *
      * @param formations the formations to resolve units for
