@@ -37,15 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationNewDayUtil;
@@ -59,6 +65,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import testUtilities.parts.FixedDieRolls;
 import testUtilities.parts.PartsCensus;
 import testUtilities.parts.PartsScenario;
@@ -143,6 +150,25 @@ class AcquisitionCharacterizationTest {
 
     private Money balance() {
         return campaign.getPlayerForce().getFinances().getBalance();
+    }
+
+    /**
+     * The Command Center's shopping list redraws only when it hears a procurement event. Ordering a part that is
+     * already on the list adds to the existing line, and that must still announce the change, or the Command Center
+     * keeps showing the old quantity until the next day (MekHQ issue 4997).
+     */
+    @Test
+    void orderingAPartAlreadyOnTheListAnnouncesTheChange() {
+        IAcquisitionWork firstOrder = orderReplacementLaser();
+
+        try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class, CALLS_REAL_METHODS)) {
+            IAcquisitionWork secondOrder = missingLaser.getAcquisitionPart().getAcquisitionWork();
+            shoppingList().addShoppingItem(secondOrder, 3, campaign);
+
+            mekHQ.verify(() -> MekHQ.triggerEvent(isA(ProcurementEvent.class)), times(1));
+        }
+        assertEquals(1, shoppingList().getShoppingList().size());
+        assertEquals(4, firstOrder.getQuantity());
     }
 
     @Test
