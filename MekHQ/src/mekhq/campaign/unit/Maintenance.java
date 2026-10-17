@@ -716,18 +716,10 @@ public class Maintenance {
                 // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
                 Double recordedGravity = planet.getGravity();
                 double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
-                if (gravity < 0.8) {
-                    int modifier = 2;
-                    target.addModifier(modifier, "Low Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity >= 2.0) {
-                    int modifier = 4;
-                    target.addModifier(modifier, "Very High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity > 1.2) {
-                    int modifier = 1;
-                    target.addModifier(modifier, "High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
+                GravityModifier gravityModifier = getGravityModifier(gravity);
+                if (gravityModifier != null) {
+                    target.addModifier(gravityModifier.modifier(), gravityModifier.description());
+                    addZeroGOperationsModifier(zeroGSkillLevel, gravityModifier.modifier(), target);
                 }
 
                 if (atmosphere.isTainted() || atmosphere.isToxic()) {
@@ -772,6 +764,33 @@ public class Maintenance {
         }
 
         return target;
+    }
+
+    /**
+     * A penalty for working outside under unusual surface gravity.
+     *
+     * @param modifier    the target number modifier
+     * @param description the name the modifier is shown under
+     */
+    record GravityModifier(int modifier, String description) {}
+
+    /**
+     * Returns the penalty for working outside at the given surface gravity, from the Planetary Conditions Modifiers
+     * table (Campaign Operations p. 193): +1 below 0.8 G, +2 above 1.2 G and +4 at 2 G or more.
+     *
+     * @param gravity the surface gravity, in multiples of Terran standard
+     *
+     * @return the penalty, or {@code null} at standard gravity
+     */
+    static @Nullable GravityModifier getGravityModifier(double gravity) {
+        if (gravity < 0.8) {
+            return new GravityModifier(1, "Low Gravity");
+        } else if (gravity >= 2.0) {
+            return new GravityModifier(4, "Very High Gravity");
+        } else if (gravity > 1.2) {
+            return new GravityModifier(2, "High Gravity");
+        }
+        return null;
     }
 
     /**
@@ -1074,6 +1093,11 @@ public class Maintenance {
      */
     private static String performEngineerCheck(Person tech, int dailyWorkMinutes) {
         Unit techUnit = tech.getUnit();
+        if (techUnit == null) {
+            LOGGER.warn("[Maintenance] {} is flagged as an engineer but serves on no unit; skipping the engineer check",
+                  tech.getFullName());
+            return "";
+        }
         int maintenanceTime = techUnit.getMaintenanceTime();
         if (techUnit.requiresMaintenance() && maintenanceTime > dailyWorkMinutes) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.largeVessel",

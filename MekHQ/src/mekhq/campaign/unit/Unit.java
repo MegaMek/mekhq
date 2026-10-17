@@ -68,6 +68,7 @@ import java.awt.Image;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -5834,6 +5835,10 @@ public class Unit implements ITechnology, ILocatable {
             processUnitSPAs(commander);
         }
 
+        // A ship or infantry unit that maintains itself needs its engineer chosen again whenever its crew changes,
+        // whatever the ability options are, or it is left with no tech until the next day
+        resetEngineer();
+
         if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
             convInfantry.setArmorKit(EquipmentType.get(armorKitName));
         }
@@ -6201,11 +6206,6 @@ public class Unit implements ITechnology, ILocatable {
             if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
-
-            // Reset the composite technician used by spacecraft and infantry
-            // Important if you just changed technician edge options for members of either
-            // unit type
-            resetEngineer();
 
             // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect the unit's current
             //  crew size vs its required crew size. There's also the question of what to do with extra crew quarters
@@ -6818,21 +6818,13 @@ public class Unit implements ITechnology, ILocatable {
             if (isUnmanned()) {
                 engineer = null;
             } else {
-                for (Person person : getActiveCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getActiveCrew());
             }
         } else {
             if (vesselCrew.isEmpty()) {
                 engineer = null;
             } else {
-                for (Person person : getVesselCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getVesselCrew());
             }
         }
 
@@ -6857,6 +6849,50 @@ public class Unit implements ITechnology, ILocatable {
                 scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * Picks the highest-ranked crew member who is actually serving aboard this unit. A crew list can still hold someone
+     * who has since left, for example a crew member who retired in an older version of MekHQ, and such a person must
+     * not become the engineer.
+     *
+     * @param crew the crew members to choose from
+     *
+     * @return the chosen engineer, or {@code null} if nobody in the crew is serving aboard
+     */
+    private @Nullable Person selectEngineer(List<Person> crew) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        final LocalDate today = campaign.getLocalDate();
+
+        Person chosenEngineer = null;
+        int departedCrewCount = 0;
+        for (Person person : crew) {
+            if (!isServingAboard(person)) {
+                departedCrewCount++;
+                continue;
+            }
+
+            if ((chosenEngineer == null)
+                      || person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, chosenEngineer)) {
+                chosenEngineer = person;
+            }
+        }
+
+        if (departedCrewCount > 0) {
+            LOGGER.debug("[Engineer] {}: {} listed crew member(s) no longer serve aboard and cannot be the engineer",
+                  getName(), departedCrewCount);
+        }
+        return chosenEngineer;
+    }
+
+    /**
+     * @param person a person on this unit's crew list
+     *
+     * @return {@code true} if the person is assigned to this unit
+     */
+    private boolean isServingAboard(Person person) {
+        return equals(person.getUnit());
     }
 
     /**
@@ -7434,6 +7470,48 @@ public class Unit implements ITechnology, ILocatable {
             crew.add(techOfficer);
         }
         return crew;
+    }
+
+    /**
+     * Drops this unit's crew entries for people whose own record no longer places them on this unit. Older versions
+     * could leave such entries behind, such as a crew member who retired or moved to another unit but stayed on this
+     * unit's crew list. Only the entries are dropped: the people stay in the campaign and keep their own assignment.
+     *
+     * @return the people whose entries were dropped
+     */
+    public Set<Person> removeDepartedCrew() {
+        Predicate<Person> hasDeparted = person -> !equals(person.getUnit());
+        Set<Person> departedCrew = new LinkedHashSet<>();
+        for (Person person : getCrew()) {
+            if (hasDeparted.test(person)) {
+                departedCrew.add(person);
+            }
+        }
+        for (Person gunner : gunners) {
+            if (hasDeparted.test(gunner)) {
+                departedCrew.add(gunner);
+            }
+        }
+        if (departedCrew.isEmpty()) {
+            return departedCrew;
+        }
+
+        drivers.removeIf(hasDeparted);
+        gunners.removeIf(hasDeparted);
+        vesselCrew.removeIf(hasDeparted);
+        if ((navigator != null) && hasDeparted.test(navigator)) {
+            navigator = null;
+        }
+        if ((techOfficer != null) && hasDeparted.test(techOfficer)) {
+            techOfficer = null;
+        }
+        if ((engineer != null) && hasDeparted.test(engineer)) {
+            engineer = null;
+        }
+        for (Person person : departedCrew) {
+            trooperSlots.release(person.getId());
+        }
+        return departedCrew;
     }
 
     /**
