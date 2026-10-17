@@ -386,9 +386,16 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
     }
 
+    /**
+     * Bay ammunition is the same part only for the same rack size: a bay of LRM-20 launchers cannot fire LRM-10
+     * ammunition, so an LRM-10 bin is never an LRM-20 bin moved to another arc.
+     */
     @Override
     public boolean isSamePartType(Part part) {
-        return (getClass() == part.getClass()) && getType().isCompatibleWith(((AmmoBin) part).getType());
+        if ((getClass() != part.getClass()) || !getType().isCompatibleWith(((AmmoBin) part).getType())) {
+            return false;
+        }
+        return getType().getRackSize() == ((AmmoBin) part).getType().getRackSize();
     }
 
     @Override
