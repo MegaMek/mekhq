@@ -503,24 +503,25 @@ public class Maintenance {
         return new MaintenanceDamage(damagedParts, destroyedParts);
     }
 
-    private static String getDamageString(Unit unit, int nDamage, int nDestroy) {
-        String damageString = "";
-        if (nDamage > 0) {
-            damageString += nDamage + " parts were damaged. ";
+    /**
+     * The maintenance report's line on what a failed check damaged and destroyed, with a link to the Repair bay, such
+     * as "1 part was damaged."
+     *
+     * @return the line, or an empty string when nothing was damaged or destroyed
+     */
+    static String getDamageString(Unit unit, int damagedParts, int destroyedParts) {
+        List<String> damageSentences = new ArrayList<>();
+        if (damagedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.damaged", damagedParts));
         }
-        if (nDestroy > 0) {
-            damageString += nDestroy + " parts were destroyed.";
+        if (destroyedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.destroyed", destroyedParts));
         }
-        if (!damageString.isEmpty()) {
-            damageString = "<b><font color='" +
-                                 getNegativeColor() +
-                                 "'>" +
-                                 damageString +
-                                 "</b></font> [<a href='REPAIR|" +
-                                 unit.getId() +
-                                 "'>Repair bay</a>]";
+        if (damageSentences.isEmpty()) {
+            return "";
         }
-        return damageString;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.report", getNegativeColor(),
+              String.join(" ", damageSentences), unit.getId().toString());
     }
 
     /**

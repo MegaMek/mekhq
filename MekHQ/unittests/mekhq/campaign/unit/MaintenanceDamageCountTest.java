@@ -88,6 +88,26 @@ class MaintenanceDamageCountTest {
     }
 
     @Test
+    void oneDamagedPartIsReportedInTheSingular() {
+        String report = Maintenance.getDamageString(wolverine, 1, 0);
+
+        assertTrue(report.contains("1 part was damaged."), report);
+    }
+
+    @Test
+    void severalPartsAreReportedInThePlural() {
+        String report = Maintenance.getDamageString(wolverine, 2, 3);
+
+        assertTrue(report.contains("2 parts were damaged."), report);
+        assertTrue(report.contains("3 parts were destroyed."), report);
+    }
+
+    @Test
+    void nothingIsReportedWhenNothingWasDamaged() {
+        assertEquals("", Maintenance.getDamageString(wolverine, 0, 0));
+    }
+
+    @Test
     void anIntactLocationIsCountedAsDamaged() {
         MaintenanceDamage damageDone = Maintenance.applyMaintenanceDamage(Map.of(rightTorso(), 1));
 
