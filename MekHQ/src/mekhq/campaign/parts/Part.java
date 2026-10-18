@@ -1409,7 +1409,32 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         timeSpent = 0;
         shorthandedMod = 0;
         return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
-              "<b> failed</b>") + ".";
+              "<b> failed</b>") + "." + getBeyondRepairReport();
+    }
+
+    /**
+     * Tells the player when a failed repair has left this part beyond repair, which no tech can then work on. Without
+     * it the report only said the repair failed, and the part just dropped out of the repair lists.
+     *
+     * @return the sentence to add to the failure report, or an empty string while the part can still be repaired
+     */
+    private String getBeyondRepairReport() {
+        if (!isDamagedBeyondRepair()) {
+            return "";
+        }
+        boolean isReplaceable = isReplaceable();
+        LOGGER.info("[BeyondRepair] {} on {} is now damaged beyond repair; replaceable: {}", getName(),
+              (unit == null) ? "no unit" : unit.getName(), isReplaceable);
+        String reportKey = isReplaceable ? "Part.fail.beyondRepair" : "Part.fail.beyondRepairNotReplaceable";
+        return " " + getTextAt(RESOURCE_BUNDLE, reportKey);
+    }
+
+    /**
+     * @return {@code true} if this part can be scrapped and a replacement fitted, which is how a part beyond repair is
+     *       dealt with. A part that can never be scrapped, such as a vehicle location, cannot be replaced either.
+     */
+    protected boolean isReplaceable() {
+        return !canNeverScrap();
     }
 
     /**
