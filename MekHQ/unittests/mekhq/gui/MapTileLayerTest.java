@@ -47,6 +47,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import mekhq.campaign.universe.Faction;
@@ -67,7 +68,7 @@ class MapTileLayerTest {
         BufferedImage tiled = target();
         Graphics2D tiledGraphics = deviceTarget(tiled);
         assertTrue(layer.paint(tiledGraphics, "content", (levelScale, pixelScale) -> MapTileLayerTest::drawScene,
-              camera, camera, false, null));
+              camera, camera, MapTileLayer.RequestMode.NONE, null));
         tiledGraphics.dispose();
 
         BufferedImage direct = target();
@@ -97,12 +98,12 @@ class MapTileLayerTest {
             };
         };
         MapTileLayer.Camera initial = camera(0.0, 0.0, 2.0);
-        layer.paint(deviceTarget(target()), "content", source, initial, initial, false, Color.BLACK);
+        layer.paint(deviceTarget(target()), "content", source, initial, initial, MapTileLayer.RequestMode.NONE, Color.BLACK);
         int initialTiles = layer.tileCount();
 
         MapTileLayer.Camera zoomed = camera(0.0, 0.0, 2.35);
         BufferedImage fallbackFrame = target();
-        boolean exact = layer.paint(deviceTarget(fallbackFrame), "content", source, zoomed, zoomed, true,
+        boolean exact = layer.paint(deviceTarget(fallbackFrame), "content", source, zoomed, zoomed, MapTileLayer.RequestMode.WITH_PREFETCH,
               Color.BLACK);
 
         assertFalse(exact, "the new zoom level must not block on rendering");
@@ -117,7 +118,7 @@ class MapTileLayerTest {
         }
         completions.forEach(Runnable::run);
         assertTrue(repaints.get() > 0);
-        assertTrue(layer.paint(deviceTarget(target()), "content", source, zoomed, zoomed, false, Color.BLACK));
+        assertTrue(layer.paint(deviceTarget(target()), "content", source, zoomed, zoomed, MapTileLayer.RequestMode.NONE, Color.BLACK));
         assertTrue(layer.isComplete(MapTileLayer.Level.of("content", 2.35, PIXEL_SCALE)));
         assertEquals(2, levelsCreated.get());
     }
@@ -146,11 +147,60 @@ class MapTileLayerTest {
     void changedContentRendersVisibleTilesInsteadOfShowingStaleFallback() {
         MapTileLayer layer = new MapTileLayer(true, 8, () -> { }, Runnable::run);
         MapTileLayer.Camera camera = camera(0.0, 0.0, 2.0);
-        layer.paint(deviceTarget(target()), "old", solid(Color.RED), camera, camera, false, Color.BLACK);
+        layer.paint(deviceTarget(target()), "old", solid(Color.RED), camera, camera, MapTileLayer.RequestMode.NONE, Color.BLACK);
 
         BufferedImage frame = target();
-        assertTrue(layer.paint(deviceTarget(frame), "new", solid(Color.GREEN), camera, camera, false, Color.BLACK));
+        assertTrue(layer.paint(deviceTarget(frame), "new", solid(Color.GREEN), camera, camera, MapTileLayer.RequestMode.NONE, Color.BLACK));
         assertEquals(Color.GREEN.getRGB(), frame.getRGB(10, 10));
+    }
+
+    @Test
+    void visibleOnlyRequestsRenderTheExactTargetLevelWithoutPrefetchRing() throws Exception {
+        ConcurrentLinkedQueue<Runnable> completions = new ConcurrentLinkedQueue<>();
+        MapTileLayer layer = new MapTileLayer(true, 8, () -> { }, completions::add);
+        List<Double> levelScales = new CopyOnWriteArrayList<>();
+        MapTileLayer.LevelSource source = (levelScale, pixelScale) -> {
+            levelScales.add(levelScale);
+            return solid(Color.ORANGE).create(levelScale, pixelScale);
+        };
+        MapTileLayer.Camera initial = camera(0.0, 0.0, 1.0);
+        layer.paint(deviceTarget(target()), "content", source, initial, initial, MapTileLayer.RequestMode.NONE,
+              Color.BLACK);
+        levelScales.clear();
+
+        MapTileLayer.Camera zoomed = camera(0.0, 0.0, 2.2);
+        layer.paint(deviceTarget(target()), "content", source, initial, zoomed,
+              MapTileLayer.RequestMode.VISIBLE_ONLY, Color.BLACK);
+        int expected = MapTileLayer.visibleKeys(MapTileLayer.Level.of("content", 2.2, PIXEL_SCALE), zoomed, 0)
+              .size();
+        long deadline = System.nanoTime() + 10_000_000_000L;
+        while ((completions.size() < expected) && (System.nanoTime() < deadline)) {
+            Thread.sleep(5);
+        }
+        Thread.sleep(50);
+        completions.forEach(Runnable::run);
+
+        assertEquals(List.of(2.2), levelScales, "tiles are rendered at the exact target scale");
+        assertEquals(expected, completions.size(), "no prefetch ring is rendered while zooming");
+        assertTrue(layer.isComplete(MapTileLayer.Level.of("content", 2.2, PIXEL_SCALE)));
+    }
+
+    @Test
+    void recycledTileImagesDoNotKeepEarlierPixels() {
+        MapTileLayer layer = new MapTileLayer(false, 8, () -> { }, Runnable::run);
+        MapTileLayer.Camera camera = camera(0.0, 0.0, 2.0);
+        layer.paint(deviceTarget(target()), "old", solid(Color.RED), camera, camera, MapTileLayer.RequestMode.NONE,
+              null);
+        layer.clear();
+
+        BufferedImage frame = target();
+        layer.paint(deviceTarget(frame), "new", (levelScale, pixelScale) -> (graphics, context) -> {
+            graphics.setColor(Color.BLUE);
+            graphics.fillRect(0, 0, 1, 1);
+            return true;
+        }, camera, camera, MapTileLayer.RequestMode.NONE, null);
+
+        assertEquals(0, frame.getRGB((frame.getWidth() / 2) - 20, (frame.getHeight() / 2) + 20));
     }
 
     @Test
@@ -215,6 +265,37 @@ class MapTileLayerTest {
 
         assertEquals(Math.rint(offset), offset, 0.000_001);
         assertEquals(snapped, InterstellarMapPanel.snapToDevicePixel(snapped, unit, halfExtent));
+    }
+
+    @Test
+    void tileBudgetKeepsTwoLevelsOfTheViewportAndItsPrefetchRing() {
+        MapTileLayer.Camera large = new MapTileLayer.Camera(1.0, 1.0, 0.0, 0.0, 2048, 1024);
+        assertEquals((8 + 3) * (4 + 3) * 2, MapTileLayer.tileBudget(large));
+        MapTileLayer.Camera small = new MapTileLayer.Camera(1.0, 1.0, 0.0, 0.0, 100, 100);
+        assertEquals(64, MapTileLayer.tileBudget(small));
+    }
+
+    @Test
+    void imageBudgetBoundsCachedImagesAndEmptyTilesNeverEvictThem() {
+        MapTileLayer layer = new MapTileLayer(false, 0, () -> { }, completion -> { });
+        MapTileLayer.Camera camera = camera(0.0, 0.0, 2.0);
+        MapTileLayer.LevelSource drawn = solid(Color.ORANGE);
+        MapTileLayer.LevelSource empty = (levelScale, pixelScale) -> (graphics, context) -> false;
+        int budget = MapTileLayer.tileBudget(camera);
+
+        // Every new content has no stand-in, so its visible tiles render synchronously.
+        for (int index = 0; index < budget; index++) {
+            layer.paint(deviceTarget(target()), "drawn" + index, drawn, camera, camera,
+                  MapTileLayer.RequestMode.VISIBLE_ONLY, null);
+        }
+        assertEquals(budget, layer.imageTileCount());
+
+        for (int index = 0; index < budget; index++) {
+            layer.paint(deviceTarget(target()), "empty" + index, empty, camera, camera,
+                  MapTileLayer.RequestMode.VISIBLE_ONLY, null);
+        }
+        assertEquals(budget, layer.imageTileCount());
+        assertTrue(layer.tileCount() > budget, "empty tiles are cached as well");
     }
 
     private static MapTileLayer.LevelSource solid(Color color) {
