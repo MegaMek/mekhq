@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -44,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -64,6 +67,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.unit.PreferredBombLoadout;
+import mekhq.campaign.unit.Unit;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -73,7 +78,10 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 public class BombsDialog extends JDialog implements ActionListener {
     private static final MMLogger LOGGER = MMLogger.create(BombsDialog.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.BombRearmer";
+
     private BombChoicePanel bombPanel;
+    private final Unit unit;
     private final IBomber bomber;
     private final Campaign campaign;
 
@@ -86,10 +94,15 @@ public class BombsDialog extends JDialog implements ActionListener {
 
     private JButton okayButton;
     private JButton cancelButton;
+    private JCheckBox rearmAfterScenariosBox;
 
-    public BombsDialog(IBomber iBomber, Campaign campaign, JFrame parent) {
+    /**
+     * @param unit the aircraft whose bombs are chosen; its entity must be an {@link IBomber}
+     */
+    public BombsDialog(Unit unit, Campaign campaign, JFrame parent) {
         super(parent, "Select Bombs", true);
-        this.bomber = iBomber;
+        this.unit = unit;
+        this.bomber = (IBomber) unit.getEntity();
         this.campaign = campaign;
         this.initialBombChoices = new BombLoadout(bomber.getBombChoices());
 
@@ -175,6 +188,12 @@ public class BombsDialog extends JDialog implements ActionListener {
     private JPanel buildButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
 
+        rearmAfterScenariosBox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "BombRearmer.rearmAfterScenarios"));
+        rearmAfterScenariosBox.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              "BombRearmer.rearmAfterScenarios.tooltip"));
+        rearmAfterScenariosBox.setSelected(unit.getPreferredBombLoadout() != null);
+        panel.add(rearmAfterScenariosBox);
+
         okayButton = new JButton("Okay");
         okayButton.setMnemonic('o');
         okayButton.addActionListener(this);
@@ -227,8 +246,21 @@ public class BombsDialog extends JDialog implements ActionListener {
 
         // Update warehouse based on the delta
         updateWarehouse(warehouseDelta);
+        savePreferredLoadout();
 
         setVisible(false);
+    }
+
+    /**
+     * Keeps the bombs just chosen as the ones to rearm with after each scenario when the box is ticked, and stops
+     * rearming when it is not. A loadout with no bombs is not kept, since there would be nothing to rearm.
+     */
+    private void savePreferredLoadout() {
+        PreferredBombLoadout chosenLoadout = new PreferredBombLoadout(bomber.getIntBombChoices(),
+              bomber.getExtBombChoices());
+        boolean isRearmWanted = rearmAfterScenariosBox.isSelected() && chosenLoadout.hasBombs();
+        unit.setPreferredBombLoadout(isRearmWanted ? chosenLoadout : null);
+        LOGGER.debug("[BombRearm] {}: rearm after scenarios {}", unit.getName(), isRearmWanted ? "on" : "off");
     }
 
     /**

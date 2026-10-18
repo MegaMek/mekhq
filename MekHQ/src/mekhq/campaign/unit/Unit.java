@@ -288,6 +288,9 @@ public class Unit implements ITechnology, ILocatable {
 
     private MothballInfo mothballInfo;
 
+    // The bombs to top the aircraft back up to after each scenario; null when the player has not opted in
+    private @Nullable PreferredBombLoadout preferredBombLoadout;
+
     public Unit() {
         this(null, null);
     }
@@ -3719,6 +3722,10 @@ public class Unit implements ITechnology, ILocatable {
             mothballInfo.writeToXML(pw, indent);
         }
 
+        if (preferredBombLoadout != null) {
+            preferredBombLoadout.writeToXML(pw, indent);
+        }
+
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unit");
     }
 
@@ -3894,6 +3901,8 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
                     retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
+                } else if (PreferredBombLoadout.isXMLTag(wn2)) {
+                    retVal.preferredBombLoadout = PreferredBombLoadout.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("podSpace")) {
                     PodSpace savedJob = PodSpace.generateInstanceFromXML(wn2, retVal);
                     if (savedJob != null) {
@@ -7583,6 +7592,22 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     // region Mothballing/Activation
+
+    /**
+     * @return the bombs this aircraft is rearmed with after each scenario, or {@code null} if the player has not opted
+     *       in
+     */
+    public @Nullable PreferredBombLoadout getPreferredBombLoadout() {
+        return preferredBombLoadout;
+    }
+
+    /**
+     * @param preferredBombLoadout the bombs to rearm this aircraft with after each scenario, or {@code null} to stop
+     *                             rearming it
+     */
+    public void setPreferredBombLoadout(@Nullable PreferredBombLoadout preferredBombLoadout) {
+        this.preferredBombLoadout = preferredBombLoadout;
+    }
 
     /**
      * Gets a value indicating whether the unit is being mothballed or activated.
