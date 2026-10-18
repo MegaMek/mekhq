@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import megamek.common.battleArmor.BattleArmor;
@@ -799,7 +799,7 @@ public class MRMSService {
 
         if (parts.isEmpty() && scrappingLimbMode) {
             parts = getRepairsOutsideLimbsThatCannotBeStripped(campaign, unit, techs, mrmsOptionsByType,
-                  locationMap.keySet());
+                  locationMap);
             configuredOptions.setAllowCarryover(originalAllowCarryover);
             scrappingLimbMode = false;
         }
@@ -822,7 +822,7 @@ public class MRMSService {
             configuredOptions.setAllowCarryover(originalAllowCarryover);
             scrappingLimbMode = false;
             for (IPartWork partWork : getRepairsOutsideLimbsThatCannotBeStripped(campaign, unit, techs,
-                  mrmsOptionsByType, locationMap.keySet())) {
+                  mrmsOptionsByType, locationMap)) {
                 performPartWork(campaign, unit, techs, mrmsOptionsByType, configuredOptions, partWork, unitAction);
             }
         }
@@ -846,22 +846,32 @@ public class MRMSService {
      * longer than the time the techs have left, the unit's other repairs go ahead instead. Before, the unit was left
      * untouched, and as nothing changed from one day to the next it was never repaired at all.
      *
-     * @param limbLocations the limbs whose parts could not be stripped; repairs there are left out
+     * <p>The daily report says so, and why, since otherwise the player sees only that the limb was not stripped.</p>
+     *
+     * @param limbs the limbs whose parts could not be stripped, by location; repairs there are left out
      *
      * @return the unit's other repairs that Mass Repair can do
      */
     private static List<IPartWork> getRepairsOutsideLimbsThatCannotBeStripped(Campaign campaign, Unit unit,
-          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType, Set<Integer> limbLocations) {
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType, Map<Integer, Part> limbs) {
         unit.setSalvage(false);
         List<IPartWork> repairsOutsideLimbs = new ArrayList<>();
         for (IPartWork partWork : unit.getPartsNeedingService(true)) {
-            if (!limbLocations.contains(partWork.getLocation())) {
+            if (!limbs.containsKey(partWork.getLocation())) {
                 repairsOutsideLimbs.add(partWork);
             }
         }
         LOGGER.debug("[MRMS] {}: no part can be stripped from locations {} today; trying its {} other repairs instead",
-              unit.getName(), limbLocations, repairsOutsideLimbs.size());
-        return filterParts(repairsOutsideLimbs, mrmsOptionsByType, techs, campaign);
+              unit.getName(), limbs.keySet(), repairsOutsideLimbs.size());
+        List<IPartWork> repairsToTry = filterParts(repairsOutsideLimbs, mrmsOptionsByType, techs, campaign);
+        if (!repairsToTry.isEmpty()) {
+            String limbNames = limbs.values().stream()
+                                     .map(Part::getName)
+                                     .collect(Collectors.joining(", "));
+            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.LimbCannotBeStripped.report",
+                  getWarningColor(), limbNames, unit.getName()));
+        }
+        return repairsToTry;
     }
 
     private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
@@ -1033,22 +1043,10 @@ public class MRMSService {
                 unfixable = (loc instanceof MekLocation);
             }
 
-            if (unfixable) {
-                campaign.addReport(TECHNICAL, String.format(
-                      "<font color='" +
-                            getWarningColor()
-                            +
-                            "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
-                      loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
-            } else {
-                campaign.addReport(TECHNICAL, String.format(
-                      "<font color='" +
-                            getWarningColor()
-                            +
-                            "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
-                      loc != null ? loc.getName() : Integer.toString(locId), unit.getName(),
-                      countOfPartsPerLocation.get(locId)));
-            }
+            String reportKey = unfixable ? "MRMS.UnfixableLimb.report" : "MRMS.MissingLocation.report";
+            String locationName = (loc != null) ? loc.getName() : Integer.toString(locId);
+            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, getWarningColor(),
+                  locationName, unit.getName(), countOfPartsPerLocation.get(locId)));
         }
     }
 

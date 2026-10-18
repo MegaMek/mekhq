@@ -32,9 +32,12 @@
  */
 package mekhq.service.mrms;
 
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -127,6 +130,13 @@ class MassRepairUnstrippableLimbTest {
         options.set(CampaignOption.MRMS_OPTIONS, repairTypeOptions);
     }
 
+    /** The daily report line telling the player the limb could not be stripped and other repairs went ahead. */
+    private boolean isThePlayerToldTheLimbCannotBeStripped() {
+        String expectedReport = getFormattedTextAt("mekhq.resources.MRMS", "MRMS.LimbCannotBeStripped.report",
+              getWarningColor(), "Mek Left Torso", wolverine.getName());
+        return campaign.getDailyReportLog().getLines(TECHNICAL).contains(expectedReport);
+    }
+
     private boolean isTheLauncherStillFitted() {
         return PartsScenario.unitParts(wolverine, EquipmentPart.class).stream()
                      .anyMatch(part -> "SRM 6".equals(part.getName()) && (part.getLocation() == Mek.LOC_LEFT_TORSO));
@@ -140,6 +150,7 @@ class MassRepairUnstrippableLimbTest {
 
         assertTrue(isTheLauncherStillFitted(), "Taking the SRM 6 out needs a 6, more than Mass Repair allows");
         assertEquals(fullCentreTorsoArmor, wolverine.getEntity().getArmor(Mek.LOC_CENTER_TORSO));
+        assertTrue(isThePlayerToldTheLimbCannotBeStripped());
     }
 
     @Test
@@ -150,5 +161,6 @@ class MassRepairUnstrippableLimbTest {
 
         assertFalse(isTheLauncherStillFitted(), "The SRM 6 is taken out of the destroyed left torso");
         assertEquals(fullCentreTorsoArmor, wolverine.getEntity().getArmor(Mek.LOC_CENTER_TORSO));
+        assertFalse(isThePlayerToldTheLimbCannotBeStripped());
     }
 }
