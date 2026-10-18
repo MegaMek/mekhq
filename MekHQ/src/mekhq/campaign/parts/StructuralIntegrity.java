@@ -267,7 +267,7 @@ public class StructuralIntegrity extends Part {
     @Override
     public void doMaintenanceDamage(int d) {
         int points = ((Aero) unit.getEntity()).getSI();
-        points = Math.max(points - d, 1);
+        points = getStructureAfterMaintenanceDamage(points, d);
         ((Aero) unit.getEntity()).setSI(points);
         updateConditionFromEntity(false);
     }

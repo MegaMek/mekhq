@@ -357,7 +357,7 @@ public class TankLocation extends Part {
     @Override
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
-        points = Math.max(points - d, 1);
+        points = getStructureAfterMaintenanceDamage(points, d);
         unit.getEntity().setInternal(points, loc);
         updateConditionFromEntity(false);
     }

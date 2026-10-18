@@ -1015,7 +1015,7 @@ public class MekLocation extends Part {
     public void doMaintenanceDamage(int d) {
         if ((getUnit() != null) && (d > 0)) {
             int points = getUnit().getEntity().getInternal(getLoc());
-            getUnit().getEntity().setInternal(Math.max(points - d, 1), getLoc());
+            getUnit().getEntity().setInternal(getStructureAfterMaintenanceDamage(points, d), getLoc());
             updateConditionFromEntity(false);
         }
     }

@@ -1923,6 +1923,25 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         updateConditionFromEntity(false);
     }
 
+    /**
+     * The structure a location or hull keeps after maintenance damage. Maintenance damage never destroys it, so it stops
+     * at 1 point. One that is already destroyed stays destroyed: raising it back to 1 point would make a wreck
+     * repairable again.
+     *
+     * @param structure the structure points before the damage
+     * @param damage    the maintenance damage
+     *
+     * @return the structure points after the damage
+     */
+    protected int getStructureAfterMaintenanceDamage(int structure, int damage) {
+        if (structure < 1) {
+            LOGGER.debug("[MaintenanceDamage] {} on {}: already destroyed, so maintenance damage leaves it as it is",
+                  getName(), (unit == null) ? "no unit" : unit.getName());
+            return structure;
+        }
+        return Math.max(structure - damage, 1);
+    }
+
     public PartQuality getQuality() {
         return quality;
     }
