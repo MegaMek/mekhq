@@ -1924,6 +1924,16 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     /**
+     * Whether a failed maintenance check can still damage this part. A location or hull that is already destroyed has
+     * nothing left to damage.
+     *
+     * @return {@code true} if maintenance damage would change this part
+     */
+    public boolean canTakeMaintenanceDamage() {
+        return true;
+    }
+
+    /**
      * The structure a location or hull keeps after maintenance damage. Maintenance damage never destroys it, so it stops
      * at 1 point. One that is already destroyed stays destroyed: raising it back to 1 point would make a wreck
      * repairable again.

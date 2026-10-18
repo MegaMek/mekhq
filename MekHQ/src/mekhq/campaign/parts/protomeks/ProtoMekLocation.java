@@ -646,6 +646,11 @@ public class ProtoMekLocation extends Part {
     }
 
     @Override
+    public boolean canTakeMaintenanceDamage() {
+        return unit.getEntity().getInternal(loc) >= 1;
+    }
+
+    @Override
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
         points = getStructureAfterMaintenanceDamage(points, d);

@@ -1012,6 +1012,11 @@ public class MekLocation extends Part {
     }
 
     @Override
+    public boolean canTakeMaintenanceDamage() {
+        return (getUnit() != null) && (getUnit().getEntity().getInternal(getLoc()) >= 1);
+    }
+
+    @Override
     public void doMaintenanceDamage(int d) {
         if ((getUnit() != null) && (d > 0)) {
             int points = getUnit().getEntity().getInternal(getLoc());
