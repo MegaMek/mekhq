@@ -4670,6 +4670,10 @@ public class Campaign implements ITechManager {
             }
         }
 
+        if (!(partWork instanceof Refit)) {
+            PlanetaryWorkConditions.addRollModifiers(this, partUnit, tech, target);
+        }
+
         final boolean isOvertime;
         if (isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
