@@ -1431,10 +1431,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
     /**
      * @return {@code true} if this part can be scrapped and a replacement fitted, which is how a part beyond repair is
-     *       dealt with
+     *       dealt with. A part that can never be scrapped, such as a vehicle location, cannot be replaced either.
      */
     protected boolean isReplaceable() {
-        return true;
+        return !canNeverScrap();
     }
 
     /**

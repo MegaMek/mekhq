@@ -37,7 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.protomeks.ProtoMekLocation;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -46,8 +49,8 @@ import testUtilities.parts.UnitFixture;
 
 /**
  * A failed repair can leave a part beyond repair, and no tech can work on it again. The report only said the repair
- * failed, so the player never learned the part had to be scrapped and replaced (issue #9579). A Mek's centre torso
- * cannot be scrapped, so it stays as it is.
+ * failed, so the player never learned the part had to be scrapped and replaced (issue #9579). Parts that can never be
+ * scrapped, such as a Mek's centre torso, a ProtoMek's torso or a vehicle location, are reported as unreplaceable.
  */
 class PartBeyondRepairReportTest {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
@@ -55,6 +58,20 @@ class PartBeyondRepairReportTest {
     private static MekLocation locationOf(Unit unit, int location) {
         return PartsScenario.unitParts(unit, MekLocation.class).stream()
                      .filter(part -> part.getLoc() == location)
+                     .findFirst()
+                     .orElseThrow();
+    }
+
+    private static TankLocation vehicleLocationOf(Unit unit, int location) {
+        return PartsScenario.unitParts(unit, TankLocation.class).stream()
+                     .filter(part -> part.getLocation() == location)
+                     .findFirst()
+                     .orElseThrow();
+    }
+
+    private static ProtoMekLocation protoMekLocationOf(Unit unit, int location) {
+        return PartsScenario.unitParts(unit, ProtoMekLocation.class).stream()
+                     .filter(part -> part.getLocation() == location)
                      .findFirst()
                      .orElseThrow();
     }
@@ -80,6 +97,36 @@ class PartBeyondRepairReportTest {
         String report = centreTorso.fail(SkillType.EXP_LEGENDARY);
 
         assertTrue(report.contains(getTextAt(RESOURCE_BUNDLE, "Part.fail.beyondRepairNotReplaceable")), report);
+    }
+
+    @Test
+    void aVehicleLocationBeyondRepairIsReportedAsUnreplaceable() {
+        Unit vedette = PartsScenario.create().withUnit(UnitFixture.VEDETTE_MEDIUM_TANK);
+        TankLocation front = vehicleLocationOf(vedette, Tank.LOC_FRONT);
+
+        String report = front.fail(SkillType.EXP_LEGENDARY);
+
+        assertTrue(report.contains(getTextAt(RESOURCE_BUNDLE, "Part.fail.beyondRepairNotReplaceable")), report);
+    }
+
+    @Test
+    void aProtoMekTorsoBeyondRepairIsReportedAsUnreplaceable() {
+        Unit minotaur = PartsScenario.create().withUnit(UnitFixture.MINOTAUR_PROTOMEK);
+        ProtoMekLocation torso = protoMekLocationOf(minotaur, ProtoMek.LOC_TORSO);
+
+        String report = torso.fail(SkillType.EXP_LEGENDARY);
+
+        assertTrue(report.contains(getTextAt(RESOURCE_BUNDLE, "Part.fail.beyondRepairNotReplaceable")), report);
+    }
+
+    @Test
+    void aProtoMekArmBeyondRepairSaysToReplaceIt() {
+        Unit minotaur = PartsScenario.create().withUnit(UnitFixture.MINOTAUR_PROTOMEK);
+        ProtoMekLocation leftArm = protoMekLocationOf(minotaur, ProtoMek.LOC_LEFT_ARM);
+
+        String report = leftArm.fail(SkillType.EXP_LEGENDARY);
+
+        assertTrue(report.contains(getTextAt(RESOURCE_BUNDLE, "Part.fail.beyondRepair")), report);
     }
 
     @Test
