@@ -663,9 +663,8 @@ public class MRMSService {
             boolean refreshParts = false;
 
             for (IPartWork partWork : parts) {
-                if ((partWork instanceof Part) && (partWork.getSkillMin() > SkillType.EXP_LEGENDARY)) {
-                    campaign.addReport(TECHNICAL, ((Part) partWork).scrap());
-                    refreshParts = true;
+                if ((partWork instanceof Part part) && (part.getSkillMin() > SkillType.EXP_LEGENDARY)) {
+                    refreshParts |= scrapPartBeyondRepair(campaign, unit, part);
                 }
             }
 
@@ -822,6 +821,29 @@ public class MRMSService {
         }
 
         return unitAction;
+    }
+
+    /**
+     * Scraps a part no tech can repair, so a replacement can be fitted. A part that can never be replaced, such as a
+     * Mek's centre torso or a vehicle location, is left in place: scrapping it would wreck the unit for good. The daily
+     * report says so, and the unit's other repairs go ahead.
+     *
+     * @return {@code true} if the part was scrapped
+     */
+    private static boolean scrapPartBeyondRepair(Campaign campaign, Unit unit, Part part) {
+        if (!part.isReplaceable()) {
+            LOGGER.debug("[MRMS] {}: {} is beyond repair but cannot be replaced, so it is not scrapped",
+                  unit.getName(), part.getName());
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CannotBeReplaced.report", getWarningColor(),
+                  part.getName(), unit.getName());
+            // Mass Repair goes over a unit several times in one run; the player needs the line only once
+            if (!campaign.getDailyReportLog().getLines(TECHNICAL).contains(report)) {
+                campaign.addReport(TECHNICAL, report);
+            }
+            return false;
+        }
+        campaign.addReport(TECHNICAL, part.scrap());
+        return true;
     }
 
     private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
