@@ -590,6 +590,10 @@ public class MRMSService {
             }
         }
 
+        if (configuredOptions.isScrapImpossible()) {
+            reportPartsThatCannotBeReplaced(campaign, unit);
+        }
+
         debugLog("Finished fixing %s in %s ns", "performUnitMRMS", unit.getName(), System.nanoTime() - time);
 
         return unitAction;
@@ -825,8 +829,9 @@ public class MRMSService {
 
     /**
      * Scraps a part no tech can repair, so a replacement can be fitted. A part that can never be replaced, such as a
-     * Mek's centre torso or a vehicle location, is left in place: scrapping it would wreck the unit for good. The daily
-     * report says so, and the unit's other repairs go ahead.
+     * Mek's centre torso or a vehicle location, is left in place: scrapping it would wreck the unit for good. The unit's
+     * other repairs go ahead, and {@link #reportPartsThatCannotBeReplaced} tells the player once Mass Repair is done
+     * with the unit.
      *
      * @return {@code true} if the part was scrapped
      */
@@ -834,16 +839,24 @@ public class MRMSService {
         if (!part.isReplaceable()) {
             LOGGER.debug("[MRMS] {}: {} is beyond repair but cannot be replaced, so it is not scrapped",
                   unit.getName(), part.getName());
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CannotBeReplaced.report", getWarningColor(),
-                  part.getName(), unit.getName());
-            // Mass Repair goes over a unit several times in one run; the player needs the line only once
-            if (!campaign.getDailyReportLog().getLines(TECHNICAL).contains(report)) {
-                campaign.addReport(TECHNICAL, report);
-            }
             return false;
         }
         campaign.addReport(TECHNICAL, part.scrap());
         return true;
+    }
+
+    /**
+     * Tells the player which parts Mass Repair left in place because they are beyond repair and cannot be replaced.
+     * It runs once, after every pass over the unit, so each part is named once however many passes there were.
+     */
+    private static void reportPartsThatCannotBeReplaced(Campaign campaign, Unit unit) {
+        for (Part part : unit.getParts()) {
+            boolean isBeyondRepair = part.getSkillMin() > SkillType.EXP_LEGENDARY;
+            if (isBeyondRepair && !part.isReplaceable()) {
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CannotBeReplaced.report",
+                      getWarningColor(), part.getName(), unit.getName()));
+            }
+        }
     }
 
     private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
