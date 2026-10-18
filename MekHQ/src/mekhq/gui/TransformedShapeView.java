@@ -94,6 +94,9 @@ final class TransformedShapeView implements Shape {
 
     @Override
     public boolean intersects(double x, double y, double width, double height) {
+        if (!(width > 0.0) || !(height > 0.0)) {
+            return false;
+        }
         return shape.intersects(transformRectangle(inverse, new Rectangle2D.Double(x, y, width, height)));
     }
 
@@ -104,6 +107,9 @@ final class TransformedShapeView implements Shape {
 
     @Override
     public boolean contains(double x, double y, double width, double height) {
+        if (!(width > 0.0) || !(height > 0.0)) {
+            return false;
+        }
         return shape.contains(transformRectangle(inverse, new Rectangle2D.Double(x, y, width, height)));
     }
 

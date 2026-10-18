@@ -110,6 +110,25 @@ class TransformedShapeViewTest {
               segments(shape, null).toArray());
     }
 
+    @Test
+    void rectangleQueriesRejectNonPositiveDimensions() {
+        Area square = new Area(new Rectangle2D.Double(0.0, 0.0, 10.0, 10.0));
+        Shape view = TransformedShapeView.of(square, AffineTransform.getScaleInstance(1.0, -1.0));
+        Shape copy = AffineTransform.getScaleInstance(1.0, -1.0).createTransformedShape(square);
+
+        for (double[] query : new double[][] { { 8.0, -3.0, -6.0, 2.0 }, { 2.0, -9.0, 2.0, -6.0 },
+              { 2.0, -8.0, 0.0, 3.0 }, { 2.0, -8.0, Double.NaN, 3.0 } }) {
+            assertEquals(copy.contains(query[0], query[1], query[2], query[3]),
+                  view.contains(query[0], query[1], query[2], query[3]));
+            assertEquals(copy.intersects(query[0], query[1], query[2], query[3]),
+                  view.intersects(query[0], query[1], query[2], query[3]));
+            assertFalse(view.contains(query[0], query[1], query[2], query[3]));
+            assertFalse(view.intersects(query[0], query[1], query[2], query[3]));
+        }
+        assertTrue(view.contains(2.0, -8.0, 6.0, 6.0));
+        assertTrue(view.intersects(8.0, -3.0, 6.0, 2.0));
+    }
+
     private static List<String> segments(Shape shape, AffineTransform transform) {
         List<String> segments = new ArrayList<>();
         double[] coordinates = new double[6];

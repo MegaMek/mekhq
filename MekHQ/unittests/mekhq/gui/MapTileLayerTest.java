@@ -298,6 +298,22 @@ class MapTileLayerTest {
         assertTrue(layer.tileCount() > budget, "empty tiles are cached as well");
     }
 
+    @Test
+    void enlargedViewportKeepsEveryNewlyRenderedVisibleTile() {
+        MapTileLayer layer = new MapTileLayer(false, 0, () -> { }, completion -> { });
+        MapTileLayer.Camera small = new MapTileLayer.Camera(1.0, 1.0, 0.0, 0.0, 100, 100);
+        layer.paint(deviceTarget(target()), "small", solid(Color.ORANGE), small, small,
+              MapTileLayer.RequestMode.VISIBLE_ONLY, null);
+
+        MapTileLayer.Camera large = new MapTileLayer.Camera(1.0, 1.0, 0.0, 0.0, 3000, 2000);
+        int visibleTiles = Math.ceilDiv(3000, MapTileLayer.TILE_SIZE) * Math.ceilDiv(2000, MapTileLayer.TILE_SIZE);
+        assertTrue(visibleTiles > MapTileLayer.tileBudget(small), "the enlarged view needs more than the old budget");
+        layer.paint(deviceTarget(target()), "large", solid(Color.BLUE), large, large,
+              MapTileLayer.RequestMode.NONE, null);
+
+        assertTrue(layer.imageTileCount() >= visibleTiles, "no visible tile of the new content was evicted");
+    }
+
     private static MapTileLayer.LevelSource solid(Color color) {
         return (levelScale, pixelScale) -> (graphics, context) -> {
             graphics.setColor(color);

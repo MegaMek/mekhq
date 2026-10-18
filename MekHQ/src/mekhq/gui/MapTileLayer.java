@@ -201,6 +201,7 @@ final class MapTileLayer {
     boolean paint(Graphics2D graphics, Object content, LevelSource source, Camera view, Camera target,
           RequestMode requestMode, @Nullable Color holeFill) {
         Level exactLevel = Level.of(content, view.scale(), view.pixelScale());
+        tileBudget = tileBudget(view);
         Graphics2D deviceGraphics = (Graphics2D) graphics.create();
         try {
             InterstellarMapPanel.prepareLayerBlit(deviceGraphics, view.pixelScale());
