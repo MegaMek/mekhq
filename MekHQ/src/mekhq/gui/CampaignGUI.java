@@ -196,6 +196,8 @@ public class CampaignGUI extends JPanel {
     private final MekLabTab mekLabTab;
     private final FinancesTab financesTab;
 
+    private boolean isDayAdvanceBatchInProgress;
+
     /* Components for the status panel */
     private JPanel statusPanel;
     private JLabel lblFunds;
@@ -2194,7 +2196,31 @@ public class CampaignGUI extends JPanel {
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
+        if (isDayAdvanceBatchInProgress) {
+            // The Command Center still refreshes every day: it collects the report lines added after its own new
+            // day handler ran, and the advance days dialog would otherwise show those lines twice.
+            commandCenterTab.refreshAll();
+            return;
+        }
         refreshAllTabs();
+    }
+
+    /**
+     * Starts a run of days advanced together, such as from the advance days dialog. Until
+     * {@link #endDayAdvanceBatch()} is called, each new day refreshes only the Command Center tab rather than every
+     * tab, because the days in between are never shown. The caller must refresh every tab once the run ends.
+     */
+    public void beginDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Deferring tab refreshes until the advance ends");
+        isDayAdvanceBatchInProgress = true;
+    }
+
+    /**
+     * Ends a run started with {@link #beginDayAdvanceBatch()}, so each new day refreshes every tab again.
+     */
+    public void endDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Advance ended, tab refreshes resume");
+        isDayAdvanceBatchInProgress = false;
     }
 
     /**
