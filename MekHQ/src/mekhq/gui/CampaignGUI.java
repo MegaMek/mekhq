@@ -1262,14 +1262,14 @@ public class CampaignGUI extends JPanel {
                 return;
             }
         } catch (EntityLoadingException exception) {
-            logger.error(exception, "[RefitStart] {}: the new design could not be loaded", refit.getUnit().getName());
+            logger.error(exception, "[RefitStart] %s: the new design could not be loaded", refit.getUnit().getName());
             JOptionPane.showMessageDialog(frame,
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.text"),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException exception) {
-            logger.error(exception, "[RefitStart] {}: the new design could not be saved", refit.getUnit().getName());
+            logger.error(exception, "[RefitStart] %s: the new design could not be saved", refit.getUnit().getName());
             JOptionPane.showMessageDialog(frame, exception.getMessage(),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitIOException.title"), JOptionPane.ERROR_MESSAGE);
             return;
