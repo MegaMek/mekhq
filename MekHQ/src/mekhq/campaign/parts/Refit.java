@@ -3161,27 +3161,37 @@ public class Refit extends Part implements IAcquisitionWork {
         AvailabilityValue avail = AvailabilityValue.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
-            if (getTechBase() == TechBase.CLAN &&
-                      campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
-            } else if (getTechBase() == TechBase.IS &&
-                             campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
-            } else if (getTechBase() == TechBase.ALL) {
-                int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
-                      campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
-                if (penalty > techBaseMod) {
-                    techBaseMod = penalty;
-                }
-            }
+            techBaseMod = Math.max(techBaseMod, getTechBasePenalty(part.getTechBase()));
             avail = AvailabilityValue.fromIndex(Math.max(avail.getIndex(), part.getAvailability().getIndex()));
         }
+        LOGGER.debug("[RefitKitAcquisition] {}: tech base penalty {} from {} parts to buy", getDesc(), techBaseMod,
+              shoppingList.size());
         if (techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         roll.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return roll;
+    }
+
+    /**
+     * The Clan or Inner Sphere acquisition penalty one part of the kit would get if it were bought on its own. The kit
+     * itself counts as either tech base, so the penalty has to come from each part. A part either tech base can use
+     * takes the lower of the two penalties.
+     *
+     * @param partTechBase the tech base of the part being bought
+     *
+     * @return the penalty for that part, or 0 if none applies
+     */
+    private int getTechBasePenalty(TechBase partTechBase) {
+        int clanPenalty = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
+        int innerSpherePenalty = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
+        return switch (partTechBase) {
+            case CLAN -> clanPenalty;
+            case IS -> innerSpherePenalty;
+            case ALL -> Math.min(clanPenalty, innerSpherePenalty);
+            case UNKNOWN -> 0;
+        };
     }
 
     public @Nullable Armor getNewArmorSupplies() {
