@@ -621,6 +621,37 @@ class SalvageRecoverySessionTest {
         }
 
         @Test
+        void stealingTakesWrecksLeftToTheEmployer() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5), 600, 0);
+            assertEquals(SalvageClaim.EMPLOYER, session.getClaim(session.getRecoveries().getFirst()));
+
+            assertTrue(session.steal());
+            assertEquals(List.of(wreck), session.getKeptSalvage());
+            assertTrue(session.getEmployerSalvage().isEmpty());
+        }
+
+        @Test
+        void stealingStillSellsWrecksSetToSell() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new CappedSalvageSettlement(0.5), 600, 0);
+            assertTrue(session.setClaim(session.getRecoveries().getFirst(), SalvageClaim.SELL));
+
+            assertTrue(session.steal());
+            assertEquals(List.of(wreck), session.getSoldSalvage());
+            assertTrue(session.getKeptSalvage().isEmpty());
+        }
+
+        @Test
+        void stealingNeedsARecoveredWreck() {
+            SalvageRecoverySession session = session(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5),
+                  List.of(wreck), List.of(truck), 600, 0, 0, 0);
+
+            assertEquals(0, session.getRecoveredCount());
+            assertFalse(session.canSteal());
+            assertFalse(session.steal());
+            assertFalse(session.isStolen());
+        }
+
+        @Test
         void stealingStillNeedsTheTechTime() {
             SalvageRecoverySession session = recovered(new MekHQSalvage(), new PurchaseSalvageSettlement(0.5), 30, 0);
 

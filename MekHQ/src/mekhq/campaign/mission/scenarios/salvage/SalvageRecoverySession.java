@@ -658,16 +658,16 @@ public class SalvageRecoverySession {
      * Checks whether the player can steal their salvage.
      *
      * <p>Stealing ignores the settlement's terms (salvage caps, purchase costs, and salvage the settlement doesn't let
-     * the player keep), but the salvage still has to be recovered: assignments must be able to recover their wrecks,
-     * and the salvage techs must have the time.</p>
+     * the player keep), but the salvage still has to be recovered: at least one wreck must be recovered, assignments
+     * must be able to recover their wrecks, and the salvage techs must have the time.</p>
      *
-     * @return {@code true} if the salvage system allows theft and nothing stops the recovery
+     * @return {@code true} if the salvage system allows theft, a wreck is recovered, and nothing stops the recovery
      *
      * @author Illiani
      * @since 0.51.01
      */
     public boolean canSteal() {
-        if (!isTheftAllowed()) {
+        if (!isTheftAllowed() || (getRecoveredCount() == 0)) {
             return false;
         }
 
@@ -677,7 +677,9 @@ public class SalvageRecoverySession {
     }
 
     /**
-     * Steals the salvage the player keeps: they keep it without paying anything, but breach their contract (see
+     * Steals every recovered wreck: those set to {@link SalvageClaim#EMPLOYER Employer} are kept along with those set
+     * to {@link SalvageClaim#KEEP Keep}, without paying anything, while those set to {@link SalvageClaim#SELL Sell}
+     * are still sold. Stealing breaches the contract (see
      * {@link CamOpsSalvageUtilities#breachContractForSalvageTheft}).
      *
      * @return {@code true} if the salvage was stolen; {@code false} if the player can't steal it (see
@@ -689,6 +691,11 @@ public class SalvageRecoverySession {
     public boolean steal() {
         if (!canSteal()) {
             return false;
+        }
+        for (WreckRecovery recovery : getRecoveries()) {
+            if (recovery.isRecovered() && (getClaim(recovery) == SalvageClaim.EMPLOYER)) {
+                claims.put(recovery, SalvageClaim.KEEP);
+            }
         }
         isStolen = true;
         return true;

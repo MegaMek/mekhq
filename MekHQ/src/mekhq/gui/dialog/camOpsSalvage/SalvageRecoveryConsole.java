@@ -999,7 +999,7 @@ public class SalvageRecoveryConsole extends JDialog {
     }
 
     /**
-     * Steals the salvage the player keeps, once they confirm they're willing to breach their contract to do it.
+     * Steals every recovered wreck, once the player confirms they're willing to breach their contract to do it.
      */
     private void steal() {
         if (!requireSession().canSteal()) {

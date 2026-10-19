@@ -239,7 +239,7 @@ public abstract class AbstractSalvage {
     }
 
     /**
-     * Checks whether the player may steal the salvage they claim.
+     * Checks whether the player may steal the salvage they recover.
      *
      * <p>Stolen salvage is kept without paying the employer anything, whatever the settlement would otherwise allow,
      * but the theft breaches the contract, which ends immediately (see
