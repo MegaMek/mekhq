@@ -1238,7 +1238,8 @@ public class ResolveScenarioTracker {
 
     /**
      * Applies all blob (temp) crew losses queued in {@link #pendingBlobCrewLosses} to the given unit, making a single
-     * update per {@link PersonnelRole}, then clears the queue.
+     * update per {@link PersonnelRole}, then clears the queue. Under {@code SIMULATED_DAMAGE} the losses are discarded
+     * instead, as no one actually dies in a simulated battle.
      *
      * @param unit the unit the queued losses were rolled against
      *
@@ -1246,6 +1247,11 @@ public class ResolveScenarioTracker {
      * @since 0.51.01
      */
     private void applyPendingBlobCrewLosses(Unit unit) {
+        if (voidsCombatDamage()) {
+            pendingBlobCrewLosses.clear();
+            return;
+        }
+
         for (Map.Entry<PersonnelRole, Integer> entry : pendingBlobCrewLosses.entrySet()) {
             PersonnelRole role = entry.getKey();
             int losses = entry.getValue();
@@ -2080,9 +2086,14 @@ public class ResolveScenarioTracker {
 
     /**
      * Processes death payouts for killed temp crew (blob crew). Calculates appropriate compensation based on role base
-     * salaries and campaign payout settings.
+     * salaries and campaign payout settings. Under {@code SIMULATED_DAMAGE} nothing is paid, as no one actually dies in
+     * a simulated battle.
      */
-    private void processTempCrewDeathPayouts() {
+    void processTempCrewDeathPayouts() {
+        if (voidsCombatDamage() || killedTempCrew.isEmpty()) {
+            return;
+        }
+
         CampaignOptions options = campaign.getCampaignOptions();
         Money totalPayout = Money.zero();
         int totalKilled = 0;
@@ -2270,10 +2281,8 @@ public class ResolveScenarioTracker {
             processFamiliarity(familiarityDice, familiarity);
         }
 
-        // Process payouts for killed temp crew (blob crew)
-        if (!killedTempCrew.isEmpty()) {
-            processTempCrewDeathPayouts();
-        }
+        // Process payouts for killed temp crew (blob crew).
+        processTempCrewDeathPayouts();
 
         // region Prisoners
         for (UUID pid : oppositionPersonnel.keySet()) {
