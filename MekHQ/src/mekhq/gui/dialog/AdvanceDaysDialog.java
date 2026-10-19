@@ -456,83 +456,88 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         final List<String> technicalReports = new ArrayList<>();
         final List<String> aggregateReports = new ArrayList<>();
         Campaign campaign = getGUI().getCampaign();
-        for (; days > 0; days--) {
-            try {
-                if (!campaign.newDay()) {
+        getGUI().beginDayAdvanceBatch();
+        try {
+            for (; days > 0; days--) {
+                try {
+                    if (!campaign.newDay()) {
+                        break;
+                    }
+
+                    final DailyReportLog reportLog = campaign.getDailyReportLog();
+                    final String generalReport = reportLog.getHtml(GENERAL);
+                    final String skillReport = reportLog.getHtml(SKILL_CHECKS);
+                    final String battleReport = reportLog.getHtml(BATTLE);
+                    final String politicsReport = reportLog.getHtml(POLITICS);
+                    final String personnelReport = reportLog.getHtml(PERSONNEL);
+                    final String medicalReport = reportLog.getHtml(MEDICAL);
+                    final String financesReport = reportLog.getHtml(FINANCES);
+                    final String acquisitionsReport = reportLog.getHtml(ACQUISITIONS);
+                    final String technicalReport = reportLog.getHtml(TECHNICAL);
+                    final String aggregateReport = reportLog.getHtml(AGGREGATE);
+                    if (firstDay) {
+                        getDailyLogPanel().refreshLog(generalReport);
+                        getSkillLogPanel().refreshLog(skillReport);
+                        getBattleLogPanel().refreshLog(battleReport);
+                        getPoliticsLogPanel().refreshLog(politicsReport);
+                        getPersonnelLogPanel().refreshLog(personnelReport);
+                        getMedicalLogPanel().refreshLog(medicalReport);
+                        getFinancesLogPanel().refreshLog(financesReport);
+                        getAcquisitionsLogPanel().refreshLog(acquisitionsReport);
+                        getTechnicalLogPanel().refreshLog(technicalReport);
+                        getAggregateLogPanel().refreshLog(aggregateReport);
+                        firstDay = false;
+                    } else {
+                        generalReports.add("<hr>");
+                        generalReports.add(generalReport);
+
+                        skillReports.add("<hr>");
+                        skillReports.add(skillReport);
+
+                        battleReports.add("<hr>");
+                        battleReports.add(battleReport);
+
+                        politicsReports.add("<hr>");
+                        politicsReports.add(politicsReport);
+
+                        personnelReports.add("<hr>");
+                        personnelReports.add(personnelReport);
+
+                        medicalReports.add("<hr>");
+                        medicalReports.add(medicalReport);
+
+                        financesReports.add("<hr>");
+                        financesReports.add(financesReport);
+
+                        acquisitionsReports.add("<hr>");
+                        acquisitionsReports.add(acquisitionsReport);
+
+                        technicalReports.add("<hr>");
+                        technicalReports.add(technicalReport);
+
+                        aggregateReports.add("<hr>");
+                        aggregateReports.add(aggregateReport);
+                    }
+                    generalReports.addAll(reportLog.fetchAndClearNew(GENERAL));
+                    skillReports.addAll(reportLog.fetchAndClearNew(SKILL_CHECKS));
+                    battleReports.addAll(reportLog.fetchAndClearNew(BATTLE));
+                    politicsReports.addAll(reportLog.fetchAndClearNew(POLITICS));
+                    personnelReports.addAll(reportLog.fetchAndClearNew(PERSONNEL));
+                    medicalReports.addAll(reportLog.fetchAndClearNew(MEDICAL));
+                    financesReports.addAll(reportLog.fetchAndClearNew(FINANCES));
+                    acquisitionsReports.addAll(reportLog.fetchAndClearNew(ACQUISITIONS));
+                    technicalReports.addAll(reportLog.fetchAndClearNew(TECHNICAL));
+                    aggregateReports.addAll(reportLog.fetchAndClearNew(AGGREGATE));
+                } catch (Exception ex) {
+                    LOGGER.error("", ex);
                     break;
                 }
-
-                final DailyReportLog reportLog = campaign.getDailyReportLog();
-                final String generalReport = reportLog.getHtml(GENERAL);
-                final String skillReport = reportLog.getHtml(SKILL_CHECKS);
-                final String battleReport = reportLog.getHtml(BATTLE);
-                final String politicsReport = reportLog.getHtml(POLITICS);
-                final String personnelReport = reportLog.getHtml(PERSONNEL);
-                final String medicalReport = reportLog.getHtml(MEDICAL);
-                final String financesReport = reportLog.getHtml(FINANCES);
-                final String acquisitionsReport = reportLog.getHtml(ACQUISITIONS);
-                final String technicalReport = reportLog.getHtml(TECHNICAL);
-                final String aggregateReport = reportLog.getHtml(AGGREGATE);
-                if (firstDay) {
-                    getDailyLogPanel().refreshLog(generalReport);
-                    getSkillLogPanel().refreshLog(skillReport);
-                    getBattleLogPanel().refreshLog(battleReport);
-                    getPoliticsLogPanel().refreshLog(politicsReport);
-                    getPersonnelLogPanel().refreshLog(personnelReport);
-                    getMedicalLogPanel().refreshLog(medicalReport);
-                    getFinancesLogPanel().refreshLog(financesReport);
-                    getAcquisitionsLogPanel().refreshLog(acquisitionsReport);
-                    getTechnicalLogPanel().refreshLog(technicalReport);
-                    getAggregateLogPanel().refreshLog(aggregateReport);
-                    firstDay = false;
-                } else {
-                    generalReports.add("<hr>");
-                    generalReports.add(generalReport);
-
-                    skillReports.add("<hr>");
-                    skillReports.add(skillReport);
-
-                    battleReports.add("<hr>");
-                    battleReports.add(battleReport);
-
-                    politicsReports.add("<hr>");
-                    politicsReports.add(politicsReport);
-
-                    personnelReports.add("<hr>");
-                    personnelReports.add(personnelReport);
-
-                    medicalReports.add("<hr>");
-                    medicalReports.add(medicalReport);
-
-                    financesReports.add("<hr>");
-                    financesReports.add(financesReport);
-
-                    acquisitionsReports.add("<hr>");
-                    acquisitionsReports.add(acquisitionsReport);
-
-                    technicalReports.add("<hr>");
-                    technicalReports.add(technicalReport);
-
-                    aggregateReports.add("<hr>");
-                    aggregateReports.add(aggregateReport);
-                }
-                generalReports.addAll(reportLog.fetchAndClearNew(GENERAL));
-                skillReports.addAll(reportLog.fetchAndClearNew(SKILL_CHECKS));
-                battleReports.addAll(reportLog.fetchAndClearNew(BATTLE));
-                politicsReports.addAll(reportLog.fetchAndClearNew(POLITICS));
-                personnelReports.addAll(reportLog.fetchAndClearNew(PERSONNEL));
-                medicalReports.addAll(reportLog.fetchAndClearNew(MEDICAL));
-                financesReports.addAll(reportLog.fetchAndClearNew(FINANCES));
-                acquisitionsReports.addAll(reportLog.fetchAndClearNew(ACQUISITIONS));
-                technicalReports.addAll(reportLog.fetchAndClearNew(TECHNICAL));
-                aggregateReports.addAll(reportLog.fetchAndClearNew(AGGREGATE));
-            } catch (Exception ex) {
-                LOGGER.error("", ex);
-                break;
             }
+        } finally {
+            setRunning(false);
+            getGUI().endDayAdvanceBatch();
         }
 
-        setRunning(false);
         getDailyLogPanel().appendLog(generalReports, GENERAL);
         getSkillLogPanel().appendLog(skillReports, SKILL_CHECKS);
         getBattleLogPanel().appendLog(battleReports, BATTLE);
