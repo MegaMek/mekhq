@@ -255,6 +255,24 @@ public abstract class AbstractSalvage {
     }
 
     /**
+     * Checks whether the player may recover a contract's salvage at all.
+     *
+     * <p>Normally this needs the contract to grant some salvage rights. Where salvage may be stolen (see
+     * {@link #isSalvageTheftAllowed()}), the player may recover salvage even without them: there is nothing they may
+     * claim under the settlement, but they can still steal it.</p>
+     *
+     * @param contract the contract the salvage would be recovered under
+     *
+     * @return {@code true} if the player may recover the contract's salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean canRecoverSalvage(AbstractContract contract) {
+        return contract.canSalvage() || isSalvageTheftAllowed();
+    }
+
+    /**
      * Creates the settlement that decides how a contract's salvage is divided between the player and their employer.
      *
      * <p>By default, the contract's salvage rights cap how much of the salvage the player may claim, or, when salvage

@@ -169,6 +169,26 @@ class SalvageRulesTest {
         }
 
         @ParameterizedTest
+        @EnumSource(SalvageSystem.class)
+        void salvageIsRecoverableUnderSalvageRights(SalvageSystem salvageSystem) {
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.canSalvage()).thenReturn(true);
+
+            assertTrue(salvageSystem.getSalvage().canRecoverSalvage(contract));
+        }
+
+        /** Without salvage rights there is nothing to claim, but salvage may still be recovered to steal it. */
+        @ParameterizedTest
+        @EnumSource(SalvageSystem.class)
+        void withoutSalvageRightsOnlyTheftAllowsRecovery(SalvageSystem salvageSystem) {
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.canSalvage()).thenReturn(false);
+
+            assertEquals(salvageSystem == SalvageSystem.MEKHQ,
+                  salvageSystem.getSalvage().canRecoverSalvage(contract));
+        }
+
+        @ParameterizedTest
         @EnumSource(FormationType.class)
         void onlySalvageFormationsMayFightAndSalvage(FormationType formationType) {
             Formation formation = formationOfType(formationType);
