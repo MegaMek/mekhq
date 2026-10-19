@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -49,16 +51,19 @@ import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitDesignMatch;
 
 /**
  * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(RefitNameDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RefitNameDialog";
 
     private final Refit refit;
     private boolean cancelled;
@@ -183,18 +188,26 @@ public class RefitNameDialog extends JDialog {
         if (chassis.isEmpty()) {
             chassis = refit.getOriginalEntity().getChassis();
         }
-        if (model.isEmpty()) {
+        // A renamed chassis may keep a blank model, as many infantry designs have; otherwise a blank model would
+        // repeat the old name, so it gets a Mk II
+        boolean isChassisRenamed = !chassis.equals(refit.getOriginalEntity().getChassis());
+        if (model.isEmpty() && !isChassisRenamed) {
             model = refit.getOriginalEntity().getModel() + " Mk II";
             model = model.trim(); // remove leading space if original model name was blank
         }
         refit.getNewEntity().setChassis(chassis);
         refit.getNewEntity().setModel(model);
         if (null != MekSummaryCache.getInstance().getMek(refit.getNewEntity().getShortNameRaw())) {
-            JOptionPane.showMessageDialog(null,
-                  "There is already a unit in the database with this name.\nPlease select a different name.",
-                  "Name already in use",
-                  JOptionPane.ERROR_MESSAGE);
-            return;
+            // A taken name is fine when the unit saved under it is this same design
+            MekSummary sameSavedDesign = RefitDesignMatch.findSameSavedDesign(refit.getNewEntity());
+            if (sameSavedDesign == null) {
+                JOptionPane.showMessageDialog(null,
+                      getTextAt(RESOURCE_BUNDLE, "nameInUse.text"),
+                      getTextAt(RESOURCE_BUNDLE, "nameInUse.title"),
+                      JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            refit.useSavedDesign(sameSavedDesign);
         }
         cancelled = false;
         this.setVisible(false);
