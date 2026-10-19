@@ -7591,8 +7591,6 @@ public class Unit implements ITechnology, ILocatable {
         return (getEngineer() != null) ? getEngineer() : tech;
     }
 
-    // region Mothballing/Activation
-
     /**
      * @return the bombs this aircraft is rearmed with after each scenario, or {@code null} if the player has not opted
      *       in
@@ -7608,6 +7606,8 @@ public class Unit implements ITechnology, ILocatable {
     public void setPreferredBombLoadout(@Nullable PreferredBombLoadout preferredBombLoadout) {
         this.preferredBombLoadout = preferredBombLoadout;
     }
+
+    // region Mothballing/Activation
 
     /**
      * Gets a value indicating whether the unit is being mothballed or activated.
