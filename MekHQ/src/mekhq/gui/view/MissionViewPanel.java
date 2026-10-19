@@ -35,9 +35,7 @@ package mekhq.gui.view;
 import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -69,6 +67,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
 import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -440,20 +439,18 @@ public class MissionViewPanel extends JScrollablePanel {
         final int SIZE = 64;
 
         String employer = contract.getEmployerFactionCode();
-        ImageIcon employerImage = getFactionLogo(gameYear, employer);
-        employerImage = scaleImageIcon(employerImage, SIZE, true);
+        ImageIcon employerImage = Factions.getFactionLogoWithScaling(gameYear, employer, scaleForGUI(SIZE));
         JLabel employerLabel = new JLabel(employerImage);
         employerLabel.setToolTipText(employerTooltip);
 
         JLabel divider = new JLabel("/");
         divider.setHorizontalAlignment(SwingConstants.CENTER);
-        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        int fontSize = scaleForGUI(SIZE);
         divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
         divider.setForeground(new Color(0, 0, 0, 128));
 
         String enemy = contract.getEnemyFactionCode();
-        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
-        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+        ImageIcon enemyImage = Factions.getFactionLogoWithScaling(gameYear, enemy, scaleForGUI(SIZE));
         JLabel enemyLabel = new JLabel(enemyImage);
         enemyLabel.setToolTipText(enemyTooltip);
 
