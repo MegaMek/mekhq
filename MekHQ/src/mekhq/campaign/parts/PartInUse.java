@@ -55,7 +55,7 @@ public class PartInUse {
     private int transferCount;
     private int plannedCount;
     private int missingCount;
-    private Money cost = Money.zero();
+    private Money cost;
     private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
     private boolean isBundle;
@@ -102,7 +102,6 @@ public class PartInUse {
             this.isBundle = true;
         }
         if (null != partToBuy) {
-            this.cost = partToBuy.getBuyCost();
             String descString = partToBuy.getAcquisitionName();
             if (!(descString.contains("(") && descString.contains(")")) && !(part instanceof EnginePart)) {
                 descString = descString.split(",")[0];
@@ -232,7 +231,17 @@ public class PartInUse {
         this.missingCount = missingCount;
     }
 
+    /**
+     * Returns the price of one of this part. It is worked out on first use and kept, because only the Parts Report
+     * shows it, while the Warehouse tab and the weekly top-up build an entry for every part and throw most of them
+     * away. For a missing part the price means building a whole new part.
+     *
+     * @return the buy cost of one of this part, or zero when there is nothing to buy
+     */
     public Money getCost() {
+        if (cost == null) {
+            cost = (partToBuy == null) ? Money.zero() : partToBuy.getBuyCost();
+        }
         return cost;
     }
 

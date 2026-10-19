@@ -176,6 +176,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private int inspectorWidth = INSPECTOR_PREFERRED_WIDTH;
     private boolean applyingLayoutState;
     private boolean isRefreshPending;
+    private boolean isNewDayUpdatePending;
     JSuggestField suggestPlanet;
 
     //region Constructors
@@ -300,6 +301,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                 return;
             }
             if (isShowing()) {
+                runPendingNewDayUpdate();
                 runPendingRefresh();
             } else {
                 panMap.closeMapUtilityWindows();
@@ -1727,8 +1729,40 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         refreshPlanetView();
     }
 
+    /**
+     * Brings the map up to the new day. While the tab is hidden this waits until the tab is shown, so advancing a
+     * month with another tab open does the update once instead of thirty times.
+     */
     @Subscribe
-    public void handle(NewDayEvent ev) {
+    public void handle(NewDayEvent event) {
+        if (!isShowing()) {
+            if (!isNewDayUpdatePending) {
+                LOGGER.debug("[MapTab] New day update deferred until the tab is shown");
+            }
+            isNewDayUpdatePending = true;
+            return;
+        }
+        isNewDayUpdatePending = false;
+        updateForNewDay();
+    }
+
+    /**
+     * Runs the new day update that {@link #handle(NewDayEvent)} held back while the tab was hidden, if there is one.
+     */
+    private void runPendingNewDayUpdate() {
+        if (!isNewDayUpdatePending) {
+            return;
+        }
+        LOGGER.debug("[MapTab] Running the new day update deferred while the tab was hidden");
+        isNewDayUpdatePending = false;
+        updateForNewDay();
+    }
+
+    /**
+     * Redraws the map for the new date, resets an unplanned route to start from the current system, and refreshes the
+     * route strip and the system names, which can change with the date.
+     */
+    private void updateForNewDay() {
         panMap.requestStaticCartographyPreparation();
         panMap.repaint();
         if (!hasPlannedRoute()) {
