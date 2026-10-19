@@ -46,22 +46,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.IntConsumer;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -317,11 +311,67 @@ public class ContractDossierPanel extends JPanel {
         columns.add(MarketHud.topAligned(buildIntel()));
         columns.add(MarketHud.topAligned(buildMoney()));
 
+        // The route preview sits beside the briefing, in the space the pitch leaves, rather than adding height.
+        JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(18), 0));
+        top.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+              BorderFactory.createEmptyBorder(0, 0, scaleForGUI(12), 0)));
+        top.add(buildBriefing(), BorderLayout.CENTER);
+        top.add(MarketHud.topAligned(buildRoute()), BorderLayout.EAST);
+
         JPanel overview = MarketHud.column();
-        overview.add(leftAligned(buildBriefing()));
+        overview.add(leftAligned(top));
         overview.add(Box.createVerticalStrut(scaleForGUI(14)));
         overview.add(leftAligned(columns));
         return overview;
+    }
+
+    /**
+     * The route: a snapshot of the jump path in the interstellar map's style, a line summing up the trip, and a link
+     * that closes the market and shows the target on the full map.
+     */
+    private JPanel buildRoute() {
+        JumpPath path = ContractUtilities.getJumpPath(campaign, contract,
+              campaign.getPlayerForce().getForceDetachment().getCurrentLocation());
+        ContractRoutePreview preview = new ContractRoutePreview(path, currentDate,
+              getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.route.none"));
+
+        JPanel heading = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
+        heading.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.route")), BorderLayout.WEST);
+        PlanetarySystem target = contract.getTargetSystem();
+        if (target != null) {
+            JLabel openMap = Hud.link(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.route.openMap"),
+                  () -> showOnMap(target));
+            openMap.setToolTipText(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.route.openMap.tooltip"));
+            heading.add(openMap, BorderLayout.EAST);
+        }
+
+        JPanel route = MarketHud.column();
+        route.add(leftAligned(heading));
+        route.add(Box.createVerticalStrut(scaleForGUI(5)));
+        route.add(leftAligned(preview));
+        if (preview.hasRoute()) {
+            PlanetarySystem origin = path.getFirstSystem();
+            String from = origin == null ? "" : origin.getName(currentDate);
+            route.add(Box.createVerticalStrut(scaleForGUI(4)));
+            route.add(leftAligned(Hud.hint(getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.route.summary",
+                  from, path.getJumps(), estimate.transitDays()))));
+        }
+        Dimension size = preview.getPreferredSize();
+        route.setPreferredSize(new Dimension(size.width, route.getPreferredSize().height));
+        return route;
+    }
+
+    /**
+     * Closes the market and shows the target system on the interstellar map. The market is modal, so the map behind it
+     * could not be used while it stayed open.
+     */
+    private void showOnMap(PlanetarySystem target) {
+        Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose();
+        }
+        campaign.getGUI().focusOnSystem(target);
     }
 
     private JPanel buildTerms() {
@@ -463,14 +513,11 @@ public class ContractDossierPanel extends JPanel {
 
     /**
      * The briefing that opens the Overview: the contact's portrait and pitch, then the contract's own (Markdown)
-     * description when it has one, set off from the columns below by a divider.
+     * description when it has one.
      */
     private JPanel buildBriefing() {
         Person negotiator = contract.getEmployerNegotiator();
         JPanel briefing = Hud.transparentPanel(new BorderLayout(scaleForGUI(14), 0));
-        briefing.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-              BorderFactory.createEmptyBorder(0, 0, scaleForGUI(12), 0)));
 
         JPanel portraitHolder = Hud.transparentPanel(new BorderLayout());
         portraitHolder.add(MarketHud.portrait(negotiator, scaleForGUI(PORTRAIT_SIZE)), BorderLayout.NORTH);
