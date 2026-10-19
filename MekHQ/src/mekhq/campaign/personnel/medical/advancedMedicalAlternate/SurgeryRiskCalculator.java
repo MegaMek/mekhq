@@ -44,8 +44,10 @@ import jakarta.annotation.Nullable;
  * Works out how likely a patient is to die from a batch of advanced surgeries.
  *
  * <p>Every surgery, pass or fail, leaves a recovery injury worth {@link #RECOVERY_INJURY_HITS} hit. A successful
- * surgery also clears the injuries it treats. Once every surgery has been rolled, a patient whose total injury
- * severity has reached {@link megamek.common.units.Crew#DEATH} dies of medical complications.</p>
+ * surgery also clears the injuries it treats and leaves its marker injury, which is a hit of its own unless it records
+ * a prosthetic or implant - removing a limb, for instance, leaves the patient with a severed limb. Once every surgery
+ * has been rolled, a patient whose total injury severity has reached {@link megamek.common.units.Crew#DEATH} dies of
+ * medical complications.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -59,17 +61,39 @@ public final class SurgeryRiskCalculator {
     /**
      * One planned surgery, as far as the risk is concerned.
      *
-     * @param hitsCleared    the hits of the injuries a success removes
-     * @param successChance  the chance of the surgery succeeding, from 0 to 1
+     * @param hitsCleared   the hits of the injuries a success removes
+     * @param markerHits    the hits a success adds through its marker injury, from
+     *                      {@link #getMarkerHits(ProstheticType)}
+     * @param successChance the chance of the surgery succeeding, from 0 to 1
      */
-    public record SurgeryOdds(int hitsCleared, double successChance) {}
+    public record SurgeryOdds(int hitsCleared, int markerHits, double successChance) {
+        /**
+         * A surgery whose marker injury adds no hits, as for one fitting a prosthetic or implant.
+         *
+         * @param hitsCleared   the hits of the injuries a success removes
+         * @param successChance the chance of the surgery succeeding, from 0 to 1
+         */
+        public SurgeryOdds(int hitsCleared, double successChance) {
+            this(hitsCleared, 0, successChance);
+        }
+
+        /** @return how many more hits a success leaves the patient with than a failure, negative if it helps */
+        int successChange() {
+            return markerHits - hitsCleared;
+        }
+
+        /** @return the most hits this surgery can add, whether it passes or fails */
+        int mostHitsAdded() {
+            return RECOVERY_INJURY_HITS + Math.max(0, successChange());
+        }
+    }
 
     /**
      * The risk of a batch of surgeries.
      *
      * @param deathChance         the chance the patient dies, from 0 to 1
-     * @param bestCaseHits        the patient's hits if every surgery succeeds
-     * @param worstCaseHits       the patient's hits if every surgery fails
+     * @param bestCaseHits        the fewest hits any outcome of the batch leaves the patient with
+     * @param worstCaseHits       the most hits any outcome of the batch leaves the patient with
      * @param fewestFatalFailures the fewest failed surgeries that can kill the patient, or {@code null} if none can
      */
     public record Risk(double deathChance, int bestCaseHits, int worstCaseHits,
@@ -78,6 +102,17 @@ public final class SurgeryRiskCalculator {
         public boolean isLethal() {
             return worstCaseHits >= DEATH;
         }
+    }
+
+    /**
+     * @param type the surgery
+     *
+     * @return the hits a successful surgery's marker injury adds: Alternate Advanced Medical counts it as one hit,
+     *       unless it records a prosthetic, an implant or a flaw
+     */
+    public static int getMarkerHits(ProstheticType type) {
+        InjurySubType subType = type.getInjuryType().getSubType();
+        return (subType.isPermanentModification() || subType.isFlaw()) ? 0 : 1;
     }
 
     /**
@@ -93,7 +128,7 @@ public final class SurgeryRiskCalculator {
             Map<Integer, Double> next = new HashMap<>();
             for (Map.Entry<Integer, Double> outcome : outcomes.entrySet()) {
                 int hits = outcome.getKey() + RECOVERY_INJURY_HITS;
-                next.merge(hits - surgery.hitsCleared(), outcome.getValue() * surgery.successChance(), Double::sum);
+                next.merge(hits + surgery.successChange(), outcome.getValue() * surgery.successChance(), Double::sum);
                 next.merge(hits, outcome.getValue() * (1 - surgery.successChance()), Double::sum);
             }
             outcomes = next;
@@ -106,24 +141,28 @@ public final class SurgeryRiskCalculator {
             }
         }
 
-        int worstCaseHits = startingHits + surgeries.size() * RECOVERY_INJURY_HITS;
-        int bestCaseHits = worstCaseHits;
+        int allFailedHits = startingHits + surgeries.size() * RECOVERY_INJURY_HITS;
+        int allSucceededHits = allFailedHits;
+        int bestCaseHits = allFailedHits;
+        int worstCaseHits = allFailedHits;
         for (SurgeryOdds surgery : surgeries) {
-            bestCaseHits -= surgery.hitsCleared();
+            allSucceededHits += surgery.successChange();
+            bestCaseHits += Math.min(0, surgery.successChange());
+            worstCaseHits += Math.max(0, surgery.successChange());
         }
 
-        // The deadliest failures are the surgeries that would have cleared the most
-        List<Integer> clearedMostFirst = surgeries.stream()
-                                               .map(SurgeryOdds::hitsCleared)
-                                               .sorted((first, second) -> second - first)
-                                               .toList();
+        // Starting from every surgery passing, the deadliest failures are the surgeries whose success helps the most
+        List<Integer> failureCostsMostFirst = surgeries.stream()
+                                                    .map(surgery -> -surgery.successChange())
+                                                    .sorted((first, second) -> second - first)
+                                                    .toList();
         Integer fewestFatalFailures = null;
-        for (int failures = 0; failures <= clearedMostFirst.size(); failures++) {
-            int stillCleared = clearedMostFirst.subList(failures, clearedMostFirst.size())
-                                     .stream()
-                                     .mapToInt(Integer::intValue)
-                                     .sum();
-            if (worstCaseHits - stillCleared >= DEATH) {
+        int hits = allSucceededHits;
+        for (int failures = 0; failures <= failureCostsMostFirst.size(); failures++) {
+            if (failures > 0) {
+                hits += failureCostsMostFirst.get(failures - 1);
+            }
+            if (hits >= DEATH) {
                 fewestFatalFailures = failures;
                 break;
             }
@@ -134,10 +173,21 @@ public final class SurgeryRiskCalculator {
 
     /**
      * @param startingHits the patient's total injury severity before surgery
+     * @param surgeries    the surgeries to choose from, in the order they should be kept
      *
-     * @return how many surgeries can be performed together without any combination of failures killing the patient
+     * @return how many of the surgeries, taken in order, can be performed together without any outcome killing the
+     *       patient
      */
-    public static int getSafeSurgeryCount(int startingHits) {
-        return Math.max(0, (DEATH - 1 - startingHits) / RECOVERY_INJURY_HITS);
+    public static int getSafeSurgeryCount(int startingHits, List<SurgeryOdds> surgeries) {
+        int worstCaseHits = startingHits;
+        int safeCount = 0;
+        for (SurgeryOdds surgery : surgeries) {
+            worstCaseHits += surgery.mostHitsAdded();
+            if (worstCaseHits >= DEATH) {
+                break;
+            }
+            safeCount++;
+        }
+        return safeCount;
     }
 }

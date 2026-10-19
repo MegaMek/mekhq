@@ -229,7 +229,8 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      *       can be worked out before rolling
      */
     public CheckTarget getCheckTarget() {
-        return new CheckTarget(targetNumber.getValue(), isCountUp(), targetNumber.cannotSucceed(), getRollType());
+        return new CheckTarget(targetNumber.getValue(), isCountUp(), targetNumber.cannotSucceed(), getRollType(),
+              hasAlwaysFailingRoll());
     }
 
     /**
@@ -343,8 +344,14 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      *       roll, such as an automatic success, is never failed this way.
      */
     private boolean isAlwaysFailingRoll(int rollResult) {
-        return isRollOfTwoAlwaysFailing && !isCountUp() && targetNumber.needsRoll()
-                     && (rollResult <= ALWAYS_FAILING_ROLL);
+        return hasAlwaysFailingRoll() && (rollResult <= ALWAYS_FAILING_ROLL);
+    }
+
+    /**
+     * @return {@code true} if a roll of {@link #ALWAYS_FAILING_ROLL} fails this check whatever the target number
+     */
+    private boolean hasAlwaysFailingRoll() {
+        return isRollOfTwoAlwaysFailing && !isCountUp() && targetNumber.needsRoll();
     }
 
     /**

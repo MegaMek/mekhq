@@ -420,16 +420,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        // <51.02 compatibility handler: triple-strength myomer and prosthetic leg MASC are now worked out each day from
-        // the prosthetics a person carries, as dermal armour already was. Anyone holding one of these implants with
-        // none of the prosthetics behind it has them recorded, so the daily check doesn't take the implant away.
-        if (version.isLowerThan(new Version("0.51.02"))
-                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
-            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
-                AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
-            }
-        }
-
         // this block verifies all in-use academies are valid
         List<String> missingList = new ArrayList<>();
 
@@ -450,6 +440,26 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         LOGGER.info("Load Personnel Nodes Complete!");
+    }
+
+    /**
+     * Pre-0.51.02 compatibility handler: triple-strength myomer and prosthetic leg MASC are now worked out each day
+     * from the prosthetics a person carries, as dermal armour already was. Anyone holding one of these implants with
+     * none of the prosthetics behind it has them recorded, so the daily check doesn't take the implant away.
+     *
+     * <p>This runs once every node is parsed, as personnel can arrive either in the legacy {@code <personnel>} node or
+     * inside {@code <humanResources>}.</p>
+     *
+     * @param campaign the campaign being loaded
+     * @param version  the version the save was written by
+     */
+    static void migrateDerivedImplantProsthetics(Campaign campaign, Version version) {
+        if (version.isLowerThan(new Version("0.51.02"))
+                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+                AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+            }
+        }
     }
 
     /**
@@ -2848,6 +2858,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (version.isLowerThan(new Version("0.50.10"))) {
             correctSexualPreferencesForCurrentSpouse(campaign.getPlayerForce().getHumanResources().getPersonnel());
         }
+
+        migrateDerivedImplantProsthetics(campaign, version);
 
         // Reconnect persons to the main-force personnel node. Skip persons already placed by
         // processPlayerBaseNodes or reconnectChildren (base / travel / campus persons).

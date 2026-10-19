@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.io;
 
+import static megamek.common.options.OptionsConstants.MD_PL_MASC;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,6 +63,7 @@ import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -72,6 +74,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Tests the save-load reputation migration in {@link CampaignXmlParser}: Chaos Reputation defaults on for new
@@ -264,6 +267,50 @@ class CampaignXmlParserTest {
 
             assertTrue(travelNode.isOnPlanet());
             assertNull(travelNode.getJumpPath());
+        }
+    }
+
+    /**
+     * Tests for {@link CampaignXmlParser#migrateDerivedImplantProsthetics}. Personnel from a {@code <humanResources>}
+     * node and from a legacy {@code <personnel>} node both end up in the force's human resources, which is where the
+     * migration looks.
+     */
+    @Nested
+    class DerivedImplantProstheticsMigration {
+        Campaign campaign;
+        Person person;
+
+        @BeforeEach
+        void setUp() {
+            campaign = MHQTestUtilities.getTestCampaign();
+            campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+
+            person = new Person(campaign);
+            person.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_PL_MASC, true);
+            campaign.importPerson(person);
+        }
+
+        @Test
+        void saveFromBeforeDerivedImplants_recordsTheProstheticsBehindThem() {
+            CampaignXmlParser.migrateDerivedImplantProsthetics(campaign, new Version("0.51.01"));
+
+            assertEquals(2, person.getProstheticInjuries().size(), "leg MASC needs both legs recorded");
+        }
+
+        @Test
+        void saveFromAfterDerivedImplants_isLeftAlone() {
+            CampaignXmlParser.migrateDerivedImplantProsthetics(campaign, new Version("0.51.02"));
+
+            assertTrue(person.getProstheticInjuries().isEmpty());
+        }
+
+        @Test
+        void campaignWithoutAlternateMedical_isLeftAlone() {
+            campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, false);
+
+            CampaignXmlParser.migrateDerivedImplantProsthetics(campaign, new Version("0.51.01"));
+
+            assertTrue(person.getProstheticInjuries().isEmpty());
         }
     }
 }

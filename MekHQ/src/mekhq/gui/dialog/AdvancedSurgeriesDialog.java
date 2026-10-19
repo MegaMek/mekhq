@@ -337,7 +337,12 @@ public class AdvancedSurgeriesDialog extends JDialog {
      *                      surgery in the plan
      * @param successChance the chance of the surgery succeeding, from 0 to 1
      */
-    private record SurgeryPreview(PlannedSurgery surgery, int hitsCleared, double successChance) {}
+    private record SurgeryPreview(PlannedSurgery surgery, int hitsCleared, double successChance) {
+        /** @return this surgery as the risk calculator sees it, including any hit its marker injury adds */
+        SurgeryOdds toOdds() {
+            return new SurgeryOdds(hitsCleared, SurgeryRiskCalculator.getMarkerHits(surgery.type()), successChance);
+        }
+    }
 
     /**
      * A clickable row in the injury rail, and the filter it applies.
@@ -764,8 +769,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private void refreshPlan() {
         todayPreviews = previewToday();
         todayRisk = SurgeryRiskCalculator.calculate(patient.getTotalInjurySeverity(),
-              todayPreviews.stream().map(preview -> new SurgeryOdds(preview.hitsCleared(),
-                    preview.successChance())).toList());
+              todayPreviews.stream().map(SurgeryPreview::toOdds).toList());
         todayCost = getCost(getTodaySurgeries());
 
         Money funds = campaign.getPlayerForce().getFunds();
@@ -1031,7 +1035,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
 
         double chance = getPlannedSuccessChance(treatment);
         int hitsCleared = getHitsCleared(treatment);
-        int net = SurgeryRiskCalculator.RECOVERY_INJURY_HITS - hitsCleared;
+        int net = SurgeryRiskCalculator.RECOVERY_INJURY_HITS + SurgeryRiskCalculator.getMarkerHits(type) - hitsCleared;
         HudStatTile success = new HudStatTile(getFormattedTextAt(RESOURCE_BUNDLE,
               "AdvancedSurgeriesDialog.detail.success", formatChance(chance)),
               hitsCleared > 0 ?
@@ -1445,7 +1449,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
         section.add(Box.createVerticalStrut(scaleForGUI(6)));
 
         if (isLethal) {
-            int safeCount = SurgeryRiskCalculator.getSafeSurgeryCount(patient.getTotalInjurySeverity());
+            int safeCount = SurgeryRiskCalculator.getSafeSurgeryCount(patient.getTotalInjurySeverity(),
+                  getMostHelpfulFirst().stream().map(SurgeryPreview::toOdds).toList());
             if (safeCount == 0) {
                 section.add(leftAligned(wrappedHint(getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedSurgeriesDialog.risk.heal", patient.getGivenName()), ACTION_WIDTH - 30)));
@@ -1493,13 +1498,19 @@ public class AdvancedSurgeriesDialog extends JDialog {
         }
     }
 
-    /**
-     * Keeps as many of today's surgeries as can all fail without killing the patient, favouring those that clear the
-     * most injuries, and sets the rest aside for later.
-     */
-    private void makeSafe(int safeCount) {
+    /** @return today's surgeries, those that clear the most injuries first */
+    private List<SurgeryPreview> getMostHelpfulFirst() {
         List<SurgeryPreview> mostHelpfulFirst = new ArrayList<>(todayPreviews);
         mostHelpfulFirst.sort(Comparator.comparingInt(SurgeryPreview::hitsCleared).reversed());
+        return mostHelpfulFirst;
+    }
+
+    /**
+     * Keeps as many of today's surgeries as can be performed without any outcome killing the patient, favouring those
+     * that clear the most injuries, and sets the rest aside for later.
+     */
+    private void makeSafe(int safeCount) {
+        List<SurgeryPreview> mostHelpfulFirst = getMostHelpfulFirst();
         for (int index = safeCount; index < mostHelpfulFirst.size(); index++) {
             plan.get(mostHelpfulFirst.get(index).surgery().location()).isDeferred = true;
         }
