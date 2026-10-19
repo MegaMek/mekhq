@@ -35,11 +35,13 @@ package mekhq.campaign.mission.scenarios.salvage;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.unit.TestUnit;
 
 /**
  * Decides how a contract's salvage is divided between the player and their employer, and what money changes hands.
@@ -54,10 +56,12 @@ import mekhq.campaign.mission.scenarios.Scenario;
  *   their share of its value in cash, unless they buy the unit by paying the employer their share.</li>
  * </ul>
  *
- * <p>Salvage is always valued at its sell value, not its purchase value (Draconis Reach, 1st printing, p. 32).</p>
+ * <p>Salvage is always valued at its sell value, not its purchase value (Draconis Reach, 1st printing, p. 32). While
+ * the employer evokes the special Clan salvage clause, Clan and mixed tech salvage is worth double (see
+ * {@link #getSalvageValue(TestUnit)}).</p>
  *
  * <p>Settlements are created by the campaign's salvage system (see
- * {@link AbstractSalvage#createSettlement(AbstractContract)}).</p>
+ * {@link AbstractSalvage#createSettlement(AbstractContract, Campaign)})</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -66,51 +70,103 @@ public abstract sealed class SalvageSettlement
       permits CappedSalvageSettlement, ExchangeSalvageSettlement, PurchaseSalvageSettlement {
     static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
 
+    /** How much more Clan and mixed tech salvage is worth while the special Clan salvage clause is in effect. */
+    static final double CLAN_SALVAGE_CLAUSE_VALUE_MULTIPLIER = 2.0;
+
     private final double playerShare;
+    private final boolean isClanSalvageClause;
 
     /**
      * @param playerShare the player's share of the salvage under the contract's salvage rights; clamped to between 0
      *                    and 1
      */
     SalvageSettlement(double playerShare) {
+        this(playerShare, false);
+    }
+
+    /**
+     * @param playerShare         the player's share of the salvage under the contract's salvage rights; clamped to
+     *                            between 0 and 1
+     * @param isClanSalvageClause {@code true} if the employer is evoking the special Clan salvage clause
+     */
+    SalvageSettlement(double playerShare, boolean isClanSalvageClause) {
         this.playerShare = Math.clamp(playerShare, 0.0, 1.0);
+        this.isClanSalvageClause = isClanSalvageClause;
     }
 
     /**
      * Creates the settlement used by Campaign Operations: the salvage rights cap how much salvage the player may
-     * claim, unless the contract has salvage exchange rights.
+     * claim, unless salvage is treated as exchange (see {@link AbstractContract#isSalvageTreatedAsExchange}).
      *
      * @param contract the contract the salvage was recovered under
+     * @param campaign the current campaign
      *
      * @return a capped or exchange settlement
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static SalvageSettlement forCappedSalvageRights(AbstractContract contract) {
+    public static SalvageSettlement forCappedSalvageRights(AbstractContract contract, Campaign campaign) {
         double playerShare = contract.getSalvageRightsMultiplier();
-        return contract.isSalvageExchange() ?
-                     new ExchangeSalvageSettlement(playerShare) :
+        return contract.isSalvageTreatedAsExchange(campaign) ?
+                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(campaign)) :
                      new CappedSalvageSettlement(playerShare);
     }
 
     /**
      * Creates the settlement used under salvage purchases: the salvage rights set the player's share of each wreck,
-     * which they can use to buy the unit. Under salvage exchange rights, the player can't buy units, and only
-     * receives their cash share.
+     * which they can use to buy the unit. When salvage is treated as exchange (see
+     * {@link AbstractContract#isSalvageTreatedAsExchange}), the player can't buy units, and only receives their cash
+     * share.
      *
      * @param contract the contract the salvage was recovered under
+     * @param campaign the current campaign
      *
      * @return a purchase or exchange settlement
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static SalvageSettlement forSalvagePurchases(AbstractContract contract) {
+    public static SalvageSettlement forSalvagePurchases(AbstractContract contract, Campaign campaign) {
         double playerShare = contract.getSalvageRightsMultiplier();
-        return contract.isSalvageExchange() ?
-                     new ExchangeSalvageSettlement(playerShare) :
+        return contract.isSalvageTreatedAsExchange(campaign) ?
+                     new ExchangeSalvageSettlement(playerShare, contract.isEmployerEvokingClanSalvageClause(campaign)) :
                      new PurchaseSalvageSettlement(playerShare);
+    }
+
+    /**
+     * Checks whether the employer is evoking the special Clan salvage clause, which makes Clan and mixed tech salvage
+     * worth double.
+     *
+     * @return {@code true} if the clause is in effect
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isClanSalvageClause() {
+        return isClanSalvageClause;
+    }
+
+    /**
+     * Gets what a wreck is worth for the purposes of this settlement: its sell value, doubled for Clan and mixed tech
+     * units while the special Clan salvage clause is in effect.
+     *
+     * @param wreck the wreck to value
+     *
+     * @return the wreck's salvage value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getSalvageValue(TestUnit wreck) {
+        Money sellValue = wreck.getSellValue();
+        if (!isClanSalvageClause) {
+            return sellValue;
+        }
+
+        Entity entity = wreck.getEntity();
+        boolean isClanOrMixedTech = (entity != null) && (entity.isClan() || entity.isMixedTech());
+        return isClanOrMixedTech ? sellValue.multipliedBy(CLAN_SALVAGE_CLAUSE_VALUE_MULTIPLIER) : sellValue;
     }
 
     /**

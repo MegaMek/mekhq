@@ -78,8 +78,9 @@ public final class SalvageRecoverySessionFactory {
      * @param actualSalvage the wrecks left on the battlefield
      * @param soldSalvage   wrecks the resolve wizard marked for sale
      *
-     * @return the session, or {@code null} if there is nothing to recover: the contract grants no salvage rights, or
-     *       no wrecks were left on the field
+     * @return the session, or {@code null} if there is nothing to recover: the player may not recover the contract's
+     *       salvage (see {@link AbstractSalvage#canRecoverSalvage(AbstractContract)}), or no wrecks were left on the
+     *       field
      */
     public static @Nullable SalvageRecoverySession createSession(Campaign campaign, AbstractSalvage salvageRules,
           AbstractContract contract, Scenario scenario, List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
@@ -93,8 +94,9 @@ public final class SalvageRecoverySessionFactory {
         List<TestUnit> wrecks = new ArrayList<>(actualSalvage);
         wrecks.addAll(soldSalvage);
 
-        if (!contract.canSalvage()) {
-            LOGGER.debug("[Salvage] {}: the contract grants no salvage rights, so there is nothing to recover",
+        if (!salvageRules.canRecoverSalvage(contract)) {
+            LOGGER.debug("[Salvage] {}: the contract grants no salvage rights, and salvage can't be stolen, so there is "
+                               + "nothing to recover",
                   scenario.getName());
             return null;
         }
@@ -105,7 +107,7 @@ public final class SalvageRecoverySessionFactory {
             return null;
         }
 
-        SalvageSettlement settlement = salvageRules.createSettlement(contract);
+        SalvageSettlement settlement = salvageRules.createSettlement(contract, campaign);
         return new SalvageRecoverySession(salvageRules, settlement, isInSpace, wrecks, recoveryUnits,
               getRecoveryTimes(campaign, scenario, wrecks), availableMinutes, contract.getSalvagedByUnitValue(),
               contract.getSalvagedByEmployerValue(), campaign.getPlayerForce().getFinances().getBalance());

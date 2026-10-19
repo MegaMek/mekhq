@@ -917,7 +917,8 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private void explainAction() {
-        String body = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.body", scaleForGUI(360));
+        String body = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.body",
+              String.valueOf(scaleForGUI(360)));
         JOptionPane.showMessageDialog(this, new JLabel(body),
               getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.title"), JOptionPane.INFORMATION_MESSAGE);
     }

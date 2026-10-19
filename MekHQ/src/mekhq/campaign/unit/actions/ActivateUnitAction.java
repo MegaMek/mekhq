@@ -84,7 +84,9 @@ public record ActivateUnitAction(Person tech, boolean isGM) implements IUnitActi
                     return;
                 }
 
-                unit.addVesselCrew(tech, true);
+                if (!unit.takeAboardVesselTech(tech)) {
+                    return;
+                }
             }
 
             unit.startActivating(tech);

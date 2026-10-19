@@ -39,6 +39,8 @@ import java.util.Locale;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -85,11 +87,13 @@ public final class ContractContactStatement {
 
         String nameCapitalized = FactionStandingUtilities.addNamePrefix(baseName, true);
         String nameLowercase = FactionStandingUtilities.addNamePrefix(baseName, false);
+        Person negotiator = contract.getEmployerNegotiator();
+        String speakerName = negotiator == null ? nameCapitalized : negotiator.getFullTitle();
 
         String greeting = getFormattedTextAt(RESOURCE_BUNDLE,
-              "greeting.contractMarket." + faction + "." + band, nameCapitalized, nameLowercase);
+              "greeting.contractMarket." + faction + "." + band, nameCapitalized, nameLowercase, speakerName);
         String ask = getFormattedTextAt(RESOURCE_BUNDLE,
-              "ask.contractMarket." + objective + "." + band, nameCapitalized, nameLowercase);
+              "ask.contractMarket." + objective + "." + band, nameCapitalized, nameLowercase, speakerName);
 
         return greeting + " " + ask;
     }
@@ -116,14 +120,38 @@ public final class ContractContactStatement {
     }
 
     /**
-     * Maps the hiring faction to a greeting voice. The Clan, ComStar, and Word of Blake registers are chosen by
-     * predicate; the major Inner Sphere and Periphery states by faction code; everything else falls back to the generic
-     * Inner Sphere or Periphery voice.
+     * Maps the hiring employer to a greeting voice. A plain covert operation speaks through an anonymous intermediary,
+     * and employers that are not a faction's own government (businesses, militias, rebels, corporations, planetary
+     * governments, mercenary subcontracts, and nobles) use their employer type's voice. Otherwise, the Clan, ComStar,
+     * and Word of Blake registers are chosen by predicate; the major Inner Sphere and Periphery states by faction code;
+     * everything else falls back to the generic Inner Sphere or Periphery voice.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private static String factionKey(AbstractContract contract) {
+        if (contract.isCovert()) {
+            return "covert";
+        }
+
+        ChaosEmployerType employerType = contract.getEmployerType();
+        if (employerType != null) {
+            String employerVoice = switch (employerType) {
+                case CIVILIAN_ORGANIZATION_BUSINESS -> "civilianbusiness";
+                case CIVILIAN_ORGANIZATION_MILITIA -> "civilianmilitia";
+                case CIVILIAN_ORGANIZATION_REBELS -> "civilianrebels";
+                case CORPORATION -> "corporation";
+                case LOCAL_PLANETARY_GOVERNMENT, ANY_PLANETARY_GOVERNMENT -> "planetarygovernment";
+                case MERCENARY_SUBCONTRACT -> "mercenary";
+                // The noble greeting introduces the negotiator by name, so it needs one to speak.
+                case NOBLE -> contract.getEmployerNegotiator() != null ? "noble" : null;
+                default -> null;
+            };
+            if (employerVoice != null) {
+                return employerVoice;
+            }
+        }
+
         Faction faction = contract.getEmployerFaction();
         if (faction == null) {
             return "innersphere";

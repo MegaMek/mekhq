@@ -356,6 +356,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_FRAME_PATH = "Pieces/Frames/";
     public static final String LAYERED_FORCE_ICON_DEFAULT_FRAME_FILENAME = "Frame.png";
     public static final String LAYERED_FORCE_ICON_LOGO_PATH = "Pieces/Logos/";
+    public static final String LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY = "Factions";
     public static final String LAYERED_FORCE_ICON_SPECIAL_MODIFIER_PATH = "Pieces/Special Modifiers/";
     public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH = "Operational Indicators (Border)/";
     public static final String LAYERED_FORCE_ICON_OPERATIONAL_STATUS_TAB_PATH = "Operational Indicators (Tab)/";

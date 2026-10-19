@@ -1209,21 +1209,6 @@ public class Person implements ILocatable {
                      portrait.getImageIcon(targetPixelWidth);
     }
 
-    /**
-     * Retrieves a fallback portrait image when no specific portrait is available.
-     *
-     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
-     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
-     *
-     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private ImageIcon getFallbackPortrait() {
-        return Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
-    }
-
     private ImageIcon getFallbackPortrait(int targetPixelWidth) {
         return Factions.getFactionLogoWithScaling(birthday.getYear(), originFaction.getShortName(),
               targetPixelWidth);
@@ -1941,7 +1926,8 @@ public class Person implements ILocatable {
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
-            if (tagAlong != null) {
+            // camp followers were never placed on leave, so they must not be made active (employed)
+            if (tagAlong != null && tagAlong.getStatus().isOnLeave()) {
                 tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
@@ -2780,19 +2766,36 @@ public class Person implements ILocatable {
      *
      * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
      * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
-     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
-     * fatigue, are applied directly without modification.</p>
+     * using {@link Math#floor(double)}, to a minimum of 1. Negative values, which indicate a reduction in fatigue, are
+     * applied directly without modification.</p>
      *
      * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
      *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
     public void changeFatigue(int delta) {
-        if (delta > 0) {
+        changeFatigue(delta, true);
+    }
+
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>If {@code isApplyMultiplier} is {@code true}, positive values are scaled by the result of
+     * {@link #getFatigueMultiplier()} and rounded down, to a minimum of 1. Otherwise, and for all negative values, the
+     * change is applied as-is.</p>
+     *
+     * @param delta             The amount to adjust the fatigue by.
+     * @param isApplyMultiplier {@code true} if fatigue gain should be scaled by the character's fatigue multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeFatigue(int delta, boolean isApplyMultiplier) {
+        if ((delta > 0) && isApplyMultiplier) {
             // Only fatigue gain is modified by SPAs, not reduction.
-            delta = (int) floor(delta * getFatigueMultiplier());
+            delta = max(1, (int) floor(delta * getFatigueMultiplier()));
         }
 
-        fatigue += MathUtility.roundAwayFromZero(delta);
+        fatigue += delta;
 
         fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }

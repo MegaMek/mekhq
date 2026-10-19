@@ -67,6 +67,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -236,6 +237,7 @@ public abstract class AbstractLocation implements IPlace {
                 }
 
                 person.changeFatigue(fatigueRate);
+                Fatigue.processFatigueActions(campaign, person);
             }
         }
     }
