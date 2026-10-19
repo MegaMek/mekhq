@@ -59,6 +59,7 @@ public class PartInUse {
     private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
     private boolean isBundle;
+    private Part comparisonPart;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -271,20 +272,37 @@ public class PartInUse {
             return false;
         }
 
+        // The cheap checks run first, so the parts needed for the last check are only built for likely matches.
         // First, try to match using String comparison. This is weak, so we need extra checks
         final PartInUse otherPartInUse = (PartInUse) object;
-        boolean haveMatchingDescriptions = this.description.equals(otherPartInUse.description);
+        if (!description.equals(otherPartInUse.description)) {
+            return false;
+        }
 
-        // Next, check they're the same item
-        Part targetPart = getPartToBuy().getAcquisitionPart();
-        Part otherTargetPart = otherPartInUse.getPartToBuy().getAcquisitionPart();
-        boolean isSamePart = targetPart.isSamePartType(otherTargetPart);
-
-        // Finally, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
+        // Next, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
         // Laser and IS ER Large Laser are the same thing.
-        boolean haveMatchingTechBases = Objects.equals(getTechBase(), otherPartInUse.getTechBase());
+        if (!Objects.equals(getTechBase(), otherPartInUse.getTechBase())) {
+            return false;
+        }
 
-        // Check everything matches up
-        return isSamePart && haveMatchingDescriptions && haveMatchingTechBases;
+        // Finally, check they're the same item
+        return getComparisonPart().isSamePartType(otherPartInUse.getComparisonPart());
+    }
+
+    /**
+     * Returns the part used to check whether two entries are the same item. It is built on first use and kept, because
+     * {@link IAcquisitionWork#getAcquisitionPart()} creates a new part on every call for a missing part, and the parts
+     * in use report compares entries once for every part in the warehouse.
+     *
+     * <p>This copy is only compared, never handed out. Callers that need a part to deliver should keep calling
+     * {@code getPartToBuy().getAcquisitionPart()}, which builds a fresh one each time.</p>
+     *
+     * @return the part this entry would buy
+     */
+    private Part getComparisonPart() {
+        if (comparisonPart == null) {
+            comparisonPart = partToBuy.getAcquisitionPart();
+        }
+        return comparisonPart;
     }
 }
