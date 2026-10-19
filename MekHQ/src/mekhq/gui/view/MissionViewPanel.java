@@ -439,18 +439,18 @@ public class MissionViewPanel extends JScrollablePanel {
         final int SIZE = 64;
 
         String employer = contract.getEmployerFactionCode();
-        ImageIcon employerImage = Factions.getFactionLogoWithScaling(gameYear, employer, SIZE);
+        ImageIcon employerImage = Factions.getFactionLogoWithScaling(gameYear, employer, scaleForGUI(SIZE));
         JLabel employerLabel = new JLabel(employerImage);
         employerLabel.setToolTipText(employerTooltip);
 
         JLabel divider = new JLabel("/");
         divider.setHorizontalAlignment(SwingConstants.CENTER);
-        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        int fontSize = scaleForGUI(SIZE);
         divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
         divider.setForeground(new Color(0, 0, 0, 128));
 
         String enemy = contract.getEnemyFactionCode();
-        ImageIcon enemyImage = Factions.getFactionLogoWithScaling(gameYear, enemy, SIZE);
+        ImageIcon enemyImage = Factions.getFactionLogoWithScaling(gameYear, enemy, scaleForGUI(SIZE));
         JLabel enemyLabel = new JLabel(enemyImage);
         enemyLabel.setToolTipText(enemyTooltip);
 

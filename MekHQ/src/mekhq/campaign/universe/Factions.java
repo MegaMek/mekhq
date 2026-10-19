@@ -282,6 +282,27 @@ public class Factions {
     }
 
     /**
+     * Returns the faction's legacy logo for the given year. Older faction files (e.g. custom factions in a user dir)
+     * may still set {@code logo} or {@code logoChanges} instead of an icon; these are kept working for the formation
+     * origin icon and the map emblem.
+     *
+     * @param gameYear    the in-game year
+     * @param factionCode the faction identifier
+     *
+     * @return the legacy logo path relative to the formation icon logo directory
+     *       ({@link mekhq.MHQConstants#LAYERED_FORCE_ICON_LOGO_PATH}), or {@code null} if the faction has none for
+     *       the year
+     *
+     * @see Faction2#getLegacyLogo(int)
+     */
+    public static @Nullable String getLegacyFactionLogo(int gameYear, String factionCode) {
+        return Factions2.getInstance().getFaction(factionCode)
+                     .map(faction -> faction.getLegacyLogo(gameYear))
+                     .filter(logo -> !logo.isBlank())
+                     .orElse(null);
+    }
+
+    /**
      * Returns a faction logo as a scaled, black-tinted {@link ImageIcon}, resolved for the given game year.
      *
      * <p>Scaling is performed on the original base image using {@link Image#SCALE_SMOOTH} to preserve
