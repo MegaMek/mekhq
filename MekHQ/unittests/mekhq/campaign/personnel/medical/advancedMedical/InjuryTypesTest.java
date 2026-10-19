@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.medical.advancedMedical;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,7 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -149,6 +151,36 @@ class InjuryTypesTest {
               // Internal bleeding can worsen in severity (same type)
               Arguments.of("Internal bleeding", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 1),
               Arguments.of("Internal bleeding (severe)", InjuryTypes.INTERNAL_BLEEDING, BodyLocation.ABDOMEN, 2)
+        );
+    }
+
+    /**
+     * The Manei Domini and Thuggee Phansigar prosthetics. Their ids are written into save files, so each must stay
+     * registered under the id and key it was given.
+     */
+    @ParameterizedTest(name = "{1} is registered as id {0}")
+    @MethodSource(value = "augmentationRegistrationData")
+    void testAugmentationInjuriesAreRegistered(int id, String key, InjuryType type) {
+        InjuryTypes.registerAll();
+
+        assertSame(type, InjuryType.byId(id), key + " is not registered under id " + id);
+        assertSame(type, InjuryType.byKey(key), key + " is not registered under its key");
+        assertEquals(id, type.getId());
+        assertEquals(key, type.getKey());
+    }
+
+    static Stream<Arguments> augmentationRegistrationData() {
+        return Stream.of(
+              Arguments.of(249, "alt:TOXIN_EFFUSER", AlternateInjuries.TOXIN_EFFUSER),
+              Arguments.of(250, "alt:EXPLOSIVE_SUICIDE_IMPLANT", AlternateInjuries.EXPLOSIVE_SUICIDE_IMPLANT),
+              Arguments.of(251, "alt:ENHANCED_PROSTHETIC_LIMB", AlternateInjuries.ENHANCED_PROSTHETIC_LIMB),
+              Arguments.of(252, "alt:IMPROVED_ENHANCED_PROSTHETIC_LIMB",
+                    AlternateInjuries.IMPROVED_ENHANCED_PROSTHETIC_LIMB),
+              Arguments.of(253, "alt:PROSTHETIC_LEG_MASC", AlternateInjuries.PROSTHETIC_LEG_MASC),
+              Arguments.of(254, "alt:ENHANCED_TAIL_PROSTHETIC", AlternateInjuries.ENHANCED_TAIL_PROSTHETIC),
+              Arguments.of(255, "alt:EXTRANEOUS_PROSTHETIC_LIMBS", AlternateInjuries.EXTRANEOUS_PROSTHETIC_LIMBS),
+              Arguments.of(256, "alt:GLIDER_WINGS", AlternateInjuries.GLIDER_WINGS),
+              Arguments.of(257, "alt:POWERED_FLIGHT_WINGS", AlternateInjuries.POWERED_FLIGHT_WINGS)
         );
     }
 }
