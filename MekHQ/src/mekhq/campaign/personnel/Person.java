@@ -440,6 +440,7 @@ public class Person implements ILocatable {
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
+    private boolean leadNegotiator;
     // Senior appointments. Booleans in the same mould as secondInCommand and salvageSupervisor, so a
     // caller can ask "who is the CMO?" as a predicate rather than matching a string. A post is a
     // position within a command, distinct from rank (what someone is) and role (what they do).
@@ -1908,6 +1909,12 @@ public class Person implements ILocatable {
         if (isSecondInCommand() && status.isDepartedUnit()) {
             setSecondInCommand(false);
             campaign.addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                  getHyperlinkedFullTitle()));
+        }
+
+        if (isLeadNegotiator() && status.isDepartedUnit()) {
+            setLeadNegotiator(false);
+            campaign.addReport(PERSONNEL, getFormattedText("removedLeadNegotiator.format",
                   getHyperlinkedFullTitle()));
         }
 
@@ -3617,6 +3624,15 @@ public class Person implements ILocatable {
         this.salvageSupervisor = salvageSupervisor;
     }
 
+    /** @return whether this person is the command's lead negotiator, put forward by default at contract negotiations */
+    public boolean isLeadNegotiator() {
+        return leadNegotiator;
+    }
+
+    public void setLeadNegotiator(final boolean leadNegotiator) {
+        this.leadNegotiator = leadNegotiator;
+    }
+
     /** @return whether this person is the command's chief medical officer */
     public boolean isChiefMedicalOfficer() {
         return chiefMedicalOfficer;
@@ -4351,6 +4367,9 @@ public class Person implements ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
+            if (leadNegotiator) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "leadNegotiator", true);
+            }
             if (chiefMedicalOfficer) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefMedicalOfficer", true);
             }
@@ -5048,6 +5067,8 @@ public class Person implements ILocatable {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("leadNegotiator")) {
+                    person.setLeadNegotiator(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("chiefMedicalOfficer")) {
                     person.setChiefMedicalOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("headTechnician")) {
