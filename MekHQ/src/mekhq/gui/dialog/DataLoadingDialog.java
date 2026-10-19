@@ -670,7 +670,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         @Override
         public void done() {
-            setVisible(false);
+            // The loader has no owner window to clean it up, so release it rather than just hiding it
+            dispose();
             try {
                 Campaign campaign = get();
                 completionHandler.accept(campaign);

@@ -200,6 +200,15 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     }
 
     /**
+     * Disposes the dialog on Escape as well, matching the Cancel button. The inherited behavior only hides it, which
+     * would leave a dialog without an owner window alive.
+     */
+    @Override
+    protected void cancelAction() {
+        dispose();
+    }
+
+    /**
      * Creates the central pane of the dialog, which contains the campaign options UI.
      *
      * @return a {@link Container} representing the center pane of the dialog
