@@ -34,7 +34,6 @@
 package mekhq;
 
 import static java.lang.Math.max;
-import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
@@ -53,7 +52,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -83,7 +81,6 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
 import megamek.common.interfaces.IStartingPositions;
-import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
@@ -92,11 +89,10 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.scenarios.IPlayerSettings;
-import mekhq.campaign.parts.RefitTechManager;
+import mekhq.campaign.parts.RefitDesignSearch;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -105,8 +101,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitTechProgression;
-import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.tables.MHQTableModel;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.csv.CSVFormat;
@@ -283,65 +277,13 @@ public class Utilities {
         return fl.listFiles(filter);
     }
 
+    /**
+     * @return the model names of the designs this unit could be refitted to with a refit kit
+     *
+     * @see RefitDesignSearch#findDesigns(Entity, Campaign)
+     */
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        ArrayList<String> variants = new ArrayList<>();
-        // Refits may fit Clan and Inner Sphere parts already owned, so the variant list allows mixed tech
-        RefitTechManager refitTechManager = new RefitTechManager(campaign);
-
-        for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
-            // If this isn't the same chassis, is our current unit, we continue
-            if (!en.getChassis().equalsIgnoreCase(summary.getChassis()) ||
-                      en.getModel().equalsIgnoreCase(summary.getModel()) ||
-                      !summary.getUnitType().equals(UnitType.getTypeName(en.getUnitType()))) {
-                continue;
-            }
-
-            // Weight of the two units must match, or we continue, but BA weight gets checked
-            // differently
-            if (en instanceof BattleArmor battleArmor) {
-                if (battleArmor.getSquadSize() != (int) summary.getTWWeight()) {
-                    continue;
-                }
-            } else {
-                if (summary.getTons() != en.getWeight()) {
-                    continue;
-                }
-            }
-
-            // If the unit doesn't meet the tech filter criteria we continue
-            ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
-            if (techProg == null) {
-                // This should never happen unless there was an exception thrown when
-                // calculating the progression. In such a case we will log it and take the least
-                // restrictive action, which is to let it through.
-                String message = String.format(
-                      "Could not determine tech progression for %s, including among available refits.",
-                      summary.getName());
-                LOGGER.warn(message);
-            } else if (!refitTechManager.isLegal(techProg)) {
-                continue;
-            }
-
-            Faction campaignFaction = campaign.getPlayerForce().getFaction();
-            boolean campaignIsClan = campaignFaction.isClan();
-            String techBase = summary.getTechBase().toLowerCase();
-            boolean modelIsClan = summary.isClan() || techBase.contains("clan") || techBase.contains("mixed");
-
-            LocalDate today = campaign.getLocalDate();
-
-            boolean isLimitClanTech = campaign.getCampaignOptions().get(CampaignOption.LIMIT_CLAN_TECH);
-            boolean isBeforeTukayyid = !today.isAfter(BATTLE_OF_TUKAYYID);
-            if (!campaignIsClan &&
-                      modelIsClan &&
-                      isLimitClanTech &&
-                      isBeforeTukayyid) {
-                continue;
-            }
-
-            // Otherwise, we can offer it for selection
-            variants.add(summary.getModel());
-        }
-        return variants;
+        return new ArrayList<>(RefitDesignSearch.findDesigns(en, campaign).models());
     }
 
     public static boolean isOmniVariant(Entity entity1, Entity entity2) {
