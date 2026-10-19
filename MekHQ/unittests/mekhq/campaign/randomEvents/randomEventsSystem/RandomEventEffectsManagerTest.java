@@ -55,12 +55,14 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import mekhq.campaign.Campaign;
@@ -73,10 +75,12 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class RandomEventEffectsManagerTest {
     // -----------------------------------------------------------------------
@@ -238,9 +242,53 @@ class RandomEventEffectsManagerTest {
               "Empty target pool should produce no report output");
     }
 
+    /**
+     * Runs an injury effect with injury fatigue enabled and returns the target's hits at the moment fatigue actions
+     * were processed ({@code -1} if never processed).
+     */
+    private int runInjuryEffectAndCaptureHitsAtFatigueCheck(RandomEventResultEffect effect, int magnitude,
+          Person target) {
+        enableFatigue();
+        when(mockCampaignOptions.get(CampaignOption.USE_INJURY_FATIGUE)).thenReturn(true);
+        stubAllPersonnel(target);
+        AtomicInteger hitsAtFatigueCheck = new AtomicInteger(-1);
+
+        try (MockedStatic<Fatigue> mockedFatigue = mockStatic(Fatigue.class)) {
+            mockedFatigue.when(() -> Fatigue.processFatigueActions(mockCampaign, target)).thenAnswer(invocation -> {
+                hitsAtFatigueCheck.set(target.getHits());
+                return null;
+            });
+
+            runEffect(effect, List.of(PRISONERS), magnitude);
+        }
+
+        return hitsAtFatigueCheck.get();
+    }
+
+    @Test
+    void testEffectInjury_injuryFatigue_fatigueProcessedAfterWounds() {
+        Person prisoner = makePrisoner();
+
+        int hitsAtFatigueCheck = runInjuryEffectAndCaptureHitsAtFatigueCheck(INJURY, 3, prisoner);
+
+        assertEquals(3, hitsAtFatigueCheck,
+              "Fatigue must be processed after the wounds, so the leave check sees the injury");
+    }
+
     // -----------------------------------------------------------------------
     // INJURY_PERCENT
     // -----------------------------------------------------------------------
+
+    @Test
+    void testEffectInjuryPercent_injuryFatigue_fatigueProcessedAfterWounds() {
+        Person prisoner = makePrisoner();
+
+        int hitsAtFatigueCheck = runInjuryEffectAndCaptureHitsAtFatigueCheck(INJURY_PERCENT, 100, prisoner);
+
+        assertTrue(hitsAtFatigueCheck > 0,
+              "Fatigue must be processed after the wounds, so the leave check sees the injury");
+        assertEquals(prisoner.getHits(), hitsAtFatigueCheck);
+    }
 
     @Test
     void testEffectInjuryPercent_50Percent_injuresHalfOfTargets() {

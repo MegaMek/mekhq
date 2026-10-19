@@ -57,6 +57,7 @@ import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifi
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getTurnoverModifier;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -3568,7 +3569,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int effectiveFatigue = getEffectiveFatigue(person, campaign);
         if (campaignOptions.get(CampaignOption.USE_FATIGUE) && (baseFatigue != 0 || effectiveFatigue != 0)) {
             StringBuilder fatigueDisplay = new StringBuilder("<html>");
-            int fatigueTurnoverModifier = Math.clamp(((effectiveFatigue - 1) / 4) - 1, 0, 3);
+            int fatigueTurnoverModifier = getTurnoverModifier(effectiveFatigue);
             if (effectiveFatigue != baseFatigue) {
                 fatigueDisplay.append("<s><font color='gray'>")
                       .append(baseFatigue)
@@ -3578,7 +3579,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 fatigueDisplay.append(effectiveFatigue);
             }
             if (fatigueTurnoverModifier > 0) {
-                fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
+                fatigueDisplay.append(" (+").append(fatigueTurnoverModifier).append(')');
             }
             fatigueDisplay.append("</html>");
 

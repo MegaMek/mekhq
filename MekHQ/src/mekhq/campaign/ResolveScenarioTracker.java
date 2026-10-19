@@ -2174,7 +2174,7 @@ public class ResolveScenarioTracker {
 
         // now lets update personnel
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID pid : peopleStatus.keySet()) {
             Person person = campaign.getPlayerForce().getHumanResources().getPerson(pid);
@@ -2241,12 +2241,9 @@ public class ResolveScenarioTracker {
                 }
             }
 
-            if (voidsCombatDamage || !status.isDead()) {
+            if ((voidsCombatDamage || !status.isDead()) && campaignOptions.get(CampaignOption.USE_FATIGUE)) {
                 person.changeFatigue(fatigueRate);
-
-                if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-                    Fatigue.processFatigueActions(campaign, person);
-                }
+                Fatigue.processFatigueActions(campaign, person);
             }
 
             if (campaignOptions.isUseAdvancedMedical()) {
