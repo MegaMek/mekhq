@@ -88,6 +88,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -274,7 +275,13 @@ class CamOpsSalvageResolutionTest {
 
         private void resolve(SalvageSettlement settlement, List<TestUnit> kept, List<TestUnit> sold,
               List<TestUnit> employer) {
-            CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, settlement, kept, sold, employer);
+            resolve(settlement, kept, sold, employer, false);
+        }
+
+        private void resolve(SalvageSettlement settlement, List<TestUnit> kept, List<TestUnit> sold,
+              List<TestUnit> employer, boolean isStolen) {
+            CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, settlement, kept, sold, employer,
+                  isStolen);
         }
 
         @Test
@@ -427,6 +434,51 @@ class CamOpsSalvageResolutionTest {
             verify(contract).changeSalvagedByEmployerValue(moneyOf(1050));
         }
 
+        @Test
+        void stolenSalvageIsFreeAndEarnsNoCashShare() {
+            resolve(new PurchaseSalvageSettlement(0.25), List.of(wreck(1000)), List.of(), List.of(wreck(400)), true);
+
+            verify(campaign).addTestUnit(any(), anyInt());
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+            verify(finances, never()).credit(any(), any(), any(), anyString());
+            // Recorded as though bought, so the theft leaves no overage at contract end
+            verify(contract).changeSalvagedByUnitValue(moneyOf(250));
+            verify(contract).changeSalvagedByEmployerValue(moneyOf(1150));
+        }
+
+        @Test
+        void stolenSalvageIsFreeUnderExchange() {
+            resolve(new ExchangeSalvageSettlement(0.25, true), List.of(wreck(1000)), List.of(), List.of(), true);
+
+            verify(campaign).addTestUnit(any(), anyInt());
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+            verify(finances, never()).credit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void clanSalvageClauseDoublesClanAndMixedTechWrecks() {
+            TestUnit clanWreck = wreck(1000);
+            when(clanWreck.getEntity().isClan()).thenReturn(true);
+            TestUnit mixedWreck = wreck(500);
+            when(mixedWreck.getEntity().isMixedTech()).thenReturn(true);
+
+            resolve(new ExchangeSalvageSettlement(0.25, true), List.of(), List.of(),
+                  List.of(clanWreck, mixedWreck, wreck(400)));
+
+            // 2000 + 1000 + 400 = 3400, a quarter of which is the player's
+            verify(finances).credit(eq(TransactionType.SALVAGE_EXCHANGE), eq(TODAY), moneyOf(850), anyString());
+            verify(contract).changeSalvagedByEmployerValue(moneyOf(2550));
+        }
+
+        @Test
+        void theftBreachesTheContract() {
+            CamOpsSalvageUtilities.breachContractForSalvageTheft(campaign, contract, scenario);
+
+            verify(contract).endContractEarly(eq(TODAY.plusDays(1)), moneyOf(0));
+            verify(contract).setMandatedCompletionStatus(MissionStatus.BREACH);
+            verify(campaign).addReport(eq(DailyReportType.GENERAL), anyString());
+        }
+
         @ParameterizedTest(name = "{0}% salvage rights")
         @CsvSource({ "30", "7", "50", "100" })
         void boughtSalvageLeavesNoOverageAtContractEnd(int salvagePercent) {
@@ -445,7 +497,7 @@ class CamOpsSalvageResolutionTest {
             // e.g. at 30%, buying a 10M wreck costs 7M: 3M is the player's, 7M the employer's
             resolve(new PurchaseSalvageSettlement(playerShare), List.of(wreck(10_000_000)), List.of(), List.of());
 
-            assertEquals(0, ContractSettlement.salvageOverage(contract).compareTo(Money.zero()));
+            assertEquals(0, ContractSettlement.salvageOverage(contract, campaign).compareTo(Money.zero()));
             assertEquals(0, salvagedByUnit[0].compareTo(Money.of(10_000_000).multipliedBy(playerShare)));
         }
 

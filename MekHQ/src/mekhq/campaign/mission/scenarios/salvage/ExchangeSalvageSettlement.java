@@ -47,6 +47,10 @@ final class ExchangeSalvageSettlement extends SalvageSettlement {
         super(playerShare);
     }
 
+    ExchangeSalvageSettlement(double playerShare, boolean isClanSalvageClause) {
+        super(playerShare, isClanSalvageClause);
+    }
+
     @Override
     public boolean canKeepSalvage() {
         return false;

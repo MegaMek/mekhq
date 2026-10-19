@@ -65,6 +65,7 @@ class MarketsOptionsModel {
     boolean useRiskySalvage;
     boolean keepEnemyCamouflageOnSalvage;
     boolean enableSalvageFlagByDefault;
+    boolean useClanSalvageClause;
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
@@ -125,6 +126,7 @@ class MarketsOptionsModel {
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
         keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
+        useClanSalvageClause = options.get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
@@ -203,6 +205,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
         options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
+        options.set(CampaignOption.USE_CLAN_SALVAGE_CLAUSE, useClanSalvageClause);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
