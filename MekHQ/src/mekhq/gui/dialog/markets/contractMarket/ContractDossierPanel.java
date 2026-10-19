@@ -529,20 +529,21 @@ public class ContractDossierPanel extends JPanel {
         nameLine.setLayout(new BoxLayout(nameLine, BoxLayout.X_AXIS));
         JLabel nameLabel = new JLabel(name);
         nameLabel.setForeground(TEXT);
-        nameLabel.setFont(hudFont(Font.BOLD, 0.92f, 0.0f));
+        nameLabel.setFont(hudFont(Font.BOLD, 1.02f, 0.0f));
         nameLine.add(nameLabel);
         if (negotiator != null) {
             JLabel role = new JLabel(getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator")
                                            + getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.contact.role"));
             role.setForeground(TEXT_MUTED);
-            role.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
+            role.setFont(hudFont(Font.PLAIN, 0.96f, 0.0f));
             nameLine.add(role);
         }
         text.add(leftAligned(nameLine));
         text.add(Box.createVerticalStrut(scaleForGUI(6)));
 
+        // Set larger than the figures below, so the pitch fills the height the route preview beside it takes.
         JTextArea quote = MarketHud.wrappedText(ContractContactStatement.forContract(campaign, contract), TEXT_MUTED,
-              Font.ITALIC, 0.92f);
+              Font.ITALIC, 1.06f);
         quote.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, BORDER_CYAN),
               BorderFactory.createEmptyBorder(0, scaleForGUI(10), 0, 0)));
@@ -563,10 +564,11 @@ public class ContractDossierPanel extends JPanel {
             // dark text, which would vanish on the dark surface.
             descriptionPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             descriptionPane.setForeground(TEXT_MUTED);
-            descriptionPane.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
+            descriptionPane.setFont(hudFont(Font.PLAIN, 1.0f, 0.0f));
             text.add(leftAligned(descriptionPane));
         }
-        briefing.add(text, BorderLayout.CENTER);
+        // Pinned to the top: stretched to the route preview's height, the quote's rule would run on below the text.
+        briefing.add(MarketHud.topAligned(text), BorderLayout.CENTER);
         return briefing;
     }
 
