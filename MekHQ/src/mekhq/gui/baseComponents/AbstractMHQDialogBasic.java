@@ -33,8 +33,10 @@
 package mekhq.gui.baseComponents;
 
 import java.util.ResourceBundle;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.abstractDialogs.AbstractDialog;
 import mekhq.MekHQ;
 
@@ -69,6 +71,20 @@ public abstract class AbstractMHQDialogBasic extends AbstractDialog {
     protected AbstractMHQDialogBasic(final JFrame frame, final boolean modal, final ResourceBundle resources,
           final String name, final String title) {
         super(frame, modal, resources, name, title);
+    }
+
+    /**
+     * This creates an AbstractMHQDialog owned by the given dialog, using the default MHQ resource bundle. Passing
+     * {@code null} as the owner creates a dialog with no owner window, which Windows lists in the taskbar and Alt+Tab
+     * on its own. Use that while the application's main window is hidden.
+     *
+     * @param owner the owning dialog, or {@code null} for no owner window
+     * @param frame the application frame returned by {@link #getFrame()}; may be hidden
+     */
+    protected AbstractMHQDialogBasic(final @Nullable JDialog owner, final JFrame frame, final boolean modal,
+          final String name, final String title) {
+        super(owner, frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
+              MekHQ.getMHQOptions().getLocale()), name, title);
     }
     //endregion Constructors
 

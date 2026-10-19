@@ -36,9 +36,11 @@ package mekhq.campaign.unit;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -122,6 +124,30 @@ class UnitVesselEngineerTest {
     }
 
     @Test
+    void crewMemberWhoNoLongerServesAboardIsNotEngineer() {
+        // Issue #10538: a crew member who retired years ago was still on the ship's crew list. As the highest rank they
+        // became the engineer, and the daily maintenance check crashed looking up the unit they no longer serve on.
+        Person retiredCaptain = vesselCrew(10);
+        when(retiredCaptain.getUnit()).thenReturn(null);
+        Person mate = vesselCrew(5);
+
+        unit.resetEngineer();
+
+        assertSame(mate, unit.getEngineer());
+        verify(retiredCaptain, never()).setEngineer(true);
+    }
+
+    @Test
+    void vesselWhoseOnlyCrewNoLongerServesAboardHasNoEngineer() {
+        Person retiredCaptain = vesselCrew(10);
+        when(retiredCaptain.getUnit()).thenReturn(null);
+
+        unit.resetEngineer();
+
+        assertNull(unit.getEngineer());
+    }
+
+    @Test
     void vesselWithNoCrewHasNoEngineer() {
         unit.resetEngineer();
 
@@ -136,8 +162,8 @@ class UnitVesselEngineerTest {
         when(person.getUnit()).thenReturn(unit);
         when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
         ranks.put(person, rank);
-        when(person.outRanksUsingSkillTiebreaker(any(Campaign.class), any())).thenAnswer(invocation -> {
-            Person otherPerson = invocation.getArgument(1);
+        when(person.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenAnswer(invocation -> {
+            Person otherPerson = invocation.getArgument(3);
             return (otherPerson == null) || (rank > ranks.get(otherPerson));
         });
 

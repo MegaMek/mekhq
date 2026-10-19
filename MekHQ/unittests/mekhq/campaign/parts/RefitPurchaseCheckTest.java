@@ -40,13 +40,16 @@ import java.util.List;
 
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsScenario;
@@ -62,6 +65,11 @@ class RefitPurchaseCheckTest {
 
     private PartsScenario scenario;
     private Campaign campaign;
+
+    @BeforeAll
+    static void initializeSkills() {
+        SkillType.initializeTypes();
+    }
 
     @BeforeEach
     void setUp() {
@@ -86,6 +94,16 @@ class RefitPurchaseCheckTest {
     private Refit planTheRefit() {
         Unit wolverine = scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R);
         return new Refit(wolverine, wolverineWithAClanLaser(), true, false, false);
+    }
+
+    /** The same refit as a kit, the way "Acquire and Use Refit Kit" plans it. */
+    private Refit planTheRefitKit() {
+        Unit wolverine = scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R);
+        return new Refit(wolverine, wolverineWithAClanLaser(), false, false, false);
+    }
+
+    private boolean isImpossibleToAcquire(Refit refitKit) {
+        return campaign.checkAcquisition(refitKit, null, false).getTargetNumber().getValue() == TargetRoll.IMPOSSIBLE;
     }
 
     private void stockOneClanLaser() {
@@ -122,6 +140,32 @@ class RefitPurchaseCheckTest {
         Refit refit = planTheRefit();
 
         assertEquals(List.of(), RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit));
+    }
+
+    /** A kit arrives with every part it needs, so buying one would bring in the Clan laser the force may not buy. */
+    @Test
+    void aRefitKitHoldingAClanLaserCannotBeBought() {
+        assertTrue(isImpossibleToAcquire(planTheRefitKit()));
+    }
+
+    @Test
+    void aRefitKitHoldingAClanLaserCanBeBoughtWhenClanPurchasesAreAllowed() {
+        campaign.getCampaignOptions().set(CampaignOption.ALLOW_CLAN_PURCHASES, true);
+
+        assertFalse(isImpossibleToAcquire(planTheRefitKit()));
+    }
+
+    @Test
+    void aRefitKitOfInnerSpherePartsCanBeBought() {
+        Unit wolverine = scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R);
+        Entity design = UnitFixture.WOLVERINE_WVR_6R.loadEntity();
+        try {
+            design.addEquipment(EquipmentType.get("ISMediumLaser"), Mek.LOC_CENTER_TORSO);
+        } catch (Exception exception) {
+            throw new IllegalStateException("The WVR-6R has room for one more laser", exception);
+        }
+
+        assertFalse(isImpossibleToAcquire(new Refit(wolverine, design, false, false, false)));
     }
 
     @Test
