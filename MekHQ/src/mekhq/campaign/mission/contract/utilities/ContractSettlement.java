@@ -59,19 +59,21 @@ public final class ContractSettlement {
      * The value of salvage the player kept beyond their salvage rights, which the employer is owed at contract end.
      * Under normal (non-exchange) salvage rights the player physically keeps the salvage they recover during the
      * contract; if the value they kept exceeds the fraction their salvage rights allow of the total salvage recovered,
-     * the excess is owed. Salvage-exchange contracts are already paid out as cash during the contract, so there is
-     * nothing owed. Whether this is actually repaid is the caller's decision (the
-     * {@code OverageRepaymentInFinalPayment} option), which folds it into the final contract payment.
+     * the excess is owed. Salvage-exchange contracts (including those under the special Clan salvage clause) are
+     * already paid out as cash during the contract, so there is nothing owed. Whether this is actually repaid is the
+     * caller's decision (the {@code OverageRepaymentInFinalPayment} option), which folds it into the final contract
+     * payment.
      *
      * @param contract the contract being completed
+     * @param campaign the current campaign
      *
      * @return the salvage overage owed, or {@link Money#zero()} when none is owed
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money salvageOverage(AbstractContract contract) {
-        if (contract.isSalvageExchange()) {
+    public static Money salvageOverage(AbstractContract contract, Campaign campaign) {
+        if (contract.isSalvageTreatedAsExchange(campaign)) {
             return Money.zero();
         }
 

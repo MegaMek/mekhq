@@ -37,17 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.common.compute.Compute;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
@@ -62,7 +66,10 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -70,6 +77,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.MockedStatic;
 
 /**
  * Tests for the helper methods in {@link CamOpsSalvageUtilities} that decide which units can recover salvage, how much
@@ -557,6 +565,62 @@ class CamOpsSalvageUtilitiesTest {
             CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario, List.of(FORMATION_ID));
 
             assertEquals(scenarioCoords, track.getAssignedForceCoords().get(FORMATION_ID));
+        }
+    }
+
+    @Nested
+    class InjuryVictim {
+        private static final int ACCIDENT_HITS = 3;
+
+        private final Campaign campaign = mock(Campaign.class);
+        private final Person victim = mock(Person.class);
+        private final List<String> events = new ArrayList<>();
+
+        InjuryVictim() {
+            when(victim.getOptions()).thenReturn(mock(PersonnelOptions.class));
+            doAnswer(invocation -> {
+                events.add("injuries");
+                return null;
+            }).when(victim).setHits(anyInt());
+        }
+
+        private void injureVictim(boolean useInjuryFatigue, boolean isUseAdvancedMedical) throws Exception {
+            Method injuryVictim = CamOpsSalvageUtilities.class.getDeclaredMethod("injuryVictim", Campaign.class,
+                  Person.class, boolean.class, int.class, boolean.class);
+            injuryVictim.setAccessible(true);
+
+            try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class);
+                  MockedStatic<InjuryUtil> mockedInjuryUtil = mockStatic(InjuryUtil.class);
+                  MockedStatic<Fatigue> mockedFatigue = mockStatic(Fatigue.class)) {
+                mockedCompute.when(() -> Compute.d6(1)).thenReturn(ACCIDENT_HITS);
+                mockedInjuryUtil.when(() -> InjuryUtil.resolveCombatDamage(campaign, victim, ACCIDENT_HITS))
+                      .thenAnswer(invocation -> {
+                          events.add("injuries");
+                          return null;
+                      });
+                mockedFatigue.when(() -> Fatigue.processFatigueActions(campaign, victim)).thenAnswer(invocation -> {
+                    events.add("fatigue");
+                    return null;
+                });
+
+                injuryVictim.invoke(null, campaign, victim, useInjuryFatigue, 1, isUseAdvancedMedical);
+            }
+        }
+
+        @ParameterizedTest(name = "advanced medical {0}")
+        @CsvSource({ "false", "true" })
+        void fatigueIsProcessedAfterInjuries(boolean isUseAdvancedMedical) throws Exception {
+            injureVictim(true, isUseAdvancedMedical);
+
+            // If fatigue were processed first, the leave check would see an uninjured tech
+            assertEquals(List.of("injuries", "fatigue"), events);
+        }
+
+        @Test
+        void fatigueIsSkippedWithoutInjuryFatigue() throws Exception {
+            injureVictim(false, false);
+
+            assertEquals(List.of("injuries"), events);
         }
     }
 }

@@ -32,8 +32,10 @@
  */
 package mekhq.campaign.mission.contract;
 
+import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -1179,6 +1181,52 @@ public abstract class AbstractContract {
 
     public boolean isSalvageExchange() {
         return getSalvageRightsStep().isExchangeSalvage();
+    }
+
+    /**
+     * Checks whether the employer is evoking the special Clan salvage clause.
+     *
+     * <p>If the {@link CampaignOption#USE_CLAN_SALVAGE_CLAUSE} campaign option is enabled, then up to and including
+     * the Battle of Tukayyid, a non-Clan employer facing a Clan enemy claims all salvage for itself: the salvage is
+     * treated as exchange, whatever the contract's salvage rights. The contract's salvage terms are left unchanged, so
+     * the clause lapses once its conditions no longer hold.</p>
+     *
+     * <p>Pirate Raids backed by pirates (see {@link #getStandingEmployerFaction()}) are exempt: pirates keep all their
+     * hard-won loot.</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the clause is in effect
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isEmployerEvokingClanSalvageClause(Campaign campaign) {
+        return campaign.getCampaignOptions().get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE) &&
+                     !isPirateBackedPirateRaid() &&
+                     getEnemyFaction().isClan() &&
+                     !getEmployerFaction().isClan() &&
+                     !campaign.getLocalDate().isAfter(BATTLE_OF_TUKAYYID);
+    }
+
+    private boolean isPirateBackedPirateRaid() {
+        return getObjectiveType().isPirateRaid() &&
+                     PIRATE_FACTION_CODE.equals(getStandingEmployerFaction().getShortName());
+    }
+
+    /**
+     * Checks whether this contract's salvage is treated as exchange: either its salvage rights are exchange rights, or
+     * the employer is evoking the special Clan salvage clause (see {@link #isEmployerEvokingClanSalvageClause}).
+     *
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if salvage is treated as exchange
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSalvageTreatedAsExchange(Campaign campaign) {
+        return isSalvageExchange() || isEmployerEvokingClanSalvageClause(campaign);
     }
 
     public boolean canSalvage() {

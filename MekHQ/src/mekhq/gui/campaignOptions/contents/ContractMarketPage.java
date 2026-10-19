@@ -103,6 +103,7 @@ class ContractMarketPage {
     private JCheckBox chkUseRiskySalvage;
     private JCheckBox chkKeepEnemyCamouflageOnSalvage;
     private JCheckBox chkEnableSalvageFlagByDefault;
+    private JCheckBox chkUseClanSalvageClause;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
@@ -265,6 +266,10 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
 
+        chkUseClanSalvageClause = new CampaignOptionsCheckBox("UseClanSalvageClause",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseClanSalvageClause.addMouseListener(createTipPanelUpdater("UseClanSalvageClause"));
+
         comboSalvageSystem.addActionListener(event -> updateSalvageTeamOptionsEnabledState());
 
         // General options that apply regardless of the contract-pay scheme (Chaos or legacy).
@@ -356,6 +361,7 @@ class ContractMarketPage {
               chkUseRiskySalvage,
               chkKeepEnemyCamouflageOnSalvage,
               chkEnableSalvageFlagByDefault,
+              chkUseClanSalvageClause,
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
@@ -728,6 +734,7 @@ class ContractMarketPage {
         chkUseRiskySalvage.setSelected(model.useRiskySalvage);
         chkKeepEnemyCamouflageOnSalvage.setSelected(model.keepEnemyCamouflageOnSalvage);
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
+        chkUseClanSalvageClause.setSelected(model.useClanSalvageClause);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
@@ -793,6 +800,7 @@ class ContractMarketPage {
         model.useRiskySalvage = chkUseRiskySalvage.isSelected();
         model.keepEnemyCamouflageOnSalvage = chkKeepEnemyCamouflageOnSalvage.isSelected();
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
+        model.useClanSalvageClause = chkUseClanSalvageClause.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();

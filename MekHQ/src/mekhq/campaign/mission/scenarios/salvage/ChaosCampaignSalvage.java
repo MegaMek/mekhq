@@ -57,8 +57,8 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
     }
 
     @Override
-    public SalvageSettlement createSettlement(AbstractContract contract) {
-        return SalvageSettlement.forSalvagePurchases(contract);
+    public SalvageSettlement createSettlement(AbstractContract contract, Campaign campaign) {
+        return SalvageSettlement.forSalvagePurchases(contract, campaign);
     }
 
     /**
