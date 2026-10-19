@@ -1926,7 +1926,8 @@ public class Person implements ILocatable {
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
-            if (tagAlong != null) {
+            // camp followers were never placed on leave, so they must not be made active (employed)
+            if (tagAlong != null && tagAlong.getStatus().isOnLeave()) {
                 tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
