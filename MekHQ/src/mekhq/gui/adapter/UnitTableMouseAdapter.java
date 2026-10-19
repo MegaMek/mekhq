@@ -867,13 +867,15 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 Campaign campaign = gui.getCampaign();
                 tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (!tech.getTechUnits().isEmpty()) {
+                    // Maintenance comes first each day, so the tech's own units are still kept up; the warning is
+                    // that the mothballing only gets the minutes left over
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(gui.getFrame(),
-                                    tech.getFullName() +
-                                          " will not be able to perform maintenance on " +
-                                          tech.getTechUnits().size() +
-                                          " assigned units. Proceed?",
-                                    "Unmaintained unit warning",
+                                    getFormattedTextAt(RESOURCE_BUNDLE,
+                                          "mothballUnit.maintenanceFirst.text",
+                                          tech.getFullName(),
+                                          tech.getTechUnits().size()),
+                                    getFormattedTextAt(RESOURCE_BUNDLE, "mothballUnit.maintenanceFirst.title"),
                                     JOptionPane.YES_NO_OPTION)) {
                         tech = null;
                     }
