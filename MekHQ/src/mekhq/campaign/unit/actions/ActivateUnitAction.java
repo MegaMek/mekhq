@@ -84,15 +84,9 @@ public record ActivateUnitAction(Person tech, boolean isGM) implements IUnitActi
                     return;
                 }
 
-                Unit techUnit = tech.getUnit();
-                if (techUnit != null && techUnit.isCarrier()) {
-                    techUnit.remove(tech, false);
-                } else if (techUnit != null) {
-                    LOGGER.warn("{} already crews {}", tech.getFullTitle(), techUnit.getName());
+                if (!unit.takeAboardVesselTech(tech)) {
                     return;
                 }
-
-                unit.addVesselCrew(tech, true);
             }
 
             unit.startActivating(tech);
