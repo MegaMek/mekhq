@@ -156,7 +156,7 @@ class AdvancedMedicalAlternateTest {
     @DisplayName("A replacement clears everything mapped to the location it treats, and nothing elsewhere")
     void replacementClearsTheTreatedLocation() {
         Injury burnAtLocation = AlternateInjuries.BURN_UPPER_ARM.newInjury(campaign, patient,
-              BodyLocation.LEFT_ARM, 1);
+              BodyLocation.UPPER_LEFT_ARM, 1);
         Injury oldProstheticAtLocation = fitted(AlternateInjuries.ENHANCED_PROSTHETIC_LIMB, BodyLocation.LEFT_ARM);
         Injury suicideImplant = fitted(AlternateInjuries.EXPLOSIVE_SUICIDE_IMPLANT, BodyLocation.INTERNAL);
 
@@ -183,7 +183,7 @@ class AdvancedMedicalAlternateTest {
     @Test
     @DisplayName("A replacement tolerates gaps in the location's injury list")
     void replacementSkipsNullEntries() {
-        Injury burn = AlternateInjuries.BURN_UPPER_ARM.newInjury(campaign, patient, BodyLocation.LEFT_ARM, 1);
+        Injury burn = AlternateInjuries.BURN_UPPER_ARM.newInjury(campaign, patient, BodyLocation.UPPER_LEFT_ARM, 1);
         List<Injury> atLocation = new ArrayList<>();
         atLocation.add(null);
         atLocation.add(burn);
