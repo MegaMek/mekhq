@@ -101,6 +101,7 @@ final class MarketOffersPage {
     private final JPanel dossierHolder = new JPanel(new BorderLayout());
 
     private AbstractContract shownInDossier;
+    private int dossierTab;
     private boolean updatingList;
     private int boardWidth = scaleForGUI(BOARD_WIDTH);
 
@@ -249,7 +250,8 @@ final class MarketOffersPage {
             dossierHolder.add(buildEmptyState(), BorderLayout.NORTH);
         } else {
             dossierHolder.add(new ContractDossierPanel(market.campaign(), contract, market.currentDate(),
-                  market.estimate(contract), market.isContractTypeHidden(), market), BorderLayout.CENTER);
+                  market.estimate(contract), market.isContractTypeHidden(), dossierTab, tab -> dossierTab = tab,
+                  market), BorderLayout.CENTER);
         }
         dossierHolder.revalidate();
         dossierHolder.repaint();
