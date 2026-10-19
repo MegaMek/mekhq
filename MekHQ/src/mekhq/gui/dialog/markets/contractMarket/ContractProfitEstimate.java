@@ -64,6 +64,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * can pay if every chance at the bonus is won (see {@link StratConCombatBonusProjection}).</p>
  *
  * @param transitDays        one-way travel time to the target system, in days
+ * @param contractMonths     the contract term, in months
  * @param guaranteedIncome   monthly pay across the contract term plus the transport payment
  * @param operatingCosts     the total expenses across the contract term and the transit out
  * @param estimatedNet       {@code guaranteedIncome} minus {@code operatingCosts}
@@ -78,7 +79,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @author Illiani
  * @since 0.51.01
  */
-public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Money operatingCosts,
+public record ContractProfitEstimate(int transitDays, int contractMonths, Money guaranteedIncome, Money operatingCosts,
       Money estimatedNet, Money salaries, Money maintenance, Money runningCosts, Money foodAndHousing,
       StratConCombatBonusProjection combatBonus, Money potentialCombatPay) {
     /**
@@ -118,6 +119,7 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
                                          .multipliedBy(combatBonus.bonusCount());
 
         return new ContractProfitEstimate(transitDays,
+              months,
               guaranteedIncome,
               operatingCosts,
               estimatedNet,
@@ -137,6 +139,30 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
      */
     public Money getNetWithCombatPay() {
         return estimatedNet.plus(potentialCombatPay);
+    }
+
+    /**
+     * @return how long the force is away earning nothing else: the contract term plus the unpaid trip out, in months
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getEngagementMonths() {
+        return contractMonths + (transitDays / ContractExpenseProjection.DAYS_PER_MONTH);
+    }
+
+    /**
+     * The estimated net spread over the whole engagement. Because it counts the trip out, it lets a short contract far
+     * away be weighed fairly against a long one nearby.
+     *
+     * @return the estimated net per month of the engagement
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getNetPerMonth() {
+        double engagementMonths = getEngagementMonths();
+        return engagementMonths > 0 ? estimatedNet.dividedBy(engagementMonths) : estimatedNet;
     }
 
     /**
