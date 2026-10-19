@@ -514,15 +514,17 @@ public class CamOpsSalvageUtilities {
           boolean isUseAdvancedMedical) {
         int newHits = d6(1);
         newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
-        if (useInjuryFatigue) {
-            Fatigue.processFatigueActions(campaign, victim);
-        }
 
         if (isUseAdvancedMedical) {
             InjuryUtil.resolveCombatDamage(campaign, victim, newHits);
         } else {
             int priorHits = victim.getHits();
             victim.setHits(priorHits + newHits);
+        }
+
+        // Process after the injuries are applied, so the injured victim isn't sent on leave
+        if (useInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, victim);
         }
 
         return newHits;

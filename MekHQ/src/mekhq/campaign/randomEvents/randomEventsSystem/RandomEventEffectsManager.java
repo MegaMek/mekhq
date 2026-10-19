@@ -335,9 +335,6 @@ public class RandomEventEffectsManager {
         boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaign.getCampaignOptions());
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue,
               campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
-        if (isUseInjuryFatigue) {
-            Fatigue.processFatigueActions(campaign, target);
-        }
 
         if (priorHits + wounds > 5) {
             wounds = 5 - priorHits;
@@ -348,6 +345,11 @@ public class RandomEventEffectsManager {
 
         if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
             target.diagnose(campaign, wounds);
+        }
+
+        // Process after the wounds are applied, so the injured target isn't sent on leave
+        if (isUseInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, target);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -396,9 +398,6 @@ public class RandomEventEffectsManager {
             int priorHits = target.getTotalInjurySeverity();
 
             wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue, fatigueRate, wounds);
-            if (isUseInjuryFatigue) {
-                Fatigue.processFatigueActions(campaign, target);
-            }
 
             if (priorHits + wounds > 5) {
                 wounds = 5 - priorHits;
@@ -409,6 +408,11 @@ public class RandomEventEffectsManager {
 
             if (isUseAdvancedMedical) {
                 target.diagnose(campaign, wounds);
+            }
+
+            // Process after the wounds are applied, so the injured target isn't sent on leave
+            if (isUseInjuryFatigue) {
+                Fatigue.processFatigueActions(campaign, target);
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));

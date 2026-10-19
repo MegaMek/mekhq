@@ -267,10 +267,12 @@ public class Bloodmark {
         boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaign.getCampaignOptions());
         wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
               campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
-        if (isUseInjuryFatigue) {
+        processWounds(campaign, person, today, wounds);
+
+        // Process after the wounds are applied, so the injured person isn't sent on leave
+        if (isUseInjuryFatigue && !person.getStatus().isDead()) {
             Fatigue.processFatigueActions(campaign, person);
         }
-        processWounds(campaign, person, today, wounds);
 
         String report = getReport(person.getStatus().isDead(), person.getHyperlinkedFullTitle(), bountyHunterName);
         campaign.addReport(PERSONNEL, report);

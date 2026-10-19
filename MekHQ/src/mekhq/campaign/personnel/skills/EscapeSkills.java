@@ -203,11 +203,8 @@ public class EscapeSkills {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
-        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, isUseInjuryFatigue,
+        injuries = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, isUseInjuryFatigue,
               campaignOptions.get(CampaignOption.FATIGUE_RATE), injuries);
-        if (isUseInjuryFatigue) {
-            Fatigue.processFatigueActions(campaign, prisoner);
-        }
 
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {
@@ -222,6 +219,11 @@ public class EscapeSkills {
             if (newHits > 5) {
                 prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
             }
+        }
+
+        // Process after the injuries are applied, so the injured prisoner isn't sent on leave
+        if (isUseInjuryFatigue && !prisoner.getStatus().isDead()) {
+            Fatigue.processFatigueActions(campaign, prisoner);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(prisoner));
