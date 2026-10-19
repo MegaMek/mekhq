@@ -68,8 +68,8 @@ public class RegionPerimeter {
             List<Point> points = new ArrayList<>();
             boundsX1 = Double.MAX_VALUE;
             boundsY1 = Double.MAX_VALUE;
-            boundsX2 = Double.MIN_VALUE;
-            boundsY2 = Double.MIN_VALUE;
+            boundsX2 = -Double.MAX_VALUE;
+            boundsY2 = -Double.MAX_VALUE;
             for (PlanetarySystem system : systems) {
                 Point p = new Point(system.getX(), system.getY());
                 boundsX1 = Math.min(boundsX1, p.x());
@@ -137,12 +137,13 @@ public class RegionPerimeter {
                 continue;
             }
             // If the point being tested is to the left of both end points of the edge, the ray will intersect.
-            // If it is to the left of one of them it lies to the left if the slope of p1->p is greater
-            // than the slope of p1->p2.
+            // If it is to the left of one of them it lies to the left if the path p1->p2->p turns
+            // anticlockwise. A cross product is used rather than comparing slopes, as slopes break down
+            // when the point shares an X coordinate with p1 (division by zero) and are only comparable
+            // when both run in the same X direction.
             if ((x < p1.x()) && (x < p2.x())) {
                 intersections++;
-            } else if ((y - p1.y()) / (x - p1.x())
-                             > (p2.y() - p1.y()) / (p2.x() - p1.x())) {
+            } else if (vectorCrossProduct(p1, p2, new Point(x, y)) > 0) {
                 intersections++;
             }
             // Since we are only dealing with convex polygons, two intersections means that the point
