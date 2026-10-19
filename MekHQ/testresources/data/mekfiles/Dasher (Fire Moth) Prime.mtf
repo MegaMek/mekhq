@@ -1,0 +1,200 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-c43a-7fba-8bd5-9103f7b41ece
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Dasher
+clanname:Fire Moth
+model:Prime
+mul id:846
+
+Config:Biped OmniMek
+techbase:Clan
+era:2874
+source:TR:3050,TR:CI
+published:RSFP:Wave 2
+rules level:2
+role:Striker
+
+quirk:overhead_arms
+quirk:low_profile
+
+mass:20
+engine:200 XL (Clan) Engine
+structure:Clan Endo Steel
+myomer:Standard
+
+heat sinks:10 Clan Double
+base chassis heat sinks:8
+walk mp:10
+jump mp:0
+
+armor:Ferro-Fibrous(Clan)
+LA armor:3
+RA armor:3
+LT armor:4
+RT armor:4
+CT armor:5
+HD armor:5
+LL armor:4
+RL armor:4
+RTL armor:2
+RTR armor:2
+RTC armor:2
+
+Weapons:4
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+SRM 6, Right Arm
+SRM 4, Right Torso
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLERMediumLaser (OMNIPOD)
+CLERMediumLaser (OMNIPOD)
+Clan Endo Steel
+Clan Ferro-Fibrous
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLSRM6 (OMNIPOD)
+Clan Ammo SRM-6 (OMNIPOD)
+Clan Endo Steel
+Clan Ferro-Fibrous
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+CLDoubleHeatSink
+CLDoubleHeatSink
+Clan Endo Steel
+Clan Ferro-Fibrous
+Clan Ferro-Fibrous
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+CLDoubleHeatSink
+CLDoubleHeatSink
+CLSRM4 (OMNIPOD)
+Clan Ammo SRM-4 (OMNIPOD)
+Clan Endo Steel
+Clan Ferro-Fibrous
+Clan Ferro-Fibrous
+-Empty-
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+CLMASC
+Clan Endo Steel
+
+Head:
+Life Support
+Sensors
+Cockpit
+Clan Ferro-Fibrous
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Clan Endo Steel
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Clan Endo Steel
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Fire Moth, known by the Inner Sphere codename Dasher, is a 20-ton Clan OmniMech originally developed by Clan Cloud Cobra scientists in 2874. Conceived as an infantry support platform, the prototype featured underslung infantry pods on its distinctive high-mounted arms, designed to ease the battlefield deployment of Elementals. Though the pods were quickly abandoned after initial field testing (drawing derision from warriors who considered the concept impractical) the unusual arm configuration was retained, proving unexpectedly beneficial for armored infantry operations.</p><p>Clan Ghost Bear acquired the design through a five-year trade agreement with the Cloud Cobras, and the Fire Moth became a mainstay of Ghost Bear and Hell's Horses formations. One of the fastest OmniMechs ever produced, its extraordinary speed earned it the Dasher designation from Inner Sphere intelligence agencies, though its minimal armor and limited pod space largely restrict it to reconnaissance, scouting, and infantry support roles.</p>
+
+capabilities:<p>Built around a 200-rated extralight fusion engine, the Fire Moth achieves a cruising speed of 108 kilometers per hour with a top speed of 162 kilometers per hour. A chassis-mounted MASC system pushes this to an extraordinary 216 kilometers per hour in short bursts, making the Fire Moth one of the fastest battlefield assets in any arsenal. This performance comes at significant cost: the endo steel chassis and two tons of IceSheet ferro-fibrous armor provide only token protection, leaving the Fire Moth dangerously vulnerable to even light weapons fire.</p><p>With just six and a half tons of pod space, weapon loadouts remain modest across all configurations. The Prime configuration exemplifies the design philosophy, mounting a pair of ER medium lasers alongside SRM-6 and SRM-4 launchers for a respectable short-range strike package. Ten double heat sinks handle the thermal demands of most configurations without difficulty. The Fire Moth's true value lies not in firepower but in its unmatched speed, allowing it to fulfill scouting, spotting, and rapid infantry deployment roles that heavier OmniMechs cannot match.</p>
+
+deployment:<p>The Primary configuration balances the Fire Moth's limited pod space with a credible short-range weapons package. A pair of ER medium lasers in the left arm provide reliable energy-based firepower, supplemented by an SRM-6 in the right arm and a torso-mounted SRM-4. This combination gives this variant surprising punch for a 20-ton chassis, particularly effective in raiding and guerrilla operations where the Fire Moth can exploit its speed to deliver concentrated missile fire before withdrawing. The heavy weapons load leaves no room for advanced electronics, relying entirely on the pilot's skill and the 'Mech's speed for battlefield awareness.</p>
+
+history:<p>The Fire Moth's origins trace to Clan Cloud Cobra's experimental weapons programs during the Golden Century. Scientists designed the OmniMech as a dedicated infantry support platform, but the radical arm-mounted infantry pod concept drew immediate ridicule from warriors who dismissed it as "crazy as a Mandrill idea." Persistent MASC reliability issues further complicated early development, and the Cloud Cobras ultimately traded the design to Clan Ghost Bear for five years of favorable trade considerations.</p><p>The Ghost Bears transformed the Fire Moth from a troubled prototype into a successful combat platform. Their scientists retained the elevated arm mounts after discovering that accidental battle damage during infantry dismount operations was near zero percent on the Fire Moth, compared to nearly seven percent on standard biped frames. The upper-mounted arms also facilitated Elemental deployment from the sides, making the design ideal for swift battlefield insertion of armored infantry.</p><p>Both the Ghost Bears and Hell's Horses make extensive use of the Fire Moth for reconnaissance, dueling, and infantry support. Because the design is poorly armed and infantry support is considered a lackluster assignment, the Fire Moth is frequently assigned to older warriors who lack Bloodnames before reaching solahma status. These warriors tend to be extremely aggressive, lending the Fire Moth a reputation that belies its modest armament.</p><p>Following Operation Revival and the Ghost Bears' migration to the Inner Sphere, the Dominion relocated its Fire Moth production lines from the Clan Homeworlds to Dominion Facility Kappa-4 on Goito and Dominion Facility Kappa-5 on Thule. The Goito facility was subsequently destroyed by Word of Blake agents in 3081 during the final stages of the Jihad, leaving Thule as the primary Inner Sphere production site. The Diamond Sharks facilitated trade of newer upgrades to the Exiled Wolves, who also adopted the design for infantry support missions.</p><p>In the Clan Homeworlds, the Fire Moth fell from favor during the Wars of Reaving, as remaining Home Clans increasingly associated it with the Inner Sphere-bound Ghost Bears. The Phantom OmniMech gradually supplanted it in Homeworld service, offering comparable speed with superior armor protection. Despite this decline in Clan Space, centuries of constant production, trade, and salvage have ensured that virtually all Clans have access to the Fire Moth, with most using it as a transport for Elementals, a fast scout, or a training 'Mech for unproven warriors.</p>
+
+manufacturer:Dominion Facility Kappa-4|Dominion Facility Kappa-5|Ghost Bear Facility Beta-1|Marshall Light Assembly Station
+
+primaryfactory:Goito|Thule|Bearclaw|Marshall
+
+fluffdate:2026-02-28 17:47:08
+
+systemmanufacturer:CHASSIS:Dominator
+systemmode:CHASSIS:Light-Alpha 20
+systemmanufacturer:ENGINE:Firebox
+systemmode:ENGINE:200 XL
+systemmanufacturer:ARMOR:IceSheet
+systemmode:ARMOR:Ferro Fibrous
+systemmanufacturer:COMMUNICATIONS:Untermarkt
+systemmode:COMMUNICATIONS:IV-a
+systemmanufacturer:TARGETING:Hakkøn MicroSystems
+systemmode:TARGETING:Unknown
