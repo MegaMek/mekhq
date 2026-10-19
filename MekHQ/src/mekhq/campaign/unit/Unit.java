@@ -1301,9 +1301,36 @@ public class Unit implements ITechnology, ILocatable {
             if (part instanceof AmmoBin && !((AmmoBin) part).isEnoughSpareAmmoAvailable()) {
                 missingParts.add((AmmoBin) part);
             }
+            if (part instanceof MekLocation location) {
+                addReplacementForLimbOnBadHipOrShoulder(location, missingParts);
+            }
         }
 
         return missingParts;
+    }
+
+    /**
+     * A limb with a broken hip or shoulder cannot be repaired: it has to be scrapped and replaced. It is not missing, so
+     * nothing else lists it, and the player had to look up its weight and side to buy one by hand. The replacement is
+     * listed with the parts needed unless one is already in stock.
+     *
+     * @param location     the Mek location to check
+     * @param missingParts the parts needed, which the replacement is added to
+     */
+    private void addReplacementForLimbOnBadHipOrShoulder(MekLocation location,
+          List<IAcquisitionWork> missingParts) {
+        if (!location.onBadHipOrShoulder()) {
+            return;
+        }
+        MissingMekLocation replacement = location.getMissingPart();
+        if (replacement.findReplacement(false) != null) {
+            LOGGER.debug("[PartsNeeded] {}: {} has a broken hip or shoulder and a replacement is in stock", getName(),
+                  location.getName());
+            return;
+        }
+        LOGGER.debug("[PartsNeeded] {}: {} has a broken hip or shoulder, so a replacement is needed", getName(),
+              location.getName());
+        missingParts.add(replacement);
     }
 
     /**
