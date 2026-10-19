@@ -331,7 +331,7 @@ public class MekLabTab extends CampaignGuiTab {
     private void beginRefit() {
         if (unit.isRefitting()) {
             LOGGER.debug("[Refit] Begin Refit refused for {}: a refit is already in progress", unit.getName());
-            JOptionPane.showMessageDialog(null, resources.getString("refitInProgress.text"),
+            JOptionPane.showMessageDialog(this, resources.getString("refitInProgress.text"),
                   resources.getString("refitInProgress.title"), JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -342,8 +342,8 @@ public class MekLabTab extends CampaignGuiTab {
         }
         Entity entity = labPanel.getEntity();
         if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
-            int response = JOptionPane.showConfirmDialog(null, "This unit is underweight. Do you want to continue?",
-                  "Underweight Unit", JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog(this, resources.getString("underweight.text"),
+                  resources.getString("underweight.title"), JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.NO_OPTION) {
                 return;
             }
