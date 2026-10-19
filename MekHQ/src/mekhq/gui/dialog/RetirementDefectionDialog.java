@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -54,6 +55,7 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
@@ -76,7 +78,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
@@ -971,14 +972,17 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setLayout(new BorderLayout());
 
         // Creating and scaling the image label
-        ImageIcon originalIcon = Factions.getFactionLogo(campaign.getGameYear(), campaign.getPlayerForce().getFaction().getShortName());
-        ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage()
-                                                   .getScaledInstance(originalIcon.getIconWidth() / 2,
-                                                         originalIcon.getIconHeight() / 2,
-                                                         Image.SCALE_FAST));
-        JLabel imageLabel = new JLabel(scaledIcon);
+        ImageIcon originalIcon = RATGenerator.getFactionLogo(campaign.getGameYear(),
+              campaign.getPlayerForce().getFaction().getShortName(), Color.BLACK);
+        if (originalIcon != null) {
+            ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage()
+                                                       .getScaledInstance(originalIcon.getIconWidth() / 2,
+                                                             originalIcon.getIconHeight() / 2,
+                                                             Image.SCALE_FAST));
+            JLabel imageLabel = new JLabel(scaledIcon);
 
-        dialog.add(imageLabel, BorderLayout.NORTH);
+            dialog.add(imageLabel, BorderLayout.NORTH);
+        }
 
         // Dialog body
         JLabel text = new JLabel(resourceMap.getString("nobodyEligibleDialog.text"), JLabel.CENTER);

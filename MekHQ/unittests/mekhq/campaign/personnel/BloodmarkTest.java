@@ -49,7 +49,9 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
@@ -59,6 +61,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -416,5 +419,51 @@ class BloodmarkTest {
               eq(BloodmarkLevel.BLOODMARK_TWO.getBounty().multipliedBy(2.0)), anyString());
         assertEquals(0, target.getHits());
         assertFalse(target.getStatus().isDead());
+    }
+
+    /**
+     * Runs an assassination attempt that inflicts exactly {@code wounds} wounds (1-6), with injury fatigue enabled,
+     * and returns the target's hits at the moment fatigue actions were processed ({@code -1} if never processed).
+     */
+    private int performAttemptAndCaptureHitsAtFatigueCheck(int wounds) {
+        when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE)).thenReturn(true);
+        when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(1);
+        when(campaignOptions.isUseAdvancedMedical()).thenReturn(false);
+        target.setBloodmark(BloodmarkLevel.BLOODMARK_ONE.getLevel());
+
+        RandomCallsignGenerator callsignGenerator = mock(RandomCallsignGenerator.class);
+        when(callsignGenerator.generate()).thenReturn("Hunter");
+        AtomicInteger hitsAtFatigueCheck = new AtomicInteger(-1);
+
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class);
+              MockedStatic<RandomCallsignGenerator> mockedCallsigns = mockStatic(RandomCallsignGenerator.class);
+              MockedStatic<Fatigue> mockedFatigue = mockStatic(Fatigue.class)) {
+            // One successful roll, then a failed roll ends the attack
+            mockedCompute.when(() -> Compute.randomInt(anyInt())).thenReturn(0, 1);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(wounds);
+            mockedCallsigns.when(() -> RandomCallsignGenerator.getInstance()).thenReturn(callsignGenerator);
+            mockedFatigue.when(() -> Fatigue.processFatigueActions(campaign, target)).thenAnswer(invocation -> {
+                hitsAtFatigueCheck.set(target.getHits());
+                return null;
+            });
+
+            Bloodmark.performAssassinationAttempt(campaign, target, CURRENT_DATE);
+        }
+
+        return hitsAtFatigueCheck.get();
+    }
+
+    @Test
+    void testPerformAssassinationAttempt_fatigueProcessedAfterWounds() {
+        // If fatigue were processed before the wounds, the leave check would see an uninjured target
+        assertEquals(2, performAttemptAndCaptureHitsAtFatigueCheck(2));
+        assertEquals(2, target.getHits());
+    }
+
+    @Test
+    void testPerformAssassinationAttempt_killedTargetSkipsFatigue() {
+        assertEquals(-1, performAttemptAndCaptureHitsAtFatigueCheck(6));
+        assertTrue(target.getStatus().isDead());
     }
 }

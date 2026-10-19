@@ -287,6 +287,46 @@ public class AdvancedMedicalAlternate {
     }
 
     /**
+     * Works out which of a patient's injuries a successful surgery takes away.
+     *
+     * <p>An implant only replaces another fitting of the same implant, or another implant of a mutually exclusive
+     * kind (VDNI implants, wings); everything else is left in place. Any other surgery clears everything at the
+     * location it treats, or only the burns there where the surgery is limited to burns.</p>
+     *
+     * @param type               the prosthetic type being fitted
+     * @param injuries           every injury the patient carries
+     * @param injuriesAtLocation the injuries mapped to the location being treated
+     *
+     * @return the injuries to remove
+     */
+    public static List<Injury> getInjuriesRemovedBySurgery(ProstheticType type, List<Injury> injuries,
+          List<Injury> injuriesAtLocation) {
+        InjuryType surgeryInjuryType = type.getInjuryType();
+        InjurySubType subType = surgeryInjuryType.getSubType();
+        List<Injury> removed = new ArrayList<>();
+
+        if (subType.isImplant()) {
+            boolean surgeryIsExclusive = subType.isMutuallyExclusiveImplant();
+            for (Injury injury : injuries) {
+                InjurySubType injurySubType = injury.getSubType();
+                if (injurySubType.isImplant()
+                          && ((surgeryIsExclusive && injurySubType == subType)
+                                    || (injury.getType() == surgeryInjuryType))) {
+                    removed.add(injury);
+                }
+            }
+        } else {
+            boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
+            for (Injury injury : injuriesAtLocation) {
+                if ((injury != null) && (injury.getSubType().isBurn() || !isBurnRemovalOnly)) {
+                    removed.add(injury);
+                }
+            }
+        }
+        return removed;
+    }
+
+    /**
      * Removes the specified injury from this person and updates any associated benefits granted by permanent
      * modifications (prosthetics/implants).
      *

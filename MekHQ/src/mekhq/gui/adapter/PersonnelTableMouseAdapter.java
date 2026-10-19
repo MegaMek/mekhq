@@ -4364,6 +4364,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         addFlagMenuItem(menu, selected, "miHidePersonality", null, Person::isHidePersonality,
               Person::setHidePersonality);
         addFlagMenuItem(menu, selected, "miImmortal", null, Person::isImmortal, Person::setImmortal);
+        addFlagMenuItem(menu, selected, "miLeadNegotiator", null, Person::isLeadNegotiator,
+              Person::setLeadNegotiator);
         addFlagMenuItem(menu, selected, "miPrefersMen", null, Person::isPrefersMen, Person::setPrefersMen);
         addFlagMenuItem(menu, selected, "miPrefersWomen", null, Person::isPrefersWomen, Person::setPrefersWomen);
         addFlagMenuItem(menu, selected, "miQuickTrainIgnore", null, Person::isQuickTrainIgnore,

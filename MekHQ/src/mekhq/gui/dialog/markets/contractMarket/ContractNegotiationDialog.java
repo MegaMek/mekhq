@@ -206,6 +206,9 @@ public class ContractNegotiationDialog extends JDialog {
         this.currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
         this.scale = max(1, contract.getScale());
+        if (contract.getPlayerNegotiator() == null) {
+            contract.setPlayerNegotiator(ContractNegotiatorPickerDialog.leadNegotiator(campaign));
+        }
         recomputeNegotiatorCaps();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
@@ -917,7 +920,8 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private void explainAction() {
-        String body = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.body", scaleForGUI(360));
+        String body = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.body",
+              String.valueOf(scaleForGUI(360)));
         JOptionPane.showMessageDialog(this, new JLabel(body),
               getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.title"), JOptionPane.INFORMATION_MESSAGE);
     }

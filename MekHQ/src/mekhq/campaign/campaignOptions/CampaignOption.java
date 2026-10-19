@@ -1039,6 +1039,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "isKeepEnemyCamouflageOnSalvage");
     public static final CampaignOption<Boolean> IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT =
           of(Boolean.class, true, "isEnableSalvageFlagByDefault");
+    public static final CampaignOption<Boolean> USE_CLAN_SALVAGE_CLAUSE =
+          of(Boolean.class, true, "useClanSalvageClause");
     public static final CampaignOption<Boolean> HAD_AT_B_ENABLED_MARKER =
           of(Boolean.class, false, "useAtB");
     public static final CampaignOption<StratConPlayType> STRAT_CON_PLAY_TYPE =
