@@ -1075,8 +1075,10 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // And now we have potential prisoners that are crewing a unit...
-        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
+        // And now we have potential prisoners that are crewing a unit... Under SIMULATED_DAMAGE the combat was only
+        // simulated, so nobody - on either side - can be taken prisoner.
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone() &&
+                  !voidsCombatDamage()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -2060,7 +2062,7 @@ public class ResolveScenarioTracker {
     /**
      * Whether this scenario's mission carries the {@code SIMULATED_DAMAGE} contract special rule, which voids every
      * combat consequence of the scenario: neither side's units take lasting damage or losses, so there is nothing
-     * for the player to salvage.
+     * for the player to salvage, and no prisoners are taken by either side.
      *
      * @return {@code true} when the scenario's mission uses the {@code SIMULATED_DAMAGE} special rule
      *
@@ -2299,7 +2301,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (scenario.getStratConScenarioType().isHostileFacility() && control) {
+        if (scenario.getStratConScenarioType().isHostileFacility() && control && !voidsCombatDamage) {
             new ImmersiveDialogNotification(campaign,
                   getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"), true);
 
