@@ -2737,6 +2737,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             person.fixReferences(campaign);
         }
 
+        // Crew lists an older version left holding people who had since left the unit are put right
+        UnitCrewRepair.repair(campaign);
+
         LOGGER.info("[Campaign Load] Personnel initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
 

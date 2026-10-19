@@ -51,10 +51,6 @@ import javax.swing.SwingUtilities;
 import megamek.common.MPCalculationSetting;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Faction;
-import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.Engine;
-import megamek.common.equipment.Mounted;
-import megamek.common.equipment.WeaponType;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
@@ -105,6 +101,7 @@ import megameklab.ui.supportVehicle.SVStructureTab;
 import megameklab.ui.util.MegaMekLabFileSaver;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
+import megameklab.util.HeatGenerationEstimate;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
@@ -334,7 +331,7 @@ public class MekLabTab extends CampaignGuiTab {
     private void beginRefit() {
         if (unit.isRefitting()) {
             LOGGER.debug("[Refit] Begin Refit refused for {}: a refit is already in progress", unit.getName());
-            JOptionPane.showMessageDialog(null, resources.getString("refitInProgress.text"),
+            JOptionPane.showMessageDialog(this, resources.getString("refitInProgress.text"),
                   resources.getString("refitInProgress.title"), JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -345,8 +342,8 @@ public class MekLabTab extends CampaignGuiTab {
         }
         Entity entity = labPanel.getEntity();
         if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
-            int response = JOptionPane.showConfirmDialog(null, "This unit is underweight. Do you want to continue?",
-                  "Underweight Unit", JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog(this, resources.getString("underweight.text"),
+                  resources.getString("underweight.title"), JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.NO_OPTION) {
                 return;
             }
@@ -408,7 +405,7 @@ public class MekLabTab extends CampaignGuiTab {
         }
         int heat = entity.getHeatCapacity();
 
-        double totalHeat = calculateTotalHeat();
+        long totalHeat = HeatGenerationEstimate.estimate(entity);
         int bvDiff = entity.calculateBattleValue(true, true, true)
                            - unit.getEntity().calculateBattleValue(true, true, true);
         double currentTonnage = testEntity.calculateWeight();
@@ -482,6 +479,7 @@ public class MekLabTab extends CampaignGuiTab {
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");
         }
+        lblHeat.setVisible(entity.tracksHeat());
         shoppingPanel.removeAll();
         JLabel lblItem;
         for (String name : refit.getShoppingListDescription()) {
@@ -492,71 +490,6 @@ public class MekLabTab extends CampaignGuiTab {
             lblItem = new JLabel("None");
             shoppingPanel.add(lblItem);
         }
-    }
-
-    public double calculateTotalHeat() {
-        double heat = 0;
-        Entity entity = labPanel.getEntity();
-
-        if (entity.getOriginalJumpMP() > 0 && !(entity instanceof Infantry)) {
-            if (entity.getJumpType() == Mek.JUMP_IMPROVED) {
-                heat += Math.max(3, entity.getOriginalJumpMP() / 2);
-            } else {
-                heat += Math.max(3, entity.getOriginalJumpMP());
-            }
-            if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
-                heat *= 2;
-            }
-        } else if (!(entity instanceof Infantry) && entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
-            heat += 6;
-        } else if (!(entity instanceof Infantry)) {
-            heat += 2;
-        }
-
-        if (entity instanceof Mek) {
-            if (((Mek) entity).hasNullSig()) {
-                heat += 10;
-            }
-
-            if (((Mek) entity).hasChameleonShield()) {
-                heat += 6;
-            }
-        }
-
-        for (Mounted<?> mounted : entity.getWeaponList()) {
-            WeaponType weaponType = (WeaponType) mounted.getType();
-            double weaponHeat = weaponType.getHeat();
-
-            // only count non-damaged equipment
-            if (mounted.isMissing() || mounted.isHit() || mounted.isDestroyed() || mounted.isBreached()) {
-                continue;
-            }
-
-            // one shot weapons count 1/4
-            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.ROCKET_LAUNCHER) ||
-                      weaponType.hasFlag(WeaponType.F_ONE_SHOT)) {
-                weaponHeat *= 0.25;
-            }
-
-            // double heat for ultras
-            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) ||
-                      (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
-                weaponHeat *= 2;
-            }
-
-            // Six times heat for RAC
-            if (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) {
-                weaponHeat *= 6;
-            }
-
-            // half heat for streaks
-            if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM_STREAK)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_STREAK)) {
-                weaponHeat *= 0.5;
-            }
-            heat += weaponHeat;
-        }
-        return heat;
     }
 
     private EntityPanel getCorrectLab(Entity en) {
