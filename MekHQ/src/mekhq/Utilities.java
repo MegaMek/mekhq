@@ -65,7 +65,6 @@ import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.CriticalSlot;
 import megamek.common.Player;
 import megamek.common.TechConstants;
 import megamek.common.battleArmor.BattleArmor;
@@ -81,6 +80,8 @@ import megamek.common.enums.Gender;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.DockingCollar;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.Mounted;
 import megamek.common.interfaces.IStartingPositions;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.EntityLoadingException;
@@ -149,7 +150,20 @@ public class Utilities {
         return result;
     }
 
-    public static List<AmmoType> getMunitionsFor(Entity entity, AmmoType currentAmmoType, int techLvl) {
+    /**
+     * Lists the munitions a bin can be switched to. They must have the Clan or Inner Sphere tech base of the weapon the
+     * bin feeds. Comparing with the ammunition in the bin instead left a Clan launcher holding Inner Sphere ammunition,
+     * as a salvaged mixed tech unit can, unable to switch to any Clan round, such as Artemis V ammunition.
+     *
+     * @param entity          the unit
+     * @param launcherType    the weapon the bin feeds, or {@code null} to use the tech base of the ammunition in it
+     * @param currentAmmoType the ammunition in the bin
+     * @param techLvl         the campaign's tech level
+     *
+     * @return the munitions the bin can hold
+     */
+    public static List<AmmoType> getMunitionsFor(Entity entity, @Nullable EquipmentType launcherType,
+          AmmoType currentAmmoType, int techLvl) {
         if (currentAmmoType == null) {
             return Collections.emptyList();
         }
@@ -162,6 +176,8 @@ public class Utilities {
             return Collections.emptyList();
         }
 
+        EquipmentType techBaseSource = (launcherType != null) ? launcherType : currentAmmoType;
+        boolean isClanTechBase = TechConstants.isClan(techBaseSource.getTechLevel(entity.getTechLevelYear()));
         List<AmmoType> ammoTypes = new ArrayList<>();
         for (AmmoType ammoType : munitions) {
             // this is an abbreviated version of setupMunitions in the CustomMekDialog
@@ -179,9 +195,7 @@ public class Utilities {
                 lvl = 0;
             }
 
-            if ((techLvl < Utilities.getSimpleTechLevel(lvl)) ||
-                      (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) !=
-                             TechConstants.isClan(lvl))) {
+            if ((techLvl < Utilities.getSimpleTechLevel(lvl)) || (isClanTechBase != TechConstants.isClan(lvl))) {
                 continue;
             }
 
@@ -366,48 +380,52 @@ public class Utilities {
             default -> {
             }
         }
-        List<EquipmentType> fixedEquipment = new ArrayList<>();
         for (int loc = 0; loc < entity1.locations(); loc++) {
             if ((entity1.getArmorType(loc) != entity2.getArmorType(loc)) ||
                       (entity1.getOArmor(loc) != entity2.getOArmor(loc))) {
                 return false;
             }
-            // Go through the base entity and make a list of all fixed equipment in this
-            // location.
-            for (int slot = 0; slot < entity1.getNumberOfCriticalSlots(loc); slot++) {
-                CriticalSlot crit = entity1.getCritical(loc, slot);
-                if ((null != crit) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (null != crit.getMount())) {
-                    if (!crit.getMount().isOmniPodMounted()) {
-                        fixedEquipment.add(crit.getMount().getType());
-                        if (null != crit.getMount2()) {
-                            fixedEquipment.add(crit.getMount2().getType());
-                        }
-                    }
-                }
-            }
-            // Go through the critical slots in this location for the second entity and
-            // remove all
-            // fixed equipment from the list. If not found or something is left over, there
-            // is a
-            // fixed equipment difference.
-            for (int slot = 0; slot < entity2.getNumberOfCriticalSlots(loc); slot++) {
-                CriticalSlot crit = entity1.getCritical(loc, slot);
-                if ((crit != null) && (crit.getType() == CriticalSlot.TYPE_EQUIPMENT) && (crit.getMount() != null)) {
-                    if (!crit.getMount().isOmniPodMounted()) {
-                        if (!fixedEquipment.remove(crit.getMount().getType())) {
-                            return false;
-                        } else if ((crit.getMount2() != null) && !fixedEquipment.remove(crit.getMount2().getType())) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            if (!fixedEquipment.isEmpty()) {
-                return false;
-            }
+        }
+        Map<String, Integer> firstFixedEquipment = getFixedEquipmentByLocation(entity1);
+        Map<String, Integer> secondFixedEquipment = getFixedEquipmentByLocation(entity2);
+        if (!firstFixedEquipment.equals(secondFixedEquipment)) {
+            LOGGER.debug("[Refit] {} to {}: fixed equipment differs, {} against {}", entity1.getShortName(),
+                  entity2.getModel(), firstFixedEquipment, secondFixedEquipment);
+            return false;
         }
         return true;
+    }
+
+    /**
+     * Counts the equipment fixed to an omni's base chassis in each location. Which slot an item sits in does not
+     * matter, only how many of it a location holds. Left out are pods; armor and structure that take slots, such as
+     * Endo Steel, whose type is compared on its own; the Clan CASE MegaMek adds wherever explosive ammunition sits; and
+     * ammunition with no location, which one-shot launchers and infantry weapons carry with them. Fixed ammunition is
+     * counted by the weapon it feeds, so loading a different munition in a fixed bin is not a change.
+     *
+     * @param entity the unit
+     *
+     * @return the count of each fixed item, keyed by location and item
+     */
+    private static Map<String, Integer> getFixedEquipmentByLocation(Entity entity) {
+        Map<String, Integer> fixedEquipment = new TreeMap<>();
+        for (Mounted<?> mounted : entity.getEquipment()) {
+            EquipmentType equipmentType = mounted.getType();
+            boolean isSlotFillingArmorOrStructure = EquipmentType.isArmorType(equipmentType)
+                                                          || EquipmentType.isStructureType(equipmentType);
+            boolean isAutomaticClanCase = EquipmentTypeLookup.CLAN_CASE.equals(equipmentType.getInternalName());
+            boolean isAmmunitionCarriedByItsWeapon = (equipmentType instanceof AmmoType)
+                                                           && (mounted.getLocation() == Entity.LOC_NONE);
+            if (mounted.isOmniPodMounted() || isSlotFillingArmorOrStructure || isAutomaticClanCase
+                      || isAmmunitionCarriedByItsWeapon) {
+                continue;
+            }
+            String item = (equipmentType instanceof AmmoType ammoType)
+                                ? ammoType.getAmmoType() + " ammunition, rack " + ammoType.getRackSize()
+                                : equipmentType.getInternalName();
+            fixedEquipment.merge(mounted.getLocation() + " " + item, 1, Integer::sum);
+        }
+        return fixedEquipment;
     }
 
     /**

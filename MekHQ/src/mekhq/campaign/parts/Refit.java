@@ -50,6 +50,7 @@ import java.util.*;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.battleArmor.BattleArmor;
@@ -705,6 +706,14 @@ public class Refit extends Part implements IAcquisitionWork {
 
             } else if (newPart instanceof MissingMekGyro) {
                 updateRefitClass(CLASS_D);
+
+            } else if (newPart instanceof MissingMekActuator) {
+                // An added actuator, such as a hand or lower arm, is a new component where there was none
+                updateRefitClass(CLASS_D);
+                int location = newPart.getLocation();
+                if ((location > -1) && (location < newEntity.locations())) {
+                    locationHasNewStuff[location] = true;
+                }
 
             } else if (newPart instanceof MissingMekLocation) {
                 replacingLocations = true;
@@ -2175,6 +2184,32 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Uses the unit already saved under the new design's name instead of saving a copy. The player picked a name that
+     * is taken, and {@link RefitDesignMatch} found the saved unit to be this same design. A saved custom unit is listed
+     * among the campaign's customs, so the campaign file keeps its design as it would for a newly saved one.
+     *
+     * <p>A refitted unit is a new design, so it never keeps the unit file identity of the design it was refitted
+     * from. It takes the saved design's identity, so a campaign reload finds that exact file, or a fresh one if the
+     * saved file has none yet.</p>
+     *
+     * @param savedDesign the summary of the unit saved under the new design's name
+     */
+    public void useSavedDesign(MekSummary savedDesign) {
+        isSavingFile = false;
+        String savedUnitFileUUID = savedDesign.getUnitFileUUID();
+        if (StringUtility.isNullOrBlank(savedUnitFileUUID)) {
+            newEntity.regenerateUnitFileUUID();
+        } else {
+            newEntity.setUnitFileUUID(savedUnitFileUUID);
+        }
+        if (!savedDesign.isCanon()) {
+            getCampaign().addCustom(newEntity.getShortNameRaw());
+        }
+        LOGGER.info("[Refit] {} uses the design saved in {} instead of saving a copy", newEntity.getShortNameRaw(),
+              savedDesign.getSourceFile());
+    }
+
+    /**
      * Writes the configuration for the new side of the refit to a .mtf or .blk file in the customs directory.
      *
      */
@@ -3126,27 +3161,37 @@ public class Refit extends Part implements IAcquisitionWork {
         AvailabilityValue avail = AvailabilityValue.A;
         int techBaseMod = 0;
         for (Part part : shoppingList) {
-            if (getTechBase() == TechBase.CLAN &&
-                      campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY) > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
-            } else if (getTechBase() == TechBase.IS &&
-                             campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY) > techBaseMod) {
-                techBaseMod = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
-            } else if (getTechBase() == TechBase.ALL) {
-                int penalty = Math.min(campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY),
-                      campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY));
-                if (penalty > techBaseMod) {
-                    techBaseMod = penalty;
-                }
-            }
+            techBaseMod = Math.max(techBaseMod, getTechBasePenalty(part.getTechBase()));
             avail = AvailabilityValue.fromIndex(Math.max(avail.getIndex(), part.getAvailability().getIndex()));
         }
+        LOGGER.debug("[RefitKitAcquisition] {}: tech base penalty {} from {} parts to buy", getDesc(), techBaseMod,
+              shoppingList.size());
         if (techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         roll.addModifier(availabilityMod, "availability (" + avail.getName() + ")");
         return roll;
+    }
+
+    /**
+     * The Clan or Inner Sphere acquisition penalty one part of the kit would get if it were bought on its own. The kit
+     * itself counts as either tech base, so the penalty has to come from each part. A part either tech base can use
+     * takes the lower of the two penalties.
+     *
+     * @param partTechBase the tech base of the part being bought
+     *
+     * @return the penalty for that part, or 0 if none applies
+     */
+    private int getTechBasePenalty(TechBase partTechBase) {
+        int clanPenalty = campaign.getCampaignOptions().get(CampaignOption.CLAN_ACQUISITION_PENALTY);
+        int innerSpherePenalty = campaign.getCampaignOptions().get(CampaignOption.IS_ACQUISITION_PENALTY);
+        return switch (partTechBase) {
+            case CLAN -> clanPenalty;
+            case IS -> innerSpherePenalty;
+            case ALL -> Math.min(clanPenalty, innerSpherePenalty);
+            case UNKNOWN -> 0;
+        };
     }
 
     public @Nullable Armor getNewArmorSupplies() {

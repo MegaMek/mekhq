@@ -286,7 +286,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        PartInventory inventories = getPartInventory(getNewPart());
+        PartInventory inventories = getReplacementInventory();
         StringBuilder toReturn = new StringBuilder();
 
         String superDetails = super.getDetails(includeRepairDetails);
@@ -403,13 +403,20 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
         return target;
     }
 
+    /**
+     * @return the spares on hand and on their way that can replace this part, and how many are on order
+     */
+    protected PartInventory getReplacementInventory() {
+        return getPartInventory(getNewPart());
+    }
+
     @Override
     public String getAcquisitionDesc() {
         String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-        PartInventory inventories = getPartInventory(getNewPart());
+        PartInventory inventories = getReplacementInventory();
         toReturn += inventories.getTransitOrderedDetails();
         if (!isOmniPodded()) {
             Part newPart = getAcquisitionPart();

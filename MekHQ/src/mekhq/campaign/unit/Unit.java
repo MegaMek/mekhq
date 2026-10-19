@@ -68,6 +68,7 @@ import java.awt.Image;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -98,6 +99,7 @@ import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ILocationExposureStatus;
 import megamek.common.interfaces.ITechnology;
+import megamek.common.loaders.MekSummary;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
@@ -1299,9 +1301,36 @@ public class Unit implements ITechnology, ILocatable {
             if (part instanceof AmmoBin && !((AmmoBin) part).isEnoughSpareAmmoAvailable()) {
                 missingParts.add((AmmoBin) part);
             }
+            if (part instanceof MekLocation location) {
+                addReplacementForLimbOnBadHipOrShoulder(location, missingParts);
+            }
         }
 
         return missingParts;
+    }
+
+    /**
+     * A limb with a broken hip or shoulder cannot be repaired: it has to be scrapped and replaced. It is not missing, so
+     * nothing else lists it, and the player had to look up its weight and side to buy one by hand. The replacement is
+     * listed with the parts needed unless one is already in stock.
+     *
+     * @param location     the Mek location to check
+     * @param missingParts the parts needed, which the replacement is added to
+     */
+    private void addReplacementForLimbOnBadHipOrShoulder(MekLocation location,
+          List<IAcquisitionWork> missingParts) {
+        if (!location.onBadHipOrShoulder()) {
+            return;
+        }
+        MissingMekLocation replacement = location.getMissingPart();
+        if (replacement.findReplacement(false) != null) {
+            LOGGER.debug("[PartsNeeded] {}: {} has a broken hip or shoulder and a replacement is in stock", getName(),
+                  location.getName());
+            return;
+        }
+        LOGGER.debug("[PartsNeeded] {}: {} has a broken hip or shoulder, so a replacement is needed", getName(),
+              location.getName());
+        missingParts.add(replacement);
     }
 
     /**
@@ -1455,6 +1484,18 @@ public class Unit implements ITechnology, ILocatable {
     /**
      * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
      */
+    /**
+     * @return {@code true} for a Mek built without a gyro, such as one with an Interface Cockpit, which has no gyro
+     *       part to repair, replace or buy
+     */
+    private boolean isBuiltWithoutGyro() {
+        boolean isBuiltWithoutGyro = (entity instanceof Mek mek) && (mek.getGyroType() == Mek.GYRO_NONE);
+        if (isBuiltWithoutGyro) {
+            LOGGER.debug("[UnitParts] {}: built without a gyro, so it has no gyro part", getName());
+        }
+        return isBuiltWithoutGyro;
+    }
+
     private void discardPart(Part part) {
         removePart(part);
         // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
@@ -1728,10 +1769,18 @@ public class Unit implements ITechnology, ILocatable {
         return hits;
     }
 
+    /**
+     * Marks critical slots of a system or piece of equipment as damaged until it has the given number of damaged
+     * slots. Slots already damaged count toward that number and are left as they are, so applying a part's hits to a
+     * unit whose slots were hit in battle does not add damage on top of the battle damage.
+     *
+     * @param type         {@link CriticalSlot#TYPE_SYSTEM} or {@link CriticalSlot#TYPE_EQUIPMENT}
+     * @param equipmentNum the system index or equipment number
+     * @param hits         how many slots should be damaged in all
+     */
     public void damageSystem(int type, int equipmentNum, int hits) {
-        // make sure we take note of existing hits to start and as we cycle through
-        // locations
-        int existingHits = getHitCriticalSlots(type, equipmentNum);
+        // Battle damage marks a slot hit but not destroyed, so count every damaged slot, not only destroyed ones
+        int existingHits = getDamagedCriticalSlots(type, equipmentNum);
         int neededHits = max(0, hits - existingHits);
         int usedHits = 0;
         for (int loc = 0; loc < getEntity().locations(); loc++) {
@@ -1741,6 +1790,17 @@ public class Unit implements ITechnology, ILocatable {
         }
     }
 
+    /**
+     * Marks up to the given number of undamaged critical slots of a system or piece of equipment in one location as
+     * damaged.
+     *
+     * @param type         {@link CriticalSlot#TYPE_SYSTEM} or {@link CriticalSlot#TYPE_EQUIPMENT}
+     * @param equipmentNum the system index or equipment number
+     * @param loc          the location
+     * @param hits         how many slots to mark at most
+     *
+     * @return how many slots were marked
+     */
     public int damageSystem(int type, int equipmentNum, int loc, int hits) {
         int numHits = 0;
         for (int i = 0; i < getEntity().getNumberOfCriticalSlots(loc); i++) {
@@ -1753,7 +1813,8 @@ public class Unit implements ITechnology, ILocatable {
             Mounted<?> m1 = cs.getMount();
             Mounted<?> m2 = cs.getMount2();
             if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
-                if (numHits < hits) {
+                // A slot already damaged in battle is not damaged again
+                if ((numHits < hits) && !cs.isDamaged()) {
                     cs.setHit(true);
                     cs.setDestroyed(true);
                     cs.setRepairable(true);
@@ -1763,6 +1824,39 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
         return numHits;
+    }
+
+    /**
+     * @return how many critical slots of a system or piece of equipment are damaged, hit or destroyed, in all
+     *       locations
+     */
+    private int getDamagedCriticalSlots(int type, int equipmentNum) {
+        Mounted<?> mounted = (type == CriticalSlot.TYPE_EQUIPMENT) ? entity.getEquipment(equipmentNum) : null;
+        int damagedSlots = 0;
+        for (int location = 0; location < entity.locations(); location++) {
+            for (int slot = 0; slot < entity.getNumberOfCriticalSlots(location); slot++) {
+                CriticalSlot criticalSlot = entity.getCritical(location, slot);
+                if ((criticalSlot != null) && criticalSlot.isDamaged()
+                          && isSlotOf(criticalSlot, type, equipmentNum, mounted)) {
+                    damagedSlots++;
+                }
+            }
+        }
+        return damagedSlots;
+    }
+
+    /**
+     * @return {@code true} when a critical slot holds the given system, or the given equipment (superheavy units can
+     *       hold two pieces of equipment in one slot)
+     */
+    private static boolean isSlotOf(CriticalSlot criticalSlot, int type, int index, @Nullable Mounted<?> mounted) {
+        if (criticalSlot.getType() != type) {
+            return false;
+        }
+        if (type == CriticalSlot.TYPE_SYSTEM) {
+            return criticalSlot.getIndex() == index;
+        }
+        return (mounted != null) && (mounted.equals(criticalSlot.getMount()) || mounted.equals(criticalSlot.getMount2()));
     }
 
     public void destroySystem(int type, int equipmentNum) {
@@ -3146,10 +3240,38 @@ public class Unit implements ITechnology, ILocatable {
      */
     public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
         if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
-            return calculateAlternateUnitCost(unitEntity, unitEntity.calculateBattleValue(true, true, true),
+            return calculateAlternateUnitCost(unitEntity.calculateBattleValue(true, true, true),
+                  getUnitPriceMultiplier(unitEntity, campaignOptions), getQuirkPriceMultiplier(unitEntity),
                   campaignOptions);
         }
         return getTraditionalBuyCost(unitEntity, campaignOptions);
+    }
+
+    /**
+     * Estimates what {@link #getBuyCost()} will return for a unit from its {@link MekSummary} alone, without loading
+     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. Under
+     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the unit is valued by the summary's Battle Value; the summary does
+     * not carry quirks, so the Good Reputation price multiplier is left out (see {@link #getQuirkPriceMultiplier}).
+     *
+     * @param summary         the unit to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     *
+     * @return the unit's estimated purchase value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions) {
+        double unitPriceMultiplier = getUnitPriceMultiplier(summary.isMixedTech(), summary.isClan(), campaignOptions);
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
+        }
+
+        // Infantry, battle armor included, is priced by its alternate cost, as getTraditionalBuyCost does
+        int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
+        boolean isInfantry = (unitTypeCode == UnitType.INFANTRY) || (unitTypeCode == UnitType.BATTLE_ARMOR);
+        Money cost = Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
+        return cost.multipliedBy(unitPriceMultiplier);
     }
 
     /**
@@ -3190,9 +3312,24 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     private static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
-        if (unitEntity.isMixedTech()) {
+        return getUnitPriceMultiplier(unitEntity.isMixedTech(), unitEntity.isClan(), campaignOptions);
+    }
+
+    /**
+     * @param isMixedTech     whether the unit is mixed tech, which takes priority over Clan
+     * @param isClan          whether the unit is Clan tech
+     * @param campaignOptions the campaign options holding the multipliers
+     *
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier for that tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
+          CampaignOptions campaignOptions) {
+        if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
-        } else if (unitEntity.isClan()) {
+        } else if (isClan) {
             return campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
         }
         return campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
@@ -3269,26 +3406,27 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getAlternateUnitCost() {
-        return calculateAlternateUnitCost(getEntity(), getUnitBattleValue(), getCampaign().getCampaignOptions());
+        return calculateAlternateUnitCost(getUnitBattleValue(), getUnitPriceMultiplier(),
+              getQuirkPriceMultiplier(getEntity()), getCampaign().getCampaignOptions());
     }
 
     /**
-     * Values an entity under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * Values a unit under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
      * {@link #getAlternateUnitCost()}).
      *
-     * @param unitEntity      the entity to value
-     * @param battleValue     the entity's Battle Value, excluding pilot skill, C3, and TAG
-     * @param campaignOptions the campaign options supplying the multipliers and support point conversion
+     * @param battleValue          the unit's Battle Value, excluding pilot skill, C3, and TAG
+     * @param unitPriceMultiplier  the unit price multiplier for the unit's tech base
+     * @param quirkPriceMultiplier the price multiplier from the unit's quirks
+     * @param campaignOptions      the campaign options supplying the support point conversion
      *
-     * @return the entity's Battle Value-based value
+     * @return the unit's Battle Value-based value
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static Money calculateAlternateUnitCost(Entity unitEntity, int battleValue,
-          CampaignOptions campaignOptions) {
-        double valueInSupportPoints = battleValue * getUnitPriceMultiplier(unitEntity, campaignOptions)
-                                            * getQuirkPriceMultiplier(unitEntity);
+    private static Money calculateAlternateUnitCost(int battleValue, double unitPriceMultiplier,
+          double quirkPriceMultiplier, CampaignOptions campaignOptions) {
+        double valueInSupportPoints = battleValue * unitPriceMultiplier * quirkPriceMultiplier;
         if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
             return Money.of(valueInSupportPoints);
         }
@@ -4086,7 +4224,12 @@ public class Unit implements ITechnology, ILocatable {
 
         for (Part part : parts) {
             if (part instanceof MekGyro || part instanceof MissingMekGyro) {
-                gyro = part;
+                if (isBuiltWithoutGyro()) {
+                    // Older versions gave a Mek with no gyro a gyro part, which a refit then tried to buy
+                    partsToRemove.add(part);
+                } else {
+                    gyro = part;
+                }
             } else if (part instanceof EnginePart || part instanceof MissingEnginePart) {
                 // reverse compatibility check, spaceships get different engines
                 if (!(entity instanceof SmallCraft || entity instanceof Jumpship)) {
@@ -4819,7 +4962,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (entity instanceof Mek mek) {
-            if (null == gyro) {
+            if ((null == gyro) && !isBuiltWithoutGyro()) {
                 gyro = new MekGyro((int) entity.getWeight(),
                       entity.getGyroType(),
                       MekGyro.getGyroTonnage(mek),
@@ -5719,6 +5862,10 @@ public class Unit implements ITechnology, ILocatable {
             processUnitSPAs(commander);
         }
 
+        // A ship or infantry unit that maintains itself needs its engineer chosen again whenever its crew changes,
+        // whatever the ability options are, or it is left with no tech until the next day
+        resetEngineer();
+
         if (isConventionalInfantry() && (armorKitName != null) && (entity instanceof ConvInfantry convInfantry)) {
             convInfantry.setArmorKit(EquipmentType.get(armorKitName));
         }
@@ -6086,11 +6233,6 @@ public class Unit implements ITechnology, ILocatable {
             if (campaignOptions.get(CampaignOption.USE_EDGE)) {
                 setEdgeForCrew(crewSize, onlyCommandersMatter);
             }
-
-            // Reset the composite technician used by spacecraft and infantry
-            // Important if you just changed technician edge options for members of either
-            // unit type
-            resetEngineer();
 
             // TODO : Set up crew hits. This might only apply to spacecraft, and should reflect the unit's current
             //  crew size vs its required crew size. There's also the question of what to do with extra crew quarters
@@ -6703,21 +6845,13 @@ public class Unit implements ITechnology, ILocatable {
             if (isUnmanned()) {
                 engineer = null;
             } else {
-                for (Person person : getActiveCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getActiveCrew());
             }
         } else {
             if (vesselCrew.isEmpty()) {
                 engineer = null;
             } else {
-                for (Person person : getVesselCrew()) {
-                    if (engineer == null || person.outRanksUsingSkillTiebreaker(campaign, engineer)) {
-                        engineer = person;
-                    }
-                }
+                engineer = selectEngineer(getVesselCrew());
             }
         }
 
@@ -6742,6 +6876,50 @@ public class Unit implements ITechnology, ILocatable {
                 scheduledWork.cancelAssignment(true);
             }
         }
+    }
+
+    /**
+     * Picks the highest-ranked crew member who is actually serving aboard this unit. A crew list can still hold someone
+     * who has since left, for example a crew member who retired in an older version of MekHQ, and such a person must
+     * not become the engineer.
+     *
+     * @param crew the crew members to choose from
+     *
+     * @return the chosen engineer, or {@code null} if nobody in the crew is serving aboard
+     */
+    private @Nullable Person selectEngineer(List<Person> crew) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        final LocalDate today = campaign.getLocalDate();
+
+        Person chosenEngineer = null;
+        int departedCrewCount = 0;
+        for (Person person : crew) {
+            if (!isServingAboard(person)) {
+                departedCrewCount++;
+                continue;
+            }
+
+            if ((chosenEngineer == null)
+                      || person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, chosenEngineer)) {
+                chosenEngineer = person;
+            }
+        }
+
+        if (departedCrewCount > 0) {
+            LOGGER.debug("[Engineer] {}: {} listed crew member(s) no longer serve aboard and cannot be the engineer",
+                  getName(), departedCrewCount);
+        }
+        return chosenEngineer;
+    }
+
+    /**
+     * @param person a person on this unit's crew list
+     *
+     * @return {@code true} if the person is assigned to this unit
+     */
+    private boolean isServingAboard(Person person) {
+        return equals(person.getUnit());
     }
 
     /**
@@ -7319,6 +7497,48 @@ public class Unit implements ITechnology, ILocatable {
             crew.add(techOfficer);
         }
         return crew;
+    }
+
+    /**
+     * Drops this unit's crew entries for people whose own record no longer places them on this unit. Older versions
+     * could leave such entries behind, such as a crew member who retired or moved to another unit but stayed on this
+     * unit's crew list. Only the entries are dropped: the people stay in the campaign and keep their own assignment.
+     *
+     * @return the people whose entries were dropped
+     */
+    public Set<Person> removeDepartedCrew() {
+        Predicate<Person> hasDeparted = person -> !equals(person.getUnit());
+        Set<Person> departedCrew = new LinkedHashSet<>();
+        for (Person person : getCrew()) {
+            if (hasDeparted.test(person)) {
+                departedCrew.add(person);
+            }
+        }
+        for (Person gunner : gunners) {
+            if (hasDeparted.test(gunner)) {
+                departedCrew.add(gunner);
+            }
+        }
+        if (departedCrew.isEmpty()) {
+            return departedCrew;
+        }
+
+        drivers.removeIf(hasDeparted);
+        gunners.removeIf(hasDeparted);
+        vesselCrew.removeIf(hasDeparted);
+        if ((navigator != null) && hasDeparted.test(navigator)) {
+            navigator = null;
+        }
+        if ((techOfficer != null) && hasDeparted.test(techOfficer)) {
+            techOfficer = null;
+        }
+        if ((engineer != null) && hasDeparted.test(engineer)) {
+            engineer = null;
+        }
+        for (Person person : departedCrew) {
+            trooperSlots.release(person.getId());
+        }
+        return departedCrew;
     }
 
     /**
@@ -8251,14 +8471,16 @@ public class Unit implements ITechnology, ILocatable {
         maintenanceMultiplier = value;
     }
 
+    /**
+     * @return the unit's quality: the average quality of the parts that are maintained, or D when there are none.
+     *       Missing parts have no quality and are left out, as they are from the maintenance report; counting them as
+     *       quality A pulled a unit whose parts are all F down to E or D.
+     */
     public PartQuality getQuality() {
         int nParts = 0;
         int sumQuality = 0;
         for (Part p : getParts()) {
-            // no rules about this but let's assume missing parts are quality A
-            if (p instanceof MissingPart) {
-                nParts++;
-            } else if (p.needsMaintenance()) {
+            if (p.needsMaintenance()) {
                 nParts++;
                 sumQuality += p.getQuality().toNumeric();
             }

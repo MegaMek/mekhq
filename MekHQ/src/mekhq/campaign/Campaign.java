@@ -4671,6 +4671,10 @@ public class Campaign implements ITechManager {
             }
         }
 
+        if (!(partWork instanceof Refit)) {
+            PlanetaryWorkConditions.addRollModifiers(this, partUnit, tech, target);
+        }
+
         final boolean isOvertime;
         if (isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
@@ -4833,6 +4837,9 @@ public class Campaign implements ITechManager {
                                      : "acquisition.modifier.ISTech";
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, reasonKey));
+        } else if (RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(this, acquisition)) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.refitKitParts"));
         } else if (getCampaignOptions().get(CampaignOption.TECH_LEVEL) < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.techLevel"));

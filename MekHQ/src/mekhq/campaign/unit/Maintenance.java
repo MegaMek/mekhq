@@ -36,8 +36,6 @@ package mekhq.campaign.unit;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
-import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -56,8 +54,6 @@ import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryConditions.Atmosphere;
-import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -80,8 +76,8 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -698,53 +694,7 @@ public class Maintenance {
             target.addModifier(campaign.getPlayerForce().getFaction().getEraMod(campaign.getGameYear()), "era");
         }
 
-        if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
-                      campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-                AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-                Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
-                int temperature = planet.getTemperature(campaign.getLocalDate());
-
-                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
-                int zeroGSkillLevel = 0;
-                if (zeroGSkill != null) {
-                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
-                }
-
-                // getGravity() is nullable (a planet may record no gravity); default to standard Terran gravity so
-                // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
-                Double recordedGravity = planet.getGravity();
-                double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
-                if (gravity < 0.8) {
-                    int modifier = 2;
-                    target.addModifier(modifier, "Low Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity >= 2.0) {
-                    int modifier = 4;
-                    target.addModifier(modifier, "Very High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity > 1.2) {
-                    int modifier = 1;
-                    target.addModifier(modifier, "High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                }
-
-                if (atmosphere.isTainted() || atmosphere.isToxic()) {
-                    target.addModifier(2, "Tainted or Toxic Atmosphere");
-                } else if (planetaryConditions.isVacuum()) {
-                    target.addModifier(2, "Vacuum");
-                }
-
-                if (planetaryConditions.isTrace() || planetaryConditions.isVeryHigh()) {
-                    target.addModifier(1, "Trace or Very High Pressure Atmosphere");
-                }
-
-                if (temperature < -30 || temperature > 50) {
-                    target.addModifier(1, "Extreme Temperature");
-                }
-            }
-        }
+        PlanetaryWorkConditions.addRollModifiers(campaign, partUnit, tech, target);
 
         if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
@@ -772,30 +722,6 @@ public class Maintenance {
         }
 
         return target;
-    }
-
-    /**
-     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
-     * gravityModifier.
-     *
-     * <ul>
-     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
-     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
-     * </ul>
-     *
-     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
-     *                        gravityModifier
-     * @param gravityModifier the penalty modifier value to offset
-     * @param target          the {@link TargetRoll} instance to modify
-     */
-    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
-        if (zeroGSkillLevel > 0) {
-            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
-
-            if (effectiveModifier < 0) {
-                target.addModifier(effectiveModifier, "Zero-G Operations");
-            }
-        }
     }
 
     /**
@@ -1074,6 +1000,11 @@ public class Maintenance {
      */
     private static String performEngineerCheck(Person tech, int dailyWorkMinutes) {
         Unit techUnit = tech.getUnit();
+        if (techUnit == null) {
+            LOGGER.warn("[Maintenance] {} is flagged as an engineer but serves on no unit; skipping the engineer check",
+                  tech.getFullName());
+            return "";
+        }
         int maintenanceTime = techUnit.getMaintenanceTime();
         if (techUnit.requiresMaintenance() && maintenanceTime > dailyWorkMinutes) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.largeVessel",

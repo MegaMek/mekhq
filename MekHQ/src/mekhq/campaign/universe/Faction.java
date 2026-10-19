@@ -50,6 +50,7 @@ import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionLeaderData;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -75,6 +76,15 @@ public class Faction {
     public static final String REPUBLIC_OF_THE_SPHERE_FACTION_CODE = "ROS";
     public static final String DISPUTED_FACTION_CODE = "DIS";
     public static final String ABANDONED_FACTION_CODE = "ABN";
+
+    private static final MMLogger LOGGER = MMLogger.create(Faction.class);
+
+    /**
+     * The year each era ends (exclusive), in the order of a faction's era modifier list: Age of War, Reunification
+     * War, Star League, First, Second, Third and Fourth Succession Wars, Clan Invasion, Jihad and Dark Age. The ilClan
+     * era that follows has no end.
+     */
+    private static final int[] ERA_END_YEARS = { 2570, 2598, 2785, 2828, 2864, 3028, 3050, 3067, 3086, 3151 };
 
     private Faction2 faction2;
 
@@ -263,45 +273,38 @@ public class Faction {
         return faction2 != null && faction2.isAresConventionsSignatory(year);
     }
 
+    /**
+     * The era modifier this faction applies to repair, refit and maintenance rolls in the given year. The faction's
+     * data lists one modifier per era, from the Age of War on, and the list stops when the faction ends. A campaign can
+     * carry on past that point, so a year beyond the list uses the last era listed rather than failing.
+     *
+     * @param year the campaign year
+     *
+     * @return the era modifier, or 0 if the faction lists none
+     */
     public int getEraMod(int year) {
-        if (eraMods == null) {
+        if ((eraMods == null) || (eraMods.length == 0)) {
             return 0;
-        } else {
-            if (year < 2570) {
-                // Era: Age of War
-                return eraMods[0];
-            } else if (year < 2598) {
-                // Era: RW
-                return eraMods[1];
-            } else if (year < 2785) {
-                // Era: Star League
-                return eraMods[2];
-            } else if (year < 2828) {
-                // Era: 1st SW
-                return eraMods[3];
-            } else if (year < 2864) {
-                // Era: 2nd SW
-                return eraMods[4];
-            } else if (year < 3028) {
-                // Era: 3rd SW
-                return eraMods[5];
-            } else if (year < 3050) {
-                // Era: 4th SW
-                return eraMods[6];
-            } else if (year < 3067) {
-                // Era: Clan Invasion
-                return eraMods[7];
-            } else if (year < 3086) {
-                // Era: Jihad
-                return eraMods[8];
-            } else if (year < 3151) {
-                // Era: Dark Age
-                return eraMods[9];
-            } else {
-                // Era: ilClan
-                return eraMods[10];
+        }
+        int eraIndex = getEraIndex(year);
+        if (eraIndex >= eraMods.length) {
+            LOGGER.trace("[EraModifier] {}: no modifier listed for {}, using the last era listed", shortName, year);
+            return eraMods[eraMods.length - 1];
+        }
+        return eraMods[eraIndex];
+    }
+
+    /**
+     * @return the position of the year's era in a faction's era modifier list: 0 for the Age of War up to 10 for the
+     *       ilClan era
+     */
+    private static int getEraIndex(int year) {
+        for (int eraIndex = 0; eraIndex < ERA_END_YEARS.length; eraIndex++) {
+            if (year < ERA_END_YEARS[eraIndex]) {
+                return eraIndex;
             }
         }
+        return ERA_END_YEARS.length;
     }
 
     public boolean is(FactionTag tag) {

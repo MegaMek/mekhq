@@ -72,6 +72,7 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.AppIcons;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -194,6 +195,8 @@ public class CampaignGUI extends JPanel {
     private final InfirmaryTab infirmaryTab;
     private final MekLabTab mekLabTab;
     private final FinancesTab financesTab;
+
+    private boolean isDayAdvanceBatchInProgress;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -335,6 +338,7 @@ public class CampaignGUI extends JPanel {
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        AppIcons.apply(frame, "mekhq");
 
         tabMain = new EnhancedTabbedPane(true, true);
         tabMain.setToolTipText("");
@@ -1166,7 +1170,7 @@ public class CampaignGUI extends JPanel {
 
         Person selectedTech = techsByLabel.get(chosenLabel);
         if (!selectedTech.isRightTechTypeFor(refit)) {
-            int response = JOptionPane.showConfirmDialog(null,
+            int response = JOptionPane.showConfirmDialog(frame,
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.text"),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.title"),
                   JOptionPane.YES_NO_OPTION);
@@ -1223,6 +1227,8 @@ public class CampaignGUI extends JPanel {
             }
             refit.setTech(selectedTech);
         }
+        logger.debug("[RefitStart] {}: tech chosen, {}", refit.getUnit().getName(),
+              (refit.getTech() == null) ? "none needed" : refit.getTech().getFullName());
         if (selectModelName) {
             // select a model name
             RefitNameDialog refitNameDialog = new RefitNameDialog(frame, true, refit);
@@ -1230,39 +1236,50 @@ public class CampaignGUI extends JPanel {
             if (refitNameDialog.wasCancelled()) {
                 // Set the tech team to null since we may want to change it when we re-do the
                 // refit
+                logger.debug("[RefitStart] {}: naming the new model was cancelled", refit.getUnit().getName());
                 refit.setTech(null);
                 return;
             }
+            logger.debug("[RefitStart] {}: new model named", refit.getUnit().getName());
         }
         // TODO: allow overtime work?
         // check to see if user really wants to do it - give some info on what
         // will be done
         // TODO: better information
-        int response = JOptionPane.showConfirmDialog(null,
+        // Every dialog here has the main window as its parent: a dialog without one can open behind MekHQ, which then
+        // looks frozen while it waits for an answer the player cannot see (issues #4072 and #4554)
+        logger.debug("[RefitStart] {}: asking the player to confirm the refit", refit.getUnit().getName());
+        int response = JOptionPane.showConfirmDialog(frame,
               getRefitConfirmation(campaign, refit),
               getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.title"),
               JOptionPane.YES_NO_OPTION);
         if (response != JOptionPane.YES_OPTION) {
+            logger.debug("[RefitStart] {}: the refit was not confirmed", refit.getUnit().getName());
             return;
         }
         try {
             if (!refit.begin()) {
                 // Refused before it started: the unit already has a refit, or the refurbishment cannot be paid for
+                logger.debug("[RefitStart] {}: the refit was refused as it began", refit.getUnit().getName());
                 return;
             }
         } catch (EntityLoadingException exception) {
-            JOptionPane.showMessageDialog(null,
+            logger.error(exception, "[RefitStart] %s: the new design could not be loaded", refit.getUnit().getName());
+            JOptionPane.showMessageDialog(frame,
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.text"),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException exception) {
-            JOptionPane.showMessageDialog(null, exception.getMessage(),
+            logger.error(exception, "[RefitStart] %s: the new design could not be saved", refit.getUnit().getName());
+            JOptionPane.showMessageDialog(frame, exception.getMessage(),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitIOException.title"), JOptionPane.ERROR_MESSAGE);
             return;
         }
+        logger.debug("[RefitStart] {}: refit begun, doing the first work", refit.getUnit().getName());
         campaign.refit(refit);
         getMekLabTab().clearUnit();
+        logger.debug("[RefitStart] {}: refit started", refit.getUnit().getName());
     }
 
     /**
@@ -2192,7 +2209,31 @@ public class CampaignGUI extends JPanel {
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
+        if (isDayAdvanceBatchInProgress) {
+            // The Command Center still refreshes every day: it collects the report lines added after its own new
+            // day handler ran, and the advance days dialog would otherwise show those lines twice.
+            commandCenterTab.refreshAll();
+            return;
+        }
         refreshAllTabs();
+    }
+
+    /**
+     * Starts a run of days advanced together, such as from the advance days dialog. Until
+     * {@link #endDayAdvanceBatch()} is called, each new day refreshes only the Command Center tab rather than every
+     * tab, because the days in between are never shown. The caller must refresh every tab once the run ends.
+     */
+    public void beginDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Deferring tab refreshes until the advance ends");
+        isDayAdvanceBatchInProgress = true;
+    }
+
+    /**
+     * Ends a run started with {@link #beginDayAdvanceBatch()}, so each new day refreshes every tab again.
+     */
+    public void endDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Advance ended, tab refreshes resume");
+        isDayAdvanceBatchInProgress = false;
     }
 
     /**
