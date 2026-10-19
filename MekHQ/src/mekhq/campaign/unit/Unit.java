@@ -7246,6 +7246,37 @@ public class Unit implements ITechnology, ILocatable {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
+    /**
+     * Takes a vessel tech aboard as crew so they can mothball or activate this unit. A tech holding a seat in a support
+     * carrier is released from it, but only once they are known to be at this unit's location, so a refused transfer
+     * leaves that seat intact. A tech who crews any other unit is refused.
+     *
+     * @param tech the tech to take aboard
+     *
+     * @return {@code true} if the tech is part of this unit's crew afterwards
+     */
+    public boolean takeAboardVesselTech(Person tech) {
+        if (getCrew().contains(tech)) {
+            return true;
+        }
+
+        if (!LocationUtils.areSameEffectiveLocation(this, tech)) {
+            reportAssignmentBlockedByLocation(tech, "vessel crew");
+            return false;
+        }
+
+        Unit techUnit = tech.getUnit();
+        if ((techUnit != null) && techUnit.isCarrier()) {
+            techUnit.remove(tech, false);
+        } else if (techUnit != null) {
+            LOGGER.warn("{} already crews {}", tech.getFullTitle(), techUnit.getName());
+            return false;
+        }
+
+        addVesselCrew(tech, true);
+        return getCrew().contains(tech);
+    }
+
     public void setNavigator(Person p) {
         setNavigator(p, false);
     }
@@ -7760,7 +7791,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Returns the engineer responsible for the mothballing or activation of this unit.
+     * Returns the engineer responsible for the mothballing or activation of this unit. For a mothballed self-crewed
+     * unit this is the engineer who mothballed it, provided they can still come back aboard: they must be active, at
+     * this unit's location, and not crewing another unit (a support carrier seat does not count).
      *
      * @return Person the previous engineer that worked on this vessel, or an empty object.
      */
@@ -7775,13 +7808,23 @@ public class Unit implements ITechnology, ILocatable {
                 var previousTech = campaign.getPlayerForce().getHumanResources().getPerson(previousTechId);
                 var previousTechExists = previousTech != null;
                 var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
-                if (previousTechIsActive) {
+                if (previousTechIsActive && isAvailableToComeAboard(previousTech)) {
                     return Optional.of(previousTech);
                 }
             }
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Whether a person could join this unit's crew: they are at this unit's location and are not crewing another unit.
+     * A seat in a support carrier is a holding assignment, so it does not count.
+     */
+    private boolean isAvailableToComeAboard(Person person) {
+        Unit personUnit = person.getUnit();
+        boolean isCrewingAnotherUnit = (personUnit != null) && !personUnit.equals(this) && !personUnit.isCarrier();
+        return !isCrewingAnotherUnit && LocationUtils.areSameEffectiveLocation(this, person);
     }
 
     /**
@@ -7835,12 +7878,12 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (isSelfCrewed() && !isConventionalInfantry()) {
-            if (engineerResponsible().isPresent() && engineerResponsible().get().getStatus().isActive()) {
-                var assignedEngineer = engineerResponsible().get();
-                addVesselCrew(assignedEngineer);
-            } else if (activationTech != null && activationTech.isTechLargeVessel()) {
-                addVesselCrew(activationTech);
-            } else if (!isGM) {
+            // The tech chosen for the job takes precedence; the engineer who mothballed the unit stands in otherwise
+            Person activationEngineer = ((activationTech != null) && activationTech.isTechLargeVessel()) ?
+                                              activationTech :
+                                              engineerResponsible().orElse(null);
+            boolean hasEngineerAboard = (activationEngineer != null) && takeAboardVesselTech(activationEngineer);
+            if (!hasEngineerAboard && !isGM) {
                 // In this case there is nothing to be done, we cant activate this unit.
                 return;
             }
