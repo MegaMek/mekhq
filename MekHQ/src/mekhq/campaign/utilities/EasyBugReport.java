@@ -46,8 +46,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JDialog;
@@ -56,7 +58,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import jakarta.annotation.Nullable;
+import megamek.MMConstants;
 import megamek.client.generator.RandomCallsignGenerator;
+import megamek.common.Configuration;
+import megamek.common.preference.ClientPreferences;
+import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -103,6 +110,89 @@ public class EasyBugReport {
      * typical overhead to keep the resulting part sizes under the limit in practice.</p>
      */
     private static final long ZIP_ENTRY_OVERHEAD_BYTES = 2_048L;
+
+    /** Archive sub-directory holding the collected logs and reports. */
+    private static final String LOG_ENTRY_PREFIX = "logs/";
+
+    /**
+     * Basenames of the text logs written by {@code mmconf/log4j2.xml}, most important first. The live {@code .log}
+     * files are collected in this order, and only rolled archives of these names are collected.
+     */
+    static final List<String> LOG_BASE_NAMES = List.of("mekhq",
+          "megamek",
+          "princess",
+          "unified_log",
+          "bot_path_ranker",
+          "megameklab");
+
+    private static final String LOG_EXTENSION = ".log";
+    private static final String ROLLED_LOG_EXTENSION = ".log.gz";
+
+    /**
+     * Archive sub-directory for MegaMek's newest in-battle autosave, kept apart from the campaign save at the root so
+     * the two cannot be confused. Kept the same as MegaMek's own bug report bundle.
+     */
+    private static final String BATTLE_AUTOSAVE_ENTRY_PREFIX = "battle-autosave/";
+
+    /**
+     * MegaMek autosaves are written to {@code savegames/} as {@code autosave.sav.gz}, {@code autosave<stamp>.sav.gz}
+     * or {@code Round-<n>-autosave<stamp>.sav.gz}. See {@code megamek.server.AbstractGameManager#autoSave()} and
+     * {@code megamek.server.AutosaveService}.
+     */
+    private static final String BATTLE_AUTOSAVE_MARKER = "autosave";
+    private static final String BATTLE_AUTOSAVE_EXTENSION = ".sav.gz";
+
+    /**
+     * The game dataset log MegaMek's server writes per game when dataset logging is on, as
+     * {@code game_actions_<counter>.tsv} or with a date stamp. See {@code megamek.common.game.GameDatasetLogger}.
+     */
+    private static final String GAME_DATASET_PREFIX = "game_actions_";
+    private static final String GAME_DATASET_EXTENSION = ".tsv";
+
+    /**
+     * Archive sub-directory for a game's minimap images, matching their layout on disk so the folder name still
+     * carries the game's UUID. Kept the same as MegaMek's own bug report bundle.
+     */
+    private static final String GAME_SUMMARY_ENTRY_PREFIX = LOG_ENTRY_PREFIX + "gameSummaries/minimap/";
+    private static final String GAME_SUMMARY_FRAME_EXTENSION = ".png";
+    private static final String GAME_SUMMARY_RECORDING_EXTENSION = ".gif";
+
+    /**
+     * How a file is treated when the bug report runs out of room. Files that are not {@link #REQUIRED} never start a
+     * new archive part. Within each group the files are newest first, and once one does not fit, it and the rest of
+     * its group are left out, so the oldest go first. A later group can still use the space that is left.
+     */
+    enum DropGroup {
+        /** The save, live logs and newest reports; these start a new part when they do not fit. */
+        REQUIRED,
+        /** The newest game dataset log. */
+        GAME_DATASET,
+        /** Rolled {@code .log.gz} archives. */
+        ROLLED_LOG,
+        /** Named minimap PNGs of the newest game, one per phase. */
+        MINIMAP_FRAME,
+        /** The minimap GIF, which repeats the PNG frames without phase names. */
+        MINIMAP_RECORDING
+    }
+
+    /**
+     * One file destined for the bug report.
+     *
+     * @param source    the file to copy
+     * @param entryName the path the file occupies inside the archive
+     * @param dropGroup how the file is treated when the archive runs out of room
+     */
+    record BugReportCandidate(File source, String entryName, DropGroup dropGroup) {}
+
+    /**
+     * The outcome of writing a bug report.
+     *
+     * @param parts           the archive parts written, in order
+     * @param includedEntries archive paths of every file written, in the order written
+     * @param droppedEntries  names of the optional files left out to avoid another part; empty when everything
+     *                        fitted
+     */
+    record BugReportArchiveResult(List<File> parts, List<String> includedEntries, List<String> droppedEntries) {}
 
     /**
      * Saves the given campaign and packages it, along with log files, into a ZIP archive chosen by the user.
@@ -185,7 +275,22 @@ public class EasyBugReport {
 
         // Now package campaign + logs into the user-chosen archive
         try {
-            createBugReportArchive(campaignFile, chosenArchiveFile);
+            // Text logs always go to LOGS_PATH (mmconf/log4j2.xml); the combat and auto-resolve reports follow the
+            // MegaMek log directory preference, which the player can relocate.
+            ClientPreferences clientPreferences = PreferenceManager.getClientPreferences();
+            List<BugReportCandidate> candidates = gatherCandidates(campaignFile,
+                  new File(LOGS_PATH),
+                  new File(clientPreferences.getLogDirectory()),
+                  clientPreferences.getGameLogFilename(),
+                  clientPreferences.getAutoResolveGameLogFilename(),
+                  Configuration.gameSummaryImagesMMDir(),
+                  new File(MMConstants.SAVEGAME_DIR));
+            BugReportArchiveResult archiveResult = createBugReportArchive(candidates,
+                  chosenArchiveFile,
+                  MAX_ARCHIVE_BYTES);
+            if (archiveResult.parts().size() > 1) {
+                showTooMuchDataDialog();
+            }
 
             // We only want the archive, so delete the loose campaign file
             if (!campaignFile.delete()) {
@@ -199,42 +304,308 @@ public class EasyBugReport {
     }
 
     /**
-     * Creates a ZIP archive containing the given campaign file and any valid log files located under
-     * {@link mekhq.MHQConstants#LOGS_PATH}.
+     * Builds the ordered list of files for a bug report. Order is load-bearing: the archive is filled front to back,
+     * so the most useful files come first.
      *
-     * <p>The campaign file is stored at the root of the archive. Log files are stored under the {@code logs/}
-     * directory within the archive, and are limited to files ending in {@code .log} or {@code .log.gz}.</p>
+     * <ol>
+     *     <li>The campaign save, at the archive root</li>
+     *     <li>MegaMek's newest in-battle autosave, under {@code battle-autosave/}, so a maintainer can reload the
+     *     battle itself</li>
+     *     <li>The live text logs, in {@link #LOG_BASE_NAMES} order; empty files are skipped</li>
+     *     <li>The newest combat report ({@code gamelog*.html}) and the newest auto-resolve report
+     *     ({@code simulation*.html})</li>
+     *     <li>The newest game dataset log ({@code game_actions_*.tsv})</li>
+     *     <li>Rolled {@code <name>_N.log.gz} archives of those logs, newest first</li>
+     *     <li>The minimap PNGs of the newest game, newest first, then that game's GIF</li>
+     * </ol>
      *
-     * <p>If the logs directory does not exist or contains no matching files, the method logs this and still returns
-     * the archive containing only the campaign file.</p>
+     * <p>Everything after the newest reports is optional: see {@link DropGroup} for how it is left out when space
+     * runs short.</p>
      *
-     * @param campaignFile the already-saved campaign file to be included at the root of the archive
-     * @param archiveFile  the target ZIP file to write to
+     * <p>The log directory also holds a {@code Bot_*.mul} unit list per bot per game and one combat report per
+     * game, which together can run to hundreds of megabytes. Those are never collected beyond the newest report.</p>
      *
-     * @throws IOException if an I/O error occurs while writing the archive
-     * @author Illiani
-     * @since 0.50.11
+     * @param campaignFile           the saved campaign
+     * @param logDirectory           the directory the text logs are written to
+     * @param gameReportDirectory    the directory the combat and auto-resolve reports and the dataset log are written
+     *                               to
+     * @param gameLogFileName        the configured combat report name, normally {@code gamelog.html}, or
+     *                               {@code null} to collect none
+     * @param autoResolveLogFileName the configured auto-resolve report name, normally {@code simulation.html}, or
+     *                               {@code null} to collect none
+     * @param minimapDirectory       the folder holding one minimap image folder per game, normally
+     *                               {@code gameSummaries/minimap} under the report directory
+     * @param savegameDirectory      the folder MegaMek writes its autosaves to, normally {@code savegames} under the
+     *                               working directory
+     *
+     * @return the files to archive, in priority order
      */
-    private static void createBugReportArchive(File campaignFile, File archiveFile) throws IOException {
-        List<File> inputFiles = new ArrayList<>();
-        inputFiles.add(campaignFile);
+    static List<BugReportCandidate> gatherCandidates(File campaignFile, File logDirectory, File gameReportDirectory,
+          @Nullable String gameLogFileName, @Nullable String autoResolveLogFileName, File minimapDirectory,
+          File savegameDirectory) {
+        List<BugReportCandidate> candidates = new ArrayList<>();
+        candidates.add(new BugReportCandidate(campaignFile, campaignFile.getName(), DropGroup.REQUIRED));
 
-        File logsDirectory = new File(LOGS_PATH);
-        if (!logsDirectory.isDirectory()) {
-            LOGGER.warn("Logs directory does not exist or is not a directory: {}", LOGS_PATH);
+        File battleAutosave = findNewestBattleAutosave(savegameDirectory);
+        if (battleAutosave != null) {
+            candidates.add(new BugReportCandidate(battleAutosave,
+                  BATTLE_AUTOSAVE_ENTRY_PREFIX + battleAutosave.getName(),
+                  DropGroup.REQUIRED));
+        }
+
+        boolean hasLogDirectory = logDirectory.isDirectory();
+        if (hasLogDirectory) {
+            for (String baseName : LOG_BASE_NAMES) {
+                File logFile = new File(logDirectory, baseName + LOG_EXTENSION);
+                if (logFile.isFile() && (logFile.length() > 0)) {
+                    candidates.add(new BugReportCandidate(logFile,
+                          LOG_ENTRY_PREFIX + logFile.getName(),
+                          DropGroup.REQUIRED));
+                }
+            }
         } else {
-            File[] logFiles = logsDirectory.listFiles(file -> file.isFile()
-                                                                    && (file.getName().endsWith(".log") ||
-                                                                              file.getName().endsWith(".log.gz")));
-            if (logFiles != null && logFiles.length > 0) {
-                // Stable order helps reproducibility and makes parts predictable
-                List<File> sortedLogFiles = new ArrayList<>(List.of(logFiles));
-                sortedLogFiles.sort(Comparator.comparing(File::getName));
-                inputFiles.addAll(sortedLogFiles);
-            } else {
-                LOGGER.info("No .log or .log.gz files found in {}", LOGS_PATH);
+            LOGGER.warn("Logs directory does not exist or is not a directory: {}", logDirectory.getPath());
+        }
+
+        for (String reportFileName : new String[] { gameLogFileName, autoResolveLogFileName }) {
+            File newestReport = findNewestReport(gameReportDirectory, reportFileName);
+            if (newestReport != null) {
+                candidates.add(new BugReportCandidate(newestReport,
+                      LOG_ENTRY_PREFIX + newestReport.getName(),
+                      DropGroup.REQUIRED));
             }
         }
+
+        File newestDataset = findNewestFile(gameReportDirectory, GAME_DATASET_PREFIX, GAME_DATASET_EXTENSION);
+        if (newestDataset != null) {
+            candidates.add(new BugReportCandidate(newestDataset,
+                  LOG_ENTRY_PREFIX + newestDataset.getName(),
+                  DropGroup.GAME_DATASET));
+        }
+
+        if (hasLogDirectory) {
+            for (File rolledLog : findRolledLogsNewestFirst(logDirectory)) {
+                candidates.add(new BugReportCandidate(rolledLog,
+                      LOG_ENTRY_PREFIX + rolledLog.getName(),
+                      DropGroup.ROLLED_LOG));
+            }
+        }
+
+        File gameSummaryDirectory = findNewestGameSummaryDirectory(minimapDirectory);
+        if (gameSummaryDirectory != null) {
+            String entryPrefix = GAME_SUMMARY_ENTRY_PREFIX + gameSummaryDirectory.getName() + "/";
+            for (File frame : listNewestFirst(gameSummaryDirectory, GAME_SUMMARY_FRAME_EXTENSION)) {
+                candidates.add(new BugReportCandidate(frame,
+                      entryPrefix + frame.getName(),
+                      DropGroup.MINIMAP_FRAME));
+            }
+            for (File recording : listNewestFirst(gameSummaryDirectory, GAME_SUMMARY_RECORDING_EXTENSION)) {
+                candidates.add(new BugReportCandidate(recording,
+                      entryPrefix + recording.getName(),
+                      DropGroup.MINIMAP_RECORDING));
+            }
+        }
+
+        LOGGER.info("Bug report: collecting logs from {} and reports from {}: {} candidate file(s)",
+              logDirectory.getPath(),
+              gameReportDirectory.getPath(),
+              candidates.size());
+        return candidates;
+    }
+
+    /**
+     * Finds the most recently modified, non-empty report matching a configured report name.
+     *
+     * <p>With MegaMek's filename stamping preference on, {@code gamelog.html} is written as
+     * {@code gamelog_2026-07-21_11-16-49.html}, so a match is the name's basename as a prefix plus its extension as a
+     * suffix.</p>
+     *
+     * @param reportDirectory the directory to search
+     * @param reportFileName  the configured report name, or {@code null}
+     *
+     * @return the newest match, or {@code null} when there is none
+     */
+    private static @Nullable File findNewestReport(File reportDirectory, @Nullable String reportFileName) {
+        if ((reportFileName == null) || reportFileName.isBlank()) {
+            return null;
+        }
+
+        int extensionIndex = reportFileName.lastIndexOf('.');
+        String prefix = (extensionIndex > 0) ? reportFileName.substring(0, extensionIndex) : reportFileName;
+        String suffix = (extensionIndex > 0) ? reportFileName.substring(extensionIndex) : "";
+        return findNewestFile(reportDirectory, prefix, suffix);
+    }
+
+    /**
+     * Finds the most recently modified, non-empty file whose name has the given prefix and suffix.
+     *
+     * @param directory the directory to search
+     * @param prefix    the name the file must start with
+     * @param suffix    the name the file must end with, or an empty string for any
+     *
+     * @return the newest match, or {@code null} when there is none
+     */
+    private static @Nullable File findNewestFile(File directory, String prefix, String suffix) {
+        File[] matches = directory.listFiles(file -> file.isFile()
+                                                          && (file.length() > 0)
+                                                          && file.getName().startsWith(prefix)
+                                                          && file.getName().endsWith(suffix));
+        if (matches == null) {
+            return null;
+        }
+
+        File newestMatch = null;
+        for (File match : matches) {
+            if ((newestMatch == null) || (match.lastModified() > newestMatch.lastModified())) {
+                newestMatch = match;
+            }
+        }
+        return newestMatch;
+    }
+
+    /**
+     * Finds MegaMek's most recent in-battle autosave, whichever of its naming forms it took.
+     *
+     * @param savegameDirectory the folder MegaMek writes its autosaves to
+     *
+     * @return the newest autosave, or {@code null} when there is none
+     */
+    private static @Nullable File findNewestBattleAutosave(File savegameDirectory) {
+        File[] autosaves = savegameDirectory.listFiles(EasyBugReport::isBattleAutosave);
+        if (autosaves == null) {
+            return null;
+        }
+
+        File newestAutosave = null;
+        for (File autosave : autosaves) {
+            if ((newestAutosave == null) || (autosave.lastModified() > newestAutosave.lastModified())) {
+                newestAutosave = autosave;
+            }
+        }
+        return newestAutosave;
+    }
+
+    /**
+     * Whether a file is a non-empty MegaMek autosave rather than a save the player named.
+     *
+     * @param file the file to test
+     *
+     * @return {@code true} if the file is an autosave
+     */
+    private static boolean isBattleAutosave(File file) {
+        String fileName = file.getName();
+        return file.isFile()
+                     && (file.length() > 0)
+                     && fileName.contains(BATTLE_AUTOSAVE_MARKER)
+                     && fileName.endsWith(BATTLE_AUTOSAVE_EXTENSION);
+    }
+
+    /**
+     * Finds the most recently changed per-game minimap folder. From the campaign there is no current game to name
+     * one, and the newest folder is the battle most likely behind the report.
+     *
+     * @param minimapDirectory the folder holding one sub-folder per game, named by the game's UUID
+     *
+     * @return the newest game folder, or {@code null} when there is none
+     */
+    private static @Nullable File findNewestGameSummaryDirectory(File minimapDirectory) {
+        File[] gameDirectories = minimapDirectory.listFiles(File::isDirectory);
+        if (gameDirectories == null) {
+            return null;
+        }
+
+        File newestDirectory = null;
+        for (File gameDirectory : gameDirectories) {
+            if ((newestDirectory == null) || (gameDirectory.lastModified() > newestDirectory.lastModified())) {
+                newestDirectory = gameDirectory;
+            }
+        }
+        return newestDirectory;
+    }
+
+    /**
+     * Lists the non-empty files in a directory with the given extension, newest first. A minimap GIF has no end
+     * trailer until its game ends, but a copy taken mid-battle is still readable.
+     *
+     * @param directory the directory to list
+     * @param extension the extension to match, such as {@code .png}
+     *
+     * @return the matching files, newest first, ties broken by name
+     */
+    private static List<File> listNewestFirst(File directory, String extension) {
+        File[] files = directory.listFiles(file -> file.isFile()
+                                                        && (file.length() > 0)
+                                                        && file.getName().toLowerCase(Locale.ROOT).endsWith(extension));
+        if (files == null) {
+            return List.of();
+        }
+
+        List<File> sortedFiles = new ArrayList<>(List.of(files));
+        sortedFiles.sort(Comparator.comparingLong(File::lastModified).reversed().thenComparing(File::getName));
+        return sortedFiles;
+    }
+
+    /**
+     * Collects the rolled archives ({@code <name>_N.log.gz}) of the logs in {@link #LOG_BASE_NAMES}, newest first.
+     * Other compressed files in the log directory are ignored.
+     *
+     * @param logDirectory the directory the text logs are written to
+     *
+     * @return the rolled logs, newest first, ties broken by name
+     */
+    private static List<File> findRolledLogsNewestFirst(File logDirectory) {
+        File[] rolledLogs = logDirectory.listFiles(EasyBugReport::isCollectableRolledLog);
+        if (rolledLogs == null) {
+            return List.of();
+        }
+
+        List<File> sortedRolledLogs = new ArrayList<>(List.of(rolledLogs));
+        sortedRolledLogs.sort(Comparator.comparingLong(File::lastModified).reversed()
+                                    .thenComparing(File::getName));
+        return sortedRolledLogs;
+    }
+
+    /**
+     * Whether a file is a rolled archive of one of the collected logs: a basename, an underscore and {@code .log.gz},
+     * as Log4j rolls {@code mekhq.log} to {@code mekhq_1.log.gz}.
+     *
+     * @param file the file to test
+     *
+     * @return {@code true} if the file is a rolled archive of a collected log
+     */
+    private static boolean isCollectableRolledLog(File file) {
+        String fileName = file.getName();
+        if (!file.isFile() || !fileName.endsWith(ROLLED_LOG_EXTENSION)) {
+            return false;
+        }
+        for (String baseName : LOG_BASE_NAMES) {
+            if (fileName.startsWith(baseName + "_")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Writes the candidates into one or more ZIP archives of at most {@code maxArchiveBytes} each.
+     *
+     * <p>Candidates are written in order. A required file that does not fit starts a new part. An optional file
+     * never starts a new part: once one does not fit, it and the rest of its {@link DropGroup} are left out and named
+     * in the result, so old history is lost before the player is asked to upload another file.</p>
+     *
+     * @param candidates      the files to write, in priority order, from
+     *                        {@link #gatherCandidates(File, File, File, String, String, File, File)}
+     * @param archiveFile     the user-chosen archive; parts are written next to it as {@code <name>-partN.zip}
+     * @param maxArchiveBytes the size cap for each part
+     *
+     * @return the parts written and what was included or left out
+     *
+     * @throws IOException if an I/O error occurs while writing the archive
+     */
+    static BugReportArchiveResult createBugReportArchive(List<BugReportCandidate> candidates, File archiveFile,
+          long maxArchiveBytes) throws IOException {
+        List<String> includedEntries = new ArrayList<>();
+        List<String> droppedEntries = new ArrayList<>();
 
         String baseName = archiveFile.getName();
         if (baseName.toLowerCase().endsWith(".zip")) {
@@ -259,18 +630,27 @@ public class EasyBugReport {
             zipOut = new ZipOutputStream(countingOut);
             parts.add(currentArchive);
 
-            for (File inputFile : inputFiles) {
-                String entryName = inputFile.equals(campaignFile)
-                                         ? campaignFile.getName()
-                                         : ("logs/" + inputFile.getName());
+            Set<DropGroup> exhaustedGroups = EnumSet.noneOf(DropGroup.class);
+            for (BugReportCandidate candidate : candidates) {
+                File inputFile = candidate.source();
+                String entryName = candidate.entryName();
+                DropGroup dropGroup = candidate.dropGroup();
 
                 long estimatedAddedBytes = inputFile.length() + ZIP_ENTRY_OVERHEAD_BYTES;
+                boolean exceedsCap = countingOut.getCount() > 0
+                                           && (countingOut.getCount() + estimatedAddedBytes) > maxArchiveBytes;
+
+                // Each optional group is newest first, so once one file does not fit, the rest of the group is
+                // older and is dropped rather than asking the player to upload another part.
+                if ((dropGroup != DropGroup.REQUIRED) && (exceedsCap || exhaustedGroups.contains(dropGroup))) {
+                    exhaustedGroups.add(dropGroup);
+                    droppedEntries.add(inputFile.getName());
+                    continue;
+                }
 
                 // If adding this file exceeds the cap, roll to next part (if current part already has something).
                 // Note: This is conservative and should keep the actual ZIP size under the limit in practice.
-                if (countingOut.getCount() > 0
-                          && (countingOut.getCount() + estimatedAddedBytes) > MAX_ARCHIVE_BYTES) {
-
+                if (exceedsCap) {
                     try {
                         zipOut.close(); // closes countingOut as well
                     } finally {
@@ -292,17 +672,18 @@ public class EasyBugReport {
                     parts.add(currentArchive);
                 }
 
-                // If a single file is huge, it may exceed MAX_ARCHIVE_BYTES even alone.
-                if (inputFile.length() > (MAX_ARCHIVE_BYTES - ZIP_ENTRY_OVERHEAD_BYTES)) {
+                // If a single file is huge, it may exceed the cap even alone.
+                if (inputFile.length() > (maxArchiveBytes - ZIP_ENTRY_OVERHEAD_BYTES)) {
                     LOGGER.warn(
                           "File '{}' is larger than the per-archive limit ({} bytes); it will be placed in its own "
                                 + "part and may exceed the limit.",
                           inputFile.getName(),
-                          MAX_ARCHIVE_BYTES
+                          maxArchiveBytes
                     );
                 }
 
                 addFileToZip(inputFile, entryName, zipOut);
+                includedEntries.add(entryName);
             }
         } finally {
             if (zipOut != null) {
@@ -322,10 +703,15 @@ public class EasyBugReport {
 
         int partCount = parts.size();
         LOGGER.info("Created bug report archive in {} part(s): {}", partCount, parts);
-
-        if (partCount > 1) {
-            showTooMuchDataDialog();
+        if (!droppedEntries.isEmpty()) {
+            LOGGER.info("Left out {} optional file(s) to avoid another part: {}",
+                  droppedEntries.size(),
+                  String.join(", ", droppedEntries));
         }
+
+        return new BugReportArchiveResult(List.copyOf(parts),
+              List.copyOf(includedEntries),
+              List.copyOf(droppedEntries));
     }
 
     /**

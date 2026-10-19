@@ -843,6 +843,12 @@ public class MekLocation extends Part {
         return (loc != Mek.LOC_CENTER_TORSO) && super.isSalvaging();
     }
 
+    /** A Mek's centre torso can never be scrapped, so it can never be replaced either. */
+    @Override
+    protected boolean isReplaceable() {
+        return loc != Mek.LOC_CENTER_TORSO;
+    }
+
     @Override
     public String checkScrappable() {
         // Can't scrap a center torso

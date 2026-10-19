@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -65,6 +67,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 
@@ -73,6 +76,7 @@ import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
  */
 public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -277,7 +281,11 @@ public class ChooseRefitDialog extends JDialog {
             return;
         }
 
-        btnRefit.setEnabled(!campaign.getCampaignOptions().get(CampaignOption.ALLOW_CANON_REFIT_ONLY) || r.getNewEntity().isCanon());
+        boolean isAllowedDesign = !campaign.getCampaignOptions().get(CampaignOption.ALLOW_CANON_REFIT_ONLY)
+              || r.getNewEntity().isCanon();
+        boolean canBuyKit = !RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(campaign, r);
+        btnRefit.setEnabled(isAllowedDesign && canBuyKit);
+        btnRefit.setToolTipText(canBuyKit ? null : getTextAt(RESOURCE_BUNDLE, "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
         JList<String> lstShopping = new JList<>(r.getShoppingListDescription());
