@@ -164,6 +164,7 @@ public class ContractDossierPanel extends JPanel {
         HudButton edit = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.edit")
                                              .toUpperCase(Locale.ROOT), false, true);
         edit.setArmed(campaign.isGM());
+        edit.setToolTipText(MarketOffersPage.gmToolTip(campaign.isGM(), "button.contractMarket.edit.tooltip"));
         edit.addActionListener(event -> actions.edit(contract));
         HudConfirmButton delete = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.delete")
                                                              .toUpperCase(Locale.ROOT),

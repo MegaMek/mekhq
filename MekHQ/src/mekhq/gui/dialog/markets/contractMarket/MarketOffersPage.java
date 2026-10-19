@@ -159,10 +159,12 @@ final class MarketOffersPage {
         HudButton generate = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.generateNew")
                                                  .toUpperCase(Locale.ROOT), false, true);
         generate.setArmed(market.isGM());
+        generate.setToolTipText(gmToolTip(market.isGM(), "button.contractMarket.generateNew.tooltip"));
         generate.addActionListener(event -> market.generateNewContracts());
         HudButton create = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.createNew")
                                                .toUpperCase(Locale.ROOT), false, true);
         create.setArmed(market.isGM());
+        create.setToolTipText(gmToolTip(market.isGM(), "button.contractMarket.createNew.tooltip"));
         create.addActionListener(event -> market.createNewContract());
         clearBoard = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.deleteAll")
                                                 .toUpperCase(Locale.ROOT),
@@ -253,6 +255,16 @@ final class MarketOffersPage {
         }
         dossierHolder.revalidate();
         dossierHolder.repaint();
+    }
+
+    /**
+     * The tooltip for a GM-only button: what it does when GM mode is on, or why it is unavailable when it is off.
+     *
+     * @param isGM          {@code true} if the campaign is in GM mode
+     * @param toolTipKey    resource key of what the button does
+     */
+    static String gmToolTip(boolean isGM, String toolTipKey) {
+        return getTextAt(RESOURCE_BUNDLE, isGM ? toolTipKey : "button.contractMarket.gmOnly.tooltip");
     }
 
     /**
