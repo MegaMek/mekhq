@@ -301,28 +301,28 @@ public class ChooseRefitDialog extends JDialog {
 
     private void populateRefits() {
         List<Refit> refits = new ArrayList<>();
-        Entity e = unit.getEntity();
-        String chassis = e.getFullChassis();
-        designSearch = RefitDesignSearch.findDesigns(e, campaign);
+        Entity entity = unit.getEntity();
+        String chassis = entity.getFullChassis();
+        designSearch = RefitDesignSearch.findDesigns(entity, campaign);
         failedRefitCheck = 0;
         for (String model : designSearch.models()) {
             model = StringUtility.isNullOrBlank(model) ? "" : " " + model;
             try {
                 MekSummary summary = Utilities.retrieveUnit(chassis + model);
-                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                if (null != refitEn) {
-                    Refit r = new Refit(unit, refitEn, false, false, false);
-                    String refitProblem = r.checkFixable();
+                Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (null != refitEntity) {
+                    Refit refit = new Refit(unit, refitEntity, false, false, false);
+                    String refitProblem = refit.checkFixable();
                     if (null == refitProblem) {
-                        refits.add(r);
+                        refits.add(refit);
                     } else {
                         logger.trace("[RefitDesigns] {}: refused by the refit check: {}", summary.getName(),
                               refitProblem);
                         failedRefitCheck++;
                     }
                 }
-            } catch (EntityLoadingException ex) {
-                logger.error("", ex);
+            } catch (EntityLoadingException exception) {
+                logger.error("", exception);
             }
         }
         refitModel = new RefitTableModel(refits);
