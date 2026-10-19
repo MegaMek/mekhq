@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
@@ -57,6 +58,7 @@ import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
@@ -139,8 +141,8 @@ public final class FormationIconBuilder {
 
         // Root gets a logo-or-default-type icon if the toggle is on.
         if (options.isGenerateOriginNodeFormationIcon()) {
-            LayeredFormationIcon rootIcon = buildOriginIcon(iconFaction, options.isUseOriginNodeFormationIconLogo(),
-                  background);
+            LayeredFormationIcon rootIcon = buildOriginIcon(iconFaction, campaign.getGameYear(),
+                  options.isUseOriginNodeFormationIconLogo(), background);
             root.setFormationIcon(rootIcon);
             LOGGER.info("[CompanyGen]   root '{}' -> origin icon applied", root.getName());
         }
@@ -343,21 +345,18 @@ public final class FormationIconBuilder {
 
     /**
      * Builds the LOGO / TYPE / BACKGROUND icon used for the campaign's root Formation. When
-     * {@code useLogo} is {@code true} and the faction has a logo, the LOGO layer is used; otherwise the
-     * generic 'Mek-center silhouette goes into the TYPE layer as a fallback.
+     * {@code useLogo} is {@code true} and the faction has a logo for {@code gameYear} (see
+     * {@link #getOriginLogo(Faction, int)}), it is used as the LOGO layer; otherwise the generic 'Mek-center
+     * silhouette goes into the TYPE layer as a fallback.
      */
-    private static LayeredFormationIcon buildOriginIcon(Faction iconFaction, boolean useLogo,
+    private static LayeredFormationIcon buildOriginIcon(Faction iconFaction, int gameYear, boolean useLogo,
           FormationPieceIcon background) {
         LayeredFormationIcon icon = new LayeredFormationIcon();
 
-        if (useLogo && iconFaction.getLayeredFormationIconLogoFilename() != null) {
-            FormationPieceIcon logoIcon = new FormationPieceIcon(LayeredFormationIconLayer.LOGO,
-                  iconFaction.getLayeredFormationIconLogoCategory(),
-                  iconFaction.getLayeredFormationIconLogoFilename());
-            if (logoIcon.getBaseImage() != null) {
-                icon.getPieces().putIfAbsent(LayeredFormationIconLayer.LOGO, new ArrayList<>());
-                icon.getPieces().get(LayeredFormationIconLayer.LOGO).add(logoIcon);
-            }
+        FormationPieceIcon logoIcon = useLogo ? getOriginLogo(iconFaction, gameYear) : null;
+        if (logoIcon != null) {
+            icon.getPieces().putIfAbsent(LayeredFormationIconLayer.LOGO, new ArrayList<>());
+            icon.getPieces().get(LayeredFormationIconLayer.LOGO).add(logoIcon);
         } else {
             icon.getPieces().putIfAbsent(LayeredFormationIconLayer.TYPE, new ArrayList<>());
             icon.getPieces().get(LayeredFormationIconLayer.TYPE)
@@ -372,6 +371,37 @@ public final class FormationIconBuilder {
         }
 
         return icon;
+    }
+
+    /**
+     * Returns the LOGO piece for the faction's icon for {@code gameYear}, found under the
+     * {@link MHQConstants#LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY} logo category. Older faction files without an icon
+     * use their legacy logo from the formation icon logos instead.
+     *
+     * @return the logo piece, or {@code null} if the faction has no logo or its image cannot be found
+     */
+    private static @Nullable FormationPieceIcon getOriginLogo(Faction iconFaction, int gameYear) {
+        String iconAddress = RATGenerator.getCanonicalFactionLogoAddress(gameYear, iconFaction.getShortName());
+        String logo;
+        if (iconAddress != null) {
+            // Keep any subdirectory of the icon, as the faction icons are registered with their directory structure
+            logo = MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY + '/'
+                         + iconAddress.substring(RATGenerator.FACTION_LOGO_DIRECTORY.length());
+        } else {
+            logo = Factions.getLegacyFactionLogo(gameYear, iconFaction.getShortName());
+            if (logo == null) {
+                return null;
+            }
+        }
+
+        int separator = logo.lastIndexOf('/');
+        FormationPieceIcon logoIcon = new FormationPieceIcon(LayeredFormationIconLayer.LOGO,
+              logo.substring(0, separator + 1), logo.substring(separator + 1));
+        if (logoIcon.getBaseImage() == null) {
+            LOGGER.warn("[CompanyGen]   origin logo '{}' not found, using the type fallback", logo);
+            return null;
+        }
+        return logoIcon;
     }
 
     /**

@@ -87,6 +87,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -2051,6 +2052,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         setSkills();
         setOptions();
+
+        // Advanced Alternate Medical works some implants out each day from the prosthetics a person carries, so one
+        // granted here needs its prosthetics recorded, or the next day's check takes it away again.
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+        }
 
         person.validateRoles(campaign);
 

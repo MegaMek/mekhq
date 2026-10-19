@@ -491,7 +491,9 @@ public abstract class AbstractProcreation {
             // if the mother is at school, add the baby to the list of tag along
             if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
-                baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+                if (!baby.getStatus().isCampFollower()) {
+                    baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+                }
             }
 
             // Apply postpartum effects (first baby only)

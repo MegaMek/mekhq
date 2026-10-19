@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.resupplyAndCaches;
 
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
@@ -44,7 +45,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.processCo
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_SMUGGLER;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.getSpeakerIcon;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
@@ -63,7 +64,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
@@ -72,6 +72,7 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Factions;
 
 /**
  * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations. These include normal
@@ -104,7 +105,7 @@ public class DialogItinerary {
         final AbstractContract contract = resupply.getContract();
         final ResupplyType resupplyType = resupply.getResupplyType();
 
-        final int DIALOG_WIDTH = UIUtil.scaleForGUI(700);
+        final int DIALOG_WIDTH = scaleForGUI(700);
 
         // Retrieves the title from the resources
         String title = getFormattedTextAt(RESOURCE_BUNDLE, "dialog.title");
@@ -136,14 +137,12 @@ public class DialogItinerary {
             speakerIcon = scaleImageIcon(speakerIcon, 100, true);
         } else if (resupplyType.equals(RESUPPLY_SMUGGLER)) {
             speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
-
-            speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
-            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
+            speakerIcon = Factions.getFactionLogoWithScaling(campaign.getGameYear(), PIRATE_FACTION_CODE,
+                  scaleForGUI(200));
         } else {
             speakerName = contract.getEmployerDisplayName();
-
-            speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerFactionCode());
-            speakerIcon = scaleImageIcon(speakerIcon, 200, true);
+            speakerIcon = Factions.getFactionLogoWithScaling(campaign.getGameYear(), contract.getEmployerFactionCode(),
+                  scaleForGUI(200));
         }
 
         StringBuilder message = new StringBuilder(getInitialDescription(resupply));
@@ -171,7 +170,7 @@ public class DialogItinerary {
 
         // Create a panel to display the icon and the message
         JLabel description = new JLabel(String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-              UIUtil.scaleForGUI(DIALOG_WIDTH),
+              scaleForGUI(DIALOG_WIDTH),
               message));
         description.setHorizontalAlignment(JLabel.CENTER);
 
