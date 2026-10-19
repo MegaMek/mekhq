@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -70,8 +73,14 @@ import megamek.common.units.Entity;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -585,6 +594,143 @@ class ResolveScenarioTrackerTest {
         }
 
         verify(campaign).decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, fullCrewSize);
+    }
+
+    /**
+     * Places the scenario in a contract that uses the {@code SIMULATED_DAMAGE} special rule, under which no one
+     * actually dies.
+     */
+    private void useSimulatedDamage() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.usesSpecialRule(SIMULATED_DAMAGE)).thenReturn(true);
+        when(campaign.getContract(any())).thenReturn(contract);
+    }
+
+    /**
+     * Verifies that neither the unit's temp crew nor the campaign temp crew pool lost anyone.
+     */
+    private void verifyNoTempCrewLost(Unit unit) {
+        verify(unit, never()).setTempCrew(any(PersonnelRole.class), anyInt());
+        verify(campaign, never()).decreaseTempCrewPool(any(PersonnelRole.class), anyInt());
+    }
+
+    /**
+     * A wiped-out infantry platoon in a simulated battle keeps all its temp crew, both on the unit and in the
+     * campaign pool.
+     */
+    @Test
+    void checkStatusOfPersonnelSparesInfantryTempCrewUnderSimulatedDamage() {
+        useSimulatedDamage();
+        Entity infantry = createPlayerBlkEntity("Foot Platoon (DCMS) (MG 2620+)");
+        int tempCrew = 10;
+        Unit unit = createBlobCrewUnit(infantry, PersonnelRole.SOLDIER, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, infantry, true);
+
+        tracker.checkStatusOfPersonnel();
+
+        verifyNoTempCrewLost(unit);
+    }
+
+    /**
+     * A destroyed vehicle in a simulated battle keeps its temp crew even when every survival roll is lethal.
+     */
+    @Test
+    void checkStatusOfPersonnelSparesVehicleTempCrewUnderSimulatedDamage() {
+        useSimulatedDamage();
+        Entity tank = createPlayerBlkEntity("Prime Mover");
+        int tempCrew = 5;
+        Unit unit = createBlobCrewUnit(tank, PersonnelRole.VEHICLE_CREW_GROUND, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, tank, true);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2); // < 7: killed, were the battle real
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verifyNoTempCrewLost(unit);
+    }
+
+    /**
+     * A destroyed large craft in a simulated battle keeps its temp vessel crew, however many crew hits it took.
+     */
+    @Test
+    void checkStatusOfPersonnelSparesLargeCraftTempCrewUnderSimulatedDamage() {
+        useSimulatedDamage();
+        SmallCraft smallCraft = mock(SmallCraft.class);
+        Crew crew = mock(Crew.class);
+        when(smallCraft.getCrew()).thenReturn(crew);
+        when(smallCraft.isDestroyed()).thenReturn(true);
+        when(smallCraft.getFullChassis()).thenReturn("Test");
+        when(smallCraft.getModel()).thenReturn("Craft");
+        when(smallCraft.getExternalIdAsString()).thenReturn(UUID.randomUUID().toString());
+
+        int tempCrew = 20;
+        Unit unit = createBlobCrewUnit(smallCraft, PersonnelRole.VESSEL_CREW, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, smallCraft, true);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.getFullCrewSize(smallCraft)).thenReturn(8);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        verifyNoTempCrewLost(unit);
+    }
+
+    /**
+     * Temp crew killed in ordinary combat earn death benefits: each is paid their role's base salary times the
+     * enlisted payout rate, debited as a single transaction and reported.
+     */
+    @Test
+    void processTempCrewDeathPayoutsPaysForTempCrewKilledInCombat() {
+        Entity infantry = createPlayerBlkEntity("Foot Platoon (DCMS) (MG 2620+)");
+        int tempCrew = 10;
+        Unit unit = createBlobCrewUnit(infantry, PersonnelRole.SOLDIER, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, infantry, true);
+
+        tracker.checkStatusOfPersonnel();
+        tracker.processTempCrewDeathPayouts();
+
+        CampaignOptions options = campaign.getCampaignOptions();
+        Money expectedPayout = options.get(CampaignOption.ROLE_BASE_SALARIES)[PersonnelRole.SOLDIER.ordinal()]
+                                     .multipliedBy(options.get(CampaignOption.PAYOUT_RATE_ENLISTED))
+                                     .multipliedBy(tempCrew);
+        Finances finances = campaign.getPlayerForce().getFinances();
+        verify(finances).debit(eq(TransactionType.SALARIES), any(), eq(expectedPayout), anyString());
+        verify(campaign).addReport(eq(DailyReportType.PERSONNEL), anyString());
+    }
+
+    /**
+     * No one dies in a simulated battle, so temp crew "killed" in one earn no death benefits: nothing is debited and
+     * nothing is reported.
+     */
+    @Test
+    void processTempCrewDeathPayoutsPaysNothingUnderSimulatedDamage() {
+        useSimulatedDamage();
+        Entity infantry = createPlayerBlkEntity("Foot Platoon (DCMS) (MG 2620+)");
+        int tempCrew = 10;
+        Unit unit = createBlobCrewUnit(infantry, PersonnelRole.SOLDIER, tempCrew, tempCrew);
+
+        ResolveScenarioTracker tracker = createTracker();
+        registerUnit(tracker, unit, infantry, true);
+
+        tracker.checkStatusOfPersonnel();
+        tracker.processTempCrewDeathPayouts();
+
+        Finances finances = campaign.getPlayerForce().getFinances();
+        verify(finances, never()).debit(any(), any(), any(), anyString());
+        verify(campaign, never()).addReport(eq(DailyReportType.PERSONNEL), anyString());
     }
 
     // endregion Blob (temporary) crew casualties
