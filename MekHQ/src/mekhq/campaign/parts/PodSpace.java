@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -480,7 +481,7 @@ public class PodSpace implements IPartWork {
 
     @Override
     public int getActualTime() {
-        return getBaseTime();
+        return (int) Math.ceil(getBaseTime() * PlanetaryWorkConditions.getTimeMultiplier(campaign, unit));
     }
 
     @Override

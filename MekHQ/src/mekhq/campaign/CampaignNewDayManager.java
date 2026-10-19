@@ -123,6 +123,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
@@ -1250,6 +1251,9 @@ public class CampaignNewDayManager {
         // Before anything else touches the contracts: an employer losing its planet today resolves the contract's
         // active scenarios and may end or regenerate the contract.
         EmployerLostPlanet.processNewDay(campaign);
+
+        // Combat teams whose contract has ended move to an active one before anything reads their assignments
+        CombatTeam.assignInactiveTeamsToActiveContract(campaign);
 
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             processTrainingCombatTeams(campaign);

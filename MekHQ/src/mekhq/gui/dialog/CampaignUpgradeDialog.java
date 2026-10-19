@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 
 /**
  * Provides a user interface dialog for upgrading a {@link Campaign} across versions.
@@ -225,7 +226,8 @@ public class CampaignUpgradeDialog {
                 });
             }
             case PRESET_SELECTION_CUSTOMIZE -> {
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign);
+                CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(null, campaign, null,
+                      CampaignOptionsDialogMode.NORMAL);
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCanceled()) {
                     exitApp(app);
