@@ -45,8 +45,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.IntConsumer;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -62,7 +69,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
-import mekhq.gui.baseComponents.hud.HudTabStrip;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 import mekhq.gui.view.PlanetViewPanel;
@@ -72,9 +78,10 @@ import org.apache.commons.lang3.StringUtils;
  * The briefing dossier for the selected {@link AbstractContract}, drawn in the HUD style of the Oracle Console.
  *
  * <p>The header names the offer and its employer, rates the fight with a compact assessment and holds the offer's
- * actions; Accept lives in the market's footer instead, so it can act on the selection from either page. Two tabs
- * follow: <b>Overview</b>, which opens with the briefing (the contact's pitch and the contract's description) and then
- * sets the terms, intel and money side by side, and <b>Target planet</b>.</p>
+ * actions; Accept lives in the market's footer instead, so it can act on the selection from either page. Beneath it,
+ * one scrolling page runs from the briefing (the contact's pitch and the contract's description, beside a preview of
+ * the route) through the terms, intel and money side by side, to the target planet. One page rather than tabs leaves
+ * no empty space under a short section.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -82,8 +89,6 @@ import org.apache.commons.lang3.StringUtils;
 public class ContractDossierPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
-    private static final int TAB_OVERVIEW = 0;
-    private static final int TAB_TARGET_PLANET = 1;
     private static final int PORTRAIT_SIZE = 48;
 
     private final transient Campaign campaign;
@@ -91,11 +96,6 @@ public class ContractDossierPanel extends JPanel {
     private final transient ContractProfitEstimate estimate;
     private final LocalDate currentDate;
     private final boolean hideContractType;
-    private final transient IntConsumer onTabChanged;
-
-    private final CardLayout tabLayout = new CardLayout();
-    private final JPanel tabHolder = new JPanel(tabLayout);
-    private final HudTabStrip tabs;
 
     /**
      * Builds a dossier for the given offer.
@@ -105,52 +105,38 @@ public class ContractDossierPanel extends JPanel {
      * @param currentDate      campaign date, for time-sensitive names
      * @param estimate         the offer's profit estimate
      * @param hideContractType {@code true} if the campaign hides contract types behind operation codenames
-     * @param initialTab       the tab to open on, so moving between offers keeps the player's place
-     * @param onTabChanged     told the tab's index whenever the player changes tab
      * @param actions          the per-offer actions the header buttons invoke
      *
      * @author Illiani
      * @since 0.51.01
      */
     public ContractDossierPanel(Campaign campaign, AbstractContract contract, LocalDate currentDate,
-          ContractProfitEstimate estimate, boolean hideContractType, int initialTab, IntConsumer onTabChanged,
-          ContractMarketActions actions) {
+          ContractProfitEstimate estimate, boolean hideContractType, ContractMarketActions actions) {
         super(new BorderLayout());
         this.campaign = campaign;
         this.contract = contract;
         this.estimate = estimate;
         this.currentDate = currentDate;
         this.hideContractType = hideContractType;
-        this.onTabChanged = onTabChanged;
         setOpaque(true);
         setBackground(SURFACE_DEEP);
 
-        tabs = new HudTabStrip(List.of(getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.overview"),
-              getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.targetPlanet")), true, this::selectTab);
+        // The header stays put while the page beneath it scrolls.
+        JPanel top = Hud.transparentPanel(new BorderLayout());
+        top.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
+        top.add(buildHeader(actions), BorderLayout.CENTER);
 
-        JPanel top = MarketHud.column();
-        top.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), 0, scaleForGUI(14)));
-        top.add(leftAligned(buildHeader(actions)));
-        top.add(Box.createVerticalStrut(scaleForGUI(10)));
-        top.add(leftAligned(tabs));
-
-        tabHolder.setOpaque(false);
-        tabHolder.add(MarketHud.scroll(padded(buildOverview()), SURFACE_DEEP), Integer.toString(TAB_OVERVIEW));
-        tabHolder.add(buildTargetPlanet(), Integer.toString(TAB_TARGET_PLANET));
+        JPanel page = MarketHud.column();
+        page.add(leftAligned(buildOverview()));
+        page.add(Box.createVerticalStrut(scaleForGUI(18)));
+        page.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.targetPlanet"))));
+        page.add(Box.createVerticalStrut(scaleForGUI(6)));
+        page.add(leftAligned(buildTargetPlanet()));
 
         add(top, BorderLayout.NORTH);
-        add(tabHolder, BorderLayout.CENTER);
-        showTab(Math.clamp(initialTab, TAB_OVERVIEW, TAB_TARGET_PLANET));
-    }
-
-    private void selectTab(int index) {
-        showTab(index);
-        onTabChanged.accept(index);
-    }
-
-    private void showTab(int index) {
-        tabs.setSelected(index);
-        tabLayout.show(tabHolder, Integer.toString(index));
+        add(MarketHud.scroll(padded(page), SURFACE_DEEP), BorderLayout.CENTER);
     }
 
     // region Header
@@ -576,22 +562,20 @@ public class ContractDossierPanel extends JPanel {
 
     // region Target planet
 
+    /**
+     * The target system's details, closing the page. The page's own scroll pane scrolls them with everything above.
+     */
     private JComponent buildTargetPlanet() {
         PlanetarySystem system = contract.getTargetSystem();
         if (system == null) {
-            JLabel empty = Hud.notice(getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.targetPlanet.none"));
-            empty.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(24), scaleForGUI(12), scaleForGUI(24),
-                  scaleForGUI(12)));
-            JPanel holder = Hud.transparentPanel(new BorderLayout());
-            holder.add(empty, BorderLayout.NORTH);
-            return holder;
+            JLabel empty = Hud.hint(getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.targetPlanet.none"));
+            empty.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), 0, 0, 0));
+            return empty;
         }
         Planet planet = contract.getTargetPlanet();
         Integer position = planet == null ? null : planet.getSystemPosition();
         // The planet view already draws itself in the HUD palette, so it sits in the dossier unchanged.
-        JScrollPane scroll = new JScrollPane(new PlanetViewPanel(system, campaign, position == null ? 0 : position));
-        Hud.styleScroll(scroll, SURFACE_DEEP, false);
-        return scroll;
+        return new PlanetViewPanel(system, campaign, position == null ? 0 : position);
     }
 
     // endregion Target planet
