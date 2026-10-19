@@ -281,7 +281,7 @@ public class ImmersiveDialogCore extends JDialog {
         super(resolveOwner(campaign));
         if (getOwner() == null) {
             // Unowned dialogs get their own taskbar entry, so give it the MekHQ icon instead of the Java default
-            AppIcons.apply(this, "mekhq");
+            AppIcons.applyToWindow(this, "mekhq");
         }
 
         // Initialize
