@@ -72,6 +72,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.AppIcons;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
@@ -138,7 +139,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
           final boolean isInAppNewCampaign, Consumer<Campaign> completionHandler) {
-        super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
+        // Every caller hides its frame before loading, and Windows leaves windows owned by a hidden frame out of the
+        // taskbar and Alt+Tab, so the loading screen has no owner and carries the MekHQ icon itself.
+        super((JDialog) null, frame, false, "DataLoadingDialog", "DataLoadingDialog.title");
+        AppIcons.applyToWindow(this, "mekhq");
         this.application = application;
         this.campaignFile = campaignFile;
         this.isInAppNewCampaign = isInAppNewCampaign;
@@ -562,7 +566,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         private boolean showStartupCampaignOptionsDialog(final Campaign campaign, final @Nullable CampaignPreset preset,
               final CampaignOptionsDialogMode mode) {
-            final CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+            final CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(getFrame(), campaign, preset, mode);
             setVisible(false); // cede visibility to `optionsDialog`
             optionsDialog.setVisible(true);
             if (optionsDialog.wasCanceled()) {
