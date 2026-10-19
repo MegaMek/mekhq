@@ -544,6 +544,12 @@ public class ProtoMekLocation extends Part {
         return (loc != ProtoMek.LOC_TORSO) && super.isSalvaging();
     }
 
+    /** A ProtoMek's torso can never be scrapped, so it can never be replaced either. */
+    @Override
+    protected boolean isReplaceable() {
+        return loc != ProtoMek.LOC_TORSO;
+    }
+
     @Override
     public @Nullable String checkScrappable() {
         // Can't scrap a center torso
