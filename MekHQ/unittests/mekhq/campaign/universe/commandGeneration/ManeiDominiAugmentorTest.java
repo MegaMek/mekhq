@@ -33,6 +33,8 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
+import static mekhq.campaign.personnel.PersonnelOptions.COMPULSION_PAINKILLER_ADDICTION;
+import static mekhq.campaign.personnel.PersonnelOptions.FLAW_UNATTRACTIVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -211,5 +213,59 @@ class ManeiDominiAugmentorTest {
         assertEquals(1, recorded);
         assertEquals(AlternateInjuries.BUFFERED_VDNI_TRIPLE_CORE,
               warrior.getProstheticInjuries().get(0).getType());
+    }
+
+    /**
+     * A warrior fitted through surgery picks up the traits that come with each prosthetic - painkiller addiction above
+     * all, which is what charges medication upkeep. A Shadow Division warrior issued the same implants must carry
+     * them too, or their augmentation costs nothing to keep.
+     */
+    @Test
+    void issuedImplantsBringTheirTraitsWhenTheCampaignUsesAbilities() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+        campaign.getCampaignOptions().set(CampaignOption.USE_ABILITIES, true);
+        Person warrior = new Person(campaign);
+
+        ManeiDominiAugmentor.recordImplantProsthetics(campaign, warrior,
+              List.of(OptionsConstants.MD_GAS_EFFUSER_TOXIN, OptionsConstants.MD_TSM_IMPLANT));
+
+        assertTrue(warrior.getOptions().booleanOption(COMPULSION_PAINKILLER_ADDICTION),
+              "the toxin effuser and myomer both need painkillers");
+        assertTrue(warrior.getOptions().booleanOption(FLAW_UNATTRACTIVE),
+              "triple-strength myomer leaves its bearer unattractive");
+    }
+
+    /** The explosive charge comes with no traits, so a warrior carrying only that picks none up. */
+    @Test
+    void theExplosiveChargeAloneBringsNoTraits() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+        campaign.getCampaignOptions().set(CampaignOption.USE_ABILITIES, true);
+        Person warrior = new Person(campaign);
+
+        int recorded = ManeiDominiAugmentor.recordImplantProsthetics(campaign, warrior,
+              List.of(OptionsConstants.MD_SUICIDE_IMPLANTS));
+
+        assertEquals(1, recorded);
+        assertFalse(warrior.getOptions().booleanOption(COMPULSION_PAINKILLER_ADDICTION),
+              "the explosive charge needs no painkillers");
+    }
+
+    /**
+     * Without Advanced Alternate Medical nothing is recorded, so no traits are added either - the implant option stays
+     * the only record, as it was before.
+     */
+    @Test
+    void noTraitsAreAddedWhenTheCampaignDoesNotUseAlternateMedical() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, false);
+        campaign.getCampaignOptions().set(CampaignOption.USE_ABILITIES, true);
+        Person warrior = new Person(campaign);
+
+        ManeiDominiAugmentor.recordImplantProsthetics(campaign, warrior,
+              List.of(OptionsConstants.MD_GAS_EFFUSER_TOXIN));
+
+        assertFalse(warrior.getOptions().booleanOption(COMPULSION_PAINKILLER_ADDICTION));
     }
 }

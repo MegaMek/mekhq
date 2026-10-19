@@ -2695,6 +2695,8 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.PHEROMONE_EFFUSER.simpleName");
+            // An implant rather than a replacement, so fitting it leaves the other internal implants in place
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(INTERNAL);
             this.injuryEffect = InjuryEffect.PHEROMONE_EFFUSER;
         }
@@ -2705,6 +2707,8 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.SECONDARY_POWER_SUPPLY.simpleName");
+            // An implant rather than a replacement, so fitting it leaves the other internal implants in place
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(INTERNAL);
             this.injuryEffect = InjuryEffect.NONE;
         }

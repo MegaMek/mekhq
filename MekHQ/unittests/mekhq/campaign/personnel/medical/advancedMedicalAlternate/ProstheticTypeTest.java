@@ -47,6 +47,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.List;
@@ -55,10 +57,12 @@ import java.util.stream.Stream;
 
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class ProstheticTypeTest {
@@ -166,9 +170,13 @@ public class ProstheticTypeTest {
     }
 
     @Test
-    @DisplayName("Effusers and the suicide implant are internal implants that leave other internal work in place")
+    @DisplayName("Effusers, the power supply and the suicide implant are internal implants that leave other internal "
+          + "work in place")
     public void internalAugmentationsAreImplants() {
+        // Surgery that isn't an implant clears everything at its location, so any of these fitted as a replacement
+        // would strip the others - and the implant options that go with them - whichever order they were fitted in.
         for (ProstheticType prostheticType : List.of(ProstheticType.TOXIN_EFFUSER,
+              ProstheticType.PHEROMONE_EFFUSER, ProstheticType.POWER_SUPPLY,
               ProstheticType.EXPLOSIVE_SUICIDE_IMPLANT)) {
             assertEquals(Set.of(BodyLocation.INTERNAL), prostheticType.getEligibleLocations());
             assertEquals(InjurySubType.IMPLANT_GENERIC, prostheticType.getInjuryType().getSubType());
@@ -187,5 +195,30 @@ public class ProstheticTypeTest {
     public void toxinEffuserIsWordOfBlakeOnly() {
         assertTrue(ProstheticType.TOXIN_EFFUSER.isWordOfBlakeOnly());
         assertTrue(ProstheticType.PHEROMONE_EFFUSER.isWordOfBlakeOnly());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ProstheticType.class)
+    @DisplayName("Every prosthetic, and the record it leaves, has its name in the resource bundles")
+    public void everyProstheticHasItsNames(ProstheticType prostheticType) {
+        assertFalse(prostheticType.toString().contains("!ProstheticType."),
+              () -> prostheticType.name() + " is missing its name: " + prostheticType);
+        String simpleName = String.valueOf(prostheticType.getInjuryType().getSimpleName());
+        assertFalse(simpleName.contains("!AlternateInjuries."),
+              () -> prostheticType.name() + " leaves a record missing its name: " + simpleName);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ProstheticType.class, names = { "DERMAL_MYOMER_ARM_TRIPLE", "DERMAL_MYOMER_LEG_TRIPLE",
+                                                        "PROSTHETIC_LEG_MASC" })
+    @DisplayName("Prosthetics behind a derived implant explain it in their tooltip")
+    public void derivedProstheticTooltipsHaveTheirText(ProstheticType prostheticType) {
+        Faction faction = mock(Faction.class);
+        when(faction.getShortName()).thenReturn("MERC");
+
+        String tooltip = prostheticType.getTooltip(faction, 3075, 1.0);
+
+        assertFalse(tooltip.contains("!ProstheticType."),
+              () -> prostheticType.name() + " has a tooltip line missing from the resource bundle: " + tooltip);
     }
 }

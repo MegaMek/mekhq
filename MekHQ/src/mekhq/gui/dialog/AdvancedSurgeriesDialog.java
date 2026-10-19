@@ -102,7 +102,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
@@ -928,35 +928,11 @@ public class AdvancedSurgeriesDialog extends JDialog {
      * @since 0.50.10
      */
     private void processOldInjuryRemoval(ProstheticType type, BodyLocation location) {
-        boolean isBurnRemovalOnly = type.isBurnRemoveOnly();
-        InjuryType surgeryInjuryType = type.getInjuryType();
-        InjurySubType subType = surgeryInjuryType.getSubType();
-        boolean surgeryIsImplant = subType.isImplant(); // Includes VDNI implants and wings
-        boolean surgeryIsExclusive = subType.isMutuallyExclusiveImplant();
         LocalDate today = campaign.getLocalDate();
-
-        // Implants remove any other instances of the same implant, otherwise no removal occurs. Non-implants remove
-        // all relevant injuries.
-        if (surgeryIsImplant) {
-            for (Injury injury : patient.getInjuries()) {
-                InjurySubType injurySubType = injury.getSubType();
-                if (injurySubType.isImplant()) {
-                    // We only remove implants if we're adding an identical implant, or another of a mutually
-                    // exclusive kind (VDNI implants, wings)
-                    if ((surgeryIsExclusive && injurySubType == subType) ||
-                              (injury.getType() == surgeryInjuryType)) {
-                        patient.removeInjury(injury, today);
-                    }
-                }
-            }
-        } else {
-            for (Injury injury : relevantInjuries.getOrDefault(location, new ArrayList<>())) {
-                if (injury != null) {
-                    if (injury.getSubType().isBurn() || !isBurnRemovalOnly) {
-                        patient.removeInjury(injury, today);
-                    }
-                }
-            }
+        List<Injury> removed = AdvancedMedicalAlternate.getInjuriesRemovedBySurgery(type, patient.getInjuries(),
+              relevantInjuries.getOrDefault(location, new ArrayList<>()));
+        for (Injury injury : removed) {
+            patient.removeInjury(injury, today);
         }
     }
 

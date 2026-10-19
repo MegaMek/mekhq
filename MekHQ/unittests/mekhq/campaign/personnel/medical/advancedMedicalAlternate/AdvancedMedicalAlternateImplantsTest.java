@@ -529,6 +529,34 @@ class AdvancedMedicalAlternateImplantsTest {
         assertEquals(0, recorded);
         assertTrue(person.getProstheticInjuries().isEmpty());
     }
+
+    @Test
+    @DisplayName("recordImplantProsthetics grants the personnel options that come with a prosthetic, as surgery does")
+    void recordImplantProsthetics_grantsAssociatedPersonnelOptions() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ABILITIES, true);
+        Person person = new Person(campaign);
+
+        AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person,
+              List.of(OptionsConstants.MD_GAS_EFFUSER_TOXIN));
+
+        assertTrue(person.getOptions().booleanOption(COMPULSION_PAINKILLER_ADDICTION),
+              "without the addiction the effuser's medication upkeep is never charged");
+    }
+
+    @Test
+    @DisplayName("recordImplantProsthetics grants no personnel options where the campaign does not use abilities")
+    void recordImplantProsthetics_skipsAssociatedPersonnelOptionsWithoutAbilities() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ABILITIES, false);
+        Person person = new Person(campaign);
+
+        AdvancedMedicalAlternateImplants.recordImplantProsthetics(campaign, person,
+              List.of(OptionsConstants.MD_PL_ENHANCED));
+
+        assertFalse(person.getProstheticInjuries().isEmpty());
+        assertFalse(person.getOptions().booleanOption(COMPULSION_PAINKILLER_ADDICTION));
+    }
     // endregion recordImplantProsthetics
 
     // region recordMissingDerivedImplantProsthetics
