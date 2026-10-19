@@ -853,9 +853,9 @@ public class CampaignNewDayManager {
      * Updates the status of whether field kitchens are operating within their required capacity.
      *
      * <p>If fatigue is enabled in the campaign options, campaign method calculates the total available
-     * field kitchen capacity and the required field kitchen usage, then updates the {@code fieldKitchenWithinCapacity}
-     * flag to reflect whether the capacity meets the demand. If fatigue is disabled, the capacity is automatically set
-     * to {@code false}.</p>
+     * field kitchen capacity (including any kitchens rented for active contracts) and the required field kitchen
+     * usage, then updates the {@code fieldKitchenWithinCapacity} flag to reflect whether the capacity meets the demand.
+     * If fatigue is disabled, the capacity is automatically set to {@code false}.</p>
      */
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
@@ -863,6 +863,8 @@ public class CampaignNewDayManager {
                   checkFieldKitchenCapacity(campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
                                                   .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(),
                                                         false), campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+                  ContractRentalType.KITCHENS);
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
                                                                  .getHumanResources()
                                                                  .getActivePersonnel(false, false),
@@ -2033,7 +2035,7 @@ public class CampaignNewDayManager {
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"));
         campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
-        boolean failedWillpowerCheck = attributeCheckResult.isSuccess();
+        boolean failedWillpowerCheck = !attributeCheckResult.isSuccess();
         person.processDiscontinuationSyndrome(campaign,
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
@@ -2041,6 +2043,10 @@ public class CampaignNewDayManager {
               fatigueRate,
               true,
               failedWillpowerCheck);
+
+        if (isUseFatigue && failedWillpowerCheck) {
+            Fatigue.processFatigueActions(campaign, person);
+        }
     }
 
     /**

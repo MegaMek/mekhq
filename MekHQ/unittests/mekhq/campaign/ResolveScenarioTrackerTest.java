@@ -55,6 +55,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -72,6 +73,7 @@ import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
+import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -84,6 +86,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.TrooperSlots;
 import mekhq.campaign.unit.Unit;
@@ -842,4 +846,77 @@ class ResolveScenarioTrackerTest {
     }
 
     // endregion Battle armor casualties by suit
+
+    // region SIMULATED_DAMAGE prisoner capture
+
+    /**
+     * Enables prisoner capture and places the scenario in a contract that does or does not use the
+     * {@code SIMULATED_DAMAGE} special rule.
+     */
+    private void captureEnabledInContract(boolean simulatedDamage) {
+        campaign.getCampaignOptions().set(CampaignOption.PRISONER_CAPTURE_STYLE, PrisonerCaptureStyle.MEKHQ);
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.usesSpecialRule(SIMULATED_DAMAGE)).thenReturn(simulatedDamage);
+        when(campaign.getContract(any())).thenReturn(contract);
+    }
+
+    /**
+     * Registers an intact enemy Mek as potential salvage, crewed by the returned (randomly generated) pilot.
+     */
+    private Person enemyPilotInPotentialSalvage(ResolveScenarioTracker tracker) {
+        Entity enemy = createEnemyEntity("Locust LCT-1V");
+        TestUnit enemyUnit = mock(TestUnit.class);
+        when(enemyUnit.getId()).thenReturn(UUID.randomUUID());
+        when(enemyUnit.getEntity()).thenReturn(enemy);
+        when(enemyUnit.getName()).thenReturn("Enemy Test Unit");
+
+        ResolveScenarioTracker.UnitStatus status = new ResolveScenarioTracker.UnitStatus(enemyUnit);
+        status.assignFoundEntity(enemy, false);
+        tracker.salvageStatus.put(enemyUnit.getId(), status);
+        tracker.potentialSalvage.add(enemyUnit);
+        return mockCrewMember("Enemy Pilot");
+    }
+
+    private void checkStatusOfPersonnelWithEnemyCrew(ResolveScenarioTracker tracker, Person enemyPilot) {
+        try (MockedStatic<Utilities> utilities = mockStatic(Utilities.class);
+              MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            utilities.when(() -> Utilities.genRandomCrewWithCombinedSkill(any(), any(), any()))
+                  .thenAnswer(invocation -> Map.of(CrewType.PILOT, new ArrayList<>(List.of(enemyPilot))));
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+    }
+
+    /**
+     * Under {@code SIMULATED_DAMAGE} the combat was only simulated, so the enemy crew cannot be taken prisoner even
+     * with prisoner capture enabled.
+     */
+    @Test
+    void checkStatusOfPersonnelTakesNoEnemyPrisonersUnderSimulatedDamage() {
+        captureEnabledInContract(true);
+        ResolveScenarioTracker tracker = createTracker();
+        Person enemyPilot = enemyPilotInPotentialSalvage(tracker);
+
+        checkStatusOfPersonnelWithEnemyCrew(tracker, enemyPilot);
+
+        assertTrue(tracker.getOppositionPersonnel().isEmpty(), "No enemy crew should be up for capture");
+    }
+
+    /**
+     * The same scenario in ordinary combat still offers the enemy crew up for capture.
+     */
+    @Test
+    void checkStatusOfPersonnelOffersEnemyPrisonersInOrdinaryCombat() {
+        captureEnabledInContract(false);
+        ResolveScenarioTracker tracker = createTracker();
+        Person enemyPilot = enemyPilotInPotentialSalvage(tracker);
+
+        checkStatusOfPersonnelWithEnemyCrew(tracker, enemyPilot);
+
+        assertTrue(tracker.getOppositionPersonnel().containsKey(enemyPilot.getId()),
+              "The enemy pilot should be up for capture");
+    }
+
+    // endregion SIMULATED_DAMAGE prisoner capture
 }

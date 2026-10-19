@@ -159,6 +159,26 @@ public class RegionPerimeterTest {
     }
 
     @Test
+    public void testIsInsideRegionPointSharesXWithLowerVertexOfLeftLeaningEdge() {
+        // The edge (0,-1)->(-1,0) leans left from its lower vertex. A point directly above that vertex
+        // must not be counted as intersecting it.
+        List<Point> diamond = List.of(new Point(0, -1), new Point(1, 0), new Point(0, 1), new Point(-1, 0));
+
+        assertTrue(RegionPerimeter.isInsideRegion(0, -0.5, diamond));
+        assertTrue(RegionPerimeter.isInsideRegion(0, 0.5, diamond));
+        assertFalse(RegionPerimeter.isInsideRegion(0, -2, diamond));
+        assertFalse(RegionPerimeter.isInsideRegion(0, 2, diamond));
+    }
+
+    @Test
+    public void testIsInsideRegionPointSharesXWithLowerVertexOfTriangle() {
+        List<Point> triangle = List.of(new Point(0, 0), new Point(4, 2), new Point(-2, 4));
+
+        assertTrue(RegionPerimeter.isInsideRegion(0, 1, triangle));
+        assertFalse(RegionPerimeter.isInsideRegion(0, -1, triangle));
+    }
+
+    @Test
     public void testIntersectionTriangleClippedByRectangle() {
         List<Point> triangle = new ArrayList<>();
         triangle.add(new Point(0, 2));
