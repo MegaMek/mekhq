@@ -387,14 +387,17 @@ public class EducationController {
 
         boolean hasActiveParent = false;
         if (spouse != null) {
-            if (spouse.getStatus().isActiveFlexible() && (spouse.isDependent() || !spouse.isEmployed())) {
+            boolean spouseTagsAlong = spouse.getStatus().isActiveFlexible()
+                                            && (spouse.isDependent() || !spouse.isEmployed());
+            if (spouseTagsAlong) {
                 person.addEduTagAlong(spouse.getId());
                 if (!spouse.getStatus().isCampFollower()) {
                     spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
                 }
             }
 
-            hasActiveParent = spouse.getStatus().isActiveFlexible();
+            // a spouse who tags along can't stay behind to look after the children
+            hasActiveParent = !spouseTagsAlong && spouse.getStatus().isActiveFlexible();
         }
 
         if (!hasActiveParent) {
@@ -1004,16 +1007,15 @@ public class EducationController {
         LocalPersonnel arrivingAtPersonnel;
         arrivingAtPersonnel = isLocal ? findPersonnelWhenReturningFromLocal(campaign,
               person.getEduAcademySystem()) : campaign.getPlayerForce().getPersonnel();
+        // changing the student's status reactivates and clears their tag-alongs, so capture them first
+        List<UUID> tagAlongs = new ArrayList<>(person.getEduTagAlongs());
         person.setParent(arrivingAtPersonnel);
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
-        for (UUID tagAlong : person.getEduTagAlongs()) {
+        for (UUID tagAlong : tagAlongs) {
             Person companion = campaign.getPlayerForce().getHumanResources().getPerson(tagAlong);
             if (companion != null) {
                 companion.setParent(arrivingAtPersonnel);
-                if (companion.getStatus().isOnLeave()) {
-                    companion.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-                }
             }
         }
 

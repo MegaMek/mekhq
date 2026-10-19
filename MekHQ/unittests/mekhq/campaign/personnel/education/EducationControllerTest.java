@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -65,10 +66,11 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.personnel.enums.education.EducationStage;import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -454,6 +456,41 @@ class EducationControllerTest {
 
             assertNull(mainForceLocation.getJumpPath());
         }
+
+        private Person addTagAlong(PersonnelStatus status) {
+            Person tagAlong = new Person("Test", "TagAlong", null, "MERC");
+            tagAlong.setStatus(status);
+            person.addEduTagAlong(tagAlong.getId());
+            when(campaign.getPlayerForce().getHumanResources().getPerson(tagAlong.getId())).thenReturn(tagAlong);
+            return tagAlong;
+        }
+
+        @Test
+        void arrivingHome_campFollowerTagAlongIsNotEmployed() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            strandTravelerAt(academySystem);
+            Detachment homeDetachment = new Detachment();
+            homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+
+            person.setStatus(PersonnelStatus.STUDENT);
+            Person campFollower = addTagAlong(PersonnelStatus.CAMP_FOLLOWER);
+            Person onLeave = addTagAlong(PersonnelStatus.ON_LEAVE);
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, campaignSystem, campaign))
+                      .thenReturn(null);
+
+                runNewDay();
+            }
+
+            assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+            assertEquals(PersonnelStatus.CAMP_FOLLOWER, campFollower.getStatus());
+            assertEquals(PersonnelStatus.ACTIVE, onLeave.getStatus());
+            assertSame(homeDetachment.getPersonnel(), campFollower.getParentLocation());
+            assertSame(homeDetachment.getPersonnel(), onLeave.getParentLocation());
+            assertTrue(person.getEduTagAlongs().isEmpty());
+        }
     }
 
     /** Tests for {@link EducationController#enrollPerson} stage assignment. */
@@ -590,6 +627,68 @@ class EducationControllerTest {
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
 
             assertEquals(ACADEMY_NAME, person.getEduAcademyNameInSet());
+        }
+
+        private Person addSpouse(Person person, PersonnelStatus status) {
+            Person spouse = new Person("Test", "Spouse", null, "MERC");
+            spouse.setStatus(status);
+            person.getGenealogy().setSpouse(spouse);
+            spouse.getGenealogy().setSpouse(person);
+            return spouse;
+        }
+
+        private Person addChild(Person person, PersonnelStatus status) {
+            Person child = new Person("Test", "Child", null, "MERC");
+            child.setDateOfBirth(LocalDate.of(3020, 1, 1));
+            child.setStatus(status);
+            person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+            return child;
+        }
+
+        @Test
+        void campFollowerFamily_tagsAlongAndRemainsCampFollowers() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+
+            Person person = buildStudentPerson();
+            Person spouse = addSpouse(person, PersonnelStatus.CAMP_FOLLOWER);
+            Person child = addChild(person, PersonnelStatus.CAMP_FOLLOWER);
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertEquals(List.of(spouse.getId(), child.getId()), person.getEduTagAlongs());
+            assertEquals(PersonnelStatus.CAMP_FOLLOWER, spouse.getStatus());
+            assertEquals(PersonnelStatus.CAMP_FOLLOWER, child.getStatus());
+        }
+
+        @Test
+        void dependentFamily_tagsAlongAndGoesOnLeave() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+
+            Person person = buildStudentPerson();
+            Person spouse = addSpouse(person, PersonnelStatus.ACTIVE);
+            spouse.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
+            Person child = addChild(person, PersonnelStatus.ACTIVE);
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertEquals(List.of(spouse.getId(), child.getId()), person.getEduTagAlongs());
+            assertEquals(PersonnelStatus.ON_LEAVE, spouse.getStatus());
+            assertEquals(PersonnelStatus.ON_LEAVE, child.getStatus());
+        }
+
+        @Test
+        void employedSpouse_staysBehindWithChildren() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+
+            Person person = buildStudentPerson();
+            Person spouse = addSpouse(person, PersonnelStatus.ACTIVE);
+            Person child = addChild(person, PersonnelStatus.ACTIVE);
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertTrue(person.getEduTagAlongs().isEmpty());
+            assertEquals(PersonnelStatus.ACTIVE, spouse.getStatus());
+            assertEquals(PersonnelStatus.ACTIVE, child.getStatus());
         }
     }
 }
