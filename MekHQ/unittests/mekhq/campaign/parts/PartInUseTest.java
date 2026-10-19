@@ -51,7 +51,8 @@ import mekhq.campaign.work.IAcquisitionWork;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests how {@link PartInUse} decides that two entries in the parts in use report are the same item.
+ * Tests how {@link PartInUse} decides that two entries in the parts in use report are the same item, and that it only
+ * works out an item's price when the price is asked for.
  */
 class PartInUseTest {
     private static final String MEDIUM_LASER = "Medium Laser";
@@ -115,6 +116,27 @@ class PartInUseTest {
 
         verify(storedWork, times(1)).getAcquisitionPart();
         verify(incomingWork, times(1)).getAcquisitionPart();
+    }
+
+    @Test
+    void buildingAnEntryDoesNotWorkOutItsPrice() {
+        IAcquisitionWork acquisitionWork = acquisitionWork(MEDIUM_LASER, TechBase.IS, sameTypeComparisonPart());
+
+        new PartInUse(partBuying(acquisitionWork));
+
+        verify(acquisitionWork, never()).getBuyCost();
+    }
+
+    @Test
+    void priceIsWorkedOutOnceWhenFirstAskedFor() {
+        IAcquisitionWork acquisitionWork = acquisitionWork(MEDIUM_LASER, TechBase.IS, sameTypeComparisonPart());
+        Money price = Money.of(40000);
+        when(acquisitionWork.getBuyCost()).thenReturn(price);
+        PartInUse entry = new PartInUse(partBuying(acquisitionWork));
+
+        assertEquals(price, entry.getCost());
+        assertEquals(price, entry.getCost());
+        verify(acquisitionWork, times(1)).getBuyCost();
     }
 
     /**
