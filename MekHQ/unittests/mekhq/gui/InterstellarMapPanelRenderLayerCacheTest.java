@@ -296,8 +296,16 @@ class InterstellarMapPanelRenderLayerCacheTest {
           LinearGradientPaint closeBands = (LinearGradientPaint) InterstellarMapPanel
               .createDisputedTerritoryPaint(
                   List.of(firstFaction, secondFaction, thirdFaction), 1.0, closeBandWidth);
-          assertEquals(22.0, closeBandWidth, 0.001);
-          assertEquals(33.0, closeBands.getEndPoint().getY(), 0.001);
+          assertEquals(22.4, closeBandWidth, 0.001);
+          assertEquals(33.6, closeBands.getEndPoint().getY(), 0.001);
+    }
+
+    @Test
+    void disputedStripesKeepTheirMapWidthAcrossZoomLevels() {
+        for (double scale : new double[] { 1.8, 2.35, 3.2, 4.7, 10.0 }) {
+            assertEquals(InterstellarMapPanel.TerritoryVisualProfile.DISPUTED_BAND_WIDTH_LIGHT_YEARS,
+                  InterstellarMapPanel.TerritoryVisualProfile.create(scale).disputedBandWidth() / scale, 0.000_001);
+        }
     }
 
     @Test
