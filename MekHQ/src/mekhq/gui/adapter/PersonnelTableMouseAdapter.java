@@ -4352,30 +4352,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             });
             menu.add(miSecondInCommand);
-
-            final JCheckBoxMenuItem miLeadNegotiator = new JCheckBoxMenuItem(getText("miLeadNegotiator.text"));
-            miLeadNegotiator.setToolTipText(getText("miLeadNegotiator.toolTipText"));
-            miLeadNegotiator.setName("miLeadNegotiator");
-            miLeadNegotiator.setSelected(person.isLeadNegotiator());
-            miLeadNegotiator.addActionListener(evt -> {
-                getCampaign().getPlayerForce().getPersonnel()
-                      .values()
-                      .stream()
-                      .filter(Person::isLeadNegotiator)
-                      .forEach(leadNegotiator -> {
-                          leadNegotiator.setLeadNegotiator(false);
-                          getCampaign().addReport(PERSONNEL, getFormattedText("removedLeadNegotiator.format",
-                                leadNegotiator.getHyperlinkedFullTitle()));
-                          MekHQ.triggerEvent(new PersonChangedEvent(leadNegotiator));
-                      });
-                if (miLeadNegotiator.isSelected()) {
-                    person.setLeadNegotiator(true);
-                    getCampaign().addReport(PERSONNEL, getFormattedText("setAsLeadNegotiator.format",
-                          person.getHyperlinkedFullTitle()));
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
-                }
-            });
-            menu.add(miLeadNegotiator);
         }
 
         addFlagMenuItem(menu, selected, "blockMaternityLeave", null, Person::isBlockMaternityLeave,
@@ -4388,6 +4364,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         addFlagMenuItem(menu, selected, "miHidePersonality", null, Person::isHidePersonality,
               Person::setHidePersonality);
         addFlagMenuItem(menu, selected, "miImmortal", null, Person::isImmortal, Person::setImmortal);
+        addFlagMenuItem(menu, selected, "miLeadNegotiator", null, Person::isLeadNegotiator,
+              Person::setLeadNegotiator);
         addFlagMenuItem(menu, selected, "miPrefersMen", null, Person::isPrefersMen, Person::setPrefersMen);
         addFlagMenuItem(menu, selected, "miPrefersWomen", null, Person::isPrefersWomen, Person::setPrefersWomen);
         addFlagMenuItem(menu, selected, "miQuickTrainIgnore", null, Person::isQuickTrainIgnore,
