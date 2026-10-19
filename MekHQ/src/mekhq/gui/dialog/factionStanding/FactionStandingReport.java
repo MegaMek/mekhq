@@ -60,6 +60,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
@@ -535,7 +536,7 @@ public class FactionStandingReport extends JDialog {
               isPirateOrMercenaryOrganization, climateRegard)));
 
         // Faction Logo
-        ImageIcon icon = Factions.getFactionLogo(gameYear, factionCode);
+        ImageIcon icon = RATGenerator.getFactionLogo(gameYear, factionCode, Color.BLACK);
         icon = ImageUtilities.scaleImageIcon(icon, REPORT_IMAGE_WIDTH, true);
         JLabel lblFactionImage = new JLabel(icon);
         lblFactionImage.setName("lblFactionImage" + factionCode);

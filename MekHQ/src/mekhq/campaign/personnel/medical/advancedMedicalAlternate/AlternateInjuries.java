@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEf
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.FLAW;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_WINGS;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.NORMAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.PROSTHETIC_MYOMER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -346,6 +347,15 @@ public class AlternateInjuries {
     public static final InjuryType PAIN_SHUNT = new PainShunt();
     public static final InjuryType IMPLANT_REMOVAL_RECOVERY = new ImplantRemovalRecovery();
     public static final InjuryType SECONDARY_POWER_SUPPLY = new SecondaryPowerSupply();
+    public static final InjuryType TOXIN_EFFUSER = new ToxinEffuser();
+    public static final InjuryType EXPLOSIVE_SUICIDE_IMPLANT = new ExplosiveSuicideImplant();
+    public static final InjuryType ENHANCED_PROSTHETIC_LIMB = new EnhancedProstheticLimb();
+    public static final InjuryType IMPROVED_ENHANCED_PROSTHETIC_LIMB = new ImprovedEnhancedProstheticLimb();
+    public static final InjuryType PROSTHETIC_LEG_MASC = new ProstheticLegMASC();
+    public static final InjuryType ENHANCED_TAIL_PROSTHETIC = new EnhancedTailProsthetic();
+    public static final InjuryType EXTRANEOUS_PROSTHETIC_LIMBS = new ExtraneousProstheticLimbs();
+    public static final InjuryType GLIDER_WINGS = new GliderWings();
+    public static final InjuryType POWERED_FLIGHT_WINGS = new PoweredFlightWings();
 
     // Base injury type classes with common behavior
     private abstract static class BaseInjury extends InjuryType {
@@ -2685,6 +2695,8 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.PHEROMONE_EFFUSER.simpleName");
+            // An implant rather than a replacement, so fitting it leaves the other internal implants in place
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(INTERNAL);
             this.injuryEffect = InjuryEffect.PHEROMONE_EFFUSER;
         }
@@ -2695,6 +2707,8 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.SECONDARY_POWER_SUPPLY.simpleName");
+            // An implant rather than a replacement, so fitting it leaves the other internal implants in place
+            this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(INTERNAL);
             this.injuryEffect = InjuryEffect.NONE;
         }
@@ -2792,6 +2806,113 @@ public class AlternateInjuries {
             this.injurySubType = IMPLANT_GENERIC;
             this.allowedLocations = Set.of(BRAIN);
             this.injuryEffect = InjuryEffect.PAIN_SHUNT;
+        }
+    }
+
+    public static final class ToxinEffuser extends Prosthetic {
+        ToxinEffuser() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.TOXIN_EFFUSER.simpleName");
+            this.injurySubType = IMPLANT_GENERIC;
+            this.allowedLocations = Set.of(INTERNAL);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class ExplosiveSuicideImplant extends Prosthetic {
+        ExplosiveSuicideImplant() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EXPLOSIVE_SUICIDE_IMPLANT.simpleName");
+            this.injurySubType = IMPLANT_GENERIC;
+            this.allowedLocations = Set.of(INTERNAL);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class EnhancedProstheticLimb extends Prosthetic {
+        EnhancedProstheticLimb() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_PROSTHETIC_LIMB.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_PROSTHETIC_LIMB.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class ImprovedEnhancedProstheticLimb extends Prosthetic {
+        ImprovedEnhancedProstheticLimb() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.IMPROVED_ENHANCED_PROSTHETIC_LIMB.simpleName");
+            this.allowedLocations = Set.of(LEFT_ARM, RIGHT_ARM);
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.IMPROVED_ENHANCED_PROSTHETIC_LIMB.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class ProstheticLegMASC extends Prosthetic {
+        ProstheticLegMASC() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_LEG_MASC.simpleName");
+            this.allowedLocations = Set.of(LEFT_LEG, RIGHT_LEG);
+            this.injuryEffect = TYPE_4_LIMB_REPLACEMENT;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PROSTHETIC_LEG_MASC.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    public static final class EnhancedTailProsthetic extends Prosthetic {
+        EnhancedTailProsthetic() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.ENHANCED_TAIL_PROSTHETIC.simpleName");
+            this.allowedLocations = Set.of(RUMP);
+            this.injuryEffect = COSMETIC_ANIMAL_LIMB_PROSTHETIC;
+        }
+    }
+
+    public static final class ExtraneousProstheticLimbs extends Prosthetic {
+        ExtraneousProstheticLimbs() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.EXTRANEOUS_PROSTHETIC_LIMBS.simpleName");
+            // An implant, so grafting the limbs on leaves any wings already at the spine in place
+            this.injurySubType = IMPLANT_GENERIC;
+            this.allowedLocations = Set.of(SPINE);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class GliderWings extends Prosthetic {
+        GliderWings() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.GLIDER_WINGS.simpleName");
+            this.injurySubType = IMPLANT_WINGS;
+            this.allowedLocations = Set.of(SPINE);
+            this.injuryEffect = NONE;
+        }
+    }
+
+    public static final class PoweredFlightWings extends Prosthetic {
+        PoweredFlightWings() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.POWERED_FLIGHT_WINGS.simpleName");
+            this.injurySubType = IMPLANT_WINGS;
+            this.allowedLocations = Set.of(SPINE);
+            this.injuryEffect = NONE;
         }
     }
 

@@ -154,12 +154,12 @@ public class Maintenance {
                 int availableMinutes = tech.getMinutesLeft();
                 maintained = (availableMinutes >= minutesUsed);
 
+                // A tech mothballing another unit still maintains this one: maintenance comes first each day, and
+                // the mothballing only uses the minutes left over, as a refit does
                 if (!maintained) {
                     // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
-                } else {
-                    maintained = !tech.isMothballing();
                 }
 
                 if (maintained) {

@@ -34,18 +34,12 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.MD_BVDNI;
-import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
-import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_VDNI;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.medical.BodyLocation.BRAIN;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_ARM_CAMO;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.DERMAL_MYOMER_LEG_CAMO;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ENHANCED_IMAGING_IMPLANT;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.getProstheticTypeFromInjuryType;
@@ -56,9 +50,13 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -68,6 +66,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -355,26 +354,203 @@ public class AdvancedMedicalAlternateImplants {
         }
     }
 
+    /**
+     * An implant that Advanced Alternate Medical works out for itself each day from the prosthetics a person carries,
+     * rather than granting it when a prosthetic is fitted.
+     *
+     * @param option        the implant's pilot option
+     * @param prosthetics   the prosthetics that count towards it
+     * @param requiredCount how many of those prosthetics must be present for the implant to take effect
+     */
+    private record DerivedImplant(String option, List<ProstheticType> prosthetics, int requiredCount) {
+        private int countIn(List<Injury> injuries) {
+            int count = 0;
+            for (Injury injury : injuries) {
+                for (ProstheticType prosthetic : prosthetics) {
+                    if (injury.getType() == prosthetic.getInjuryType()) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+    }
+
+    /**
+     * The implants that only take effect once enough of the body is covered. Dermal armour, dermal camouflage and
+     * triple-strength myomer need all four limbs (IO:AE p. 74-75); prosthetic leg MASC needs both legs (ATOW Companion
+     * p. 187).
+     */
+    private static final List<DerivedImplant> DERIVED_IMPLANTS = List.of(
+          new DerivedImplant(OptionsConstants.MD_DERMAL_ARMOR,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_ARMOR, ProstheticType.DERMAL_MYOMER_LEG_ARMOR), 4),
+          new DerivedImplant(OptionsConstants.MD_DERMAL_CAMO_ARMOR,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_CAMO, ProstheticType.DERMAL_MYOMER_LEG_CAMO), 4),
+          new DerivedImplant(OptionsConstants.MD_TSM_IMPLANT,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_TRIPLE, ProstheticType.DERMAL_MYOMER_LEG_TRIPLE), 4),
+          new DerivedImplant(OptionsConstants.MD_PL_MASC, List.of(ProstheticType.PROSTHETIC_LEG_MASC), 2));
+
+    /**
+     * The prosthetics that stand behind each implant option, used to put an implant that was granted directly - by
+     * the Command Generator, or before Advanced Alternate Medical was switched on - into the medical record.
+     *
+     * <p>Where the medical record splits one implant into several pieces of surgery, every piece is listed. The
+     * triple-core processor is absent: it only has a prosthetic in combination with a buffered VDNI, which
+     * {@link #getProstheticsFor(String, Collection)} handles.</p>
+     */
+    private static final Map<String, List<ProstheticType>> IMPLANT_PROSTHETICS = Map.ofEntries(
+          Map.entry(OptionsConstants.MD_BOOST_COMM_IMPLANT,
+                List.of(ProstheticType.CYBERNETIC_EAR_BOOSTED_COMMUNICATIONS)),
+          Map.entry(OptionsConstants.MD_BVDNI, List.of(ProstheticType.BUFFERED_VDNI)),
+          Map.entry(OptionsConstants.MD_COMM_IMPLANT, List.of(ProstheticType.CYBERNETIC_EAR_COMMUNICATIONS)),
+          Map.entry(OptionsConstants.MD_CYBER_IMP_AUDIO, List.of(ProstheticType.CYBERNETIC_EAR_ENHANCED)),
+          Map.entry(OptionsConstants.MD_CYBER_IMP_LASER, List.of(ProstheticType.CYBERNETIC_EYE_LASER)),
+          Map.entry(OptionsConstants.MD_CYBER_IMP_TELE, List.of(ProstheticType.CYBERNETIC_EYE_TELESCOPE)),
+          Map.entry(OptionsConstants.MD_CYBER_IMP_VISUAL, List.of(ProstheticType.CYBERNETIC_EYE_EM_IR)),
+          Map.entry(OptionsConstants.MD_ENH_MM_IMPLANTS, List.of(ProstheticType.CYBERNETIC_EYE_MULTI_ENHANCED)),
+          Map.entry(OptionsConstants.MD_MM_IMPLANTS,
+                List.of(ProstheticType.CYBERNETIC_EAR_MULTI, ProstheticType.CYBERNETIC_EYE_MULTI)),
+          Map.entry(OptionsConstants.MD_PAIN_SHUNT, List.of(ProstheticType.PAIN_SHUNT)),
+          Map.entry(OptionsConstants.MD_VDNI, List.of(ProstheticType.VDNI)),
+          Map.entry(OptionsConstants.MD_DERMAL_ARMOR,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_ARMOR, ProstheticType.DERMAL_MYOMER_LEG_ARMOR)),
+          Map.entry(OptionsConstants.MD_DERMAL_CAMO_ARMOR,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_CAMO, ProstheticType.DERMAL_MYOMER_LEG_CAMO)),
+          Map.entry(OptionsConstants.MD_TSM_IMPLANT,
+                List.of(ProstheticType.DERMAL_MYOMER_ARM_TRIPLE, ProstheticType.DERMAL_MYOMER_LEG_TRIPLE)),
+          Map.entry(OptionsConstants.MD_GAS_EFFUSER_PHEROMONE, List.of(ProstheticType.PHEROMONE_EFFUSER)),
+          Map.entry(OptionsConstants.MD_GAS_EFFUSER_TOXIN, List.of(ProstheticType.TOXIN_EFFUSER)),
+          Map.entry(OptionsConstants.MD_PL_ENHANCED, List.of(ProstheticType.ENHANCED_PROSTHETIC_LIMB)),
+          Map.entry(OptionsConstants.MD_PL_I_ENHANCED, List.of(ProstheticType.IMPROVED_ENHANCED_PROSTHETIC_LIMB)),
+          Map.entry(OptionsConstants.MD_PL_MASC, List.of(ProstheticType.PROSTHETIC_LEG_MASC)),
+          Map.entry(OptionsConstants.MD_PL_EXTRA_LIMBS, List.of(ProstheticType.EXTRANEOUS_PROSTHETIC_LIMBS)),
+          Map.entry(OptionsConstants.MD_PL_TAIL, List.of(ProstheticType.ENHANCED_TAIL_PROSTHETIC)),
+          Map.entry(OptionsConstants.MD_PL_GLIDER, List.of(ProstheticType.GLIDER_WINGS)),
+          Map.entry(OptionsConstants.MD_PL_FLIGHT, List.of(ProstheticType.POWERED_FLIGHT_WINGS)),
+          Map.entry(OptionsConstants.MD_SUICIDE_IMPLANTS, List.of(ProstheticType.EXPLOSIVE_SUICIDE_IMPLANT)));
+
+    /**
+     * Works out each implant that depends on how much of the body its prosthetics cover, and writes the answer over
+     * the implant option.
+     *
+     * <p>Despite the name, this covers triple-strength myomer and prosthetic leg MASC as well as the two dermal
+     * implants.</p>
+     *
+     * @param person the person to check
+     */
     public static void checkForDermalEligibility(Person person) {
         List<Injury> injuries = person.getProstheticInjuries();
-
-        int dermalArmorCount = 0;
-        int dermalCamoCount = 0;
-        for (Injury injury : injuries) {
-            InjuryType injuryType = injury.getType();
-            if (injuryType == DERMAL_MYOMER_ARM_ARMOR || injuryType == DERMAL_MYOMER_LEG_ARMOR) {
-                dermalArmorCount++;
-            }
-
-            if (injuryType == DERMAL_MYOMER_ARM_CAMO || injuryType == DERMAL_MYOMER_LEG_CAMO) {
-                dermalCamoCount++;
+        PersonnelOptions options = person.getOptions();
+        for (DerivedImplant derivedImplant : DERIVED_IMPLANTS) {
+            IOption option = options.getOption(derivedImplant.option());
+            if (option != null) {
+                option.setValue(derivedImplant.countIn(injuries) >= derivedImplant.requiredCount());
             }
         }
+    }
 
+    /**
+     * Puts the prosthetics behind each of the given implants into a person's medical record, so the medical system
+     * can see implants that were granted directly rather than through surgery.
+     *
+     * <p>Each prosthetic is recorded at every location it covers, skipping any location that already carries it, so
+     * calling this twice records nothing new. Entries are made at severity zero, which is how a fitted prosthetic is
+     * marked rather than a wound.</p>
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person   the person to record prosthetics for
+     * @param implants the implant options the person carries
+     *
+     * @return the number of prosthetics newly recorded
+     */
+    public static int recordImplantProsthetics(Campaign campaign, Person person, Collection<String> implants) {
+        int recorded = 0;
+        for (String implant : implants) {
+            for (ProstheticType prosthetic : getProstheticsFor(implant, implants)) {
+                recorded += recordProsthetic(campaign, person, prosthetic);
+            }
+        }
+        return recorded;
+    }
+
+    /**
+     * Records the prosthetics behind any derived implant a person holds without them.
+     *
+     * <p>Derived implants are cleared each day unless enough of their prosthetics are present. A person granted one
+     * before it was derived - or before Advanced Alternate Medical was switched on - carries none of them, and would
+     * lose the implant on the next day. Someone with some but not all of the prosthetics is left alone: that is a
+     * record the daily check already reads correctly.</p>
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person   the person to check
+     *
+     * @return the number of prosthetics newly recorded
+     */
+    public static int recordMissingDerivedImplantProsthetics(Campaign campaign, Person person) {
+        List<Injury> injuries = person.getProstheticInjuries();
         PersonnelOptions options = person.getOptions();
-        int requiredLimbCount = 4;
-        options.getOption(MD_DERMAL_ARMOR).setValue(dermalArmorCount >= requiredLimbCount);
-        options.getOption(MD_DERMAL_CAMO_ARMOR).setValue(dermalCamoCount >= requiredLimbCount);
+        List<String> unsupported = new ArrayList<>();
+        for (DerivedImplant derivedImplant : DERIVED_IMPLANTS) {
+            if (options.booleanOption(derivedImplant.option()) && (derivedImplant.countIn(injuries) == 0)) {
+                unsupported.add(derivedImplant.option());
+            }
+        }
+        return recordImplantProsthetics(campaign, person, unsupported);
+    }
+
+    /**
+     * @param implant  the implant option to look up
+     * @param implants every implant option the person carries, as some prosthetics stand for a pair of implants
+     *
+     * @return the prosthetics behind that implant, empty if it has none
+     */
+    private static List<ProstheticType> getProstheticsFor(String implant, Collection<String> implants) {
+        // A buffered VDNI with a triple-core processor is one piece of surgery. With a standard VDNI the processor has
+        // no prosthetic of its own, so it goes unrecorded.
+        if (implant.equals(OptionsConstants.MD_BVDNI) && implants.contains(OptionsConstants.MD_TRIPLE_CORE_PROCESSOR)) {
+            return List.of(ProstheticType.BUFFERED_VDNI_TRIPLE_CORE);
+        }
+        return IMPLANT_PROSTHETICS.getOrDefault(implant, List.of());
+    }
+
+    /**
+     * Records one prosthetic at every location it covers, skipping any location that already carries it.
+     *
+     * <p>Where anything new is recorded, the personnel options that come with the prosthetic - painkiller addiction
+     * and the like - are granted too, as surgery grants them, so medication upkeep and the rest apply. As with
+     * surgery, these are only granted where the campaign uses abilities.</p>
+     *
+     * @return the number of locations newly recorded
+     */
+    private static int recordProsthetic(Campaign campaign, Person person, ProstheticType prosthetic) {
+        InjuryType injuryType = prosthetic.getInjuryType();
+        int recorded = 0;
+        for (BodyLocation location : prosthetic.getEligibleLocations()) {
+            if (hasProsthetic(person, injuryType, location)) {
+                continue;
+            }
+            person.addInjury(injuryType.newInjury(campaign, person, location, 0));
+            recorded++;
+        }
+
+        if ((recorded > 0) && campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
+            for (String option : prosthetic.getAssociatedPersonnelOptions()) {
+                person.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
+            }
+        }
+        return recorded;
+    }
+
+    /**
+     * @return {@code true} where the person already carries that prosthetic at that location
+     */
+    private static boolean hasProsthetic(Person person, InjuryType injuryType, BodyLocation location) {
+        for (Injury injury : person.getProstheticInjuries()) {
+            if ((injury.getType() == injuryType) && (injury.getLocation() == location)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

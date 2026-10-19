@@ -32,9 +32,10 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
+import java.util.Collection;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.ContractExpenseProjection;
@@ -43,6 +44,7 @@ import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 /**
@@ -69,8 +71,11 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @param estimatedNet       {@code guaranteedIncome} minus {@code operatingCosts}
  * @param salaries           the payroll part of {@code operatingCosts}
  * @param maintenance        the unit maintenance part of {@code operatingCosts}
- * @param runningCosts       the overhead, Hot Spots upkeep, and peacetime operating cost part of
- *                           {@code operatingCosts}
+ * @param overhead           the overhead part of {@code operatingCosts}
+ * @param hotSpotsUpkeep     the Hot Spots upkeep part of {@code operatingCosts}
+ * @param spareParts         the peacetime spare parts part of {@code operatingCosts}
+ * @param trainingMunitions  the peacetime training munitions part of {@code operatingCosts}
+ * @param fuel               the peacetime fuel part of {@code operatingCosts}
  * @param foodAndHousing     the food and housing part of {@code operatingCosts}
  * @param combatBonus        how many times the combat bonus can be paid, and what pays it
  * @param potentialCombatPay the combat pay if every chance at the bonus is won
@@ -79,8 +84,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @since 0.51.01
  */
 public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Money operatingCosts,
-      Money estimatedNet, Money salaries, Money maintenance, Money runningCosts, Money foodAndHousing,
-      StratConCombatBonusProjection combatBonus, Money potentialCombatPay) {
+      Money estimatedNet, Money salaries, Money maintenance, Money overhead, Money hotSpotsUpkeep, Money spareParts,
+      Money trainingMunitions, Money fuel, Money foodAndHousing, StratConCombatBonusProjection combatBonus,
+      Money potentialCombatPay) {
     /**
      * Computes the profit estimate for the given offer in the context of the supplied campaign.
      *
@@ -106,11 +112,27 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
 
         Accountant accountant = campaign.getAccountant();
         Money salaries = getMonthlySalaries(campaign, accountant).multipliedBy(engagementMonths);
-        Money runningCosts = getMonthlyRunningCosts(campaign, accountant).multipliedBy(engagementMonths);
+        Money overhead = accountant.getOverheadExpenses().multipliedBy(engagementMonths);
+        Money hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts().multipliedBy(engagementMonths);
         Money foodAndHousing = getFoodAndHousing(campaign, contract, months, transitMonths);
         Money maintenance = getMaintenance(campaign, contract, months, transitDays);
+        Money spareParts = Money.zero();
+        Money trainingMunitions = Money.zero();
+        Money fuel = Money.zero();
+        if (campaign.getCampaignOptions().isChargingPeacetimeCost()) {
+            Collection<Unit> units = accountant.getUnitsInFormations();
+            spareParts = Accountant.getSparePartsTotal(units).multipliedBy(engagementMonths);
+            trainingMunitions = Accountant.getAmmoTotal(units).multipliedBy(engagementMonths);
+            fuel = Accountant.getFuelTotal(units).multipliedBy(engagementMonths);
+        }
 
-        Money operatingCosts = salaries.plus(runningCosts).plus(foodAndHousing).plus(maintenance);
+        Money operatingCosts = salaries.plus(maintenance)
+                                     .plus(overhead)
+                                     .plus(hotSpotsUpkeep)
+                                     .plus(spareParts)
+                                     .plus(trainingMunitions)
+                                     .plus(fuel)
+                                     .plus(foodAndHousing);
         Money estimatedNet = guaranteedIncome.minus(operatingCosts);
 
         StratConCombatBonusProjection combatBonus = StratConCombatBonusProjection.project(campaign, contract);
@@ -123,7 +145,11 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
               estimatedNet,
               salaries,
               maintenance,
-              runningCosts,
+              overhead,
+              hotSpotsUpkeep,
+              spareParts,
+              trainingMunitions,
+              fuel,
               foodAndHousing,
               combatBonus,
               potentialCombatPay);
@@ -147,25 +173,6 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
             return Money.zero();
         }
         return accountant.getPayRoll();
-    }
-
-    /**
-     * The monthly costs charged wherever the force is, other than salaries and food and housing. Each is only included
-     * while the campaign charges it; Hot Spots upkeep replaces overhead and peacetime costs.
-     *
-     * @return the monthly overhead, Hot Spots upkeep, and peacetime spare parts, fuel, and ammunition
-     */
-    private static Money getMonthlyRunningCosts(Campaign campaign, Accountant accountant) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-
-        // Salaries are counted on their own, covering all salaried personnel rather than only unit crews
-        Money runningCosts = campaignOptions.isChargingPeacetimeCost()
-                                   ? accountant.getPeacetimeCost(false)
-                                   : Money.zero();
-
-        // These are zero unless their options are enabled
-        runningCosts = runningCosts.plus(accountant.getOverheadExpenses());
-        return runningCosts.plus(accountant.getHotSpotsUpkeepCosts());
     }
 
     /**

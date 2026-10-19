@@ -1738,7 +1738,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 case PRISONER_PANEL -> !tracker.getOppositionPersonnel().isEmpty();
                 case SALVAGE_PANEL -> !tracker.getPotentialSalvage().isEmpty() &&
                                             tracker.getMission() != null &&
-                                            tracker.getMission().canSalvage();
+                                            campaign.getCampaignOptions()
+                                                  .get(CampaignOption.SALVAGE_SYSTEM)
+                                                  .getSalvage()
+                                                  .canRecoverSalvage(tracker.getMission());
                 case KILLS_PANEL -> !tracker.getKillCredits().isEmpty();
                 case REWARD_PANEL -> !loots.isEmpty();
                 case PREVIEW_PANEL -> true;

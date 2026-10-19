@@ -63,9 +63,11 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.icons.Portrait;
+import megamek.common.ui.AppIcons;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -76,7 +78,6 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
@@ -277,6 +278,12 @@ public class ImmersiveDialogCore extends JDialog {
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
           @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
+        super(resolveOwner(campaign));
+        if (getOwner() == null) {
+            // Unowned dialogs get their own taskbar entry, so give it the MekHQ icon instead of the Java default
+            AppIcons.applyToWindow(this, "mekhq");
+        }
+
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -379,6 +386,30 @@ public class ImmersiveDialogCore extends JDialog {
         setModal(isModal);
         setLocationRelativeTo(locationReference); // Needs to be after pack
         setVisible(true);
+    }
+
+    /**
+     * Picks the owner window for this dialog.
+     *
+     * <p>When the campaign window is visible, the dialog is owned by it so it stays on top of it and shares its
+     * taskbar entry. Otherwise (for example during startup, before the campaign window exists), the dialog has no
+     * owner. Without an explicit {@code null} owner, Swing would attach the dialog to a hidden shared frame, which
+     * leaves it out of the Windows taskbar and Alt+Tab.</p>
+     *
+     * @param campaign the campaign the dialog belongs to; may be {@code null}
+     *
+     * @return the visible campaign window, or {@code null} if there is none
+     */
+    private static @Nullable Window resolveOwner(@Nullable Campaign campaign) {
+        if (campaign == null) {
+            return null;
+        }
+        CampaignGUI campaignGUI = campaign.getGUI();
+        if (campaignGUI == null) {
+            return null;
+        }
+        JFrame frame = campaignGUI.getFrame();
+        return ((frame != null) && frame.isShowing()) ? frame : null;
     }
 
     /**
@@ -1167,8 +1198,12 @@ public class ImmersiveDialogCore extends JDialog {
 
             baseImage = portrait.getBaseImage();
         } else {
-            baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
-                              .getImage();
+            ImageIcon factionLogo = RATGenerator.getFactionLogo(campaign.getGameYear(),
+                  speaker.getOriginFaction().getShortName(), Color.BLACK);
+            if (factionLogo == null) {
+                return campaign.getCampaignFactionIcon();
+            }
+            baseImage = factionLogo.getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.

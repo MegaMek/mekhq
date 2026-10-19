@@ -47,6 +47,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -163,6 +164,35 @@ public class CombatTeam {
             missionId = NO_MISSION;
         } else {
             missionId = atBContract.getId();
+        }
+    }
+
+    /**
+     * Moves every combat team that has no contract, or whose contract is no longer active, onto the first active
+     * contract. With no active contract the team is left without one. StratCon reads these assignments to decide which
+     * forces are available, so this runs during each new day as well as whenever the lance assignment table is shown.
+     *
+     * @param campaign the campaign whose combat teams are checked
+     */
+    public static void assignInactiveTeamsToActiveContract(Campaign campaign) {
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        AbstractContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
+        UUID defaultMissionId = (defaultContract == null) ? NO_MISSION : defaultContract.getId();
+        LocalDate today = campaign.getLocalDate();
+        int reassignedTeams = 0;
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsMap(campaign).values()) {
+            AbstractContract contract = combatTeam.getContract(campaign);
+            boolean hasActiveContract = (contract != null) && contract.isActiveOn(today);
+            boolean isAlreadyOnDefault = Objects.equals(combatTeam.getMissionId(), defaultMissionId);
+            if (hasActiveContract || isAlreadyOnDefault) {
+                continue;
+            }
+            combatTeam.setContract(defaultContract);
+            reassignedTeams++;
+        }
+        if (reassignedTeams > 0) {
+            LOGGER.debug("[CombatTeam] {} combat teams without an active contract assigned to {}",
+                  reassignedTeams, (defaultContract == null) ? "no contract" : defaultContract.getName());
         }
     }
 
