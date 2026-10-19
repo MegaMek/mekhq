@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -83,6 +84,10 @@ import org.w3c.dom.NodeList;
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabricatable {
     private static final MMLogger LOGGER = MMLogger.create(AmmoBin.class);
     private static final String PARTS_BUNDLE = "mekhq.resources.Parts";
+    /** Swapping out an omni pod takes half the time of reloading its magazine. */
+    private static final double OMNI_POD_TIME_MULTIPLIER = 0.5;
+    /** A one-shot weapon reloads in a quarter of the standard time (Campaign Operations p. 209). */
+    private static final double ONE_SHOT_RELOAD_TIME_MULTIPLIER = 0.25;
 
     protected int shotsNeeded;
     protected boolean oneShot;
@@ -457,6 +462,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     /**
+     * @return the weapon this bin feeds, or {@code null} when the bin feeds no weapon or is not on a unit
+     */
+    public @Nullable EquipmentType getLauncherType() {
+        Mounted<?> mounted = getMounted();
+        if ((mounted == null) || (mounted.getLinkedBy() == null)) {
+            return null;
+        }
+        return mounted.getLinkedBy().getType();
+    }
+
+    /**
      * Gets the underlying {@link Mounted} which manages this {@code AmmoBin} on the {@link Unit}.
      *
      * @return The {@code Mounted} or {@code null} if no valid piece of equipment exists on the {@code Unit}.
@@ -624,11 +640,22 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
         return 15;
     }
 
+    /**
+     * The time to reload, swap or remove this bin's ammunition. An omni pod is swapped out whole in half the time, and a
+     * one-shot weapon reloads in a quarter of the time (Rearm Time Table, Campaign Operations p. 209). Salvage is not a
+     * reload, so a one-shot bin is salvaged in the full time. Harsh planetary conditions slow the work further.
+     */
     @Override
     public int getActualTime() {
-        int time = isOmniPodded()
-                         ? (int) Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5)
-                         : (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+        double timeMultiplier = mode.timeMultiplier;
+        if (isOmniPodded()) {
+            timeMultiplier *= OMNI_POD_TIME_MULTIPLIER;
+        }
+        if (isOneShot() && !isSalvaging()) {
+            timeMultiplier *= ONE_SHOT_RELOAD_TIME_MULTIPLIER;
+        }
+        timeMultiplier *= PlanetaryWorkConditions.getTimeMultiplier(getCampaign(), getUnit());
+        int time = (int) Math.ceil(getBaseTime() * timeMultiplier);
         // Fabricating ammunition takes ten times as long as a routine reload.
         return time * fabricationTimeMultiplier();
     }

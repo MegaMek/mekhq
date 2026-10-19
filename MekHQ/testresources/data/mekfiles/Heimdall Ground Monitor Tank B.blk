@@ -1,0 +1,179 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-e5a4-72ec-a0e3-7c131ddb2d44
+</UUID>
+
+<UnitType>
+Tank
+</UnitType>
+
+<Name>
+Heimdall Ground Monitor Tank
+</Name>
+
+<Model>
+B
+</Model>
+
+<mul id:>
+5742
+</mul id:>
+
+<year>
+3068
+</year>
+
+<type>
+Clan Level 2
+</type>
+
+<role>
+Missile Boat
+</role>
+
+<motion_type>
+Tracked
+</motion_type>
+
+<transporters>
+BattleArmorHandles - troopers:-1
+</transporters>
+
+<cruiseMP>
+3
+</cruiseMP>
+
+<engine_type>
+2
+</engine_type>
+
+<armor_type>
+0
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+2
+</armor_tech_level>
+
+<omni>
+1
+</omni>
+
+<armor>
+106
+70
+70
+47
+59
+</armor>
+
+<Body Equipment>
+CLCASE:OMNI
+Clan LB 10-X AC Ammo
+Clan LB 10-X AC Ammo
+Clan LB 10-X Cluster Ammo
+Clan Ammo LRM-20:OMNI
+Clan Ammo LRM-20:OMNI
+Clan Ammo LRM-20:OMNI
+Clan Ammo LRM-20:OMNI
+Clan Ammo LRM-20:OMNI
+Clan Ammo LRM-20:OMNI
+</Body Equipment>
+
+<Front Equipment>
+CLLBXAC10
+CLLBXAC10
+</Front Equipment>
+
+<Right Equipment>
+</Right Equipment>
+
+<Left Equipment>
+</Left Equipment>
+
+<Rear Equipment>
+</Rear Equipment>
+
+<Turret Equipment>
+CLLRM20:OMNI
+CLLRM20:OMNI
+CLLRM20:OMNI
+</Turret Equipment>
+
+<capabilities>
+<p>The Heimdall is powered by a Second Grade 285 XL fusion engine, an unusual choice for any ground vehicle and particularly notable for a Clan design of this tonnage. The powerplant provides a cruising speed of 32 km/h and a flank speed of 54 km/h, modest for a vehicle of its size but adequate for its intended defensive role. Twenty-two tons of Royal-7 standard armor provides thorough protection across the hull and turret.</p><p>The most distinctive feature of the Heimdall's design is the permanent mounting of two Type KOV LB-10X autocannons in the forward hull. This controversial decision was driven by the production realities of WC Site 4, where incorporating these weapons into the fixed structure proved more practical than placing them in pod space. The fixed autocannons consume relatively little of the vehicle's mass budget, leaving twenty-one tons of pod space, fifteen of which are available in the large turret. This allocation is sufficient to mount assault-class weapon systems, giving the Heimdall the reach to engage the heaviest BattleMechs and assault tanks it encounters.</p><p>The generous turret pod space is a key strength, allowing configuration for long-range fire support or close-range assault. The design's chief weaknesses are its limited ground speed and the fixed weapons' restriction on tactical flexibility in configurations that do not benefit from direct autocannon fire.</p>
+</capabilities>
+
+<overview>
+<p>Clan Wolf in Exile developed the Heimdall Ground Monitor Tank in the early 3060s as a heavy defensive platform for their Arc-Royal enclave. Built at WC Site 4 under Khan Phelan Kell's engineering teams, the Heimdall was designed to serve as a line-holder, anchoring defensive positions and denying ground to advancing forces. The design emerged as one of the few original OmniVehicle developments produced entirely outside traditional Clan space, reflecting the Exiled Wolves' technical ambitions despite the constraints of their Arc-Royal facilities.</p><p>At ninety-five tons, the Heimdall is among the heaviest tracked combat vehicles in the Exiled Wolves' arsenal. Its combination of fixed direct-fire weapons and a generous pod-space allocation gives field commanders substantial flexibility in configuring the vehicle for specific tactical needs, from area denial to heavy anti-armor engagements.</p>
+</overview>
+
+<deployment>
+<p>The B configuration entered service in 3068, developed from operational lessons accumulated during the Civil War period and the opening phases of the Jihad. Pod loadout details remain closely held within Wolf in Exile operational records, but the configuration emphasizes adaptability to the varied threat environments encountered during the Blakist conflict. It served primarily with garrison clusters assigned to the defense of Arc-Royal and supporting systems during the extended campaign.</p>
+</deployment>
+
+<history>
+<p>The origins of the Heimdall stretch to the earliest years of Clan Wolf in Exile's occupation of Arc-Royal. With WC Site 4 as their primary production facility, the Exiled Wolves' engineers sought to develop a heavy tracked design that could leverage Clan technology without relying on supply chains back to the homeworlds. The original concept called for a standard fusion engine, but the project was redirected after Khan Phelan Kell's forces acquired design specifications for the Advanced Tactical Missile system. Engineers upgraded the powerplant to an XL engine to accommodate the additional heat demands anticipated from ATM weapon mounts, setting the vehicle on its final development path.</p><p>The permanent mounting of the twin LB-10X autocannons became a point of ongoing debate within the Wolf engineering community. Critics cited the still-limited facilities on Arc-Royal as the driving factor, arguing the decision was forced by production constraints rather than tactical intent. Others maintained that by the time Clan scientists recognized the full potential of the ATM system, the vehicle's architecture was too far along to modify without significant delays. The Heimdall entered service in 3063 as the exclusive equipment of Clan Wolf in Exile.</p><p>Combat exposure came quickly. During the Jade Falcon offensive against the Lyran Alliance in 3064, several Heimdalls were captured by Clan Jade Falcon on Melissia, giving that Clan its first direct access to the design. Two additional units were observed operating alongside the Kell Hounds First Regiment during the same period, with Clan warriors still at the controls and training alongside the mercenary command. Rumors circulated that Clan Steel Viper was evaluating the design on Vinton, though no confirmation ever emerged.</p><p>The Heimdall remained in continuous production through the Jihad and into the Republic era, its heavy firepower and solid construction ensuring relevance long after its introduction. The design's longevity reflected both the lack of a compelling successor from the Arc-Royal industrial base and the continuing value of the Heimdall's heavy direct-fire capability in the Exiled Wolves' defensive posture.</p>
+</history>
+
+<manufacturer>
+WC Site 4
+</manufacturer>
+
+<primaryFactory>
+Arc-Royal
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Second Grade
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:285 XL
+ARMOR:Royal-7 Standard
+COMMUNICATIONS:K9 Communications System
+TARGETING:Hunter (2) Dedicated TTS
+</systemModels>
+
+<source>
+TR:3067
+</source>
+
+<published>
+RS:3067u
+</published>
+
+<tonnage>
+95.0
+</tonnage>
+
+<baseChassisTurretWeight>
+1.5
+</baseChassisTurretWeight>
+

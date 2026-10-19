@@ -1078,7 +1078,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         });
                         ammoMenu.add(cbMenuItem);
                         AmmoType curType = ammo.getType();
-                        for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(),
+                        for (AmmoType ammoType : Utilities.getMunitionsFor(unit.getEntity(), ammo.getLauncherType(),
                               curType,
                               gui.getCampaign().getCampaignOptions().get(CampaignOption.TECH_LEVEL))) {
                             cbMenuItem = new JCheckBoxMenuItem(ammoType.getDesc());
