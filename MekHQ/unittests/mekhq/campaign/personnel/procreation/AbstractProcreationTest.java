@@ -833,6 +833,7 @@ public class AbstractProcreationTest {
     @Test
     public void testProcessNewWeek_ForNonPregnantMale() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
         when(mockPerson.getGender()).thenReturn(Gender.MALE);
@@ -844,6 +845,7 @@ public class AbstractProcreationTest {
     @Test
     public void testProcessNewWeek_ForPregnantFemale() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
 
@@ -853,14 +855,15 @@ public class AbstractProcreationTest {
 
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
 
-        verify(mockProcreation, never()).birth(any(), any(), any());
+        verify(mockProcreation, never()).birth(any(), any(), any(), anyBoolean());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
     }
 
     @Test
     public void testProcessNewWeek_ForPregnantFemaleWithDueDate() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
-        doNothing().when(mockProcreation).birth(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
+        doNothing().when(mockProcreation).birth(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
 
@@ -870,7 +873,7 @@ public class AbstractProcreationTest {
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
 
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(1)).birth(any(), any(), any());
+        verify(mockProcreation, times(1)).birth(any(), any(), any(), anyBoolean());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
     }
 
@@ -881,6 +884,7 @@ public class AbstractProcreationTest {
     @Test
     public void testProcessNewWeek_PregnantActivePersonGoesOnMaternityLeave() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
         when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
 
         final LocalDate today = LocalDate.ofYearDay(3025, 1);
@@ -906,6 +910,7 @@ public class AbstractProcreationTest {
     @EnumSource(value = PersonnelStatus.class, names = { "ACTIVE" }, mode = EnumSource.Mode.EXCLUDE)
     public void testProcessNewWeek_PregnantNonActivePersonDoesNotGoOnMaternityLeave(PersonnelStatus status) {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
         when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
 
         final LocalDate today = LocalDate.ofYearDay(3025, 1);
