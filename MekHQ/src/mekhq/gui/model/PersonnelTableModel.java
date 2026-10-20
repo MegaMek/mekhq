@@ -118,8 +118,19 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
         return getRow(row);
     }
 
-    public void refreshData() {
+    /**
+     * Shows these people, and takes a fresh snapshot of the jobs each tech is in the middle of, so the rows are
+     * colored from the campaign as it is now.
+     *
+     * @param people the people to show
+     */
+    @Override
+    public void setData(List<Person> people) {
         techJobs = TechJobs.find(campaign);
+        super.setData(people);
+    }
+
+    public void refreshData() {
         if (!isGroupByUnit()) {
             setData(new ArrayList<>(campaign.getPlayerForce().getHumanResources().getPersonnel()));
         } else {
