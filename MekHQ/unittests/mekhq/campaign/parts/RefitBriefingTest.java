@@ -32,9 +32,12 @@
  */
 package mekhq.campaign.parts;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -63,9 +66,34 @@ class RefitBriefingTest {
 
         assertTrue(briefing.contains("Class C (Maintenance)"), briefing);
         assertTrue(briefing.contains(wolverine.getName()), briefing);
-        assertTrue(briefing.contains("<li>Class C (Maintenance): Moving Jump Jet from the Left Leg to the Left Torso"
-              + "</li>"), briefing);
+        // Point form: the class as a heading, its reasons beneath it
+        assertTrue(briefing.contains("<li><b>Class C (Maintenance)</b><ul><li>Moving Jump Jet from the Left Leg to the "
+              + "Left Torso</li>"), briefing);
         assertFalse(briefing.contains("{"), "No placeholder is left unfilled: " + briefing);
+    }
+
+    @Test
+    void theTechSaysHowLongTheRefitWillTake() {
+        Refit refit = planWolverineRefit(REFIT_KIT);
+
+        String briefing = RefitBriefing.describeInCharacter(scenario.getCampaign(), refit);
+
+        // 2,750 minutes of kit work at a plain 8-hour day runs into a sixth day
+        assertTrue(briefing.endsWith("Shall I begin? It will take about <b>6 days</b>."), briefing);
+    }
+
+    @Test
+    void podWorkIsListedByLocation() {
+        RefitClassGrader grader = new RefitClassGrader();
+        grader.gradeOmniPodRemoved("ER PPC", "Left Arm");
+        grader.gradeOmniPodWork("ER Large Laser", "Left Arm");
+
+        List<RefitClassGrader.ReasonGroup> groups = grader.describeByClass();
+
+        assertEquals(1, groups.size());
+        assertEquals(Refit.getRefitClassName(Refit.CLASS_OMNI), groups.getFirst().className());
+        assertEquals(new RefitClassGrader.ReasonItem("Left Arm", "ER PPC becomes ER Large Laser"),
+              groups.getFirst().items().getFirst());
     }
 
     @Test

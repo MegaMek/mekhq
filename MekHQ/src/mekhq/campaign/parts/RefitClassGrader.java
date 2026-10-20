@@ -75,6 +75,23 @@ public class RefitClassGrader {
      */
     public record RefitClassStep(int refitClass, String reason) {}
 
+    /**
+     * One reason in a class's group of reasons.
+     *
+     * @param location the location the reason is about, for pod work, or {@code null} when the text says it all
+     * @param text     the reason, in words the player can read
+     */
+    public record ReasonItem(@Nullable String location, String text) {}
+
+    /**
+     * The reasons that set one class, for the briefing to list under that class.
+     *
+     * @param refitClass the class, one of the {@link Refit} class constants
+     * @param className  the class as the player reads it
+     * @param items      the reasons, each listed once
+     */
+    public record ReasonGroup(int refitClass, String className, List<ReasonItem> items) {}
+
     private final List<RefitClassStep> steps = new ArrayList<>();
     private int refitClass = Refit.NO_CHANGE;
     // Pods going in and coming out, by location, so a pod swap can say what each location becomes
@@ -102,21 +119,42 @@ public class RefitClassGrader {
      * @return one line for each different reason
      */
     public List<String> describeSteps() {
-        Set<String> lines = new LinkedHashSet<>();
-        List<RefitClassStep> biggestFirst = steps.stream()
-                                                 .sorted(Comparator.comparingInt(RefitClassStep::refitClass)
-                                                               .reversed())
-                                                 .toList();
-        for (RefitClassStep step : biggestFirst) {
-            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.step",
-                  Refit.getRefitClassName(step.refitClass()), step.reason()));
+        List<String> lines = new ArrayList<>();
+        for (ReasonGroup group : describeByClass()) {
+            for (ReasonItem item : group.items()) {
+                String reason = (item.location() == null) ? item.text()
+                                      : getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.location",
+                                            item.location(), item.text());
+                lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.step", group.className(), reason));
+            }
         }
-        // Pod work is the quickest kind, so it comes last: one line for each location saying what its pods become
-        String podClassName = Refit.getRefitClassName(Refit.CLASS_OMNI);
-        for (String podChange : describePodChanges()) {
-            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.step", podClassName, podChange));
+        return lines;
+    }
+
+    /**
+     * Groups the reasons by the class they set, the biggest class first. Pod work is listed by location, saying what
+     * each location's pods become.
+     *
+     * @return one group for each class that has reasons
+     */
+    public List<ReasonGroup> describeByClass() {
+        Map<Integer, Set<ReasonItem>> itemsByClass = new TreeMap<>(Comparator.reverseOrder());
+        for (RefitClassStep step : steps) {
+            itemsByClass.computeIfAbsent(step.refitClass(), key -> new LinkedHashSet<>())
+                  .add(new ReasonItem(null, step.reason()));
         }
-        return new ArrayList<>(lines);
+        Set<String> podLocations = new LinkedHashSet<>(podsOut.keySet());
+        podLocations.addAll(podsIn.keySet());
+        for (String location : podLocations) {
+            itemsByClass.computeIfAbsent(Refit.CLASS_OMNI, key -> new LinkedHashSet<>())
+                  .add(new ReasonItem(location, describePodChange(location)));
+        }
+        List<ReasonGroup> groups = new ArrayList<>();
+        for (Map.Entry<Integer, Set<ReasonItem>> classItems : itemsByClass.entrySet()) {
+            groups.add(new ReasonGroup(classItems.getKey(), Refit.getRefitClassName(classItems.getKey()),
+                  List.copyOf(classItems.getValue())));
+        }
+        return groups;
     }
 
     /**
@@ -130,18 +168,25 @@ public class RefitClassGrader {
         locations.addAll(podsIn.keySet());
         List<String> descriptions = new ArrayList<>();
         for (String location : locations) {
-            String goingIn = listPods(podsIn.get(location));
-            String comingOut = listPods(podsOut.get(location));
-            if (goingIn.isEmpty()) {
-                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.remove", location, comingOut));
-            } else if (comingOut.isEmpty()) {
-                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.add", location, goingIn));
-            } else {
-                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.swap", location, comingOut,
-                      goingIn));
-            }
+            descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.location", location,
+                  describePodChange(location)));
         }
         return descriptions;
+    }
+
+    /**
+     * @return what one location's pods become, for example {@code ER PPC becomes ER Large Laser, ER Micro Laser}
+     */
+    private String describePodChange(String location) {
+        String goingIn = listPods(podsIn.get(location));
+        String comingOut = listPods(podsOut.get(location));
+        if (goingIn.isEmpty()) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.remove", comingOut);
+        }
+        if (comingOut.isEmpty()) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.add", goingIn);
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.swap", comingOut, goingIn);
     }
 
     private static String listPods(@Nullable Map<String, Integer> podCounts) {

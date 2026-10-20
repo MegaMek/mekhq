@@ -285,6 +285,14 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * @return the changes that set this refit's class, grouped by class, the biggest first; empty for a refit loaded
+     *       from a save
+     */
+    public List<RefitClassGrader.ReasonGroup> getRefitClassReasonGroups() {
+        return classGrader.describeByClass();
+    }
+
+    /**
      * @return The cost of carrying out this refit
      */
     public Money getCost() {

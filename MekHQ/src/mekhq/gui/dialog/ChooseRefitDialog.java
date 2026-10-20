@@ -35,6 +35,7 @@ package mekhq.gui.dialog;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -44,7 +45,9 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -69,6 +72,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitDesignSearch;
+import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
@@ -279,6 +283,7 @@ public class ChooseRefitDialog extends JDialog {
         Refit r = getSelectedRefit();
         if (null == r) {
             scrShoppingList.setViewportView(null);
+            scrShoppingList.setColumnHeaderView(null);
             txtNewUnit.setText("");
             btnRefit.setEnabled(false);
             btnCustomize.setEnabled(false);
@@ -294,9 +299,31 @@ public class ChooseRefitDialog extends JDialog {
 
         JList<String> lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
+        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(r)));
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
+    }
+
+    /**
+     * @return a line above the parts list saying where the refit stands for parts, in the colour the refit list uses
+     */
+    private static JLabel createPartsStatusLabel(RefitPartsStatus partsStatus) {
+        JLabel statusLabel = new JLabel("<html>" + partsStatus.describe() + "</html>");
+        statusLabel.setForeground(getPartsStatusColor(partsStatus.state()));
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        return statusLabel;
+    }
+
+    /**
+     * @return green when everything is in stock, amber when parts must be ordered, red when some cannot be bought
+     */
+    private static Color getPartsStatusColor(RefitPartsStatus.State state) {
+        return switch (state) {
+            case IN_STOCK -> MekHQ.getMHQOptions().getFontColorPositive();
+            case TO_ORDER -> MekHQ.getMHQOptions().getFontColorWarning();
+            case CANNOT_BUY -> MekHQ.getMHQOptions().getFontColorNegative();
+        };
     }
 
     private void populateRefits() {
@@ -354,8 +381,18 @@ public class ChooseRefitDialog extends JDialog {
         public final static int COL_COST = 6;
         public final static int N_COL = 7;
 
+        // Worked out once for each refit, since the table repaints often
+        private final Map<Refit, RefitPartsStatus> partsStatusByRefit = new HashMap<>();
+
         public RefitTableModel(List<Refit> refits) {
             data = refits;
+        }
+
+        /**
+         * @return whether the refit needs parts ordered, or has some that cannot be bought
+         */
+        public RefitPartsStatus getPartsStatus(Refit refit) {
+            return partsStatusByRefit.computeIfAbsent(refit, key -> RefitPartsStatus.of(campaign, key));
         }
 
         @Override
@@ -452,6 +489,9 @@ public class ChooseRefitDialog extends JDialog {
             if (col == COL_TIME) {
                 return WorkTimeFormatter.describeWorkingDays(r.getTime(), getRefitMinutesPerDay());
             }
+            if (col == COL_MODEL) {
+                return getPartsStatus(r).describe();
+            }
 
             return null;
         }
@@ -483,6 +523,13 @@ public class ChooseRefitDialog extends JDialog {
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
                 setToolTipText(getTooltip(actualRow, actualCol));
+                // The model name is coloured by whether the refit needs parts ordered
+                boolean isColouredByParts = (actualCol == COL_MODEL) && !isSelected && !data.isEmpty();
+                if (isColouredByParts) {
+                    setForeground(getPartsStatusColor(getPartsStatus(data.get(actualRow)).state()));
+                } else {
+                    setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                }
 
                 return this;
             }

@@ -76,22 +76,63 @@ public final class RefitBriefing {
 
         StringBuilder briefing = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.refit",
               commander, unitName, refit.getNewEntity().getShortName(), refit.getRefitClassName()));
-        List<String> reasons = refit.getRefitClassReasons();
-        if (!reasons.isEmpty()) {
+        List<RefitClassGrader.ReasonGroup> reasonGroups = refit.getRefitClassReasonGroups();
+        if (!reasonGroups.isEmpty()) {
             briefing.append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.reasons"));
-            briefing.append("<ul>");
-            for (String reason : reasons.subList(0, Math.min(MAXIMUM_REASONS, reasons.size()))) {
-                briefing.append("<li>").append(reason).append("</li>");
-            }
-            int reasonsLeftOut = reasons.size() - MAXIMUM_REASONS;
-            if (reasonsLeftOut > 0) {
-                briefing.append("<li>").append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.more",
-                      reasonsLeftOut)).append("</li>");
-            }
-            briefing.append("</ul>");
+            appendReasonGroups(briefing, reasonGroups);
         }
-        briefing.append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.question"));
+        briefing.append(describeQuestion(campaign, refit));
         return briefing.toString();
+    }
+
+    /**
+     * Lists the reasons in point form: each class as a heading, and under the pod work each location with what its
+     * pods become. A long list stops after {@link #MAXIMUM_REASONS} reasons with a count of the rest.
+     */
+    private static void appendReasonGroups(StringBuilder briefing, List<RefitClassGrader.ReasonGroup> reasonGroups) {
+        int reasonsListed = 0;
+        int reasonsLeftOut = 0;
+        briefing.append("<ul>");
+        for (RefitClassGrader.ReasonGroup group : reasonGroups) {
+            if (reasonsListed >= MAXIMUM_REASONS) {
+                reasonsLeftOut += group.items().size();
+                continue;
+            }
+            briefing.append("<li><b>").append(group.className()).append("</b><ul>");
+            for (RefitClassGrader.ReasonItem item : group.items()) {
+                if (reasonsListed >= MAXIMUM_REASONS) {
+                    reasonsLeftOut++;
+                    continue;
+                }
+                if (item.location() == null) {
+                    briefing.append("<li>").append(item.text()).append("</li>");
+                } else {
+                    briefing.append("<li>").append(item.location()).append("<ul><li>").append(item.text())
+                          .append("</li></ul></li>");
+                }
+                reasonsListed++;
+            }
+            briefing.append("</ul></li>");
+        }
+        if (reasonsLeftOut > 0) {
+            briefing.append("<li>").append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.more", reasonsLeftOut))
+                  .append("</li>");
+        }
+        briefing.append("</ul>");
+    }
+
+    /**
+     * @return the question that closes the briefing, with how long the work will take at the tech's pace
+     */
+    private static String describeQuestion(Campaign campaign, Refit refit) {
+        int workMinutes = refit.getTimeLeft();
+        if (workMinutes <= 0) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.question");
+        }
+        int minutesPerDay = WorkTimeEstimate.getMinutesPerDay(campaign, refit.getTech(), false);
+        String duration = WorkTimeFormatter.formatDuration(workMinutes, minutesPerDay, campaign.getLocalDate(),
+              MekHQ.getMHQOptions().getWorkTimeDisplay());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.questionWithTime", duration);
     }
 
     /**

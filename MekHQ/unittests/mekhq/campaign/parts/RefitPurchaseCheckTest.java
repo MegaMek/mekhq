@@ -128,6 +128,35 @@ class RefitPurchaseCheckTest {
     }
 
     @Test
+    void theRefitListShowsEverythingInStock() {
+        stockOneClanLaser();
+
+        RefitPartsStatus partsStatus = RefitPartsStatus.of(campaign, planTheRefit());
+
+        assertEquals(RefitPartsStatus.State.IN_STOCK, partsStatus.state());
+        assertTrue(partsStatus.describe().contains("Nothing needs to be ordered"), partsStatus.describe());
+    }
+
+    @Test
+    void theRefitListShowsPartsToOrder() {
+        campaign.getCampaignOptions().set(CampaignOption.ALLOW_CLAN_PURCHASES, true);
+
+        RefitPartsStatus partsStatus = RefitPartsStatus.of(campaign, planTheRefit());
+
+        assertEquals(RefitPartsStatus.State.TO_ORDER, partsStatus.state());
+        assertTrue(partsStatus.describe().contains("ER Medium Laser"), partsStatus.describe());
+    }
+
+    @Test
+    void theRefitListShowsPartsThatCannotBeBought() {
+        RefitPartsStatus partsStatus = RefitPartsStatus.of(campaign, planTheRefit());
+
+        assertEquals(RefitPartsStatus.State.CANNOT_BUY, partsStatus.state());
+        assertEquals(List.of("ER Medium Laser"), partsStatus.parts());
+        assertTrue(partsStatus.describe().contains("campaign's purchasing options"), partsStatus.describe());
+    }
+
+    @Test
     void aClanLaserThatWouldHaveToBeBoughtIsNamedInTheWarning() {
         Refit refit = planTheRefit();
 
