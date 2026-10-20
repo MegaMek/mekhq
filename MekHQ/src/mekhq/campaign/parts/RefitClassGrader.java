@@ -415,6 +415,10 @@ public class RefitClassGrader {
      * @return {@code true} if the type is a Mek turret, which is graded as a turret rather than a component
      */
     public static boolean isMekTurret(EquipmentType type) {
+        // Only equipment carries these flags; asking a weapon or ammunition type for one logs a warning
+        if (!(type instanceof MiscType)) {
+            return false;
+        }
         return type.hasFlag(MiscType.F_HEAD_TURRET)
               || type.hasFlag(MiscType.F_SHOULDER_TURRET)
               || type.hasFlag(MiscType.F_QUAD_TURRET);
@@ -426,6 +430,9 @@ public class RefitClassGrader {
      * @return {@code true} if the type is a kind of myomer, whose change is graded for the whole unit
      */
     public static boolean isMyomer(EquipmentType type) {
+        if (!(type instanceof MiscType)) {
+            return false;
+        }
         return type.hasFlag(MiscType.F_TSM) || type.hasFlag(MiscType.F_INDUSTRIAL_TSM) || type.hasFlag(MiscType.F_SCM);
     }
 
@@ -435,6 +442,9 @@ public class RefitClassGrader {
      * @return {@code true} if the type is a command console, whose change is graded for the whole unit
      */
     public static boolean isCommandConsole(EquipmentType type) {
+        if (!(type instanceof MiscType)) {
+            return false;
+        }
         return type.hasFlag(MiscType.F_COMMAND_CONSOLE);
     }
 
