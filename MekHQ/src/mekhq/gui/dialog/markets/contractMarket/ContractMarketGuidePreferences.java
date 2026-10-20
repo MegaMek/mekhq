@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.PreferenceElement;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.MathUtility;
@@ -45,9 +46,10 @@ import mekhq.MekHQ;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog.MarketPage;
 
 /**
- * Which of the contract market's guides the player has seen: one per market page, one per section of the GM contract
- * editor, and one for the negotiation table. A guide opens by itself the first time the player visits its page, clicks
- * to its section, or sits at the table, and only from its button after that.
+ * Which of the contract market's guides the player has seen: one per market page, one per tab of the GM contract
+ * editor, and one for the negotiation table. A guide opens by itself the first time the player visits its page or tab,
+ * or sits at the table, and only from its button after that. As with the Oracle Console's guides, the player can turn
+ * that off from the checkbox at the foot of any guide.
  *
  * <p>The flags are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's
  * node, so they follow the MekHQ install rather than a campaign. Deleting this class's entry from that file (while
@@ -59,17 +61,25 @@ import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog.MarketP
 public final class ContractMarketGuidePreferences {
     private static final MMLogger LOGGER = MMLogger.create(ContractMarketGuidePreferences.class);
 
+    static final String GUIDE_AUTO_OPEN = "guideAutoOpen";
     static final String GUIDE_SEEN_PREFIX = "guideSeen.";
 
     private static ContractMarketGuidePreferences instance;
 
     /** One flag per guide, keyed by the guide's resource-key prefix. */
     private final Map<String, Flag> seen = new LinkedHashMap<>();
+    private @Nullable Flag autoOpen;
 
     /**
      * @param node the preferences node to store the settings under
      */
     ContractMarketGuidePreferences(final PreferencesNode node) {
+        try {
+            autoOpen = new Flag(GUIDE_AUTO_OPEN, true);
+            node.manage(autoOpen);
+        } catch (Exception exception) {
+            LOGGER.error(exception, "Failed to register contract market guide preference {}", GUIDE_AUTO_OPEN);
+        }
         List<String> guides = new ArrayList<>();
         for (MarketPage page : MarketPage.values()) {
             guides.add(page.guidePrefix());
@@ -80,7 +90,7 @@ public final class ContractMarketGuidePreferences {
             // A guide's prefix ends in a dot (such as "guide.contractMarket.offers."); the flag's name drops it.
             String name = GUIDE_SEEN_PREFIX + guide.substring(0, guide.length() - 1);
             try {
-                Flag flag = new Flag(name);
+                Flag flag = new Flag(name, false);
                 // Managing the flag loads any value saved in an earlier session and saves it again on exit.
                 node.manage(flag);
                 seen.put(guide, flag);
@@ -99,6 +109,28 @@ public final class ContractMarketGuidePreferences {
                                                                 .forClass(ContractMarketGuidePreferences.class));
         }
         return instance;
+    }
+
+    /**
+     * @return {@code true} if a guide opens by itself the first time the player reaches it
+     */
+    boolean isGuideAutoOpen() {
+        return autoOpen == null || autoOpen.value;
+    }
+
+    void setGuideAutoOpen(final boolean isAutoOpen) {
+        if (autoOpen != null) {
+            autoOpen.value = isAutoOpen;
+        }
+    }
+
+    /**
+     * @param guidePrefix a guide's resource-key prefix
+     *
+     * @return {@code true} if that guide should open by itself: guides open by themselves and it has not been seen
+     */
+    boolean shouldAutoOpen(final String guidePrefix) {
+        return isGuideAutoOpen() && !isGuideSeen(guidePrefix);
     }
 
     /**
@@ -123,8 +155,9 @@ public final class ContractMarketGuidePreferences {
     private static final class Flag extends PreferenceElement {
         private boolean value;
 
-        private Flag(final String name) throws Exception {
+        private Flag(final String name, final boolean defaultValue) throws Exception {
             super(name);
+            value = defaultValue;
         }
 
         @Override

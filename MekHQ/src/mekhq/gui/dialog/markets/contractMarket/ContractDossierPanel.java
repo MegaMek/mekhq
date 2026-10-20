@@ -158,9 +158,6 @@ public class ContractDossierPanel extends JPanel {
         constraints.gridy = 0;
         side.add(markers, constraints);
 
-        HudButton negotiate = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate")
-                                                  .toUpperCase(Locale.ROOT), false, true);
-        negotiate.addActionListener(event -> actions.negotiate(contract));
         HudButton edit = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.edit")
                                              .toUpperCase(Locale.ROOT), false, true);
         edit.setArmed(campaign.isGM());
@@ -173,8 +170,6 @@ public class ContractDossierPanel extends JPanel {
 
         JPanel buttons = Hud.transparentPanel(null);
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
-        buttons.add(negotiate);
-        buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(edit);
         buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(delete);

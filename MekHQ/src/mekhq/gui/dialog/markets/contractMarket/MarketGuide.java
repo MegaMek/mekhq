@@ -47,6 +47,7 @@ import javax.swing.JDialog;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
+import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
@@ -56,7 +57,8 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 /**
  * The guides that slide over the right of a contract market window, one per page or section, as the Oracle Console's
  * guides do: a darkened scrim over the window and a {@link HudGuideDrawer} with its Steps, Example and Terms tabs.
- * Clicking the scrim or the drawer's close button dismisses the guide.
+ * Clicking the scrim or the drawer's close button dismisses the guide, and the checkbox at the drawer's foot turns off
+ * guides opening by themselves.
  *
  * <p>Each guide's text comes from resource keys under its own prefix: {@code eyebrow}, {@code title} and
  * {@code exampleIntro}, plus numbered {@code step.N.title} and {@code step.N.text}, {@code example.N.who} and
@@ -76,6 +78,7 @@ final class MarketGuide {
     private final JDialog window;
     private final HudGuideDrawer drawer;
     private final JPanel scrim;
+    private final HudCheckBox autoOpen;
 
     /**
      * Adds a hidden guide drawer to a window's layered pane, ready to {@link #open(String)}.
@@ -84,8 +87,11 @@ final class MarketGuide {
      */
     MarketGuide(JDialog window) {
         this.window = window;
+        autoOpen = new HudCheckBox(text(SHARED_PREFIX, "autoOpen"));
+        autoOpen.addActionListener(event -> ContractMarketGuidePreferences.getInstance()
+                                                  .setGuideAutoOpen(autoOpen.isSelected()));
         drawer = new HudGuideDrawer(List.of(text(SHARED_PREFIX, "tab.steps"), text(SHARED_PREFIX, "tab.example"),
-              text(SHARED_PREFIX, "tab.terms")), null, text(SHARED_PREFIX, "close"), this::close);
+              text(SHARED_PREFIX, "tab.terms")), autoOpen, text(SHARED_PREFIX, "close"), this::close);
         scrim = new JPanel() {
             @Override
             protected void paintComponent(Graphics graphics) {
@@ -122,6 +128,7 @@ final class MarketGuide {
      *               {@code "guide.contractMarket.offers."}
      */
     void open(String prefix) {
+        autoOpen.setSelected(ContractMarketGuidePreferences.getInstance().isGuideAutoOpen());
         drawer.showGuide(build(prefix));
         scrim.setVisible(true);
         drawer.setVisible(true);

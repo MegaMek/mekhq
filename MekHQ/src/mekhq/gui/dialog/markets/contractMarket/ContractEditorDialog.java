@@ -44,8 +44,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -101,6 +101,7 @@ import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudDateField;
+import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 import mekhq.gui.baseComponents.hud.HudStyle;
@@ -122,9 +123,11 @@ import mekhq.gui.utilities.WrapLayout;
  * pay, rented facilities, morale, characteristics and the generated NPCs - so an offer can be reshaped to their
  * specifications. Faction and system fields are pickers rather than free text to prevent typos.
  *
- * <p>The form is one scrolling page in six sections, with a rail on the left to jump between them and a preview on the
- * right of how the offer will read on the board and in the dossier. Each row that differs from the contract as it was
- * opened is marked, the rail counts them per section, and Revert puts every field back.</p>
+ * <p>The form is split across six tabs, chosen from the selector in the command bar as the Oracle Console's pages are,
+ * with a preview on the right of how the offer will read on the board and in the dossier. Each tab has a guide that
+ * slides over the window, opened by the guide button or by itself the first time the tab is visited. Each row that
+ * differs from the contract as it was opened is marked, each tab counts its changes, and Revert puts every field
+ * back.</p>
  *
  * <p>The generated NPC personnel attached to a contract (the employer's negotiator and liaison, and the opposing
  * commander) can have their name, rank, and portrait edited. On confirmation the contract is mutated in place; query
@@ -142,7 +145,6 @@ public class ContractEditorDialog extends JDialog {
     private static final int MONEY_STEP = 1000;
     private static final double FRACTIONAL_SCALE_STEP = 0.1;
     private static final int LABEL_WIDTH = 120;
-    private static final int RAIL_WIDTH = 176;
     private static final int PREVIEW_WIDTH = 300;
     private static final int COLUMN_GAP = 22;
     /** The end date is held at least this many months after the start date. */
@@ -156,7 +158,7 @@ public class ContractEditorDialog extends JDialog {
     /** Profession used to label ranks in the create-mode NPC pickers; the numeric rank is what actually applies. */
     private static final Profession DEFAULT_PROFESSION = Profession.MEKWARRIOR;
 
-    /** The form's sections, in page order, keyed for the rail, the change counts and the guides. */
+    /** The form's tabs, in order, keyed for the tab selector, the change counts and the guides. */
     enum Section {
         OFFER, JOB, EMPLOYER, ENEMY, TERMS, CHARACTERISTICS;
 
@@ -297,19 +299,18 @@ public class ContractEditorDialog extends JDialog {
     private transient NpcOverride commanderOverride;
 
     // Layout and change tracking
-    private final JPanel formHolder = Hud.transparentPanel(new BorderLayout());
+    private final CardLayout pageLayout = new CardLayout();
+    private final JPanel pageHolder = new JPanel(pageLayout);
     private final JPanel previewHolder = new JPanel(new BorderLayout());
-    private final Map<Section, JComponent> sectionPanels = new EnumMap<>(Section.class);
-    private final Map<Section, RailItem> railItems = new EnumMap<>(Section.class);
     private final List<Tracked> tracked = new ArrayList<>();
-    private JScrollPane formScroll;
+    private HudModeSelector<Section> sectionSelector;
     private Section buildingSection = Section.OFFER;
     private boolean building;
     private JLabel titleLabel;
     private JLabel changesValue;
     private HudButton guideButton;
     private MarketGuide guide;
-    /** The section at the top of the form, whose guide the guide button opens. */
+    /** The tab on screen, whose guide the guide button opens. */
     private Section currentSection = Section.OFFER;
     private HudButton revertButton;
     private HudButton saveButton;
@@ -390,8 +391,9 @@ public class ContractEditorDialog extends JDialog {
         JPanel body = new JPanel(new BorderLayout());
         body.setOpaque(true);
         body.setBackground(SURFACE_DEEP);
-        body.add(buildRail(), BorderLayout.WEST);
-        body.add(formHolder, BorderLayout.CENTER);
+        pageHolder.setOpaque(true);
+        pageHolder.setBackground(SURFACE_DEEP);
+        body.add(pageHolder, BorderLayout.CENTER);
         previewHolder.setOpaque(true);
         previewHolder.setBackground(GROUND);
         previewHolder.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
@@ -417,6 +419,12 @@ public class ContractEditorDialog extends JDialog {
         setSize(scaleForGUI(1240, 780)); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(getParent());
         setPreferences(); // Must be before setVisible
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide(currentSection);
+            }
+        });
         setVisible(true);
     }
 
@@ -433,9 +441,12 @@ public class ContractEditorDialog extends JDialog {
         }
     }
 
-    /** The market-style command bar: what is being edited, the live title, and the change count. */
+    /**
+     * The market-style command bar: what is being edited, the live title and the change count, over the tab selector
+     * and the guide button for the tab on screen.
+     */
     private JPanel buildCommandBar() {
-        JPanel bar = new JPanel(new BorderLayout(scaleForGUI(20), 0));
+        JPanel bar = new JPanel(new BorderLayout(0, scaleForGUI(10)));
         bar.setOpaque(true);
         bar.setBackground(GROUND);
         bar.setBorder(BorderFactory.createCompoundBorder(
@@ -462,45 +473,29 @@ public class ContractEditorDialog extends JDialog {
                                   : contract.getStatus().toString();
         JPanel status = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.readout.status"),
               statusText, ACCENT_BRIGHT, SURFACE_DEEP);
-        guideButton = new HudButton("", false, true);
-        guideButton.addActionListener(event -> openGuide(currentSection));
-
         JPanel readouts = Hud.transparentPanel(null);
         readouts.setLayout(new BoxLayout(readouts, BoxLayout.X_AXIS));
         readouts.add(changes);
         readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
         readouts.add(status);
-        readouts.add(Box.createHorizontalStrut(scaleForGUI(10)));
-        readouts.add(guideButton);
 
-        bar.add(identity, BorderLayout.CENTER);
-        bar.add(readouts, BorderLayout.EAST);
+        JPanel topRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(20), 0));
+        topRow.add(identity, BorderLayout.CENTER);
+        topRow.add(readouts, BorderLayout.EAST);
+
+        sectionSelector = new HudModeSelector<>(Section.class, section -> sectionLabel(section, 0),
+              this::showSection);
+        sectionSelector.setSelected(currentSection);
+        guideButton = new HudButton("", false, true);
+        guideButton.addActionListener(event -> openGuide(currentSection));
+        refreshGuideButton();
+        JPanel tabsRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        tabsRow.add(sectionSelector, BorderLayout.CENTER);
+        tabsRow.add(guideButton, BorderLayout.EAST);
+
+        bar.add(topRow, BorderLayout.CENTER);
+        bar.add(tabsRow, BorderLayout.SOUTH);
         return bar;
-    }
-
-    /** The section rail: one entry per section, showing how many of its rows have changed. */
-    private JPanel buildRail() {
-        JPanel rail = new JPanel();
-        rail.setLayout(new BoxLayout(rail, BoxLayout.Y_AXIS));
-        rail.setOpaque(true);
-        rail.setBackground(GROUND);
-        rail.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 0, scaleForGUI(1), BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(10), 0, scaleForGUI(10), 0)));
-        rail.setPreferredSize(new Dimension(scaleForGUI(RAIL_WIDTH), 0));
-        for (Section section : Section.values()) {
-            RailItem item = new RailItem(section);
-            railItems.put(section, item);
-            rail.add(item);
-        }
-        rail.add(Box.createVerticalGlue());
-        JTextArea note = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.rail.note"),
-              TEXT_FAINT, Font.PLAIN, 0.8f);
-        note.setBorder(BorderFactory.createEmptyBorder(0, scaleForGUI(14), 0, scaleForGUI(10)));
-        note.setAlignmentX(Component.LEFT_ALIGNMENT);
-        note.setMaximumSize(new Dimension(scaleForGUI(RAIL_WIDTH), Integer.MAX_VALUE));
-        rail.add(note);
-        return rail;
     }
 
     private JPanel buildFooter() {
@@ -542,43 +537,37 @@ public class ContractEditorDialog extends JDialog {
     private void buildForm() {
         building = true;
         tracked.clear();
-        sectionPanels.clear();
         characteristicCheckboxes.clear();
         noneChips.clear();
 
-        JPanel page = MarketHud.column();
-        page.setBorder(BorderFactory.createEmptyBorder(0, scaleForGUI(18), scaleForGUI(40), scaleForGUI(18)));
-        addSection(page, Section.OFFER, this::buildOfferSection);
-        addSection(page, Section.JOB, this::buildJobSection);
-        addSection(page, Section.EMPLOYER, this::buildEmployerSection);
-        addSection(page, Section.ENEMY, this::buildEnemySection);
-        addSection(page, Section.TERMS, this::buildTermsSection);
-        addSection(page, Section.CHARACTERISTICS, this::buildCharacteristicsSection);
-
-        formHolder.removeAll();
-        formScroll = MarketHud.scroll(page, SURFACE_DEEP);
-        formScroll.getViewport().addChangeListener(event -> highlightVisibleSection());
-        formHolder.add(formScroll, BorderLayout.CENTER);
+        pageHolder.removeAll();
+        addSection(Section.OFFER, this::buildOfferSection);
+        addSection(Section.JOB, this::buildJobSection);
+        addSection(Section.EMPLOYER, this::buildEmployerSection);
+        addSection(Section.ENEMY, this::buildEnemySection);
+        addSection(Section.TERMS, this::buildTermsSection);
+        addSection(Section.CHARACTERISTICS, this::buildCharacteristicsSection);
+        pageLayout.show(pageHolder, currentSection.name());
 
         for (Tracked entry : tracked) {
             entry.initial = entry.value.get();
         }
         building = false;
         onEdited();
-        formHolder.revalidate();
-        formHolder.repaint();
-        highlightVisibleSection();
+        pageHolder.revalidate();
+        pageHolder.repaint();
     }
 
-    private void addSection(JPanel page, Section section, Consumer<JPanel> builder) {
+    /** Builds a tab's page, scrolling on its own, and adds it to the tab pages under the tab's name. */
+    private void addSection(Section section, Consumer<JPanel> builder) {
         buildingSection = section;
         JPanel panel = MarketHud.column();
-        panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(16), 0, 0, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(16), scaleForGUI(18), scaleForGUI(40),
+              scaleForGUI(18)));
         panel.add(leftAligned(Hud.sectionHeading(section.label())));
         panel.add(Box.createVerticalStrut(scaleForGUI(4)));
         builder.accept(panel);
-        sectionPanels.put(section, panel);
-        page.add(leftAligned(panel));
+        pageHolder.add(MarketHud.scroll(panel, SURFACE_DEEP), section.name());
     }
 
     // endregion Layout
@@ -1191,7 +1180,7 @@ public class ContractEditorDialog extends JDialog {
     }
 
     /**
-     * Marks every changed row, counts the changes per section for the rail and overall for the command bar and the
+     * Marks every changed row, counts the changes per tab for the tab selector and overall for the command bar and the
      * Save button, and redraws the preview.
      */
     private void onEdited() {
@@ -1214,8 +1203,8 @@ public class ContractEditorDialog extends JDialog {
                 perSection.merge(rowSection.get(entry.getKey()), 1, Integer::sum);
             }
         }
-        for (Map.Entry<Section, RailItem> entry : railItems.entrySet()) {
-            entry.getValue().setCount(perSection.getOrDefault(entry.getKey(), 0));
+        for (Section section : Section.values()) {
+            sectionSelector.setModeLabel(section, sectionLabel(section, perSection.getOrDefault(section, 0)));
         }
         changesValue.setText(Integer.toString(total));
         revertButton.setArmed(total > 0);
@@ -1425,113 +1414,54 @@ public class ContractEditorDialog extends JDialog {
 
     // endregion Change tracking and preview
 
-    // region Rail
+    // region Tabs and guides
 
-    /** One entry of the section rail: the section's name and how many of its rows have changed. */
-    private final class RailItem extends JPanel {
-        private final JLabel count = new JLabel();
-        private boolean current;
+    /** A tab's label, with how many of its rows have changed beside it once there are any. */
+    private static String sectionLabel(Section section, int changes) {
+        String label = MarketHud.escape(section.label().toUpperCase(Locale.ROOT));
+        return changes == 0 ? "<html>" + label + "</html>"
+                     : "<html>" + label + "&nbsp;&nbsp;<span style='color:" + hex(AMBER) + "'>" + changes
+                             + "</span></html>";
+    }
 
-        private RailItem(Section section) {
-            super(new BorderLayout(scaleForGUI(8), 0));
-            setOpaque(true);
-            setAlignmentX(Component.LEFT_ALIGNMENT);
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(32)));
-            setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(14), scaleForGUI(8),
-                  scaleForGUI(12)));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            JLabel name = new JLabel(section.label().toUpperCase(Locale.ROOT));
-            name.setFont(hudFont(Font.BOLD, 0.78f, 0.1f));
-            name.setForeground(TEXT_MUTED);
-            count.setFont(hudFont(Font.BOLD, 0.82f, 0.0f));
-            count.setForeground(ACCENT_BRIGHT);
-            add(name, BorderLayout.CENTER);
-            add(count, BorderLayout.EAST);
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    scrollTo(section);
-                    // The first time the player goes to a section, its guide opens by itself.
-                    if (!ContractMarketGuidePreferences.getInstance().isGuideSeen(section.guidePrefix())) {
-                        openGuide(section);
-                    }
-                }
-            });
-            setCurrent(false);
-        }
+    /**
+     * Switches to a tab, opening its guide if the player has not seen it yet.
+     *
+     * @param section the tab
+     */
+    private void showSection(Section section) {
+        guide.close();
+        currentSection = section;
+        sectionSelector.setSelected(section);
+        pageLayout.show(pageHolder, section.name());
+        refreshGuideButton();
+        maybeOpenGuide(section);
+    }
 
-        private void setCount(int changes) {
-            count.setText(changes == 0 ? "" : Integer.toString(changes));
-        }
+    private void refreshGuideButton() {
+        guideButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "button.contractMarket.guide",
+              currentSection.guideLabel()).toUpperCase(Locale.ROOT));
+    }
 
-        private void setCurrent(boolean current) {
-            this.current = current;
-            setBackground(current ? SURFACE : GROUND);
-            repaint();
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            super.paintComponent(graphics);
-            if (current) {
-                graphics.setColor(ACCENT);
-                graphics.fillRect(0, 0, scaleForGUI(2), getHeight());
-            }
+    /** Opens a tab's guide by itself the first time the player visits the tab, unless they turned that off. */
+    private void maybeOpenGuide(Section section) {
+        if (isShowing() && ContractMarketGuidePreferences.getInstance().shouldAutoOpen(section.guidePrefix())) {
+            openGuide(section);
         }
     }
 
-    /** Opens a section's guide, marking it seen so it does not open by itself again. */
+    /** Opens a tab's guide, marking it seen so it does not open by itself again. */
     private void openGuide(Section section) {
         ContractMarketGuidePreferences.getInstance().setGuideSeen(section.guidePrefix(), true);
         guide.open(section.guidePrefix());
     }
 
-    /** @return every section guide's resource-key prefix, so the guides' seen flags can be registered */
+    /** @return every tab guide's resource-key prefix, so the guides' seen flags can be registered */
     static List<String> guidePrefixes() {
         return Arrays.stream(Section.values()).map(Section::guidePrefix).toList();
     }
 
-    private void scrollTo(Section section) {
-        JComponent panel = sectionPanels.get(section);
-        if (panel == null || formScroll == null) {
-            return;
-        }
-        JViewport viewport = formScroll.getViewport();
-        Rectangle bounds = SwingUtilities.convertRectangle(panel.getParent(), panel.getBounds(), viewport.getView());
-        int maximum = Math.max(0, viewport.getView().getHeight() - viewport.getHeight());
-        viewport.setViewPosition(new Point(0, Math.min(bounds.y, maximum)));
-    }
-
-    /** Lights the rail entry for the section at the top of the form, or the last one when scrolled to the end. */
-    private void highlightVisibleSection() {
-        if (formScroll == null) {
-            return;
-        }
-        JViewport viewport = formScroll.getViewport();
-        int top = viewport.getViewPosition().y + scaleForGUI(40);
-        boolean atEnd = viewport.getViewPosition().y + viewport.getHeight() >= viewport.getView().getHeight() - 4;
-        Section current = Section.OFFER;
-        for (Section section : Section.values()) {
-            JComponent panel = sectionPanels.get(section);
-            if (panel == null) {
-                continue;
-            }
-            Rectangle bounds = SwingUtilities.convertRectangle(panel.getParent(), panel.getBounds(),
-                  viewport.getView());
-            if (bounds.y <= top || atEnd) {
-                current = section;
-            }
-        }
-        for (Map.Entry<Section, RailItem> entry : railItems.entrySet()) {
-            entry.getValue().setCurrent(entry.getKey() == current);
-        }
-        // The guide button opens the guide for whichever section is in view.
-        currentSection = current;
-        guideButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "button.contractMarket.guide", current.guideLabel())
-                                  .toUpperCase(Locale.ROOT));
-    }
-
-    // endregion Rail
+    // endregion Tabs and guides
 
     // region Schedule
 

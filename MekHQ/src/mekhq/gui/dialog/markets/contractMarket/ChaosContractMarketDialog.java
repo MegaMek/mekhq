@@ -98,8 +98,8 @@ import mekhq.gui.baseComponents.hud.HudStyle;
  * holds the market's identity, the page selector and the player's reputation and funds; the pages are
  * {@link MarketOffersPage Offers} (a sortable board of offers beside the selected offer's dossier) and
  * {@link MarketComparePage Compare} (the offers side by side, with the strongest value in each row marked). The footer
- * holds the on-departure options and the Accept button, which act on the selected offer from either page. A guide
- * slides over the window, opened by its button or by itself the first time the market is opened.
+ * holds the on-departure options and the Negotiate and Accept buttons, which act on the selected offer from either
+ * page. A guide slides over the window, opened by its button or by itself the first time the market is opened.
  *
  * <p>The dialog keeps the market's state - the search type, the selected offer, the board's sort and which offers
  * are compared - and the pages read it through package-private accessors, rebuilding from it on {@link #refresh}.</p>
@@ -181,6 +181,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private MarketComparePage comparePage;
     private JLabel selectedLabel;
     private HudButton acceptButton;
+    private HudButton negotiateButton;
     private MarketGuide guide;
     private HudButton guideButton;
 
@@ -342,6 +343,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         }
 
         selectedLabel = Hud.hint("");
+        negotiateButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate")
+                                              .toUpperCase(Locale.ROOT), false);
+        negotiateButton.addActionListener(event -> {
+            if (selected != null) {
+                negotiate(selected);
+            }
+        });
         acceptButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.accept")
                                            .toUpperCase(Locale.ROOT), true);
         acceptButton.addActionListener(event -> {
@@ -357,6 +365,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
         actions.add(selectedLabel);
         actions.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        actions.add(negotiateButton);
+        actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
         actions.add(acceptButton);
         actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
         actions.add(close);
@@ -433,6 +443,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                     : getFormattedTextAt(RESOURCE_BUNDLE, "footer.contractMarket.selected",
                                           marketName(selected)));
         acceptButton.setArmed(selected != null);
+        negotiateButton.setArmed(selected != null);
 
         if (page == MarketPage.OFFERS) {
             offersPage.refresh(rebuildDossier);
@@ -482,7 +493,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /**
      * Selects an offer: its dossier is shown on the board, its column is marked on the comparison, and the footer's
-     * Accept button acts on it.
+     * Negotiate and Accept buttons act on it.
      */
     void select(AbstractContract contract) {
         if (contract == selected) {
@@ -786,7 +797,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /** Opens the page's guide by itself the first time the player sees the page. */
     private void maybeOpenGuide() {
-        if (isShowing() && !ContractMarketGuidePreferences.getInstance().isGuideSeen(page.guidePrefix())) {
+        if (isShowing() && ContractMarketGuidePreferences.getInstance().shouldAutoOpen(page.guidePrefix())) {
             openGuide();
         }
     }

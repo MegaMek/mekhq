@@ -52,10 +52,12 @@ import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -92,7 +94,6 @@ import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
 import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.hud.HudVerdictBanner;
-import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * The contract negotiation table, drawn as a heads-up display in the style of the contract market. Lets the player
@@ -129,7 +130,6 @@ public class ContractNegotiationDialog extends JDialog {
     private static final int MAXIMUM_FACILITY_UNITS = 100;
     private static final int SIDE_WIDTH = 330;
     private static final int LABEL_WIDTH = 130;
-    private static final int VALUE_WIDTH = 190;
     private static final int PORTRAIT_SIZE = 48;
 
     private final transient Campaign campaign;
@@ -170,6 +170,7 @@ public class ContractNegotiationDialog extends JDialog {
     private final Readout swapsReadout = new Readout(AMBER);
     private final JLabel bankValue = new JLabel();
     private final JPanel negotiatorHolder = Hud.transparentPanel(new BorderLayout());
+    private final JPanel employerHolder = Hud.transparentPanel(new BorderLayout());
     private final JPanel impactHolder = Hud.transparentPanel(new BorderLayout());
     private final JLabel attemptsLabel = HudStyle.keyLabel("");
     private final HudVerdictBanner resultBanner = new HudVerdictBanner();
@@ -179,6 +180,8 @@ public class ContractNegotiationDialog extends JDialog {
     private HudConfirmButton haggleButton;
     private HudConfirmButton exceptionButton;
     private MarketGuide guide;
+    private JScrollPane mainScroll;
+    private JScrollPane sideScroll;
 
     private boolean confirmed;
 
@@ -259,8 +262,10 @@ public class ContractNegotiationDialog extends JDialog {
         JPanel body = new JPanel(new BorderLayout());
         body.setOpaque(true);
         body.setBackground(SURFACE_DEEP);
-        body.add(MarketHud.scroll(buildMain(), SURFACE_DEEP), BorderLayout.CENTER);
-        JComponent side = MarketHud.scroll(buildSide(), GROUND);
+        mainScroll = MarketHud.scroll(buildMain(), SURFACE_DEEP);
+        body.add(mainScroll, BorderLayout.CENTER);
+        sideScroll = MarketHud.scroll(buildSide(), GROUND);
+        JComponent side = sideScroll;
         side.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
         side.setPreferredSize(new Dimension(scaleForGUI(SIDE_WIDTH), 0));
         body.add(side, BorderLayout.EAST);
@@ -288,8 +293,13 @@ public class ContractNegotiationDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent event) {
+                // Both columns open at their top, whatever their contents scrolled into view while being laid out.
+                SwingUtilities.invokeLater(() -> {
+                    mainScroll.getVerticalScrollBar().setValue(0);
+                    sideScroll.getVerticalScrollBar().setValue(0);
+                });
                 // The guide opens by itself the first time the player sits at the table.
-                if (!ContractMarketGuidePreferences.getInstance().isGuideSeen(GUIDE_PREFIX)) {
+                if (ContractMarketGuidePreferences.getInstance().shouldAutoOpen(GUIDE_PREFIX)) {
                     openGuide();
                 }
             }
@@ -493,7 +503,7 @@ public class ContractNegotiationDialog extends JDialog {
             side.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
                   "negotiate.contractMarket.negotiator.employer.title"))));
             side.add(Box.createVerticalStrut(scaleForGUI(5)));
-            side.add(leftAligned(card(personSummary(employerNegotiator))));
+            side.add(leftAligned(employerHolder));
             side.add(Box.createVerticalStrut(scaleForGUI(14)));
         }
 
@@ -613,7 +623,7 @@ public class ContractNegotiationDialog extends JDialog {
                 content.add(Box.createVerticalStrut(scaleForGUI(8)));
                 traits.forEach(trait -> {
                     content.add(leftAligned(trait));
-                    content.add(Box.createVerticalStrut(scaleForGUI(3)));
+                    content.add(Box.createVerticalStrut(scaleForGUI(6)));
                 });
             }
         }
@@ -632,6 +642,92 @@ public class ContractNegotiationDialog extends JDialog {
         negotiatorHolder.add(card(content), BorderLayout.CENTER);
         negotiatorHolder.revalidate();
         negotiatorHolder.repaint();
+    }
+
+    /**
+     * The employer's negotiator, with the player's chances against them when the campaign uses re-negotiation. The
+     * chances follow the player's negotiator, so the card is rebuilt with every refresh.
+     */
+    private void refreshEmployerCard() {
+        Person employerNegotiator = contract.getEmployerNegotiator();
+        if (employerNegotiator == null) {
+            return;
+        }
+        JPanel content = MarketHud.column();
+        content.add(leftAligned(personSummary(employerNegotiator)));
+        if (activeNegotiators) {
+            content.add(Box.createVerticalStrut(scaleForGUI(10)));
+            content.add(leftAligned(renegotiationOdds(employerNegotiator)));
+        }
+        employerHolder.removeAll();
+        employerHolder.add(card(content), BorderLayout.CENTER);
+        employerHolder.revalidate();
+        employerHolder.repaint();
+    }
+
+    /**
+     * The chance the player's negotiator comes out ahead of the employer's on each re-negotiation, worked out exactly
+     * from both target numbers, natural aptitude, Edge rerolls and the player's traits.
+     */
+    private JPanel renegotiationOdds(Person employerNegotiator) {
+        JPanel block = MarketHud.column();
+        JLabel heading = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.heading")
+                                          .toUpperCase(Locale.ROOT));
+        heading.setForeground(TEXT_FAINT);
+        heading.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
+        heading.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.odds.tooltip")));
+        block.add(leftAligned(heading));
+        block.add(Box.createVerticalStrut(scaleForGUI(4)));
+
+        Person playerNegotiator = contract.getPlayerNegotiator();
+        if (playerNegotiator == null) {
+            block.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.odds.none"), TEXT_FAINT, Font.PLAIN, 0.8f)));
+            return block;
+        }
+        boolean useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
+        boolean playerUsesEdge = useEdge && playerNegotiator.getOptions()
+                                                  .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
+        double[] player = marginChances(playerNegotiator, playerUsesEdge);
+        double[] employer = marginChances(employerNegotiator, useEdge);
+        int general = generalNegotiationModifier(playerNegotiator);
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", ActiveNegotiationMath.opposedOdds(
+              player, employer, general + haggleNegotiationModifier(playerNegotiator)))));
+        block.add(Box.createVerticalStrut(scaleForGUI(2)));
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", ActiveNegotiationMath.opposedOdds(
+              player, employer, general + exceptionNegotiationModifier(playerNegotiator)))));
+        return block;
+    }
+
+    /** The chance of each margin on a person's Negotiation check, as {@link #reportedNegotiationCheck} rolls it. */
+    private double[] marginChances(Person person, boolean useEdge) {
+        TargetRoll target = person.checkSkill(SkillType.S_NEGOTIATION, campaign).getTargetNumber();
+        Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
+        return ActiveNegotiationMath.marginChances(target.getValue(), target.cannotSucceed(),
+              SkillType.getType(SkillType.S_NEGOTIATION).isCountUp(), skill != null && skill.getHasNaturalAptitude(),
+              useEdge && person.getCurrentEdge() > 0);
+    }
+
+    /** One re-negotiation's chances: its name, and how often the player prevails, coloured by who is favoured. */
+    private static JPanel oddsRow(String labelKey, ActiveNegotiationMath.Odds odds) {
+        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        name.setForeground(TEXT_MUTED);
+        name.setFont(hudFont(Font.PLAIN, 0.84f, 0.0f));
+        row.add(name, BorderLayout.WEST);
+        JLabel value = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.value",
+              percentOf(odds.win()), percentOf(odds.stalemate())));
+        value.setForeground(odds.win() >= odds.loss() ? READY : DANGER);
+        value.setFont(hudFont(Font.BOLD, 0.84f, 0.0f));
+        row.add(value, BorderLayout.EAST);
+        row.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.row.tooltip",
+              percentOf(odds.win()), percentOf(odds.stalemate()), percentOf(odds.loss())));
+        return row;
+    }
+
+    private static long percentOf(double chance) {
+        return Math.round(chance * 100);
     }
 
     /** A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it). */
@@ -684,20 +780,20 @@ public class ContractNegotiationDialog extends JDialog {
                 continue;
             }
             String name = option.getDisplayableName().replaceAll("\\s*\\([^)]*\\)", "");
-            JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+            // The trait's name over its effect, so both have the card's full width.
+            JPanel row = MarketHud.column();
             JLabel nameLabel = new JLabel(name);
             nameLabel.setForeground(isHelpfulTrait(trait) ? READY : DANGER);
             nameLabel.setFont(hudFont(Font.BOLD, 0.82f, 0.0f));
-            nameLabel.setVerticalAlignment(SwingConstants.TOP);
-            row.add(nameLabel, BorderLayout.WEST);
-            JLabel effect = new JLabel("<html><div style='text-align:right'>" + StringEscapeUtils.escapeHtml4(
-                  getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.trait." + trait)) + "</div></html>",
-                  SwingConstants.RIGHT);
-            effect.setForeground(TEXT_FAINT);
-            effect.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
-            row.add(effect, BorderLayout.CENTER);
+            row.add(leftAligned(nameLabel));
+            JTextArea effect = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.trait." + trait), TEXT_FAINT, Font.PLAIN, 0.8f);
+            row.add(leftAligned(effect));
             if (option.getDescription() != null) {
-                row.setToolTipText(MarketHud.wrapToolTip(option.getDescription()));
+                String toolTip = MarketHud.wrapToolTip(option.getDescription());
+                row.setToolTipText(toolTip);
+                nameLabel.setToolTipText(toolTip);
+                effect.setToolTipText(toolTip);
             }
             rows.add(row);
         }
@@ -1369,6 +1465,34 @@ public class ContractNegotiationDialog extends JDialog {
     // region Rendering
 
     private void refresh() {
+        Runnable restoreMain = holdScrollPosition(mainScroll);
+        Runnable restoreSide = holdScrollPosition(sideScroll);
+        refreshContent();
+        // Rebuilt rows change height for a moment; put each column back where the player had it once laid out.
+        SwingUtilities.invokeLater(() -> {
+            restoreMain.run();
+            restoreSide.run();
+        });
+    }
+
+    /**
+     * Notes where a column is scrolled to, returning how to put it back: at the bottom if it was at the bottom, so
+     * rows changed there stay in view, and otherwise at the same offset.
+     */
+    private static Runnable holdScrollPosition(@Nullable JScrollPane scroll) {
+        if (scroll == null) {
+            return () -> {};
+        }
+        JScrollBar bar = scroll.getVerticalScrollBar();
+        int value = bar.getValue();
+        boolean atBottom = value > 0 && value + bar.getVisibleAmount() >= bar.getMaximum() - scaleForGUI(2);
+        return () -> {
+            scroll.getViewport().validate();
+            bar.setValue(atBottom ? bar.getMaximum() - bar.getVisibleAmount() : value);
+        };
+    }
+
+    private void refreshContent() {
         reputationReadout.set(reputationUsed, reputationPool, getFormattedTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.budget.left", reputationPool - reputationUsed));
         swapsReadout.set(swapsUsed, MAXIMUM_SWAPS,
@@ -1411,6 +1535,7 @@ public class ContractNegotiationDialog extends JDialog {
               NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), maxSacrificedTerms, capPerTerm));
 
         refreshNegotiatorCard();
+        refreshEmployerCard();
         refreshRenegotiation();
         refreshImpact();
     }
@@ -1591,10 +1716,11 @@ public class ContractNegotiationDialog extends JDialog {
                 label.add(leftAligned(markerLabel));
             }
             label.setPreferredSize(new Dimension(scaleForGUI(LABEL_WIDTH), label.getPreferredSize().height));
+            // When the window narrows, the track gives way; the name and value keep their width.
+            label.setMinimumSize(label.getPreferredSize());
 
             value.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
             value.setForeground(TEXT);
-            value.setPreferredSize(new Dimension(scaleForGUI(VALUE_WIDTH), value.getPreferredSize().height));
 
             lowerButton = stepButton("negotiate.contractMarket.stepper.decrease", () -> lower(clause));
             raiseButton = stepButton("negotiate.contractMarket.stepper.increase", () -> raise(clause));
@@ -1619,17 +1745,20 @@ public class ContractNegotiationDialog extends JDialog {
             constraints.gridx = 2;
             constraints.weightx = 0;
             constraints.fill = GridBagConstraints.NONE;
-            constraints.insets = new Insets(0, 0, 0, scaleForGUI(12));
-            panel.add(value, constraints);
-            constraints.gridx = 3;
             constraints.insets = new Insets(0, 0, 0, 0);
             constraints.anchor = GridBagConstraints.EAST;
             panel.add(controls, constraints);
-            constraints.gridy = 1;
+            // The term's effect and, when it will not move, the reason sit under the track.
             constraints.gridx = 1;
-            constraints.gridwidth = 3;
+            constraints.gridwidth = 2;
+            constraints.weightx = 1.0;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(scaleForGUI(3), scaleForGUI(12), 0, 0);
+            constraints.gridy = 1;
+            constraints.insets = new Insets(scaleForGUI(4), scaleForGUI(12), 0, 0);
+            panel.add(value, constraints);
+            constraints.gridy = 2;
+            constraints.insets = new Insets(scaleForGUI(2), scaleForGUI(12), 0, 0);
             panel.add(why, constraints);
         }
 
@@ -1666,10 +1795,13 @@ public class ContractNegotiationDialog extends JDialog {
                 chips.add(chip(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.plateau"), TEXT_FAINT));
             }
             if (!chips.isEmpty()) {
-                html.append("<br><span style='font-size:smaller'>").append(String.join("&nbsp;&nbsp;", chips))
+                html.append("&nbsp;&nbsp;&nbsp;<span style='font-size:smaller'>")
+                      .append(String.join("&nbsp;&nbsp;", chips))
                       .append("</span>");
             }
             value.setText(html.append("</html>").toString());
+            // The effect gives way rather than widening the row when the window narrows, but keeps its height.
+            value.setMinimumSize(new Dimension(0, value.getPreferredSize().height));
             if (delta != 0 && originalValue.equals(proposedValue)) {
                 value.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                       "negotiate.contractMarket.plateau.tooltip")));

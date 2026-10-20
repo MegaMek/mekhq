@@ -46,6 +46,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
@@ -260,6 +261,8 @@ final class MarketHud {
         area.setBorder(null);
         area.setForeground(color);
         area.setFont(hudFont(style, size, 0.0f));
+        // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page.
+        ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         return area;
     }
 
