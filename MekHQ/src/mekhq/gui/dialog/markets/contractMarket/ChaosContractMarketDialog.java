@@ -780,13 +780,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /** Opens the guide for the page on screen, marking it seen so it does not open by itself again. */
     private void openGuide() {
-        ContractMarketGuidePreferences.getInstance().setGuideSeen(page, true);
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(page.guidePrefix(), true);
         guide.open(page.guidePrefix());
     }
 
     /** Opens the page's guide by itself the first time the player sees the page. */
     private void maybeOpenGuide() {
-        if (isShowing() && !ContractMarketGuidePreferences.getInstance().isGuideSeen(page)) {
+        if (isShowing() && !ContractMarketGuidePreferences.getInstance().isGuideSeen(page.guidePrefix())) {
             openGuide();
         }
     }

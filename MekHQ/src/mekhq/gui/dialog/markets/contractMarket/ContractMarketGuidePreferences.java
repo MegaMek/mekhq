@@ -32,8 +32,9 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
-import java.util.EnumMap;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import megamek.client.ui.preferences.PreferenceElement;
@@ -44,8 +45,9 @@ import mekhq.MekHQ;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog.MarketPage;
 
 /**
- * Which of the contract market's page guides the player has seen. Each page's guide opens by itself the first time the
- * player visits that page, and only from its button after that.
+ * Which of the contract market's guides the player has seen: one per market page, and one per section of the GM
+ * contract editor. A guide opens by itself the first time the player visits its page or clicks to its section, and
+ * only from its button after that.
  *
  * <p>The flags are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's
  * node, so they follow the MekHQ install rather than a campaign. Deleting this class's entry from that file (while
@@ -61,19 +63,26 @@ public final class ContractMarketGuidePreferences {
 
     private static ContractMarketGuidePreferences instance;
 
-    private final Map<MarketPage, Flag> seen = new EnumMap<>(MarketPage.class);
+    /** One flag per guide, keyed by the guide's resource-key prefix. */
+    private final Map<String, Flag> seen = new LinkedHashMap<>();
 
     /**
      * @param node the preferences node to store the settings under
      */
     ContractMarketGuidePreferences(final PreferencesNode node) {
+        List<String> guides = new ArrayList<>();
         for (MarketPage page : MarketPage.values()) {
-            String name = GUIDE_SEEN_PREFIX + page.name().toLowerCase(Locale.ROOT);
+            guides.add(page.guidePrefix());
+        }
+        guides.addAll(ContractEditorDialog.guidePrefixes());
+        for (String guide : guides) {
+            // A guide's prefix ends in a dot (such as "guide.contractMarket.offers."); the flag's name drops it.
+            String name = GUIDE_SEEN_PREFIX + guide.substring(0, guide.length() - 1);
             try {
                 Flag flag = new Flag(name);
                 // Managing the flag loads any value saved in an earlier session and saves it again on exit.
                 node.manage(flag);
-                seen.put(page, flag);
+                seen.put(guide, flag);
             } catch (Exception exception) {
                 LOGGER.error(exception, "Failed to register contract market guide preference {}", name);
             }
@@ -92,18 +101,18 @@ public final class ContractMarketGuidePreferences {
     }
 
     /**
-     * @param page a market page
+     * @param guidePrefix a guide's resource-key prefix, such as {@code "guide.contractMarket.offers."}
      *
-     * @return {@code true} once the player has seen that page's guide
+     * @return {@code true} once the player has seen that guide
      */
-    boolean isGuideSeen(final MarketPage page) {
-        Flag flag = seen.get(page);
+    boolean isGuideSeen(final String guidePrefix) {
+        Flag flag = seen.get(guidePrefix);
         // If the flag could not be registered, treat the guide as seen rather than opening it every time.
         return (flag == null) || flag.value;
     }
 
-    void setGuideSeen(final MarketPage page, final boolean isSeen) {
-        Flag flag = seen.get(page);
+    void setGuideSeen(final String guidePrefix, final boolean isSeen) {
+        Flag flag = seen.get(guidePrefix);
         if (flag != null) {
             flag.value = isSeen;
         }

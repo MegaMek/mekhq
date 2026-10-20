@@ -156,8 +156,8 @@ public class ContractEditorDialog extends JDialog {
     /** Profession used to label ranks in the create-mode NPC pickers; the numeric rank is what actually applies. */
     private static final Profession DEFAULT_PROFESSION = Profession.MEKWARRIOR;
 
-    /** The form's sections, in page order, keyed for the rail and the change counts. */
-    private enum Section {
+    /** The form's sections, in page order, keyed for the rail, the change counts and the guides. */
+    enum Section {
         OFFER, JOB, EMPLOYER, ENEMY, TERMS, CHARACTERISTICS;
 
         String label() {
@@ -463,7 +463,7 @@ public class ContractEditorDialog extends JDialog {
         JPanel status = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.readout.status"),
               statusText, ACCENT_BRIGHT, SURFACE_DEEP);
         guideButton = new HudButton("", false, true);
-        guideButton.addActionListener(event -> guide.open(currentSection.guidePrefix()));
+        guideButton.addActionListener(event -> openGuide(currentSection));
 
         JPanel readouts = Hud.transparentPanel(null);
         readouts.setLayout(new BoxLayout(readouts, BoxLayout.X_AXIS));
@@ -1451,6 +1451,10 @@ public class ContractEditorDialog extends JDialog {
                 @Override
                 public void mouseReleased(MouseEvent event) {
                     scrollTo(section);
+                    // The first time the player goes to a section, its guide opens by itself.
+                    if (!ContractMarketGuidePreferences.getInstance().isGuideSeen(section.guidePrefix())) {
+                        openGuide(section);
+                    }
                 }
             });
             setCurrent(false);
@@ -1474,6 +1478,17 @@ public class ContractEditorDialog extends JDialog {
                 graphics.fillRect(0, 0, scaleForGUI(2), getHeight());
             }
         }
+    }
+
+    /** Opens a section's guide, marking it seen so it does not open by itself again. */
+    private void openGuide(Section section) {
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(section.guidePrefix(), true);
+        guide.open(section.guidePrefix());
+    }
+
+    /** @return every section guide's resource-key prefix, so the guides' seen flags can be registered */
+    static List<String> guidePrefixes() {
+        return Arrays.stream(Section.values()).map(Section::guidePrefix).toList();
     }
 
     private void scrollTo(Section section) {
