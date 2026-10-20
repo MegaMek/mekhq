@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -116,8 +117,9 @@ class TechJobsTest {
         laser.setTech(tech);
         String withoutMaintenance = TechJobs.find(scenario.getCampaign()).getJobs(tech).getFirst();
 
-        // The same tech now keeps four other units maintained, leaving far less of the day for the repair
-        for (int count = 0; count < 4; count++) {
+        // The same tech now keeps seven other units maintained, checked every day, leaving little of each day free
+        scenario.getCampaign().getCampaignOptions().set(CampaignOption.MAINTENANCE_CYCLE_DAYS, 1);
+        for (int count = 0; count < 7; count++) {
             tech.addTechUnit(scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R));
         }
         String withMaintenance = TechJobs.find(scenario.getCampaign()).getJobs(tech).getFirst();

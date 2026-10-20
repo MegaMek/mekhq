@@ -149,15 +149,14 @@ public final class TechJobs {
     }
 
     /**
-     * Says how long the rest of a job will take, at the minutes the tech has left each day after maintenance. A tech
+     * Says how long the rest of a job will take, at the minutes the tech has free each day after maintenance. A tech
      * spending most of the day on maintenance takes far longer than the job's hours suggest.
      */
     private static String describeTimeLeft(Campaign campaign, Person tech, int minutesLeft) {
         if (minutesLeft <= 0) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "TechJobs.finishing");
         }
-        int minutesPerDay = WorkTimeEstimate.getMinutesPerDay(campaign, tech, false);
-        int minutesFreeForJobs = Math.max(1, minutesPerDay - tech.getMaintenanceTimeUsing());
+        int minutesFreeForJobs = WorkTimeEstimate.getMinutesFreeForJobsPerDay(campaign, tech);
         String duration = WorkTimeFormatter.formatDuration(minutesLeft, minutesFreeForJobs, campaign.getLocalDate(),
               MekHQ.getMHQOptions().getWorkTimeDisplay());
         return getFormattedTextAt(RESOURCE_BUNDLE, "TechJobs.timeLeft", duration);
