@@ -36,6 +36,7 @@ package mekhq.campaign.parts;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
@@ -67,7 +68,6 @@ import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
-import megamek.common.equipment.WeaponType;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -151,6 +151,8 @@ public class Refit extends Part implements IAcquisitionWork {
     private Entity newEntity;
 
     private int refitClass;
+    // The reasons for the class, kept only while the refit is planned; a saved refit keeps just its class
+    private RefitClassGrader classGrader = new RefitClassGrader();
 
     // This needs to be converted to FLOAT and handled accordingly.
     private int time;
@@ -275,6 +277,24 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * @return the changes that set this refit's class, the biggest first, as lines the player can read; empty for a
+     *       refit loaded from a save
+     */
+    public List<String> getRefitClassReasons() {
+        return classGrader.describeSteps();
+    }
+
+    /**
+     * @param maximumLines the most reasons to list
+     *
+     * @return why this refit is its class, for the player to read before it starts; empty for a refit loaded from a
+     *       save
+     */
+    public String explainRefitClass(int maximumLines) {
+        return classGrader.explain(maximumLines);
+    }
+
+    /**
      * @return The cost of carrying out this refit
      */
     public Money getCost() {
@@ -375,11 +395,14 @@ public class Refit extends Part implements IAcquisitionWork {
         newEntity.setCamouflage(camouflageBeforeRefit);
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
-        boolean isOmniRefit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
-        if (isOmniRefit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity)) {
-            errorStrings.add("A unit loses omni capabilities if any fixed equipment is modified.");
-            return;
+        classGrader = new RefitClassGrader();
+        boolean isOmniUnit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
+        boolean isFixedEquipmentChanged = isOmniUnit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity);
+        if (isFixedEquipmentChanged) {
+            // An Omni unit's fixed components can be altered, as a Class F refit worked like any other (CamOps p.212)
+            classGrader.gradeFixedOmniChange();
         }
+        boolean isOmniRefit = isOmniUnit && !isFixedEquipmentChanged;
         time = 0;
         sameArmorType = hasSameArmor(oldUnit.getEntity(), newEntity);
         int recycledArmorPoints = 0;
@@ -566,9 +589,13 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
                 if (isOmniRefit && movedPart.isOmniPodded()) {
-                    updateRefitClass(CLASS_OMNI);
+                    classGrader.gradeOmniPodWork(movedPart.getName());
                 } else {
-                    updateRefitClass(CLASS_C);
+                    int fromLocation = movedPart.getLocation();
+                    int toLocation = newPart.getLocation();
+                    classGrader.gradeMovedComponent(movedPart.getName(),
+                          getLocationName(oldUnit.getEntity(), fromLocation), getLocationName(newEntity, toLocation),
+                          fromLocation == toLocation);
                 }
 
                 if (movedPart instanceof EquipmentPart) {
@@ -600,10 +627,8 @@ public class Refit extends Part implements IAcquisitionWork {
         // this item replaces another item of the same or fewer critical slots. Also add cost for new equipment. at the
         // same time, check spare parts for new equipment
 
-        // first put oldUnitParts in a new arraylist so they can be removed as we find them
-        // An infantry weapon's ammunition clip is carried with the weapon and takes no slot, so it never frees one
-        List<Part> tempOldParts = new ArrayList<>(oldUnitParts);
-        tempOldParts.removeIf(oldPart -> oldPart instanceof InfantryAmmoBin);
+        // What is left of the old parts is coming off the unit, so adding to those locations is Class B, not C
+        boolean[] locationHadPartsRemoved = findLocationsWithPartsRemoved(locationLostOldStuff.length);
         long newInfantryClips = newPartList.stream().filter(InfantryAmmoBin.class::isInstance).count();
         LOGGER.debug("[Refit] {}: {} new infantry weapon clips leave the refit class to their weapons",
               newEntity.getShortName(), newInfantryClips);
@@ -687,163 +712,12 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             /* CHECK REFIT CLASS */
-            // See Campaign Operations, page 211 as of third printing
-            if (newPart instanceof MissingEnginePart) {
-                Engine oldEngine = oldUnit.getEntity().getEngine();
-                Engine newEngine = newUnit.getEntity().getEngine();
-                if (oldEngine.getRating() != newEngine.getRating() ||
-                          oldEngine.getEngineType() != newEngine.getEngineType()) {
-                    updateRefitClass(customJob ? CLASS_E : CLASS_D);
-                }
-
-                if (newEngine.getSideTorsoCriticalSlots().length > oldEngine.getSideTorsoCriticalSlots().length) {
-                    // WeaverThree - This still doesn't account for downgrading engine removing from
-                    // the parts
-                    // That can wait for rework
-                    locationHasNewStuff[Mek.LOC_LEFT_TORSO] = true;
-                    locationHasNewStuff[Mek.LOC_RIGHT_TORSO] = true;
-                }
-
-            } else if (newPart instanceof MissingMekGyro) {
-                updateRefitClass(CLASS_D);
-
-            } else if (newPart instanceof MissingMekActuator) {
-                // An added actuator, such as a hand or lower arm, is a new component where there was none
-                updateRefitClass(CLASS_D);
-                int location = newPart.getLocation();
-                if ((location > -1) && (location < newEntity.locations())) {
-                    locationHasNewStuff[location] = true;
-                }
-
-            } else if (newPart instanceof MissingMekLocation) {
-                replacingLocations = true;
-
-                // If a location is being replaced, the internal structure or myomer must have been changed.
-                updateRefitClass(CLASS_F);
-
-            } else if (newPart instanceof Armor) {
-                updateRefitClass(CLASS_A);
-                locationHasNewStuff[newPart.getLocation()] = true;
-
-            } else if (newPart instanceof MissingMekCockpit) {
-                updateRefitClass(CLASS_E);
-                locationHasNewStuff[Mek.LOC_HEAD] = true;
-
-            } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
-                // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
-                locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
-
-            } else if (newPart instanceof MissingInfantryMotiveType || newPart instanceof MissingInfantryArmorPart) {
-                updateRefitClass(CLASS_A);
-
-            } else if (RefitSpacecraftSystems.isNewShipComponent(newPart)) {
-                updateRefitClass(CLASS_C);
-
-            } else if (newPart instanceof InfantryAmmoBin) {
-                // The clip comes with its infantry weapon and takes no slot, so the weapon alone sets the class
-
-            } else {
-                // determine whether this is A, B, or C
-                if (newPart instanceof MissingEquipmentPart || newPart instanceof AmmoBin) {
-                    newPart.setUnit(newUnit);
-                    int loc;
-                    EquipmentType type;
-                    double size;
-                    if (newPart instanceof MissingEquipmentPart) {
-                        loc = newPart.getLocation();
-                        if (loc > -1 && loc < newEntity.locations()) {
-                            locationHasNewStuff[loc] = true;
-                        }
-                        type = ((MissingEquipmentPart) newPart).getType();
-                        size = ((MissingEquipmentPart) newPart).getSize();
-
-                    } else {
-                        loc = newPart.getLocation();
-                        if (loc > -1 && loc < newEntity.locations()) {
-                            locationHasNewStuff[loc] = true;
-                        }
-                        type = ((AmmoBin) newPart).getType();
-                        size = ((AmmoBin) newPart).getSize();
-                    }
-
-                    int criticalSlots = type.getNumCriticalSlots(newUnit.getEntity(), size);
-                    newPart.setUnit(oldUnit);
-                    int index = -1;
-                    boolean matchFound = false;
-                    int matchIndex = -1;
-                    int thisPartRefitClass = CLASS_D;
-                    for (Part oldPart : tempOldParts) {
-                        index++;
-                        int oldLoc = -1;
-                        int oldCriticalSlots = -1;
-                        EquipmentType oldType = null;
-                        if (oldPart instanceof MissingEquipmentPart) {
-                            oldLoc = oldPart.getLocation();
-                            oldType = ((MissingEquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
-                                  ((MissingEquipmentPart) oldPart).getSize());
-
-                        } else if (oldPart instanceof EquipmentPart) {
-                            oldLoc = oldPart.getLocation();
-                            oldType = ((EquipmentPart) oldPart).getType();
-                            oldCriticalSlots = oldType.getNumCriticalSlots(oldUnit.getEntity(),
-                                  ((EquipmentPart) oldPart).getSize());
-                        }
-
-                        if (loc != oldLoc) {
-                            continue;
-                        }
-
-                        if ((criticalSlots == oldCriticalSlots) &&
-                                  (oldType != null)
-                                  // FIXME: WeaverThree - CamOps doesn't specify anything about weapon types
-                                  // -- Not sure how best to resolve this quickly
-                                  &&
-                                  (type.hasFlag(WeaponType.F_LASER) == oldType.hasFlag(WeaponType.F_LASER)) &&
-                                  (type.hasFlag(WeaponType.F_MISSILE) == oldType.hasFlag(WeaponType.F_MISSILE)) &&
-                                  (type.hasFlag(WeaponType.F_BALLISTIC) == oldType.hasFlag(WeaponType.F_BALLISTIC)) &&
-                                  (type.hasFlag(WeaponType.F_ARTILLERY) == oldType.hasFlag(WeaponType.F_ARTILLERY))) {
-                            thisPartRefitClass = CLASS_A;
-                            matchFound = true;
-                            matchIndex = index;
-                            break;
-
-                        } else if (criticalSlots <= oldCriticalSlots) {
-                            // FIXME: WeaverThree - Class B is "Stuff added where something was removed,
-                            // other than thing removed"
-                            // This is the wrong logic - not sure how to fix it quickly
-                            thisPartRefitClass = CLASS_B;
-                            matchFound = true;
-                            matchIndex = index;
-                            // don't break because we may find something better
-
-                        } else {
-                            thisPartRefitClass = CLASS_C;
-                            matchFound = true;
-                            matchIndex = index;
-                            // don't break because we may find something better
-                        }
-                    }
-
-                    if (isOmniRefit && newPart.isOmniPoddable()) {
-                        thisPartRefitClass = CLASS_OMNI;
-                    }
-
-                    updateRefitClass(thisPartRefitClass);
-                    if (matchFound) {
-                        tempOldParts.remove(matchIndex);
-                    }
-                }
-            }
+            gradeNewPart(newPart, newUnit, isOmniRefit, locationHasNewStuff, locationHadPartsRemoved);
         }
 
         // Removing anything makes this at least a Class A refit
         if (isRemovingPartsOtherThanBays()) {
-            if (isOmniRefit) {
-                updateRefitClass(CLASS_OMNI);
-            } else {
-                updateRefitClass(CLASS_A);
-            }
+            classGrader.gradeRemovedComponents(isOmniRefit);
         }
 
         planBayWork();
@@ -969,6 +843,9 @@ public class Refit extends Part implements IAcquisitionWork {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHeatSinks.add(newHeatSink.getMissingPart());
                 }
+                if (oldHeatSinkCount != newHeatSinkCount) {
+                    classGrader.gradeEngineHeatSinkChange();
+                }
             } else {
                 for (int i = 0; i < oldHeatSinkCount; i++) {
                     oldIntegratedHeatSinks.add(oldHeatSink.clone());
@@ -977,7 +854,9 @@ public class Refit extends Part implements IAcquisitionWork {
                     // Heat sink added for supply chain tracking purposes and removed from refit later
                     newIntegratedHeatSinks.add(newHeatSink.getMissingPart());
                 }
-                updateRefitClass(CLASS_D);
+                if ((oldHeatSinkCount > 0) || (newHeatSinkCount > 0)) {
+                    classGrader.gradeEngineHeatSinkChange();
+                }
             }
         } else if ((newEntity instanceof Tank) || (newEntity instanceof ConvFighter)) {
             int oldHeatSinkCount = untrackedHeatSinkCount(oldUnit.getEntity());
@@ -1043,20 +922,21 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (!(oldUnit.getEntity().locationHasCase(loc) ||
                             (oldUnit.getEntity() instanceof Mek && oldUnit.getEntity().hasCASEII(loc))) &&
                           (newEntity.locationHasCase(loc) || (newEntity instanceof Mek && newEntity.hasCASEII(loc)))) {
-                    if (isOmniRefit) {
-                        updateRefitClass(CLASS_OMNI);
-                    } else {
+                    if (!isOmniRefit) {
                         time += WORK_HOUR;
-                        updateRefitClass(CLASS_D);
                     }
+                    classGrader.gradeCaseAdded(getLocationName(newEntity, loc), isOmniRefit);
                 }
             }
         }
 
+        classGrader.gradeWholeUnitChanges(oldUnit.getEntity(), newEntity);
+        refitClass = classGrader.getRefitClass();
+
         // multiply time by refit class
         time = (int) (time * getTimeMultiplier());
 
-        // Refit Kits cost an additional 10% beyond the cost of their components. (SO p188)
+        // Refit Kits cost an additional 10% beyond the cost of their components (CamOps p.212)
         if (!customJob) {
             cost = cost.multipliedBy(1.1);
         }
@@ -1079,7 +959,8 @@ public class Refit extends Part implements IAcquisitionWork {
         if (oldUnit.isConventionalInfantry()) {
             if (((Infantry) oldUnit.getEntity()).getSquadCount() != ((Infantry) newEntity).getSquadCount() ||
                       ((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
-                updateRefitClass(CLASS_A);
+                classGrader.gradeInfantrySquadChange();
+                refitClass = classGrader.getRefitClass();
             }
             time = 0;
         }
@@ -1117,6 +998,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // Refurbishment rules (class, time, and cost) are found in SO p189.
         // FIXME: WeaverThree - This should be its own code path rather than an appendix
         // to the other
+        classGrader.gradeRefurbishment();
         refitClass = CLASS_E;
 
         if (newEntity instanceof Warship || newEntity instanceof SpaceStation) {
@@ -1527,14 +1409,169 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Updates the refit class, keeping only the highest and most difficult of those put through it
+     * Grades one part the new design adds, by the Campaign Operations customization rules (pp. 211-212).
      *
-     * @param newClass a new refit class to check
+     * @param newPart              the new part, or the missing part standing in for it
+     * @param newUnit              a unit holding the new design
+     * @param isOmniRefit          {@code true} if this is a pod swap on an Omni unit
+     * @param locationHasNewStuff  marks the locations that receive something new
+     * @param locationLostOldStuff the locations losing something in this refit
      */
-    private void updateRefitClass(int newClass) {
-        if (newClass > refitClass) {
-            refitClass = newClass;
+    private void gradeNewPart(Part newPart, Unit newUnit, boolean isOmniRefit, boolean[] locationHasNewStuff,
+          boolean[] locationHadPartsRemoved) {
+        int location = newPart.getLocation();
+        if (newPart instanceof MissingEnginePart) {
+            Engine oldEngine = oldUnit.getEntity().getEngine();
+            Engine newEngine = newUnit.getEntity().getEngine();
+            boolean isEngineChanged = (oldEngine.getRating() != newEngine.getRating())
+                  || (oldEngine.getEngineType() != newEngine.getEngineType());
+            if (isEngineChanged) {
+                classGrader.gradeEngineChange(!customJob);
+            }
+            if (newEngine.getSideTorsoCriticalSlots().length > oldEngine.getSideTorsoCriticalSlots().length) {
+                locationHasNewStuff[Mek.LOC_LEFT_TORSO] = true;
+                locationHasNewStuff[Mek.LOC_RIGHT_TORSO] = true;
+            }
+        } else if (newPart instanceof MissingMekGyro) {
+            classGrader.gradeGyroChange();
+        } else if (newPart instanceof MissingMekActuator) {
+            // An added actuator, such as a hand or lower arm, is a component like any other
+            markLocation(locationHasNewStuff, location);
+            classGrader.gradeAddedComponent(newPart.getName(), getLocationName(newEntity, location),
+                  isMarked(locationHadPartsRemoved, location), false);
+        } else if (newPart instanceof MissingMekLocation) {
+            // If a location is being replaced, the internal structure or myomer must have been changed
+            replacingLocations = true;
+            classGrader.gradeStructureChange();
+        } else if (newPart instanceof Armor) {
+            classGrader.gradeArmorChange();
+            markLocation(locationHasNewStuff, location);
+        } else if (newPart instanceof MissingMekCockpit) {
+            classGrader.gradeCockpitChange();
+            locationHasNewStuff[Mek.LOC_HEAD] = true;
+        } else if (newPart instanceof MissingTurret) {
+            classGrader.gradeTurret(getLocationName(newEntity, location), hasVehicleTurretAt(location));
+        } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
+            // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
+            locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
+        } else if (newPart instanceof MissingInfantryMotiveType || newPart instanceof MissingInfantryArmorPart) {
+            classGrader.gradeInfantryKit();
+        } else if (RefitSpacecraftSystems.isNewShipComponent(newPart)) {
+            classGrader.gradeNewShipComponent(newPart.getName());
+        } else if (newPart instanceof InfantryAmmoBin) {
+            // The clip comes with its infantry weapon and takes no slot, so the weapon alone sets the class
+            LOGGER.trace("[RefitClass] {}: clip graded with its weapon", newPart.getName());
+        } else if (newPart instanceof MissingEquipmentPart || newPart instanceof AmmoBin) {
+            gradeNewEquipment(newPart, newUnit, isOmniRefit, locationHasNewStuff, locationHadPartsRemoved);
         }
+    }
+
+    /**
+     * Grades a weapon, ammunition bin or other piece of equipment the new design adds.
+     */
+    private void gradeNewEquipment(Part newPart, Unit newUnit, boolean isOmniRefit, boolean[] locationHasNewStuff,
+          boolean[] locationHadPartsRemoved) {
+        // The part's location comes from the design it belongs to, so read it while the part is on the new design
+        newPart.setUnit(newUnit);
+        int location = newPart.getLocation();
+        markLocation(locationHasNewStuff, location);
+        EquipmentType type;
+        Mounted<?> mounted = null;
+        if (newPart instanceof MissingEquipmentPart missingEquipmentPart) {
+            type = missingEquipmentPart.getType();
+            if (missingEquipmentPart.getEquipmentNum() >= 0) {
+                mounted = newEntity.getEquipment(missingEquipmentPart.getEquipmentNum());
+            }
+        } else {
+            type = ((AmmoBin) newPart).getType();
+        }
+        String partName = newPart.getName();
+        newPart.setUnit(oldUnit);
+
+        if (isOmniRefit && newPart.isOmniPoddable()) {
+            classGrader.gradeOmniPodWork(partName);
+            return;
+        }
+
+        String locationName = getLocationName(newEntity, location);
+        if (RefitClassGrader.isMyomer(type) || RefitClassGrader.isCommandConsole(type)) {
+            // Graded for the whole unit, by comparing the old and new designs
+            LOGGER.trace("[RefitClass] {}: graded with the whole unit", partName);
+        } else if (RefitClassGrader.isMekTurret(type)) {
+            classGrader.gradeTurret(locationName, hasMekTurretAt(location));
+        } else {
+            classGrader.gradeAddedComponent(partName, locationName, isMarked(locationHadPartsRemoved, location),
+                  RefitClassGrader.spansLocations(type, mounted));
+        }
+    }
+
+    /**
+     * Finds every location that has a part taken out in this refit. The old parts not matched to the new design are
+     * the ones coming off; armor, an infantry weapon's clip and parts that take no slot do not count. A part moved to
+     * another location does not count either: the book's Wolverine WVR-6M example adds heat sinks to the legs its
+     * jump jets moved out of as Class C (CamOps p.212).
+     *
+     * @param locationCount the number of locations to cover
+     *
+     * @return for each location, {@code true} if a part is taken out of it
+     */
+    private boolean[] findLocationsWithPartsRemoved(int locationCount) {
+        boolean[] locationHadPartsRemoved = new boolean[locationCount];
+        for (Part oldPart : oldUnitParts) {
+            boolean isNotAComponent = (oldPart instanceof Armor)
+                  || (oldPart instanceof InfantryAmmoBin)
+                  || (oldPart instanceof BattleArmorSuit)
+                  || (oldPart instanceof TransportBayPart);
+            if (!isNotAComponent) {
+                markLocation(locationHadPartsRemoved, oldPart.getLocation());
+            }
+        }
+        return locationHadPartsRemoved;
+    }
+
+    private static void markLocation(boolean[] locationFlags, int location) {
+        if ((location >= 0) && (location < locationFlags.length)) {
+            locationFlags[location] = true;
+        }
+    }
+
+    private static boolean isMarked(boolean[] locationFlags, int location) {
+        return (location >= 0) && (location < locationFlags.length) && locationFlags[location];
+    }
+
+    private static String getLocationName(Entity entity, int location) {
+        if ((location < 0) || (location >= entity.locations())) {
+            return getTextAt(REFIT_RESOURCE_BUNDLE, "RefitClass.location.unit");
+        }
+        return entity.getLocationName(location);
+    }
+
+    /**
+     * @return {@code true} if the unit already has a vehicle turret in this location, so a new one only changes
+     *       its weight
+     */
+    private boolean hasVehicleTurretAt(int location) {
+        for (Part oldPart : oldUnit.getParts()) {
+            boolean isTurretHere = (oldPart instanceof Turret turret) && (turret.getLoc() == location);
+            boolean isMissingTurretHere = (oldPart instanceof MissingTurret) && (oldPart.getLocation() == location);
+            if (isTurretHere || isMissingTurretHere) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return {@code true} if the unit already has a Mek turret in this location, so a new one only changes its
+     *       weight
+     */
+    private boolean hasMekTurretAt(int location) {
+        for (MiscMounted mounted : oldUnit.getEntity().getMisc()) {
+            if (RefitClassGrader.isMekTurret(mounted.getType()) && (mounted.getLocation() == location)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -3383,7 +3420,9 @@ public class Refit extends Part implements IAcquisitionWork {
     private void planBayWork() {
         RefitBayWork bayWork = RefitBayWork.between(oldUnit.getEntity(), newEntity);
         time += bayWork.time();
-        updateRefitClass(bayWork.refitClass());
+        if (bayWork.refitClass() > NO_CHANGE) {
+            classGrader.gradeBayWork(bayWork.refitClass());
+        }
         LOGGER.debug("[Refit] {}: {} cargo or infantry bays change and {} bay doors move, bay work {}",
               oldUnit.getName(), bayWork.baysWithoutCubiclesChanged(), bayWork.doorsMoved(),
               getRefitClassName(bayWork.refitClass()));

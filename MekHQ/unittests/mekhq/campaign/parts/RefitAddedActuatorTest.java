@@ -46,7 +46,8 @@ import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
 /**
- * Adding a hand or lower arm actuator is a change to the unit, a Class D refit, so the refit can be made (issue #6748).
+ * Adding a hand or lower arm actuator is a change to the unit, graded like any added component, so the refit can be
+ * made (issue #6748).
  * Before, the refit class ignored added actuators, so a Mek given a hand counted as "no change" and the refit could not
  * be started.
  */
@@ -67,12 +68,13 @@ class RefitAddedActuatorTest {
     }
 
     @Test
-    void addingAHandIsAClassDRefit() {
+    void addingAHandWhereNothingCameOutIsClassC() {
         Unit wolverine = wolverineWithoutLeftHand();
 
         Refit refit = new Refit(wolverine, UnitFixture.WOLVERINE_WVR_6R.loadEntity(), true, false, false);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
+        // A hand is a component like any other: added where nothing was removed, it is Class C (CamOps p.211)
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
     }
 
     @Test
