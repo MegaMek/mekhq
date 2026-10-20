@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -117,6 +118,29 @@ class RefitWaitingForPartsTest {
 
         boolean isAnyFitted = heldParts.stream().anyMatch(part -> part.getUnit() != null);
         assertFalse(isAnyFitted, "The Locust's own parts are not warehouse stock");
+    }
+
+    @Test
+    void deliveringTheKitAtOnceKeepsItForTheRefit() {
+        // What the GM Deliver Part Now menu does for a kit part on its way
+        findTheKit();
+        List<Part> kitParts = kitPartsInTransit();
+        for (Part part : kitParts) {
+            scenario.getCampaign().getQuartermaster().arrivePart(part);
+        }
+        if ((refit.getNewArmorSupplies() != null) && !refit.getNewArmorSupplies().isPresent()) {
+            scenario.getCampaign().getQuartermaster().arrivePart(refit.getNewArmorSupplies());
+        }
+
+        boolean isEveryPartStillSetAside = kitParts.stream().allMatch(Part::isReservedForRefit);
+        assertTrue(isEveryPartStillSetAside, "A delivered kit part is not merged into spare stock");
+        assertEquals(0, refit.getDaysUntilPartsArrive());
+    }
+
+    @Test
+    void theDeliverNowMenuTextExists() {
+        assertFalse(getTextAt("mekhq.resources.GUI", "partsMenu.deliverNow.text").startsWith("!"));
+        assertFalse(getTextAt("mekhq.resources.GUI", "partsMenu.gmMode.text").startsWith("!"));
     }
 
     @Test
