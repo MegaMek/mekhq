@@ -34,6 +34,8 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Dimension;
@@ -43,6 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import megamek.common.ui.FastJScrollPane;
@@ -61,6 +64,18 @@ class ImmersiveDialogSizingTest {
                              StyleConstants.getFontSize(styleSheet.getRule("p")));
             assertEquals(scaleForGUI(6) + "px",
                   styleSheet.getRule("p").getAttribute(CSS.Attribute.MARGIN_TOP).toString());
+        });
+    }
+
+    @Test
+    void configuredHtmlDoesNotChangeSharedDefaultStyleSheet() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            StyleSheet defaultStyleSheet = new HTMLEditorKit().getStyleSheet();
+
+            ImmersiveDialogCore.configureHtmlEditorPane(new JEditorPane());
+
+            assertSame(defaultStyleSheet, new HTMLEditorKit().getStyleSheet());
+            assertNull(defaultStyleSheet.getRule("p").getAttribute(CSS.Attribute.BACKGROUND_COLOR));
         });
     }
 
