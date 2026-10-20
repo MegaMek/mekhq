@@ -101,9 +101,9 @@ public class Maintenance {
         }
         if (!unit.requiresMaintenance()) {
             LOGGER.debug("[Maintenance] {}: no maintenance today (present={}, deployed={}, refitting={}, "
-                               + "mothballing={}, mothballed={})",
+                               + "mothballing={}, mothballed={}, salvage={})",
                   unit.getName(), unit.isPresent(), unit.isDeployed(), unit.isRefitting(), unit.isMothballing(),
-                  unit.isMothballed());
+                  unit.isMothballed(), unit.isSalvage());
             return;
         }
         // Maintenance is paused, rather than skipped: the cycle does not advance, so nothing is charged or checked
