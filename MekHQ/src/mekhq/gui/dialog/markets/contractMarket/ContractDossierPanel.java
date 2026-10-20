@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
@@ -443,7 +444,7 @@ public class ContractDossierPanel extends JPanel {
                     contract.getLengthInMonths(), estimate.transitDays()),
               "-" + estimate.operatingCosts().toAmountString(), DANGER, expensesBreakdown, false);
         MarketHud.SegmentBar costBar = new MarketHud.SegmentBar(
-              List.of(amount(estimate.salaries()), amount(estimate.maintenance()), amount(estimate.runningCosts()),
+              List.of(amount(estimate.salaries()), amount(estimate.maintenance()), amount(estimate.operatingCosts()),
                     amount(estimate.foodAndHousing())),
               List.of(ACCENT, translucent(ACCENT, 150), translucent(ACCENT, 90), TEXT_FAINT));
         costBar.setToolTipText(expensesBreakdown);
