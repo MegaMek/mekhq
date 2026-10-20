@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,9 @@ public class RefitClassGrader {
 
     private final List<RefitClassStep> steps = new ArrayList<>();
     private int refitClass = Refit.NO_CHANGE;
+    // Pods going in and coming out, by location, so a pod swap can say what each location becomes
+    private final Map<String, Map<String, Integer>> podsIn = new LinkedHashMap<>();
+    private final Map<String, Map<String, Integer>> podsOut = new LinkedHashMap<>();
 
     /**
      * @return the highest class of any change graded so far
@@ -107,12 +111,60 @@ public class RefitClassGrader {
             lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.step",
                   Refit.getRefitClassName(step.refitClass()), step.reason()));
         }
+        // Pod work is the quickest kind, so it comes last: one line for each location saying what its pods become
+        String podClassName = Refit.getRefitClassName(Refit.CLASS_OMNI);
+        for (String podChange : describePodChanges()) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.step", podClassName, podChange));
+        }
         return new ArrayList<>(lines);
+    }
+
+    /**
+     * Describes each location's pod changes, for example {@code In the Left Arm: ER PPC becomes ER Large Laser, ER
+     * Micro Laser}.
+     *
+     * @return one description for each location whose pods change, in the order the locations were graded
+     */
+    public List<String> describePodChanges() {
+        Set<String> locations = new LinkedHashSet<>(podsOut.keySet());
+        locations.addAll(podsIn.keySet());
+        List<String> descriptions = new ArrayList<>();
+        for (String location : locations) {
+            String goingIn = listPods(podsIn.get(location));
+            String comingOut = listPods(podsOut.get(location));
+            if (goingIn.isEmpty()) {
+                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.remove", location, comingOut));
+            } else if (comingOut.isEmpty()) {
+                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.add", location, goingIn));
+            } else {
+                descriptions.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.swap", location, comingOut,
+                      goingIn));
+            }
+        }
+        return descriptions;
+    }
+
+    private static String listPods(@Nullable Map<String, Integer> podCounts) {
+        if (podCounts == null) {
+            return "";
+        }
+        List<String> pods = new ArrayList<>();
+        for (Map.Entry<String, Integer> pod : podCounts.entrySet()) {
+            boolean isSingle = pod.getValue() == 1;
+            pods.add(isSingle ? pod.getKey()
+                           : getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.pods.count", pod.getValue(),
+                                 pod.getKey()));
+        }
+        return String.join(", ", pods);
     }
 
     private void raise(int stepClass, String reasonKey, Object... arguments) {
         String reason = getFormattedTextAt(RESOURCE_BUNDLE, reasonKey, arguments);
         steps.add(new RefitClassStep(stepClass, reason));
+        raiseClass(stepClass, reason);
+    }
+
+    private void raiseClass(int stepClass, String reason) {
         if (stepClass > refitClass) {
             LOGGER.debug("[RefitClass] {} raises the refit to {}", reason, Refit.getRefitClassName(stepClass));
             refitClass = stepClass;
@@ -158,17 +210,9 @@ public class RefitClassGrader {
         }
     }
 
-    /**
-     * Taking components off the unit is Class A, or a pod swap when they are an Omni unit's pods.
-     *
-     * @param isOmniPodWork {@code true} if the components come out of an Omni unit's pods
-     */
-    public void gradeRemovedComponents(boolean isOmniPodWork) {
-        if (isOmniPodWork) {
-            raise(Refit.CLASS_OMNI, "RefitClass.removed.omniPod");
-        } else {
-            raise(Refit.CLASS_A, "RefitClass.removed");
-        }
+    /** Taking components off the unit is Class A. */
+    public void gradeRemovedComponents() {
+        raise(Refit.CLASS_A, "RefitClass.removed");
     }
 
     /** Changing armor type, amount or distribution is Class A. */
@@ -177,12 +221,25 @@ public class RefitClassGrader {
     }
 
     /**
-     * Swapping pod-mounted equipment on an Omni unit is the quickest kind of refit.
+     * A pod fitted to an Omni unit. Swapping pods is the quickest kind of refit.
      *
-     * @param partName the pod-mounted component
+     * @param partName     the pod-mounted component
+     * @param locationName where it goes
      */
-    public void gradeOmniPodWork(String partName) {
-        raise(Refit.CLASS_OMNI, "RefitClass.omniPod", partName);
+    public void gradeOmniPodWork(String partName, String locationName) {
+        podsIn.computeIfAbsent(locationName, key -> new LinkedHashMap<>()).merge(partName, 1, Integer::sum);
+        raiseClass(Refit.CLASS_OMNI, partName);
+    }
+
+    /**
+     * A pod taken off an Omni unit.
+     *
+     * @param partName     the pod-mounted component
+     * @param locationName where it comes from
+     */
+    public void gradeOmniPodRemoved(String partName, String locationName) {
+        podsOut.computeIfAbsent(locationName, key -> new LinkedHashMap<>()).merge(partName, 1, Integer::sum);
+        raiseClass(Refit.CLASS_OMNI, partName);
     }
 
     /** Altering an Omni unit's fixed components is Class F. */
@@ -325,7 +382,7 @@ public class RefitClassGrader {
      */
     public void gradeCaseAdded(String locationName, boolean isOmniPodWork) {
         if (isOmniPodWork) {
-            raise(Refit.CLASS_OMNI, "RefitClass.case.omniPod", locationName);
+            gradeOmniPodWork(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.case.name"), locationName);
         } else {
             raise(Refit.CLASS_D, "RefitClass.case", locationName);
         }

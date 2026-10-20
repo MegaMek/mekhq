@@ -585,7 +585,11 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
                 if (isOmniRefit && movedPart.isOmniPodded()) {
-                    classGrader.gradeOmniPodWork(movedPart.getName());
+                    // A pod moved to another location comes out of one and goes into the other
+                    classGrader.gradeOmniPodRemoved(movedPart.getName(),
+                          getLocationName(oldUnit.getEntity(), movedPart.getLocation()));
+                    classGrader.gradeOmniPodWork(movedPart.getName(), getLocationName(newEntity,
+                          newPart.getLocation()));
                 } else {
                     int fromLocation = movedPart.getLocation();
                     int toLocation = newPart.getLocation();
@@ -713,7 +717,11 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // Removing anything makes this at least a Class A refit
         if (isRemovingPartsOtherThanBays()) {
-            classGrader.gradeRemovedComponents(isOmniRefit);
+            if (isOmniRefit) {
+                gradeRemovedPods();
+            } else {
+                classGrader.gradeRemovedComponents();
+            }
         }
 
         planBayWork();
@@ -1525,7 +1533,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (isOmniRefit) {
                 // An Omni's lower arm and hand actuators come and go with its pod configuration, as the Timber Wolf
                 // D, which has none, shows against its Prime
-                classGrader.gradeOmniPodWork(newPart.getName());
+                classGrader.gradeOmniPodWork(newPart.getName(), getLocationName(newEntity, location));
             } else {
                 // An added actuator, such as a hand or lower arm, is a component like any other
                 classGrader.gradeAddedComponent(newPart.getName(), getLocationName(newEntity, location),
@@ -1581,7 +1589,7 @@ public class Refit extends Part implements IAcquisitionWork {
         newPart.setUnit(oldUnit);
 
         if (isOmniRefit && newPart.isOmniPoddable()) {
-            classGrader.gradeOmniPodWork(partName);
+            classGrader.gradeOmniPodWork(partName, getLocationName(newEntity, location));
             return;
         }
 
@@ -1594,6 +1602,19 @@ public class Refit extends Part implements IAcquisitionWork {
         } else {
             classGrader.gradeAddedComponent(partName, locationName, isMarked(locationHadPartsRemoved, location),
                   RefitClassGrader.spansLocations(type, mounted));
+        }
+    }
+
+    /**
+     * Grades each pod an Omni pod swap takes off, by the location it comes from, so the briefing can say what each
+     * location's pods become.
+     */
+    private void gradeRemovedPods() {
+        for (Part oldPart : oldUnitParts) {
+            if (!(oldPart instanceof TransportBayPart)) {
+                classGrader.gradeOmniPodRemoved(oldPart.getName(),
+                      getLocationName(oldUnit.getEntity(), oldPart.getLocation()));
+            }
         }
     }
 

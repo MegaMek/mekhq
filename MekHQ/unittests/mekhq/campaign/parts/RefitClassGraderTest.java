@@ -73,7 +73,7 @@ class RefitClassGraderTest {
     @Test
     void armorAndRemovalAreClassA() {
         grader.gradeArmorChange();
-        grader.gradeRemovedComponents(false);
+        grader.gradeRemovedComponents();
 
         assertEquals(Refit.CLASS_A, grader.getRefitClass());
     }
@@ -133,6 +133,22 @@ class RefitClassGraderTest {
         assertEquals(Refit.CLASS_D, caseGrader.getRefitClass());
         assertEquals(Refit.CLASS_D, gyroGrader.getRefitClass());
         assertEquals(Refit.CLASS_D, turretGrader.getRefitClass());
+    }
+
+    @Test
+    void podChangesAreDescribedByLocation() {
+        grader.gradeOmniPodRemoved("ER PPC", "Left Arm");
+        grader.gradeOmniPodWork("ER Large Laser", "Left Arm");
+        grader.gradeOmniPodWork("ER Micro Laser", "Left Arm");
+        grader.gradeOmniPodRemoved("Streak SRM 6", "Left Torso");
+        grader.gradeOmniPodRemoved("Streak SRM 6", "Left Torso");
+        grader.gradeOmniPodWork("HarJel", "Center Torso");
+
+        List<String> podChanges = grader.describePodChanges();
+
+        assertEquals(Refit.CLASS_OMNI, grader.getRefitClass());
+        assertEquals(List.of("In the Left Arm: ER PPC becomes ER Large Laser, ER Micro Laser",
+              "In the Left Torso: removes 2 × Streak SRM 6", "In the Center Torso: adds HarJel"), podChanges);
     }
 
     @Test

@@ -116,6 +116,18 @@ class RefitOmniFixedEquipmentTest {
     }
 
     @Test
+    void aPodSwapSaysWhatEachLocationsPodsBecome() {
+        Unit batu = scenario.getCampaign().addNewUnit(load("Batu Prime", true), false, 0, PartQuality.QUALITY_D);
+
+        Refit refit = new Refit(batu, load("Batu E", true), false, false, false);
+
+        String reasons = String.join("; ", refit.getRefitClassReasons());
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass(), reasons);
+        assertTrue(reasons.contains(" becomes "), reasons);
+        assertFalse(reasons.contains("Swapping"), "No line for each single pod: " + reasons);
+    }
+
+    @Test
     void oneShotLauncherAmmunitionDoesNotCountAsFixed() {
         // The Batu E's improved one-shot Streak launchers carry ammunition MegaMek adds with no location
         assertTrue(Utilities.isOmniVariant(load("Batu Prime", true), load("Batu E", true)));
