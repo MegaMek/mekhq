@@ -91,6 +91,19 @@ public class EquipmentPartTest {
     }
 
     @Test
+    public void navalC3StickerPriceDoesNotOverflowForWarshipTonnage() {
+        Campaign mockCampaign = mockCampaign();
+
+        // A 34,900-ton unit's price used to overflow an int, which made resupplies pay the player instead
+        int unitTonnage = 34900;
+        EquipmentType type = getEquipmentType("ISNC3");
+        EquipmentPart equipmentPart = new EquipmentPart(unitTonnage, type, -1, 1.0, false, mockCampaign);
+
+        // 1% of the unit's tonnage at 100,000 C-bills per ton, as MegaMek prices it
+        assertEquals(34_900_000.0, equipmentPart.getStickerPrice().getAmount().doubleValue(), 0.001);
+    }
+
+    @Test
     public void equipmentPartCtorTest() {
         Campaign mockCampaign = mockCampaign();
 
