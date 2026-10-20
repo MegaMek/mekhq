@@ -38,11 +38,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import jakarta.annotation.Nullable;
+import megamek.common.CriticalSlot;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -210,6 +214,85 @@ public class RefitClassGrader {
     /** Altering an Omni unit's fixed components is Class F. */
     public void gradeFixedOmniChange() {
         raise(Refit.CLASS_F, "RefitClass.omniFixed");
+    }
+
+    /**
+     * Moving an Omni unit's weightless fixed slots, such as Endo Steel or Ferro-Fibrous, into a location is part of a
+     * Class F refit.
+     *
+     * @param locationName the location the slots move to
+     */
+    public void gradeWeightlessSlotsMoved(String locationName) {
+        raise(Refit.CLASS_F, "RefitClass.weightlessSlots", locationName);
+    }
+
+    /**
+     * Finds the locations of an Omni unit that hold more of some weightless fixed slot after the refit than before,
+     * such as Endo Steel, Ferro-Fibrous, Reflective armor or TSM slots. Only how many of each a location holds
+     * matters: two Endo Steel slots in the left torso before and after is no change, wherever they sit in it, but two
+     * becoming one is (CamOps p.212, with errata). Each location gaining slots costs a base 60 minutes.
+     *
+     * @param oldEntity the unit as it is
+     * @param newEntity the design it is refitted to
+     *
+     * @return the locations gaining weightless fixed slots, in order
+     */
+    public static List<Integer> getLocationsGainingWeightlessSlots(Entity oldEntity, Entity newEntity) {
+        Map<Integer, Map<String, Integer>> oldSlots = countWeightlessFixedSlots(oldEntity);
+        Map<Integer, Map<String, Integer>> newSlots = countWeightlessFixedSlots(newEntity);
+        List<Integer> locationsGaining = new ArrayList<>();
+        for (Map.Entry<Integer, Map<String, Integer>> location : newSlots.entrySet()) {
+            Map<String, Integer> slotsBefore = oldSlots.getOrDefault(location.getKey(), Map.of());
+            boolean isGainingSlots = location.getValue()
+                                           .entrySet()
+                                           .stream()
+                                           .anyMatch(slot -> slot.getValue() > slotsBefore.getOrDefault(slot.getKey(),
+                                                 0));
+            if (isGainingSlots) {
+                locationsGaining.add(location.getKey());
+            }
+        }
+        return locationsGaining;
+    }
+
+    /**
+     * @param oldEntity the unit as it is
+     * @param newEntity the design it is refitted to
+     *
+     * @return {@code true} if any location holds a different number of some weightless fixed slot after the refit
+     */
+    public static boolean haveWeightlessSlotsChanged(Entity oldEntity, Entity newEntity) {
+        return !countWeightlessFixedSlots(oldEntity).equals(countWeightlessFixedSlots(newEntity));
+    }
+
+    /**
+     * Counts each kind of weightless fixed slot in each location. Pods, equipment that can be hit or weighs
+     * something, and the Clan CASE MegaMek adds wherever explosive ammunition sits are left out.
+     */
+    private static Map<Integer, Map<String, Integer>> countWeightlessFixedSlots(Entity entity) {
+        Map<Integer, Map<String, Integer>> slotsByLocation = new TreeMap<>();
+        for (int location = 0; location < entity.locations(); location++) {
+            for (int slot = 0; slot < entity.getNumberOfCriticalSlots(location); slot++) {
+                CriticalSlot criticalSlot = entity.getCritical(location, slot);
+                boolean isEquipmentSlot = (criticalSlot != null)
+                      && (criticalSlot.getType() == CriticalSlot.TYPE_EQUIPMENT)
+                      && (criticalSlot.getMount() != null);
+                if (isEquipmentSlot && isWeightlessFixedSlot(criticalSlot.getMount())) {
+                    slotsByLocation.computeIfAbsent(location, key -> new TreeMap<>())
+                          .merge(criticalSlot.getMount().getType().getInternalName(), 1, Integer::sum);
+                }
+            }
+        }
+        return slotsByLocation;
+    }
+
+    private static boolean isWeightlessFixedSlot(Mounted<?> mounted) {
+        EquipmentType type = mounted.getType();
+        boolean isFixed = !mounted.isOmniPodMounted();
+        boolean isSlotOnlyEquipment = (type instanceof MiscType) && !type.isHittable();
+        boolean isWeightless = mounted.getTonnage() <= 0;
+        boolean isAutomaticClanCase = EquipmentTypeLookup.CLAN_CASE.equals(type.getInternalName());
+        return isFixed && isSlotOnlyEquipment && isWeightless && !isAutomaticClanCase;
     }
 
     /**

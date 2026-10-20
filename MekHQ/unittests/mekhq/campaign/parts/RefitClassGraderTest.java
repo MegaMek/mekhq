@@ -35,12 +35,14 @@ package mekhq.campaign.parts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.CriticalSlot;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscMounted;
@@ -259,6 +261,67 @@ class RefitClassGraderTest {
         grader.gradeWholeUnitChanges(entityWithMisc(), entityWithMisc());
 
         assertEquals(Refit.NO_CHANGE, grader.getRefitClass());
+    }
+
+    @Test
+    void endoSteelInTheSamePlacesIsNoChange() {
+        // Two Endo Steel slots in the left torso before and after, wherever they sit in it, is a pod swap
+        Entity oldEntity = entityWithEndoSteel(0, 0, 2, 2);
+        Entity newEntity = entityWithEndoSteel(0, 0, 2, 2);
+
+        assertFalse(RefitClassGrader.haveWeightlessSlotsChanged(oldEntity, newEntity));
+        assertTrue(RefitClassGrader.getLocationsGainingWeightlessSlots(oldEntity, newEntity).isEmpty());
+    }
+
+    @Test
+    void endoSteelGoingFromTwoToOneIsAChange() {
+        Entity oldEntity = entityWithEndoSteel(0, 0, 2, 2);
+        Entity newEntity = entityWithEndoSteel(0, 0, 2, 1);
+
+        assertTrue(RefitClassGrader.haveWeightlessSlotsChanged(oldEntity, newEntity));
+        assertTrue(RefitClassGrader.getLocationsGainingWeightlessSlots(oldEntity, newEntity).isEmpty(),
+              "No location gains slots, so there is no move time");
+    }
+
+    @Test
+    void slotsMovedToTheOtherTorsoChargeThatLocation() {
+        // The Balius A carries three Ferro-Fibrous slots in one side torso; the Prime carries them in the other
+        Entity oldEntity = entityWithEndoSteel(0, 0, 0, 3);
+        Entity newEntity = entityWithEndoSteel(0, 0, 3, 0);
+
+        assertTrue(RefitClassGrader.haveWeightlessSlotsChanged(oldEntity, newEntity));
+        assertEquals(List.of(2), RefitClassGrader.getLocationsGainingWeightlessSlots(oldEntity, newEntity));
+    }
+
+    @Test
+    void movedSlotsAreClassF() {
+        grader.gradeWeightlessSlotsMoved("Right Torso");
+
+        assertEquals(Refit.CLASS_F, grader.getRefitClass());
+    }
+
+    /**
+     * @param endoSteelSlotsByLocation how many Endo Steel slots each location holds, by location number
+     */
+    private static Entity entityWithEndoSteel(int... endoSteelSlotsByLocation) {
+        MiscType endoSteel = (MiscType) EquipmentType.get(EquipmentType.getStructureTypeName(
+              EquipmentType.T_STRUCTURE_ENDO_STEEL, false));
+        MiscMounted mounted = mock(MiscMounted.class);
+        when(mounted.getType()).thenReturn(endoSteel);
+        when(mounted.getTonnage()).thenReturn(0.0);
+        CriticalSlot criticalSlot = mock(CriticalSlot.class);
+        when(criticalSlot.getType()).thenReturn(CriticalSlot.TYPE_EQUIPMENT);
+        doReturn(mounted).when(criticalSlot).getMount();
+
+        Entity entity = mock(Entity.class);
+        when(entity.locations()).thenReturn(endoSteelSlotsByLocation.length);
+        for (int location = 0; location < endoSteelSlotsByLocation.length; location++) {
+            when(entity.getNumberOfCriticalSlots(location)).thenReturn(endoSteelSlotsByLocation[location]);
+            for (int slot = 0; slot < endoSteelSlotsByLocation[location]; slot++) {
+                when(entity.getCritical(location, slot)).thenReturn(criticalSlot);
+            }
+        }
+        return entity;
     }
 
     private static Entity entityWithMisc(EquipmentType... equipmentTypes) {

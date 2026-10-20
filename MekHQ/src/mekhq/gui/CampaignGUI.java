@@ -157,6 +157,7 @@ public class CampaignGUI extends JPanel {
     private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     /** The most reasons for a refit's class listed when the player is asked to confirm it */
     private static final int MAXIMUM_REFIT_CLASS_REASONS = 15;
+    private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1295,6 +1296,9 @@ public class CampaignGUI extends JPanel {
         String classExplanation = refit.explainRefitClass(MAXIMUM_REFIT_CLASS_REASONS);
         if (!classExplanation.isEmpty()) {
             question = classExplanation + "\n\n" + question;
+        }
+        if (refit.isLosingQualityForNoKit()) {
+            question = getTextAt(PARTS_RESOURCE_BUNDLE, "Refit.qualityWarning.noKit") + "\n\n" + question;
         }
         List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
         if (partsThatCannotBeBought.isEmpty()) {

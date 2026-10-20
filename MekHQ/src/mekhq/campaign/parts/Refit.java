@@ -397,13 +397,19 @@ public class Refit extends Part implements IAcquisitionWork {
         refitClass = NO_CHANGE;
         classGrader = new RefitClassGrader();
         boolean isOmniUnit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
-        boolean isFixedEquipmentChanged = isOmniUnit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity);
-        if (isFixedEquipmentChanged) {
+        boolean isFixedEquipmentAltered = isOmniUnit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity);
+        boolean isWeightlessSlotChanged = isOmniUnit
+              && RefitClassGrader.haveWeightlessSlotsChanged(oldUnit.getEntity(), newEntity);
+        boolean isFixedEquipmentChanged = isFixedEquipmentAltered || isWeightlessSlotChanged;
+        if (isFixedEquipmentAltered) {
             // An Omni unit's fixed components can be altered, as a Class F refit worked like any other (CamOps p.212)
             classGrader.gradeFixedOmniChange();
         }
         boolean isOmniRefit = isOmniUnit && !isFixedEquipmentChanged;
         time = 0;
+        if (isWeightlessSlotChanged) {
+            time += planWeightlessSlotMoves();
+        }
         sameArmorType = hasSameArmor(oldUnit.getEntity(), newEntity);
         int recycledArmorPoints = 0;
         boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
@@ -1409,6 +1415,69 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * @return {@code true} if a failed refit check costs the unit a quality level when the refit is done
+     */
+    public boolean isLosingQualityForFailedCheck() {
+        return !isRefurbishing && failedCheck;
+    }
+
+    /**
+     * Customization beyond Class B without a refit kit costs the unit a quality level, over and above any failed
+     * check (CamOps p.211). A kit avoids it, and a pod swap is quicker than any class.
+     *
+     * @return {@code true} if this refit costs the unit a quality level because no kit is used
+     */
+    public boolean isLosingQualityForNoKit() {
+        boolean isBeyondFieldWork = refitClass >= CLASS_C;
+        return !isRefurbishing && customJob && isBeyondFieldWork;
+    }
+
+    /**
+     * Lowers the quality of every part on the unit, new and old, by one level for each reason that applies, and tells
+     * the player why.
+     */
+    private void lowerQualityForTheWorkDone() {
+        List<String> reasonKeys = new ArrayList<>();
+        if (isLosingQualityForFailedCheck()) {
+            reasonKeys.add("Refit.qualityLost.failedCheck");
+        }
+        if (isLosingQualityForNoKit()) {
+            reasonKeys.add("Refit.qualityLost.noKit");
+        }
+        LOGGER.debug("[Refit] {}: loses {} quality levels on completion", oldUnit.getName(), reasonKeys.size());
+        for (String reasonKey : reasonKeys) {
+            for (Part part : oldUnit.getParts()) {
+                if (!(part instanceof MissingPart)) {
+                    part.reduceQuality();
+                }
+            }
+            campaign.addReport(TECHNICAL, getFormattedTextAt(REFIT_RESOURCE_BUNDLE, reasonKey,
+                  oldUnit.getHyperlinkedName(), getRefitClassName()));
+        }
+    }
+
+    /**
+     * Grades moving an Omni unit's weightless fixed slots, such as Endo Steel, and works out its time: a base 60
+     * minutes for each location the slots move to, however many move there (CamOps p.212, with errata).
+     *
+     * @return the base minutes for moving the slots
+     */
+    private int planWeightlessSlotMoves() {
+        List<Integer> locationsGainingSlots = RefitClassGrader.getLocationsGainingWeightlessSlots(oldUnit.getEntity(),
+              newEntity);
+        for (int location : locationsGainingSlots) {
+            classGrader.gradeWeightlessSlotsMoved(getLocationName(newEntity, location));
+        }
+        if (locationsGainingSlots.isEmpty()) {
+            // Slots only taken away, as when two Endo Steel slots become one: still a change to fixed components
+            classGrader.gradeFixedOmniChange();
+        }
+        LOGGER.debug("[RefitClass] {}: weightless fixed slots move into {} locations", oldUnit.getName(),
+              locationsGainingSlots.size());
+        return WORK_HOUR * locationsGainingSlots.size();
+    }
+
+    /**
      * Grades one part the new design adds, by the Campaign Operations customization rules (pp. 211-212).
      *
      * @param newPart              the new part, or the missing part standing in for it
@@ -2098,6 +2167,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         oldUnit.resetPilotAndEntity();
         addPartsForNewLocations();
+        lowerQualityForTheWorkDone();
 
         if (isRefurbishing) {
             for (Part part : oldUnit.getParts()) {
