@@ -553,13 +553,15 @@ public class PlanetViewPanel extends JScrollablePanel {
     private JTextPane createHtmlTextPane(String text) {
         JTextPane textPane = new JTextPane();
         HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
-        StyleSheet dossierStyleSheet = new StyleSheet();
+        textPane.setEditorKit(htmlEditorKit);
+        // Add rules to this document's own style sheet; HTMLEditorKit.setStyleSheet would replace the shared
+        // default style sheet used by every HTML pane in the application.
+        HTMLDocument document = (HTMLDocument) htmlEditorKit.createDefaultDocument();
+        StyleSheet dossierStyleSheet = document.getStyleSheet();
         dossierStyleSheet.addRule("body { color: #DAE7EB; margin: 0; padding: 0; }");
         dossierStyleSheet.addRule("p { margin: 0 0 0.5em 0; }");
         dossierStyleSheet.addRule("a { color: #41D2E0; }");
-        htmlEditorKit.setStyleSheet(dossierStyleSheet);
-        textPane.setEditorKit(htmlEditorKit);
-        textPane.setDocument(new HTMLDocument(dossierStyleSheet));
+        textPane.setDocument(document);
         textPane.setEditable(false);
         textPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         textPane.setOpaque(false);
