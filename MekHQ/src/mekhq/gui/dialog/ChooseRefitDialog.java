@@ -53,6 +53,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.entityreadout.EntityReadout;
+import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
@@ -80,6 +81,8 @@ import mekhq.campaign.work.WorkTimeFormatter;
 public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
+    /** The smallest a panel can be dragged to, so none disappears behind a divider */
+    private static final int MINIMUM_PANEL_SIZE = 100;
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -95,6 +98,9 @@ public class ChooseRefitDialog extends JDialog {
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
     private JScrollPane scrNewUnit;
+    private JSplitPane mainSplit;
+    private JSplitPane refitListSplit;
+    private JSplitPane unitReadoutSplit;
 
     private boolean confirmed = false;
     private boolean customize = false;
@@ -143,30 +149,12 @@ public class ChooseRefitDialog extends JDialog {
         JScrollPane scrRefitTable = new FastJScrollPane();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrRefitTable, gridBagConstraints);
 
         scrShoppingList = new FastJScrollPane();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "shoppingList.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrShoppingList.setMinimumSize(new Dimension(300, 200));
+        scrShoppingList.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrShoppingList.setPreferredSize(new Dimension(300, 200));
-        getContentPane().add(scrShoppingList, gridBagConstraints);
 
         JTextPane txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
@@ -176,19 +164,9 @@ public class ChooseRefitDialog extends JDialog {
         EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         scrOldUnit = new FastJScrollPane(txtOldUnit);
-        scrOldUnit.setMinimumSize(new Dimension(300, 400));
+        scrOldUnit.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrOldUnit, gridBagConstraints);
 
         txtNewUnit = new JTextPane();
         txtNewUnit.setEditable(false);
@@ -196,10 +174,28 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtNewUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new FastJScrollPane(txtNewUnit);
-        scrNewUnit.setMinimumSize(new Dimension(300, 400));
+        scrNewUnit.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrNewUnit.setPreferredSize(new Dimension(300, 400));
-        gridBagConstraints.gridx = 2;
-        getContentPane().add(scrNewUnit, gridBagConstraints);
+
+        // Each border between the panels can be dragged, and the dialog remembers where it was left
+        refitListSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrRefitTable, scrShoppingList);
+        refitListSplit.setName("refitListSplit");
+        refitListSplit.setResizeWeight(0.7);
+        unitReadoutSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrOldUnit, scrNewUnit);
+        unitReadoutSplit.setName("unitReadoutSplit");
+        unitReadoutSplit.setResizeWeight(0.5);
+        mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, refitListSplit, unitReadoutSplit);
+        mainSplit.setName("mainSplit");
+        mainSplit.setResizeWeight(0.4);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(mainSplit, gridBagConstraints);
 
         JPanel panBtn = new JPanel(new GridBagLayout());
 
@@ -219,8 +215,7 @@ public class ChooseRefitDialog extends JDialog {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -239,6 +234,9 @@ public class ChooseRefitDialog extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseRefitDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
+            preferences.manage(new JSplitPanePreference(mainSplit));
+            preferences.manage(new JSplitPanePreference(refitListSplit));
+            preferences.manage(new JSplitPanePreference(unitReadoutSplit));
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
         }
