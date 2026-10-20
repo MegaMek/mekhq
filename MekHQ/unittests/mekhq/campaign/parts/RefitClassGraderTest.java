@@ -67,7 +67,7 @@ class RefitClassGraderTest {
     @Test
     void nothingGradedIsNoChange() {
         assertEquals(Refit.NO_CHANGE, grader.getRefitClass());
-        assertEquals("", grader.explain(10));
+        assertTrue(grader.describeSteps().isEmpty());
     }
 
     @Test
@@ -196,18 +196,6 @@ class RefitClassGraderTest {
         assertEquals(2, reasons.size(), "Armor changed in two places is one reason");
         assertTrue(reasons.getFirst().contains("Moving Jump Jet from the Left Leg to the Left Torso"), reasons.getFirst());
         assertTrue(reasons.getFirst().startsWith(Refit.getRefitClassName(Refit.CLASS_C)), reasons.getFirst());
-    }
-
-    @Test
-    void aLongExplanationIsCutShortWithACount() {
-        for (int slot = 0; slot < 5; slot++) {
-            grader.gradeAddedComponent("Heat Sink " + slot, "Left Torso", false, false);
-        }
-
-        String explanation = grader.explain(3);
-
-        assertEquals(5, explanation.split("\n").length, "a heading, three reasons and the count of the rest");
-        assertTrue(explanation.endsWith("2 more"), explanation);
     }
 
     @Test

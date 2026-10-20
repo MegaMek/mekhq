@@ -110,32 +110,6 @@ public class RefitClassGrader {
         return new ArrayList<>(lines);
     }
 
-    /**
-     * Explains the refit's class for the player: a heading, then the reasons, the biggest first. A long list is cut
-     * short with a count of the reasons left out.
-     *
-     * @param maximumLines the most reasons to list
-     *
-     * @return the explanation, one reason to a line, or an empty string if nothing was graded
-     */
-    public String explain(int maximumLines) {
-        List<String> lines = describeSteps();
-        if (lines.isEmpty()) {
-            return "";
-        }
-        StringBuilder explanation = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              "RefitClass.explanation.header"));
-        for (String line : lines.subList(0, Math.min(maximumLines, lines.size()))) {
-            explanation.append('\n').append(line);
-        }
-        int linesLeftOut = lines.size() - maximumLines;
-        if (linesLeftOut > 0) {
-            explanation.append('\n').append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitClass.explanation.more",
-                  linesLeftOut));
-        }
-        return explanation.toString();
-    }
-
     private void raise(int stepClass, String reasonKey, Object... arguments) {
         String reason = getFormattedTextAt(RESOURCE_BUNDLE, reasonKey, arguments);
         steps.add(new RefitClassStep(stepClass, reason));

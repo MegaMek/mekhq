@@ -107,7 +107,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.RefitPurchaseCheck;
+import mekhq.campaign.parts.RefitBriefing;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -155,9 +155,6 @@ import mekhq.gui.view.CurrentLocationPanel;
 public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
     private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
-    /** The most reasons for a refit's class listed when the player is asked to confirm it */
-    private static final int MAXIMUM_REFIT_CLASS_REASONS = 15;
-    private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1246,17 +1243,11 @@ public class CampaignGUI extends JPanel {
             logger.debug("[RefitStart] {}: new model named", refit.getUnit().getName());
         }
         // TODO: allow overtime work?
-        // check to see if user really wants to do it - give some info on what
-        // will be done
-        // TODO: better information
-        // Every dialog here has the main window as its parent: a dialog without one can open behind MekHQ, which then
-        // looks frozen while it waits for an answer the player cannot see (issues #4072 and #4554)
+        // The chosen tech briefs the commander on the refit class and why. Every dialog here has the main window as
+        // its parent: a dialog without one can open behind MekHQ, which then looks frozen while it waits for an answer
+        // the player cannot see (issues #4072 and #4554); the immersive dialog opens over the main window.
         logger.debug("[RefitStart] {}: asking the player to confirm the refit", refit.getUnit().getName());
-        int response = JOptionPane.showConfirmDialog(frame,
-              getRefitConfirmation(campaign, refit),
-              getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.title"),
-              JOptionPane.YES_NO_OPTION);
-        if (response != JOptionPane.YES_OPTION) {
+        if (!isRefitConfirmed(refit)) {
             logger.debug("[RefitStart] {}: the refit was not confirmed", refit.getUnit().getName());
             return;
         }
@@ -1286,27 +1277,18 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the question asked before a refit or refurbishment starts, naming its refit class and the unit, and
-     *       warning about parts the refit needs but the campaign may not buy
+     * Has the tech chosen for the refit brief the commander on its class and why, with any rules the player should
+     * know, such as a loss of quality, and asks whether to begin.
+     *
+     * @return {@code true} if the player chose to begin the refit
      */
-    private static String getRefitConfirmation(Campaign campaign, Refit refit) {
-        String key = refit.isBeingRefurbished() ? "refitConfirm.refurbish.text" : "refitConfirm.refit.text";
-        String question = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, key, refit.getRefitClassName(),
-              refit.getUnit().getName());
-        String classExplanation = refit.explainRefitClass(MAXIMUM_REFIT_CLASS_REASONS);
-        if (!classExplanation.isEmpty()) {
-            question = classExplanation + "\n\n" + question;
-        }
-        if (refit.isLosingQualityForNoKit()) {
-            question = getTextAt(PARTS_RESOURCE_BUNDLE, "Refit.qualityWarning.noKit") + "\n\n" + question;
-        }
-        List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
-        if (partsThatCannotBeBought.isEmpty()) {
-            return question;
-        }
-        String warning = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.cannotBuy.text",
-              String.join(", ", partsThatCannotBeBought));
-        return warning + "\n\n" + question;
+    private boolean isRefitConfirmed(Refit refit) {
+        List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.cancel"),
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.begin"));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
+              RefitBriefing.describeInCharacter(getCampaign(), refit), buttons,
+              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false);
+        return dialog.getDialogChoice() == 1;
     }
 
     /**

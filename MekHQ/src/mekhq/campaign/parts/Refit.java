@@ -285,16 +285,6 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @param maximumLines the most reasons to list
-     *
-     * @return why this refit is its class, for the player to read before it starts; empty for a refit loaded from a
-     *       save
-     */
-    public String explainRefitClass(int maximumLines) {
-        return classGrader.explain(maximumLines);
-    }
-
-    /**
      * @return The cost of carrying out this refit
      */
     public Money getCost() {

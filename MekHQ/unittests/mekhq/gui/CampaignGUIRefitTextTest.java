@@ -51,7 +51,7 @@ class CampaignGUIRefitTextTest {
     @ValueSource(strings = { "refitSelectTech.title", "refitSelectTech.prompt", "refitSelectTech.noTechs.title",
                              "refitSelectTech.noTechs.text", "refitSelectTech.wrongType.title",
                              "refitSelectTech.wrongType.text", "refitNoEngineer.title", "refitNoEngineer.text",
-                             "refitConfirm.title", "refitLoadFailed.title", "refitLoadFailed.text",
+                             "refitConfirm.button.cancel", "refitConfirm.button.begin", "refitLoadFailed.title", "refitLoadFailed.text",
                              "refitIOException.title", "refitEngineerCannotWork.title" })
     void plainRefitTextExists(String key) {
         String text = getFormattedTextAt(BUNDLE, key);
@@ -65,15 +65,6 @@ class CampaignGUIRefitTextTest {
 
         assertFalse(text.contains("{"), text);
         assertEquals(true, text.contains("ER Medium Laser") && text.contains("campaign's"), text);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "refitConfirm.refit.text", "refitConfirm.refurbish.text" })
-    void refitConfirmationNamesTheClassAndTheUnit(String key) {
-        String text = getFormattedTextAt(BUNDLE, key, "Class C", "Locust LCT-1V");
-
-        assertFalse(text.contains("{"), text);
-        assertEquals(true, text.contains("Class C") && text.contains("Locust LCT-1V"), text);
     }
 
     @ParameterizedTest
