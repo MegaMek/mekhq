@@ -186,4 +186,22 @@ public class EntityUtilities {
 
         return false;
     }
+
+    /**
+     * Determines whether the given {@link Entity} carries a working Satellite Imager (TO:AUE p.151-152): a
+     * Hyperspectral Imager, High-Resolution Imager, Infrared Imager, or Look-Down Radar.
+     *
+     * @param entity the {@link Entity} to check for a satellite imager
+     *
+     * @return {@code true} if the entity has at least one working satellite imager
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasSatelliteImager(Entity entity) {
+        return entity.hasWorkingMisc(MiscType.F_HYPERSPECTRAL_IMAGER)
+                     || entity.hasWorkingMisc(MiscType.F_HIRES_IMAGER)
+                     || entity.hasWorkingMisc(MiscType.F_INFRARED_IMAGER)
+                     || entity.hasWorkingMisc(MiscType.F_LOOKDOWN_RADAR);
+    }
 }

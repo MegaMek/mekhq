@@ -39,17 +39,21 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Sensor;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the sensor equipment checks used by StratCon advanced scouting.
@@ -223,6 +227,36 @@ class EntityUtilitiesTest {
             when(aero.hasWorkingMisc(MiscType.F_RECON_CAMERA)).thenReturn(true);
             when(aero.getBombChoices()).thenReturn(new BombLoadout());
             assertTrue(EntityUtilities.hasReconCamera(aero));
+        }
+    }
+
+    static Stream<MiscTypeFlag> satelliteImagerFlags() {
+        return Stream.of(MiscType.F_HYPERSPECTRAL_IMAGER,
+              MiscType.F_HIRES_IMAGER,
+              MiscType.F_INFRARED_IMAGER,
+              MiscType.F_LOOKDOWN_RADAR);
+    }
+
+    @Nested
+    class SatelliteImager {
+        @ParameterizedTest
+        @MethodSource("mekhq.utilities.EntityUtilitiesTest#satelliteImagerFlags")
+        void eachWorkingImagerType_counts(MiscTypeFlag flag) {
+            Entity entity = mock(Entity.class);
+            when(entity.hasWorkingMisc(flag)).thenReturn(true);
+            assertTrue(EntityUtilities.hasSatelliteImager(entity));
+        }
+
+        @Test
+        void noWorkingImager_doesNotCount() {
+            assertFalse(EntityUtilities.hasSatelliteImager(mock(Entity.class)));
+        }
+
+        @Test
+        void reconCamera_isNotASatelliteImager() {
+            Entity entity = mock(Entity.class);
+            when(entity.hasWorkingMisc(MiscType.F_RECON_CAMERA)).thenReturn(true);
+            assertFalse(EntityUtilities.hasSatelliteImager(entity));
         }
     }
 
