@@ -171,6 +171,8 @@ public class ContractNegotiationDialog extends JDialog {
     private final JLabel bankValue = new JLabel();
     private final JPanel negotiatorHolder = Hud.transparentPanel(new BorderLayout());
     private final JPanel employerHolder = Hud.transparentPanel(new BorderLayout());
+    /** Says why re-negotiation is closed while the terms differ from the employer's offer. */
+    private JTextArea termsChangedNote;
     private final JPanel impactHolder = Hud.transparentPanel(new BorderLayout());
     private final JLabel attemptsLabel = HudStyle.keyLabel("");
     private final HudVerdictBanner resultBanner = new HudVerdictBanner();
@@ -535,6 +537,10 @@ public class ContractNegotiationDialog extends JDialog {
         content.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.renegotiate.explain"), TEXT_FAINT, Font.PLAIN, 0.84f)));
         content.add(Box.createVerticalStrut(scaleForGUI(8)));
+        termsChangedNote = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.renegotiate.termsChanged"), AMBER, Font.PLAIN, 0.84f);
+        termsChangedNote.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(8), 0));
+        content.add(leftAligned(termsChangedNote));
 
         haggleButton = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.haggle")
                                                   .toUpperCase(Locale.ROOT),
@@ -1167,13 +1173,15 @@ public class ContractNegotiationDialog extends JDialog {
     /**
      * Runs one active-negotiation attempt: an opposed Negotiation check between the player's and the employer's
      * negotiators. {@code haggle} presses for a better offer - each margin-of-success level the player wins improves a
-     * random term one meaningful step, each level lost lowers one, and the outcome becomes a fresh baseline, clearing
-     * any manual haggling. Otherwise it asks for an exception - the stakes are the non-negotiable flags. Either way the
-     * result is committed immediately and cannot be undone. The confirm-twice buttons stand in for the old prompt, so a
-     * stray click never spends the attempt.
+     * random term one meaningful step, each level lost lowers one, and the outcome becomes a fresh baseline. Otherwise
+     * it asks for an exception - the stakes are the non-negotiable flags. Either way the
+     * result is committed immediately and cannot be undone. It is only open while every term matches the employer's
+     * offer (see {@link #termsChanged()}). The confirm-twice buttons stand in for the old prompt, so a stray click
+     * never spends the attempt.
      */
     private void renegotiate(boolean haggle) {
-        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()) {
+        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()
+                  || termsChanged()) {
             return;
         }
         if (haggle) {
@@ -1378,6 +1386,19 @@ public class ContractNegotiationDialog extends JDialog {
                      : NegotiationStepMath.nextLowerDifferentStep(clause.term, from);
     }
 
+    /**
+     * Whether any term differs from the employer's offer. Re-negotiation is only open while none do, so an attempt
+     * never has to settle what becomes of steps the player has already raised or given up.
+     */
+    private boolean termsChanged() {
+        for (Clause clause : Clause.values()) {
+            if (currentStep[clause.ordinal()] != originalStep[clause.ordinal()]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** How many re-negotiation attempts have already been spent on this contract. */
     private int attemptsSoFar() {
         ActiveNegotiationData data = contract.getActiveNegotiationData();
@@ -1402,11 +1423,20 @@ public class ContractNegotiationDialog extends JDialog {
         }
         boolean hasNegotiator = contract.getPlayerNegotiator() != null;
         int left = max(0, maxRenegotiationAttempts() - attemptsSoFar());
-        boolean available = hasNegotiator && left > 0;
-        String tooltipKey = !hasNegotiator
-                                  ? "negotiate.contractMarket.renegotiate.tooltip.noNegotiator"
-                                  : (left == 0 ? "negotiate.contractMarket.renegotiate.tooltip.spent"
-                                           : "negotiate.contractMarket.renegotiate.tooltip");
+        boolean termsChanged = termsChanged();
+        boolean available = hasNegotiator && left > 0 && !termsChanged;
+        String tooltipKey;
+        if (!hasNegotiator) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.noNegotiator";
+        } else if (left == 0) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.spent";
+        } else if (termsChanged) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.termsChanged";
+        } else {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip";
+        }
+        // The note only matters while an attempt could otherwise be made.
+        termsChangedNote.setVisible(hasNegotiator && left > 0 && termsChanged);
         for (HudConfirmButton button : List.of(haggleButton, exceptionButton)) {
             button.reset();
             button.setArmed(available);
