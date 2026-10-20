@@ -443,26 +443,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Pre-0.51.02 compatibility handler: triple-strength myomer and prosthetic leg MASC are now worked out each day
-     * from the prosthetics a person carries, as dermal armour already was. Anyone holding one of these implants with
-     * none of the prosthetics behind it has them recorded, so the daily check doesn't take the implant away.
-     *
-     * <p>This runs once every node is parsed, as personnel can arrive either in the legacy {@code <personnel>} node or
-     * inside {@code <humanResources>}.</p>
-     *
-     * @param campaign the campaign being loaded
-     * @param version  the version the save was written by
-     */
-    static void migrateDerivedImplantProsthetics(Campaign campaign, Version version) {
-        if (version.isLowerThan(new Version("0.51.02"))
-                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
-            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
-                AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
-            }
-        }
-    }
-
-    /**
      * Migrates persons mid-journey on legacy saves (pre-location-tree) into real {@link CurrentLocation} nodes so they
      * are handled by the location-aware travel code.
      *
