@@ -90,6 +90,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Era;
 import megamek.common.enums.Faction;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
@@ -6981,7 +6982,37 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public int getFullCrewSize() {
+        if (isGunneryCoveredByDniDriver()) {
+            return Compute.getFullCrewSize(entity) - Compute.getTotalGunnerNeeds(entity);
+        }
         return Compute.getFullCrewSize(entity);
+    }
+
+    /**
+     * Whether this vehicle's driver handles its gunnery through a Direct Neural Interface, so it needs no gunners.
+     *
+     * <p>This holds when the unit is a vehicle and one of its drivers carries a VDNI or Buffered VDNI implant that the
+     * campaign's neural interface setting lets work in this vehicle: under Pilot Abilities Only the implant alone is
+     * enough, while under Full Tracking the vehicle must also carry the DNI Cockpit Modification. Non-gunner seats
+     * (communications, MASH, field kitchen, extra crew seats) still need crew.</p>
+     *
+     * @return {@code true} if the vehicle's gunner seats are covered by its DNI-linked driver
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isGunneryCoveredByDniDriver() {
+        if (!(entity instanceof Tank) || (campaign == null)) {
+            return false;
+        }
+
+        boolean hasDniDriver = drivers.stream().anyMatch(driver -> {
+            PersonnelOptions options = driver.getOptions();
+            return options.booleanOption(OptionsConstants.MD_VDNI) || options.booleanOption(OptionsConstants.MD_BVDNI);
+        });
+
+        return NeuralInterfaceMode.from(campaign.getGameOptions()).grantsBenefit(hasDniDriver,
+              entity.hasDNICockpitMod());
     }
 
     public int getTotalDriverNeeds() {
@@ -7086,6 +7117,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public int getTotalGunnerNeeds() {
+        if (isGunneryCoveredByDniDriver()) {
+            return 0;
+        }
         return Compute.getTotalGunnerNeeds(entity);
     }
 
