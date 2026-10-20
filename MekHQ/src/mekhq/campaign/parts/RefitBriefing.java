@@ -38,7 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.work.WorkTimeEstimate;
+import mekhq.campaign.work.WorkTimeFormatter;
 
 /**
  * The briefing the tech gives before a refit starts: what class of refit it is and why, followed by the rules the
@@ -89,6 +92,38 @@ public final class RefitBriefing {
         }
         briefing.append(getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.question"));
         return briefing.toString();
+    }
+
+    /**
+     * What the tech tells the commander when the refit check fails, as HTML. A refit must be done over, so the tech
+     * says how much longer it will take; a refurbishment is lost.
+     *
+     * @param campaign the campaign, for how the commander is addressed and the date
+     * @param refit    the refit whose check failed
+     *
+     * @return the tech's report
+     */
+    public static String describeFailedCheck(Campaign campaign, Refit refit) {
+        String commander = campaign.getCommanderAddress();
+        String unitName = refit.getUnit().getName();
+        if (refit.isBeingRefurbished()) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.failed.refurbish", commander, unitName);
+        }
+        int minutesPerDay = WorkTimeEstimate.getMinutesPerDay(campaign, refit.getTech(), false);
+        String timeLeft = WorkTimeFormatter.formatDuration(refit.getTimeLeft(), minutesPerDay,
+              campaign.getLocalDate(), MekHQ.getMHQOptions().getWorkTimeDisplay());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RefitBriefing.failed.refit", commander, unitName, timeLeft);
+    }
+
+    /**
+     * @param refit the refit whose check failed
+     *
+     * @return the rule behind a failed check, for the player
+     */
+    public static String describeFailedCheckRules(Refit refit) {
+        String key = refit.isBeingRefurbished() ? "RefitBriefing.failed.refurbish.rules"
+                           : "RefitBriefing.failed.refit.rules";
+        return getFormattedTextAt(RESOURCE_BUNDLE, key);
     }
 
     /**

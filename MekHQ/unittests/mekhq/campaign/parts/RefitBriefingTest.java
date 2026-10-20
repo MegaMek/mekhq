@@ -85,6 +85,30 @@ class RefitBriefingTest {
     }
 
     @Test
+    void aFailedCheckSaysHowMuchLongerTheRefitTakes() {
+        Refit refit = planWolverineRefit(REFIT_KIT);
+        refit.fail(0);
+
+        String report = RefitBriefing.describeFailedCheck(scenario.getCampaign(), refit);
+
+        // 2,750 minutes of work again at a plain 8-hour day runs into a sixth day
+        assertTrue(report.contains(wolverine.getName()), report);
+        assertTrue(report.contains("6 days"), report);
+        assertTrue(RefitBriefing.describeFailedCheckRules(refit).contains("time doubles"));
+        assertFalse(report.contains("{"), report);
+    }
+
+    @Test
+    void aFailedRefurbishmentIsLost() {
+        Refit refurbishment = new Refit(wolverine, wolverine.getEntity(), false, true, false);
+
+        String report = RefitBriefing.describeFailedCheck(scenario.getCampaign(), refurbishment);
+
+        assertTrue(report.contains("has failed"), report);
+        assertFalse(report.contains("{"), report);
+    }
+
+    @Test
     void refurbishmentIsBriefedAsAFactoryJob() {
         Refit refurbishment = new Refit(wolverine, wolverine.getEntity(), false, true, false);
 

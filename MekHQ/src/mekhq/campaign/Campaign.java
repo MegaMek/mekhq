@@ -146,6 +146,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.events.*;
+import mekhq.campaign.events.RefitCheckFailedEvent;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
@@ -2829,6 +2830,7 @@ public class Campaign implements ITechManager {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
