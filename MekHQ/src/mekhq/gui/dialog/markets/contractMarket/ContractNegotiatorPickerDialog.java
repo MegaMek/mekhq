@@ -91,7 +91,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
      * the detail pane. Kept in sync with {@code ContractNegotiationDialog}: manual-haggle caps, the two re-negotiation
      * options, the general penalty, the extra attempt, and the Edge trigger.
      */
-    private static final String[] RELEVANT_TRAITS = {
+    static final String[] RELEVANT_TRAITS = {
           PersonnelOptions.HARD_BARGAINER, PersonnelOptions.PUSHOVER,
           PersonnelOptions.SHREWD_TRADER, PersonnelOptions.INFLEXIBLE,
           PersonnelOptions.FINE_PRINT_READER, PersonnelOptions.EASILY_FOOLED,
