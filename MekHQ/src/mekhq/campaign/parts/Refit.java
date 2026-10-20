@@ -1613,11 +1613,11 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * Grades one part the new design adds, by the Campaign Operations customization rules (pp. 211-212).
      *
-     * @param newPart              the new part, or the missing part standing in for it
-     * @param newUnit              a unit holding the new design
-     * @param isOmniRefit          {@code true} if this is a pod swap on an Omni unit
-     * @param locationHasNewStuff  marks the locations that receive something new
-     * @param locationLostOldStuff the locations losing something in this refit
+     * @param newPart                 the new part, or the missing part standing in for it
+     * @param newUnit                 a unit holding the new design
+     * @param isOmniRefit             {@code true} if this is a pod swap on an Omni unit
+     * @param locationHasNewStuff     marks the locations that receive something new
+     * @param locationHadPartsRemoved the locations that have a part taken out in this refit
      */
     private void gradeNewPart(Part newPart, Unit newUnit, boolean isOmniRefit, boolean[] locationHasNewStuff,
           boolean[] locationHadPartsRemoved) {
