@@ -385,6 +385,7 @@ public class Person implements ILocatable {
     private int eduDaysOfTravel;
     private transient String legacyEduAcademySystem;
     private List<UUID> eduTagAlongs;
+    private UUID eduOriginBaseId;
     private List<String> eduFailedApplications;
     private double trainingForceEducationTime;
     // endregion Education
@@ -648,6 +649,7 @@ public class Person implements ILocatable {
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduTagAlongs = new ArrayList<>();
+        eduOriginBaseId = null;
         eduFailedApplications = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
@@ -1929,6 +1931,7 @@ public class Person implements ILocatable {
         this.setEduJourneyTime(0);
         this.setEduEducationTime(0);
         this.setEduDaysOfTravel(0);
+        this.setEduOriginBaseId(null);
 
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
@@ -3203,6 +3206,18 @@ public class Person implements ILocatable {
         this.eduTagAlongs.add(tagAlong);
     }
 
+    /**
+     * Returns the id of the {@link mekhq.campaign.base.PlayerBase} this person left from to attend an academy, or
+     * {@code null} if they left from the main force. Students return here once their education ends.
+     */
+    public @Nullable UUID getEduOriginBaseId() {
+        return eduOriginBaseId;
+    }
+
+    public void setEduOriginBaseId(final @Nullable UUID eduOriginBaseId) {
+        this.eduOriginBaseId = eduOriginBaseId;
+    }
+
     public List<String> getEduFailedApplications() {
         return eduFailedApplications;
     }
@@ -4179,6 +4194,10 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
             }
 
+            if (eduOriginBaseId != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduOriginBaseId", eduOriginBaseId);
+            }
+
             if (!eduTagAlongs.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduFailedApplications");
 
@@ -4939,6 +4958,8 @@ public class Person implements ILocatable {
                             }
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("eduOriginBaseId")) {
+                    person.eduOriginBaseId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                     if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                         NodeList nodes = wn2.getChildNodes();

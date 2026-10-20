@@ -260,13 +260,13 @@ class EducationControllerTest {
             when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
             when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
-            when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);
             when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
 
             PlanetarySystem currentSystem = mock(PlanetarySystem.class);
             when(currentSystem.getId()).thenReturn("CurrentSystem");
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+            when(campaign.getSimplifiedTravelTime(currentSystem, destSystem)).thenReturn(5);
         }
 
         @Test
@@ -430,7 +430,7 @@ class EducationControllerTest {
             CurrentLocation travelNode = strandTravelerAt(academySystem);
             Detachment homeDetachment = new Detachment();
             homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
-            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+            when(forceDetachment.getPersonnel()).thenReturn(homeDetachment.getPersonnel());
             CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
 
             try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
@@ -472,7 +472,7 @@ class EducationControllerTest {
             strandTravelerAt(academySystem);
             Detachment homeDetachment = new Detachment();
             homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
-            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+            when(forceDetachment.getPersonnel()).thenReturn(homeDetachment.getPersonnel());
 
             person.setStatus(PersonnelStatus.STUDENT);
             Person campFollower = addTagAlong(PersonnelStatus.CAMP_FOLLOWER);
