@@ -46,7 +46,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.View;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
@@ -469,5 +471,43 @@ final class MarketHud {
         panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
               BorderFactory.createEmptyBorder(inset, inset, inset, inset)));
         return panel;
+    }
+
+    /**
+     * A label for HTML text that wraps to the width its layout gives it and grows tall enough for every line. A plain
+     * {@link JLabel} keeps the one-line height it measured before it knew its width, so wrapped lines overlap whatever
+     * sits below. Its preferred width never exceeds the width it was last given, and it can shrink to nothing, so it
+     * never widens the row it sits in.
+     */
+    static final class WrappingLabel extends JLabel {
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension natural = super.getPreferredSize();
+            int width = getWidth();
+            View view = (View) getClientProperty(BasicHTML.propertyKey);
+            if (view == null || width <= 0 || natural.width <= width) {
+                return natural;
+            }
+            Insets insets = getInsets();
+            int textWidth = Math.max(1, width - insets.left - insets.right);
+            view.setSize(textWidth, 0);
+            int height = (int) Math.ceil(view.getPreferredSpan(View.Y_AXIS)) + insets.top + insets.bottom;
+            return new Dimension(width, height);
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            return new Dimension(0, getPreferredSize().height);
+        }
+
+        @Override
+        public void setBounds(int x, int y, int width, int height) {
+            boolean resized = width != getWidth();
+            super.setBounds(x, y, width, height);
+            if (resized) {
+                // Its height depends on its width, so lay out again now the width is known.
+                SwingUtilities.invokeLater(this::revalidate);
+            }
+        }
     }
 }

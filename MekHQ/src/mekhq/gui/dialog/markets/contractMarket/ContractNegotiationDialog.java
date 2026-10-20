@@ -1687,8 +1687,8 @@ public class ContractNegotiationDialog extends JDialog {
         private final Clause clause;
         private final JPanel panel = new JPanel(new GridBagLayout());
         private final Track track;
-        private final JLabel value = new JLabel();
-        private final JLabel why = new JLabel();
+        private final JLabel value = new MarketHud.WrappingLabel();
+        private final JLabel why = new MarketHud.WrappingLabel();
         private final HudButton lowerButton;
         private final HudButton raiseButton;
         private final JLabel lockBadge = new JLabel();
@@ -1800,8 +1800,6 @@ public class ContractNegotiationDialog extends JDialog {
                       .append("</span>");
             }
             value.setText(html.append("</html>").toString());
-            // The effect gives way rather than widening the row when the window narrows, but keeps its height.
-            value.setMinimumSize(new Dimension(0, value.getPreferredSize().height));
             if (delta != 0 && originalValue.equals(proposedValue)) {
                 value.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                       "negotiate.contractMarket.plateau.tooltip")));
@@ -1841,7 +1839,7 @@ public class ContractNegotiationDialog extends JDialog {
                 controls.add(raiseButton);
             }
             String reason = raiseBlockReason(clause);
-            why.setText(reason == null ? " " : reason);
+            why.setText(reason == null ? " " : "<html>" + MarketHud.escape(reason) + "</html>");
             track.repaint();
             controls.revalidate();
             controls.repaint();
