@@ -86,6 +86,39 @@ public final class WorkTimeEstimate {
     }
 
     /**
+     * The minutes a tech has for jobs on an average working day, once their maintenance is done. Maintenance only
+     * takes a tech's minutes on the day a unit's check is due, so each unit's check is spread over its cycle: a tech
+     * whose two units need 240 minutes each every 7 days spends about 69 minutes a day on them, not 480.
+     *
+     * @param campaign the campaign, for the maintenance options
+     * @param tech     the tech
+     *
+     * @return the minutes free for jobs each day, never less than one
+     */
+    public static int getMinutesFreeForJobsPerDay(Campaign campaign, Person tech) {
+        int minutesPerDay = getMinutesPerDay(campaign, tech, false);
+        return Math.max(1, (int) Math.round(minutesPerDay - getAverageDailyMaintenanceMinutes(campaign, tech)));
+    }
+
+    /**
+     * @return the minutes a tech spends on maintenance on an average day, each unit's check spread over its cycle
+     */
+    private static double getAverageDailyMaintenanceMinutes(Campaign campaign, Person tech) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
+            return 0;
+        }
+        int maintenanceCycleDays = campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
+        double dailyMinutes = 0;
+        for (Unit unit : tech.getTechUnits()) {
+            if (unit.requiresMaintenance()) {
+                int cycleDays = Math.max(1, unit.getMaintenanceCycleDuration(maintenanceCycleDays));
+                dailyMinutes += (double) unit.getMaintenanceTime() / cycleDays;
+            }
+        }
+        return dailyMinutes;
+    }
+
+    /**
      * Describes the time left on a job, for example {@code 3 days (2 days with overtime)}.
      *
      * @param campaign the campaign
