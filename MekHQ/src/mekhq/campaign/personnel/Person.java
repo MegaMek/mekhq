@@ -7222,6 +7222,8 @@ public class Person implements ILocatable {
     public int getMaintenanceTimeUsing() {
         return getTechUnits().stream()
                      .filter(unit -> !(unit.isRefitting() && unit.getRefit().getTech() == this))
+                     // Units in salvage mode are not maintained, so they take none of the tech's time
+                     .filter(unit -> !unit.isSalvage())
                      .mapToInt(Unit::getMaintenanceTime)
                      .sum();
     }

@@ -835,6 +835,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             for (Unit unit : units) {
+                if (unit.isSalvage()) {
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "maintenanceAdHoc.salvage",
+                          unit.getHyperlinkedName()));
+                    continue;
+                }
                 if (!unit.requiresMaintenance()) {
                     campaign.addReport(TECHNICAL, String.format(getText("maintenanceAdHoc.noNeed"),
                           unit.getHyperlinkedName()));
