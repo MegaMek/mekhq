@@ -67,6 +67,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitDesignSearch;
 import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
@@ -82,6 +83,8 @@ public class ChooseRefitDialog extends JDialog {
     private final Campaign campaign;
     private final Unit unit;
     private RefitTableModel refitModel;
+    private RefitDesignSearch.Result designSearch;
+    private int failedRefitCheck;
 
     private JButton btnRefit;
     private JButton btnCustomize;
@@ -104,6 +107,7 @@ public class ChooseRefitDialog extends JDialog {
         this.unit = unit;
         populateRefits();
         initComponents();
+        showWhyNoRefitsWhenEmpty();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -297,24 +301,41 @@ public class ChooseRefitDialog extends JDialog {
 
     private void populateRefits() {
         List<Refit> refits = new ArrayList<>();
-        Entity e = unit.getEntity();
-        String chassis = e.getFullChassis();
-        for (String model : Utilities.getAllVariants(e, campaign)) {
+        Entity entity = unit.getEntity();
+        String chassis = entity.getFullChassis();
+        designSearch = RefitDesignSearch.findDesigns(entity, campaign);
+        failedRefitCheck = 0;
+        for (String model : designSearch.models()) {
             model = StringUtility.isNullOrBlank(model) ? "" : " " + model;
             try {
                 MekSummary summary = Utilities.retrieveUnit(chassis + model);
-                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                if (null != refitEn) {
-                    Refit r = new Refit(unit, refitEn, false, false, false);
-                    if (null == r.checkFixable()) {
-                        refits.add(r);
+                Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (null != refitEntity) {
+                    Refit refit = new Refit(unit, refitEntity, false, false, false);
+                    String refitProblem = refit.checkFixable();
+                    if (null == refitProblem) {
+                        refits.add(refit);
+                    } else {
+                        logger.trace("[RefitDesigns] {}: refused by the refit check: {}", summary.getName(),
+                              refitProblem);
+                        failedRefitCheck++;
                     }
                 }
-            } catch (EntityLoadingException ex) {
-                logger.error("", ex);
+            } catch (EntityLoadingException exception) {
+                logger.error("", exception);
             }
         }
         refitModel = new RefitTableModel(refits);
+    }
+
+    /** When no refit can be offered, tells the player why in the panel that would show the selected design. */
+    private void showWhyNoRefitsWhenEmpty() {
+        if (refitModel.getRowCount() > 0) {
+            return;
+        }
+        logger.debug("[RefitDesigns] {}: no refits offered, {} refused by the refit check", unit.getName(),
+              failedRefitCheck);
+        txtNewUnit.setText(designSearch.describeEmptyList(unit.getName(), failedRefitCheck));
     }
 
     /**
