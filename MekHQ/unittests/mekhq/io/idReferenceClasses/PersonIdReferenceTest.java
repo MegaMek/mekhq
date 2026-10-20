@@ -35,11 +35,10 @@ package mekhq.io.idReferenceClasses;
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,6 +46,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -190,5 +190,57 @@ public class PersonIdReferenceTest {
         PersonIdReference.fixGenealogyReferences(mockCampaign, origin);
         assertFalse(origin.getGenealogy().getFamily().containsKey(FamilialRelationshipType.PARENT));
         assertEquals(0, origin.getGenealogy().getFamily().size());
+    }
+
+    @Test
+    public void testFixImportedPersonnelReferencesMissingSpouseRevertsToMaidenName() {
+        final Person imported = new Person("Jane", "Married", mockCampaign, "MERC");
+        imported.setMaidenName("Maiden");
+        imported.getGenealogy().setSpouse(new PersonIdReference(UUID.randomUUID().toString()));
+
+        PersonIdReference.fixImportedPersonnelReferences(mockCampaign, List.of(imported));
+
+        assertFalse(imported.getGenealogy().hasSpouse());
+        assertEquals("Maiden", imported.getSurname());
+    }
+
+    @Test
+    public void testFixImportedPersonnelReferencesKnownSpouseIsResolved() {
+        final Person spouse = new Person(mockCampaign, "MERC");
+        final Person imported = new Person("Jane", "Married", mockCampaign, "MERC");
+        imported.setMaidenName("Maiden");
+        imported.getGenealogy().setSpouse(new PersonIdReference(spouse.getId().toString()));
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
+
+        PersonIdReference.fixImportedPersonnelReferences(mockCampaign, List.of(imported));
+
+        assertSame(spouse, imported.getGenealogy().getSpouse());
+        assertEquals("Married", imported.getSurname());
+    }
+
+    @Test
+    public void testFixImportedPersonnelReferencesResolvesFamilyAndDropsMissingRelatives() {
+        final Person parent = new Person("Parent", "Surname", mockCampaign, "MERC");
+        final UUID missingChildId = UUID.randomUUID();
+        final Person imported = new Person(mockCampaign, "MERC");
+        imported.getGenealogy().getFamily().put(FamilialRelationshipType.PARENT, new ArrayList<>());
+        imported.getGenealogy()
+              .getFamily()
+              .get(FamilialRelationshipType.PARENT)
+              .add(new PersonIdReference(parent.getId().toString()));
+        imported.getGenealogy().getFamily().put(FamilialRelationshipType.CHILD, new ArrayList<>());
+        imported.getGenealogy()
+              .getFamily()
+              .get(FamilialRelationshipType.CHILD)
+              .add(new PersonIdReference(missingChildId.toString()));
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(missingChildId)))).willReturn(null);
+        given(mockCampaign.getPlayerForce().getHumanResources().getPerson(argThat(matchPersonUUID(parent.getId())))).willReturn(parent);
+
+        PersonIdReference.fixImportedPersonnelReferences(mockCampaign, List.of(imported));
+
+        assertFalse(imported.getGenealogy().getFamily().containsKey(FamilialRelationshipType.CHILD));
+        final Person resolvedParent = imported.getGenealogy().getFamily().get(FamilialRelationshipType.PARENT).getFirst();
+        assertSame(parent, resolvedParent);
+        assertEquals("Parent", resolvedParent.getFirstName());
     }
 }
