@@ -39,6 +39,7 @@ import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
 import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
+import static mekhq.campaign.mission.utilities.CombatRole.TRAINING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -256,12 +257,12 @@ class AtBDynamicScenarioFactoryTest {
         LocalHangar hangar = mock(LocalHangar.class);
         AtBDynamicScenario scenario = mockScenario(T_GROUND);
 
-        CombatTeam maneuverTeam = mockCombatTeam(MANEUVER, mockFormationWithBV(campaign, hangar, false, 4000));
+        CombatTeam trainingTeam = mockCombatTeam(TRAINING, mockFormationWithBV(campaign, hangar, false, 4000));
         CombatTeam patrolTeam = mockCombatTeam(PATROL, mockFormationWithBV(campaign, hangar, false, 6000));
 
         when(campaign.getPlayerForce()).thenReturn(playerForce);
         when(playerForce.getHangar()).thenReturn(hangar);
-        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(maneuverTeam, patrolTeam));
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(trainingTeam, patrolTeam));
 
         int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
 
