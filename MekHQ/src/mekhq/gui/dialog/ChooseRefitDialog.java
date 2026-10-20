@@ -55,6 +55,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -85,6 +86,7 @@ import mekhq.campaign.work.WorkTimeFormatter;
 public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
+    private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
     /** The smallest a panel can be dragged to, so none disappears behind a divider */
     private static final int MINIMUM_PANEL_SIZE = 100;
 
@@ -297,7 +299,7 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setToolTipText(canBuyKit ? null : getTextAt(RESOURCE_BUNDLE, "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
-        JList<String> lstShopping = new JList<>(r.getShoppingListDescription());
+        JList<String> lstShopping = new JList<>(listNeeds(r).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
         scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(r)));
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
@@ -310,18 +312,44 @@ public class ChooseRefitDialog extends JDialog {
      */
     private static JLabel createPartsStatusLabel(RefitPartsStatus partsStatus) {
         JLabel statusLabel = new JLabel("<html>" + partsStatus.describe() + "</html>");
-        statusLabel.setForeground(getPartsStatusColor(partsStatus.state()));
+        Color statusColor = getPartsStatusColor(partsStatus.state());
+        if (statusColor != null) {
+            statusLabel.setForeground(statusColor);
+        }
         statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
         return statusLabel;
     }
 
     /**
-     * @return green when everything is in stock, amber when parts must be ordered, red when some cannot be bought
+     * @return what the refit needs, under a heading for what the warehouse covers and one for what must be ordered
      */
-    private static Color getPartsStatusColor(RefitPartsStatus.State state) {
+    private static List<String> listNeeds(Refit refit) {
+        List<String> inStock = new ArrayList<>();
+        List<String> toOrder = new ArrayList<>();
+        for (Refit.RefitNeed need : refit.describeNeeds()) {
+            (need.isInStock() ? inStock : toOrder).add("   " + need.description());
+        }
+        List<String> lines = new ArrayList<>();
+        if (!inStock.isEmpty()) {
+            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.inStock"));
+            lines.addAll(inStock);
+        }
+        if (!toOrder.isEmpty()) {
+            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.toOrder"));
+            lines.addAll(toOrder);
+        }
+        return lines;
+    }
+
+    /**
+     * @return green when the refit can start now, amber when the warehouse covers part of it, the normal text colour
+     *       when everything must be ordered, and red when some parts cannot be bought
+     */
+    private static @Nullable Color getPartsStatusColor(RefitPartsStatus.State state) {
         return switch (state) {
-            case IN_STOCK -> MekHQ.getMHQOptions().getFontColorPositive();
-            case TO_ORDER -> MekHQ.getMHQOptions().getFontColorWarning();
+            case READY -> MekHQ.getMHQOptions().getFontColorPositive();
+            case PARTLY_IN_STOCK -> MekHQ.getMHQOptions().getFontColorWarning();
+            case TO_ORDER -> null;
             case CANNOT_BUY -> MekHQ.getMHQOptions().getFontColorNegative();
         };
     }
@@ -524,9 +552,13 @@ public class ChooseRefitDialog extends JDialog {
                 setHorizontalAlignment(getAlignment(actualCol));
                 setToolTipText(getTooltip(actualRow, actualCol));
                 // The model name is coloured by whether the refit needs parts ordered
+                Color partsColor = null;
                 boolean isColouredByParts = (actualCol == COL_MODEL) && !isSelected && !data.isEmpty();
                 if (isColouredByParts) {
-                    setForeground(getPartsStatusColor(getPartsStatus(data.get(actualRow)).state()));
+                    partsColor = getPartsStatusColor(getPartsStatus(data.get(actualRow)).state());
+                }
+                if (partsColor != null) {
+                    setForeground(partsColor);
                 } else {
                     setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
                 }

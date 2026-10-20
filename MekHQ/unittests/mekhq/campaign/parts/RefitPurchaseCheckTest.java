@@ -133,8 +133,8 @@ class RefitPurchaseCheckTest {
 
         RefitPartsStatus partsStatus = RefitPartsStatus.of(campaign, planTheRefit());
 
-        assertEquals(RefitPartsStatus.State.IN_STOCK, partsStatus.state());
-        assertTrue(partsStatus.describe().contains("Nothing needs to be ordered"), partsStatus.describe());
+        assertEquals(RefitPartsStatus.State.READY, partsStatus.state());
+        assertTrue(partsStatus.describe().contains("can start now"), partsStatus.describe());
     }
 
     @Test

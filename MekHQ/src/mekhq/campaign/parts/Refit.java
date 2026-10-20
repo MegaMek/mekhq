@@ -153,6 +153,10 @@ public class Refit extends Part implements IAcquisitionWork {
     private int refitClass;
     // The reasons for the class, kept only while the refit is planned; a saved refit keeps just its class
     private RefitClassGrader classGrader = new RefitClassGrader();
+    // Where the planned refit's parts and ammunition come from, kept only while the refit is planned
+    private final List<String> partsTakenFromStock = new ArrayList<>();
+    private final Map<AmmoType, Integer> ammoShotsInStock = new LinkedHashMap<>();
+    private final Map<AmmoType, Integer> ammoShotsToBuy = new LinkedHashMap<>();
 
     // This needs to be converted to FLOAT and handled accordingly.
     private int time;
@@ -376,6 +380,92 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * One thing a planned refit needs, and whether the warehouse already holds it.
+     *
+     * @param description the part, armor or ammunition, for example {@code 2 \u00d7 ER Medium Laser}
+     * @param isInStock   {@code true} if it comes from the warehouse, {@code false} if it must be ordered
+     */
+    public record RefitNeed(String description, boolean isInStock) {}
+
+    /**
+     * Lists what this planned refit needs: the parts it takes from the warehouse, the parts it must order, and its
+     * armor and ammunition, split between what is in stock and what must be bought. Ammunition is counted in rounds,
+     * since a refit fills its new bins from the warehouse's ammunition; the bins themselves are not ordered.
+     *
+     * @return what the refit needs, the items in stock first; empty for a refit loaded from a save
+     */
+    public List<RefitNeed> describeNeeds() {
+        List<RefitNeed> needs = new ArrayList<>();
+        for (String part : tallyPartNames(partsTakenFromStock)) {
+            needs.add(new RefitNeed(part, true));
+        }
+        for (Map.Entry<AmmoType, Integer> ammo : ammoShotsInStock.entrySet()) {
+            needs.add(new RefitNeed(describeRounds(ammo.getKey(), ammo.getValue()), true));
+        }
+        int armorPointsToBuy = getArmorPointsToBuy();
+        boolean hasArmorInStock = (newArmorSupplies != null) && (armorNeeded > armorPointsToBuy);
+        if (hasArmorInStock) {
+            needs.add(new RefitNeed(describeArmorPoints(armorNeeded - armorPointsToBuy), true));
+        }
+
+        List<String> partsToOrder = new ArrayList<>();
+        for (Part part : shoppingList) {
+            boolean isOrderedSeparately = (part instanceof Armor) || (part instanceof AmmoBin)
+                  || (part instanceof AmmoStorage);
+            if (!isOrderedSeparately) {
+                partsToOrder.add(part.getName());
+            }
+        }
+        for (String part : tallyPartNames(partsToOrder)) {
+            needs.add(new RefitNeed(part, false));
+        }
+        for (Map.Entry<AmmoType, Integer> ammo : ammoShotsToBuy.entrySet()) {
+            needs.add(new RefitNeed(describeRounds(ammo.getKey(), ammo.getValue()), false));
+        }
+        if (armorPointsToBuy > 0) {
+            needs.add(new RefitNeed(describeArmorPoints(armorPointsToBuy), false));
+        }
+        return needs;
+    }
+
+    /**
+     * @return the armor points this refit must still buy, after recycled armor and the armor already in stock
+     */
+    private int getArmorPointsToBuy() {
+        if (newArmorSupplies == null) {
+            return 0;
+        }
+        Armor existingSupplies = getExistingArmorSupplies();
+        int pointsInStock = (existingSupplies == null) ? 0 : existingSupplies.getAmount();
+        return Math.max(0, armorNeeded - pointsInStock);
+    }
+
+    private String describeArmorPoints(int points) {
+        return getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "RefitNeed.armor", newArmorSupplies.getName(), points);
+    }
+
+    private static String describeRounds(AmmoType ammoType, int rounds) {
+        return getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "RefitNeed.rounds", ammoType.getName(), rounds);
+    }
+
+    /**
+     * @return each name once, with a count in front when there is more than one, in the order first seen
+     */
+    private static List<String> tallyPartNames(List<String> names) {
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        for (String name : names) {
+            counts.merge(name, 1, Integer::sum);
+        }
+        List<String> tallied = new ArrayList<>();
+        for (Map.Entry<String, Integer> count : counts.entrySet()) {
+            tallied.add((count.getValue() == 1) ? count.getKey()
+                              : getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "RefitNeed.count", count.getValue(),
+                                    count.getKey()));
+        }
+        return tallied;
+    }
+
+    /**
      * @return the time this refit will take
      */
     public int getTime() {
@@ -394,6 +484,9 @@ public class Refit extends Part implements IAcquisitionWork {
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
         classGrader = new RefitClassGrader();
+        partsTakenFromStock.clear();
+        ammoShotsInStock.clear();
+        ammoShotsToBuy.clear();
         boolean isOmniUnit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
         boolean isFixedEquipmentAltered = isOmniUnit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity);
         boolean isWeightlessSlotChanged = isOmniUnit
@@ -666,6 +759,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
                     newUnitParts.add(replacement);
+                    partsTakenFromStock.add(replacement.getName());
                     // adjust quantity
                     partQuantity.put(replacement, partQuantity.get(replacement) - 1);
                     // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement
@@ -829,7 +923,12 @@ public class Refit extends Part implements IAcquisitionWork {
         // full ton and half ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
             int shotsNeeded = Math.max(ammoNeeded.get(type) - campaign.getQuartermaster().getAmmoAvailable(type), 0);
+            int shotsInStock = ammoNeeded.get(type) - shotsNeeded;
+            if (shotsInStock > 0) {
+                ammoShotsInStock.put(type, shotsInStock);
+            }
             if (shotsNeeded > 0) {
+                ammoShotsToBuy.put(type, shotsNeeded);
                 // Priced like any ammunition bought for the campaign, so the campaign price multipliers apply
                 cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getActualValue());
             }
@@ -906,6 +1005,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
                 newUnitParts.add(replacement);
+                partsTakenFromStock.add(replacement.getName());
                 // adjust quantity
                 partQuantity.put(replacement, partQuantity.get(replacement) - 1);
                 // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item

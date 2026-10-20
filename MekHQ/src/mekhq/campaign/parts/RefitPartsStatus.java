@@ -34,65 +34,77 @@ package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.util.Arrays;
 import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 /**
- * Whether a planned refit needs parts bought, so the refit list can show at a glance which refits can start from the
- * warehouse. For example, refitting a Javelin JVN-10A to the JVN-10N with the right lasers already on the shelf needs
- * nothing ordered, while a refit needing a Clan part the campaign may not buy cannot finish until one is found.
+ * How far the warehouse covers a planned refit, so the refit list can show at a glance which refits can start now,
+ * which are partly covered, which need everything ordered, and which cannot be finished by buying parts at all. For
+ * example, refitting a Timber Wolf D to the Prime with its lasers, actuators and ammunition on the shelf can start
+ * now, while a refit needing a Clan part the campaign may not buy cannot finish until one is found.
  *
- * @param state the state the refit is in
- * @param parts the parts to order, or the parts that cannot be bought; empty when everything is in stock
+ * @param state        how the refit stands
+ * @param itemsInStock how many of the refit's needs the warehouse covers
+ * @param itemsNeeded  how many needs the refit has in all
+ * @param parts        the items to order, or the parts that cannot be bought; empty when the refit can start now
  */
-public record RefitPartsStatus(State state, List<String> parts) {
+public record RefitPartsStatus(State state, int itemsInStock, int itemsNeeded, List<String> parts) {
     private static final MMLogger LOGGER = MMLogger.create(RefitPartsStatus.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     /** How a refit stands for parts. */
     public enum State {
-        /** Every part is in the warehouse */
-        IN_STOCK,
-        /** Some parts must be bought, and the campaign may buy them */
+        /** Everything the refit needs is in the warehouse */
+        READY,
+        /** The warehouse covers some of the refit's needs; the rest must be ordered */
+        PARTLY_IN_STOCK,
+        /** Nothing the refit needs is in the warehouse; everything must be ordered */
         TO_ORDER,
         /** Some parts are not in stock and the campaign's purchasing options do not allow buying them */
         CANNOT_BUY
     }
 
     /**
-     * Works out how a refit stands for parts.
+     * Works out how far the warehouse covers a planned refit.
      *
-     * @param campaign the campaign, for its warehouse and purchasing options
+     * @param campaign the campaign, for its purchasing options
      * @param refit    the planned refit
      *
      * @return the refit's parts status
      */
     public static RefitPartsStatus of(Campaign campaign, Refit refit) {
+        List<Refit.RefitNeed> needs = refit.describeNeeds();
+        int itemsInStock = (int) needs.stream().filter(Refit.RefitNeed::isInStock).count();
+        List<String> itemsToOrder = needs.stream()
+                                          .filter(need -> !need.isInStock())
+                                          .map(Refit.RefitNeed::description)
+                                          .toList();
         List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
+        LOGGER.debug("[RefitParts] {}: {} of {} needs in stock, {} cannot be bought",
+              refit.getNewEntity().getShortName(), itemsInStock, needs.size(), partsThatCannotBeBought.size());
         if (!partsThatCannotBeBought.isEmpty()) {
-            LOGGER.debug("[RefitParts] {}: {} parts cannot be bought", refit.getNewEntity().getShortName(),
-                  partsThatCannotBeBought.size());
-            return new RefitPartsStatus(State.CANNOT_BUY, partsThatCannotBeBought);
+            return new RefitPartsStatus(State.CANNOT_BUY, itemsInStock, needs.size(), partsThatCannotBeBought);
         }
-        List<String> partsToOrder = Arrays.asList(refit.getShoppingListDescription());
-        if (!partsToOrder.isEmpty()) {
-            return new RefitPartsStatus(State.TO_ORDER, partsToOrder);
+        if (itemsToOrder.isEmpty()) {
+            return new RefitPartsStatus(State.READY, itemsInStock, needs.size(), List.of());
         }
-        return new RefitPartsStatus(State.IN_STOCK, List.of());
+        State state = (itemsInStock > 0) ? State.PARTLY_IN_STOCK : State.TO_ORDER;
+        return new RefitPartsStatus(state, itemsInStock, needs.size(), itemsToOrder);
     }
 
     /**
-     * @return a sentence for the player saying where the refit stands for parts
+     * @return a sentence for the player saying how far the warehouse covers the refit
      */
     public String describe() {
+        String partList = String.join(", ", parts);
         return switch (state) {
-            case IN_STOCK -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.inStock");
-            case TO_ORDER -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.toOrder", String.join(", ", parts));
-            case CANNOT_BUY -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.cannotBuy",
-                  String.join(", ", parts));
+            case READY -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.ready");
+            case PARTLY_IN_STOCK -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.partly", itemsInStock,
+                  itemsNeeded, partList);
+            case TO_ORDER -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.toOrder", partList);
+            case CANNOT_BUY -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.cannotBuy", partList);
         };
     }
 }
