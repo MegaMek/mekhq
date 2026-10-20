@@ -5420,6 +5420,8 @@ public class Campaign implements ITechManager {
         entity.setConversionMode(0);
         entity.setDoomed(false);
         entity.setDestroyed(false);
+        // Without this a unit wrecked, recovered and repaired is written off again the next time it only flees
+        entity.clearBattleOutcome();
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
         entity.setShutDown(false);
