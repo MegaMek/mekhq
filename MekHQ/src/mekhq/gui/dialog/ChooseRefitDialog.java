@@ -71,6 +71,8 @@ import mekhq.campaign.parts.RefitDesignSearch;
 import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
+import mekhq.campaign.work.WorkTimeEstimate;
+import mekhq.campaign.work.WorkTimeFormatter;
 
 /**
  * @author Taharqa
@@ -396,7 +398,8 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_BV) {
                 return r.getNewEntity().calculateBattleValue(true, true);
             } else if (col == COL_TIME) {
-                return r.getTime();
+                return new RefitTime(r.getTime(), WorkTimeFormatter.formatDuration(r.getTime(),
+                      getRefitMinutesPerDay(), campaign.getLocalDate(), MekHQ.getMHQOptions().getWorkTimeDisplay()));
             } else if (col == COL_NUM_PART) {
                 return r.getShoppingList().size();
             } else if (col == COL_COST) {
@@ -448,8 +451,18 @@ public class ChooseRefitDialog extends JDialog {
                              .getTargetNumber()
                              .getDesc();
             }
+            if (col == COL_TIME) {
+                return WorkTimeFormatter.describeWorkingDays(r.getTime(), getRefitMinutesPerDay());
+            }
 
             return null;
+        }
+
+        /**
+         * @return the minutes a tech puts into a refit each day; no tech is chosen yet, so a plain working day
+         */
+        private int getRefitMinutesPerDay() {
+            return WorkTimeEstimate.getMinutesPerDay(campaign, null, false);
         }
 
         // fill table with values
@@ -475,6 +488,24 @@ public class ChooseRefitDialog extends JDialog {
 
                 return this;
             }
+        }
+    }
+
+    /**
+     * A refit's time as the table shows it, sorted by its minutes of work rather than by its text.
+     *
+     * @param minutes minutes of work
+     * @param text    the time as the player's chosen display shows it
+     */
+    public record RefitTime(int minutes, String text) implements Comparable<RefitTime> {
+        @Override
+        public int compareTo(RefitTime other) {
+            return Integer.compare(minutes, other.minutes);
+        }
+
+        @Override
+        public String toString() {
+            return text;
         }
     }
 

@@ -151,6 +151,33 @@ public final class WorkTimeFormatter {
         return String.join(" ", shownUnits);
     }
 
+    /**
+     * Spells out an amount of work in working days, for example {@code 2,750 min of work (45 h 50 min): 5 days 5 h 50
+     * min at 8 h a day, about 5.7 working days}. Work that fits in one day is shown as work alone.
+     *
+     * @param workMinutes   minutes of work
+     * @param minutesPerDay minutes worked each day; must be above zero
+     *
+     * @return the work as working days, as text
+     */
+    public static String describeWorkingDays(int workMinutes, int minutesPerDay) {
+        int minutes = Math.max(0, workMinutes);
+        String minutesText = formatWork(minutes, WorkTimeDisplay.MINUTES);
+        String hoursText = formatWork(minutes, WorkTimeDisplay.AUTOMATIC);
+        if (minutes <= minutesPerDay) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeFormatter.workOnly", minutesText, hoursText);
+        }
+        int wholeDays = minutes / minutesPerDay;
+        int minutesAfterDays = minutes % minutesPerDay;
+        String daysText = unitText("days", wholeDays);
+        if (minutesAfterDays > 0) {
+            daysText = daysText + ' ' + formatWork(minutesAfterDays, WorkTimeDisplay.AUTOMATIC);
+        }
+        double workingDays = (double) minutes / minutesPerDay;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeFormatter.workingDays", minutesText, hoursText, daysText,
+              formatWork(minutesPerDay, WorkTimeDisplay.AUTOMATIC), workingDays);
+    }
+
     private static String unitText(String unitKey, int amount) {
         return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeFormatter." + unitKey, amount);
     }
