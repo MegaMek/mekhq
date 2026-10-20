@@ -85,6 +85,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -273,6 +275,7 @@ public class CamOpsSalvageUtilities {
         Money keptSalvageValue = Money.zero();
         boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
                                               .get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
+        boolean isReduceSalvageQuality = campaign.getCampaignOptions().get(CampaignOption.IS_REDUCE_SALVAGE_QUALITY);
 
         // now let's take care of salvage
         for (TestUnit salvageUnit : keptSalvage) {
@@ -291,6 +294,9 @@ public class CamOpsSalvageUtilities {
             Unit salvagedUnit = campaign.addTestUnit(salvageUnit, deliveryTime);
             if (isKeepEnemyCamouflage && !fieldedCamouflage.hasDefaultCategory()) {
                 salvagedUnit.getEntity().setCamouflage(fieldedCamouflage);
+            }
+            if (isReduceSalvageQuality) {
+                reduceSalvageQuality(salvagedUnit);
             }
             // Units still in transit are given the best repair site when they arrive (see LocationNewDayUtil)
             if (salvagedUnit.isPresent()) {
@@ -343,6 +349,24 @@ public class CamOpsSalvageUtilities {
         mission.changeSalvagedByUnitValue(playerTakeHome);
 
         mission.changeSalvagedByEmployerValue(employerTakeHome);
+    }
+
+    /**
+     * Drops every part of a salvaged unit by one quality level, clamped at the lowest quality.
+     *
+     * <p>Missing parts have no quality and are left untouched.</p>
+     *
+     * @param salvagedUnit the {@link Unit} that was just salvaged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void reduceSalvageQuality(Unit salvagedUnit) {
+        for (Part part : salvagedUnit.getParts()) {
+            if (!(part instanceof MissingPart)) {
+                part.reduceQuality();
+            }
+        }
     }
 
     /**

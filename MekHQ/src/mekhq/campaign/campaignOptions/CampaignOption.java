@@ -1037,6 +1037,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "isUseRiskySalvage");
     public static final CampaignOption<Boolean> IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE =
           of(Boolean.class, false, "isKeepEnemyCamouflageOnSalvage");
+    public static final CampaignOption<Boolean> IS_REDUCE_SALVAGE_QUALITY =
+          of(Boolean.class, false, "isReduceSalvageQuality");
     public static final CampaignOption<Boolean> IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT =
           of(Boolean.class, true, "isEnableSalvageFlagByDefault");
     public static final CampaignOption<Boolean> USE_CLAN_SALVAGE_CLAUSE =
