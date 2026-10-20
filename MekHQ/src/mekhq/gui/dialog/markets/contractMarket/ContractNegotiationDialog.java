@@ -48,8 +48,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -153,6 +155,11 @@ public class ContractNegotiationDialog extends JDialog {
     private final int[] originalStep = new int[Clause.values().length];
     private final int[] currentStep = new int[Clause.values().length];
     private final transient List<List<TermFunding>> funding = new ArrayList<>();
+    /**
+     * Each negotiator's portrait, scaled once: the negotiator cards are rebuilt on every click at the table, and
+     * re-reading and smoothly scaling the images each time made the steppers sluggish.
+     */
+    private final transient Map<Person, Icon> portraits = new HashMap<>();
 
     private final TermRow[] termRows = new TermRow[Clause.values().length];
 
@@ -640,6 +647,11 @@ public class ContractNegotiationDialog extends JDialog {
         HudButton change = new HudButton(getTextAt(RESOURCE_BUNDLE, changeKey).toUpperCase(Locale.ROOT),
               negotiator == null, true);
         change.addActionListener(event -> openNegotiatorPicker());
+        if (isNegotiatorLocked()) {
+            change.setArmed(false);
+            change.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.change.locked")));
+        }
         JPanel changeRow = Hud.transparentPanel(new BorderLayout());
         changeRow.add(change, BorderLayout.WEST);
         content.add(leftAligned(changeRow));
@@ -724,7 +736,10 @@ public class ContractNegotiationDialog extends JDialog {
     /** A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it). */
     private JPanel personSummary(Person person) {
         JPanel summary = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
-        summary.add(MarketHud.topAligned(MarketHud.portrait(person, scaleForGUI(PORTRAIT_SIZE))), BorderLayout.WEST);
+        JLabel portrait = MarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
+        portrait.setIcon(portraits.computeIfAbsent(person,
+              key -> MarketHud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
+        summary.add(MarketHud.topAligned(portrait), BorderLayout.WEST);
         JPanel text = MarketHud.column();
         JLabel name = new JLabel(person.getFullTitle());
         name.setForeground(TEXT);
@@ -750,8 +765,9 @@ public class ContractNegotiationDialog extends JDialog {
                   skill.getTotalSkillLevel(modifiers), skill.getSkillTargetNumber(modifiers, 0));
         }
         if (campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)) {
+            // The Edge left to spend, as the picker shows it and the odds assume, rather than the person's maximum.
             text = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.edge", text,
-                  person.getAdjustedEdge());
+                  person.getCurrentEdge());
         }
         return text;
     }
@@ -792,7 +808,19 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
 
+    /**
+     * Whether the negotiator is fixed for this contract: once a re-negotiation has been made, the negotiator who made
+     * it stays at the table. Otherwise the attempts left would follow whoever sat down next, and swapping in a
+     * Relentless Bargainer after another negotiator's attempt would win a roll neither had alone.
+     */
+    private boolean isNegotiatorLocked() {
+        return contract.getPlayerNegotiator() != null && attemptsSoFar() > 0;
+    }
+
     private void openNegotiatorPicker() {
+        if (isNegotiatorLocked()) {
+            return;
+        }
         ContractNegotiatorPickerDialog picker = new ContractNegotiatorPickerDialog(campaign, contract,
               contract.getPlayerNegotiator());
         if (picker.wasConfirmed()) {

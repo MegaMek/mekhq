@@ -629,19 +629,18 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Opens the negotiation table for the offer. If the player confirms changes, the contract's terms, pay, and rented
-     * facilities are updated in place, so its estimate and dossier are rebuilt to reflect them.
+     * Opens the negotiation table for the offer. The contract's terms, pay, and rented facilities are updated in place,
+     * and not only on confirmation: a re-negotiation commits its result at once, even if the player then cancels. So
+     * the offer's estimate and dossier are always rebuilt once the table closes.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void negotiate(AbstractContract contract) {
-        ContractNegotiationDialog negotiation = new ContractNegotiationDialog(campaign, contract);
-        if (negotiation.wasConfirmed()) {
-            estimates.remove(contract.getId());
-            refresh(true);
-        }
+        new ContractNegotiationDialog(campaign, contract);
+        estimates.remove(contract.getId());
+        refresh(true);
     }
 
     /**

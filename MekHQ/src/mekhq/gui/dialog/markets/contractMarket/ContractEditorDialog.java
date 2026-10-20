@@ -302,6 +302,11 @@ public class ContractEditorDialog extends JDialog {
     private final CardLayout pageLayout = new CardLayout();
     private final JPanel pageHolder = new JPanel(pageLayout);
     private final JPanel previewHolder = new JPanel(new BorderLayout());
+    /**
+     * The preview's content, refilled on every edit inside one long-lived scroll pane, so the preview keeps its scroll
+     * position while the GM types.
+     */
+    private final JPanel previewContent = MarketHud.column();
     private final List<Tracked> tracked = new ArrayList<>();
     private HudModeSelector<Section> sectionSelector;
     private Section buildingSection = Section.OFFER;
@@ -398,6 +403,9 @@ public class ContractEditorDialog extends JDialog {
         previewHolder.setBackground(GROUND);
         previewHolder.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
         previewHolder.setPreferredSize(new Dimension(scaleForGUI(PREVIEW_WIDTH), 0));
+        previewContent.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
+              scaleForGUI(14)));
+        previewHolder.add(MarketHud.scroll(previewContent, GROUND), BorderLayout.CENTER);
         body.add(previewHolder, BorderLayout.EAST);
         content.add(body, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
@@ -1223,12 +1231,12 @@ public class ContractEditorDialog extends JDialog {
     /**
      * Redraws the preview from the form as it stands: the offer as it will read on the board, its terms, and the intel
      * the player will see. Difficulty and pay are only worked out again on save, so the board's ring keeps the saved
-     * difficulty and an automatic pay figure reads "Auto".
+     * difficulty and an automatic pay figure reads "Auto". Only the content is refilled; its scroll pane stays, so the
+     * preview does not jump back to the top with each keystroke.
      */
     private void refreshPreview() {
-        JPanel preview = MarketHud.column();
-        preview.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
-              scaleForGUI(14)));
+        JPanel preview = previewContent;
+        preview.removeAll();
 
         preview.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.board"))));
         preview.add(Box.createVerticalStrut(scaleForGUI(5)));
@@ -1277,10 +1285,8 @@ public class ContractEditorDialog extends JDialog {
         preview.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.note"),
               TEXT_FAINT, Font.PLAIN, 0.8f)));
 
-        previewHolder.removeAll();
-        previewHolder.add(MarketHud.scroll(preview, GROUND), BorderLayout.CENTER);
-        previewHolder.revalidate();
-        previewHolder.repaint();
+        preview.revalidate();
+        preview.repaint();
     }
 
     /** The offer's board row: difficulty ring, name, employer and job, any badges, and the total payout. */

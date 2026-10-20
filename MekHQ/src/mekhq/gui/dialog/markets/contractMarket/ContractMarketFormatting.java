@@ -279,14 +279,16 @@ public final class ContractMarketFormatting {
         double magnitude = Math.abs(amount);
 
         NumberFormat format = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
-        if (magnitude >= MILLION) {
+        // The unit is chosen after rounding, so an amount just short of a million reads "1.00M" rather than "1,000K",
+        // and one just short of a thousand reads "1K" rather than "1,000".
+        if (Math.round(magnitude / THOUSAND) >= THOUSAND) {
             format.setMinimumFractionDigits(2);
             format.setMaximumFractionDigits(2);
             return sign + getFormattedTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.millions",
                   format.format(magnitude / MILLION));
         }
         format.setMaximumFractionDigits(0);
-        if (magnitude >= THOUSAND) {
+        if (Math.round(magnitude) >= THOUSAND) {
             return sign + getFormattedTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.thousands",
                   format.format(Math.round(magnitude / THOUSAND)));
         }
