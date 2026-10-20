@@ -42,6 +42,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.missing.MissingMekActuator;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -56,15 +57,29 @@ class RefitAddedActuatorTest {
 
     /** A Wolverine WVR-6R with its left hand taken out. */
     private Unit wolverineWithoutLeftHand() {
-        Entity wolverine = UnitFixture.WOLVERINE_WVR_6R.loadEntity();
-        for (int slot = 0; slot < wolverine.getNumberOfCriticalSlots(Mek.LOC_LEFT_ARM); slot++) {
-            CriticalSlot criticalSlot = wolverine.getCritical(Mek.LOC_LEFT_ARM, slot);
+        return withoutLeftHand(UnitFixture.WOLVERINE_WVR_6R.loadEntity());
+    }
+
+    private Unit withoutLeftHand(Entity entity) {
+        for (int slot = 0; slot < entity.getNumberOfCriticalSlots(Mek.LOC_LEFT_ARM); slot++) {
+            CriticalSlot criticalSlot = entity.getCritical(Mek.LOC_LEFT_ARM, slot);
             if ((criticalSlot != null) && (criticalSlot.getType() == CriticalSlot.TYPE_SYSTEM)
                       && (criticalSlot.getIndex() == Mek.ACTUATOR_HAND)) {
-                wolverine.setCritical(Mek.LOC_LEFT_ARM, slot, null);
+                entity.setCritical(Mek.LOC_LEFT_ARM, slot, null);
             }
         }
-        return scenario.getCampaign().addNewUnit(wolverine, false, 0, PartQuality.QUALITY_D);
+        return scenario.getCampaign().addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
+    }
+
+    @Test
+    void anOmniGivenBackItsHandIsAPodSwap() {
+        // As a Timber Wolf D, which has no lower arms, refitted to its Prime: the arms go with the pod configuration
+        Unit fireMoth = withoutLeftHand(MHQTestUtilities.getEntityForUnitTesting("Dasher (Fire Moth) Prime", false));
+
+        Refit refit = new Refit(fireMoth, MHQTestUtilities.getEntityForUnitTesting("Dasher (Fire Moth) Prime", false),
+              true, false, false);
+
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass(), String.join("; ", refit.getRefitClassReasons()));
     }
 
     @Test

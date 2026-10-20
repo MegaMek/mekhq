@@ -1521,10 +1521,16 @@ public class Refit extends Part implements IAcquisitionWork {
         } else if (newPart instanceof MissingMekGyro) {
             classGrader.gradeGyroChange();
         } else if (newPart instanceof MissingMekActuator) {
-            // An added actuator, such as a hand or lower arm, is a component like any other
             markLocation(locationHasNewStuff, location);
-            classGrader.gradeAddedComponent(newPart.getName(), getLocationName(newEntity, location),
-                  isMarked(locationHadPartsRemoved, location), false);
+            if (isOmniRefit) {
+                // An Omni's lower arm and hand actuators come and go with its pod configuration, as the Timber Wolf
+                // D, which has none, shows against its Prime
+                classGrader.gradeOmniPodWork(newPart.getName());
+            } else {
+                // An added actuator, such as a hand or lower arm, is a component like any other
+                classGrader.gradeAddedComponent(newPart.getName(), getLocationName(newEntity, location),
+                      isMarked(locationHadPartsRemoved, location), false);
+            }
         } else if (newPart instanceof MissingMekLocation) {
             // If a location is being replaced, the internal structure or myomer must have been changed
             replacingLocations = true;
