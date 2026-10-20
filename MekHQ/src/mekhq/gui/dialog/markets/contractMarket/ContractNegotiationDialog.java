@@ -57,7 +57,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.compute.Compute;
 import megamek.common.options.IOption;
-import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -125,8 +124,6 @@ public class ContractNegotiationDialog extends JDialog {
 
     private static final int SACRIFICE_STEPS_PER_SWAP = 2;
     private static final int MAXIMUM_SWAPS = 2;
-    private static final int BASE_MAXIMUM_SACRIFICED_TERMS = 2;
-    private static final int BASE_MAXIMUM_SACRIFICED_STEPS = 4;
     private static final int MAXIMUM_FACILITY_UNITS = 100;
     private static final int SIDE_WIDTH = 330;
     private static final int LABEL_WIDTH = 130;
@@ -692,27 +689,12 @@ public class ContractNegotiationDialog extends JDialog {
                   "negotiate.contractMarket.odds.none"), TEXT_FAINT, Font.PLAIN, 0.8f)));
             return block;
         }
-        boolean useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
-        boolean playerUsesEdge = useEdge && playerNegotiator.getOptions()
-                                                  .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
-        double[] player = marginChances(playerNegotiator, playerUsesEdge);
-        double[] employer = marginChances(employerNegotiator, useEdge);
-        int general = generalNegotiationModifier(playerNegotiator);
-        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", ActiveNegotiationMath.opposedOdds(
-              player, employer, general + haggleNegotiationModifier(playerNegotiator)))));
+        NegotiatorProfile.TableOdds odds = NegotiatorProfile.odds(campaign, playerNegotiator, employerNegotiator,
+              scale);
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", odds.haggle())));
         block.add(Box.createVerticalStrut(scaleForGUI(2)));
-        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", ActiveNegotiationMath.opposedOdds(
-              player, employer, general + exceptionNegotiationModifier(playerNegotiator)))));
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", odds.exception())));
         return block;
-    }
-
-    /** The chance of each margin on a person's Negotiation check, as {@link #reportedNegotiationCheck} rolls it. */
-    private double[] marginChances(Person person, boolean useEdge) {
-        TargetRoll target = person.checkSkill(SkillType.S_NEGOTIATION, campaign).getTargetNumber();
-        Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
-        return ActiveNegotiationMath.marginChances(target.getValue(), target.cannotSucceed(),
-              SkillType.getType(SkillType.S_NEGOTIATION).isCountUp(), skill != null && skill.getHasNaturalAptitude(),
-              useEdge && person.getCurrentEdge() > 0);
     }
 
     /** One re-negotiation's chances: its name, and how often the player prevails, coloured by who is favoured. */
@@ -789,7 +771,7 @@ public class ContractNegotiationDialog extends JDialog {
             // The trait's name over its effect, so both have the card's full width.
             JPanel row = MarketHud.column();
             JLabel nameLabel = new JLabel(name);
-            nameLabel.setForeground(isHelpfulTrait(trait) ? READY : DANGER);
+            nameLabel.setForeground(NegotiatorProfile.isHelpfulTrait(trait) ? READY : DANGER);
             nameLabel.setFont(hudFont(Font.BOLD, 0.82f, 0.0f));
             row.add(leftAligned(nameLabel));
             JTextArea effect = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
@@ -806,17 +788,9 @@ public class ContractNegotiationDialog extends JDialog {
         return rows;
     }
 
-    /** Whether a negotiation trait works in the player's favour (an SPA) rather than against them (a Flaw). */
-    private static boolean isHelpfulTrait(String trait) {
-        return trait.equals(PersonnelOptions.HARD_BARGAINER) || trait.equals(PersonnelOptions.SHREWD_TRADER)
-                     || trait.equals(PersonnelOptions.FINE_PRINT_READER)
-                     || trait.equals(PersonnelOptions.LOOPHOLE_FINDER)
-                     || trait.equals(PersonnelOptions.RELENTLESS_BARGAINER)
-                     || trait.equals(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
-    }
 
     private void openNegotiatorPicker() {
-        ContractNegotiatorPickerDialog picker = new ContractNegotiatorPickerDialog(campaign,
+        ContractNegotiatorPickerDialog picker = new ContractNegotiatorPickerDialog(campaign, contract,
               contract.getPlayerNegotiator());
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
@@ -832,32 +806,10 @@ public class ContractNegotiationDialog extends JDialog {
      * negotiator changes.
      */
     private void recomputeNegotiatorCaps() {
-        int raiseCapModifier = 0;
-        int sacrificeTermModifier = 0;
-        int sacrificeStepModifier = 0;
-
-        Person negotiator = contract.getPlayerNegotiator();
-        if (negotiator != null) {
-            PersonnelOptions options = negotiator.getOptions();
-            if (options.booleanOption(PersonnelOptions.HARD_BARGAINER)) {
-                raiseCapModifier++;
-            }
-            if (options.booleanOption(PersonnelOptions.PUSHOVER)) {
-                raiseCapModifier--;
-            }
-            if (options.booleanOption(PersonnelOptions.SHREWD_TRADER)) {
-                sacrificeTermModifier++;
-                sacrificeStepModifier += 2;
-            }
-            if (options.booleanOption(PersonnelOptions.INFLEXIBLE)) {
-                sacrificeTermModifier--;
-                sacrificeStepModifier -= 2;
-            }
-        }
-
-        capPerTerm = max(1, scale + raiseCapModifier);
-        maxSacrificedTerms = max(0, BASE_MAXIMUM_SACRIFICED_TERMS + sacrificeTermModifier);
-        maxSacrificedSteps = max(0, BASE_MAXIMUM_SACRIFICED_STEPS + sacrificeStepModifier);
+        NegotiatorProfile profile = NegotiatorProfile.of(contract.getPlayerNegotiator(), scale);
+        capPerTerm = profile.raiseCap();
+        maxSacrificedTerms = profile.sacrificeTerms();
+        maxSacrificedSteps = profile.sacrificeSteps();
     }
 
     // endregion Negotiators
@@ -1217,55 +1169,7 @@ public class ContractNegotiationDialog extends JDialog {
                                                      isUseEdge) :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
-                     + generalNegotiationModifier(playerNegotiator);
-    }
-
-    /**
-     * A flat modifier to the net margin from the negotiator's general contract SPAs and Flaws, applied to both
-     * re-negotiation options. Abrasive worsens every re-negotiation by one.
-     */
-    private static int generalNegotiationModifier(Person negotiator) {
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.ABRASIVE)) {
-            modifier--;
-        }
-        return modifier;
-    }
-
-    /**
-     * A net-margin modifier specific to the "make an exception" option (shifting non-negotiable flags). Loophole Finder
-     * frees more terms; Blacklisted, its opposite, locks more.
-     */
-    private static int exceptionNegotiationModifier(Person negotiator) {
-        if (negotiator == null) {
-            return 0;
-        }
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
-            modifier++;
-        }
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.BLACKLISTED)) {
-            modifier--;
-        }
-        return modifier;
-    }
-
-    /**
-     * A net-margin modifier specific to the "give me a better offer" option (shifting the terms' values). Fine Print
-     * Reader wins better terms; Easily Fooled, its opposite, loses ground.
-     */
-    private static int haggleNegotiationModifier(Person negotiator) {
-        if (negotiator == null) {
-            return 0;
-        }
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
-            modifier++;
-        }
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.EASILY_FOOLED)) {
-            modifier--;
-        }
-        return modifier;
+                     + NegotiatorProfile.of(playerNegotiator, scale).generalModifier();
     }
 
     /**
@@ -1281,7 +1185,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends one attempt. */
     private void performHaggle() {
-        int net = rollNetMargin() + haggleNegotiationModifier(contract.getPlayerNegotiator());
+        int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).haggleModifier();
         int[] moveCounts = applyActiveNegotiation(net);
 
         // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
@@ -1308,7 +1212,7 @@ public class ContractNegotiationDialog extends JDialog {
      * locked term, each margin of failure locks a random unlocked one. Spends one attempt.
      */
     private void performException() {
-        int net = rollNetMargin() + exceptionNegotiationModifier(contract.getPlayerNegotiator());
+        int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).exceptionModifier();
         int[] lockChanges = applyLockChanges(net);
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
         contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
@@ -1411,9 +1315,7 @@ public class ContractNegotiationDialog extends JDialog {
      */
     private int maxRenegotiationAttempts() {
         Person negotiator = contract.getPlayerNegotiator();
-        boolean relentless = negotiator != null
-                                   && negotiator.getOptions().booleanOption(PersonnelOptions.RELENTLESS_BARGAINER);
-        return relentless ? 2 : 1;
+        return NegotiatorProfile.of(negotiator, scale).attempts();
     }
 
     /** Arms the re-negotiation buttons only when a negotiator is set and an attempt remains, saying why otherwise. */
