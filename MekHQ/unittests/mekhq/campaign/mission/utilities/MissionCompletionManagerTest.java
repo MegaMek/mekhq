@@ -318,7 +318,7 @@ public class MissionCompletionManagerTest {
     @Nested
     public class UndeployFormations {
         @Test
-        void cadreDutyRevertsCadreRoleAndReportsCadreForces() {
+        void leavesFormationRolesUnchanged() {
             AbstractContract mission = mock(AbstractContract.class);
             when(mission.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
 
@@ -327,30 +327,10 @@ public class MissionCompletionManagerTest {
             Formation formation = mock(Formation.class);
             when(campaign.getPlayerForce()).thenReturn(playerForce);
             when(playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.CADRE);
             when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
 
-            boolean hadCadreForces = MissionCompletionManager.undeployFormations(campaign, mission);
+            MissionCompletionManager.undeployFormations(campaign, mission);
 
-            assertTrue(hadCadreForces);
-            verify(formation).setCombatRoleInMemory(CombatRole.FRONTLINE);
-        }
-
-        @Test
-        void nonCadreDutyLeavesRolesAndReportsNoCadreForces() {
-            AbstractContract mission = mock(AbstractContract.class);
-            when(mission.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
-
-            Campaign campaign = mock(Campaign.class);
-            PlayerForce playerForce = mock(PlayerForce.class);
-            Formation formation = mock(Formation.class);
-            when(campaign.getPlayerForce()).thenReturn(playerForce);
-            when(playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
-
-            boolean hadCadreForces = MissionCompletionManager.undeployFormations(campaign, mission);
-
-            assertFalse(hadCadreForces);
             verify(formation, never()).setCombatRoleInMemory(any());
         }
 
@@ -1081,34 +1061,6 @@ public class MissionCompletionManagerTest {
                 verify(fixture.humanResources).refreshApplicants(fixture.campaign, true);
                 campaignNewDayManager.verify(
                       () -> CampaignNewDayManager.showRarePersonnelDialog(fixture.campaign, false));
-            }
-        }
-
-        @Test
-        void cadreForcesReassignmentShowsNotification() {
-            Fixture fixture = new Fixture();
-            when(fixture.mission.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
-
-            Formation formation = mock(Formation.class);
-            when(fixture.playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.CADRE);
-            when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
-
-            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
-                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
-                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
-                        ContractCharacteristics.class);
-                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
-                        MissionStatus.SUCCESS);
-                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
-                        PrisonerMissionEndEvent.class);
-                  MockedConstruction<ImmersiveDialogNotification> notifications = mockConstruction(
-                        ImmersiveDialogNotification.class)) {
-                boolean completed = fixture.manager.completeMission();
-
-                assertTrue(completed);
-                verify(formation).setCombatRoleInMemory(CombatRole.FRONTLINE);
-                assertEquals(1, notifications.constructed().size());
             }
         }
 

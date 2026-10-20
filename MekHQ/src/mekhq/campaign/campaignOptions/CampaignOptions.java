@@ -234,7 +234,6 @@ public class CampaignOptions {
         get(CampaignOption.ATB_BATTLE_CHANCE)[CombatRole.FRONTLINE.ordinal()] = 20;
         get(CampaignOption.ATB_BATTLE_CHANCE)[CombatRole.PATROL.ordinal()] = 60;
         get(CampaignOption.ATB_BATTLE_CHANCE)[CombatRole.TRAINING.ordinal()] = 10;
-        get(CampaignOption.ATB_BATTLE_CHANCE)[CombatRole.CADRE.ordinal()] = 10;
 
         set(CampaignOption.USE_FACTION_STANDING_OUTLAWED, true);
     }

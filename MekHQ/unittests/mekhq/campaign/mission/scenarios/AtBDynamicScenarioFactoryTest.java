@@ -36,7 +36,6 @@ import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.createEntityWithCrew;
 import static mekhq.campaign.mission.scenarios.Scenario.T_GROUND;
 import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
-import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
 import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
@@ -257,12 +256,12 @@ class AtBDynamicScenarioFactoryTest {
         LocalHangar hangar = mock(LocalHangar.class);
         AtBDynamicScenario scenario = mockScenario(T_GROUND);
 
-        CombatTeam cadreTeam = mockCombatTeam(CADRE, mockFormationWithBV(campaign, hangar, false, 4000));
+        CombatTeam maneuverTeam = mockCombatTeam(MANEUVER, mockFormationWithBV(campaign, hangar, false, 4000));
         CombatTeam patrolTeam = mockCombatTeam(PATROL, mockFormationWithBV(campaign, hangar, false, 6000));
 
         when(campaign.getPlayerForce()).thenReturn(playerForce);
         when(playerForce.getHangar()).thenReturn(hangar);
-        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(cadreTeam, patrolTeam));
+        when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(maneuverTeam, patrolTeam));
 
         int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
 
