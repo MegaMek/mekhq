@@ -48,22 +48,15 @@ import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.c
 import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.marketName;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
@@ -97,11 +90,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
-import mekhq.gui.baseComponents.hud.HudGuideDrawer;
-import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
-import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
-import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
-import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStyle;
 
@@ -134,6 +122,16 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         String label() {
             return getTextAt(RESOURCE_BUNDLE, "page.contractMarket." + name());
+        }
+
+        /** @return the label of the page's guide button, such as "How the board works" */
+        String guideLabel() {
+            return getTextAt(RESOURCE_BUNDLE, "page.contractMarket." + name() + ".guide");
+        }
+
+        /** @return the resource-key prefix the page's guide is read from */
+        String guidePrefix() {
+            return "guide.contractMarket." + name().toLowerCase(Locale.ROOT) + ".";
         }
     }
 
@@ -183,8 +181,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private MarketComparePage comparePage;
     private JLabel selectedLabel;
     private HudButton acceptButton;
-    private HudGuideDrawer guideDrawer;
-    private JPanel scrim;
+    private MarketGuide guide;
+    private HudButton guideButton;
 
     /**
      * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
@@ -242,7 +240,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
-        buildGuideDrawer();
+        guide = new MarketGuide(this);
         installKeyBindings(content);
         refresh(true);
 
@@ -255,9 +253,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent event) {
-                if (!ContractMarketGuidePreferences.getInstance().isGuideSeen()) {
-                    openGuide();
-                }
+                maybeOpenGuide();
             }
         });
         setVisible(true); // Should always be last
@@ -305,10 +301,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         fundsReadout.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "readout.contractMarket.funds.tooltip",
               balance.toAmountAndSymbolString()));
 
-        HudButton guideButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.guide")
-                                                    .toUpperCase(Locale.ROOT), false, true);
-        guideButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "guide.contractMarket.title"));
+        guideButton = new HudButton("", false, true);
         guideButton.addActionListener(event -> openGuide());
+        refreshGuideButton();
 
         JPanel readouts = Hud.transparentPanel(null);
         readouts.setLayout(new BoxLayout(readouts, BoxLayout.X_AXIS));
@@ -382,7 +377,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     List<AbstractContract> ordered = sortedContracts();
-                    if (!guideDrawer.isVisible() && index < ordered.size()) {
+                    if (!guide.isOpen() && index < ordered.size()) {
                         select(ordered.get(index));
                     }
                 }
@@ -391,7 +386,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         AbstractAction togglePage = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                if (!guideDrawer.isVisible()) {
+                if (!guide.isOpen()) {
                     showPage(page == MarketPage.OFFERS ? MarketPage.COMPARE : MarketPage.OFFERS);
                 }
             }
@@ -456,7 +451,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         page = newPage;
         pageSelector.setSelected(newPage);
         pageLayout.show(pageHolder, newPage.name());
+        refreshGuideButton();
         refresh(newPage == MarketPage.OFFERS);
+        maybeOpenGuide();
     }
 
     Campaign campaign() {
@@ -781,90 +778,28 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     // region Guide
 
-    private void buildGuideDrawer() {
-        guideDrawer = new HudGuideDrawer(List.of(getTextAt(RESOURCE_BUNDLE, "guide.contractMarket.tab.steps"),
-              getTextAt(RESOURCE_BUNDLE, "guide.contractMarket.tab.example"),
-              getTextAt(RESOURCE_BUNDLE, "guide.contractMarket.tab.terms")), null,
-              getTextAt(RESOURCE_BUNDLE, "guide.contractMarket.close"), this::closeGuide);
-        scrim = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics graphics) {
-                graphics.setColor(new Color(2, 7, 13, 160));
-                graphics.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        scrim.setOpaque(false);
-        scrim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent event) {
-                closeGuide();
-            }
-        });
-
-        // The guide drawer and its scrim float over the pages on the layered pane.
-        getLayeredPane().add(scrim, JLayeredPane.MODAL_LAYER);
-        getLayeredPane().add(guideDrawer, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1));
-        scrim.setVisible(false);
-        guideDrawer.setVisible(false);
-        getLayeredPane().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent event) {
-                layoutGuide();
-            }
-        });
+    /** Opens the guide for the page on screen, marking it seen so it does not open by itself again. */
+    private void openGuide() {
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(page, true);
+        guide.open(page.guidePrefix());
     }
 
-    private void openGuide() {
-        ContractMarketGuidePreferences.getInstance().setGuideSeen(true);
-        guideDrawer.showGuide(buildGuide());
-        scrim.setVisible(true);
-        guideDrawer.setVisible(true);
-        layoutGuide();
-        guideDrawer.focusClose();
+    /** Opens the page's guide by itself the first time the player sees the page. */
+    private void maybeOpenGuide() {
+        if (isShowing() && !ContractMarketGuidePreferences.getInstance().isGuideSeen(page)) {
+            openGuide();
+        }
+    }
+
+    private void refreshGuideButton() {
+        guideButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "button.contractMarket.guide", page.guideLabel())
+                                  .toUpperCase(Locale.ROOT));
     }
 
     private void closeGuide() {
-        if (scrim != null) {
-            scrim.setVisible(false);
-            guideDrawer.setVisible(false);
+        if (guide != null) {
+            guide.close();
         }
-    }
-
-    private void layoutGuide() {
-        int width = getLayeredPane().getWidth();
-        int height = getLayeredPane().getHeight();
-        scrim.setBounds(0, 0, width, height);
-        int drawerWidth = Math.min(HudGuideDrawer.drawerWidth(), width);
-        guideDrawer.setBounds(width - drawerWidth, 0, drawerWidth, height);
-        guideDrawer.revalidate();
-    }
-
-    /**
-     * Builds the guide from the resource bundle. Its steps, example lines and terms are numbered keys
-     * ({@code guide.contractMarket.step.1.title}, {@code .step.2.title}, ...), read until the next number is missing,
-     * so text can be added or reworded without code changes.
-     */
-    private static Guide buildGuide() {
-        String prefix = "guide.contractMarket.";
-        List<Step> steps = new ArrayList<>();
-        for (int number = 1; isResourceKeyValid(text(prefix + "step." + number + ".title")); number++) {
-            steps.add(new Step(text(prefix + "step." + number + ".title"), text(prefix + "step." + number + ".text")));
-        }
-        List<ExampleLine> example = new ArrayList<>();
-        for (int number = 1; isResourceKeyValid(text(prefix + "example." + number + ".who")); number++) {
-            example.add(new ExampleLine(text(prefix + "example." + number + ".who"),
-                  text(prefix + "example." + number + ".text")));
-        }
-        List<Term> terms = new ArrayList<>();
-        for (int number = 1; isResourceKeyValid(text(prefix + "term." + number + ".name")); number++) {
-            terms.add(new Term(text(prefix + "term." + number + ".name"), text(prefix + "term." + number + ".text")));
-        }
-        return new Guide(text(prefix + "eyebrow"), text(prefix + "title"), steps, null, text(prefix + "exampleIntro"),
-              example, terms, null);
-    }
-
-    private static String text(String key) {
-        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     // endregion Guide

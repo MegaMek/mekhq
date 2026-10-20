@@ -32,19 +32,24 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Map;
+
 import megamek.client.ui.preferences.PreferenceElement;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog.MarketPage;
 
 /**
- * Whether the player has seen the contract market's guide. The guide opens by itself the first time the market is
- * opened, and only from its button after that.
+ * Which of the contract market's page guides the player has seen. Each page's guide opens by itself the first time the
+ * player visits that page, and only from its button after that.
  *
- * <p>The flag is stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's
- * node, so it follows the MekHQ install rather than a campaign. Deleting this class's entry from that file (while MekHQ
- * is closed) shows the guide again.</p>
+ * <p>The flags are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's
+ * node, so they follow the MekHQ install rather than a campaign. Deleting this class's entry from that file (while
+ * MekHQ is closed) shows the guides again.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -52,29 +57,31 @@ import mekhq.MekHQ;
 public final class ContractMarketGuidePreferences {
     private static final MMLogger LOGGER = MMLogger.create(ContractMarketGuidePreferences.class);
 
-    static final String GUIDE_SEEN = "guideSeen";
+    static final String GUIDE_SEEN_PREFIX = "guideSeen.";
 
     private static ContractMarketGuidePreferences instance;
 
-    private final Flag guideSeen;
+    private final Map<MarketPage, Flag> seen = new EnumMap<>(MarketPage.class);
 
     /**
-     * @param node the preferences node to store the setting under
+     * @param node the preferences node to store the settings under
      */
     ContractMarketGuidePreferences(final PreferencesNode node) {
-        Flag flag = null;
-        try {
-            flag = new Flag(GUIDE_SEEN);
-            // Managing the flag loads any value saved in an earlier session and saves it again on exit.
-            node.manage(flag);
-        } catch (Exception exception) {
-            LOGGER.error(exception, "Failed to register contract market guide preference {}", GUIDE_SEEN);
+        for (MarketPage page : MarketPage.values()) {
+            String name = GUIDE_SEEN_PREFIX + page.name().toLowerCase(Locale.ROOT);
+            try {
+                Flag flag = new Flag(name);
+                // Managing the flag loads any value saved in an earlier session and saves it again on exit.
+                node.manage(flag);
+                seen.put(page, flag);
+            } catch (Exception exception) {
+                LOGGER.error(exception, "Failed to register contract market guide preference {}", name);
+            }
         }
-        this.guideSeen = flag;
     }
 
     /**
-     * @return the setting, stored in MekHQ's preferences file
+     * @return the settings, stored in MekHQ's preferences file
      */
     public static synchronized ContractMarketGuidePreferences getInstance() {
         if (instance == null) {
@@ -85,16 +92,20 @@ public final class ContractMarketGuidePreferences {
     }
 
     /**
-     * @return {@code true} once the player has seen the market's guide
+     * @param page a market page
+     *
+     * @return {@code true} once the player has seen that page's guide
      */
-    public boolean isGuideSeen() {
+    boolean isGuideSeen(final MarketPage page) {
+        Flag flag = seen.get(page);
         // If the flag could not be registered, treat the guide as seen rather than opening it every time.
-        return (guideSeen == null) || guideSeen.value;
+        return (flag == null) || flag.value;
     }
 
-    public void setGuideSeen(final boolean seen) {
-        if (guideSeen != null) {
-            guideSeen.value = seen;
+    void setGuideSeen(final MarketPage page, final boolean isSeen) {
+        Flag flag = seen.get(page);
+        if (flag != null) {
+            flag.value = isSeen;
         }
     }
 
