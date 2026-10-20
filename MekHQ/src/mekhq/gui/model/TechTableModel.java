@@ -45,6 +45,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.TechRepairAbilities;
 import mekhq.campaign.work.TechTaskEstimate;
 import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.BasicInfo;
@@ -107,6 +108,8 @@ public class TechTableModel extends DataTableModel<Person> {
             Person tech = getTechAt(actualRow);
             setImage(tech.getPortraitImageIconWithFallback(true, 54).getImage());
             setHtmlText(getTechDescription(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
+            String abilityEffects = TechRepairAbilities.describeEffects(tech);
+            setToolTipText((abilityEffects == null) ? null : ("<html>" + abilityEffects + "</html>"));
             if (isSelected) {
                 highlightBorder();
             } else {
@@ -181,6 +184,12 @@ public class TechTableModel extends DataTableModel<Person> {
         }
         toReturn.append("<br/>");
 
+        // The abilities that change repair work, so a tech worth saving for a weapon or armor job stands out
+        String abilities = TechRepairAbilities.describeNames(tech);
+        if (!abilities.isEmpty()) {
+            toReturn.append("<i>").append(abilities).append("</i><br/>");
+        }
+
         toReturn.append(WorkTimeEstimate.describeTechDay(getCampaign(), tech, overtimeAllowed));
         if (null != part) {
             TechTaskEstimate estimate = TechTaskEstimate.estimate(getCampaign(), part, tech);
@@ -189,31 +198,6 @@ public class TechTableModel extends DataTableModel<Person> {
             if (!finish.isEmpty()) {
                 toReturn.append("<br/>").append(finish);
             }
-        }
-
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
-            toReturn.append(", <i>Engineer</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-            toReturn.append(", <i>Maintainer</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
-            toReturn.append(", <i>Mr/Ms Fix-it</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)) {
-            toReturn.append(", <i>Armor Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)) {
-            toReturn.append(", <i>Internal Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)) {
-            toReturn.append(", <i>Weapon Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
-            toReturn.append(", <i>Gremlins</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.ATOW_TECH_EMPATHY)) {
-            toReturn.append(", <i>Tech Empathy</i>");
         }
 
         toReturn.append("</font></html>");
