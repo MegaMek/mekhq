@@ -40,7 +40,6 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.LEGENDARY;
 import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.getContractDefinition;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.DOMINATING;
@@ -819,7 +818,7 @@ public class MHQMorale {
                           today.getYear(), regardMultiplier);
 
                     for (String report : reports) {
-                        campaign.addReport(GENERAL, report);
+                        campaign.addReport(POLITICS, report);
                     }
                 }
                 newEnemyData = new EnemyData(newEnemyData, acceptedBatchall);

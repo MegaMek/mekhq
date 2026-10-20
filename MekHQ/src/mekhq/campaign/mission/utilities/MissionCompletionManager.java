@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
@@ -521,12 +522,18 @@ public class MissionCompletionManager {
 
         // A covert sponsor, if any, takes the standing change in the visible employer's place.
         Faction employer = mission.getStandingEmployerFaction();
-        factionStandings.processContractCompletion(playerForce.getFaction(),
+        List<String> reports = factionStandings.processContractCompletion(playerForce.getFaction(),
               employer,
               campaign.getLocalDate(),
               status,
               regardMultiplier,
               mission.getLengthInMonths());
+
+        for (String report : reports) {
+            if (report != null && !report.isBlank()) {
+                campaign.addReport(POLITICS, report);
+            }
+        }
     }
 
     /**
