@@ -798,15 +798,16 @@ public class ImmersiveDialogCore extends JDialog {
 
     static void configureHtmlEditorPane(JEditorPane editorPane) {
         HTMLEditorKit editorKit = new HTMLEditorKit();
-        StyleSheet styleSheet = new StyleSheet();
-        styleSheet.addStyleSheet(editorKit.getStyleSheet());
+        editorPane.setEditorKit(editorKit);
+        // Add rules to this document's own style sheet; HTMLEditorKit.setStyleSheet would replace the shared
+        // default style sheet used by every HTML pane in the application.
+        HTMLDocument document = (HTMLDocument) editorKit.createDefaultDocument();
+        StyleSheet styleSheet = document.getStyleSheet();
         styleSheet.addRule("body, div, p, span { background-color: transparent; }");
         styleSheet.addRule("body { margin: 0; padding: 0; }");
         styleSheet.addRule("p { margin: " + scaleForGUI(6) + "px 0 0 0; }");
 
-        editorKit.setStyleSheet(styleSheet);
-        editorPane.setEditorKit(editorKit);
-        editorPane.setDocument(new HTMLDocument(styleSheet));
+        editorPane.setDocument(document);
         editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         editorPane.setOpaque(false);
     }

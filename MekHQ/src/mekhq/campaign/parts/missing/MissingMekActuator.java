@@ -38,7 +38,6 @@ import java.io.PrintWriter;
 import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.units.BipedMek;
 import megamek.common.units.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -73,8 +72,7 @@ public class MissingMekActuator extends MissingPart {
     public MissingMekActuator(int tonnage, int type, int loc, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        Mek m = new BipedMek();
-        this.name = m.getSystemName(type) + " Actuator";
+        this.name = Mek.systemNames[type] + " Actuator";
         this.location = loc;
         this.unitTonnageMatters = true;
     }

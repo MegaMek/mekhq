@@ -593,9 +593,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     @Override
     public void refreshAll() {
+        // Refreshing the serviced unit list also rebuilds the parts acquisition list.
         refreshServicedUnitList();
         refreshTaskList();
-        refreshPartsAcquisition();
         refreshTechsList();
         refreshOvertimeStatus();
     }

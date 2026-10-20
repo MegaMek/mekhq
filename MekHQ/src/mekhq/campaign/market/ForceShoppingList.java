@@ -111,7 +111,7 @@ public class ForceShoppingList {
 
     public @Nullable IAcquisitionWork getShoppingItem(final Object newEquipment) {
         return getShoppingList().stream()
-                     .filter(shoppingItem -> isSameEquipment(shoppingItem.getNewEquipment(), newEquipment))
+                     .filter(shoppingItem -> holdsSameEquipment(shoppingItem, newEquipment))
                      .findFirst()
                      .orElse(null);
     }
@@ -120,7 +120,7 @@ public class ForceShoppingList {
         int idx = -1;
         int row = 0;
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), equipment)) {
+            if (holdsSameEquipment(shoppingItem, equipment)) {
                 idx = row;
                 break;
             }
@@ -228,8 +228,9 @@ public class ForceShoppingList {
 
         // If the same equipment is already ordered for the same destination and the same refit (or neither is for a
         // refit), add the quantity to that order and return
+        Object newEquipment = newWork.getNewEquipment();
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())
+            if (holdsSameEquipment(shoppingItem, newEquipment)
                       && orderPlace(shoppingItem) == destination
                       && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))) {
                 campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
@@ -371,6 +372,14 @@ public class ForceShoppingList {
             }
         }
         return unitList;
+    }
+
+    private boolean holdsSameEquipment(IAcquisitionWork shoppingItem, Object equipment) {
+        // A unit order can only match a unit, and building its equipment reads the unit file from disk.
+        if ((shoppingItem instanceof UnitOrder) && !(equipment instanceof Entity)) {
+            return false;
+        }
+        return isSameEquipment(shoppingItem.getNewEquipment(), equipment);
     }
 
     private boolean isSameEquipment(Object equipment, Object newEquipment) {

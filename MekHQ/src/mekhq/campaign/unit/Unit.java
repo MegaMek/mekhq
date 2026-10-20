@@ -8601,6 +8601,10 @@ public class Unit implements ITechnology, ILocatable {
         if (!isAvailable()) {
             return false;
         }
+        // A unit in salvage mode is being stripped for parts, so it is not kept in working order
+        if (isSalvage()) {
+            return false;
+        }
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor || !isSelfMaintainedInfantry();
     }
 
