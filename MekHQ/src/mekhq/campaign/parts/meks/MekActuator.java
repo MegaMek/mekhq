@@ -42,7 +42,6 @@ import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
-import megamek.common.units.BipedMek;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -102,8 +101,7 @@ public class MekActuator extends Part {
     public MekActuator(int tonnage, int type, int loc, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        Mek m = new BipedMek();
-        this.name = m.getSystemName(type) + " Actuator";
+        this.name = Mek.systemNames[type] + " Actuator";
         this.location = loc;
         this.unitTonnageMatters = true;
     }
