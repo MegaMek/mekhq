@@ -1242,6 +1242,33 @@ public class Refit extends Part implements IAcquisitionWork {
         newUnitParts = newNewUnitParts;
     }
 
+    /** {@link #getDaysUntilPartsArrive()} while the kit or parts are still to be found */
+    public static final int PARTS_NOT_FOUND = -1;
+
+    /**
+     * How long the refit waits for its kit or parts before work can begin. A kit refit waits until the kit is found
+     * and then until every part of it has arrived; a custom refit waits for everything on its shopping list.
+     *
+     * @return {@link #PARTS_NOT_FOUND} while the kit or parts are still to be found, otherwise the days until the last
+     *       part arrives, or {@code 0} when everything is here
+     */
+    public int getDaysUntilPartsArrive() {
+        boolean isStillToBeFound = customJob ? !shoppingList.isEmpty() : !kitFound;
+        if (isStillToBeFound) {
+            return PARTS_NOT_FOUND;
+        }
+        int daysUntilArrival = 0;
+        for (Part part : newUnitParts) {
+            if (!part.isPresent()) {
+                daysUntilArrival = Math.max(daysUntilArrival, part.getDaysToArrival());
+            }
+        }
+        if ((newArmorSupplies != null) && !newArmorSupplies.isPresent()) {
+            daysUntilArrival = Math.max(daysUntilArrival, newArmorSupplies.getDaysToArrival());
+        }
+        return daysUntilArrival;
+    }
+
     /**
      * @return if any of our parts are still in transit.
      */

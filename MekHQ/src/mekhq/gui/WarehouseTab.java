@@ -527,6 +527,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 // Check grouping
                 boolean inGroup = PartsFilterGroup.matches(nGroup, part);
 
+                // Parts set aside for a refit or repair belong only in the views that track them
+                boolean isShownInThisView = part.isSpare() || (nGroupView == SV_IN_TRANSIT)
+                      || (nGroupView == SV_RESERVED);
+                if (!isShownInThisView) {
+                    return false;
+                }
+
                 // Check view
                 if (nGroupView == SV_ALL) {
                     inView = true;
@@ -708,7 +715,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
-        List<Part> parts = locationFilter.selectSpareParts(getCampaign());
+        // Reserved parts are listed too, but only the In Transit and Reserved views show them
+        List<Part> parts = locationFilter.selectHeldParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
@@ -750,6 +758,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return;
         }
         if (null == selectedTech) {
+            return;
+        }
+        if (!part.isSpare()) {
+            LOGGER.debug("[Warehouse] {} is set aside for a refit or repair, so it is not worked on here",
+                  part.getName());
             return;
         }
         partId = part.getId();

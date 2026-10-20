@@ -369,6 +369,11 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         for (int i = 0; i < rows.length; i++) {
             parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
         }
+        // A part set aside for a refit or repair is listed so it can be followed, not sold or removed
+        boolean isAnyPartReserved = Arrays.stream(parts).anyMatch(selectedPart -> !selectedPart.isSpare());
+        if (isAnyPartReserved) {
+            return Optional.empty();
+        }
         Part part = null;
         if (parts.length == 1) {
             oneSelected = true;
