@@ -546,7 +546,7 @@ public class ProtoMekLocation extends Part {
 
     /** A ProtoMek's torso can never be scrapped, so it can never be replaced either. */
     @Override
-    protected boolean isReplaceable() {
+    public boolean isReplaceable() {
         return loc != ProtoMek.LOC_TORSO;
     }
 
@@ -646,9 +646,14 @@ public class ProtoMekLocation extends Part {
     }
 
     @Override
+    public boolean canTakeMaintenanceDamage() {
+        return unit.getEntity().getInternal(loc) >= 1;
+    }
+
+    @Override
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
-        points = Math.max(points - d, 1);
+        points = getStructureAfterMaintenanceDamage(points, d);
         unit.getEntity().setInternal(points, loc);
         updateConditionFromEntity(false);
     }

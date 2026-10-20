@@ -516,6 +516,10 @@ public class AdvancedMedicalAlternateImplants {
     /**
      * Records one prosthetic at every location it covers, skipping any location that already carries it.
      *
+     * <p>Where anything new is recorded, the personnel options that come with the prosthetic - painkiller addiction
+     * and the like - are granted too, as surgery grants them, so medication upkeep and the rest apply. As with
+     * surgery, these are only granted where the campaign uses abilities.</p>
+     *
      * @return the number of locations newly recorded
      */
     private static int recordProsthetic(Campaign campaign, Person person, ProstheticType prosthetic) {
@@ -527,6 +531,12 @@ public class AdvancedMedicalAlternateImplants {
             }
             person.addInjury(injuryType.newInjury(campaign, person, location, 0));
             recorded++;
+        }
+
+        if ((recorded > 0) && campaign.getCampaignOptions().get(CampaignOption.USE_ABILITIES)) {
+            for (String option : prosthetic.getAssociatedPersonnelOptions()) {
+                person.getOptions().acquireAbility(LVL3_ADVANTAGES, option, true);
+            }
         }
         return recorded;
     }

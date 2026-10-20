@@ -534,7 +534,7 @@ public class CampaignSummary {
 
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
                                                                  .getHumanResources()
-                                                                 .getActivePersonnel(false, true),
+                                                                 .getActivePersonnel(false, false),
                   campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);

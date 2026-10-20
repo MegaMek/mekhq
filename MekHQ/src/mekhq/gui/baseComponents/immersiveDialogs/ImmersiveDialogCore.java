@@ -63,6 +63,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.icons.Portrait;
@@ -77,7 +78,6 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
@@ -1198,8 +1198,12 @@ public class ImmersiveDialogCore extends JDialog {
 
             baseImage = portrait.getBaseImage();
         } else {
-            baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
-                              .getImage();
+            ImageIcon factionLogo = RATGenerator.getFactionLogo(campaign.getGameYear(),
+                  speaker.getOriginFaction().getShortName(), Color.BLACK);
+            if (factionLogo == null) {
+                return campaign.getCampaignFactionIcon();
+            }
+            baseImage = factionLogo.getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.

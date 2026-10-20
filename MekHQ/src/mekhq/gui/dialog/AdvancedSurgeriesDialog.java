@@ -99,7 +99,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.Risk;
@@ -2300,7 +2300,9 @@ public class AdvancedSurgeriesDialog extends JDialog {
      */
     private void processOldInjuryRemoval(ProstheticType type, BodyLocation location) {
         LocalDate today = campaign.getLocalDate();
-        for (Injury injury : findInjuriesClearedBy(type, location)) {
+        List<Injury> removed = AdvancedMedicalAlternate.getInjuriesRemovedBySurgery(type, patient.getInjuries(),
+              relevantInjuries.getOrDefault(location, new ArrayList<>()));
+        for (Injury injury : removed) {
             patient.removeInjury(injury, today);
         }
     }

@@ -723,6 +723,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * &lt;51.02 compatibility handler: triple-strength myomer and prosthetic leg MASC are now worked out each day from
+     * the prosthetics a person carries, as dermal armour already was. Anyone holding one of these implants with none
+     * of the prosthetics behind it has them recorded, so the daily check doesn't take the implant away.
+     *
+     * <p>This runs once loading is complete, rather than alongside the personnel nodes, so it reaches saves that
+     * wrap their personnel in {@code <humanResources>} as well as older saves with a top-level {@code <personnel>}
+     * node.</p>
+     *
+     * @param campaign the campaign that has just been loaded
+     * @param version  the version the save was written by
+     */
+    static void migrateDerivedImplantProsthetics(Campaign campaign, Version version) {
+        if (version.isLowerThan(new Version("0.51.02"))
+                  && campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+                AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+            }
+        }
+    }
+
     private static void cleanupGhostKills(Campaign retVal) {
         // check for kills with missing person references
         List<Kill> ghostKills = new ArrayList<>();
@@ -2504,6 +2525,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Fixup any ghost kills
         cleanupGhostKills(campaign);
+
+        migrateDerivedImplantProsthetics(campaign, version);
 
         // Update the Personnel Modules
         final AbstractDivorce divorce = options.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(options);

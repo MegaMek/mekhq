@@ -441,6 +441,8 @@ class CargoCapacityTest {
             // Read when a unit's crew gets its Natural Aptitudes
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
             lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
+            // Read when a unit's crew gets its Fatigue
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
             when(crewMember.getPortrait()).thenReturn(mock(Portrait.class));
             when(crewMember.getId()).thenReturn(mock(UUID.class));
 

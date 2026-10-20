@@ -568,4 +568,116 @@ class SalvageRecoverySessionTest {
             assertEquals(0, session.autoAssign());
         }
     }
+
+    @Nested
+    class Theft {
+        private final Unit truck = tank(0, 100);
+        private final TestUnit wreck = wreck(20, 1000, 60);
+
+        private SalvageRecoverySession recovered(AbstractSalvage rules, SalvageSettlement settlement,
+              int availableMinutes, double funds) {
+            SalvageRecoverySession session = session(rules, settlement, List.of(wreck), List.of(truck),
+                  availableMinutes, 0, 0, funds);
+            session.assign(session.getRecoveries().getFirst(), truck, null);
+            return session;
+        }
+
+        @Test
+        void onlyMekHQSalvageAllowsTheft() {
+            assertTrue(new MekHQSalvage().isSalvageTheftAllowed());
+            assertFalse(new CamOpsStrictSalvage().isSalvageTheftAllowed());
+            assertFalse(new CamOpsRevisedSalvage().isSalvageTheftAllowed());
+            assertFalse(new ChaosCampaignSalvage().isSalvageTheftAllowed());
+            assertFalse(new LegacySalvage().isSalvageTheftAllowed());
+        }
+
+        @Test
+        void exchangeOffersKeepingOnlyToSteal() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5), 600, 0);
+
+            assertEquals(List.of(SalvageClaim.EMPLOYER, SalvageClaim.KEEP), session.getAvailableClaims());
+            assertTrue(session.isKeptSalvageStealOnly());
+        }
+
+        @Test
+        void keepingUnderExchangeBlocksConfirmingButNotStealing() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5), 600, 0);
+            assertTrue(session.setClaim(session.getRecoveries().getFirst(), SalvageClaim.KEEP));
+
+            assertEquals(List.of(ConfirmBlocker.KEPT_SALVAGE_NOT_ALLOWED), session.getConfirmBlockers());
+            assertFalse(session.canConfirm());
+            assertTrue(session.canSteal());
+        }
+
+        @Test
+        void stealingIgnoresUnaffordablePurchases() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new PurchaseSalvageSettlement(0.5), 600, 0);
+            session.setClaim(session.getRecoveries().getFirst(), SalvageClaim.KEEP);
+
+            assertFalse(session.canConfirm());
+            assertTrue(session.steal());
+            assertTrue(session.isStolen());
+            assertEquals(List.of(wreck), session.getKeptSalvage());
+        }
+
+        @Test
+        void stealingTakesWrecksLeftToTheEmployer() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5), 600, 0);
+            assertEquals(SalvageClaim.EMPLOYER, session.getClaim(session.getRecoveries().getFirst()));
+
+            assertTrue(session.steal());
+            assertEquals(List.of(wreck), session.getKeptSalvage());
+            assertTrue(session.getEmployerSalvage().isEmpty());
+        }
+
+        @Test
+        void stealingStillSellsWrecksSetToSell() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new CappedSalvageSettlement(0.5), 600, 0);
+            assertTrue(session.setClaim(session.getRecoveries().getFirst(), SalvageClaim.SELL));
+
+            assertTrue(session.steal());
+            assertEquals(List.of(wreck), session.getSoldSalvage());
+            assertTrue(session.getKeptSalvage().isEmpty());
+        }
+
+        @Test
+        void stealingNeedsARecoveredWreck() {
+            SalvageRecoverySession session = session(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5),
+                  List.of(wreck), List.of(truck), 600, 0, 0, 0);
+
+            assertEquals(0, session.getRecoveredCount());
+            assertFalse(session.canSteal());
+            assertFalse(session.steal());
+            assertFalse(session.isStolen());
+        }
+
+        @Test
+        void stealingStillNeedsTheTechTime() {
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new PurchaseSalvageSettlement(0.5), 30, 0);
+
+            assertFalse(session.canSteal());
+            assertFalse(session.steal());
+            assertFalse(session.isStolen());
+        }
+
+        @Test
+        void otherSystemsCantSteal() {
+            SalvageRecoverySession session = recovered(new CamOpsRevisedSalvage(), new ExchangeSalvageSettlement(0.5),
+                  600, 0);
+
+            assertEquals(List.of(SalvageClaim.EMPLOYER), session.getAvailableClaims());
+            assertFalse(session.canSteal());
+            assertFalse(session.steal());
+        }
+
+        @Test
+        void clanSalvageClauseDoublesClanWreckValues() {
+            when(wreck.getEntity().isClan()).thenReturn(true);
+            SalvageRecoverySession session = recovered(new MekHQSalvage(), new ExchangeSalvageSettlement(0.5, true),
+                  600, 0);
+
+            assertMoney(2000, session.getEmployerValue());
+            assertMoney(1000, session.getCashShare());
+        }
+    }
 }
