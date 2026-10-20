@@ -192,6 +192,7 @@ public class SalvageOperationPlanner extends JDialog {
 
     // Buttons
     private final HudButton backNextButton = new HudButton("", false);
+    private final HudButton commitButton = new HudButton(upper(text("button.commit")), true);
     private final JLabel footer = new JLabel();
 
     /** The planner's pages. */
@@ -572,7 +573,6 @@ public class SalvageOperationPlanner extends JDialog {
         actions.add(cancelButton);
         backNextButton.addActionListener(event -> showPage((page == Page.TEAMS) ? Page.TECHS : Page.TEAMS));
         actions.add(backNextButton);
-        HudButton commitButton = new HudButton(upper(text("button.commit")), true);
         commitButton.addActionListener(event -> commit());
         actions.add(commitButton);
         buttons.add(actions, BorderLayout.EAST);
@@ -1070,6 +1070,31 @@ public class SalvageOperationPlanner extends JDialog {
     private void refreshButtons() {
         backNextButton.setText(upper((page == Page.TEAMS) ? text("button.next") : text("button.back")));
         footer.setText((page == Page.TEAMS) ? text("footer.teams") : text("footer.techs"));
+
+        String commitBlockReason = commitBlockReason();
+        commitButton.setArmed(commitBlockReason == null);
+        commitButton.setToolTipText((commitBlockReason == null) ?
+                                          null :
+                                          "<html><div style='width:" + scaleForGUI(280) + "px'>" +
+                                                commitBlockReason + "</div></html>");
+    }
+
+    /**
+     * A plan with teams but no techs, or techs but no teams, cannot recover anything, so the player is not allowed to
+     * commit it. A plan with neither is fine: that is the player choosing not to salvage.
+     *
+     * @return why the plan cannot be committed yet, or {@code null} if it can
+     */
+    private @Nullable String commitBlockReason() {
+        boolean hasTeams = !draft.getStagedTeams().isEmpty();
+        boolean hasTechs = !draft.getSelectedTechs().isEmpty();
+        if (hasTeams && !hasTechs) {
+            return text("button.commit.blocked.noTechs");
+        }
+        if (hasTechs && !hasTeams) {
+            return text("button.commit.blocked.noTeams");
+        }
+        return null;
     }
 
     // endregion Refresh
