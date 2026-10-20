@@ -826,6 +826,11 @@ public class ContractNegotiationDialog extends JDialog {
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
             recomputeNegotiatorCaps();
+            // Terms one negotiator was allowed may be beyond the next one's limits; rather than mix the two
+            // negotiators' traits, the manual haggling starts over within the new limits.
+            if (exceedsNegotiatorLimits()) {
+                resetTerms();
+            }
             refresh();
         }
     }
@@ -1096,17 +1101,32 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     private void resetAll() {
-        for (Clause clause : Clause.values()) {
-            currentStep[clause.ordinal()] = originalStep[clause.ordinal()];
-            funding.get(clause.ordinal()).clear();
-        }
-        reputationUsed = 0;
-        swapsUsed = 0;
-        sacrificeBank = 0;
+        resetTerms();
         facilityQuantity[0] = contract.getRentedHospitalBeds();
         facilityQuantity[1] = contract.getRentedKitchens();
         facilityQuantity[2] = contract.getRentedHoldingCells();
         refresh();
+    }
+
+    /** Puts every term back to the baseline and refunds everything spent on them. */
+    private void resetTerms() {
+        System.arraycopy(originalStep, 0, currentStep, 0, originalStep.length);
+        clearManualHaggling();
+    }
+
+    /**
+     * Whether the terms on screen go past what the chosen negotiator may do: a term raised beyond their raise cap, or
+     * more terms or steps given up than they may give up. Raises and sacrifices are only checked as they are made, so
+     * this catches a negotiator swapped in after them.
+     */
+    private boolean exceedsNegotiatorLimits() {
+        for (Clause clause : Clause.values()) {
+            if (currentStep[clause.ordinal()] - originalStep[clause.ordinal()] > capPerTerm) {
+                return true;
+            }
+        }
+        return NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep) > maxSacrificedTerms
+                     || NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep) > maxSacrificedSteps;
     }
 
     private void confirmAction() {
@@ -1218,17 +1238,7 @@ public class ContractNegotiationDialog extends JDialog {
     private void performHaggle() {
         int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).haggleModifier();
         int[] moveCounts = applyActiveNegotiation(net);
-
-        // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
-        reputationUsed = 0;
-        swapsUsed = 0;
-        sacrificeBank = 0;
-        for (Clause clause : Clause.values()) {
-            funding.get(clause.ordinal()).clear();
-        }
-
-        commitTermsAndPay();
-        contract.setNegotiationData(null);
+        commitAsNewBaseline();
         contract.setActiveNegotiationData(ActiveNegotiationData.haggle(attemptsSoFar() + 1, net,
               moveCounts[Clause.PAY.ordinal()], moveCounts[Clause.SUPPORT.ordinal()],
               moveCounts[Clause.TRANSPORT.ordinal()], moveCounts[Clause.SALVAGE.ordinal()],
@@ -1245,6 +1255,10 @@ public class ContractNegotiationDialog extends JDialog {
     private void performException() {
         int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).exceptionModifier();
         int[] lockChanges = applyLockChanges(net);
+        // The terms on screen match the employer's offer, but the contract may still hold an earlier confirmed
+        // negotiation that the player has only reset here. Committing them keeps a cancelled table from leaving a
+        // raised term behind under a lock this attempt just set.
+        commitAsNewBaseline();
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
         contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
               lockChanges[Clause.PAY.ordinal()], lockChanges[Clause.SUPPORT.ordinal()],
@@ -1253,6 +1267,26 @@ public class ContractNegotiationDialog extends JDialog {
 
         LOGGER.info("Active negotiation (exception) for contract {}: net margin {}", contract.getName(), net);
         refresh();
+    }
+
+    /**
+     * Makes the terms on screen the new baseline after a re-negotiation: manual haggling starts fresh from them, and
+     * they are written to the contract at once, as the re-negotiation itself is.
+     */
+    private void commitAsNewBaseline() {
+        clearManualHaggling();
+        commitTermsAndPay();
+        contract.setNegotiationData(null);
+    }
+
+    /** Spends nothing: no reputation, swaps or banked steps, and no raise paid for. */
+    private void clearManualHaggling() {
+        reputationUsed = 0;
+        swapsUsed = 0;
+        sacrificeBank = 0;
+        for (Clause clause : Clause.values()) {
+            funding.get(clause.ordinal()).clear();
+        }
     }
 
     /**
@@ -1542,11 +1576,11 @@ public class ContractNegotiationDialog extends JDialog {
               totalPay.toAmountString(), null, totalPay.toAmountAndSymbolString(), false);
         if (!isPirateContract()) {
             MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.rental"),
-                  rental.isZero() ? rental.toAmountString() : "-" + rental.toAmountString(),
+                  ContractMarketFormatting.costAmount(rental),
                   rental.isZero() ? null : DANGER, null, false);
         }
         MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.change"),
-              (change.isNegative() ? "-" : "+") + change.absolute().toAmountString(),
+              ContractMarketFormatting.signedAmount(change),
               change.isNegative() ? DANGER : READY, null, true);
         MarketHud.addSpanning(impact, MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.impact.note"), TEXT_FAINT, Font.PLAIN, 0.78f), 6);

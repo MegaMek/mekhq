@@ -36,6 +36,7 @@ import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.ma
 import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.marginScore;
 import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.netMargin;
 import static mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.opposedOdds;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -139,8 +140,10 @@ class ActiveNegotiationMathTest {
 
     @Test
     void edgeIsNotSpentOnACheckThatCannotSucceed() {
-        double[] chances = marginChances(Integer.MAX_VALUE, true, false, false, true);
-        assertEquals(1.0, chances[MarginOfSuccess.DISASTROUS.ordinal()], TOLERANCE);
+        // A reachable target number, so a reroll would change the odds if Edge were spent despite the check being
+        // marked as one that cannot succeed.
+        assertArrayEquals(marginChances(7, true, false, false, false), marginChances(7, true, false, false, true),
+              TOLERANCE);
     }
 
     @Test

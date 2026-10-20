@@ -39,7 +39,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -205,8 +204,10 @@ public class ContractDossierPanel extends JPanel {
         status.add(destination(contract, currentDate));
         status.add(getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.status.term",
               contract.getLengthInMonths()));
-        status.add(getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.status.transit",
-              estimate.transitDays()));
+        status.add(estimate.hasRoute()
+                         ? getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.status.transit",
+                               estimate.transitDays())
+                         : getTextAt(RESOURCE_BUNDLE, "value.contractMarket.noRoute"));
         JLabel statusLabel = new JLabel(joined(status));
         statusLabel.setForeground(TEXT_MUTED);
         statusLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
@@ -365,8 +366,7 @@ public class ContractDossierPanel extends JPanel {
         addRow(terms, "dossier.contractMarket.terms.transport", transport(contract));
         addRow(terms, "dossier.contractMarket.terms.term",
               getFormattedTextAt(RESOURCE_BUNDLE, "card.contractMarket.months", contract.getLengthInMonths()));
-        addRow(terms, "dossier.contractMarket.terms.transit",
-              getFormattedTextAt(RESOURCE_BUNDLE, "value.contractMarket.days", estimate.transitDays()));
+        addRow(terms, "dossier.contractMarket.terms.transit", transit(estimate));
 
         // The contract's random characteristics ride along at the foot of the Terms column.
         if (!contract.getCharacteristics().isEmpty()) {
@@ -441,10 +441,17 @@ public class ContractDossierPanel extends JPanel {
 
         String expensesBreakdown = buildExpensesBreakdown(estimate);
         MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.expenses",
-                    contract.getLengthInMonths(), estimate.transitDays()),
-              "-" + estimate.operatingCosts().toAmountString(), DANGER, expensesBreakdown, false);
+                    contract.getLengthInMonths(), Math.max(0, estimate.transitDays())),
+              costAmount(estimate.operatingCosts()), DANGER, expensesBreakdown, false);
+        // The third segment is every running cost besides payroll, maintenance and food - not the operating costs as a
+        // whole, which already include the other three.
+        Money otherCosts = estimate.overhead()
+                                 .plus(estimate.hotSpotsUpkeep())
+                                 .plus(estimate.spareParts())
+                                 .plus(estimate.trainingMunitions())
+                                 .plus(estimate.fuel());
         MarketHud.SegmentBar costBar = new MarketHud.SegmentBar(
-              List.of(amount(estimate.salaries()), amount(estimate.maintenance()), amount(estimate.operatingCosts()),
+              List.of(amount(estimate.salaries()), amount(estimate.maintenance()), amount(otherCosts),
                     amount(estimate.foodAndHousing())),
               List.of(ACCENT, translucent(ACCENT, 150), translucent(ACCENT, 90), TEXT_FAINT));
         costBar.setToolTipText(expensesBreakdown);
@@ -452,7 +459,7 @@ public class ContractDossierPanel extends JPanel {
 
         Money net = estimate.estimatedNet();
         MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
-              signed(net), net.isNegative() ? DANGER : READY, null, true);
+              signedAmount(net), net.isNegative() ? DANGER : READY, null, true);
         addCombatPayRows(money);
 
         JTextArea caveat = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.caveat"),
@@ -501,7 +508,7 @@ public class ContractDossierPanel extends JPanel {
             return;
         }
         StratConCombatBonusProjection combatBonus = estimate.combatBonus();
-        String bonusCount = new DecimalFormat("0.#").format(combatBonus.bonusCount());
+        String bonusCount = decimalFormat("0.#").format(combatBonus.bonusCount());
         String combatPayTooltip = getFormattedTextAt(RESOURCE_BUNDLE,
               combatBonus.isFromNavPoint()
                     ? "dossier.contractMarket.profit.combatPay.navPoint.tooltip"
@@ -509,11 +516,11 @@ public class ContractDossierPanel extends JPanel {
               bonusCount,
               contract.getContractFinanceData().combatPay().toAmountAndSymbolString());
         MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.combatPay",
-              bonusCount), "+" + estimate.potentialCombatPay().toAmountString(), READY, combatPayTooltip, false);
+              bonusCount), signedAmount(estimate.potentialCombatPay()), READY, combatPayTooltip, false);
 
         Money netWithCombatPay = estimate.getNetWithCombatPay();
         MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.netWithCombatPay"),
-              signed(netWithCombatPay), netWithCombatPay.isNegative() ? DANGER : READY, null, true);
+              signedAmount(netWithCombatPay), netWithCombatPay.isNegative() ? DANGER : READY, null, true);
     }
 
     // endregion Overview
@@ -623,10 +630,6 @@ public class ContractDossierPanel extends JPanel {
             case ADVERSE -> DANGER;
             case NEUTRAL -> AMBER;
         };
-    }
-
-    private static String signed(Money money) {
-        return (money.isNegative() ? "-" : "+") + money.absolute().toAmountString();
     }
 
     private static double amount(Money money) {

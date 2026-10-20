@@ -188,7 +188,6 @@ public class HudCard extends JPanel {
         }
         subLabel.setText(sub);
         figureLabel.setText((figure == null) ? "" : figure);
-        figureLabel.setForeground(TEXT);
         figureUnitLabel.setText((figureUnit == null) ? "" : figureUnit);
 
         setOpaque(true);
@@ -199,22 +198,6 @@ public class HudCard extends JPanel {
                     BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
                     BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10), scaleForGUI(8),
                           scaleForGUI(10)))));
-        return this;
-    }
-
-    /**
-     * Colours the figure on the right, for a figure whose sign matters (such as a profit). Call it after
-     * {@link #show}, which resets the figure to the standard text colour.
-     *
-     * @param color the figure's colour
-     *
-     * @return this card, for chaining
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public HudCard setFigureColor(Color color) {
-        figureLabel.setForeground(color);
         return this;
     }
 

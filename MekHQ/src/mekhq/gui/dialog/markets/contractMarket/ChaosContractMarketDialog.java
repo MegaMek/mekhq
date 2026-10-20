@@ -82,6 +82,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationDifficulty;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.utilities.ContractAcceptance;
@@ -377,7 +378,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     private void installKeyBindings(JComponent root) {
-        // Number keys pick an offer in the board's current order; C switches between the board and the comparison.
+        // Number keys pick an offer in the order on screen: the board's, or the compared columns' on the comparison, so
+        // a key never selects an offer the comparison hides. C switches between the board and the comparison.
         for (int number = 1; number <= SHORTCUT_OFFERS; number++) {
             final int index = number - 1;
             String name = "offer" + number;
@@ -386,7 +388,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             root.getActionMap().put(name, new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    List<AbstractContract> ordered = sortedContracts();
+                    List<AbstractContract> ordered = page == MarketPage.COMPARE
+                                                           ? comparedContracts()
+                                                           : sortedContracts();
                     if (!guide.isOpen() && index < ordered.size()) {
                         select(ordered.get(index));
                     }
@@ -433,7 +437,11 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         } else if (ordered.isEmpty()) {
             selected = null;
         }
-        excludedFromComparison.removeIf(id -> contracts.stream().noneMatch(contract -> contract.getId().equals(id)));
+        Set<UUID> offerIds = new HashSet<>();
+        for (AbstractContract contract : contracts) {
+            offerIds.add(contract.getId());
+        }
+        excludedFromComparison.retainAll(offerIds);
 
         pageSelector.setModeLabel(MarketPage.OFFERS, pageLabel(MarketPage.OFFERS, contracts.size()));
         pageSelector.setModeLabel(MarketPage.COMPARE, pageLabel(MarketPage.COMPARE, comparedContracts().size()));
@@ -551,7 +559,10 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                                              estimate(contract).getNetPerMonth()).reversed();
             case PAY -> Comparator.comparing(AbstractContract::getTotalPay).reversed();
             case DANGER -> Comparator.comparingInt(ContractMarketFormatting::assessmentDifficulty);
-            case NEAREST -> Comparator.comparingInt(contract -> estimate(contract).transitDays());
+            // An offer with no route cannot be reached, so it sorts after every offer that can.
+            case NEAREST -> Comparator.comparingInt(contract -> estimate(contract).hasRoute()
+                                                                      ? estimate(contract).transitDays()
+                                                                      : Integer.MAX_VALUE);
         };
         if (comparator != null) {
             ordered.sort(comparator);
@@ -573,6 +584,14 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             excludedFromComparison.remove(contract.getId());
         } else {
             excludedFromComparison.add(contract.getId());
+            // Accept and Negotiate act on the selection, so it moves to an offer still on the page rather than staying
+            // on one with no column.
+            if (contract == selected) {
+                List<AbstractContract> stillCompared = comparedContracts();
+                if (!stillCompared.isEmpty()) {
+                    selected = stillCompared.getFirst();
+                }
+            }
         }
         refresh(false);
     }
@@ -597,6 +616,14 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private void loadOffersForSearchType() {
         contracts.clear();
         contracts.addAll(contractMarket.getContracts(searchType).values());
+        for (AbstractContract contract : contracts) {
+            // The cached difficulty is not saved, so an offer loaded from a save has none until it is worked out here;
+            // otherwise every offer would read as an even fight and the Danger sort would do nothing.
+            if (contract.getCachedContractDifficulty() < 1) {
+                contract.setCachedContractDifficulty(
+                      ChaosContractDeterminationDifficulty.calculateContractDifficulty(campaign, contract));
+            }
+        }
     }
 
     // endregion State and refresh

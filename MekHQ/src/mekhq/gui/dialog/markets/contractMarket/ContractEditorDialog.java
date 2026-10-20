@@ -46,7 +46,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -81,6 +80,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationDifficulty;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
@@ -212,6 +212,11 @@ public class ContractEditorDialog extends JDialog {
     private transient LocalDate endDate;
     private JSpinner lengthSpinner;
     private JCheckBox lengthAutomatic;
+    /**
+     * The generator's length, rolled once when the length goes on "Automatic". Rolling it on every read would give the
+     * end date, the length shown and the length saved different values when contract lengths vary.
+     */
+    private @Nullable Integer automaticLengthMonths;
 
     // Target
     private JSuggestField systemField;
@@ -887,8 +892,9 @@ public class ContractEditorDialog extends JDialog {
         routEndDateField.setText(routEnd == null ? "" : routEnd.toString());
         routEndDateField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.tooltip")));
         routEndDateField.setEnabled(routFieldsEditable);
+        // The date field already refreshes the form on every change, so it is not watched a second time.
         grid.add(trackedRow("edit.contractMarket.field.routEndDate", routEndDateField, routNote,
-              routEndDateField::getText, routEndDateField));
+              routEndDateField::getText));
 
         routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
         routedPayoutSpinner.setEnabled(routFieldsEditable);
@@ -1095,8 +1101,8 @@ public class ContractEditorDialog extends JDialog {
         Runnable refreshEnemyRanks = () -> commanderOverride.refreshRanks(rankSystemOf(enemyFactionCombo));
         refreshEmployerRanks.run();
         refreshEnemyRanks.run();
-        employerFactionCombo.addActionListener(e -> refreshEmployerRanks.run());
-        enemyFactionCombo.addActionListener(e -> refreshEnemyRanks.run());
+        employerFactionCombo.addActionListener(event -> refreshEmployerRanks.run());
+        enemyFactionCombo.addActionListener(event -> refreshEnemyRanks.run());
     }
 
     private void addNpcRow(Grid grid, String labelKey, @Nullable NpcEditor editor) {
@@ -1339,7 +1345,7 @@ public class ContractEditorDialog extends JDialog {
         return card;
     }
 
-    /** The badges the offer will carry: batchall, proving ground or covert operation. */
+    /** The badges the offer will carry: batchall, proving ground or covert operation, and its special rules. */
     private List<String> previewTags() {
         List<String> tags = new ArrayList<>();
         Faction enemy = factionOf(enemyFactionCombo);
@@ -1351,6 +1357,13 @@ public class ContractEditorDialog extends JDialog {
             tags.add(tag(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround"), READY));
         } else if (nature == ContractNature.COVERT) {
             tags.add(tag(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.covert"), ACCENT_BRIGHT));
+        }
+        // The special rules follow the objective chosen on the form, as the board's badges follow the saved one.
+        ContractObjectiveType objective = (ContractObjectiveType) playerObjectiveCombo.getSelectedItem();
+        if (objective != null) {
+            for (ChaosObjectiveSpecialRules specialRule : objective.getChaosObjectiveType().getSpecialRules()) {
+                tags.add(tag(specialRule.getName(), AMBER));
+            }
         }
         return tags;
     }
@@ -1473,6 +1486,8 @@ public class ContractEditorDialog extends JDialog {
 
     /** When the length's "Automatic" box is toggled, re-derive the length and (automatic) end date, and repaint. */
     private void onLengthAutomaticToggled() {
+        // Each time the length goes on "Automatic" it is rolled afresh, then kept.
+        automaticLengthMonths = null;
         if (startDate != null && (lengthAutomatic.isSelected() || endAutomatic.isSelected())) {
             endDate = startDate.plusMonths(effectiveLengthMonths());
         }
@@ -1485,8 +1500,11 @@ public class ContractEditorDialog extends JDialog {
      */
     private int effectiveLengthMonths() {
         if (lengthAutomatic != null && lengthAutomatic.isSelected()) {
-            return ContractCharacteristics.bakeLength(AbstractContractGeneration.determineLength(campaign, contract),
-                  contract);
+            if (automaticLengthMonths == null) {
+                automaticLengthMonths = ContractCharacteristics.bakeLength(
+                      AbstractContractGeneration.determineLength(campaign, contract), contract);
+            }
+            return automaticLengthMonths;
         }
         return lengthValue();
     }
@@ -1495,14 +1513,14 @@ public class ContractEditorDialog extends JDialog {
     private HudButton dateButton(Runnable onPick) {
         HudButton button = new HudButton("", false, true);
         button.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.pick.tooltip")));
-        button.addActionListener(e -> onPick.run());
+        button.addActionListener(event -> onPick.run());
         return button;
     }
 
     /** An "Automatic" pill for a schedule field, defaulting on for a new offer and off when editing. */
     private JCheckBox scheduleAutomaticToggle(Runnable onToggle) {
         Pill automatic = autoPill(createMode);
-        automatic.addActionListener(e -> onToggle.run());
+        automatic.addActionListener(event -> onToggle.run());
         return automatic;
     }
 
@@ -1855,6 +1873,11 @@ public class ContractEditorDialog extends JDialog {
             StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
         }
 
+        // The difficulty is worked out again from the saved opposition and forces, as the editor tells the GM it will
+        // be; a created offer would otherwise read as an even fight.
+        contract.setCachedContractDifficulty(
+              ChaosContractDeterminationDifficulty.calculateContractDifficulty(campaign, contract));
+
         LOGGER.info("GM {} contract: {}", createMode ? "created" : "edited", contract.getName());
         confirmed = true;
         dispose();
@@ -1977,13 +2000,14 @@ public class ContractEditorDialog extends JDialog {
         JLabel effectLabel = new JLabel();
         effectLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
         effectLabel.setForeground(TEXT);
-        effectLabel.setPreferredSize(new Dimension(scaleForGUI(170), effectLabel.getPreferredSize().height));
         Runnable showEffect = () -> effectLabel.setText("<html>" + MarketHud.escape(termEffectText(effect,
               track.getSelected())) + "<br><span style='font-weight:normal; font-size:smaller; color:"
                                                               + HudStyle.hex(TEXT_FAINT) + "'>"
                                                               + MarketHud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.stepLabel", track.getSelected().stepValue())) + "</span></html>");
         showEffect.run();
+        // Sized only once its two lines are set: an empty label measures no height at all, which would clip them.
+        effectLabel.setPreferredSize(new Dimension(scaleForGUI(170), effectLabel.getPreferredSize().height));
         track.addChangeListener(showEffect);
         track.addChangeListener(this::onEdited);
         watch(lock);
@@ -2318,7 +2342,7 @@ public class ContractEditorDialog extends JDialog {
     private static String termEffectText(TermEffect term, ChaosContractStepsTable step) {
         return switch (term) {
             case PAY_RATE -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.effect.payRate",
-                  new DecimalFormat("0.00").format(step.getBasePayMultiplier()));
+                  ContractMarketFormatting.decimalFormat("0.00").format(step.getBasePayMultiplier()));
             case SUPPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.effect.support",
                   percent(step.getStraightSupportMultiplier()), percent(step.getBattlefieldLossMultiplier()));
             case TRANSPORT -> getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.term.effect.transport",
@@ -2345,7 +2369,7 @@ public class ContractEditorDialog extends JDialog {
     private static JComboBox<ContractObjectiveType> objectiveCombo(ContractObjectiveType selected) {
         JComboBox<ContractObjectiveType> combo = enumCombo(ContractObjectiveType.values(), selected,
               type -> type == null ? "" : type.toString());
-        combo.addActionListener(e -> {
+        combo.addActionListener(event -> {
             ContractObjectiveType type = (ContractObjectiveType) combo.getSelectedItem();
             combo.setToolTipText(type == null ? null : wordWrap(type.getToolTipText()));
         });
@@ -2631,6 +2655,7 @@ public class ContractEditorDialog extends JDialog {
             portraitAutomatic = automaticToggle(portraitButton);
             watch(givenNameField);
             watch(surnameField);
+            watch(ranks);
             watch(givenNameAutomatic);
             watch(surnameAutomatic);
             watch(rankAutomatic);
@@ -2645,9 +2670,9 @@ public class ContractEditorDialog extends JDialog {
         }
 
         private Object state() {
-            return List.of(givenNameField.getText(), surnameField.getText(), String.valueOf(portrait),
-                  automaticState(givenNameAutomatic), automaticState(surnameAutomatic), automaticState(rankAutomatic),
-                  automaticState(portraitAutomatic));
+            return List.of(givenNameField.getText(), surnameField.getText(), String.valueOf(ranks.getSelectedItem()),
+                  String.valueOf(portrait), automaticState(givenNameAutomatic), automaticState(surnameAutomatic),
+                  automaticState(rankAutomatic), automaticState(portraitAutomatic));
         }
 
         /** Applies each field the GM took off "Automatic" onto the freshly-generated NPC, leaving the rest generated. */

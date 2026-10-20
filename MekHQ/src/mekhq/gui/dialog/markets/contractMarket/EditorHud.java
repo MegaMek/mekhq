@@ -161,7 +161,7 @@ final class EditorHud {
                 int x = scaleForGUI(8);
                 int middle = height / 2;
                 canvas.setColor(text);
-                canvas.setStroke(new BasicStroke(1f));
+                canvas.setStroke(new BasicStroke(scaleForGUI(1)));
                 if (kind == PillKind.LOCK) {
                     drawLock(canvas, x, middle, on);
                     x += scaleForGUI(14);
@@ -561,7 +561,8 @@ final class EditorHud {
 
     private static BasicStroke dashed() {
         float dash = scaleForGUI(3);
-        return new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[] { dash, dash }, 0f);
+        return new BasicStroke(scaleForGUI(1), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f,
+              new float[] { dash, dash }, 0f);
     }
 
     // endregion Stylers

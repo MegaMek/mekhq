@@ -350,15 +350,16 @@ final class MarketComparePage {
               contract -> objective(contract, market.isContractTypeHidden()));
         textRow(built, "compare.contractMarket.row.destination", offers,
               contract -> destination(contract, market.currentDate()));
+        // An offer with no route has no trip to rank, so it is never marked the nearest.
         rankedRow(built, "dossier.contractMarket.terms.transit", false, offers,
-              contract -> getFormattedTextAt(RESOURCE_BUNDLE, "value.contractMarket.days",
-                    market.estimate(contract).transitDays()),
-              contract -> (double) market.estimate(contract).transitDays(), Better.LOWER);
+              contract -> transit(market.estimate(contract)),
+              contract -> market.estimate(contract).hasRoute()
+                                ? Double.valueOf(market.estimate(contract).transitDays()) : null, Better.LOWER);
         rankedRow(built, "dossier.contractMarket.terms.term", false, offers,
               contract -> getFormattedTextAt(RESOURCE_BUNDLE, "card.contractMarket.months",
                     contract.getLengthInMonths()),
               contract -> (double) contract.getLengthInMonths(), Better.NEITHER);
-        DecimalFormat months = new DecimalFormat("0.0");
+        DecimalFormat months = decimalFormat("0.0");
         rankedRow(built, "compare.contractMarket.row.timeAway", false, offers,
               contract -> getFormattedTextAt(RESOURCE_BUNDLE, "compare.contractMarket.monthsAway",
                     months.format(market.estimate(contract).getEngagementMonths())),

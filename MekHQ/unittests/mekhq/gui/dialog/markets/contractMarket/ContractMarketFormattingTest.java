@@ -59,7 +59,8 @@ import org.mockito.MockedStatic;
  * signed variant marks a gain with a plus.</p>
  */
 class ContractMarketFormattingTest {
-    private static final String MINUS = "−";
+    /** The minus sign the bundle gives losses (U+2212), not the ASCII hyphen. */
+    private static final String MINUS = "\u2212";
 
     private MockedStatic<MekHQ> mekHQ;
 

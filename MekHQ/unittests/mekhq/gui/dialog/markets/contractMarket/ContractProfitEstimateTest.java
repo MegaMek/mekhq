@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.finances.ContractExpenseProjection;
@@ -105,6 +106,20 @@ class ContractProfitEstimateTest {
 
         assertEquals(0.0, estimate.getEngagementMonths(), DELTA);
         assertEquals(estimate.estimatedNet(), estimate.getNetPerMonth());
+    }
+
+    @Test
+    void engagementWithNoRouteIsTheContractTermAlone() {
+        ContractProfitEstimate estimate = estimate(ContractProfitEstimate.NO_ROUTE, 6, 600_000);
+
+        assertFalse(estimate.hasRoute());
+        assertEquals(6.0, estimate.getEngagementMonths(), DELTA);
+        assertEquals(100_000, estimate.getNetPerMonth().getAmount().doubleValue(), MONEY_DELTA);
+    }
+
+    @Test
+    void aSameSystemTripHasARoute() {
+        assertTrue(estimate(0, 6, 0).hasRoute());
     }
 
     @Test

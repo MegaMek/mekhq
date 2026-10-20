@@ -312,8 +312,8 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ContractNegotiatorPickerDialog.class);
             setName("ContractNegotiatorPickerDialog");
             preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
         }
     }
 
@@ -620,8 +620,8 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     private final class CandidateRenderer extends JPanel implements ListCellRenderer<Person> {
         /** Gaps and padding around the text: the row's insets, the accent bar, the portrait, and the gaps between. */
         private static final int TEXT_CHROME = 10 + 10 + 3 + PORTRAIT_SIZE + 10 + 10 + 6;
-        private static final String WIDEST_TARGET = "12+";
-        private static final String WIDEST_CHANCE = "100%";
+        private static final String WIDEST_TARGET = targetNumberText(12);
+        private static final String WIDEST_CHANCE = percent(1.0);
 
         private final JLabel portrait = MarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
         private final JLabel text = new JLabel();
@@ -1076,11 +1076,16 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         }
         TargetRoll target = person.checkSkill(SkillType.S_NEGOTIATION, campaign).getTargetNumber();
         return target.cannotSucceed() ? getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.impossible")
-                     : target.getValue() + "+";
+                     : targetNumberText(target.getValue());
+    }
+
+    /** A target number as the roll it needs, such as "7+". */
+    private static String targetNumberText(int target) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.target", target);
     }
 
     private static String percent(double chance) {
-        return Math.round(chance * 100) + "%";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.percent", Math.round(chance * 100));
     }
 
     private void choose() {

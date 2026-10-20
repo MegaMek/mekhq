@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
+import static mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationDifficulty.MAXIMUM_DIFFICULTY;
 import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
 import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
@@ -42,6 +43,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -123,7 +126,9 @@ public final class ContractMarketFormatting {
      */
     public static int assessmentDifficulty(AbstractContract contract) {
         int difficulty = contract.getCachedContractDifficulty();
-        return difficulty < 1 ? DEFAULT_DIFFICULTY : difficulty;
+        // Generation clamps its own result, but a value from elsewhere (such as a converted legacy contract) need not
+        // be, and every difficulty above the top would otherwise have no assessment word.
+        return difficulty < 1 ? DEFAULT_DIFFICULTY : Math.min(difficulty, MAXIMUM_DIFFICULTY);
     }
 
     /**
@@ -306,6 +311,41 @@ public final class ContractMarketFormatting {
         return money.getAmount().compareTo(BigDecimal.ZERO) > 0
                      ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.plus") + compact
                      : compact;
+    }
+
+    /**
+     * A full money amount with its sign, in the same glyphs as {@link #signedCompactMoney}: a minus for a loss, a plus
+     * for a gain, and no sign at all for zero.
+     */
+    public static String signedAmount(Money money) {
+        int sign = money.getAmount().signum();
+        String prefix = sign > 0 ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.plus")
+                              : sign < 0 ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.minus") : "";
+        return prefix + money.absolute().toAmountString();
+    }
+
+    /**
+     * A full money amount shown as a cost: with the minus glyph, unless it is zero.
+     */
+    public static String costAmount(Money cost) {
+        return signedAmount(cost.multipliedBy(-1));
+    }
+
+    /**
+     * The one-way trip to an offer's target, such as "12 days", or "No route" when no jump path reaches it.
+     */
+    public static String transit(ContractProfitEstimate estimate) {
+        return estimate.hasRoute()
+                     ? getFormattedTextAt(RESOURCE_BUNDLE, "value.contractMarket.days", estimate.transitDays())
+                     : getTextAt(RESOURCE_BUNDLE, "value.contractMarket.noRoute");
+    }
+
+    /**
+     * A decimal format for the given pattern in the player's chosen locale, as {@link #compactMoney} formats, rather
+     * than the system default.
+     */
+    public static DecimalFormat decimalFormat(String pattern) {
+        return new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(MekHQ.getMHQOptions().getLocale()));
     }
 
     private static String ratingLetter(int equipmentRating) {

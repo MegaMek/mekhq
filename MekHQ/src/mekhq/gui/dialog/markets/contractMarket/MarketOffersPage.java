@@ -86,8 +86,8 @@ final class MarketOffersPage {
     /** The board's narrowest width; it grows past this when its controls need more room to sit on one line. */
     private static final int BOARD_WIDTH = 360;
     private static final int BOARD_PADDING = 12;
-    /** The widest estimated-profit figure a row is sized for. */
-    private static final String WIDEST_FIGURE = "\u221288.88M";
+    /** The widest estimated-profit figure a row is sized for, a loss in the tens of millions. */
+    private static final double WIDEST_FIGURE = -88_880_000;
 
     private final ChaosContractMarketDialog market;
     private final JPanel root = new JPanel(new BorderLayout());
@@ -333,12 +333,13 @@ final class MarketOffersPage {
             figure.setFont(hudFont(Font.BOLD, 1.0f, 0.0f));
             figure.setAlignmentX(Component.RIGHT_ALIGNMENT);
             // Measured with sample text: an empty label has no height, which would cut the figure off at the bottom.
-            figure.setText(WIDEST_FIGURE);
+            String widestFigure = signedCompactMoney(Money.of(WIDEST_FIGURE));
+            figure.setText(widestFigure);
             figureUnit.setText(getTextAt(RESOURCE_BUNDLE, "board.contractMarket.profit"));
             figureUnit.setFont(hudFont(Font.PLAIN, 0.7f, 0.08f));
             figureUnit.setForeground(TEXT_FAINT);
             figureUnit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            figureWidth = Math.max(getFontMetrics(figure.getFont()).stringWidth(WIDEST_FIGURE),
+            figureWidth = Math.max(getFontMetrics(figure.getFont()).stringWidth(widestFigure),
                   getFontMetrics(figureUnit.getFont()).stringWidth(figureUnit.getText()));
 
             JPanel figureColumn = Hud.transparentPanel(null);

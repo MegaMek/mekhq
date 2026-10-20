@@ -53,6 +53,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JComponent;
@@ -89,6 +90,8 @@ final class ContractRoutePreview extends JComponent {
     private static final double MARGIN = 0.18;
     private static final double MINOR_GRID_STEP = 10.0;
     private static final double MAJOR_GRID_STEP = 50.0;
+    /** The closest grid lines are drawn, in unscaled pixels. */
+    private static final int MINIMUM_GRID_SPACING = 6;
     private static final int PREFERRED_WIDTH = 320;
     private static final int PREFERRED_HEIGHT = 170;
 
@@ -180,6 +183,10 @@ final class ContractRoutePreview extends JComponent {
 
     /** Gathers every other system inside the framed area, to draw as the map's background stars. */
     private void collectSurroundings() {
+        Set<PlanetarySystem> onRoute = new HashSet<>();
+        for (MapPoint point : route) {
+            onRoute.add(point.system());
+        }
         for (PlanetarySystem system : Systems.getInstance().getSystems().values()) {
             Double x = system.getX();
             Double y = system.getY();
@@ -187,7 +194,7 @@ final class ContractRoutePreview extends JComponent {
                       || y > minimumY + spanY) {
                 continue;
             }
-            if (route.stream().noneMatch(point -> point.system() == system)) {
+            if (!onRoute.contains(system)) {
                 surroundings.add(point(system));
             }
         }
@@ -239,8 +246,12 @@ final class ContractRoutePreview extends JComponent {
     }
 
     private void paintGridLines(Graphics2D canvas, double step, Color color) {
+        // On a long route the lines would crowd into a haze, so a grid too fine to read is left out.
+        if (step * scale() < scaleForGUI(MINIMUM_GRID_SPACING)) {
+            return;
+        }
         canvas.setColor(color);
-        canvas.setStroke(new BasicStroke(1f));
+        canvas.setStroke(new BasicStroke(scaleForGUI(1)));
         for (double x = Math.ceil(minimumX / step) * step; x <= minimumX + spanX; x += step) {
             int screenX = (int) Math.round(toScreen(x, minimumY).x);
             canvas.drawLine(screenX, 0, screenX, getHeight());
@@ -287,7 +298,7 @@ final class ContractRoutePreview extends JComponent {
             canvas.setColor(point.color());
             canvas.fill(dot);
             canvas.setColor(ROUTE_COLOR);
-            canvas.setStroke(new BasicStroke(1f));
+            canvas.setStroke(new BasicStroke(scaleForGUI(1)));
             canvas.draw(dot);
         }
 
@@ -339,7 +350,8 @@ final class ContractRoutePreview extends JComponent {
 
         // A dark halo keeps the name readable over stars and grid lines.
         canvas.setColor(translucent(MAP_BACKGROUND, 200));
-        canvas.fillRect(x - 2, y - metrics.getAscent(), metrics.stringWidth(name) + 4, metrics.getHeight());
+        int halo = scaleForGUI(2);
+        canvas.fillRect(x - halo, y - metrics.getAscent(), metrics.stringWidth(name) + 2 * halo, metrics.getHeight());
         canvas.setColor(color);
         canvas.drawString(name, x, y);
     }
