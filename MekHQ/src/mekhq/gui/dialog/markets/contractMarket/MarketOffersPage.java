@@ -86,8 +86,8 @@ final class MarketOffersPage {
     /** The board's narrowest width; it grows past this when its controls need more room to sit on one line. */
     private static final int BOARD_WIDTH = 360;
     private static final int BOARD_PADDING = 12;
-    /** The widest net-per-month figure a row is sized for. */
-    private static final String WIDEST_FIGURE = "\u22128.88M";
+    /** The widest estimated-profit figure a row is sized for. */
+    private static final String WIDEST_FIGURE = "\u221288.88M";
 
     private final ChaosContractMarketDialog market;
     private final JPanel root = new JPanel(new BorderLayout());
@@ -312,8 +312,8 @@ final class MarketOffersPage {
 
     /**
      * Draws each offer as a board card in the style of {@link HudCard}: the ring in the difficulty's colour, the name,
-     * the employer, mission type and term beneath, any badges, and the estimated net per month on the right. Unlike
-     * {@code HudCard}, the text wraps to the list's width, so long operation names are never cut off.
+     * the employer, mission type and term beneath, any badges, and the estimated profit (combat pay included) on the
+     * right. Unlike {@code HudCard}, the text wraps to the list's width, so long operation names are never cut off.
      */
     private final class OfferRenderer extends JPanel implements ListCellRenderer<AbstractContract> {
         /** Gaps and padding around the text: the card's insets, the accent bar, the ring, and the gaps between. */
@@ -334,7 +334,7 @@ final class MarketOffersPage {
             figure.setAlignmentX(Component.RIGHT_ALIGNMENT);
             // Measured with sample text: an empty label has no height, which would cut the figure off at the bottom.
             figure.setText(WIDEST_FIGURE);
-            figureUnit.setText(getTextAt(RESOURCE_BUNDLE, "board.contractMarket.netPerMonth"));
+            figureUnit.setText(getTextAt(RESOURCE_BUNDLE, "board.contractMarket.profit"));
             figureUnit.setFont(hudFont(Font.PLAIN, 0.7f, 0.08f));
             figureUnit.setForeground(TEXT_FAINT);
             figureUnit.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -388,9 +388,9 @@ final class MarketOffersPage {
             fitTextToWidth(textWidth(source));
 
             ring.setColor(severityColor(assessmentDifficulty(contract)), true);
-            Money netPerMonth = market.estimate(contract).getNetPerMonth();
-            figure.setText(signedCompactMoney(netPerMonth));
-            figure.setForeground(netPerMonth.isNegative() ? DANGER : READY);
+            Money profit = market.estimate(contract).getNetWithCombatPay();
+            figure.setText(signedCompactMoney(profit));
+            figure.setForeground(profit.isNegative() ? DANGER : READY);
 
             setOpaque(true);
             setBackground(isSelected ? SURFACE : SURFACE_DEEP);

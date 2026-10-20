@@ -137,7 +137,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /** The orders the board can be sorted in. */
     enum MarketSort {
-        BOARD, NET_PER_MONTH, PAY, DANGER, NEAREST;
+        BOARD, PROFIT, NET_PER_MONTH, PAY, DANGER, NEAREST;
 
         String label() {
             return getTextAt(RESOURCE_BUNDLE, "sort.contractMarket." + name());
@@ -545,6 +545,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         List<AbstractContract> ordered = new ArrayList<>(contracts);
         Comparator<AbstractContract> comparator = switch (sort) {
             case BOARD -> null;
+            case PROFIT -> Comparator.comparing((AbstractContract contract) ->
+                                                      estimate(contract).getNetWithCombatPay()).reversed();
             case NET_PER_MONTH -> Comparator.comparing((AbstractContract contract) ->
                                                              estimate(contract).getNetPerMonth()).reversed();
             case PAY -> Comparator.comparing(AbstractContract::getTotalPay).reversed();
