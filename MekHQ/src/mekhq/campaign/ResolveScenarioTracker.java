@@ -94,6 +94,7 @@ import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.unit.AerospaceRefueling;
+import mekhq.campaign.unit.BombRearmer;
 import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -2378,6 +2379,8 @@ public class ResolveScenarioTracker {
                     // as their repairs are carried out.
                     ContractSupportPayments.payBattlefieldLoss(campaign, mission, unitValue.multipliedBy(blc),
                           unit.getName());
+                } else {
+                    BombRearmer.rearmAfterScenario(campaign, unit);
                 }
             }
         }
