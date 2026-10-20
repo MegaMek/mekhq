@@ -203,8 +203,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     }
 
     /**
-     * The people eligible to negotiate for the player: detachment personnel trained in Negotiation, ranked best-first,
-     * or the detachment commander if nobody is trained.
+     * The people eligible to negotiate for the player: the detachment's lead negotiators (if any) first, then detachment
+     * personnel trained in Negotiation, each group ranked best-first, or the detachment commander if there are no such
+     * people.
      *
      * @author Illiani
      * @since 0.51.01
@@ -212,15 +213,29 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     public static List<Person> eligibleNegotiators(Campaign campaign) {
         Detachment detachment = campaign.getPlayerForce().getForceDetachment();
 
+        List<Person> leadNegotiators = new ArrayList<>();
         List<Person> trained = new ArrayList<>();
         for (Person person : detachment.getPersonnel().values()) {
-            if (person.isActive() && person.hasSkill(SkillType.S_NEGOTIATION)) {
+            if (!person.isActive()) {
+                continue;
+            }
+
+            // Lead negotiators are the player's explicit picks, so they are offered even without Negotiation training
+            if (person.isLeadNegotiator()) {
+                leadNegotiators.add(person);
+            } else if (person.hasSkill(SkillType.S_NEGOTIATION)) {
                 trained.add(person);
             }
         }
-        trained.sort(Comparator.comparingInt(ContractNegotiatorPickerDialog::negotiationLevel).reversed());
-        if (!trained.isEmpty()) {
-            return trained;
+        Comparator<Person> bestFirst = Comparator.comparingInt(ContractNegotiatorPickerDialog::negotiationLevel)
+                                             .reversed();
+        leadNegotiators.sort(bestFirst);
+        trained.sort(bestFirst);
+
+        List<Person> candidates = new ArrayList<>(leadNegotiators);
+        candidates.addAll(trained);
+        if (!candidates.isEmpty()) {
+            return candidates;
         }
 
         PlayerForce playerForce = campaign.getPlayerForce();
@@ -229,6 +244,16 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                        playerForce.isClanForce(),
                                        campaign.getLocalDate());
         return commander == null ? List.of() : List.of(commander);
+    }
+
+    /**
+     * The negotiator to put forward by default: the detachment's most skilled lead negotiator, if any are flagged and
+     * able to negotiate.
+     *
+     * @return the best lead negotiator, or {@code null} if there is none
+     */
+    public static @Nullable Person leadNegotiator(Campaign campaign) {
+        return eligibleNegotiators(campaign).stream().filter(Person::isLeadNegotiator).findFirst().orElse(null);
     }
 
     private static int negotiationLevel(Person person) {

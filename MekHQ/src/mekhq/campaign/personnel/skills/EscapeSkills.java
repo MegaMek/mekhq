@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 
 /**
  * Provides utilities for handling escape attempts by prisoners with the "Acting", "Escape Artist", "Disguise", or
@@ -201,7 +202,8 @@ public class EscapeSkills {
         int injuries = (int) floor(roll / 2.0);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE),
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
+        injuries = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(prisoner, isUseInjuryFatigue,
               campaignOptions.get(CampaignOption.FATIGUE_RATE), injuries);
 
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
@@ -217,6 +219,11 @@ public class EscapeSkills {
             if (newHits > 5) {
                 prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
             }
+        }
+
+        // Process after the injuries are applied, so the injured prisoner isn't sent on leave
+        if (isUseInjuryFatigue && !prisoner.getStatus().isDead()) {
+            Fatigue.processFatigueActions(campaign, prisoner);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(prisoner));

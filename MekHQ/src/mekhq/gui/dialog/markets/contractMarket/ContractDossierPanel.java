@@ -438,12 +438,7 @@ public class ContractDossierPanel extends JPanel {
         MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.transport"),
               contract.getTransportPayment().toAmountString(), null, null, false);
 
-        String expensesBreakdown = getFormattedTextAt(RESOURCE_BUNDLE,
-              "dossier.contractMarket.profit.expenses.tooltip",
-              estimate.salaries().toAmountAndSymbolString(),
-              estimate.maintenance().toAmountAndSymbolString(),
-              estimate.runningCosts().toAmountAndSymbolString(),
-              estimate.foodAndHousing().toAmountAndSymbolString());
+        String expensesBreakdown = buildExpensesBreakdown(estimate);
         MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.expenses",
                     contract.getLengthInMonths(), estimate.transitDays()),
               "-" + estimate.operatingCosts().toAmountString(), DANGER, expensesBreakdown, false);
@@ -463,6 +458,37 @@ public class ContractDossierPanel extends JPanel {
               TEXT_FAINT, Font.PLAIN, 0.78f);
         MarketHud.addSpanning(money, caveat, 6);
         return money;
+    }
+
+    /**
+     * Lists each expense that makes up the operating costs. Expenses the campaign does not charge are left out, as on
+     * the Finances tab.
+     *
+     * @return the breakdown as an HTML tooltip, or {@code null} when there are no expenses
+     */
+    private static @Nullable String buildExpensesBreakdown(ContractProfitEstimate estimate) {
+        List<String> lines = new ArrayList<>();
+        addExpenseLine(lines, "salaries", estimate.salaries());
+        addExpenseLine(lines, "maintenance", estimate.maintenance());
+        addExpenseLine(lines, "overhead", estimate.overhead());
+        addExpenseLine(lines, "hotSpotsUpkeep", estimate.hotSpotsUpkeep());
+        addExpenseLine(lines, "spareParts", estimate.spareParts());
+        addExpenseLine(lines, "trainingMunitions", estimate.trainingMunitions());
+        addExpenseLine(lines, "fuel", estimate.fuel());
+        addExpenseLine(lines, "foodAndHousing", estimate.foodAndHousing());
+
+        if (lines.isEmpty()) {
+            return null;
+        }
+        return "<html>" + String.join("<br>", lines) + "</html>";
+    }
+
+    private static void addExpenseLine(List<String> lines, String expenseKey, Money amount) {
+        if (amount.isZero()) {
+            return;
+        }
+        lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.expenses." + expenseKey,
+              amount.toAmountAndSymbolString()));
     }
 
     /**

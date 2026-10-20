@@ -32,7 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static megamek.client.ratgenerator.RATGenerator.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -266,7 +266,7 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
         header.setOpaque(false);
         header.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        header.add(new EmblemBadge(getFactionLogo(campaign.getGameYear(), mission.getEmployerFactionCode())),
+        header.add(new EmblemBadge(getFactionLogo(campaign.getGameYear(), mission.getEmployerFactionCode(), Color.BLACK)),
               BorderLayout.LINE_START);
 
         JPanel details = new JPanel();

@@ -1126,7 +1126,7 @@ public final class BriefingTab extends CampaignGuiTab {
                   scenario.getName());
             return false;
         }
-        if (!mission.canSalvage()) {
+        if (!salvageSystem.getSalvage().canRecoverSalvage(mission)) {
             logger.debug("[Salvage] Skipping the salvage planner for {}: {} has no salvage rights",
                   scenario.getName(), mission.getName());
             return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,9 +36,26 @@ import static java.lang.Math.ceil;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 
 public class InjurySPAUtility {
+    /**
+     * Checks whether injuries should increase Fatigue. This requires both Fatigue and Injury Fatigue to be enabled.
+     *
+     * @param campaignOptions the campaign's options
+     *
+     * @return {@code true} if injuries should increase Fatigue
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isUseInjuryFatigue(CampaignOptions campaignOptions) {
+        return campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE) &&
+                     campaignOptions.get(CampaignOption.USE_FATIGUE);
+    }
+
     /**
      * Adjusts the number of injuries for a person based on their Special Pilot Abilities (SPAs) and optionally updates
      * their fatigue.
@@ -51,7 +68,10 @@ public class InjurySPAUtility {
      * fatigueRate} multiplied by the base (unmodified) number of injuries. The "Glass Jaw" and "Toughness"
      * adjustments are deliberately excluded from this calculation. Glass Jaw doubles injuries suffered and fatigue
      * gained, and Toughness reduces injuries suffered and halves fatigue gained, but in both cases the fatigue gained
-     * from sustaining injuries is neither doubled nor halved.</p>
+     * from sustaining injuries is neither doubled nor halved. For the same reason, this fatigue is not scaled by the
+     * person's fatigue multiplier.</p>
+     *
+     * <p>Callers should use {@link #isUseInjuryFatigue(CampaignOptions)} to determine {@code isUseInjuryFatigue}.</p>
      *
      * @param person             the {@link Person} whose injuries and fatigue are to be adjusted
      * @param isUseInjuryFatigue whether to apply fatigue increase based on injuries
@@ -81,7 +101,8 @@ public class InjurySPAUtility {
 
         if (isUseInjuryFatigue) {
             int fatigueIncrease = fatigueRate * fatigueInjuries;
-            person.changeFatigue(fatigueIncrease);
+            // Injury fatigue is deliberately unscaled, so the fatigue multiplier isn't applied
+            person.changeFatigue(fatigueIncrease, false);
         }
 
         return injuries;

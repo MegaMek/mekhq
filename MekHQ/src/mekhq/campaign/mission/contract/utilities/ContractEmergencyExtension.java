@@ -56,6 +56,12 @@ public class ContractEmergencyExtension {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractEmergencyExtension";
 
     public static boolean contractExtended(Campaign campaign, AbstractContract contract) {
+        // A contract whose outcome is already decided (e.g. breached by salvage theft, or canceled when its employer
+        // lost the planet) has ended for good, so the employer can't invoke the emergency clause to extend it.
+        if (contract.getMandatedCompletionStatus() != null) {
+            return false;
+        }
+
         Factions factions = Factions.getInstance();
         // We use anchor faction to allow for the breadth of faction political interactions
         Faction employerFaction = factions.getFaction(contract.getEmployerData().anchorFactionCode());

@@ -1435,7 +1435,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @return {@code true} if this part can be scrapped and a replacement fitted, which is how a part beyond repair is
      *       dealt with. A part that can never be scrapped, such as a vehicle location, cannot be replaced either.
      */
-    protected boolean isReplaceable() {
+    public boolean isReplaceable() {
         return !canNeverScrap();
     }
 
@@ -1921,6 +1921,35 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         setHits(getHits() + d);
         updateConditionFromPart();
         updateConditionFromEntity(false);
+    }
+
+    /**
+     * Whether a failed maintenance check can still damage this part. A location or hull that is already destroyed has
+     * nothing left to damage.
+     *
+     * @return {@code true} if maintenance damage would change this part
+     */
+    public boolean canTakeMaintenanceDamage() {
+        return true;
+    }
+
+    /**
+     * The structure a location or hull keeps after maintenance damage. Maintenance damage never destroys it, so it stops
+     * at 1 point. One that is already destroyed stays destroyed: raising it back to 1 point would make a wreck
+     * repairable again.
+     *
+     * @param structure the structure points before the damage
+     * @param damage    the maintenance damage
+     *
+     * @return the structure points after the damage
+     */
+    protected int getStructureAfterMaintenanceDamage(int structure, int damage) {
+        if (structure < 1) {
+            LOGGER.debug("[MaintenanceDamage] {} on {}: already destroyed, so maintenance damage leaves it as it is",
+                  getName(), (unit == null) ? "no unit" : unit.getName());
+            return structure;
+        }
+        return Math.max(structure - damage, 1);
     }
 
     public PartQuality getQuality() {

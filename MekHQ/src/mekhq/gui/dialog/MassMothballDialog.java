@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -62,6 +61,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.ActivateUnitAction;
+import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.utilities.ReportingUtilities;
 
@@ -204,14 +205,20 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         JList<Person> techList = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
-        for (Person tech : campaign.getPlayerForce()
-                                 .getHumanResources()
-                                 .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
-                                       campaign.getCampaignOptions(),
-                                       campaign.getPlayerForce().isClanForce(),
-                                       campaign.getLocalDate())) {
-            if (tech.canTech(unitsByType.get(unitType).getFirst().getEntity())) {
-                listModel.addElement(tech);
+        Unit representativeUnit = unitsByType.get(unitType).getFirst();
+        // Infantry that look after themselves need no tech, so there is no one to choose
+        boolean isSelfMaintained = representativeUnit.isSelfMaintainedInfantry();
+        if (!isSelfMaintained) {
+            for (Person tech : campaign.getPlayerForce()
+                                     .getHumanResources()
+                                     .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
+                                           campaign.getCampaignOptions(),
+                                           campaign.getPlayerForce().isClanForce(),
+                                           campaign.getLocalDate())) {
+                if (tech.canTech(representativeUnit.getEntity())
+                          && !isCrewingAnotherVessel(tech, representativeUnit, false)) {
+                    listModel.addElement(tech);
+                }
             }
         }
 
@@ -233,7 +240,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
         labelTotalTime.setBorder(new LineBorder(Color.BLUE));
-        labelTotalTime.setText(getCompletionTimeText(0));
+        labelTotalTime.setText(getCompletionTimeText(isSelfMaintained ?
+                                                           (activating ? 1 : 2) * Unit.TECH_WORK_DAY :
+                                                           0));
         timeLabelsByUnitType.put(unitType, labelTotalTime);
         contentPanel.add(labelTotalTime, gbc);
     }
@@ -321,37 +330,66 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
 
         for (int unitType : unitsByType.keySet()) {
             final List<Person> selectedTechs = techListsByUnitType.get(unitType).getSelectedValuesList();
-            if (selectedTechs.isEmpty()) {
-                continue;
-            }
 
             int techIndex = 0;
 
             // this is a "naive" approach, where we assign each of the selected techs
             // to approximately # units / # techs in mothball/reactivation tasks
             for (Unit unit : unitsByType.get(unitType)) {
-                UUID id = selectedTechs.get(techIndex).getId();
-                Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
+                Person tech = null;
+                if (!unit.isSelfMaintainedInfantry()) {
+                    // A crewed vessel's own engineer looks after it, as when it is processed on its own
+                    if (unit.isSelfCrewed()) {
+                        tech = unit.engineerResponsible().orElse(null);
+                    }
+
+                    // Vessel crew can serve only one vessel, so pass over anyone already seated on another
+                    for (int tried = 0; (tech == null) && (tried < selectedTechs.size()); tried++) {
+                        Person candidate = selectedTechs.get(techIndex);
+                        techIndex = (techIndex + 1) % selectedTechs.size();
+                        if (!isCrewingAnotherVessel(candidate, unit, true)) {
+                            tech = candidate;
+                        }
+                    }
+
+                    if (tech == null) {
+                        continue;
+                    }
+                }
+
                 if (isMothballing) {
                     if (clearDesignationsCheckbox != null && clearDesignationsCheckbox.isSelected()) {
                         unit.clearCrew();
                         Campaign campaign1 = unit.getCampaign();
                         campaign1.getPlayerForce().removeUnitFromFormation(unit, campaign1);
                     }
-                    unit.startMothballing(tech);
+                    new MothballUnitAction(tech, false).execute(campaign, unit);
                 } else {
-                    unit.startActivating(tech);
+                    new ActivateUnitAction(tech, false).execute(campaign, unit);
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
-
-                if (techIndex == (selectedTechs.size() - 1)) {
-                    techIndex = 0;
-                } else {
-                    techIndex++;
-                }
             }
         }
         this.setVisible(false);
+    }
+
+    /**
+     * Whether a tech cannot work on a large vessel because they already crew another one. A seat in a support carrier
+     * is a holding assignment, so it does not count.
+     *
+     * @param tech         the tech to check
+     * @param target       the unit the tech would work on; only large vessels take their techs aboard
+     * @param allowOwnCrew {@code true} if the target's own crew may work on it
+     *
+     * @return {@code true} if the tech cannot be spared for {@code target}
+     */
+    private static boolean isCrewingAnotherVessel(Person tech, Unit target, boolean allowOwnCrew) {
+        if (!target.getEntity().isLargeCraft() || !tech.isTechLargeVessel()) {
+            return false;
+        }
+
+        Unit techUnit = tech.getUnit();
+        return (techUnit != null) && !techUnit.isCarrier() && !(allowOwnCrew && techUnit.equals(target));
     }
 
     /**

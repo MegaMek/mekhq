@@ -66,7 +66,6 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -95,6 +94,7 @@ import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.unit.AerospaceRefueling;
+import mekhq.campaign.unit.BombRearmer;
 import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -1076,8 +1076,10 @@ public class ResolveScenarioTracker {
             }
         }
 
-        // And now we have potential prisoners that are crewing a unit...
-        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
+        // And now we have potential prisoners that are crewing a unit... Under SIMULATED_DAMAGE the combat was only
+        // simulated, so nobody - on either side - can be taken prisoner.
+        if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone() &&
+                  !voidsCombatDamage()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -1237,7 +1239,8 @@ public class ResolveScenarioTracker {
 
     /**
      * Applies all blob (temp) crew losses queued in {@link #pendingBlobCrewLosses} to the given unit, making a single
-     * update per {@link PersonnelRole}, then clears the queue.
+     * update per {@link PersonnelRole}, then clears the queue. Under {@code SIMULATED_DAMAGE} the losses are discarded
+     * instead, as no one actually dies in a simulated battle.
      *
      * @param unit the unit the queued losses were rolled against
      *
@@ -1245,6 +1248,11 @@ public class ResolveScenarioTracker {
      * @since 0.51.01
      */
     private void applyPendingBlobCrewLosses(Unit unit) {
+        if (voidsCombatDamage()) {
+            pendingBlobCrewLosses.clear();
+            return;
+        }
+
         for (Map.Entry<PersonnelRole, Integer> entry : pendingBlobCrewLosses.entrySet()) {
             PersonnelRole role = entry.getKey();
             int losses = entry.getValue();
@@ -2061,7 +2069,7 @@ public class ResolveScenarioTracker {
     /**
      * Whether this scenario's mission carries the {@code SIMULATED_DAMAGE} contract special rule, which voids every
      * combat consequence of the scenario: neither side's units take lasting damage or losses, so there is nothing
-     * for the player to salvage.
+     * for the player to salvage, and no prisoners are taken by either side.
      *
      * @return {@code true} when the scenario's mission uses the {@code SIMULATED_DAMAGE} special rule
      *
@@ -2079,9 +2087,14 @@ public class ResolveScenarioTracker {
 
     /**
      * Processes death payouts for killed temp crew (blob crew). Calculates appropriate compensation based on role base
-     * salaries and campaign payout settings.
+     * salaries and campaign payout settings. Under {@code SIMULATED_DAMAGE} nothing is paid, as no one actually dies in
+     * a simulated battle.
      */
-    private void processTempCrewDeathPayouts() {
+    void processTempCrewDeathPayouts() {
+        if (voidsCombatDamage() || killedTempCrew.isEmpty()) {
+            return;
+        }
+
         CampaignOptions options = campaign.getCampaignOptions();
         Money totalPayout = Money.zero();
         int totalKilled = 0;
@@ -2175,7 +2188,7 @@ public class ResolveScenarioTracker {
 
         // now lets update personnel
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID pid : peopleStatus.keySet()) {
             Person person = campaign.getPlayerForce().getHumanResources().getPerson(pid);
@@ -2242,12 +2255,9 @@ public class ResolveScenarioTracker {
                 }
             }
 
-            if (voidsCombatDamage || !status.isDead()) {
+            if ((voidsCombatDamage || !status.isDead()) && campaignOptions.get(CampaignOption.USE_FATIGUE)) {
                 person.changeFatigue(fatigueRate);
-
-                if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-                    Fatigue.processFatigueActions(campaign, person);
-                }
+                Fatigue.processFatigueActions(campaign, person);
             }
 
             if (campaignOptions.isUseAdvancedMedical()) {
@@ -2272,10 +2282,8 @@ public class ResolveScenarioTracker {
             processFamiliarity(familiarityDice, familiarity);
         }
 
-        // Process payouts for killed temp crew (blob crew)
-        if (!killedTempCrew.isEmpty()) {
-            processTempCrewDeathPayouts();
-        }
+        // Process payouts for killed temp crew (blob crew).
+        processTempCrewDeathPayouts();
 
         // region Prisoners
         for (UUID pid : oppositionPersonnel.keySet()) {
@@ -2303,7 +2311,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (scenario.getStratConScenarioType().isHostileFacility() && control) {
+        if (scenario.getStratConScenarioType().isHostileFacility() && control && !voidsCombatDamage) {
             new ImmersiveDialogNotification(campaign,
                   getTextAt(RESOURCE_BUNDLE, "ResolveScenarioTracker.civilianCaptives"), true);
 
@@ -2371,6 +2379,8 @@ public class ResolveScenarioTracker {
                     // as their repairs are carried out.
                     ContractSupportPayments.payBattlefieldLoss(campaign, mission, unitValue.multipliedBy(blc),
                           unit.getName());
+                } else {
+                    BombRearmer.rearmAfterScenario(campaign, unit);
                 }
             }
         }
@@ -2510,32 +2520,17 @@ public class ResolveScenarioTracker {
     /**
      * Determines whether a salvage exchange is used based on the current contract's conditions.
      *
-     * <p>This method checks the type of the mission and evaluates specific conditions to determine if a salvage
-     * exchange approach applies. For AtB (Against the Bot) contracts, it evaluates if the enemy and employer's factions
-     * are Clan and if the date is before the Battle of Tukayyid. If these conditions are met, it returns true.</p>
-     *
-     * <p>Additionally, in general contracts, it checks if the salvage exchange is explicitly enabled.</p>
+     * <p>Salvage is exchange if the contract has salvage exchange rights, or if the employer is evoking the special
+     * Clan salvage clause (see {@link AbstractContract#isSalvageTreatedAsExchange(Campaign)}).</p>
      *
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
-        if (getMission().isSalvageExchange()) {
-            return true;
-        }
-
-        return isEmployerEvokingSpecialClause();
+        return (getMission() != null) && getMission().isSalvageTreatedAsExchange(campaign);
     }
 
     public boolean isEmployerEvokingSpecialClause() {
-        if (getMission() != null) {
-            boolean enemyIsClan = getMission().getEnemyFaction().isClan();
-            boolean employerIsClan = getMission().getEmployerFaction().isClan();
-            boolean isBeforeTukayyid = campaign.getLocalDate().isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
-
-            return enemyIsClan && !employerIsClan && isBeforeTukayyid;
-        }
-
-        return false;
+        return (getMission() != null) && getMission().isEmployerEvokingClanSalvageClause(campaign);
     }
 
     /**

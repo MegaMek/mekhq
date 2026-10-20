@@ -154,12 +154,12 @@ public class Maintenance {
                 int availableMinutes = tech.getMinutesLeft();
                 maintained = (availableMinutes >= minutesUsed);
 
+                // A tech mothballing another unit still maintains this one: maintenance comes first each day, and
+                // the mothballing only uses the minutes left over, as a refit does
                 if (!maintained) {
                     // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
-                } else {
-                    maintained = !tech.isMothballing();
                 }
 
                 if (maintained) {
@@ -238,18 +238,7 @@ public class Maintenance {
                 }
             }
 
-            int nDamage = 0;
-            int nDestroy = 0;
-            for (Map.Entry<Part, Integer> p : partsToDamage.entrySet()) {
-                int damage = p.getValue();
-                if (damage > 3) {
-                    nDestroy++;
-                    p.getKey().remove(false);
-                } else {
-                    p.getKey().doMaintenanceDamage(damage);
-                    nDamage++;
-                }
-            }
+            MaintenanceDamage damageDone = applyMaintenanceDamage(partsToDamage);
 
             unit.setLastMaintenanceReport(maintenanceReport.toString());
 
@@ -277,7 +266,7 @@ public class Maintenance {
             } else {
                 qualityString = "Overall quality remains " + quality.toName(reverse);
             }
-            String damageString = getDamageString(unit, nDamage, nDestroy);
+            String damageString = getDamageString(unit, damageDone.damagedParts(), damageDone.destroyedParts());
             String paidString = "";
             if (!paidMaintenance) {
                 paidString = "<font color='" +
@@ -477,24 +466,62 @@ public class Maintenance {
         return unit.getMaintenanceCost().multipliedBy(cyclesPerDay * multiplier);
     }
 
-    private static String getDamageString(Unit unit, int nDamage, int nDestroy) {
-        String damageString = "";
-        if (nDamage > 0) {
-            damageString += nDamage + " parts were damaged. ";
+    /**
+     * How many parts a failed maintenance check damaged and destroyed, for the maintenance report.
+     *
+     * @param damagedParts   the parts that took damage
+     * @param destroyedParts the parts that were destroyed
+     */
+    record MaintenanceDamage(int damagedParts, int destroyedParts) {}
+
+    /**
+     * Applies the damage from failed maintenance checks: more than 3 points destroys the part, less damages it. A
+     * location or hull that is already destroyed has nothing left to damage, so it is left alone and not counted;
+     * otherwise the report would say a part was damaged when nothing changed.
+     *
+     * @param partsToDamage each part with the damage its failed check did
+     *
+     * @return how many parts were damaged and destroyed
+     */
+    static MaintenanceDamage applyMaintenanceDamage(Map<Part, Integer> partsToDamage) {
+        int damagedParts = 0;
+        int destroyedParts = 0;
+        for (Map.Entry<Part, Integer> partAndDamage : partsToDamage.entrySet()) {
+            Part part = partAndDamage.getKey();
+            int damage = partAndDamage.getValue();
+            if (!part.canTakeMaintenanceDamage()) {
+                LOGGER.debug("[MaintenanceDamage] {}: already destroyed, so the failed check changes nothing",
+                      part.getName());
+            } else if (damage > 3) {
+                destroyedParts++;
+                part.remove(false);
+            } else {
+                part.doMaintenanceDamage(damage);
+                damagedParts++;
+            }
         }
-        if (nDestroy > 0) {
-            damageString += nDestroy + " parts were destroyed.";
+        return new MaintenanceDamage(damagedParts, destroyedParts);
+    }
+
+    /**
+     * The maintenance report's line on what a failed check damaged and destroyed, with a link to the Repair bay, such
+     * as "1 part was damaged."
+     *
+     * @return the line, or an empty string when nothing was damaged or destroyed
+     */
+    static String getDamageString(Unit unit, int damagedParts, int destroyedParts) {
+        List<String> damageSentences = new ArrayList<>();
+        if (damagedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.damaged", damagedParts));
         }
-        if (!damageString.isEmpty()) {
-            damageString = "<b><font color='" +
-                                 getNegativeColor() +
-                                 "'>" +
-                                 damageString +
-                                 "</b></font> [<a href='REPAIR|" +
-                                 unit.getId() +
-                                 "'>Repair bay</a>]";
+        if (destroyedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.destroyed", destroyedParts));
         }
-        return damageString;
+        if (damageSentences.isEmpty()) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.report", getNegativeColor(),
+              String.join(" ", damageSentences), unit.getId().toString());
     }
 
     /**

@@ -217,6 +217,9 @@ public class ContractNegotiationDialog extends JDialog {
         this.currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
         this.scale = max(1, contract.getScale());
+        if (contract.getPlayerNegotiator() == null) {
+            contract.setPlayerNegotiator(ContractNegotiatorPickerDialog.leadNegotiator(campaign));
+        }
         recomputeNegotiatorCaps();
         boolean useChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);

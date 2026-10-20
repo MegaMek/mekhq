@@ -79,6 +79,12 @@ public enum InjurySubType {
      */
     IMPLANT_VDNI,
 
+    /**
+     * A pair of prosthetic wings. A type of implant, so fitting one leaves anything else at the same location in place.
+     * All implants of this type are mutually exclusive. Always count as 0 TW-scale 'Hits.'
+     */
+    IMPLANT_WINGS,
+
     /** Special injuries caused by Flaws. Always count as 0 TW-scale 'Hits.' */
     FLAW;
 
@@ -148,7 +154,17 @@ public enum InjurySubType {
      * @return {@code true} if this subtype is {@link #IMPLANT_GENERIC}, otherwise {@code false}.
      */
     public boolean isImplant() {
-        return this == IMPLANT_GENERIC || this == IMPLANT_VDNI;
+        return this == IMPLANT_GENERIC || this == IMPLANT_VDNI || this == IMPLANT_WINGS;
+    }
+
+    /**
+     * Checks whether only one implant of this subtype may be fitted at a time, so fitting one replaces any other.
+     *
+     * @return {@code true} if this subtype is {@link #IMPLANT_VDNI} or {@link #IMPLANT_WINGS}, otherwise
+     *       {@code false}.
+     */
+    public boolean isMutuallyExclusiveImplant() {
+        return this == IMPLANT_VDNI || this == IMPLANT_WINGS;
     }
 
     /**
