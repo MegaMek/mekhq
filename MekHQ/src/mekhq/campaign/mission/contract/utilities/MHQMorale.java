@@ -691,7 +691,7 @@ public class MHQMorale {
             }
 
             if (today.isAfter(contract.getRoutEndDate())) {
-                int roll = randomInt(8);
+                int roll = randomInt(9);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
                 // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
