@@ -2680,17 +2680,17 @@ public class StratConContractInitializer {
             }
 
             // facility
-            boolean addedFacility = false;
+            StratConFacility facility = null;
             if (template.isFacilityScenario()) {
-                StratConFacility facility = createMidContractFacility(campaign,
+                facility = createMidContractFacility(campaign,
                       contract,
                       template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
                       true);
                 if (facility != null) {
                     trackState.addFacility(coords, facility);
-                    addedFacility = true;
                 }
             }
+            boolean addedFacility = facility != null;
 
             // create scenario - don't assign a force yet
             StratConScenario scenario = StratConRulesManager.generateScenario(campaign,
@@ -2702,6 +2702,10 @@ public class StratConContractInitializer {
                   null);
 
             if (scenario != null) {
+                if (addedFacility) {
+                    StratConRulesManager.setupFacilityScenario(scenario, facility, null);
+                }
+
                 // These appear over the contract's run on their scheduled day and are meant to be fought like any
                 // normal scenario: keep the deployment dates generateScenario set and leave them uncloaked, so the
                 // player can engage immediately rather than having to scout them out first.
