@@ -93,6 +93,7 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.OffBoardDirection;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRollModifier;
@@ -115,6 +116,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.orders.UnitOrders;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
@@ -2829,6 +2831,7 @@ public class Campaign implements ITechManager {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -5420,10 +5423,16 @@ public class Campaign implements ITechManager {
         entity.setConversionMode(0);
         entity.setDoomed(false);
         entity.setDestroyed(false);
+        // Without this a unit wrecked, recovered and repaired is written off again the next time it only flees
+        entity.clearBattleOutcome();
+        // Without this a unit that fled the last battle still reports the edge it left by
+        entity.setRetreatedDirection(OffBoardDirection.NONE);
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
         entity.setShutDown(false);
         entity.setSearchlightState(false);
+        // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
+        entity.setUnitOrders(UnitOrders.NONE);
 
         resetSensorChoice(entity);
 

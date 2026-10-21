@@ -86,7 +86,7 @@ public class ContractUtilitiesTest {
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest1LanceBypassVariance(CombatRole combatRole) {
             mockCombatTeams.add(newMockCombatTeam(4, combatRole, FormationType.STANDARD));
-            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
 
             assertEquals(1, reqLances);
         }
@@ -95,7 +95,7 @@ public class ContractUtilitiesTest {
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest3LancesBypassVariance(CombatRole combatRole) {
             newMockCombatTeams(3, 4, combatRole, FormationType.STANDARD);
-            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
 
             assertEquals(3, reqLances);
         }
@@ -104,7 +104,7 @@ public class ContractUtilitiesTest {
         @MethodSource(value = "getCombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9LanceBypassVariance(CombatRole combatRole) {
             newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
-            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
 
             assertEquals(9, reqLances);
         }
@@ -117,7 +117,6 @@ public class ContractUtilitiesTest {
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
                 int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
-                      false,
                       false,
                       TEST_VARIANCE);
 
@@ -134,7 +133,6 @@ public class ContractUtilitiesTest {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
                 int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
                       false,
-                      false,
                       TEST_VARIANCE);
 
                 assertEquals(Math.ceil(3 * TEST_VARIANCE), reqLances);
@@ -150,7 +148,6 @@ public class ContractUtilitiesTest {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
                 int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
                       false,
-                      false,
                       TEST_VARIANCE);
 
                 assertEquals(Math.ceil(9 * TEST_VARIANCE), reqLances);
@@ -161,7 +158,7 @@ public class ContractUtilitiesTest {
         @MethodSource(value = "getNoncombatRoles")
         void calculateBaseNumberOfRequiredLancesTest9LanceBypassVarianceNonCombat(CombatRole combatRole) {
             newMockCombatTeams(9, 4, combatRole, FormationType.STANDARD);
-            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+            int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
 
             assertEquals(1, reqLances);
         }
@@ -174,7 +171,6 @@ public class ContractUtilitiesTest {
             for (int i = 0; i < 5; i++) {
                 final double TEST_VARIANCE = ContractUtilities.BASE_VARIANCE_FACTOR + (.2 - (i * .1));
                 int reqLances = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign,
-                      false,
                       false,
                       TEST_VARIANCE);
 

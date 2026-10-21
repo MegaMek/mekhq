@@ -416,7 +416,9 @@ final class CampaignOptionCodecs {
                     options.get(CampaignOption.ATB_BATTLE_CHANCE)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
-                  for (int i = 0; i < values.length; i++) {
+                  // Older saves can carry entries for since-removed roles (such as Cadre), so ignore any extras
+                  final int count = Math.min(values.length, options.get(CampaignOption.ATB_BATTLE_CHANCE).length);
+                  for (int i = 0; i < count; i++) {
                       try {
                           options.setAtBBattleChance(i, parseInt(values[i]));
                       } catch (Exception ignored) {

@@ -52,6 +52,8 @@ import megamek.common.enums.Gender;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
+import mekhq.campaign.roleplay.CheckOdds;
+import mekhq.campaign.roleplay.CheckTarget;
 import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -513,5 +515,37 @@ class ActionCheckTest {
 
         assertTrue(result.isSuccess());
         assertTrue(result.getReport().contains("Passed"), result.getReport());
+    }
+
+    @Test
+    void checkTargetFailsARollOfTwoAsResolveDoes() {
+        Person person = new Person("F", "L", null, "Faction");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, new TargetRoll(2, ""), false, false, "Action")
+                                          .withRollOfTwoAlwaysFailing();
+        CheckTarget target = check.getCheckTarget();
+
+        assertFalse(resolveWithFixedRoll(check, false, 1, 1).isSuccess());
+        assertFalse(target.succeeds(2));
+        assertEquals(35.0 / 36, CheckOdds.chance(target, false), 1e-9);
+    }
+
+    @Test
+    void checkTargetOfAnOrdinaryCheckLetsARollOfTwoPass() {
+        Person person = new Person("F", "L", null, "Faction");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, new TargetRoll(2, ""), false, false, "Action");
+
+        assertTrue(check.getCheckTarget().succeeds(2));
+        assertEquals(1.0, CheckOdds.chance(check.getCheckTarget(), false), 1e-9);
+    }
+
+    @Test
+    void checkTargetOfAnAutomaticSuccessIgnoresTheRollOfTwoRule() {
+        Person person = new Person("F", "L", null, "Faction");
+        TargetRoll automaticSuccess = new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "reload");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, automaticSuccess, false, false, "Action")
+                                          .withRollOfTwoAlwaysFailing();
+
+        assertFalse(check.getCheckTarget().rollOfTwoFails());
+        assertTrue(check.getCheckTarget().succeeds(2));
     }
 }

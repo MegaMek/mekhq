@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.utilities;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 
 /**
@@ -47,7 +48,126 @@ import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
  * @since 0.51.01
  */
 public final class ActiveNegotiationMath {
+    /** The margin a check can reach either way, matching the clamp skill checks apply. */
+    private static final int MARGIN_LIMIT = 10;
+    private static final int DIE_FACES = 6;
+
     private ActiveNegotiationMath() {
+    }
+
+    /**
+     * How likely each outcome of an opposed negotiation is.
+     *
+     * @param win       the chance the player comes out ahead (a positive net margin)
+     * @param stalemate the chance of a net margin of zero
+     * @param loss      the chance the employer comes out ahead
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record Odds(double win, double stalemate, double loss) {
+    }
+
+    /**
+     * The chance of each {@link MarginOfSuccess} on one Negotiation check, as a skill check resolves it: two dice (or
+     * three keeping the highest two, with natural aptitude) against the target number, and, when Edge is spent, one
+     * reroll of a failed roll that could have succeeded.
+     *
+     * @param targetNumber      the check's target number
+     * @param cannotSucceed     whether the target can never be met (an automatic failure or impossible check)
+     * @param countUp           whether the skill succeeds at or under its target rather than at or over it
+     * @param naturalAptitude   whether the check rolls three dice and keeps the highest two
+     * @param rerollWithEdge    whether a failed roll is rerolled with Edge
+     *
+     * @return the chance of each margin, indexed by {@link MarginOfSuccess#ordinal()}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double[] marginChances(int targetNumber, boolean cannotSucceed, boolean countUp,
+          boolean naturalAptitude, boolean rerollWithEdge) {
+        double[] rolls = rollChances(naturalAptitude);
+        boolean canSucceed = !cannotSucceed && (countUp ? targetNumber >= 2 : targetNumber <= 12);
+        double[] chances = new double[MarginOfSuccess.values().length];
+        for (int roll = 2; roll <= 12; roll++) {
+            boolean failed = countUp ? roll > targetNumber : roll < targetNumber;
+            if (failed && canSucceed && rerollWithEdge) {
+                for (int reroll = 2; reroll <= 12; reroll++) {
+                    chances[margin(targetNumber, reroll, countUp).ordinal()] += rolls[roll] * rolls[reroll];
+                }
+            } else {
+                chances[margin(targetNumber, roll, countUp).ordinal()] += rolls[roll];
+            }
+        }
+        return chances;
+    }
+
+    /**
+     * The odds of an opposed negotiation: every pairing of the two checks' margins, scored as
+     * {@link #netMargin(MarginOfSuccess, MarginOfSuccess)} plus a flat modifier from the player's traits.
+     *
+     * @param playerChances   the player's margin chances, from {@link #marginChances}
+     * @param employerChances the employer's margin chances, or {@code null} when the employer has no negotiator and
+     *                        always barely makes it
+     * @param modifier        the flat modifier to the net margin
+     *
+     * @return the chance of a win, a stalemate and a loss
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Odds opposedOdds(double[] playerChances, @Nullable double[] employerChances, int modifier) {
+        MarginOfSuccess[] margins = MarginOfSuccess.values();
+        double win = 0;
+        double stalemate = 0;
+        double loss = 0;
+        for (MarginOfSuccess player : margins) {
+            for (MarginOfSuccess employer : margins) {
+                double employerChance = employerChances == null
+                                              ? (employer == MarginOfSuccess.BARELY_MADE_IT ? 1 : 0)
+                                              : employerChances[employer.ordinal()];
+                double chance = playerChances[player.ordinal()] * employerChance;
+                int net = netMargin(player, employer) + modifier;
+                if (net > 0) {
+                    win += chance;
+                } else if (net == 0) {
+                    stalemate += chance;
+                } else {
+                    loss += chance;
+                }
+            }
+        }
+        return new Odds(win, stalemate, loss);
+    }
+
+    /** The chance of each total from 2 to 12, indexed by the total. */
+    private static double[] rollChances(boolean keepHighestTwoOfThree) {
+        double[] chances = new double[13];
+        if (keepHighestTwoOfThree) {
+            double each = 1.0 / (DIE_FACES * DIE_FACES * DIE_FACES);
+            for (int first = 1; first <= DIE_FACES; first++) {
+                for (int second = 1; second <= DIE_FACES; second++) {
+                    for (int third = 1; third <= DIE_FACES; third++) {
+                        int lowest = Math.min(first, Math.min(second, third));
+                        chances[first + second + third - lowest] += each;
+                    }
+                }
+            }
+        } else {
+            double each = 1.0 / (DIE_FACES * DIE_FACES);
+            for (int first = 1; first <= DIE_FACES; first++) {
+                for (int second = 1; second <= DIE_FACES; second++) {
+                    chances[first + second] += each;
+                }
+            }
+        }
+        return chances;
+    }
+
+    private static MarginOfSuccess margin(int targetNumber, int roll, boolean countUp) {
+        long difference = (long) targetNumber - roll;
+        int margin = (int) Math.clamp(countUp ? difference : -difference, -MARGIN_LIMIT, MARGIN_LIMIT);
+        return MarginOfSuccess.getMarginOfSuccessObject(margin);
     }
 
     /**
