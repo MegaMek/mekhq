@@ -35,13 +35,13 @@ package mekhq.campaign.mission.contract.contractData;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 public enum ChaosObjectiveSpecialRules {
-    DOUBLE_ALL_COSTS /* All costs are doubled */,
+    DOUBLE_ALL_COSTS /* Unit and part purchase costs are doubled */,
     DOUBLE_SUPPORT_PAYOUTS /* All support payments doubled */,
-    END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS /* Contract automatically ends once one side has achieved two consecutive victories */,
+    END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS /* Contract ends once either side leads by twice the contract's scale */,
     NO_IN_CONTRACT_SUPPORT /* No support payments made until end of contract */,
     REDUCED_COMBAT_PAY /* Combat pay is quartered */,
-    SIMULATED_DAMAGE /* All combat damaged removed at the end of each scenario */,
-    USE_PIRATE_LOOTING /* Player gets bonus loot after each track. */;
+    SIMULATED_DAMAGE /* No lasting combat damage or losses, salvage, or prisoners */,
+    USE_PIRATE_LOOTING /* Player attempts to escape with loot at contract end, risking a criminal record */;
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";
 

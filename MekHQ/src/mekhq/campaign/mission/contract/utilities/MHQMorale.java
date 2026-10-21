@@ -691,6 +691,7 @@ public class MHQMorale {
             }
 
             if (today.isAfter(contract.getRoutEndDate())) {
+                // 0-8 inclusive, so every case in the switch below (including OVERWHELMING on 8) is reachable
                 int roll = randomInt(9);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
