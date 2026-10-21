@@ -4959,7 +4959,13 @@ public class Person implements ILocatable {
                         }
                     }
                 } else if (nodeName.equalsIgnoreCase("eduOriginBaseId")) {
-                    person.eduOriginBaseId = UUID.fromString(wn2.getTextContent().trim());
+                    try {
+                        person.eduOriginBaseId = UUID.fromString(wn2.getTextContent().trim());
+                    } catch (IllegalArgumentException ex) {
+                        // the student will fall back to returning to the main force
+                        LOGGER.warn("Invalid eduOriginBaseId '{}' for {}; ignoring", wn2.getTextContent().trim(),
+                              person.getFullName());
+                    }
                 } else if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                     if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                         NodeList nodes = wn2.getChildNodes();

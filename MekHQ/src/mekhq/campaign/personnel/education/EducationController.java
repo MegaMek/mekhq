@@ -849,7 +849,7 @@ public class EducationController {
         int travelDays = returnPath != null
                                ? LocationUtils.computeJourneyDays(returnPath, campaign.getLocalDate(),
               LocationUtils.computeStartTransit(academySystem, campaign))
-                               : max(2, campaign.getSimplifiedTravelTime(returnSystem, academySystem));
+                               : max(2, campaign.getSimplifiedTravelTime(academySystem, returnSystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
 

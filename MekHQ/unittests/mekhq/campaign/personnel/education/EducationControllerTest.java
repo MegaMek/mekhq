@@ -53,12 +53,14 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
@@ -492,6 +494,72 @@ class EducationControllerTest {
             assertSame(homeDetachment.getPersonnel(), onLeave.getParentLocation());
             assertTrue(person.getEduTagAlongs().isEmpty());
         }
+
+        private PlayerBase addOriginBase(PlanetarySystem baseSystem) {
+            PlayerBase originBase = mock(PlayerBase.class);
+            UUID originBaseId = UUID.randomUUID();
+            when(originBase.getId()).thenReturn(originBaseId);
+            when(originBase.getCurrentSystem()).thenReturn(baseSystem);
+            Detachment baseDetachment = new Detachment();
+            baseDetachment.setParent(new CurrentLocation(baseSystem, 0));
+            when(originBase.getPersonnel()).thenReturn(baseDetachment.getPersonnel());
+            person.setEduOriginBaseId(originBaseId);
+            return originBase;
+        }
+
+        @Test
+        void arrivingHome_returnsToOriginBase() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            strandTravelerAt(academySystem);
+            PlanetarySystem baseSystem = mock(PlanetarySystem.class);
+            when(baseSystem.getId()).thenReturn("BaseSystem");
+            PlayerBase originBase = addOriginBase(baseSystem);
+            when(campaign.getCampaignLocationManager().getPlayerBaseById(originBase.getId())).thenReturn(originBase);
+            Detachment homeDetachment = new Detachment();
+            homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            when(forceDetachment.getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+
+            person.setStatus(PersonnelStatus.STUDENT);
+            Person campFollower = addTagAlong(PersonnelStatus.CAMP_FOLLOWER);
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, baseSystem, campaign))
+                      .thenReturn(null);
+
+                runNewDay();
+            }
+
+            assertSame(originBase.getPersonnel(), person.getParentLocation());
+            assertSame(originBase.getPersonnel(), campFollower.getParentLocation());
+            assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+            assertNull(person.getEduOriginBaseId());
+        }
+
+        @Test
+        void arrivingHome_originBaseGone_returnsToMainForce() {
+            when(campaign.getCurrentSystem()).thenReturn(campaignSystem);
+            strandTravelerAt(academySystem);
+            PlanetarySystem baseSystem = mock(PlanetarySystem.class);
+            when(baseSystem.getId()).thenReturn("BaseSystem");
+            PlayerBase originBase = addOriginBase(baseSystem);
+            when(campaign.getCampaignLocationManager().getPlayerBaseById(originBase.getId())).thenReturn(null);
+            Detachment homeDetachment = new Detachment();
+            homeDetachment.setParent(new CurrentLocation(campaignSystem, 0));
+            when(forceDetachment.getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+
+            person.setStatus(PersonnelStatus.STUDENT);
+
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.planJumpPath(academySystem, campaignSystem, campaign))
+                      .thenReturn(null);
+
+                runNewDay();
+            }
+
+            assertSame(homeDetachment.getPersonnel(), person.getParentLocation());
+            assertEquals(PersonnelStatus.ACTIVE, person.getStatus());
+            assertNull(person.getEduOriginBaseId());
+        }
     }
 
     /** Tests for {@link EducationController#enrollPerson} stage assignment. */
@@ -628,6 +696,36 @@ class EducationControllerTest {
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
 
             assertEquals(ACADEMY_NAME, person.getEduAcademyNameInSet());
+        }
+
+        @Test
+        void enrollingFromPlayerBase_remembersOriginBase() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+            PlayerBase originBase = mock(PlayerBase.class);
+            UUID originBaseId = UUID.randomUUID();
+            when(originBase.getId()).thenReturn(originBaseId);
+
+            Person person = buildStudentPerson();
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
+                mockUtils.when(() -> LocationUtils.findEffectiveBase(person)).thenReturn(originBase);
+
+                EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+            }
+
+            assertEquals(originBaseId, person.getEduOriginBaseId());
+        }
+
+        @Test
+        void enrollingFromMainForce_hasNoOriginBase() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+
+            Person person = buildStudentPerson();
+            person.setEduOriginBaseId(UUID.randomUUID());
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertNull(person.getEduOriginBaseId());
         }
 
         private Person addSpouse(Person person, PersonnelStatus status) {
