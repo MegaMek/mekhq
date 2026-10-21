@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -993,5 +995,70 @@ public class AbstractProcreationTest {
             assertEquals("", baby.getPreNominal());
             assertEquals("", baby.getPostNominal());
         }
+    }
+
+    /**
+     * A normal birth leaves the mother in postpartum recovery and shows the birth announcement.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirth_appliesPostpartumAndAnnouncesOutsideStartingSimulation() {
+        final Person mother = prepareBirth();
+
+        try (MockedConstruction<BirthAnnouncement> announcements = mockConstruction(BirthAnnouncement.class)) {
+            new DisabledRandomProcreation(mockCampaignOptions).birth(mockCampaign, LocalDate.of(3025, 6, 1), mother,
+                  false);
+
+            assertEquals(1, mother.getHits());
+            assertEquals(1, announcements.constructed().size());
+        }
+    }
+
+    /**
+     * A birth during a new command's starting simulation spares the mother postpartum recovery and shows no birth
+     * announcement.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirth_skipsPostpartumAndAnnouncementDuringStartingSimulation() {
+        final Person mother = prepareBirth();
+
+        try (MockedConstruction<BirthAnnouncement> announcements = mockConstruction(BirthAnnouncement.class)) {
+            new DisabledRandomProcreation(mockCampaignOptions).birth(mockCampaign, LocalDate.of(3025, 6, 1), mother,
+                  true);
+
+            assertEquals(0, mother.getHits());
+            assertTrue(announcements.constructed().isEmpty());
+        }
+    }
+
+    /**
+     * Stubs the options a single, fatherless birth reads, with birth announcements enabled.
+     *
+     * @return the mother, uninjured
+     */
+    private Person prepareBirth() {
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)).thenReturn(BabySurnameStyle.MOTHERS);
+        when(mockCampaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ASSIGN_NON_PRISONER_BABIES_FOUNDER_TAG)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ASSIGN_CHILDREN_OF_FOUNDERS_FOUNDER_TAG)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS)).thenReturn(true);
+        // Only read if the random loyalty change actually moves someone's loyalty
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
+
+        when(mockCampaign.getPlayerForce().getHumanResources().newDependent(any(), any(), any(), any()))
+              .thenAnswer(invocation -> new Person(mockCampaign));
+
+        final Person mother = new Person(mockCampaign);
+        mother.setGender(Gender.FEMALE);
+        assertEquals(0, mother.getHits());
+        return mother;
     }
 }

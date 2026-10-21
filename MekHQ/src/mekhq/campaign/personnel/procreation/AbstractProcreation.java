@@ -730,7 +730,7 @@ public abstract class AbstractProcreation {
     //region New Day
 
     /**
-     * Process new day procreation for an individual
+     * Process new week procreation for an individual
      *
      * @param campaign the campaign to process
      * @param today    the current day
@@ -741,7 +741,7 @@ public abstract class AbstractProcreation {
     }
 
     /**
-     * Process new day procreation for an individual
+     * Process new week procreation for an individual
      *
      * @param campaign             the campaign to process
      * @param today                the current day
