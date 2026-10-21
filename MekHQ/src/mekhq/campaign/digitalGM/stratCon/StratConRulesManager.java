@@ -2013,12 +2013,14 @@ public class StratConRulesManager {
         boolean hasFatigueIncreased = false;
 
         int scanRangeIncrease = track.getScanRangeIncrease();
+        boolean isTraining = false;
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
         if (combatTeam != null) {
-            boolean isPatrol = combatTeam.getRole().isPatrol();
-            if (isPatrol) {
+            CombatRole combatRole = combatTeam.getRole();
+            if (combatRole.isPatrol()) {
                 scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
             }
+            isTraining = combatRole.isTraining();
         }
 
         // Process starting point
@@ -2051,6 +2053,11 @@ public class StratConRulesManager {
 
                 MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
             }
+        }
+
+        // A training force is busy drilling, not scouting, so it reveals only the hex it deploys to
+        if (isTraining) {
+            return;
         }
 
         if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
