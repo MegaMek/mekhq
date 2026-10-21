@@ -42,6 +42,7 @@ import java.util.List;
 
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.ArmorType;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -138,5 +139,52 @@ class SupportVehicleBarArmorTest {
 
         assertEquals(fiveTonsOfPoints, order.getAmount(), "An order is five tons of armor, as for other armor");
         assertTrue(armor.getStickerPrice().isPositive(), "Support vehicle armor is not free");
+    }
+
+    @Test
+    void standardArmorOnAnArmoredChassisIsNotBarArmor() {
+        Entity design = UnitFixture.CELLCO_RANGER_UPU_3000.loadEntity();
+        design.setArmorType(EquipmentType.T_ARMOR_STANDARD);
+        design.setBARRating(10);
+
+        assertFalse(SVArmor.usesBarArmor(design, design.firstArmorIndex()),
+              "Standard armor at BAR 10 is military armor, weighed by points per ton");
+    }
+
+    @Test
+    void standardArmorLoadedWithoutABarIsNotBarArmor() {
+        Entity design = UnitFixture.CELLCO_RANGER_UPU_3000.loadEntity();
+        design.setArmorType(EquipmentType.T_ARMOR_STANDARD);
+        // A unit file with standard armor has no BAR rating, which leaves a support vehicle's BAR at 0
+        design.setBARRating(0);
+
+        assertFalse(SVArmor.usesBarArmor(design, design.firstArmorIndex()));
+    }
+
+    @Test
+    void standardArmorOnACombatVehicleIsNotBarArmor() {
+        Entity tank = UnitFixture.VEDETTE_MEDIUM_TANK.loadEntity();
+        tank.setArmorType(EquipmentType.T_ARMOR_STANDARD);
+
+        assertFalse(SVArmor.usesBarArmor(tank, tank.firstArmorIndex()));
+    }
+
+    @Test
+    void armorThatDoesNotExistAtItsTechRatingOrdersNoPoints() {
+        // BAR 10 armor only exists from tech rating D
+        SVArmor armor = new SVArmor(10, TechRating.C, 0, Entity.LOC_NONE, scenario.getCampaign());
+
+        assertEquals(0.0, armor.getArmorPointsPerTon());
+        assertEquals(0, ((Armor) armor.getNewPart()).getAmount(),
+              "An empty order rather than -1 points, which kept a refit ordering armor forever");
+        assertEquals(0, ((SVArmor) armor.getAcquisitionWork()).getAmount());
+    }
+
+    @Test
+    void armorThatExistsAtItsTechRatingHasPointsPerTon() {
+        SVArmor armor = new SVArmor(10, TechRating.E, 0, Entity.LOC_NONE, scenario.getCampaign());
+
+        assertEquals(1.0 / weightPerPoint(10, TechRating.E), armor.getArmorPointsPerTon(), 0.0001);
+        assertTrue(((Armor) armor.getNewPart()).getAmount() > 0);
     }
 }
