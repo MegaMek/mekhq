@@ -32,6 +32,8 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
@@ -39,6 +41,7 @@ import javax.swing.table.TableCellRenderer;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
@@ -57,6 +60,7 @@ import mekhq.utilities.ReportingUtilities;
  * A table model for displaying work items
  */
 public class TechTableModel extends DataTableModel<Person> {
+    private static final String CAMPAIGN_RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
@@ -122,6 +126,21 @@ public class TechTableModel extends DataTableModel<Person> {
     }
 
     /**
+     * @param campaign the campaign
+     * @param tech     a tech
+     *
+     * @return the formation the tech is the assigned tech of, with its parent formations, for example {@code  (Alpha
+     *       Lance, 1st Company)}, or an empty string if they have none
+     */
+    static String describeFormation(Campaign campaign, Person tech) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(tech);
+        if (formation == null) {
+            return "";
+        }
+        return getFormattedTextAt(CAMPAIGN_RESOURCE_BUNDLE, "TechTableModel.formation", formation.getFullName());
+    }
+
+    /**
      * @deprecated Use {@link #getTechDescription(Person, boolean, IPartWork)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
@@ -152,7 +171,9 @@ public class TechTableModel extends DataTableModel<Person> {
         } else {
             toReturn.append("><b>");
         }
-        toReturn.append(tech.getFullTitle()).append("</b><br/>");
+        toReturn.append(tech.getFullTitle()).append("</b>");
+        // The formation the tech works for, so techs kept on a sub-contract stand apart from the main force
+        toReturn.append(describeFormation(getCampaign(), tech)).append("<br/>");
 
         SkillModifierData skillModifierData = tech.getSkillModifierData();
         Skill taskSkill = (null == part) ? null : tech.getSkillForWorkingOn(part);
