@@ -2807,6 +2807,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             correctSexualPreferencesForCurrentSpouse(campaign.getPlayerForce().getHumanResources().getPersonnel());
         }
 
+        migrateDerivedImplantProsthetics(campaign, version);
+
         // Reconnect persons to the main-force personnel node. Skip persons already placed by
         // processPlayerBaseNodes or reconnectChildren (base / travel / campus persons).
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
