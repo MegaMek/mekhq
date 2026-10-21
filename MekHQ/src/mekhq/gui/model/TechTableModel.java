@@ -32,6 +32,8 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
@@ -39,12 +41,14 @@ import javax.swing.table.TableCellRenderer;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.TechRepairAbilities;
 import mekhq.campaign.work.TechTaskEstimate;
 import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.BasicInfo;
@@ -56,6 +60,7 @@ import mekhq.utilities.ReportingUtilities;
  * A table model for displaying work items
  */
 public class TechTableModel extends DataTableModel<Person> {
+    private static final String CAMPAIGN_RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
@@ -107,6 +112,8 @@ public class TechTableModel extends DataTableModel<Person> {
             Person tech = getTechAt(actualRow);
             setImage(tech.getPortraitImageIconWithFallback(true, 54).getImage());
             setHtmlText(getTechDescription(tech, getCampaign().isOvertimeAllowed(), panel.getSelectedTask()));
+            String abilityEffects = TechRepairAbilities.describeEffects(tech);
+            setToolTipText((abilityEffects == null) ? null : ("<html>" + abilityEffects + "</html>"));
             if (isSelected) {
                 highlightBorder();
             } else {
@@ -116,6 +123,21 @@ public class TechTableModel extends DataTableModel<Person> {
             c.setForeground(table.getForeground());
             return c;
         }
+    }
+
+    /**
+     * @param campaign the campaign
+     * @param tech     a tech
+     *
+     * @return the formation the tech is the assigned tech of, with its parent formations, for example {@code  (Alpha
+     *       Lance, 1st Company)}, or an empty string if they have none
+     */
+    static String describeFormation(Campaign campaign, Person tech) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(tech);
+        if (formation == null) {
+            return "";
+        }
+        return getFormattedTextAt(CAMPAIGN_RESOURCE_BUNDLE, "TechTableModel.formation", formation.getFullName());
     }
 
     /**
@@ -149,7 +171,9 @@ public class TechTableModel extends DataTableModel<Person> {
         } else {
             toReturn.append("><b>");
         }
-        toReturn.append(tech.getFullTitle()).append("</b><br/>");
+        toReturn.append(tech.getFullTitle()).append("</b>");
+        // The formation the tech works for, so techs kept on a sub-contract stand apart from the main force
+        toReturn.append(describeFormation(getCampaign(), tech)).append("<br/>");
 
         SkillModifierData skillModifierData = tech.getSkillModifierData();
         Skill taskSkill = (null == part) ? null : tech.getSkillForWorkingOn(part);
@@ -181,6 +205,12 @@ public class TechTableModel extends DataTableModel<Person> {
         }
         toReturn.append("<br/>");
 
+        // The abilities that change repair work, so a tech worth saving for a weapon or armor job stands out
+        String abilities = TechRepairAbilities.describeNames(tech);
+        if (!abilities.isEmpty()) {
+            toReturn.append("<i>").append(abilities).append("</i><br/>");
+        }
+
         toReturn.append(WorkTimeEstimate.describeTechDay(getCampaign(), tech, overtimeAllowed));
         if (null != part) {
             TechTaskEstimate estimate = TechTaskEstimate.estimate(getCampaign(), part, tech);
@@ -189,31 +219,6 @@ public class TechTableModel extends DataTableModel<Person> {
             if (!finish.isEmpty()) {
                 toReturn.append("<br/>").append(finish);
             }
-        }
-
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
-            toReturn.append(", <i>Engineer</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-            toReturn.append(", <i>Maintainer</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
-            toReturn.append(", <i>Mr/Ms Fix-it</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)) {
-            toReturn.append(", <i>Armor Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)) {
-            toReturn.append(", <i>Internal Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)) {
-            toReturn.append(", <i>Weapon Specialist</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
-            toReturn.append(", <i>Gremlins</i>");
-        }
-        if (tech.getOptions().booleanOption(PersonnelOptions.ATOW_TECH_EMPATHY)) {
-            toReturn.append(", <i>Tech Empathy</i>");
         }
 
         toReturn.append("</font></html>");
