@@ -2686,11 +2686,16 @@ public class StratConContractInitializer {
                       contract,
                       template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
                       true);
-                if (facility != null) {
-                    trackState.addFacility(coords, facility);
+                if (facility == null) {
+                    // Without a facility to sit on, a facility scenario has nothing to fight over; skip it rather
+                    // than place one whose objectives point at a missing facility.
+                    LOGGER.warn("No facility for objective scenario {} on track {}; skipping it.",
+                          template.name,
+                          trackState.getDisplayableName());
+                    continue;
                 }
+                trackState.addFacility(coords, facility);
             }
-            boolean addedFacility = facility != null;
 
             // create scenario - don't assign a force yet
             StratConScenario scenario = StratConRulesManager.generateScenario(campaign,
@@ -2702,7 +2707,7 @@ public class StratConContractInitializer {
                   null);
 
             if (scenario != null) {
-                if (addedFacility) {
+                if (facility != null) {
                     StratConRulesManager.setupFacilityScenario(scenario, facility, null);
                 }
 
@@ -2725,11 +2730,8 @@ public class StratConContractInitializer {
                 // as befits a scenario that is already visible and fightable: the objectives list then shows its
                 // coordinates instead of the "Locate and..." wording used for hexes still to be scouted.
                 trackState.getRevealedCoords().add(coords);
-                if (addedFacility) {
-                    StratConFacility placedFacility = trackState.getFacility(coords);
-                    if (placedFacility != null) {
-                        placedFacility.setVisible(true);
-                    }
+                if (facility != null) {
+                    facility.setVisible(true);
                 }
 
                 StratConStrategicObjective sso = new StratConStrategicObjective();
@@ -2737,7 +2739,7 @@ public class StratConContractInitializer {
                 sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
                 sso.setDesiredObjectiveCount(1);
                 trackState.addStrategicObjective(sso);
-            } else if (addedFacility) {
+            } else if (facility != null) {
                 trackState.removeFacility(coords);
             }
         }
