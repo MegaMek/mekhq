@@ -94,7 +94,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.*;
-import mekhq.campaign.events.RefitCheckFailedEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.persons.PersonEvent;
@@ -2022,8 +2021,18 @@ public class CampaignGUI extends JPanel {
      *
      * @param missionEvent the event signaling a mission change
      */
+    @Subscribe
+    public void handleMissionChanged(MissionEvent missionEvent) {
+        refreshPartsAvailability();
+    }
+
     /**
      * The tech on a refit whose check failed tells the commander what went wrong and how much longer it will take.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param refitCheckFailedEvent the event naming the refit whose check failed
      */
     @Subscribe
     public void handleRefitCheckFailed(RefitCheckFailedEvent refitCheckFailedEvent) {
@@ -2032,11 +2041,6 @@ public class CampaignGUI extends JPanel {
         new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
               RefitBriefing.describeFailedCheck(getCampaign(), refit), null,
               RefitBriefing.describeFailedCheckRules(refit), null, false);
-    }
-
-    @Subscribe
-    public void handleMissionChanged(MissionEvent missionEvent) {
-        refreshPartsAvailability();
     }
 
     /**

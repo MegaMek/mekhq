@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ import mekhq.campaign.work.WorkTimeFormatter;
  */
 public final class RefitBriefing {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
-    private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     /** The most reasons for the class the tech lists before summing up the rest */
     static final int MAXIMUM_REASONS = 15;
 
@@ -183,8 +183,7 @@ public final class RefitBriefing {
         }
         List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
         if (!partsThatCannotBeBought.isEmpty()) {
-            notes.add(getFormattedTextAt(GUI_RESOURCE_BUNDLE, "refitConfirm.cannotBuy.text",
-                  String.join(", ", partsThatCannotBeBought)));
+            notes.add(getFormattedText("refitConfirm.cannotBuy.text", String.join(", ", partsThatCannotBeBought)));
         }
         return notes.isEmpty() ? null : String.join("<br><br>", notes);
     }

@@ -171,7 +171,8 @@ public final class WorkTimeFormatter {
         int minutesAfterDays = minutes % minutesPerDay;
         String daysText = unitText("days", wholeDays);
         if (minutesAfterDays > 0) {
-            daysText = daysText + ' ' + formatWork(minutesAfterDays, WorkTimeDisplay.AUTOMATIC);
+            daysText = getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeFormatter.daysAndTime", daysText,
+                  formatWork(minutesAfterDays, WorkTimeDisplay.AUTOMATIC));
         }
         double workingDays = (double) minutes / minutesPerDay;
         return getFormattedTextAt(RESOURCE_BUNDLE, "WorkTimeFormatter.workingDays", minutesText, hoursText, daysText,

@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,9 +60,10 @@ class CampaignGUIRefitTextTest {
         assertFalse(text.startsWith("!"), key + " is missing from the bundle");
     }
 
+    /** The refit briefing reads this warning from the default GUI bundle */
     @Test
     void cannotBuyWarningNamesThePartsAndKeepsItsApostrophe() {
-        String text = getFormattedTextAt(BUNDLE, "refitConfirm.cannotBuy.text", "ER Medium Laser");
+        String text = getFormattedText("refitConfirm.cannotBuy.text", "ER Medium Laser");
 
         assertFalse(text.contains("{"), text);
         assertEquals(true, text.contains("ER Medium Laser") && text.contains("campaign's"), text);
