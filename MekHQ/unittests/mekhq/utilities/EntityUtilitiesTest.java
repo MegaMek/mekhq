@@ -230,17 +230,17 @@ class EntityUtilitiesTest {
         }
     }
 
-    static Stream<MiscTypeFlag> satelliteImagerFlags() {
-        return Stream.of(MiscType.F_HYPERSPECTRAL_IMAGER,
-              MiscType.F_HIRES_IMAGER,
-              MiscType.F_INFRARED_IMAGER,
-              MiscType.F_LOOKDOWN_RADAR);
-    }
-
     @Nested
     class SatelliteImager {
+        static Stream<MiscTypeFlag> satelliteImagerFlags() {
+            return Stream.of(MiscType.F_HYPERSPECTRAL_IMAGER,
+                  MiscType.F_HIRES_IMAGER,
+                  MiscType.F_INFRARED_IMAGER,
+                  MiscType.F_LOOKDOWN_RADAR);
+        }
+
         @ParameterizedTest
-        @MethodSource("mekhq.utilities.EntityUtilitiesTest#satelliteImagerFlags")
+        @MethodSource("satelliteImagerFlags")
         void eachWorkingImagerType_counts(MiscTypeFlag flag) {
             Entity entity = mock(Entity.class);
             when(entity.hasWorkingMisc(flag)).thenReturn(true);

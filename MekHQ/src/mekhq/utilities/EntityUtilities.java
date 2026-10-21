@@ -32,6 +32,7 @@
  */
 package mekhq.utilities;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -40,6 +41,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.Sensor;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.IBomber;
@@ -52,6 +54,12 @@ import mekhq.campaign.unit.Unit;
  * Utility class that provides helper methods for working with entities.
  */
 public class EntityUtilities {
+    /** Equipment flags that qualify as a Satellite Imager (TO:AUE p.151-152). */
+    private static final List<MiscTypeFlag> SATELLITE_IMAGER_FLAGS = List.of(MiscType.F_HYPERSPECTRAL_IMAGER,
+          MiscType.F_HIRES_IMAGER,
+          MiscType.F_INFRARED_IMAGER,
+          MiscType.F_LOOKDOWN_RADAR);
+
     /**
      * Retrieves an {@link Entity} associated with a specific unit ID.
      *
@@ -199,9 +207,6 @@ public class EntityUtilities {
      * @since 0.51.01
      */
     public static boolean hasSatelliteImager(Entity entity) {
-        return entity.hasWorkingMisc(MiscType.F_HYPERSPECTRAL_IMAGER)
-                     || entity.hasWorkingMisc(MiscType.F_HIRES_IMAGER)
-                     || entity.hasWorkingMisc(MiscType.F_INFRARED_IMAGER)
-                     || entity.hasWorkingMisc(MiscType.F_LOOKDOWN_RADAR);
+        return SATELLITE_IMAGER_FLAGS.stream().anyMatch(entity::hasWorkingMisc);
     }
 }
