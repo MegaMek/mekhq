@@ -34,6 +34,7 @@ package mekhq.gui.baseComponents.hud;
 
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
@@ -63,6 +64,9 @@ import megamek.client.ui.util.UIUtil;
  * @since 0.51.01
  */
 public class HudButton extends JPanel {
+    /** How strongly a disarmed button's label shows, from 0 (invisible) to 255; dimmer than any armed label. */
+    private static final int DISARMED_TEXT_ALPHA = 150;
+
     private final JLabel label;
     private final boolean primary;
     private boolean hovered;
@@ -161,7 +165,7 @@ public class HudButton extends JPanel {
 
     private void refreshForeground() {
         if (!armed) {
-            label.setForeground(TEXT_MUTED);
+            label.setForeground(translucent(TEXT_FAINT, DISARMED_TEXT_ALPHA));
             return;
         }
         if (primary) {
@@ -184,14 +188,20 @@ public class HudButton extends JPanel {
         try {
             int width = getWidth();
             int height = getHeight();
-            float dim = armed ? 1.0f : 0.5f;
-            if (primary) {
-                g2.setPaint(new GradientPaint(0, 0, translucent(ACCENT, (int) ((hovered ? 66 : 40) * dim)),
-                      0, height, translucent(ACCENT, (int) ((hovered ? 26 : 13) * dim))));
+            if (!armed) {
+                // A disarmed button has no fill and a dashed outline, so it cannot be mistaken for one that is merely
+                // not hovered.
+                int dash = UIUtil.scaleForGUI(3);
+                g2.setColor(BORDER);
+                g2.setStroke(new BasicStroke(UIUtil.scaleForGUI(1), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+                      10f, new float[] { dash, dash }, 0f));
+            } else if (primary) {
+                g2.setPaint(new GradientPaint(0, 0, translucent(ACCENT, hovered ? 66 : 40),
+                      0, height, translucent(ACCENT, hovered ? 26 : 13)));
                 g2.fillRect(0, 0, width, height);
                 g2.setColor(BORDER_CYAN);
             } else {
-                g2.setColor(hovered && armed ? SURFACE_HIGHLIGHT : SURFACE);
+                g2.setColor(hovered ? SURFACE_HIGHLIGHT : SURFACE);
                 g2.fillRect(0, 0, width, height);
                 g2.setColor(BORDER);
             }

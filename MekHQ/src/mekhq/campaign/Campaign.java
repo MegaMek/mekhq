@@ -115,6 +115,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.orders.UnitOrders;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
@@ -5437,6 +5438,8 @@ public class Campaign implements ITechManager {
         entity.clearNarcAndiNarcPods();
         entity.setShutDown(false);
         entity.setSearchlightState(false);
+        // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
+        entity.setUnitOrders(UnitOrders.NONE);
 
         resetSensorChoice(entity);
 
