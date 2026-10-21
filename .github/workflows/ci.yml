@@ -142,7 +142,7 @@ jobs:
 
       - name: Test All
         working-directory: mekhq
-        run: ./gradlew testAll  --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest
+        run: ./gradlew testAll --no-parallel --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest
         env:
           mm.profile: dev
 
