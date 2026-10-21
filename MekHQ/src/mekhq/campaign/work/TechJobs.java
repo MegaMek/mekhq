@@ -85,7 +85,8 @@ public final class TechJobs {
      */
     public static TechJobs find(Campaign campaign) {
         Map<UUID, List<String>> jobsByTech = new HashMap<>();
-        for (Unit unit : campaign.getUnits()) {
+        // Units at every location, so a tech working on a unit kept at a base is busy too
+        for (Unit unit : campaign.getAllUnits()) {
             for (Part part : unit.getParts()) {
                 addPartJob(campaign, jobsByTech, part);
             }

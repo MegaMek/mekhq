@@ -34,10 +34,14 @@ package mekhq.campaign.work;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.FixedLocation;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -45,6 +49,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsScenario;
@@ -106,6 +111,81 @@ class TechJobsTest {
         assertEquals(List.of("Refitting " + locust.getName()), jobs.stream()
                                                                       .map(job -> job.substring(0, job.indexOf(" (")))
                                                                       .toList());
+    }
+
+    @Test
+    void salvageUnderWayIsAJob() {
+        Person tech = scenario.withTech(SkillType.EXP_REGULAR);
+        Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
+        locust.setSalvage(true);
+        mediumLaserOf(locust).setTech(tech);
+
+        List<String> jobs = TechJobs.find(scenario.getCampaign()).getJobs(tech);
+
+        assertEquals(1, jobs.size(), jobs.toString());
+        assertTrue(jobs.getFirst().startsWith("Salvaging Medium Laser from " + locust.getName() + " ("),
+              jobs.getFirst());
+    }
+
+    @Test
+    void aBenchRepairInTheWarehouseIsAJob() {
+        Person tech = scenario.withTech(SkillType.EXP_REGULAR);
+        Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
+        scenario.withSpare(mediumLaserOf(locust).clone(), 1);
+        Part spareLaser = scenario.getSpareParts()
+                                .stream()
+                                .filter(part -> "Medium Laser".equals(part.getName()))
+                                .findFirst()
+                                .orElseThrow();
+        spareLaser.setHits(1);
+        spareLaser.setTech(tech);
+
+        List<String> jobs = TechJobs.find(scenario.getCampaign()).getJobs(tech);
+
+        assertEquals(1, jobs.size(), jobs.toString());
+        assertTrue(jobs.getFirst().startsWith("Repairing Medium Laser in the warehouse ("), jobs.getFirst());
+    }
+
+    @Test
+    void mothballingAndActivatingAreJobs() {
+        Person tech = scenario.withTech(SkillType.EXP_REGULAR);
+        Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
+        locust.setTech(tech);
+        locust.setMothballTime(600);
+
+        List<String> mothballJobs = TechJobs.find(scenario.getCampaign()).getJobs(tech);
+        // Mothballing lets the tech go, so activation needs them assigned again
+        locust.setMothballed(true);
+        locust.setTech(tech);
+        locust.setMothballTime(600);
+        List<String> activateJobs = TechJobs.find(scenario.getCampaign()).getJobs(tech);
+
+        assertTrue(mothballJobs.getFirst().startsWith("Mothballing " + locust.getName() + " ("), mothballJobs.toString());
+        assertTrue(activateJobs.getFirst().startsWith("Activating " + locust.getName() + " ("), activateJobs.toString());
+    }
+
+    @Test
+    void aRepairOnAUnitKeptAtABaseIsAJob() {
+        Person tech = scenario.withTech(SkillType.EXP_REGULAR);
+        Campaign campaign = scenario.getCampaign();
+        PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
+        campaign.getCampaignLocationManager().addPlayerBase(base);
+        Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
+        campaign.getPlayerForce().getHangar().removeUnit(locust.getId());
+        base.getBaseHangar().addUnit(locust);
+        for (Part part : List.copyOf(locust.getParts())) {
+            scenario.getWarehouse().removePart(part);
+            base.getBaseWarehouse().addPart(part);
+        }
+        Part laser = mediumLaserOf(locust);
+        laser.setHits(1);
+        laser.setTech(tech);
+
+        List<String> jobs = TechJobs.find(campaign).getJobs(tech);
+
+        assertEquals(1, jobs.size(), jobs.toString());
+        assertTrue(jobs.getFirst().startsWith("Repairing Medium Laser on " + locust.getName() + " ("),
+              jobs.getFirst());
     }
 
     @Test
