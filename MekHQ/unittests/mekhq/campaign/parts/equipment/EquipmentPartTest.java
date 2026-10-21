@@ -74,6 +74,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -100,7 +101,7 @@ public class EquipmentPartTest {
         EquipmentPart equipmentPart = new EquipmentPart(unitTonnage, type, -1, 1.0, false, mockCampaign);
 
         // 1% of the unit's tonnage at 100,000 C-bills per ton, as MegaMek prices it
-        assertEquals(34_900_000.0, equipmentPart.getStickerPrice().getAmount().doubleValue(), 0.001);
+        assertEquals(Money.of(34_900_000L), equipmentPart.getStickerPrice());
     }
 
     @Test
