@@ -57,6 +57,22 @@ class CheckOddsTest {
     }
 
     @Test
+    void aRollOfTwoThatAlwaysFailsCostsEvenTheLowestTargetItsCertainty() {
+        CheckTarget target = new CheckTarget(2, false, false, RollType.NORMAL, true);
+
+        assertFalse(target.succeeds(2));
+        assertEquals(-1, target.margin(2));
+        assertEquals(-1, target.opposedMargin(2));
+        assertTrue(target.succeeds(3));
+        assertEquals(35.0 / 36, CheckOdds.chance(target, false), DELTA);
+    }
+
+    @Test
+    void aRollOfTwoThatAlwaysFailsKeepsItsRealMarginWhenItMissedAnyway() {
+        assertEquals(-3, new CheckTarget(5, false, false, RollType.NORMAL, true).margin(2));
+    }
+
+    @Test
     void countUpSkillsSucceedAtOrUnderTheTarget() {
         assertEquals(21.0 / 36, CheckOdds.chance(new CheckTarget(7, true, false, RollType.NORMAL), false), DELTA);
     }

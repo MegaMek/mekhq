@@ -107,6 +107,7 @@ import mekhq.service.enums.MRMSMode;
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
+    private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
@@ -396,7 +397,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(UIUtil.scaleForGUI(60));
+        // Tall enough for a tech's name, skills, repair abilities and day
+        techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
         techSorter = new TableRowSorter<>(techsModel);
