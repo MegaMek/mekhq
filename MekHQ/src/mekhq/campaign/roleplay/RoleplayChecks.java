@@ -45,7 +45,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import jakarta.annotation.Nullable;
-import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
@@ -53,8 +52,6 @@ import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ActionCheckRoll;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * Makes skill, attribute and opposed checks for the Oracle console's Checks page, logs them to the Oracle log and adds
@@ -172,7 +169,7 @@ public class RoleplayChecks {
      * @return the target they need
      */
     public CheckTarget target(final Person person, final CheckTrait trait, final int modifier) {
-        return targetOf(person, trait, build(person, trait).withMiscModifier(modifier));
+        return build(person, trait).withMiscModifier(modifier).getCheckTarget();
     }
 
     /**
@@ -205,14 +202,6 @@ public class RoleplayChecks {
                      : person.checkAttributes(Objects.requireNonNull(trait.first()), trait.second());
     }
 
-    private static CheckTarget targetOf(final Person person, final CheckTrait trait, final ActionCheck<?> check) {
-        TargetRoll targetRoll = check.getTargetNumber();
-        boolean countUp = trait.isSkill() && SkillType.getType(trait.skillName()).isCountUp();
-        Skill skill = trait.isSkill() ? person.getSkill(trait.skillName()) : null;
-        RollType rollType = (skill != null && skill.getHasNaturalAptitude()) ? RollType.ADVANTAGE : RollType.NORMAL;
-        return new CheckTarget(targetRoll.getValue(), countUp, targetRoll.cannotSucceed(), rollType);
-    }
-
     // endregion Targets
 
     // region Checks
@@ -240,7 +229,7 @@ public class RoleplayChecks {
         final List<OracleCharacter> tagged = new ArrayList<>();
         for (Person person : people) {
             ActionCheck<?> check = build(person, trait).withMiscModifier(difficulty.getModifier() + other);
-            CheckTarget target = targetOf(person, trait, check);
+            CheckTarget target = check.getCheckTarget();
             // The daily report is HTML, so what the player typed is escaped there.
             ActionCheckResult result = check.resolve(useEdge && isEdgeAllowed(),
                   trimmedReason.isEmpty() ? null : JournalText.escapeHtml(trimmedReason));

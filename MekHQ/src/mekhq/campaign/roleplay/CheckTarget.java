@@ -32,19 +32,37 @@
  */
 package mekhq.campaign.roleplay;
 
+import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 
 /**
  * The number a check has to roll on 2d6, and which way it counts.
  *
- * @param value      the target number, including modifiers
- * @param countUp    {@code true} for a skill that succeeds at or under the target, rather than at or over it
- * @param impossible {@code true} if the check cannot succeed whatever is rolled
- * @param rollType   how the dice are rolled: two dice, or three keeping two for natural aptitude
+ * @param value          the target number, including modifiers
+ * @param countUp        {@code true} for a skill that succeeds at or under the target, rather than at or over it
+ * @param impossible     {@code true} if the check cannot succeed whatever is rolled
+ * @param rollType       how the dice are rolled: two dice, or three keeping two for natural aptitude
+ * @param rollOfTwoFails {@code true} if a roll of 2 fails however low the target number is, as for a check made with
+ *                       {@link ActionCheck#withRollOfTwoAlwaysFailing()}
  */
-public record CheckTarget(int value, boolean countUp, boolean impossible, RollType rollType) {
+public record CheckTarget(int value, boolean countUp, boolean impossible, RollType rollType,
+      boolean rollOfTwoFails) {
     /** The largest margin of success or failure a check can have, as for skill checks elsewhere in MekHQ. */
     public static final int MAXIMUM_MARGIN = 10;
+    /** The margin a roll of 2 gets when it met the target but fails anyway: the narrowest possible failure. */
+    private static final int ALWAYS_FAILING_MARGIN = -1;
+
+    /**
+     * A target with no automatic failure on a roll of 2.
+     *
+     * @param value      the target number, including modifiers
+     * @param countUp    {@code true} for a skill that succeeds at or under the target, rather than at or over it
+     * @param impossible {@code true} if the check cannot succeed whatever is rolled
+     * @param rollType   how the dice are rolled: two dice, or three keeping two for natural aptitude
+     */
+    public CheckTarget(int value, boolean countUp, boolean impossible, RollType rollType) {
+        this(value, countUp, impossible, rollType, false);
+    }
 
     /**
      * @param value the target number
@@ -65,7 +83,8 @@ public record CheckTarget(int value, boolean countUp, boolean impossible, RollTy
             return -MAXIMUM_MARGIN;
         }
         long difference = countUp ? (long) value - roll : (long) roll - value;
-        return (int) Math.clamp(difference, -MAXIMUM_MARGIN, MAXIMUM_MARGIN);
+        int margin = (int) Math.clamp(difference, -MAXIMUM_MARGIN, MAXIMUM_MARGIN);
+        return isAlwaysFailing(roll) ? Math.min(margin, ALWAYS_FAILING_MARGIN) : margin;
     }
 
     /**
@@ -80,7 +99,17 @@ public record CheckTarget(int value, boolean countUp, boolean impossible, RollTy
         if (impossible) {
             return Long.MIN_VALUE;
         }
-        return countUp ? (long) value - roll : (long) roll - value;
+        long margin = countUp ? (long) value - roll : (long) roll - value;
+        return isAlwaysFailing(roll) ? Math.min(margin, ALWAYS_FAILING_MARGIN) : margin;
+    }
+
+    /**
+     * @param roll the total rolled
+     *
+     * @return {@code true} if the roll fails whatever the target number
+     */
+    private boolean isAlwaysFailing(final int roll) {
+        return rollOfTwoFails && (roll <= ActionCheck.ALWAYS_FAILING_ROLL);
     }
 
     /**
