@@ -35,6 +35,7 @@ package mekhq.gui.dialog;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -44,7 +45,9 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -52,7 +55,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.entityreadout.EntityReadout;
+import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
@@ -68,9 +73,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitDesignSearch;
+import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
+import mekhq.campaign.work.WorkTimeEstimate;
+import mekhq.campaign.work.WorkTimeFormatter;
 
 /**
  * @author Taharqa
@@ -78,6 +86,9 @@ import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
+    private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
+    /** The smallest a panel can be dragged to, so none disappears behind a divider */
+    private static final int MINIMUM_PANEL_SIZE = 100;
 
     // region Variable Declarations
     private final Campaign campaign;
@@ -93,6 +104,9 @@ public class ChooseRefitDialog extends JDialog {
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
     private JScrollPane scrNewUnit;
+    private JSplitPane mainSplit;
+    private JSplitPane refitListSplit;
+    private JSplitPane unitReadoutSplit;
 
     private boolean confirmed = false;
     private boolean customize = false;
@@ -141,30 +155,12 @@ public class ChooseRefitDialog extends JDialog {
         JScrollPane scrRefitTable = new FastJScrollPane();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrRefitTable, gridBagConstraints);
 
         scrShoppingList = new FastJScrollPane();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "shoppingList.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrShoppingList.setMinimumSize(new Dimension(300, 200));
+        scrShoppingList.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrShoppingList.setPreferredSize(new Dimension(300, 200));
-        getContentPane().add(scrShoppingList, gridBagConstraints);
 
         JTextPane txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
@@ -174,19 +170,9 @@ public class ChooseRefitDialog extends JDialog {
         EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), false, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         scrOldUnit = new FastJScrollPane(txtOldUnit);
-        scrOldUnit.setMinimumSize(new Dimension(300, 400));
+        scrOldUnit.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrOldUnit, gridBagConstraints);
 
         txtNewUnit = new JTextPane();
         txtNewUnit.setEditable(false);
@@ -194,10 +180,28 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
               "txtNewUnit.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new FastJScrollPane(txtNewUnit);
-        scrNewUnit.setMinimumSize(new Dimension(300, 400));
+        scrNewUnit.setMinimumSize(new Dimension(MINIMUM_PANEL_SIZE, MINIMUM_PANEL_SIZE));
         scrNewUnit.setPreferredSize(new Dimension(300, 400));
-        gridBagConstraints.gridx = 2;
-        getContentPane().add(scrNewUnit, gridBagConstraints);
+
+        // Each border between the panels can be dragged, and the dialog remembers where it was left
+        refitListSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrRefitTable, scrShoppingList);
+        refitListSplit.setName("refitListSplit");
+        refitListSplit.setResizeWeight(0.7);
+        unitReadoutSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrOldUnit, scrNewUnit);
+        unitReadoutSplit.setName("unitReadoutSplit");
+        unitReadoutSplit.setResizeWeight(0.5);
+        mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, refitListSplit, unitReadoutSplit);
+        mainSplit.setName("mainSplit");
+        mainSplit.setResizeWeight(0.4);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(mainSplit, gridBagConstraints);
 
         JPanel panBtn = new JPanel(new GridBagLayout());
 
@@ -217,8 +221,7 @@ public class ChooseRefitDialog extends JDialog {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -237,6 +240,9 @@ public class ChooseRefitDialog extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseRefitDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
+            preferences.manage(new JSplitPanePreference(mainSplit));
+            preferences.manage(new JSplitPanePreference(refitListSplit));
+            preferences.manage(new JSplitPanePreference(unitReadoutSplit));
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
         }
@@ -279,6 +285,7 @@ public class ChooseRefitDialog extends JDialog {
         Refit r = getSelectedRefit();
         if (null == r) {
             scrShoppingList.setViewportView(null);
+            scrShoppingList.setColumnHeaderView(null);
             txtNewUnit.setText("");
             btnRefit.setEnabled(false);
             btnCustomize.setEnabled(false);
@@ -292,11 +299,59 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setToolTipText(canBuyKit ? null : getTextAt(RESOURCE_BUNDLE, "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
-        JList<String> lstShopping = new JList<>(r.getShoppingListDescription());
+        JList<String> lstShopping = new JList<>(listNeeds(r).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
+        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(r)));
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
+    }
+
+    /**
+     * @return a line above the parts list saying where the refit stands for parts, in the colour the refit list uses
+     */
+    private static JLabel createPartsStatusLabel(RefitPartsStatus partsStatus) {
+        JLabel statusLabel = new JLabel("<html>" + partsStatus.describe() + "</html>");
+        Color statusColor = getPartsStatusColor(partsStatus.state());
+        if (statusColor != null) {
+            statusLabel.setForeground(statusColor);
+        }
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        return statusLabel;
+    }
+
+    /**
+     * @return what the refit needs, under a heading for what the warehouse covers and one for what must be ordered
+     */
+    private static List<String> listNeeds(Refit refit) {
+        List<String> inStock = new ArrayList<>();
+        List<String> toOrder = new ArrayList<>();
+        for (Refit.RefitNeed need : refit.describeNeeds()) {
+            (need.isInStock() ? inStock : toOrder).add("   " + need.description());
+        }
+        List<String> lines = new ArrayList<>();
+        if (!inStock.isEmpty()) {
+            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.inStock"));
+            lines.addAll(inStock);
+        }
+        if (!toOrder.isEmpty()) {
+            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.toOrder"));
+            lines.addAll(toOrder);
+        }
+        return lines;
+    }
+
+    /**
+     * @return green when the refit can start now, amber when the warehouse covers part of it, the normal text colour
+     *       when everything must be ordered, and red when some parts cannot be bought
+     */
+    private static @Nullable Color getPartsStatusColor(RefitPartsStatus.State state) {
+        return switch (state) {
+            case READY -> MekHQ.getMHQOptions().getFontColorPositive();
+            case PARTLY_IN_STOCK -> MekHQ.getMHQOptions().getFontColorWarning();
+            case TO_ORDER -> null;
+            case CANNOT_BUY -> MekHQ.getMHQOptions().getFontColorNegative();
+        };
     }
 
     private void populateRefits() {
@@ -354,8 +409,18 @@ public class ChooseRefitDialog extends JDialog {
         public final static int COL_COST = 6;
         public final static int N_COL = 7;
 
+        // Worked out once for each refit, since the table repaints often
+        private final Map<Refit, RefitPartsStatus> partsStatusByRefit = new HashMap<>();
+
         public RefitTableModel(List<Refit> refits) {
             data = refits;
+        }
+
+        /**
+         * @return whether the refit needs parts ordered, or has some that cannot be bought
+         */
+        public RefitPartsStatus getPartsStatus(Refit refit) {
+            return partsStatusByRefit.computeIfAbsent(refit, key -> RefitPartsStatus.of(campaign, key));
         }
 
         @Override
@@ -396,7 +461,8 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_BV) {
                 return r.getNewEntity().calculateBattleValue(true, true);
             } else if (col == COL_TIME) {
-                return r.getTime();
+                return new RefitTime(r.getTime(), WorkTimeFormatter.formatDuration(r.getTime(),
+                      getRefitMinutesPerDay(), campaign.getLocalDate(), MekHQ.getMHQOptions().getWorkTimeDisplay()));
             } else if (col == COL_NUM_PART) {
                 return r.getShoppingList().size();
             } else if (col == COL_COST) {
@@ -448,8 +514,21 @@ public class ChooseRefitDialog extends JDialog {
                              .getTargetNumber()
                              .getDesc();
             }
+            if (col == COL_TIME) {
+                return WorkTimeFormatter.describeWorkingDays(r.getTime(), getRefitMinutesPerDay());
+            }
+            if (col == COL_MODEL) {
+                return getPartsStatus(r).describe();
+            }
 
             return null;
+        }
+
+        /**
+         * @return the minutes a tech puts into a refit each day; no tech is chosen yet, so a plain working day
+         */
+        private int getRefitMinutesPerDay() {
+            return WorkTimeEstimate.getMinutesPerDay(campaign, null, false);
         }
 
         // fill table with values
@@ -472,9 +551,38 @@ public class ChooseRefitDialog extends JDialog {
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
                 setToolTipText(getTooltip(actualRow, actualCol));
+                // The model name is coloured by whether the refit needs parts ordered
+                Color partsColor = null;
+                boolean isColouredByParts = (actualCol == COL_MODEL) && !isSelected && !data.isEmpty();
+                if (isColouredByParts) {
+                    partsColor = getPartsStatusColor(getPartsStatus(data.get(actualRow)).state());
+                }
+                if (partsColor != null) {
+                    setForeground(partsColor);
+                } else {
+                    setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                }
 
                 return this;
             }
+        }
+    }
+
+    /**
+     * A refit's time as the table shows it, sorted by its minutes of work rather than by its text.
+     *
+     * @param minutes minutes of work
+     * @param text    the time as the player's chosen display shows it
+     */
+    public record RefitTime(int minutes, String text) implements Comparable<RefitTime> {
+        @Override
+        public int compareTo(RefitTime other) {
+            return Integer.compare(minutes, other.minutes);
+        }
+
+        @Override
+        public String toString() {
+            return text;
         }
     }
 
