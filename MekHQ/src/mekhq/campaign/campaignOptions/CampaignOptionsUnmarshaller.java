@@ -138,7 +138,7 @@ public class CampaignOptionsUnmarshaller {
                   parseBoolean(nodeContents) ? SalvageSystem.CAM_OPS_STRICT : SalvageSystem.LEGACY);
             // 0.51.01 nightly compatibility: boolean replaced by the UnitCostModel enum.
             case "useAlternateUnitCost" -> campaignOptions.set(CampaignOption.UNIT_COST_MODEL,
-                  parseBoolean(nodeContents) ? UnitCostModel.CHAOS_CAMPAIGN_STRICT : UnitCostModel.CANON);
+                  parseBoolean(nodeContents) ? UnitCostModel.CHAOS_CAMPAIGN : UnitCostModel.TOTAL_WARFARE);
             // Legacy boolean replaced by the alternative advanced medical healing-time multiplier.
             case "useKinderAlternativeAdvancedMedical" -> {
                 if (parseBoolean(nodeContents)) {

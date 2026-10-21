@@ -44,9 +44,9 @@ import megamek.common.units.UnitType;
  * Cost rule from <i>Hot Spots: Draconis Reach</i>.
  *
  * <ul>
- *     <li>{@link #CANON} - units are valued by their construction cost.</li>
- *     <li>{@link #CHAOS_CAMPAIGN_STRICT} - every unit is valued by its Battle Value.</li>
- *     <li>{@link #CHAOS_CAMPAIGN_REVISED} - as {@link #CHAOS_CAMPAIGN_STRICT}, except large craft (DropShips,
+ *     <li>{@link #TOTAL_WARFARE} - units are valued by their construction cost.</li>
+ *     <li>{@link #CHAOS_CAMPAIGN} - every unit is valued by its Battle Value.</li>
+ *     <li>{@link #MEKHQ} - as {@link #CHAOS_CAMPAIGN}, except large craft (DropShips,
  *     JumpShips, WarShips, and space stations) keep their construction cost. Their Battle Value is tiny next to their
  *     construction cost, so valuing them by it makes them absurdly cheap.</li>
  * </ul>
@@ -55,9 +55,9 @@ import megamek.common.units.UnitType;
  * @since 0.51.01
  */
 public enum UnitCostModel {
-    CANON("CANON"),
-    CHAOS_CAMPAIGN_STRICT("CHAOS_CAMPAIGN_STRICT"),
-    CHAOS_CAMPAIGN_REVISED("CHAOS_CAMPAIGN_REVISED");
+    TOTAL_WARFARE("TOTAL_WARFARE"),
+    CHAOS_CAMPAIGN("CHAOS_CAMPAIGN"),
+    MEKHQ("MEKHQ");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.UnitCostModel";
 
@@ -73,24 +73,24 @@ public enum UnitCostModel {
      * @author Illiani
      * @since 0.51.01
      */
-    public boolean isCanon() {
-        return this == CANON;
+    public boolean isTotalWarfare() {
+        return this == TOTAL_WARFARE;
     }
 
     /**
      * @author Illiani
      * @since 0.51.01
      */
-    public boolean isChaosCampaignStrict() {
-        return this == CHAOS_CAMPAIGN_STRICT;
+    public boolean isChaosCampaign() {
+        return this == CHAOS_CAMPAIGN;
     }
 
     /**
      * @author Illiani
      * @since 0.51.01
      */
-    public boolean isChaosCampaignRevised() {
-        return this == CHAOS_CAMPAIGN_REVISED;
+    public boolean isMekHQ() {
+        return this == MEKHQ;
     }
 
     /**
@@ -103,9 +103,9 @@ public enum UnitCostModel {
      */
     public boolean isBattleValueCost(boolean isLargeCraft) {
         return switch (this) {
-            case CANON -> false;
-            case CHAOS_CAMPAIGN_STRICT -> true;
-            case CHAOS_CAMPAIGN_REVISED -> !isLargeCraft;
+            case TOTAL_WARFARE -> false;
+            case CHAOS_CAMPAIGN -> true;
+            case MEKHQ -> !isLargeCraft;
         };
     }
 

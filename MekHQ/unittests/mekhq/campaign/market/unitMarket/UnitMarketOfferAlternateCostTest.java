@@ -68,7 +68,7 @@ class UnitMarketOfferAlternateCostTest {
     @BeforeEach
     void setUp() {
         campaignOptions = new CampaignOptions();
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN_STRICT);
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
         campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
         campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
@@ -131,21 +131,21 @@ class UnitMarketOfferAlternateCostTest {
 
     @Test
     void optionOffKeepsConstructionCostPricing() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CANON);
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
         assertEquals(Money.of(4_000_000), offer(100).getPrice());
         verify(summary, never()).getBV();
     }
 
     /**
-     * Chaos Campaign (Revised) prices large craft offers from their construction cost.
+     * MekHQ prices large craft offers from their construction cost.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Test
-    void revisedPricesLargeCraftFromConstructionCost() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN_REVISED);
+    void mekHQPricesLargeCraftFromConstructionCost() {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
         when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.DROPSHIP));
 
         assertEquals(Money.of(4_000_000), offer(100).getPrice());
@@ -157,8 +157,8 @@ class UnitMarketOfferAlternateCostTest {
      * @since 0.51.01
      */
     @Test
-    void revisedPricesOrdinaryUnitsFromBattleValue() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN_REVISED);
+    void mekHQPricesOrdinaryUnitsFromBattleValue() {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
         when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
 
         assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice());

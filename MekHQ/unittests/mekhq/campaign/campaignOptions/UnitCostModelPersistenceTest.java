@@ -79,8 +79,8 @@ class UnitCostModelPersistenceTest {
     }
 
     @Test
-    void newCampaignsDefaultToCanon() {
-        assertEquals(UnitCostModel.CANON, new CampaignOptions().get(CampaignOption.UNIT_COST_MODEL));
+    void newCampaignsDefaultToTotalWarfare() {
+        assertEquals(UnitCostModel.TOTAL_WARFARE, new CampaignOptions().get(CampaignOption.UNIT_COST_MODEL));
     }
 
     @ParameterizedTest
@@ -102,21 +102,21 @@ class UnitCostModelPersistenceTest {
     }
 
     @Test
-    void legacyAlternateUnitCostMigratesToChaosCampaignStrict() throws Exception {
+    void legacyAlternateUnitCostMigratesToChaosCampaign() throws Exception {
         CampaignOptions loaded = unmarshalTags("<useAlternateUnitCost>true</useAlternateUnitCost>");
 
-        assertEquals(UnitCostModel.CHAOS_CAMPAIGN_STRICT, loaded.get(CampaignOption.UNIT_COST_MODEL));
+        assertEquals(UnitCostModel.CHAOS_CAMPAIGN, loaded.get(CampaignOption.UNIT_COST_MODEL));
     }
 
     @Test
-    void legacyNonAlternateUnitCostMigratesToCanon() throws Exception {
+    void legacyNonAlternateUnitCostMigratesToTotalWarfare() throws Exception {
         CampaignOptions loaded = unmarshalTags("<useAlternateUnitCost>false</useAlternateUnitCost>");
 
-        assertEquals(UnitCostModel.CANON, loaded.get(CampaignOption.UNIT_COST_MODEL));
+        assertEquals(UnitCostModel.TOTAL_WARFARE, loaded.get(CampaignOption.UNIT_COST_MODEL));
     }
 
     @Test
-    void saveWithoutAnyUnitCostTagDefaultsToCanon() throws Exception {
-        assertEquals(UnitCostModel.CANON, unmarshalTags("").get(CampaignOption.UNIT_COST_MODEL));
+    void saveWithoutAnyUnitCostTagDefaultsToTotalWarfare() throws Exception {
+        assertEquals(UnitCostModel.TOTAL_WARFARE, unmarshalTags("").get(CampaignOption.UNIT_COST_MODEL));
     }
 }

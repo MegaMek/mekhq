@@ -131,8 +131,8 @@ class HotSpotsUpkeepExclusionTest {
         for (CampaignOption<Boolean> option : newOptions) {
             assertFalse(campaignOptions.get(option), option + " should default to off");
         }
-        assertEquals(UnitCostModel.CANON, campaignOptions.get(CampaignOption.UNIT_COST_MODEL),
-              "UNIT_COST_MODEL should default to Canon");
+        assertEquals(UnitCostModel.TOTAL_WARFARE, campaignOptions.get(CampaignOption.UNIT_COST_MODEL),
+              "UNIT_COST_MODEL should default to Total Warfare");
     }
 
     /** A fresh campaign with default options must charge exactly what it charged before these changes. */

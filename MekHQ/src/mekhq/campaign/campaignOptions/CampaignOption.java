@@ -793,7 +793,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
           of(Boolean.class, false, "payForHotSpotsUpkeep");
     public static final CampaignOption<UnitCostModel> UNIT_COST_MODEL =
-          of(UnitCostModel.class, UnitCostModel.CANON, "unitCostModel");
+          of(UnitCostModel.class, UnitCostModel.TOTAL_WARFARE, "unitCostModel");
     public static final CampaignOption<Boolean> INCREASE_CLAN_REPAIR_COSTS =
           of(Boolean.class, false, "increaseClanRepairCosts");
     public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =
