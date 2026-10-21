@@ -5110,10 +5110,6 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        // Here we selectively overwrite the earlier entries
-        processInstantArrivals(scenario, hangar);
-        processDelayedArrivals(scenario, hangar, strategy);
-
         // loop through individual units as well
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -5142,6 +5138,12 @@ public class AtBDynamicScenarioFactory {
                       strategy);
             }
         }
+
+        // Here we selectively overwrite the earlier entries. This must come after the individual unit loop, as
+        // auxiliary (leadership) and utility units are individual units whose templates are not saved; without this
+        // ordering they fall back to reinforcement arrival turns after a reload.
+        processInstantArrivals(scenario, hangar);
+        processDelayedArrivals(scenario, hangar, strategy);
     }
 
     /**
