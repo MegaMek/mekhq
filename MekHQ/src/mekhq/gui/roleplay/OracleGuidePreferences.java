@@ -32,15 +32,11 @@
  */
 package mekhq.gui.roleplay;
 
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import megamek.client.ui.preferences.PreferenceElement;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.codeUtilities.MathUtility;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.gui.preferences.PreferenceFlags;
 
 /**
  * The Oracle console's tutorial settings: whether the welcome banner has been dismissed, whether each page's guide has
@@ -51,24 +47,23 @@ import mekhq.MekHQ;
  * closed) resets every tutorial.</p>
  */
 public final class OracleGuidePreferences {
-    private static final MMLogger LOGGER = MMLogger.create(OracleGuidePreferences.class);
-
     static final String WELCOME_DISMISSED = "welcomeDismissed";
     static final String GUIDE_AUTO_OPEN = "guideAutoOpen";
     static final String GUIDE_SEEN_PREFIX = "guideSeen.";
 
     private static OracleGuidePreferences instance;
 
-    private final Map<String, Flag> flags = new LinkedHashMap<>();
+    private final PreferenceFlags flags;
 
     /**
      * @param node the preferences node to store the settings under
      */
     OracleGuidePreferences(final PreferencesNode node) {
-        register(node, WELCOME_DISMISSED, false);
-        register(node, GUIDE_AUTO_OPEN, true);
+        flags = new PreferenceFlags(node);
+        flags.register(WELCOME_DISMISSED, false);
+        flags.register(GUIDE_AUTO_OPEN, true);
         for (ConsolePage page : ConsolePage.values()) {
-            register(node, seenKey(page), false);
+            flags.register(seenKey(page), false);
         }
     }
 
@@ -82,53 +77,30 @@ public final class OracleGuidePreferences {
         return instance;
     }
 
-    private void register(final PreferencesNode node, final String name, final boolean defaultValue) {
-        try {
-            Flag flag = new Flag(name, defaultValue);
-            flags.put(name, flag);
-            // Managing the flag loads any value saved in an earlier session and saves it again on exit.
-            node.manage(flag);
-        } catch (Exception exception) {
-            LOGGER.error(exception, "Failed to register Oracle tutorial preference {}", name);
-        }
-    }
-
     private static String seenKey(final ConsolePage page) {
         return GUIDE_SEEN_PREFIX + page.name().toLowerCase(Locale.ROOT);
-    }
-
-    private boolean get(final String name) {
-        Flag flag = flags.get(name);
-        return flag != null && flag.value;
-    }
-
-    private void set(final String name, final boolean value) {
-        Flag flag = flags.get(name);
-        if (flag != null) {
-            flag.value = value;
-        }
     }
 
     /**
      * @return {@code true} once the player has dismissed the welcome banner
      */
     public boolean isWelcomeDismissed() {
-        return get(WELCOME_DISMISSED);
+        return flags.get(WELCOME_DISMISSED);
     }
 
     public void setWelcomeDismissed(final boolean dismissed) {
-        set(WELCOME_DISMISSED, dismissed);
+        flags.set(WELCOME_DISMISSED, dismissed);
     }
 
     /**
      * @return {@code true} if a page's guide opens by itself the first time the page is visited
      */
     public boolean isGuideAutoOpen() {
-        return get(GUIDE_AUTO_OPEN);
+        return flags.get(GUIDE_AUTO_OPEN);
     }
 
     public void setGuideAutoOpen(final boolean autoOpen) {
-        set(GUIDE_AUTO_OPEN, autoOpen);
+        flags.set(GUIDE_AUTO_OPEN, autoOpen);
     }
 
     /**
@@ -137,35 +109,10 @@ public final class OracleGuidePreferences {
      * @return {@code true} if the player has already seen that page's guide
      */
     public boolean isGuideSeen(final ConsolePage page) {
-        return get(seenKey(page));
+        return flags.get(seenKey(page));
     }
 
     public void setGuideSeen(final ConsolePage page, final boolean seen) {
-        set(seenKey(page), seen);
-    }
-
-    /** One on/off setting, saved in the preferences file as {@code true} or {@code false}. */
-    private static final class Flag extends PreferenceElement {
-        private boolean value;
-
-        private Flag(final String name, final boolean defaultValue) throws Exception {
-            super(name);
-            this.value = defaultValue;
-        }
-
-        @Override
-        protected String getValue() {
-            return Boolean.toString(value);
-        }
-
-        @Override
-        protected void initialize(final String saved) {
-            value = MathUtility.parseBoolean(saved.strip());
-        }
-
-        @Override
-        protected void dispose() {
-            // Nothing to release: the flag is not tied to a component.
-        }
+        flags.set(seenKey(page), seen);
     }
 }

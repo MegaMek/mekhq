@@ -147,9 +147,9 @@ public final class RefitDesignSearch {
     }
 
     /**
-     * Whether a design's weight lets it be a refit of this unit. Battle armor matches on squad size, which the summary
-     * holds as its weight. Conventional infantry always matches: a platoon's weight follows from its troopers and
-     * their weapons, so any change to either gives a different weight.
+     * Whether a design's weight lets it be a refit of this unit. Battle armor always matches: the summary holds its
+     * squad size as its weight, and a refit may add or remove troopers. Conventional infantry always matches: a
+     * platoon's weight follows from its troopers and their weapons, so any change to either gives a different weight.
      *
      * @param entity  the unit's current design
      * @param summary the candidate design
@@ -157,10 +157,7 @@ public final class RefitDesignSearch {
      * @return {@code true} if the weights are compatible
      */
     static boolean isWeightMatch(Entity entity, MekSummary summary) {
-        if (entity instanceof BattleArmor battleArmor) {
-            return battleArmor.getSquadSize() == (int) summary.getTWWeight();
-        }
-        if (entity instanceof ConvInfantry) {
+        if ((entity instanceof BattleArmor) || (entity instanceof ConvInfantry)) {
             return true;
         }
         return summary.getTons() == entity.getWeight();

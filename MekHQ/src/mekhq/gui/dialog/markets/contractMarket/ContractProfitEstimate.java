@@ -35,6 +35,7 @@ package mekhq.gui.dialog.markets.contractMarket;
 import java.util.Collection;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Accountant;
@@ -65,7 +66,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * battlefield losses (which depend on how the fighting goes). Combat pay is given separately, as the most the contract
  * can pay if every chance at the bonus is won (see {@link StratConCombatBonusProjection}).</p>
  *
- * @param transitDays        one-way travel time to the target system, in days
+ * @param transitDays        one-way travel time to the target system, in days, or {@link #NO_ROUTE} when no jump path
+ *                           reaches it
+ * @param contractMonths     the contract term, in months
  * @param guaranteedIncome   monthly pay across the contract term plus the transport payment
  * @param operatingCosts     the total expenses across the contract term and the transit out
  * @param estimatedNet       {@code guaranteedIncome} minus {@code operatingCosts}
@@ -83,10 +86,16 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @author Illiani
  * @since 0.51.01
  */
-public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Money operatingCosts,
+public record ContractProfitEstimate(int transitDays, int contractMonths, Money guaranteedIncome, Money operatingCosts,
       Money estimatedNet, Money salaries, Money maintenance, Money overhead, Money hotSpotsUpkeep, Money spareParts,
       Money trainingMunitions, Money fuel, Money foodAndHousing, StratConCombatBonusProjection combatBonus,
       Money potentialCombatPay) {
+    /**
+     * The {@link #transitDays} of an offer whose target no jump path reaches. Its trip out cannot be costed, so the
+     * estimate covers the contract term alone, and the offer is never ranked as the nearest.
+     */
+    public static final int NO_ROUTE = -1;
+
     /**
      * Computes the profit estimate for the given offer in the context of the supplied campaign.
      *
@@ -98,16 +107,19 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
         Detachment detachment = playerForce.getForceDetachment();
         FactionStandings factionStandings = playerForce.getFactionStandings();
 
-        int transitDays = ContractUtilities.getTravelDays(campaign,
+        // getTravelDays reads zero days when there is no route, which would make an unreachable offer look closest.
+        JumpPath path = ContractUtilities.getJumpPath(campaign, contract, detachment.getCurrentLocation());
+        int transitDays = (path == null || path.isEmpty()) ? NO_ROUTE : ContractUtilities.getTravelDays(campaign,
               contract,
               detachment.getCurrentLocation(),
               false,
               factionStandings);
+        int costedTransitDays = Math.max(0, transitDays);
 
         int months = contract.getLengthInMonths();
         Money guaranteedIncome = contract.getTotalMonthlyPay().plus(contract.getTransportPayment());
 
-        double transitMonths = transitDays / ContractExpenseProjection.DAYS_PER_MONTH;
+        double transitMonths = costedTransitDays / ContractExpenseProjection.DAYS_PER_MONTH;
         double engagementMonths = months + transitMonths;
 
         Accountant accountant = campaign.getAccountant();
@@ -115,7 +127,7 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
         Money overhead = accountant.getOverheadExpenses().multipliedBy(engagementMonths);
         Money hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts().multipliedBy(engagementMonths);
         Money foodAndHousing = getFoodAndHousing(campaign, contract, months, transitMonths);
-        Money maintenance = getMaintenance(campaign, contract, months, transitDays);
+        Money maintenance = getMaintenance(campaign, contract, months, costedTransitDays);
         Money spareParts = Money.zero();
         Money trainingMunitions = Money.zero();
         Money fuel = Money.zero();
@@ -140,6 +152,7 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
                                          .multipliedBy(combatBonus.bonusCount());
 
         return new ContractProfitEstimate(transitDays,
+              months,
               guaranteedIncome,
               operatingCosts,
               estimatedNet,
@@ -163,6 +176,37 @@ public record ContractProfitEstimate(int transitDays, Money guaranteedIncome, Mo
      */
     public Money getNetWithCombatPay() {
         return estimatedNet.plus(potentialCombatPay);
+    }
+
+    /**
+     * @return how long the force is away earning nothing else: the contract term plus the unpaid trip out, in months
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getEngagementMonths() {
+        return contractMonths + (Math.max(0, transitDays) / ContractExpenseProjection.DAYS_PER_MONTH);
+    }
+
+    /**
+     * @return {@code true} if a jump path reaches the target, so {@link #transitDays} is a real travel time
+     */
+    public boolean hasRoute() {
+        return transitDays != NO_ROUTE;
+    }
+
+    /**
+     * The estimated net spread over the whole engagement. Because it counts the trip out, it lets a short contract far
+     * away be weighed fairly against a long one nearby.
+     *
+     * @return the estimated net per month of the engagement
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getNetPerMonth() {
+        double engagementMonths = getEngagementMonths();
+        return engagementMonths > 0 ? estimatedNet.dividedBy(engagementMonths) : estimatedNet;
     }
 
     /**
