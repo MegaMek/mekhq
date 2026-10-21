@@ -216,7 +216,7 @@ public class ProstheticTypeTest {
         Faction faction = mock(Faction.class);
         when(faction.getShortName()).thenReturn("MERC");
 
-        String tooltip = prostheticType.getTooltip(faction, 3075, 1.0);
+        String tooltip = prostheticType.getTooltip(faction, 3075, 1.0, BodyLocation.GENERIC);
 
         assertFalse(tooltip.contains("!ProstheticType."),
               () -> prostheticType.name() + " has a tooltip line missing from the resource bundle: " + tooltip);
