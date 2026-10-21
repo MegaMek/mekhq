@@ -55,29 +55,17 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
  * Generates the employer's negotiator for a contract. The negotiator's role is chosen from the campaign type, employer
- * faction, and hiring hall level, and the generated person is then brought up to the CamOps negotiator baseline
- * (veteran experience, minimum charisma, and minimum negotiation skill) before being assigned a special ability and,
- * for ranked roles, a military rank. This is a static utility class and is not instantiable.
+ * faction, and hiring hall level, and the generated person's skills are then set to the tier the employer type fields
+ * (see {@link #getEmployerSkillLevel(Faction, ChaosEmployerType)}) before being assigned a special ability and, for
+ * ranked roles, a military rank. This is a static utility class and is not instantiable.
  */
 public class EmployerNegotiator {
-    /**
-     * This level is taken from CamOps rev 5th printing, pg 41. CamOps states that Negotiators have a Charisma modifier
-     * of 1. 7 Charisma is the minimum score necessary to reach that modifier.
-     */
-    private final static int MINIMUM_CHARISMA = 7;
-
-    /**
-     * This level is taken from CamOps rev 5th printing, pg 41. CamOps states that Negotiators have a Negotiation level
-     * of 4.
-     */
-    private final static int MINIMUM_NEGOTIATION = 4;
-
     private final static PersonnelRole PIRATE_NEGOTIATOR_ROLE = BROKER;
     private final static PersonnelRole GOVERNMENT_NEGOTIATOR_NORMAL = ADMINISTRATOR;
     private final static PersonnelRole GOVERNMENT_NEGOTIATOR_CLAN = MEKWARRIOR;
@@ -92,13 +80,14 @@ public class EmployerNegotiator {
     private EmployerNegotiator() {}
 
     /**
-     * Generates the employer's negotiator, choosing an appropriate role and raising the person to the CamOps negotiator
-     * baseline.
+     * Generates the employer's negotiator, choosing an appropriate role and setting the person's skills to the tier the
+     * employer type fields.
      *
-     * @param campaign        the current campaign, used to create and adjust the person
-     * @param searchType      the campaign type, which drives the negotiator's role
-     * @param employerFaction the employer faction (its Clan status affects the role and rank system)
-     * @param hiringHallLevel the local hiring hall level, which can affect the mercenary negotiator's role
+     * @param campaign          the current campaign, used to create and adjust the person
+     * @param searchType        the campaign type, which drives the negotiator's role
+     * @param employerFaction   the employer faction (its Clan status affects the role and rank system)
+     * @param hiringHallLevel   the local hiring hall level, which can affect the mercenary negotiator's role
+     * @param chaosEmployerType the employer type, which drives the negotiator's skill tier
      *
      * @return the generated negotiator
      */
@@ -110,9 +99,7 @@ public class EmployerNegotiator {
                                   .getHumanResources()
                                   .newPerson(campaign, role, employerFaction.getShortName(), Gender.RANDOMIZE);
 
-        adjustExperienceLevel(campaign, negotiator, role, employerFaction, chaosEmployerType);
-        adjustCharisma(negotiator);
-        adjustNegotiation(negotiator);
+        applySkillLevel(campaign, negotiator, getEmployerSkillLevel(employerFaction, chaosEmployerType));
         giveSPA(campaign, negotiator);
 
         assignRank(negotiator);
@@ -151,17 +138,20 @@ public class EmployerNegotiator {
         return MERCENARY_NEGOTIATOR_NORMAL;
     }
 
-    private static void adjustExperienceLevel(Campaign campaign, Person negotiator, PersonnelRole role,
-          Faction faction, ChaosEmployerType chaosEmployerType) {
-        boolean isClan = faction.isClan();
-        int experienceLevel = negotiator.getExperienceLevel(campaign.getCampaignOptions(),
-              isClan,
-              campaign.getLocalDate(),
-              false,
-              false);
-
-        // Due to modifiers, the final skill level will usually be one step above
-        SkillLevel targetSkillLevel = switch (chaosEmployerType) {
+    /**
+     * The skill tier of the negotiator a given employer fields. Major powers, Clans, ComStar, and the Word of Blake send
+     * seasoned negotiators; smaller employers send progressively less experienced ones.
+     *
+     * @param faction           the employer faction
+     * @param chaosEmployerType the employer type
+     *
+     * @return the negotiator's skill tier, before any negotiator contract characteristic is applied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static SkillLevel getEmployerSkillLevel(Faction faction, ChaosEmployerType chaosEmployerType) {
+        return switch (chaosEmployerType) {
             case ANY_SYSTEM_OWNER, LOCAL_SYSTEM_OWNER -> {
                 if (faction.isMajorOrSuperPower() || faction.isClan()) {
                     yield SkillLevel.VETERAN;
@@ -178,31 +168,27 @@ public class EmployerNegotiator {
                  ANY_PLANETARY_GOVERNMENT -> SkillLevel.GREEN;
             case CIVILIAN_ORGANIZATION_REBELS -> SkillLevel.ULTRA_GREEN;
         };
-
-        if (experienceLevel > targetSkillLevel.getExperienceLevel()) {
-            PersonUtility.overrideSkills(campaign, negotiator, role, targetSkillLevel, true);
-        }
     }
 
-    private static void adjustCharisma(Person negotiator) {
-        int charisma = negotiator.getAttributeScore(SkillAttribute.CHARISMA);
-        if (charisma < MINIMUM_CHARISMA) {
-            negotiator.setAttributeScore(SkillAttribute.CHARISMA, MINIMUM_CHARISMA);
-        }
-    }
+    /**
+     * Sets the negotiator's skills to the given tier, raising or lowering them as needed. Negotiation is set to that
+     * tier as well, since not every negotiator role (a Clan MekWarrior, or an Administrator when Administrators don't
+     * have Negotiation) has it as a profession skill.
+     *
+     * @param campaign   the current campaign
+     * @param negotiator the negotiator to adjust
+     * @param skillLevel the tier to set the negotiator's skills to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void applySkillLevel(Campaign campaign, Person negotiator, SkillLevel skillLevel) {
+        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), skillLevel, true);
 
-    private static void adjustNegotiation(Person negotiator) {
         Skill negotiationSkill = negotiator.getSkill(S_NEGOTIATION);
-
-        if (negotiationSkill == null) { // Unskilled
-            negotiator.addSkill(S_NEGOTIATION, MINIMUM_NEGOTIATION, 0);
-            return;
-        }
-
-        int currentLevel = negotiationSkill.getLevel();
-        if (currentLevel < MINIMUM_NEGOTIATION) {
-            negotiationSkill.setLevel(MINIMUM_NEGOTIATION);
-        }
+        int bonus = (negotiationSkill == null) ? 0 : negotiationSkill.getBonus();
+        int level = SkillType.getType(S_NEGOTIATION).getLevelFromExperience(skillLevel.getAdjustedValue());
+        negotiator.addSkill(S_NEGOTIATION, level, bonus);
     }
 
     private static void assignRank(Person negotiator) {

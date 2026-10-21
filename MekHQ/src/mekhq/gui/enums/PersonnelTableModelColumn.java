@@ -91,6 +91,7 @@ import mekhq.gui.baseComponents.tables.MHQTableColumn;
 import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
+import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 
@@ -951,21 +952,21 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
-     * @param personalStateFlags list of i18n keys for color reasons, or null/empty if no special coloring
+     * @param personalStateFlags the reasons the row is colored, or empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
-    public @Nullable String getToolTipText(Person person, java.util.List<String> personalStateFlags) {
+    public @Nullable String getToolTipText(Person person, List<ColorReason> personalStateFlags) {
         String baseTooltip = getBaseToolTipText(person);
 
         // For name, rank, and status columns, append color reasons if present
         if (!personalStateFlags.isEmpty() && isNameRankOrStatusColumn()) {
             StringBuilder colorReasons = new StringBuilder();
-            for (String key : personalStateFlags) {
+            for (ColorReason reason : personalStateFlags) {
                 if (!colorReasons.isEmpty()) {
                     colorReasons.append("<br>");
                 }
-                colorReasons.append(MHQInternationalization.getText(key));
+                colorReasons.append(reason.text());
             }
 
             if (baseTooltip != null) {

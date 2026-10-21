@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link ChaosContractDeterminationScale#generateScaleForDetachment}. Scale is the detachment's combat Battle
  * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded up. Only STANDARD formations in a combat
- * role count - with cadre formations counting too, but only on cadre-duty contracts.
+ * role count.
  */
 class ChaosContractDeterminationScaleTest {
     private static final double DELTA = 1e-9;
@@ -83,66 +83,59 @@ class ChaosContractDeterminationScaleTest {
         return unit;
     }
 
-    private int scaleFor(final boolean isCadreDuty, final Unit... units) {
-        return ChaosContractDeterminationScale.roundUpScale(exactScaleFor(isCadreDuty, units));
+    private int scaleFor(final Unit... units) {
+        return ChaosContractDeterminationScale.roundUpScale(exactScaleFor(units));
     }
 
-    private double exactScaleFor(final boolean isCadreDuty, final Unit... units) {
+    private double exactScaleFor(final Unit... units) {
         LocalHangar hangar = mock(LocalHangar.class);
         when(hangar.getUnits()).thenReturn(List.of(units));
-        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, isCadreDuty, true);
+        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, true);
     }
 
     @Test
     void battleValueIsDividedByThePerScaleFigureAndRoundedUp() {
-        assertEquals(1, scaleFor(false, unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE)),
+        assertEquals(1, scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE)),
               "exactly one scale's worth of BV is one scale");
-        assertEquals(2, scaleFor(false, unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + 1)),
+        assertEquals(2, scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + 1)),
               "one BV over the boundary rounds up to the next scale");
-        assertEquals(1, scaleFor(false, unit(1, CombatRole.MANEUVER, true, 100)),
+        assertEquals(1, scaleFor(unit(1, CombatRole.MANEUVER, true, 100)),
               "any positive combat BV is at least one scale");
     }
 
     @Test
     void exactScaleIsTheUnroundedBattleValueRatio() {
-        assertEquals(1.5, exactScaleFor(false,
-              unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2))), 0.000001);
+        assertEquals(1.5,
+              exactScaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2))),
+              0.000001);
     }
 
     @Test
     void oneBattleValueOverABoundaryStillRoundsUpAfterCleaning() {
         // 1 BV in 20,500 is 0.0000488 of a Scale - the precision cleaning must not swallow it
-        assertEquals(3, scaleFor(false, unit(1, CombatRole.MANEUVER, true, (BATTLE_VALUE_PER_SCALE * 2) + 1)));
+        assertEquals(3, scaleFor(unit(1, CombatRole.MANEUVER, true, (BATTLE_VALUE_PER_SCALE * 2) + 1)));
     }
 
     @Test
     void anEmptyDetachmentHasNoScale() {
-        assertEquals(0, scaleFor(false));
+        assertEquals(0, scaleFor());
     }
 
     @Test
     void nonCombatRolesDoNotContribute() {
-        assertEquals(0, scaleFor(false, unit(1, CombatRole.RESERVE, true, BATTLE_VALUE_PER_SCALE)),
+        assertEquals(0, scaleFor(unit(1, CombatRole.RESERVE, true, BATTLE_VALUE_PER_SCALE)),
               "a reserve formation is not committed to the detachment");
     }
 
     @Test
     void nonStandardFormationsDoNotContribute() {
-        assertEquals(0, scaleFor(false, unit(1, CombatRole.MANEUVER, false, BATTLE_VALUE_PER_SCALE)),
+        assertEquals(0, scaleFor(unit(1, CombatRole.MANEUVER, false, BATTLE_VALUE_PER_SCALE)),
               "only STANDARD formations count toward scale");
     }
 
     @Test
-    void cadreFormationsCountOnlyOnCadreDuty() {
-        assertEquals(1, scaleFor(true, unit(1, CombatRole.CADRE, true, BATTLE_VALUE_PER_SCALE)),
-              "on cadre duty a cadre formation counts");
-        assertEquals(0, scaleFor(false, unit(1, CombatRole.CADRE, true, BATTLE_VALUE_PER_SCALE)),
-              "off cadre duty a cadre formation does not count");
-    }
-
-    @Test
     void aCountedUnitWithoutAnEntityAddsNothing() {
-        assertEquals(0, scaleFor(false, unit(1, CombatRole.MANEUVER, true, null)));
+        assertEquals(0, scaleFor(unit(1, CombatRole.MANEUVER, true, null)));
     }
 
     @Test

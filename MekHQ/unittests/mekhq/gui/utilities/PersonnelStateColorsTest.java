@@ -45,6 +45,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
@@ -56,6 +57,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -66,7 +68,7 @@ class PersonnelStateColorsTest {
     private final CampaignLocationManager locationManager = mock(CampaignLocationManager.class);
     private final MHQOptions mhqOptions = mock(MHQOptions.class);
     private final MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
-    private final List<String> reasons = new ArrayList<>();
+    private final List<ColorReason> reasons = new ArrayList<>();
 
     private final ComponentColors absent = mock(ComponentColors.class);
     private final ComponentColors gone = mock(ComponentColors.class);
@@ -77,9 +79,12 @@ class PersonnelStateColorsTest {
     private final ComponentColors pregnant = mock(ComponentColors.class);
     private final ComponentColors fatigued = mock(ComponentColors.class);
     private final ComponentColors healed = mock(ComponentColors.class);
+    private final ComponentColors working = mock(ComponentColors.class);
 
     PersonnelStateColorsTest() {
         mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+        // Person loads its resource bundle with the client locale the first time it is used
+        when(mhqOptions.getLocale()).thenReturn(Locale.getDefault());
         when(mhqOptions.getAbsentColors()).thenReturn(absent);
         when(mhqOptions.getGoneColors()).thenReturn(gone);
         when(mhqOptions.getDeployedColors()).thenReturn(deployed);
@@ -89,6 +94,7 @@ class PersonnelStateColorsTest {
         when(mhqOptions.getPregnantColors()).thenReturn(pregnant);
         when(mhqOptions.getFatiguedColors()).thenReturn(fatigued);
         when(mhqOptions.getHealedInjuriesColors()).thenReturn(healed);
+        when(mhqOptions.getWorkingColors()).thenReturn(working);
 
         options.set(CampaignOption.USE_ADVANCED_MEDICAL, false);
         options.set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, false);
@@ -109,7 +115,15 @@ class PersonnelStateColorsTest {
     }
 
     private ComponentColors colorsFor(Person person) {
-        return PersonnelStateColors.getStateColors(campaign, person, reasons);
+        return colorsFor(person, List.of());
+    }
+
+    private ComponentColors colorsFor(Person person, List<String> jobs) {
+        return PersonnelStateColors.getStateColors(campaign, person, reasons, jobs);
+    }
+
+    private List<String> keys() {
+        return reasons.stream().map(ColorReason::key).toList();
     }
 
     @Test
@@ -121,13 +135,13 @@ class PersonnelStateColorsTest {
     @Test
     void absentPerson() {
         assertSame(absent, colorsFor(person(PersonnelStatus.ON_LEAVE)));
-        assertEquals(List.of("colorReason.personnel.absent"), reasons);
+        assertEquals(List.of("colorReason.personnel.absent"), keys());
     }
 
     @Test
     void departedPerson() {
         assertSame(gone, colorsFor(person(PersonnelStatus.RETIRED)));
-        assertEquals(List.of("colorReason.personnel.departed"), reasons);
+        assertEquals(List.of("colorReason.personnel.departed"), keys());
     }
 
     @Test
@@ -136,7 +150,7 @@ class PersonnelStateColorsTest {
         when(person.isDeployed()).thenReturn(true);
 
         assertSame(deployed, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.deployed"), reasons);
+        assertEquals(List.of("colorReason.personnel.deployed"), keys());
     }
 
     @Test
@@ -145,7 +159,7 @@ class PersonnelStateColorsTest {
         when(person.isQueuedForTravel(locationManager)).thenReturn(true);
 
         assertSame(queued, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.queuedForTravel"), reasons);
+        assertEquals(List.of("colorReason.personnel.queuedForTravel"), keys());
     }
 
     @Test
@@ -155,7 +169,7 @@ class PersonnelStateColorsTest {
         when(person.getParentLocation()).thenReturn(mock(AbstractLocation.class));
 
         assertSame(away, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.awayFromMainForce"), reasons);
+        assertEquals(List.of("colorReason.personnel.awayFromMainForce"), keys());
     }
 
     @Test
@@ -164,7 +178,7 @@ class PersonnelStateColorsTest {
         when(person.getHits()).thenReturn(2);
 
         assertSame(injured, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.injured"), reasons);
+        assertEquals(List.of("colorReason.personnel.injured"), keys());
     }
 
     @Test
@@ -191,7 +205,7 @@ class PersonnelStateColorsTest {
         when(person.isPregnant()).thenReturn(true);
 
         assertSame(pregnant, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.pregnant"), reasons);
+        assertEquals(List.of("colorReason.personnel.pregnant"), keys());
     }
 
     @Test
@@ -205,7 +219,7 @@ class PersonnelStateColorsTest {
             fatigue.when(() -> Fatigue.getEffectiveFatigue(rested, campaign)).thenReturn(4);
 
             assertSame(fatigued, colorsFor(tired));
-            assertEquals(List.of("colorReason.personnel.fatigued"), reasons);
+            assertEquals(List.of("colorReason.personnel.fatigued"), keys());
             reasons.clear();
             assertNull(colorsFor(rested));
         }
@@ -228,7 +242,7 @@ class PersonnelStateColorsTest {
         when(person.hasNonProstheticPermanentInjuries(false)).thenReturn(true);
 
         assertSame(healed, colorsFor(person));
-        assertEquals(List.of("colorReason.personnel.healedInjuries"), reasons);
+        assertEquals(List.of("colorReason.personnel.healedInjuries"), keys());
     }
 
     @Test
@@ -239,13 +253,13 @@ class PersonnelStateColorsTest {
 
         assertSame(absent, colorsFor(person));
         assertEquals(List.of("colorReason.personnel.absent", "colorReason.personnel.injured",
-              "colorReason.personnel.pregnant"), reasons);
+              "colorReason.personnel.pregnant"), keys());
     }
 
     @Test
     void reasonsAreLocalizedAndJoinedWithLineBreaks() {
-        String text = PersonnelStateColors.getColorReasonsText(List.of("colorReason.personnel.absent",
-              "colorReason.personnel.awayFromMainForce"));
+        String text = PersonnelStateColors.getColorReasonsText(List.of(new ColorReason("colorReason.personnel.absent"),
+              new ColorReason("colorReason.personnel.awayFromMainForce")));
 
         String[] lines = text.split("<br>");
         assertEquals(2, lines.length, text);
@@ -253,6 +267,34 @@ class PersonnelStateColorsTest {
             assertFalse(line.isBlank());
             assertFalse(line.startsWith("!"), line);
         }
+    }
+
+    @Test
+    void aTechInTheMiddleOfAJobIsMarkedAsWorking() {
+        String job = "Repairing Medium Laser on Atlas AS7-D (6 days left)";
+
+        assertSame(working, colorsFor(person(PersonnelStatus.ACTIVE), List.of(job)));
+        assertEquals(List.of(PersonnelStateColors.WORKING_REASON_KEY), keys());
+        String text = PersonnelStateColors.getColorReasonsText(reasons);
+        assertTrue(text.contains(job), text);
+        assertFalse(text.contains("{"), text);
+    }
+
+    @Test
+    void anInjuredTechAtWorkKeepsTheInjuredColorAndListsBoth() {
+        Person person = person(PersonnelStatus.ACTIVE);
+        when(person.getHits()).thenReturn(1);
+
+        assertSame(injured, colorsFor(person, List.of("Refitting Wolverine WVR-6R (3 days left)")));
+        assertEquals(List.of(PersonnelStateColors.INJURED_REASON_KEY, PersonnelStateColors.WORKING_REASON_KEY), keys());
+    }
+
+    @Test
+    void eachJobIsItsOwnReason() {
+        colorsFor(person(PersonnelStatus.ACTIVE), List.of("Repairing Medium Laser on Atlas AS7-D (1 day left)",
+              "Mothballing Locust LCT-1V (2 days left)"));
+
+        assertEquals(2, reasons.size());
     }
 
     @Test

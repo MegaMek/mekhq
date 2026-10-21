@@ -53,6 +53,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultCaret;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
@@ -571,7 +572,12 @@ public class ContractDossierPanel extends JPanel {
             text.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE,
                   "dossier.contractMarket.section.briefing"))));
             text.add(Box.createVerticalStrut(scaleForGUI(4)));
-            JEditorPane descriptionPane = new JEditorPane("text/html", MarkdownRenderer.getRenderedHtml(description));
+            JEditorPane descriptionPane = new JEditorPane();
+            descriptionPane.setContentType("text/html");
+            // Set before the text: a caret that follows the text ends up below it, and scrolling it into view would
+            // open the dossier at the bottom of the page.
+            ((DefaultCaret) descriptionPane.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            descriptionPane.setText(MarkdownRenderer.getRenderedHtml(description));
             descriptionPane.setEditable(false);
             descriptionPane.setFocusable(false);
             descriptionPane.setOpaque(false);
