@@ -1107,9 +1107,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             mods.append(getUnit().getSiteMod());
             if (getUnit().getEntity() != null) {
                 if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                    mods.addModifier(-1, "easy to maintain");
+                    mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
                 } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                    mods.addModifier(1, "difficult to maintain");
+                    mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
                 }
 
                 // Apply obsolete quirk modifier
@@ -1125,7 +1125,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (this instanceof MissingMekLocation) ||
                              (this instanceof MekActuator) ||
                              (this instanceof MissingMekActuator))) {
-                mods.addModifier(2, "prototype TSM");
+                mods.addModifier(2, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
             }
         } else {
             // Parts repaired in the warehouse work under the same conditions a unit would be assigned on arrival,
@@ -1138,12 +1138,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1153,11 +1153,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(1, "Maintainer");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
@@ -1179,9 +1179,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         mods.append(getUnit().getSiteMod());
         if (getUnit().getEntity() != null) {
             if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                mods.addModifier(-1, "easy to maintain");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
             } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                mods.addModifier(1, "difficult to maintain");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
             }
 
             // Apply obsolete quirk modifier
@@ -1196,12 +1196,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1211,16 +1211,16 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(-1, "Maintainer");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
         if (getUnit().hasPrototypeTSM()) {
-            mods.addModifier(1, "prototype TSM");
+            mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
         }
 
         return getCampaign().getCampaignOptions().get(CampaignOption.USE_QUALITY_MAINTENANCE) ?
@@ -1242,7 +1242,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                   (null != tech) &&
                   tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             // fixers can ignore the first point of penalty for poor quality
-            mods.addModifier(-1, "Mr/Ms Fix-it");
+            mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.fixer"));
         }
         return mods;
     }

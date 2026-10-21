@@ -1705,7 +1705,7 @@ public enum InjuryEffect {
      * Builds a localized tooltip summarizing key information about all active injury effects.
      *
      * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
-     * {@link ProstheticType#getTooltip(Faction, int, double)}.</p>
+     * {@link ProstheticType#getTooltip(Faction, int, double, mekhq.campaign.personnel.medical.BodyLocation)}.</p>
      *
      * @param injuryEffects A list of currently active injury effects
      *
