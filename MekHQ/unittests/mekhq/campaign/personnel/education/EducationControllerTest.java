@@ -268,7 +268,7 @@ class EducationControllerTest {
             PlanetarySystem currentSystem = mock(PlanetarySystem.class);
             when(currentSystem.getId()).thenReturn("CurrentSystem");
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
-            when(campaign.getSimplifiedTravelTime(currentSystem, destSystem)).thenReturn(5);
+            when(campaign.getSimplifiedTravelTime(destSystem, currentSystem)).thenReturn(5);
         }
 
         @Test
