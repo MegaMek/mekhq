@@ -33,6 +33,7 @@
 package mekhq.campaign.finances;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
@@ -110,12 +111,33 @@ public final class ContractExpenseProjection {
      * @since 0.51.01
      */
     public static Money getTransitMaintenance(Campaign campaign, int transitDays) {
+        return getTransitMaintenance(campaign, transitDays, List.of());
+    }
+
+    /**
+     * As {@link #getTransitMaintenance(Campaign, int)}, leaving out units that will be mothballed for the journey, as
+     * a mothballed unit needs no maintenance.
+     *
+     * @param campaign        the campaign
+     * @param transitDays     the length of the journey, in days
+     * @param mothballedUnits the units that will be mothballed before departure
+     *
+     * @return the projected maintenance over the journey
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getTransitMaintenance(Campaign campaign, int transitDays, Collection<Unit> mothballedUnits) {
         if (transitDays <= 0) {
             return Money.zero();
         }
 
         Money dailyMaintenance = Money.zero();
         for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+            if (mothballedUnits.contains(unit)) {
+                continue;
+            }
+
             dailyMaintenance = dailyMaintenance.plus(Maintenance.getProjectedDailyMaintenanceCost(campaign,
                   unit,
                   false,
