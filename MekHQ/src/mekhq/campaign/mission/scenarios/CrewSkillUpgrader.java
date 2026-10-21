@@ -68,6 +68,7 @@ public class CrewSkillUpgrader {
     private final double oneThirdXPCost;
     private double minAbilityCost = Double.MAX_VALUE;
     private final int upgradeIntensity;
+    private final boolean extremeRangeEnabled;
 
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
@@ -76,7 +77,20 @@ public class CrewSkillUpgrader {
      *                         every time)
      */
     public CrewSkillUpgrader(int upgradeIntensity) {
+        this(upgradeIntensity, true);
+    }
+
+    /**
+     * Constructor. Initializes updated SPA list, broken down by unit type.
+     *
+     * @param upgradeIntensity    how likely a pilot is to receive consideration for an SPA (&lt;0 means none, 3+
+     *                            means every time)
+     * @param extremeRangeEnabled whether the extreme range game option is enabled; if not, Range Master will never be
+     *                            assigned to extreme range
+     */
+    public CrewSkillUpgrader(int upgradeIntensity, boolean extremeRangeEnabled) {
         this.upgradeIntensity = upgradeIntensity;
+        this.extremeRangeEnabled = extremeRangeEnabled;
 
         specialAbilitiesByUnitType = new HashMap<>();
 
@@ -320,9 +334,11 @@ public class CrewSkillUpgrader {
     }
 
     private String pickRandomRangeMaster() {
-        return ObjectUtility.getRandomItem(Arrays.asList(Crew.RANGEMASTER_MEDIUM,
-              Crew.RANGEMASTER_LONG,
-              Crew.RANGEMASTER_EXTREME));
+        List<String> ranges = new ArrayList<>(Arrays.asList(Crew.RANGEMASTER_MEDIUM, Crew.RANGEMASTER_LONG));
+        if (extremeRangeEnabled) {
+            ranges.add(Crew.RANGEMASTER_EXTREME);
+        }
+        return ObjectUtility.getRandomItem(ranges);
     }
 
     private String pickRandomHumanTRO() {

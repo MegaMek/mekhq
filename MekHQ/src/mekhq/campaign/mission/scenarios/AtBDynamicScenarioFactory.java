@@ -41,6 +41,7 @@ import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.options.OptionsConstants.ADVANCED_COMBAT_TAC_OPS_RANGE;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
@@ -5110,10 +5111,6 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        // Here we selectively overwrite the earlier entries
-        processInstantArrivals(scenario, hangar);
-        processDelayedArrivals(scenario, hangar, strategy);
-
         // loop through individual units as well
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
@@ -5142,6 +5139,12 @@ public class AtBDynamicScenarioFactory {
                       strategy);
             }
         }
+
+        // Here we selectively overwrite the earlier entries. This must come after the individual unit loop, as
+        // auxiliary (leadership) and utility units are individual units whose templates are not saved; without this
+        // ordering they fall back to reinforcement arrival turns after a reload.
+        processInstantArrivals(scenario, hangar);
+        processDelayedArrivals(scenario, hangar, strategy);
     }
 
     /**
@@ -5695,16 +5698,18 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().get(CampaignOption.SPA_UPGRADE_INTENSITY));
+        int upgradeIntensity = campaign.getCampaignOptions().get(CampaignOption.SPA_UPGRADE_INTENSITY);
+        boolean extremeRangeEnabled = campaign.getGameOptions().booleanOption(ADVANCED_COMBAT_TAC_OPS_RANGE);
+        CrewSkillUpgrader upgrader = new CrewSkillUpgrader(upgradeIntensity, extremeRangeEnabled);
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {
-                csu.upgradeCrew(entity);
+                upgrader.upgradeCrew(entity);
             }
         }
 
         for (Entity entity : scenario.getAlliesPlayer()) {
-            csu.upgradeCrew(entity);
+            upgrader.upgradeCrew(entity);
         }
     }
 

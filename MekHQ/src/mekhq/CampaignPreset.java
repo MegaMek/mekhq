@@ -732,7 +732,10 @@ public class CampaignPreset {
                                 continue;
                             }
 
-                            SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
+                            SpecialAbility.generateSeparateInstanceFromXML(wn2,
+                                  preset.getSpecialAbilities(),
+                                  options,
+                                  version);
                         }
                         break;
                     }

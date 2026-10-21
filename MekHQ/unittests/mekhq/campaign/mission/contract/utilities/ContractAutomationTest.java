@@ -169,6 +169,96 @@ class ContractAutomationTest {
     }
 
     /**
+     * Tests {@link ContractAutomation#getAutomatedMothballCandidates}, which the contract profit estimate uses to leave
+     * units mothballed for the journey out of the transit costs.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class MothballCandidates {
+        /** Wires a detachment whose units all sit in the only formation and are physically at the detachment. */
+        private static Detachment detachmentWith(Campaign campaign, List<Unit> units) {
+            List<UUID> unitIds = new ArrayList<>();
+            for (Unit unit : units) {
+                UUID unitId = UUID.randomUUID();
+                when(unit.getId()).thenReturn(unitId);
+                when(campaign.getUnit(unitId)).thenReturn(unit);
+                unitIds.add(unitId);
+            }
+
+            PlayerForce force = mock(PlayerForce.class);
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(new Vector<>(unitIds));
+            when(force.getAllFormations()).thenReturn(List.of(formation));
+            when(campaign.getPlayerForce()).thenReturn(force);
+
+            Detachment detachment = spy(new Detachment());
+            LocalHangar hangar = mock(LocalHangar.class);
+            doReturn(hangar).when(detachment).getHangar();
+            when(hangar.getUnits()).thenReturn(units);
+            return detachment;
+        }
+
+        @Test
+        void candidatesAreTheUnitsThatWouldBeMothballed() {
+            Unit eligible = mothballableUnit();
+            Unit underRepair = mothballableUnit();
+            when(underRepair.isUnderRepair()).thenReturn(true);
+            Unit unavailable = mothballableUnit();
+            when(unavailable.isAvailable(false)).thenReturn(false);
+            Unit dropShip = mothballableUnit();
+            when(dropShip.getEntity().isLargeCraft()).thenReturn(true);
+
+            Campaign campaign = mock(Campaign.class);
+            Detachment detachment = detachmentWith(campaign, List.of(eligible, underRepair, unavailable, dropShip));
+
+            try (MockedStatic<MekHQ> ignored = mockStatic(MekHQ.class)) {
+                assertIterableEquals(List.of(eligible),
+                      ContractAutomation.getAutomatedMothballCandidates(campaign, detachment));
+            }
+        }
+
+        @Test
+        void listingCandidatesMothballsNothing() {
+            Unit eligible = mothballableUnit();
+
+            Campaign campaign = mock(Campaign.class);
+            Detachment detachment = detachmentWith(campaign, List.of(eligible));
+
+            try (MockedStatic<MekHQ> ignored = mockStatic(MekHQ.class)) {
+                ContractAutomation.getAutomatedMothballCandidates(campaign, detachment);
+            }
+
+            verify(eligible, never()).startMothballing(null, true);
+            assertTrue(detachment.getAutomatedMothballUnits().isEmpty());
+        }
+
+        @Test
+        void candidatesHonourTheTravelMothballOptions() {
+            Unit unitInBay = mothballableUnit();
+            when(unitInBay.hasTransportShipAssignment()).thenReturn(true);
+            Unit salvage = mothballableUnit();
+            when(salvage.isSalvage()).thenReturn(true);
+            Unit ordinary = mothballableUnit();
+
+            MHQOptions mhqOptions = mock(MHQOptions.class);
+            when(mhqOptions.getDoNotMothballUnitsInBays()).thenReturn(true);
+            when(mhqOptions.getDoNotMothballSalvage()).thenReturn(true);
+
+            Campaign campaign = mock(Campaign.class);
+            Detachment detachment = detachmentWith(campaign, List.of(unitInBay, salvage, ordinary));
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+
+                assertIterableEquals(List.of(ordinary),
+                      ContractAutomation.getAutomatedMothballCandidates(campaign, detachment));
+            }
+        }
+    }
+
+    /**
      * Tests the "Don't Mothball Units in Bays When Travelling" and "Don't Mothball Salvage When Travelling" client
      * options.
      *

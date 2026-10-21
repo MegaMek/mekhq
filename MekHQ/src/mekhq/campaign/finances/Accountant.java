@@ -425,8 +425,48 @@ public record Accountant(Campaign campaign) {
             return Money.zero();
         }
 
-        double scale = ChaosContractDeterminationScale.getEconomicScale(
-              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign()),
+        return getHotSpotsUpkeepCostsForScale(campaignOptions,
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign()));
+    }
+
+    /**
+     * As {@link #getHotSpotsUpkeepCosts()}, but as if the given units had left the TO&amp;E. Used to project the upkeep
+     * charged while travelling with those units mothballed.
+     *
+     * @param excludedUnits the units to leave out of the TO&amp;E Scale
+     *
+     * @return the monthly upkeep cost without those units, or zero if Hot Spots upkeep is disabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getHotSpotsUpkeepCostsExcluding(Collection<Unit> excludedUnits) {
+        CampaignOptions campaignOptions = getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+            return Money.zero();
+        }
+
+        if (excludedUnits.isEmpty()) {
+            return getHotSpotsUpkeepCosts();
+        }
+
+        List<Unit> remainingUnits = new ArrayList<>(campaign().getPlayerForce().getHangar().getUnits());
+        remainingUnits.removeAll(excludedUnits);
+        double exactScale = ChaosContractDeterminationScale.generateScaleForTableOfOrganization(
+              campaign().getPlayerForce(),
+              remainingUnits,
+              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+        return getHotSpotsUpkeepCostsForScale(campaignOptions, exactScale);
+    }
+
+    /**
+     * @param campaignOptions the campaign options
+     * @param exactScale      the exact (unrounded) Scale of the TO&amp;E
+     *
+     * @return the monthly Hot Spots upkeep for a TO&amp;E of that Scale
+     */
+    private static Money getHotSpotsUpkeepCostsForScale(CampaignOptions campaignOptions, double exactScale) {
+        double scale = ChaosContractDeterminationScale.getEconomicScale(exactScale,
               campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE));
         double upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
         if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
