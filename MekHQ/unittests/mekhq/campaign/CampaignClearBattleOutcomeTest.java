@@ -34,6 +34,7 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import megamek.common.OffBoardDirection;
 import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.units.Entity;
 import org.junit.jupiter.api.Test;
@@ -62,5 +63,17 @@ class CampaignClearBattleOutcomeTest {
         assertEquals(IEntityRemovalConditions.REMOVE_UNKNOWN, wreckedUnit.getRemovalCondition(),
               "The wreck result from the last battle must not follow the unit into the next one");
         assertEquals(Entity.NONE, wreckedUnit.getKillerId(), "The last battle's kill credit must be cleared");
+    }
+
+    @Test
+    void clearingGameDataForgetsTheEdgeTheUnitFledBy() {
+        Campaign campaign = PartsScenario.create().getCampaign();
+        Entity fledUnit = UnitFixture.WOLVERINE_WVR_6R.loadEntity();
+        fledUnit.setRetreatedDirection(OffBoardDirection.NORTH);
+
+        campaign.clearGameData(fledUnit);
+
+        assertEquals(OffBoardDirection.NONE, fledUnit.getRetreatedDirection(),
+              "The edge the unit fled by in the last battle must not follow it into the next one");
     }
 }
