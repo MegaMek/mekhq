@@ -2056,7 +2056,11 @@ public class StratConRulesManager {
         }
 
         // A training force is busy drilling, not scouting, so it reveals only the hex it deploys to
-        if (isTraining || (scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
+        if (isTraining) {
+            return;
+        }
+
+        if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
             return;
         }
 
