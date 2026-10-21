@@ -252,7 +252,7 @@ class EducationControllerTest {
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3053, 6, 26));
             Detachment homeDetachment = new Detachment();
             homeDetachment.setParent(new CurrentLocation(mock(PlanetarySystem.class), 0));
-            when(campaign.getPlayerForce().getPersonnel()).thenReturn(homeDetachment.getPersonnel());
+            when(campaign.getPlayerForce().getForceDetachment()).thenReturn(homeDetachment);
             return homeDetachment;
         }
 
