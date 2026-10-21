@@ -766,6 +766,31 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
     }
 
+    /**
+     * @return the colors for a tech in the middle of a job, which start out matching a refitting unit's colors
+     */
+    public ComponentColors getWorkingColors() {
+        return new ComponentColors(getWorkingForeground(), getWorkingBackground());
+    }
+
+    public Color getWorkingForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.WORKING_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setWorkingForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.WORKING_FOREGROUND, value.getRGB());
+    }
+
+    public Color getWorkingBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.WORKING_BACKGROUND, Color.CYAN.getRGB()));
+    }
+
+    public void setWorkingBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.WORKING_BACKGROUND, value.getRGB());
+    }
+
     public ComponentColors getAwayFromMainForceColors() {
         return new ComponentColors(getAwayFromMainForceForeground(), getAwayFromMainForceBackground());
     }

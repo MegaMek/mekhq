@@ -2831,6 +2831,7 @@ public class Campaign implements ITechManager {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);

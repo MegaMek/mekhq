@@ -124,6 +124,18 @@ class ContractExpenseProjectionTest {
     }
 
     @Test
+    void unitsMothballedForTheJourneyNeedNoTransitMaintenance() {
+        try (MockedStatic<Maintenance> maintenance = mockStatic(Maintenance.class)) {
+            maintenance.when(() -> Maintenance.getProjectedDailyMaintenanceCost(any(), any(), eq(false), eq(false),
+                  eq(true))).thenReturn(Money.of(10));
+
+            // Only the second unit is maintained: 10 a day x 12 days
+            assertEquals(Money.of(120),
+                  ContractExpenseProjection.getTransitMaintenance(campaign, 12, List.of(firstUnit)));
+        }
+    }
+
+    @Test
     void noJourneyMeansNoTransitMaintenance() {
         try (MockedStatic<Maintenance> maintenance = mockStatic(Maintenance.class)) {
             maintenance.when(() -> Maintenance.getProjectedDailyMaintenanceCost(any(), any(), anyBoolean(),

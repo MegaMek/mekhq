@@ -110,7 +110,7 @@ class MissionLocationProfileTest {
         // Pirate hunting is routed by the enemy faction (PIR/BAN) instead, see PirateMissionTargetFinder.
         assertEquals(MissionLocationProfile.DEFAULT,
               ContractObjectiveType.PIRATE_HUNTING.getMissionLocationProfile());
-        // Deprecated for removal, and its location roles are inverted; see fromContractType's javadoc.
+        // Its location roles are inverted, so it keeps the default profile.
         assertEquals(MissionLocationProfile.DEFAULT,
               ContractObjectiveType.MOLE_HUNTING.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEFAULT,

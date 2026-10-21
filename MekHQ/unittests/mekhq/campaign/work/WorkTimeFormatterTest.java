@@ -33,7 +33,9 @@
 package mekhq.campaign.work;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 
@@ -48,6 +50,31 @@ class WorkTimeFormatterTest {
     /** 3025 is not a leap year, so January has 31 days and February 28. */
     private static final LocalDate CAMPAIGN_DATE = LocalDate.of(3025, 1, 1);
     private static final int WORKING_DAY = 480;
+
+    @Test
+    void workIsSpelledOutInWorkingDays() {
+        // The Wolverine WVR-6M kit refit: 2,750 minutes at 480 a day is 5 days and 350 minutes, about 5.7 days
+        String minutes = NumberFormat.getIntegerInstance().format(2750) + " min";
+        String about = new DecimalFormat("0.#").format(2750 / 480.0);
+        String expected = minutes + " of work (45 h 50 min): 5 days 5 h 50 min at 8 h a day, about " + about
+              + " working days";
+
+        assertEquals(expected, WorkTimeFormatter.describeWorkingDays(2750, WORKING_DAY));
+    }
+
+    @Test
+    void wholeWorkingDaysHaveNoRemainder() {
+        String description = WorkTimeFormatter.describeWorkingDays(960, WORKING_DAY);
+
+        assertTrue(description.contains(": 2 days at 8 h a day"), description);
+    }
+
+    @Test
+    void workWithinOneDayIsShownAsWorkOnly() {
+        String minutes = NumberFormat.getIntegerInstance().format(90) + " min";
+
+        assertEquals(minutes + " of work (1 h 30 min)", WorkTimeFormatter.describeWorkingDays(90, WORKING_DAY));
+    }
 
     @Test
     void workIsShownInHoursAndMinutes() {

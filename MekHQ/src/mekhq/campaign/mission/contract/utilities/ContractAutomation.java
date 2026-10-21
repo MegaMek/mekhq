@@ -174,6 +174,50 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
+        // Gathered before any unit is mothballed, as mothballing takes a unit out of its formation.
+        for (Unit unit : getAutomatedMothballingConsideredUnits(campaign, detachment)) {
+            if (canBeMothballedNow(unit)) {
+                mothballTargets.add(unit.getId());
+
+                mothballUnitAction.execute(campaign, unit);
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            } else {
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "mothballingFailed.text",
+                      unit.getHyperlinkedName()));
+            }
+        }
+
+        detachment.setAutomatedMothballUnits(mothballTargets);
+    }
+
+    /**
+     * The units {@link #performAutomatedMothballing(Campaign, Detachment)} would mothball if it ran now. Used to leave
+     * them out of the expenses forecast for the journey to a contract.
+     *
+     * @param campaign   The current campaign.
+     * @param detachment The detachment whose units would be mothballed.
+     *
+     * @return the units that would be mothballed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<Unit> getAutomatedMothballCandidates(Campaign campaign, Detachment detachment) {
+        List<Unit> candidates = new ArrayList<>();
+        for (Unit unit : getAutomatedMothballingConsideredUnits(campaign, detachment)) {
+            if (canBeMothballedNow(unit)) {
+                candidates.add(unit);
+            }
+        }
+        return candidates;
+    }
+
+    /**
+     * The units of the given {@link Detachment} assigned to a {@link Formation} that automated mothballing will try to
+     * mothball: those not skipped by the travel mothballing client options, and not large craft.
+     */
+    private static List<Unit> getAutomatedMothballingConsideredUnits(Campaign campaign, Detachment detachment) {
         final MHQOptions mhqOptions = MekHQ.getMHQOptions();
         // Null during unit tests
         final boolean skipUnitsInBays = (mhqOptions != null) && mhqOptions.getDoNotMothballUnitsInBays();
@@ -183,10 +227,9 @@ public class ContractAutomation {
                                             .map(Unit::getId)
                                             .collect(Collectors.toSet());
 
+        List<Unit> consideredUnits = new ArrayList<>();
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
-
-            for (UUID unitId : iterationSafeUnitIds) {
+            for (UUID unitId : formation.getUnits()) {
                 if (!detachmentUnitIds.contains(unitId)) {
                     continue;
                 }
@@ -217,20 +260,17 @@ public class ContractAutomation {
                     continue;
                 }
 
-                if (unit.isAvailable(false) && !unit.isUnderRepair()) {
-                    mothballTargets.add(unitId);
-
-                    mothballUnitAction.execute(campaign, unit);
-                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                } else {
-                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                          "mothballingFailed.text",
-                          unit.getHyperlinkedName()));
-                }
+                consideredUnits.add(unit);
             }
         }
+        return consideredUnits;
+    }
 
-        detachment.setAutomatedMothballUnits(mothballTargets);
+    /**
+     * @return {@code true} if the unit is free to be mothballed today
+     */
+    private static boolean canBeMothballedNow(Unit unit) {
+        return unit.isAvailable(false) && !unit.isUnderRepair();
     }
 
     /**

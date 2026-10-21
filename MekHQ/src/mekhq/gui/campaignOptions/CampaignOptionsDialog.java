@@ -392,7 +392,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @return {@code true} if the user chose to overwrite the existing file
      */
     private boolean confirmPresetOverwrite(final CampaignPreset preset) {
-        final int choice = JOptionPane.showConfirmDialog(getFrame(),
+        final int choice = JOptionPane.showConfirmDialog(this,
               getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
               getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
               JOptionPane.YES_NO_OPTION,
@@ -446,7 +446,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
               getTextAt(bundle, "savePresetSuccess.location"),
               pathPanel };
 
-        JOptionPane.showMessageDialog(getFrame(),
+        JOptionPane.showMessageDialog(this,
               message,
               getTextAt(bundle, "savePresetSuccess.title"),
               JOptionPane.INFORMATION_MESSAGE);
@@ -507,14 +507,17 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
 
         Object[] options = { getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.button") };
 
-        JOptionPane.showOptionDialog(null,
-              panel,
-              title,
-              JOptionPane.DEFAULT_OPTION,
+        // Shown after this dialog closes, while the startup screen is still hidden, so give the notice no owner window
+        // and the MekHQ icon to keep it in the Windows taskbar and Alt+Tab
+        final JDialog dialog = new JOptionPane(panel,
               JOptionPane.INFORMATION_MESSAGE,
+              JOptionPane.DEFAULT_OPTION,
               null,
               options,
-              options[0]);
+              options[0]).createDialog(title);
+        AppIcons.applyToWindow(dialog, "mekhq");
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     @Override

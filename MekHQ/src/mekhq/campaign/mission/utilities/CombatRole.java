@@ -44,7 +44,6 @@ public enum CombatRole {
     PATROL("CombatRole.PATROL.text", "CombatRole.PATROL.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
-    CADRE("CombatRole.CADRE.text", "CombatRole.CADRE.toolTipText"),
     RESERVE("CombatRole.RESERVE.text", "CombatRole.RESERVE.toolTipText");
     // endregion Enum Declarations
 
@@ -85,10 +84,6 @@ public enum CombatRole {
         return this == TRAINING;
     }
 
-    public boolean isCadre() {
-        return this == CADRE;
-    }
-
     public boolean isAuxiliary() {
         return this == AUXILIARY;
     }
@@ -122,8 +117,10 @@ public enum CombatRole {
      * This method first attempts to interpret the input string as an integer and then maps it to the corresponding
      * {@link CombatRole} based on its ordinal index. If that fails, it attempts to match the string to the name of a
      * {@link CombatRole} using {@code Enum.valueOf(String)}. If both parsing approaches fail, it logs an error and
-     * returns the default value {@code IN_RESERVE}.
+     * returns the default value {@code RESERVE}.
      * </p>
+     *
+     * <p>The retired {@code CADRE} role is migrated to {@code RESERVE}.</p>
      *
      * @param text the string to be parsed into a {@link CombatRole}. The string can represent either:
      *             <ul>
@@ -131,9 +128,14 @@ public enum CombatRole {
      *               <li>The name of a {@link CombatRole}.</li>
      *             </ul>
      *
-     * @return the corresponding {@link CombatRole} if the input is valid; otherwise, returns {@code IN_RESERVE}.
+     * @return the corresponding {@link CombatRole} if the input is valid; otherwise, returns {@code RESERVE}.
      */
     public static CombatRole parseFromString(final String text) {
+        // Cadre has been removed; any formation still carrying it falls back to Reserve
+        if ("CADRE".equals(text)) {
+            return RESERVE;
+        }
+
         try {
             int value = Integer.parseInt(text);
             return values()[value];

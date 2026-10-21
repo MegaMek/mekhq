@@ -2680,16 +2680,21 @@ public class StratConContractInitializer {
             }
 
             // facility
-            boolean addedFacility = false;
+            StratConFacility facility = null;
             if (template.isFacilityScenario()) {
-                StratConFacility facility = createMidContractFacility(campaign,
+                facility = createMidContractFacility(campaign,
                       contract,
                       template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
                       true);
-                if (facility != null) {
-                    trackState.addFacility(coords, facility);
-                    addedFacility = true;
+                if (facility == null) {
+                    // Without a facility to sit on, a facility scenario has nothing to fight over; skip it rather
+                    // than place one whose objectives point at a missing facility.
+                    LOGGER.warn("No facility for objective scenario {} on track {}; skipping it.",
+                          template.name,
+                          trackState.getDisplayableName());
+                    continue;
                 }
+                trackState.addFacility(coords, facility);
             }
 
             // create scenario - don't assign a force yet
@@ -2702,6 +2707,10 @@ public class StratConContractInitializer {
                   null);
 
             if (scenario != null) {
+                if (facility != null) {
+                    StratConRulesManager.setupFacilityScenario(scenario, facility, null);
+                }
+
                 // These appear over the contract's run on their scheduled day and are meant to be fought like any
                 // normal scenario: keep the deployment dates generateScenario set and leave them uncloaked, so the
                 // player can engage immediately rather than having to scout them out first.
@@ -2721,11 +2730,8 @@ public class StratConContractInitializer {
                 // as befits a scenario that is already visible and fightable: the objectives list then shows its
                 // coordinates instead of the "Locate and..." wording used for hexes still to be scouted.
                 trackState.getRevealedCoords().add(coords);
-                if (addedFacility) {
-                    StratConFacility placedFacility = trackState.getFacility(coords);
-                    if (placedFacility != null) {
-                        placedFacility.setVisible(true);
-                    }
+                if (facility != null) {
+                    facility.setVisible(true);
                 }
 
                 StratConStrategicObjective sso = new StratConStrategicObjective();
@@ -2733,7 +2739,7 @@ public class StratConContractInitializer {
                 sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
                 sso.setDesiredObjectiveCount(1);
                 trackState.addStrategicObjective(sso);
-            } else if (addedFacility) {
+            } else if (facility != null) {
                 trackState.removeFacility(coords);
             }
         }
