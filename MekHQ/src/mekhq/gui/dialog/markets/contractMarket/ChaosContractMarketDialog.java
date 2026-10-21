@@ -335,6 +335,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                             .toUpperCase(Locale.ROOT)));
         options.add(Box.createHorizontalStrut(scaleForGUI(12)));
         options.add(mothballOnDepartureCheckbox);
+        // The estimates cost the journey out with or without the units mothballed for it, so they follow this choice,
+        // including when it is restored from preferences after the board is first drawn.
+        mothballOnDepartureCheckbox.addItemListener(event -> {
+            estimates.clear();
+            refresh(true);
+        });
         options.add(Box.createHorizontalStrut(scaleForGUI(14)));
         options.add(travelToSystemCheckbox);
         // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
@@ -597,12 +603,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Returns the offer's profit estimate, computed once and kept until the offer's terms change. Estimating plots the
-     * jump path to the target, so it is too slow to repeat every time a row or cell is drawn.
+     * Returns the offer's profit estimate, computed once and kept until the offer's terms or the mothball on departure
+     * choice change. Estimating plots the jump path to the target, so it is too slow to repeat every time a row or cell
+     * is drawn.
      */
     ContractProfitEstimate estimate(AbstractContract contract) {
         return estimates.computeIfAbsent(contract.getId(),
-              id -> ContractProfitEstimate.estimate(campaign, contract));
+              id -> ContractProfitEstimate.estimate(campaign, contract, isMothballOnDepartureSelected()));
     }
 
     /**

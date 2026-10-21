@@ -80,6 +80,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTechEligibility;
 import mekhq.campaign.work.WorkTime;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
 import mekhq.utilities.ReportingUtilities;
@@ -1158,6 +1159,8 @@ public class MRMSService {
         List<Person> overflowDayTechs = new ArrayList<>();
         List<Person> sameDayAssignedTechs = new ArrayList<>();
         List<Person> overflowDayAssignedTechs = new ArrayList<>();
+        // How long the job would take each tech, for choosing who finishes soonest when nobody can finish today
+        Map<Person, Integer> expectedMinutesByTech = new HashMap<>();
         int highestAvailableTechSkill = -1;
 
         for (Person tech : techs) {
@@ -1300,6 +1303,7 @@ public class MRMSService {
 
             WorkTime workTime = getWorkTime(canChangeWorkTime, techSkillToWorktimeMap, skill, tech, experienceLevel);
             int expectedTime = getExpectedWorkTime((partWork), workTime);
+            expectedMinutesByTech.put(tech, expectedTime);
 
             if (RepairTechEligibility.getTimeLeftToday(campaign, tech) < expectedTime) {
                 boolean isCarryoverAllowed = configuredOptions.isAllowCarryover()
@@ -1344,14 +1348,20 @@ public class MRMSService {
             validTechs.addAll(sameDayTechs);
         }
 
-        if (!overflowDayAssignedTechs.isEmpty()) {
-            overflowDayAssignedTechs.sort(sorter);
-            validTechs.addAll(overflowDayAssignedTechs);
-        }
+        boolean isNobodyFinishingToday = validTechs.isEmpty();
+        if (configuredOptions.isOptimizeToCompleteToday() && isNobodyFinishingToday) {
+            validTechs.addAll(sortBySoonestFinish(campaign, overflowDayAssignedTechs, overflowDayTechs,
+                  expectedMinutesByTech, sorter));
+        } else {
+            if (!overflowDayAssignedTechs.isEmpty()) {
+                overflowDayAssignedTechs.sort(sorter);
+                validTechs.addAll(overflowDayAssignedTechs);
+            }
 
-        if (!overflowDayTechs.isEmpty()) {
-            overflowDayTechs.sort(sorter);
-            validTechs.addAll(overflowDayTechs);
+            if (!overflowDayTechs.isEmpty()) {
+                overflowDayTechs.sort(sorter);
+                validTechs.addAll(overflowDayTechs);
+            }
         }
 
         if (validTechs.isEmpty()) {
@@ -1515,6 +1525,45 @@ public class MRMSService {
         }
 
         return newParts;
+    }
+
+    /**
+     * Orders the techs for a job nobody can finish today by who will finish it soonest, counting what is left of
+     * their day and then the minutes they have each day after maintenance. A tech whose day goes mostly to
+     * maintaining their units would carry a long job for days, so an idle tech can finish it far sooner even when
+     * the busy tech is the one assigned to the unit. The assigned tech wins only a tie, and then the usual skill
+     * order applies.
+     *
+     * @return the techs, soonest finish first
+     */
+    private static List<Person> sortBySoonestFinish(Campaign campaign, List<Person> assignedTechs,
+          List<Person> otherTechs, Map<Person, Integer> expectedMinutesByTech, TechSorter sorter) {
+        List<Person> techs = new ArrayList<>(assignedTechs);
+        techs.addAll(otherTechs);
+        Map<Person, Integer> daysToFinishByTech = new HashMap<>();
+        for (Person tech : techs) {
+            int daysToFinish = estimateDaysToFinish(campaign, tech, expectedMinutesByTech.getOrDefault(tech, 0));
+            daysToFinishByTech.put(tech, daysToFinish);
+            LOGGER.debug("[MRMS] {}: would finish the job in {} more days, {} free minutes a day after maintenance",
+                  tech.getFullName(), daysToFinish, WorkTimeEstimate.getMinutesFreeForJobsPerDay(campaign, tech));
+        }
+        Comparator<Person> soonestFinishFirst = Comparator.comparingInt(daysToFinishByTech::get);
+        Comparator<Person> assignedFirst = Comparator.comparing(tech -> !assignedTechs.contains(tech));
+        techs.sort(soonestFinishFirst.thenComparing(assignedFirst).thenComparing(sorter));
+        return techs;
+    }
+
+    /**
+     * @return the days after today a tech needs to finish a job: none if it fits in what is left of today, otherwise
+     *       the rest at the minutes they have each day after maintenance
+     */
+    static int estimateDaysToFinish(Campaign campaign, Person tech, int expectedMinutes) {
+        int minutesBeyondToday = expectedMinutes - RepairTechEligibility.getTimeLeftToday(campaign, tech);
+        if (minutesBeyondToday <= 0) {
+            return 0;
+        }
+        int minutesFreePerDay = WorkTimeEstimate.getMinutesFreeForJobsPerDay(campaign, tech);
+        return (int) Math.ceil((double) minutesBeyondToday / minutesFreePerDay);
     }
 
     /**

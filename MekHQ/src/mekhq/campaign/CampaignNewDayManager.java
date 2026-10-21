@@ -1354,7 +1354,7 @@ public class CampaignNewDayManager {
                                                            campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
                         for (String report : reports) {
-                            campaign.addReport(GENERAL, report);
+                            campaign.addReport(POLITICS, report);
                         }
                     }
                 }
@@ -1593,7 +1593,7 @@ public class CampaignNewDayManager {
             campaign.addReport(POLITICS, report);
         }
 
-        List<AbstractContract> activeMissions = campaign.getContractHistoryData().getCompleted();
+        List<AbstractContract> activeMissions = campaign.getContractHistoryData().getActiveAndStarted(today);
         boolean isInTransit = !updatedLocation.isOnPlanet();
         Factions factions = Factions.getInstance();
 

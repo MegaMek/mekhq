@@ -212,7 +212,7 @@ public class RefitTest {
         assertEquals(mockCampaign, refit.getCampaign());
 
         //
-        // Locust 1V to 1E Class D refit steps (in no particular order):
+        // Locust 1V to 1E Class C refit steps (in no particular order):
         // 1. Remove excess Machine Gun (LA) [120 mins]
         // 2. Remove excess Machine Gun (RA) [120 mins]
         // 3. Remove Machine Gun Ammo [Full] Bin (CT) [120 mins]
@@ -224,22 +224,21 @@ public class RefitTest {
         // Everything else is the same.
         //
 
-        // Per SO p188:
-        // "This kit permits players to install a new item
-        // where previously there was none..."
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
+        // Per CamOps p.211, moving the Medium Laser to another location is Class C; the lasers added where the
+        // Machine Guns came out are only Class B
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
 
         // Time?
         // + 3 removals @ 120 mins ea
         // + 1 move @ 120 mins ea
         // + 3 adds @ 120 mins ea
-        // x 8*.5=4 (Class D) (CamOps)
-        assertEquals((120.0 * 7.0) * 4.0, refit.getActualTime(), 0.1);
+        // x 5*.5=2.5 (Class C with kit) (CamOps)
+        assertEquals((120.0 * 7.0) * 2.5, refit.getActualTime(), 0.1);
 
         // Cost?
         // + 1 Medium Laser @ 40,000 ea
         // + 2 Small Lasers @ 11,250 ea
-        // x 1.1 (Refit Kit cost, SO p188)
+        // x 1.1 (Refit Kit cost, CamOps p.212)
         assertEquals(Money.of((40000 + 11250 + 11250) * 1.1), refit.getCost());
 
         // We're removing 2 machine guns and an ammo bin
@@ -400,7 +399,7 @@ public class RefitTest {
         assertEquals(mockCampaign, refit.getCampaign());
 
         //
-        // Javelin 10N to 10A Class C refit steps (in no particular order):
+        // Javelin 10N to 10A Class B refit steps (in no particular order):
         // 1. Remove excess SRM 6 (LT) [120 mins]
         // 2. Remove excess SRM 6 (RT) [120 mins]
         // 3. Remove SRM 6 Ammo Bin (LT) [120 mins]
@@ -411,25 +410,21 @@ public class RefitTest {
         // Everything else is the same.
         //
 
-        // Per SO p188:
-        // "A Class C kit also enables replacement of a weapon
-        // or item of equipment with any other, even if it is
-        // larger than the item(s) being replaced; for example,
-        // replacing an ER large laser with an LRM-10 launcher
-        // and ammunition."
-        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        // Per CamOps p.211, adding components to a location where something was removed in the same refit is Class B,
+        // whatever their size
+        assertEquals(Refit.CLASS_B, refit.getRefitClass());
 
         // Time?
         // + 4 removals @ 120 mins ea
         // + 2 adds @ 120 mins ea
-        // x 5 (Class C)
+        // x 3 (Class B)
         // / 2 - Not a custom job
-        assertEquals((120.0 * 6.0) * 5.0 / 2.0, refit.getActualTime(), 0.1);
+        assertEquals((120.0 * 6.0) * 3.0 / 2.0, refit.getActualTime(), 0.1);
 
         // Cost?
         // + 1 LRM 15 @ 175,000 ea
         // + 1 ton LRM 15 Ammo @ 30,000 ea
-        // x 1.1 (Refit Kit cost, SO p188)
+        // x 1.1 (Refit Kit cost, CamOps p.212)
         assertEquals(Money.of(175000.0 + 30000.0).multipliedBy(1.1), refit.getCost());
 
         // We're removing 2 SRM 6s and two ammo bins
@@ -594,7 +589,7 @@ public class RefitTest {
         assertEquals(mockCampaign, refit.getCampaign());
 
         //
-        // Flea 4 to 15 Class D refit steps (in no particular order):
+        // Flea 4 to 15 Class C refit steps (in no particular order):
         // 1. Remove excess Large Laser (RA) [120 mins]
         // 2. Move Small Laser (LA) to (LT)(R) [120 mins]
         // 3. Move Small Laser (LA) to (RT)(R) [120 mins]
@@ -619,10 +614,9 @@ public class RefitTest {
         // Everything else is the same.
         //
 
-        // Per SO p188:
-        // "This kit permits players to install a new item
-        // where previously there was none..."
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
+        // Per CamOps p.211, moving the Small Lasers to other locations and adding Machine Gun ammo to the center
+        // torso, where nothing came out, are Class C
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
 
         // Time?
         // + 1 removal @ 120 mins ea
@@ -630,15 +624,15 @@ public class RefitTest {
         // + 1 facing change @ 120 mins ea
         // + 5 adds @ 120 mins ea
         // + 16 armor changes @ 5 mins ea
-        // x 8*0.5 = 4 (Class D with kit, CamOps)
-        assertEquals(((120.0 * 9.0) + (5.0 * 16.0)) * 4.0, refit.getActualTime(), 0.1);
+        // x 5*0.5 = 2.5 (Class C with kit, CamOps)
+        assertEquals(((120.0 * 9.0) + (5.0 * 16.0)) * 2.5, refit.getActualTime(), 0.1);
 
         // Cost?
         // + 2 Medium Lasers @ 40,000 ea
         // + 2 Machine Guns @ 5,000 ea
         // + 1 ton Machine Gun Ammo @ 1,000 ea
         // + 1 ton Armor (Standard) @ 10,000 ea
-        // x 1.1 (Refit Kit cost, SO p188)
+        // x 1.1 (Refit Kit cost, CamOps p.212)
         assertEquals(Money.of(40000.0 + 40000.0 + 5000.0 + 5000.0 + 1000.0 + 10000.0).multipliedBy(1.1),
               refit.getCost());
 
