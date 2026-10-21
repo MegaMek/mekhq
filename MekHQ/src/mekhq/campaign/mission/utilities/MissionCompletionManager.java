@@ -33,13 +33,13 @@
 package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -187,10 +187,7 @@ public class MissionCompletionManager {
 
         refreshPersonnelMarketIfNeeded();
 
-        boolean hadCadreForces = undeployFormations(campaign, mission);
-        if (hadCadreForces) {
-            new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "cadreReassignment.text"), true);
-        }
+        undeployFormations(campaign, mission);
         undeployUnits(campaign, mission);
 
         resolveOutstandingScenarios(mission);
@@ -521,34 +518,31 @@ public class MissionCompletionManager {
 
         // A covert sponsor, if any, takes the standing change in the visible employer's place.
         Faction employer = mission.getStandingEmployerFaction();
-        factionStandings.processContractCompletion(playerForce.getFaction(),
+        List<String> reports = factionStandings.processContractCompletion(playerForce.getFaction(),
               employer,
               campaign.getLocalDate(),
               status,
               regardMultiplier,
               mission.getLengthInMonths());
+
+        for (String report : reports) {
+            if (report != null && !report.isBlank()) {
+                campaign.addReport(POLITICS, report);
+            }
+        }
     }
 
     /**
-     * Undeploys all formations from the completed mission's scenarios, reverting cadre roles to frontline.
+     * Undeploys all formations from the completed mission's scenarios.
      *
      * @param campaign the campaign being updated
      * @param mission  the completed mission
      *
-     * @return {@code true} if any cadre formations were reassigned, so the caller can notify the player
-     *
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean undeployFormations(Campaign campaign, AbstractContract mission) {
-        boolean isCadreDuty = mission.getObjectiveType().isCadreDuty();
-        boolean hadCadreForces = false;
+    static void undeployFormations(Campaign campaign, AbstractContract mission) {
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
-                formation.setCombatRoleInMemory(CombatRole.FRONTLINE);
-                hadCadreForces = true;
-            }
-
             int scenarioAssignment = formation.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
                 Scenario scenario = campaign.getScenario(scenarioAssignment);
@@ -559,8 +553,6 @@ public class MissionCompletionManager {
                 }
             }
         }
-
-        return hadCadreForces;
     }
 
     /**

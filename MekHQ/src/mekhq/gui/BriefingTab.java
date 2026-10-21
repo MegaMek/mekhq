@@ -1881,9 +1881,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (!chosen.isEmpty()) {
-            getCampaignGui().getApplication().joinGame(scenario, chosen);
+        if (chosen.isEmpty()) {
+            return;
         }
+
+        if (handleSalvageAssignments(scenario)) {
+            return;
+        }
+
+        getCampaignGui().getApplication().joinGame(scenario, chosen);
     }
 
     private void deployListFile() {

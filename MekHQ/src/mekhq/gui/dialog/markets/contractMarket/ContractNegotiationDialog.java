@@ -33,30 +33,32 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static java.lang.Math.max;
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Image;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.compute.Compute;
-import megamek.common.icons.Portrait;
-import megamek.common.ui.EnhancedTabbedPane;
+import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -83,17 +85,21 @@ import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.view.PersonViewPanel;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudConfirmButton;
+import mekhq.gui.baseComponents.hud.HudStyle;
+import mekhq.gui.baseComponents.hud.HudVerdictBanner;
 
 /**
- * The contract negotiation table. Lets the player improve a contract's terms - spending reputation or sacrificing steps
- * between terms - and rent support facilities, before accepting the offer.
+ * The contract negotiation table, drawn as a heads-up display in the style of the contract market. Lets the player
+ * improve a contract's terms - spending reputation or sacrificing steps between terms - and rent support facilities,
+ * before accepting the offer.
  *
  * <p>Rules (Hot Spots: Draconis Reach): each of the five terms may be raised at most {@code Scale} steps above its
  * baseline; reputation raises one term one step per point, up to {@code 2 x Scale} points total. Lowering a term skips
@@ -103,8 +109,12 @@ import mekhq.gui.view.PersonViewPanel;
  *
  * <p>Raising a sacrificed term reverses its lowers one at a time, returning it to the step each lower started from and
  * reclaiming those banked steps. Raising a term above its baseline is single-step, and such a step may land on a
- * plateau that leaves the value unchanged - surfaced as "no change" so the player sees they must spend more to cross a
- * band.</p>
+ * plateau that leaves the value unchanged - surfaced as "no change yet" so the player sees they must spend more to
+ * cross a band.</p>
+ *
+ * <p>Each term is a track of seventeen steps showing the employer's offer, how every raised step was paid for, and
+ * the steps given up; when a term cannot move, the reason is written beneath it. The negotiators, the one-time
+ * re-negotiation and the impact on pay sit in a column on the right.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -112,18 +122,14 @@ import mekhq.gui.view.PersonViewPanel;
 public class ContractNegotiationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ContractNegotiationDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
+    static final String GUIDE_PREFIX = "guide.contractNegotiation.";
 
     private static final int SACRIFICE_STEPS_PER_SWAP = 2;
     private static final int MAXIMUM_SWAPS = 2;
-    private static final int BASE_MAXIMUM_SACRIFICED_TERMS = 2;
-    private static final int BASE_MAXIMUM_SACRIFICED_STEPS = 4;
     private static final int MAXIMUM_FACILITY_UNITS = 100;
-
-    private static final String REPUTATION_HEX = "#1d5fa5";
-    private static final String SACRIFICE_HEX = "#993c1d";
-    private static final String MUTED_HEX = "#888888";
-
-    private final int PADDING = scaleForGUI(6);
+    private static final int SIDE_WIDTH = 330;
+    private static final int LABEL_WIDTH = 130;
+    private static final int PORTRAIT_SIZE = 48;
 
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
@@ -149,27 +155,39 @@ public class ContractNegotiationDialog extends JDialog {
     private final int[] originalStep = new int[Clause.values().length];
     private final int[] currentStep = new int[Clause.values().length];
     private final transient List<List<TermFunding>> funding = new ArrayList<>();
+    /**
+     * Each negotiator's portrait, scaled once: the negotiator cards are rebuilt on every click at the table, and
+     * re-reading and smoothly scaling the images each time made the steppers sluggish.
+     */
+    private final transient Map<Person, Icon> portraits = new HashMap<>();
 
-    private final JLabel[] termValueLabels = new JLabel[Clause.values().length];
-    private final JLabel[] termCapLabels = new JLabel[Clause.values().length];
-    private final JButton[] termRaiseButtons = new JButton[Clause.values().length];
-    private final JButton[] termLowerButtons = new JButton[Clause.values().length];
+    private final TermRow[] termRows = new TermRow[Clause.values().length];
 
     private final int[] facilityUnitCost = new int[3];
     private final int[] facilityQuantity = new int[3];
+    private final int[] initialFacilityQuantity = new int[3];
     private final JLabel[] facilityQuantityLabels = new JLabel[3];
     private final JLabel[] facilityTotalLabels = new JLabel[3];
+    private final HudButton[] facilityLowerButtons = new HudButton[3];
 
-    private JButton negotiatorButton;
-    private JLabel negotiatorLabel;
-    private JScrollPane playerNegotiatorScroll;
-    private JLabel reputationBudgetLabel;
-    private JLabel swapsBudgetLabel;
-    private JLabel bankBudgetLabel;
-    private JLabel payImpactLabel;
-    private JLabel summaryLabel;
-    private JLabel resultsLabel;
-    private RoundedJButton renegotiateButton;
+    private final Readout reputationReadout = new Readout(ACCENT);
+    private final Readout swapsReadout = new Readout(AMBER);
+    private final JLabel bankValue = new JLabel();
+    private final JPanel negotiatorHolder = Hud.transparentPanel(new BorderLayout());
+    private final JPanel employerHolder = Hud.transparentPanel(new BorderLayout());
+    /** Says why re-negotiation is closed while the terms differ from the employer's offer. */
+    private JTextArea termsChangedNote;
+    private final JPanel impactHolder = Hud.transparentPanel(new BorderLayout());
+    private final JLabel attemptsLabel = HudStyle.keyLabel("");
+    private final HudVerdictBanner resultBanner = new HudVerdictBanner();
+    private JLabel limitsLabel;
+    private HudButton resetButton;
+    private HudButton confirmButton;
+    private HudConfirmButton haggleButton;
+    private HudConfirmButton exceptionButton;
+    private MarketGuide guide;
+    private JScrollPane mainScroll;
+    private JScrollPane sideScroll;
 
     private boolean confirmed;
 
@@ -230,6 +248,7 @@ public class ContractNegotiationDialog extends JDialog {
         facilityQuantity[0] = contract.getRentedHospitalBeds();
         facilityQuantity[1] = contract.getRentedKitchens();
         facilityQuantity[2] = contract.getRentedHoldingCells();
+        System.arraycopy(facilityQuantity, 0, initialFacilityQuantity, 0, facilityQuantity.length);
 
         initializeComponents();
     }
@@ -239,31 +258,61 @@ public class ContractNegotiationDialog extends JDialog {
         return confirmed;
     }
 
+    // region Layout
+
     private void initializeComponents() {
         setTitle(getTextAt(RESOURCE_BUNDLE, "title.contractMarket.negotiate"));
 
         JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        content.add(buildHeader(), BorderLayout.NORTH);
-        content.add(buildFooter(), BorderLayout.SOUTH);
+        content.setOpaque(true);
+        content.setBackground(GROUND);
+        content.add(buildCommandBar(), BorderLayout.NORTH);
 
-        // The haggling controls and each negotiator's dossier live on their own tabs, so every view gets the full
-        // dialog width instead of being crammed into a narrow side column.
-        EnhancedTabbedPane tabs = new EnhancedTabbedPane();
-        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.tab.terms"), buildBody());
-        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.employer.title"),
-              buildEmployerNegotiatorPane());
-        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.player.title"),
-              buildPlayerNegotiatorPane());
-        content.add(tabs, BorderLayout.CENTER);
-        getContentPane().add(content);
+        JPanel body = new JPanel(new BorderLayout());
+        body.setOpaque(true);
+        body.setBackground(SURFACE_DEEP);
+        mainScroll = MarketHud.scroll(buildMain(), SURFACE_DEEP);
+        body.add(mainScroll, BorderLayout.CENTER);
+        sideScroll = MarketHud.scroll(buildSide(), GROUND);
+        JComponent side = sideScroll;
+        side.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
+        side.setPreferredSize(new Dimension(scaleForGUI(SIDE_WIDTH), 0));
+        body.add(side, BorderLayout.EAST);
+        content.add(body, BorderLayout.CENTER);
+        content.add(buildFooter(), BorderLayout.SOUTH);
+        setContentPane(content);
+
+        guide = new MarketGuide(this);
+        content.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+              "closeGuide");
+        content.getActionMap().put("closeGuide", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                guide.close();
+            }
+        });
 
         refresh();
 
+        setMinimumSize(scaleForGUI(960, 600));
         pack();
-        setSize(scaleForGUI(560, 720)); // Default opening size; saved preferences (below) override it on later opens
+        setSize(scaleForGUI(1120, 720)); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(getParent());
         setPreferences(); // Must be before setVisible
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                // Both columns open at their top, whatever their contents scrolled into view while being laid out.
+                SwingUtilities.invokeLater(() -> {
+                    mainScroll.getVerticalScrollBar().setValue(0);
+                    sideScroll.getVerticalScrollBar().setValue(0);
+                });
+                // The guide opens by itself the first time the player sits at the table.
+                if (ContractMarketGuidePreferences.getInstance().shouldAutoOpen(GUIDE_PREFIX)) {
+                    openGuide();
+                }
+            }
+        });
         setVisible(true);
     }
 
@@ -280,179 +329,509 @@ public class ContractNegotiationDialog extends JDialog {
         }
     }
 
-    private JPanel buildHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+    private void openGuide() {
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(GUIDE_PREFIX, true);
+        guide.open(GUIDE_PREFIX);
+    }
 
-        header.add(buildNegotiatorControl(), BorderLayout.WEST);
+    /** The market-style command bar: the contract, and the reputation, swaps and banked steps left to spend. */
+    private JPanel buildCommandBar() {
+        JPanel bar = new JPanel(new BorderLayout(scaleForGUI(20), 0));
+        bar.setOpaque(true);
+        bar.setBackground(GROUND);
+        bar.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JLabel heading = new JLabel("<html><b style='font-size:larger'>"
-                                          +
-                                          getTextAt(RESOURCE_BUNDLE, "title.contractMarket.negotiate") +
-                                          "</b></html>");
-        heading.setVerticalAlignment(SwingConstants.TOP);
+        JPanel identity = MarketHud.column();
+        String scaleText = ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE));
+        identity.add(leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.eyebrow",
+              contract.getEmployerMarketDisplayName(), scaleText))));
+        identity.add(Box.createVerticalStrut(scaleForGUI(2)));
+        JLabel title = new JLabel(ContractMarketFormatting.marketName(contract).toUpperCase(Locale.ROOT));
+        title.setForeground(ACCENT_BRIGHT);
+        title.setFont(hudFont(Font.BOLD, 1.12f, 0.12f));
+        identity.add(leftAligned(title));
 
-        JLabel subtitle = new JLabel("<html><span style='color:" +
-                                           MUTED_HEX +
-                                           "'>"
-                                           +
-                                           escape(getFormattedTextAt(RESOURCE_BUNDLE,
-                                                 "negotiate.contractMarket.subtitle",
-                                                 contract.getName(),
-                                                 contract.getEmployerMarketDisplayName(),
-                                                 ChaosContractDeterminationScale.formatScale(
-                                                       contract.getExactScale(),
-                                                       campaign.getCampaignOptions()
-                                                             .get(CampaignOption.USE_FRACTIONAL_SCALE)))) +
-                                           "</span></html>");
+        JPanel readouts = Hud.transparentPanel(null);
+        readouts.setLayout(new BoxLayout(readouts, BoxLayout.X_AXIS));
+        readouts.add(reputationReadout.build(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.reputation"),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.reputation.tooltip")));
+        readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        readouts.add(swapsReadout.build(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.swaps"),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.swaps.tooltip")));
+        readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        JPanel bank = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.bank"), "", AMBER,
+              SURFACE_DEEP);
+        bank.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.budget.bank.tooltip")));
+        bank.remove(1);
+        bankValue.setForeground(AMBER);
+        bankValue.setFont(hudFont(Font.BOLD, 1.08f, 0.0f));
+        bankValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bank.add(bankValue);
+        readouts.add(bank);
+        readouts.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        HudButton guideButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.guide")
+                                                    .toUpperCase(Locale.ROOT), false, true);
+        guideButton.addActionListener(event -> openGuide());
+        readouts.add(guideButton);
 
-        JPanel budgets = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(16), 0));
-        reputationBudgetLabel = new JLabel();
-        swapsBudgetLabel = new JLabel();
-        bankBudgetLabel = new JLabel();
-        budgets.add(reputationBudgetLabel);
-        budgets.add(swapsBudgetLabel);
-        budgets.add(bankBudgetLabel);
+        bar.add(identity, BorderLayout.CENTER);
+        bar.add(readouts, BorderLayout.EAST);
+        return bar;
+    }
 
-        // Top line: the heading on the left, the budgets on the right. The contract name sits below both.
-        JPanel topRow = new JPanel(new BorderLayout());
-        topRow.add(heading, BorderLayout.WEST);
-        topRow.add(budgets, BorderLayout.EAST);
+    /** The terms as step tracks with a legend, then the rented facilities. */
+    private JPanel buildMain() {
+        JPanel main = MarketHud.column();
+        main.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(18), scaleForGUI(18),
+              scaleForGUI(18)));
+        main.add(leftAligned(heading("negotiate.contractMarket.section.terms")));
+        for (Clause clause : Clause.values()) {
+            termRows[clause.ordinal()] = new TermRow(clause);
+            main.add(leftAligned(termRows[clause.ordinal()].panel));
+        }
+        main.add(leftAligned(buildLegend()));
 
-        JPanel titleArea = new JPanel(new BorderLayout());
-        titleArea.setBorder(BorderFactory.createEmptyBorder(0, scaleForGUI(10), 0, 0));
-        titleArea.add(topRow, BorderLayout.NORTH);
-        titleArea.add(subtitle, BorderLayout.CENTER);
-        header.add(titleArea, BorderLayout.CENTER);
+        if (!isPirateContract()) {
+            main.add(leftAligned(heading("negotiate.contractMarket.section.facilities")));
+            String[] facilityKeys = { "negotiate.contractMarket.facility.hospitalBeds",
+                                      "negotiate.contractMarket.facility.kitchens",
+                                      "negotiate.contractMarket.facility.holdingCells" };
+            for (int index = 0; index < facilityKeys.length; index++) {
+                main.add(leftAligned(buildFacilityRow(index, facilityKeys[index])));
+            }
+        }
+        return main;
+    }
 
-        return header;
+    private static JComponent heading(String key) {
+        JPanel holder = Hud.transparentPanel(new BorderLayout());
+        holder.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(14), 0, scaleForGUI(4), 0));
+        holder.add(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, key)), BorderLayout.CENTER);
+        return holder;
+    }
+
+    /** What each colour on the tracks means. */
+    private JComponent buildLegend() {
+        JPanel legend = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(14),
+              scaleForGUI(2)));
+        legend.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(4), 0, 0));
+        legend.add(legendItem(CellStyle.OFFER, "negotiate.contractMarket.legend.offer"));
+        legend.add(legendItem(CellStyle.REPUTATION, "negotiate.contractMarket.legend.reputation"));
+        legend.add(legendItem(CellStyle.SWAP, "negotiate.contractMarket.legend.swap"));
+        legend.add(legendItem(CellStyle.GIVEN_UP, "negotiate.contractMarket.legend.givenUp"));
+        return legend;
+    }
+
+    private static JLabel legendItem(CellStyle style, String key) {
+        JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, key));
+        label.setForeground(TEXT_FAINT);
+        label.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
+        label.setIcon(new Icon() {
+            @Override
+            public void paintIcon(Component component, Graphics graphics, int x, int y) {
+                style.paint((Graphics2D) graphics, x, y, getIconWidth(), getIconHeight());
+            }
+
+            @Override
+            public int getIconWidth() {
+                return scaleForGUI(12);
+            }
+
+            @Override
+            public int getIconHeight() {
+                return scaleForGUI(10);
+            }
+        });
+        label.setIconTextGap(scaleForGUI(6));
+        return label;
+    }
+
+    private JPanel buildFacilityRow(int index, String labelKey) {
+        JPanel row = new JPanel(new BorderLayout(scaleForGUI(12), 0));
+        row.setOpaque(false);
+        row.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(9), scaleForGUI(6), 0)));
+
+        String costEach = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.facility.each",
+              Money.of(facilityUnitCost[index]).toAmountAndSymbolString());
+        String benefit = getTextAt(RESOURCE_BUNDLE, labelKey + ".benefit");
+        JLabel name = new JLabel("<html>" + MarketHud.escape(getTextAt(RESOURCE_BUNDLE, labelKey))
+                                       + "<br><span style='font-size:smaller; color:" + hex(TEXT_FAINT) + "'>"
+                                       + MarketHud.escape(costEach) + " &middot; " + MarketHud.escape(benefit)
+                                       + "</span></html>");
+        name.setForeground(TEXT);
+        name.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
+        row.add(name, BorderLayout.CENTER);
+
+        facilityLowerButtons[index] = stepButton("negotiate.contractMarket.stepper.decrease",
+              () -> adjustFacility(index, -1));
+        HudButton more = stepButton("negotiate.contractMarket.stepper.increase", () -> adjustFacility(index, 1));
+        facilityQuantityLabels[index] = new JLabel("", SwingConstants.CENTER);
+        facilityQuantityLabels[index].setForeground(TEXT);
+        facilityQuantityLabels[index].setFont(hudFont(Font.BOLD, 0.95f, 0.0f));
+        facilityQuantityLabels[index].setPreferredSize(new Dimension(scaleForGUI(30),
+              facilityQuantityLabels[index].getPreferredSize().height + scaleForGUI(4)));
+        facilityTotalLabels[index] = new JLabel("", SwingConstants.RIGHT);
+        facilityTotalLabels[index].setForeground(TEXT_MUTED);
+        facilityTotalLabels[index].setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+        facilityTotalLabels[index].setPreferredSize(new Dimension(scaleForGUI(130),
+              facilityTotalLabels[index].getPreferredSize().height + scaleForGUI(4)));
+
+        JPanel controls = Hud.transparentPanel(null);
+        controls.setLayout(new BoxLayout(controls, BoxLayout.X_AXIS));
+        controls.add(facilityLowerButtons[index]);
+        controls.add(Box.createHorizontalStrut(scaleForGUI(4)));
+        controls.add(facilityQuantityLabels[index]);
+        controls.add(Box.createHorizontalStrut(scaleForGUI(4)));
+        controls.add(more);
+        controls.add(Box.createHorizontalStrut(scaleForGUI(12)));
+        controls.add(facilityTotalLabels[index]);
+        row.add(controls, BorderLayout.EAST);
+        return row;
+    }
+
+    /** The negotiators, the re-negotiation, and the impact on pay. */
+    private JPanel buildSide() {
+        JPanel side = MarketHud.column();
+        side.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
+              scaleForGUI(14)));
+
+        side.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.negotiator.player.title"))));
+        side.add(Box.createVerticalStrut(scaleForGUI(5)));
+        side.add(leftAligned(negotiatorHolder));
+        side.add(Box.createVerticalStrut(scaleForGUI(14)));
+
+        Person employerNegotiator = contract.getEmployerNegotiator();
+        if (employerNegotiator != null) {
+            side.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.employer.title"))));
+            side.add(Box.createVerticalStrut(scaleForGUI(5)));
+            side.add(leftAligned(employerHolder));
+            side.add(Box.createVerticalStrut(scaleForGUI(14)));
+        }
+
+        // The re-negotiation only exists when the campaign uses active negotiators.
+        if (activeNegotiators) {
+            JPanel headingRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+            headingRow.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.renegotiate")),
+                  BorderLayout.WEST);
+            attemptsLabel.setForeground(ACCENT_BRIGHT);
+            headingRow.add(attemptsLabel, BorderLayout.EAST);
+            side.add(leftAligned(headingRow));
+            side.add(Box.createVerticalStrut(scaleForGUI(5)));
+            side.add(leftAligned(buildRenegotiationCard()));
+            side.add(Box.createVerticalStrut(scaleForGUI(14)));
+        }
+
+        side.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.impact"))));
+        side.add(Box.createVerticalStrut(scaleForGUI(5)));
+        side.add(leftAligned(impactHolder));
+        return side;
     }
 
     /**
-     * Builds the negotiator control: a portrait button, showing the chosen negotiator or a warning default when none
-     * has been picked, above a label naming them. Clicking the button opens the negotiator picker.
-     *
-     * @author Illiani
-     * @since 0.51.01
+     * The re-negotiation: what it does, and one confirm-twice button for each way to press the case. The result is
+     * shown in place once an attempt has been made.
      */
-    private JPanel buildNegotiatorControl() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private JPanel buildRenegotiationCard() {
+        JPanel content = MarketHud.column();
+        content.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.renegotiate.explain"), TEXT_FAINT, Font.PLAIN, 0.84f)));
+        content.add(Box.createVerticalStrut(scaleForGUI(8)));
+        termsChangedNote = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.renegotiate.termsChanged"), AMBER, Font.PLAIN, 0.84f);
+        termsChangedNote.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(8), 0));
+        content.add(leftAligned(termsChangedNote));
 
-        negotiatorButton = new JButton();
-        negotiatorButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        negotiatorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        negotiatorButton.addActionListener(e -> openNegotiatorPicker());
-        panel.add(negotiatorButton);
+        haggleButton = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.haggle")
+                                                  .toUpperCase(Locale.ROOT),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.confirm").toUpperCase(Locale.ROOT),
+              true);
+        haggleButton.addActionListener(event -> renegotiate(true));
+        exceptionButton = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.renegotiate.exception").toUpperCase(Locale.ROOT),
+              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.confirm").toUpperCase(Locale.ROOT),
+              true);
+        exceptionButton.addActionListener(event -> renegotiate(false));
 
-        negotiatorLabel = new JLabel();
-        negotiatorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        negotiatorLabel.setFont(negotiatorLabel.getFont().deriveFont(negotiatorLabel.getFont().getSize2D() - 2f));
-        panel.add(negotiatorLabel);
-
-        updateNegotiatorControl();
-        return panel;
+        content.add(leftAligned(option(haggleButton, "negotiate.contractMarket.renegotiate.haggle.detail")));
+        content.add(Box.createVerticalStrut(scaleForGUI(6)));
+        content.add(leftAligned(option(exceptionButton, "negotiate.contractMarket.renegotiate.exception.detail")));
+        content.add(Box.createVerticalStrut(scaleForGUI(8)));
+        resultBanner.setVisible(false);
+        content.add(leftAligned(resultBanner));
+        return card(content);
     }
 
-    private void updateNegotiatorControl() {
-        int size = scaleForGUI(56);
-        Person negotiator = contract.getPlayerNegotiator();
+    private static JPanel option(HudConfirmButton button, String detailKey) {
+        JPanel option = Hud.transparentPanel(new BorderLayout(0, scaleForGUI(2)));
+        option.add(button, BorderLayout.NORTH);
+        option.add(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, detailKey), TEXT_FAINT, Font.PLAIN, 0.8f),
+              BorderLayout.CENTER);
+        return option;
+    }
 
-        if (negotiator != null) {
-            ImageIcon icon = negotiator.getPortraitImageIconWithFallback(true);
-            if (icon != null) {
-                negotiatorButton.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size,
-                      Image.SCALE_SMOOTH)));
-            }
-            negotiatorButton.setBorder(BorderFactory.createLineBorder(muted(), scaleForGUI(1)));
-            negotiatorButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
-                  "negotiate.contractMarket.negotiator.tooltip")));
-            negotiatorLabel.setText(escape(negotiator.getFullTitle()));
-            negotiatorLabel.setForeground(null);
+    private JPanel buildFooter() {
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        footer.setOpaque(true);
+        footer.setBackground(SURFACE_DEEP);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(14), scaleForGUI(8), scaleForGUI(14))));
+
+        limitsLabel = Hud.hint("");
+        footer.add(limitsLabel, BorderLayout.CENTER);
+
+        resetButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.reset")
+                                          .toUpperCase(Locale.ROOT), false);
+        resetButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.reset.tooltip"));
+        resetButton.addActionListener(event -> resetAll());
+        HudButton cancel = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.cancel")
+                                               .toUpperCase(Locale.ROOT), false);
+        cancel.addActionListener(event -> dispose());
+        confirmButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.confirm")
+                                            .toUpperCase(Locale.ROOT), true);
+        confirmButton.addActionListener(event -> confirmAction());
+
+        JPanel buttons = Hud.transparentPanel(null);
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+        buttons.add(resetButton);
+        buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
+        buttons.add(cancel);
+        buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
+        buttons.add(confirmButton);
+        footer.add(buttons, BorderLayout.EAST);
+        return footer;
+    }
+
+    // endregion Layout
+
+    // region Negotiators
+
+    /**
+     * Rebuilds the "your negotiator" card: their portrait, Negotiation skill and Edge, and each negotiation trait with
+     * what it does at this table; or, with no negotiator chosen, a prompt to choose one.
+     */
+    private void refreshNegotiatorCard() {
+        Person negotiator = contract.getPlayerNegotiator();
+        JPanel content = MarketHud.column();
+        if (negotiator == null) {
+            JLabel none = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.none"));
+            none.setForeground(AMBER);
+            none.setFont(hudFont(Font.BOLD, 0.92f, 0.0f));
+            content.add(leftAligned(none));
+            content.add(Box.createVerticalStrut(scaleForGUI(4)));
+            content.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.player.empty"), TEXT_FAINT, Font.PLAIN, 0.84f)));
         } else {
-            ImageIcon icon = new Portrait().getImageIcon(size);
-            if (icon != null) {
-                negotiatorButton.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size,
-                      Image.SCALE_SMOOTH)));
+            content.add(leftAligned(personSummary(negotiator)));
+            List<JComponent> traits = traitRows(negotiator);
+            if (!traits.isEmpty()) {
+                content.add(Box.createVerticalStrut(scaleForGUI(8)));
+                traits.forEach(trait -> {
+                    content.add(leftAligned(trait));
+                    content.add(Box.createVerticalStrut(scaleForGUI(6)));
+                });
             }
-            negotiatorButton.setBorder(BorderFactory.createLineBorder(warning(), scaleForGUI(2)));
-            negotiatorButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
-                  "negotiate.contractMarket.negotiator.tooltip")));
-            negotiatorLabel.setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.none"));
-            negotiatorLabel.setForeground(warning());
         }
+        content.add(Box.createVerticalStrut(scaleForGUI(8)));
+        String changeKey = negotiator == null
+                                 ? "negotiate.contractMarket.negotiator.choose"
+                                 : "negotiate.contractMarket.negotiator.change";
+        HudButton change = new HudButton(getTextAt(RESOURCE_BUNDLE, changeKey).toUpperCase(Locale.ROOT),
+              negotiator == null, true);
+        change.addActionListener(event -> openNegotiatorPicker());
+        if (isNegotiatorLocked()) {
+            change.setArmed(false);
+            change.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.negotiator.change.locked")));
+        }
+        JPanel changeRow = Hud.transparentPanel(new BorderLayout());
+        changeRow.add(change, BorderLayout.WEST);
+        content.add(leftAligned(changeRow));
+
+        negotiatorHolder.removeAll();
+        negotiatorHolder.add(card(content), BorderLayout.CENTER);
+        negotiatorHolder.revalidate();
+        negotiatorHolder.repaint();
+    }
+
+    /**
+     * The employer's negotiator, with the player's chances against them when the campaign uses re-negotiation. The
+     * chances follow the player's negotiator, so the card is rebuilt with every refresh.
+     */
+    private void refreshEmployerCard() {
+        Person employerNegotiator = contract.getEmployerNegotiator();
+        if (employerNegotiator == null) {
+            return;
+        }
+        JPanel content = MarketHud.column();
+        content.add(leftAligned(personSummary(employerNegotiator)));
+        if (activeNegotiators) {
+            content.add(Box.createVerticalStrut(scaleForGUI(10)));
+            content.add(leftAligned(renegotiationOdds(employerNegotiator)));
+        }
+        employerHolder.removeAll();
+        employerHolder.add(card(content), BorderLayout.CENTER);
+        employerHolder.revalidate();
+        employerHolder.repaint();
+    }
+
+    /**
+     * The chance the player's negotiator comes out ahead of the employer's on each re-negotiation, worked out exactly
+     * from both target numbers, natural aptitude, Edge rerolls and the player's traits.
+     */
+    private JPanel renegotiationOdds(Person employerNegotiator) {
+        JPanel block = MarketHud.column();
+        JLabel heading = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.heading")
+                                          .toUpperCase(Locale.ROOT));
+        heading.setForeground(TEXT_FAINT);
+        heading.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
+        heading.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.odds.tooltip")));
+        block.add(leftAligned(heading));
+        block.add(Box.createVerticalStrut(scaleForGUI(4)));
+
+        Person playerNegotiator = contract.getPlayerNegotiator();
+        if (playerNegotiator == null) {
+            block.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.odds.none"), TEXT_FAINT, Font.PLAIN, 0.8f)));
+            return block;
+        }
+        NegotiatorProfile.TableOdds odds = NegotiatorProfile.odds(campaign, playerNegotiator, employerNegotiator,
+              scale);
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", odds.haggle())));
+        block.add(Box.createVerticalStrut(scaleForGUI(2)));
+        block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", odds.exception())));
+        return block;
+    }
+
+    /** One re-negotiation's chances: its name, and how often the player prevails, coloured by who is favoured. */
+    private static JPanel oddsRow(String labelKey, ActiveNegotiationMath.Odds odds) {
+        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        name.setForeground(TEXT_MUTED);
+        name.setFont(hudFont(Font.PLAIN, 0.84f, 0.0f));
+        row.add(name, BorderLayout.WEST);
+        JLabel value = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.value",
+              percentOf(odds.win()), percentOf(odds.stalemate())));
+        value.setForeground(odds.win() >= odds.loss() ? READY : DANGER);
+        value.setFont(hudFont(Font.BOLD, 0.84f, 0.0f));
+        row.add(value, BorderLayout.EAST);
+        row.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.row.tooltip",
+              percentOf(odds.win()), percentOf(odds.stalemate()), percentOf(odds.loss())));
+        return row;
+    }
+
+    private static long percentOf(double chance) {
+        return Math.round(chance * 100);
+    }
+
+    /** A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it). */
+    private JPanel personSummary(Person person) {
+        JPanel summary = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
+        JLabel portrait = MarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
+        portrait.setIcon(portraits.computeIfAbsent(person,
+              key -> MarketHud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
+        summary.add(MarketHud.topAligned(portrait), BorderLayout.WEST);
+        JPanel text = MarketHud.column();
+        JLabel name = new JLabel(person.getFullTitle());
+        name.setForeground(TEXT);
+        name.setFont(hudFont(Font.BOLD, 0.92f, 0.0f));
+        text.add(leftAligned(name));
+        JLabel skill = new JLabel(skillSummary(person));
+        skill.setForeground(TEXT_MUTED);
+        skill.setFont(hudFont(Font.PLAIN, 0.84f, 0.0f));
+        text.add(leftAligned(skill));
+        summary.add(text, BorderLayout.CENTER);
+        return summary;
+    }
+
+    /** "Negotiation 4 · needs 7+ · Edge 2", or "Untrained" when the person has no Negotiation skill. */
+    private String skillSummary(Person person) {
+        Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
+        String text;
+        if (skill == null) {
+            text = getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.untrained");
+        } else {
+            SkillModifierData modifiers = person.getSkillModifierData();
+            text = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.skill",
+                  skill.getTotalSkillLevel(modifiers), skill.getSkillTargetNumber(modifiers, 0));
+        }
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)) {
+            // The Edge left to spend, as the picker shows it and the odds assume, rather than the person's maximum.
+            text = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.edge", text,
+                  person.getCurrentEdge());
+        }
+        return text;
+    }
+
+    /** Each negotiation trait the person carries, named in green or red, with what it does at this table. */
+    private List<JComponent> traitRows(Person person) {
+        boolean useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
+        List<JComponent> rows = new ArrayList<>();
+        for (String trait : ContractNegotiatorPickerDialog.RELEVANT_TRAITS) {
+            // The Edge negotiation trigger has no effect when Edge is disabled, so it is not listed then.
+            if ((trait.equals(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION) && !useEdge)
+                      || !person.getOptions().booleanOption(trait)) {
+                continue;
+            }
+            IOption option = person.getOptions().getOption(trait);
+            if (option == null) {
+                continue;
+            }
+            String name = option.getDisplayableName().replaceAll("\\s*\\([^)]*\\)", "");
+            // The trait's name over its effect, so both have the card's full width.
+            JPanel row = MarketHud.column();
+            JLabel nameLabel = new JLabel(name);
+            nameLabel.setForeground(NegotiatorProfile.isHelpfulTrait(trait) ? READY : DANGER);
+            nameLabel.setFont(hudFont(Font.BOLD, 0.82f, 0.0f));
+            row.add(leftAligned(nameLabel));
+            JTextArea effect = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+                  "negotiate.contractMarket.trait." + trait), TEXT_FAINT, Font.PLAIN, 0.8f);
+            row.add(leftAligned(effect));
+            if (option.getDescription() != null) {
+                String toolTip = MarketHud.wrapToolTip(option.getDescription());
+                row.setToolTipText(toolTip);
+                nameLabel.setToolTipText(toolTip);
+                effect.setToolTipText(toolTip);
+            }
+            rows.add(row);
+        }
+        return rows;
+    }
+
+
+    /**
+     * Whether the negotiator is fixed for this contract: once a re-negotiation has been made, the negotiator who made
+     * it stays at the table. Otherwise the attempts left would follow whoever sat down next, and swapping in a
+     * Relentless Bargainer after another negotiator's attempt would win a roll neither had alone.
+     */
+    private boolean isNegotiatorLocked() {
+        return contract.getPlayerNegotiator() != null && attemptsSoFar() > 0;
     }
 
     private void openNegotiatorPicker() {
-        ContractNegotiatorPickerDialog picker = new ContractNegotiatorPickerDialog(campaign,
+        if (isNegotiatorLocked()) {
+            return;
+        }
+        ContractNegotiatorPickerDialog picker = new ContractNegotiatorPickerDialog(campaign, contract,
               contract.getPlayerNegotiator());
         if (picker.wasConfirmed()) {
             contract.setPlayerNegotiator(picker.getSelectedNegotiator());
-            updateNegotiatorControl();
-            updatePlayerNegotiatorPane();
             recomputeNegotiatorCaps();
+            // Terms one negotiator was allowed may be beyond the next one's limits; rather than mix the two
+            // negotiators' traits, the manual haggling starts over within the new limits.
+            if (exceedsNegotiatorLimits()) {
+                resetTerms();
+            }
             refresh();
-        }
-    }
-
-    /**
-     * Builds the "Your Negotiator" tab: a scroll pane showing the player's chosen negotiator as a full
-     * {@link PersonViewPanel}, or a placeholder prompt until one is picked. Kept in {@link #playerNegotiatorScroll} so
-     * {@link #updatePlayerNegotiatorPane()} can swap its contents when the negotiator changes.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private JScrollPane buildPlayerNegotiatorPane() {
-        playerNegotiatorScroll = new JScrollPane();
-        playerNegotiatorScroll.setBorder(BorderFactory.createEmptyBorder());
-        playerNegotiatorScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        playerNegotiatorScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-        updatePlayerNegotiatorPane();
-        return playerNegotiatorScroll;
-    }
-
-    /**
-     * Builds the "Their Negotiator" tab: a scroll pane showing the employer's negotiator as a full
-     * {@link PersonViewPanel}. The employer's representative is fixed, so this pane never changes.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private JScrollPane buildEmployerNegotiatorPane() {
-        JScrollPane scroll = new JScrollPane(new PersonViewPanel(contract.getEmployerNegotiator(), campaign,
-              campaign.getGUI()));
-        scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-        return scroll;
-    }
-
-    /**
-     * Swaps the "Your Negotiator" tab's contents to match the currently selected player negotiator: their full
-     * {@link PersonViewPanel} once chosen, or a muted placeholder prompt while none is set.
-     */
-    private void updatePlayerNegotiatorPane() {
-        if (playerNegotiatorScroll == null) {
-            return;
-        }
-        Person negotiator = contract.getPlayerNegotiator();
-        if (negotiator != null) {
-            playerNegotiatorScroll.setViewportView(new PersonViewPanel(negotiator, campaign, campaign.getGUI()));
-        } else {
-            JLabel placeholder = new JLabel("<html><div style='text-align:center; color:" +
-                                                  MUTED_HEX +
-                                                  "'>"
-                                                  +
-                                                  escape(getTextAt(RESOURCE_BUNDLE,
-                                                        "negotiate.contractMarket.negotiator.player.empty"))
-                                                  +
-                                                  "</div></html>", SwingConstants.CENTER);
-            placeholder.setVerticalAlignment(SwingConstants.CENTER);
-            JPanel wrapper = new JPanel(new BorderLayout());
-            wrapper.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-            wrapper.add(placeholder, BorderLayout.CENTER);
-            playerNegotiatorScroll.setViewportView(wrapper);
         }
     }
 
@@ -463,129 +842,19 @@ public class ContractNegotiationDialog extends JDialog {
      * negotiator changes.
      */
     private void recomputeNegotiatorCaps() {
-        int raiseCapModifier = 0;
-        int sacrificeTermModifier = 0;
-        int sacrificeStepModifier = 0;
-
-        Person negotiator = contract.getPlayerNegotiator();
-        if (negotiator != null) {
-            PersonnelOptions options = negotiator.getOptions();
-            if (options.booleanOption(PersonnelOptions.HARD_BARGAINER)) {
-                raiseCapModifier++;
-            }
-            if (options.booleanOption(PersonnelOptions.PUSHOVER)) {
-                raiseCapModifier--;
-            }
-            if (options.booleanOption(PersonnelOptions.SHREWD_TRADER)) {
-                sacrificeTermModifier++;
-                sacrificeStepModifier += 2;
-            }
-            if (options.booleanOption(PersonnelOptions.INFLEXIBLE)) {
-                sacrificeTermModifier--;
-                sacrificeStepModifier -= 2;
-            }
-        }
-
-        capPerTerm = max(1, scale + raiseCapModifier);
-        maxSacrificedTerms = max(0, BASE_MAXIMUM_SACRIFICED_TERMS + sacrificeTermModifier);
-        maxSacrificedSteps = max(0, BASE_MAXIMUM_SACRIFICED_STEPS + sacrificeStepModifier);
+        NegotiatorProfile profile = NegotiatorProfile.of(contract.getPlayerNegotiator(), scale);
+        capPerTerm = profile.raiseCap();
+        maxSacrificedTerms = profile.sacrificeTerms();
+        maxSacrificedSteps = profile.sacrificeSteps();
     }
 
-    private JPanel buildBody() {
-        JPanel body = new JPanel();
-        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+    // endregion Negotiators
 
-        body.add(buildTermsCard());
-        if (!isPirateContract()) {
-            body.add(javax.swing.Box.createVerticalStrut(PADDING));
-            body.add(buildFacilitiesCard());
-        }
-
-        return body;
-    }
+    // region Negotiation logic
 
     /** Whether this contract is a pirate raid, which cannot rent support facilities. */
     private boolean isPirateContract() {
         return contract.getObjectiveType().getChaosObjectiveType() == ChaosObjectiveType.PIRATE_RAID;
-    }
-
-    private JPanel buildTermsCard() {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
-              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
-
-        JPanel head = new JPanel(new BorderLayout());
-        JLabel section = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.terms").toUpperCase());
-        section.setFont(section.getFont().deriveFont(section.getFont().getSize2D() - 2f));
-        section.setForeground(muted());
-        head.add(section, BorderLayout.WEST);
-        JLabel hint = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.terms.hint"));
-        hint.setForeground(muted());
-        hint.setFont(hint.getFont().deriveFont(hint.getFont().getSize2D() - 1f));
-        head.add(hint, BorderLayout.EAST);
-        card.add(head, BorderLayout.NORTH);
-
-        JPanel rows = new JPanel();
-        rows.setLayout(new BoxLayout(rows, BoxLayout.Y_AXIS));
-        rows.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
-        for (Clause clause : Clause.values()) {
-            rows.add(buildTermRow(clause));
-        }
-
-        payImpactLabel = new JLabel();
-        payImpactLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
-
-        JPanel south = new JPanel(new BorderLayout());
-        south.add(payImpactLabel, BorderLayout.WEST);
-
-        JPanel center = new JPanel(new BorderLayout());
-        center.add(rows, BorderLayout.NORTH);
-        center.add(south, BorderLayout.CENTER);
-        card.add(center, BorderLayout.CENTER);
-
-        return card;
-    }
-
-    private JPanel buildTermRow(Clause clause) {
-        int index = clause.ordinal();
-
-        JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
-        row.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), 0, scaleForGUI(4), 0));
-
-        JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, clause.labelKey));
-        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(6), 0));
-        namePanel.setPreferredSize(new Dimension(scaleForGUI(210), name.getPreferredSize().height));
-        namePanel.add(name);
-        // Mark a term the employer's faction disposition shifts (e.g. "Stingy" next to Base Pay), when the campaign
-        // uses faction modifiers.
-        String factionMarker = factionModifierMarker(clause);
-        if (factionMarker != null) {
-            JLabel marker = new JLabel(factionMarker);
-            marker.setForeground(muted());
-            marker.setFont(marker.getFont().deriveFont(Font.ITALIC, marker.getFont().getSize2D() - 1f));
-            namePanel.add(marker);
-        }
-        row.add(namePanel, BorderLayout.WEST);
-
-        termValueLabels[index] = new JLabel();
-        row.add(termValueLabels[index], BorderLayout.CENTER);
-
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
-        termCapLabels[index] = new JLabel();
-        termCapLabels[index].setForeground(muted());
-        termCapLabels[index].setFont(termCapLabels[index].getFont().deriveFont(
-              termCapLabels[index].getFont().getSize2D() - 1f));
-        controls.add(termCapLabels[index]);
-
-        termLowerButtons[index] = stepperButton(getTextAt(RESOURCE_BUNDLE,
-              "negotiate.contractMarket.stepper.decrease"), () -> lower(clause));
-        controls.add(termLowerButtons[index]);
-        termRaiseButtons[index] = stepperButton(getTextAt(RESOURCE_BUNDLE,
-              "negotiate.contractMarket.stepper.increase"), () -> raise(clause));
-        controls.add(termRaiseButtons[index]);
-
-        row.add(controls, BorderLayout.EAST);
-        return row;
     }
 
     /**
@@ -623,146 +892,6 @@ public class ContractNegotiationDialog extends JDialog {
             default -> null;
         };
     }
-
-    private JPanel buildFacilitiesCard() {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
-              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
-
-        JLabel section = new JLabel(getTextAt(RESOURCE_BUNDLE,
-              "negotiate.contractMarket.section.facilities").toUpperCase());
-        section.setFont(section.getFont().deriveFont(section.getFont().getSize2D() - 2f));
-        section.setForeground(muted());
-        card.add(section, BorderLayout.NORTH);
-
-        String[] facilityKeys = { "negotiate.contractMarket.facility.hospitalBeds",
-                                  "negotiate.contractMarket.facility.kitchens",
-                                  "negotiate.contractMarket.facility.holdingCells" };
-
-        JPanel rows = new JPanel();
-        rows.setLayout(new BoxLayout(rows, BoxLayout.Y_AXIS));
-        rows.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
-        for (int i = 0; i < facilityKeys.length; i++) {
-            rows.add(buildFacilityRow(i, facilityKeys[i]));
-        }
-        card.add(rows, BorderLayout.CENTER);
-
-        return card;
-    }
-
-    private JPanel buildFacilityRow(int index, String labelKey) {
-        JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
-        row.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), 0, scaleForGUI(4), 0));
-
-        String costEach = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.facility.each",
-              Money.of(facilityUnitCost[index]).toAmountAndSymbolString());
-        String benefit = getTextAt(RESOURCE_BUNDLE, labelKey + ".benefit");
-        JLabel name = new JLabel("<html>" +
-                                       escape(getTextAt(RESOURCE_BUNDLE, labelKey)) +
-                                       "<br><span style='color:"
-                                       +
-                                       MUTED_HEX +
-                                       "; font-size:smaller'>" +
-                                       escape(costEach) +
-                                       " &middot; " +
-                                       escape(benefit)
-                                       +
-                                       "</span></html>");
-        row.add(name, BorderLayout.WEST);
-
-        JPanel east = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(10), 0));
-
-        JPanel stepper = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
-        stepper.add(stepperButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.stepper.decrease"),
-              () -> adjustFacility(index, -1)));
-        // Seed with real text so the label has a non-zero preferred height before we pin its width.
-        facilityQuantityLabels[index] = new JLabel(Integer.toString(facilityQuantity[index]), SwingConstants.CENTER);
-        facilityQuantityLabels[index].setPreferredSize(new Dimension(scaleForGUI(28),
-              facilityQuantityLabels[index].getPreferredSize().height));
-        stepper.add(facilityQuantityLabels[index]);
-        stepper.add(stepperButton(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.stepper.increase"),
-              () -> adjustFacility(index, 1)));
-        east.add(stepper);
-
-        Money initialTotal = Money.of((double) facilityQuantity[index] * facilityUnitCost[index]);
-        facilityTotalLabels[index] = new JLabel(initialTotal.toAmountAndSymbolString(), SwingConstants.RIGHT);
-        facilityTotalLabels[index].setPreferredSize(new Dimension(scaleForGUI(120),
-              facilityTotalLabels[index].getPreferredSize().height));
-        east.add(facilityTotalLabels[index]);
-
-        row.add(east, BorderLayout.EAST);
-        return row;
-    }
-
-    private JPanel buildFooter() {
-        // Summary on its own line (top), the results area below it, buttons on the line below that (right).
-        JPanel footer = new JPanel(new BorderLayout(0, PADDING));
-        footer.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, 0, PADDING));
-
-        summaryLabel = new JLabel();
-        summaryLabel.setForeground(muted());
-        footer.add(summaryLabel, BorderLayout.NORTH);
-
-        // The active-negotiation results area only appears when the feature is enabled.
-        if (activeNegotiators) {
-            footer.add(buildResultsCard(), BorderLayout.CENTER);
-        }
-
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
-        if (activeNegotiators) {
-            renegotiateButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-                  "button.contractMarket.negotiate.renegotiate"));
-            renegotiateButton.addActionListener(e -> renegotiateAction());
-            buttons.add(renegotiateButton);
-        }
-        RoundedJButton explain = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "button.contractMarket.negotiate.explain"));
-        explain.addActionListener(e -> explainAction());
-        buttons.add(explain);
-        RoundedJButton reset = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.reset"));
-        reset.addActionListener(e -> resetAll());
-        buttons.add(reset);
-        RoundedJButton cancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "button.contractMarket.negotiate.cancel"));
-        cancel.addActionListener(e -> dispose());
-        buttons.add(cancel);
-        RoundedJButton confirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "button.contractMarket.negotiate.confirm"));
-        confirm.addActionListener(e -> confirmAction());
-        buttons.add(confirm);
-        footer.add(buttons, BorderLayout.SOUTH);
-
-        return footer;
-    }
-
-    /** The bordered "Negotiation Results" area shown at the bottom when active negotiators are enabled. */
-    private JPanel buildResultsCard() {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(BorderFactory.createCompoundBorder(RoundedLineBorder.createSubtleRoundedLineBorder(),
-              BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING)));
-
-        JLabel section = new JLabel(getTextAt(RESOURCE_BUNDLE,
-              "negotiate.contractMarket.section.results").toUpperCase());
-        section.setFont(section.getFont().deriveFont(section.getFont().getSize2D() - 2f));
-        section.setForeground(muted());
-        card.add(section, BorderLayout.NORTH);
-
-        resultsLabel = new JLabel();
-        resultsLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, 0, 0));
-        card.add(resultsLabel, BorderLayout.CENTER);
-
-        return card;
-    }
-
-    private JButton stepperButton(String text, Runnable action) {
-        JButton button = new JButton(text);
-        button.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        button.setPreferredSize(scaleForGUI(30, 28));
-        button.addActionListener(e -> action.run());
-        return button;
-    }
-
-    // region Negotiation logic
 
     /**
      * Restores a previous negotiation from the contract, if one was stored, so reopening the dialog resumes where it
@@ -898,20 +1027,72 @@ public class ContractNegotiationDialog extends JDialog {
         };
     }
 
-    /** Whether this clause's lower button should be active: an earlier raise can be undone, or a sacrifice is allowed. */
-    private boolean canLower(Clause clause) {
+    /**
+     * Why the term cannot be raised right now, or {@code null} when it can. The order follows {@link #raise}, so the
+     * reason given is the one actually stopping it.
+     */
+    private String raiseBlockReason(Clause clause) {
+        if (isPermanentlyLocked(clause)) {
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.fixed");
+        }
         if (isLocked(clause)) {
-            return false;
+            return getTextAt(RESOURCE_BUNDLE, activeNegotiators
+                                                    ? "negotiate.contractMarket.why.locked.exception"
+                                                    : "negotiate.contractMarket.why.locked");
+        }
+        int index = clause.ordinal();
+        if (currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.top");
+        }
+        if (currentStep[index] < originalStep[index]) {
+            int gap = restoreTarget(clause) - currentStep[index];
+            return gap <= sacrificeBank ? null
+                         : getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.takeBack", gap);
+        }
+        if ((currentStep[index] - originalStep[index]) >= capPerTerm) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.cap", capPerTerm);
+        }
+        if (reputationUsed < reputationPool) {
+            return null;
+        }
+        if (swapsUsed >= MAXIMUM_SWAPS) {
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.noSwaps");
+        }
+        if (sacrificeBank < SACRIFICE_STEPS_PER_SWAP) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.needBank",
+                  SACRIFICE_STEPS_PER_SWAP - sacrificeBank);
+        }
+        return null;
+    }
+
+    /** Why the term cannot be lowered right now, or {@code null} when it can. */
+    private String lowerBlockReason(Clause clause) {
+        if (isPermanentlyLocked(clause)) {
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.fixed");
+        }
+        if (isLocked(clause)) {
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.locked");
         }
         int index = clause.ordinal();
         if (currentStep[index] > originalStep[index]) {
-            return true;
+            return null;
         }
         int target = NegotiationStepMath.nextLowerDifferentStep(clause.term, currentStep[index]);
         if (target < CHAOS_CONTRACT_MINIMUM_STEP_VALUE) {
-            return false;
+            return getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.bottom");
         }
-        return canSacrifice(clause, currentStep[index] - target);
+        if (canSacrifice(clause, currentStep[index] - target)) {
+            return null;
+        }
+        boolean alreadySacrificed = currentStep[index] < originalStep[index];
+        boolean termLimitReached = !alreadySacrificed
+                                         && NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep)
+                                                  >= maxSacrificedTerms;
+        return termLimitReached
+                     ? getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.termLimit",
+                           maxSacrificedTerms)
+                     : getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.why.stepLimit",
+                           maxSacrificedSteps);
     }
 
     private void adjustFacility(int index, int delta) {
@@ -919,25 +1100,33 @@ public class ContractNegotiationDialog extends JDialog {
         refresh();
     }
 
-    private void explainAction() {
-        String body = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.body",
-              String.valueOf(scaleForGUI(360)));
-        JOptionPane.showMessageDialog(this, new JLabel(body),
-              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.explain.title"), JOptionPane.INFORMATION_MESSAGE);
-    }
-
     private void resetAll() {
-        for (Clause clause : Clause.values()) {
-            currentStep[clause.ordinal()] = originalStep[clause.ordinal()];
-            funding.get(clause.ordinal()).clear();
-        }
-        reputationUsed = 0;
-        swapsUsed = 0;
-        sacrificeBank = 0;
+        resetTerms();
         facilityQuantity[0] = contract.getRentedHospitalBeds();
         facilityQuantity[1] = contract.getRentedKitchens();
         facilityQuantity[2] = contract.getRentedHoldingCells();
         refresh();
+    }
+
+    /** Puts every term back to the baseline and refunds everything spent on them. */
+    private void resetTerms() {
+        System.arraycopy(originalStep, 0, currentStep, 0, originalStep.length);
+        clearManualHaggling();
+    }
+
+    /**
+     * Whether the terms on screen go past what the chosen negotiator may do: a term raised beyond their raise cap, or
+     * more terms or steps given up than they may give up. Raises and sacrifices are only checked as they are made, so
+     * this catches a negotiator swapped in after them.
+     */
+    private boolean exceedsNegotiatorLimits() {
+        for (Clause clause : Clause.values()) {
+            if (currentStep[clause.ordinal()] - originalStep[clause.ordinal()] > capPerTerm) {
+                return true;
+            }
+        }
+        return NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep) > maxSacrificedTerms
+                     || NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep) > maxSacrificedSteps;
     }
 
     private void confirmAction() {
@@ -985,34 +1174,23 @@ public class ContractNegotiationDialog extends JDialog {
     // region Active negotiation
 
     /**
-     * Runs the one active-negotiation attempt a contract allows: an opposed Negotiation check between the player's and
-     * the employer's negotiators. Each margin-of-success level the player wins improves a random term one meaningful
-     * step; each level lost lowers one (non-negotiable terms are skipped). The outcome rewrites the contract's terms as
-     * a fresh baseline - clearing any in-progress manual haggling - and is committed immediately: it cannot be undone,
-     * and the attempt can only be made once per contract.
+     * Runs one active-negotiation attempt: an opposed Negotiation check between the player's and the employer's
+     * negotiators. {@code haggle} presses for a better offer - each margin-of-success level the player wins improves a
+     * random term one meaningful step, each level lost lowers one, and the outcome becomes a fresh baseline. Otherwise
+     * it asks for an exception - the stakes are the non-negotiable flags. Either way the
+     * result is committed immediately and cannot be undone. It is only open while every term matches the employer's
+     * offer (see {@link #termsChanged()}). The confirm-twice buttons stand in for the old prompt, so a stray click
+     * never spends the attempt.
      */
-    private void renegotiateAction() {
-        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()) {
+    private void renegotiate(boolean haggle) {
+        if (contract.getPlayerNegotiator() == null || attemptsSoFar() >= maxRenegotiationAttempts()
+                  || termsChanged()) {
             return;
         }
-
-        // The employer's negotiator opens the floor; the player picks how to press their case. The player's own
-        // negotiator is deliberately not shown as a speaker. Cancel is first (index 0) so closing the window - which
-        // defaults the dialog choice to 0 - safely cancels rather than spending the one-shot attempt.
-        List<String> options = List.of(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.cancel"),
-              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.better"),
-              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.option.exception"));
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              contract.getEmployerNegotiator(), null,
-              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.prompt"),
-              options,
-              getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.ooc"),
-              null, true);
-
-        switch (dialog.getDialogChoice()) {
-            case 1 -> performHaggle();
-            case 2 -> performException();
-            default -> { /* cancelled (or window closed) - the attempt is not spent */ }
+        if (haggle) {
+            performHaggle();
+        } else {
+            performException();
         }
     }
 
@@ -1042,55 +1220,7 @@ public class ContractNegotiationDialog extends JDialog {
                                                      isUseEdge) :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
-                     + generalNegotiationModifier(playerNegotiator);
-    }
-
-    /**
-     * A flat modifier to the net margin from the negotiator's general contract SPAs and Flaws, applied to both
-     * re-negotiation options. Abrasive worsens every re-negotiation by one.
-     */
-    private static int generalNegotiationModifier(Person negotiator) {
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.ABRASIVE)) {
-            modifier--;
-        }
-        return modifier;
-    }
-
-    /**
-     * A net-margin modifier specific to the "make an exception" option (shifting non-negotiable flags). Loophole Finder
-     * frees more terms; Blacklisted, its opposite, locks more.
-     */
-    private static int exceptionNegotiationModifier(Person negotiator) {
-        if (negotiator == null) {
-            return 0;
-        }
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.LOOPHOLE_FINDER)) {
-            modifier++;
-        }
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.BLACKLISTED)) {
-            modifier--;
-        }
-        return modifier;
-    }
-
-    /**
-     * A net-margin modifier specific to the "give me a better offer" option (shifting the terms' values). Fine Print
-     * Reader wins better terms; Easily Fooled, its opposite, loses ground.
-     */
-    private static int haggleNegotiationModifier(Person negotiator) {
-        if (negotiator == null) {
-            return 0;
-        }
-        int modifier = 0;
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.FINE_PRINT_READER)) {
-            modifier++;
-        }
-        if (negotiator.getOptions().booleanOption(PersonnelOptions.EASILY_FOOLED)) {
-            modifier--;
-        }
-        return modifier;
+                     + NegotiatorProfile.of(playerNegotiator, scale).generalModifier();
     }
 
     /**
@@ -1104,21 +1234,11 @@ public class ContractNegotiationDialog extends JDialog {
         return result.getReportMargin();
     }
 
-    /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends the contract's one attempt. */
+    /** Runs the opposed check and rewrites the terms as a fresh baseline. Spends one attempt. */
     private void performHaggle() {
-        int net = rollNetMargin() + haggleNegotiationModifier(contract.getPlayerNegotiator());
+        int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).haggleModifier();
         int[] moveCounts = applyActiveNegotiation(net);
-
-        // The re-negotiated terms become the new baseline; manual haggling starts fresh from here.
-        reputationUsed = 0;
-        swapsUsed = 0;
-        sacrificeBank = 0;
-        for (Clause clause : Clause.values()) {
-            funding.get(clause.ordinal()).clear();
-        }
-
-        commitTermsAndPay();
-        contract.setNegotiationData(null);
+        commitAsNewBaseline();
         contract.setActiveNegotiationData(ActiveNegotiationData.haggle(attemptsSoFar() + 1, net,
               moveCounts[Clause.PAY.ordinal()], moveCounts[Clause.SUPPORT.ordinal()],
               moveCounts[Clause.TRANSPORT.ordinal()], moveCounts[Clause.SALVAGE.ordinal()],
@@ -1130,11 +1250,15 @@ public class ContractNegotiationDialog extends JDialog {
 
     /**
      * Runs the same opposed check, but the stakes are the non-negotiable flags: each margin of success waives a random
-     * locked term, each margin of failure locks a random unlocked one. Spends the contract's one attempt.
+     * locked term, each margin of failure locks a random unlocked one. Spends one attempt.
      */
     private void performException() {
-        int net = rollNetMargin() + exceptionNegotiationModifier(contract.getPlayerNegotiator());
+        int net = rollNetMargin() + NegotiatorProfile.of(contract.getPlayerNegotiator(), scale).exceptionModifier();
         int[] lockChanges = applyLockChanges(net);
+        // The terms on screen match the employer's offer, but the contract may still hold an earlier confirmed
+        // negotiation that the player has only reset here. Committing them keeps a cancelled table from leaving a
+        // raised term behind under a lock this attempt just set.
+        commitAsNewBaseline();
         contract.setNonNegotiableTermsData(nonNegotiableTerms);
         contract.setActiveNegotiationData(ActiveNegotiationData.exception(attemptsSoFar() + 1, net,
               lockChanges[Clause.PAY.ordinal()], lockChanges[Clause.SUPPORT.ordinal()],
@@ -1143,6 +1267,26 @@ public class ContractNegotiationDialog extends JDialog {
 
         LOGGER.info("Active negotiation (exception) for contract {}: net margin {}", contract.getName(), net);
         refresh();
+    }
+
+    /**
+     * Makes the terms on screen the new baseline after a re-negotiation: manual haggling starts fresh from them, and
+     * they are written to the contract at once, as the re-negotiation itself is.
+     */
+    private void commitAsNewBaseline() {
+        clearManualHaggling();
+        commitTermsAndPay();
+        contract.setNegotiationData(null);
+    }
+
+    /** Spends nothing: no reputation, swaps or banked steps, and no raise paid for. */
+    private void clearManualHaggling() {
+        reputationUsed = 0;
+        swapsUsed = 0;
+        sacrificeBank = 0;
+        for (Clause clause : Clause.values()) {
+            funding.get(clause.ordinal()).clear();
+        }
     }
 
     /**
@@ -1203,12 +1347,25 @@ public class ContractNegotiationDialog extends JDialog {
         return moveCounts;
     }
 
-    /** The step a term's baseline moves to on one meaningful improve/lower, or -1 if there is none in that direction. */
+    /** The step a term's baseline moves to on one meaningful improve/lower, or -1 if there is none that way. */
     private int meaningfulStep(Clause clause, boolean improve) {
         int from = originalStep[clause.ordinal()];
         return improve
                      ? NegotiationStepMath.nextHigherDifferentStep(clause.term, from)
                      : NegotiationStepMath.nextLowerDifferentStep(clause.term, from);
+    }
+
+    /**
+     * Whether any term differs from the employer's offer. Re-negotiation is only open while none do, so an attempt
+     * never has to settle what becomes of steps the player has already raised or given up.
+     */
+    private boolean termsChanged() {
+        for (Clause clause : Clause.values()) {
+            if (currentStep[clause.ordinal()] != originalStep[clause.ordinal()]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** How many re-negotiation attempts have already been spent on this contract. */
@@ -1223,40 +1380,45 @@ public class ContractNegotiationDialog extends JDialog {
      */
     private int maxRenegotiationAttempts() {
         Person negotiator = contract.getPlayerNegotiator();
-        boolean relentless = negotiator != null
-                                   && negotiator.getOptions().booleanOption(PersonnelOptions.RELENTLESS_BARGAINER);
-        return relentless ? 2 : 1;
+        return NegotiatorProfile.of(negotiator, scale).attempts();
     }
 
-    /** Enables the Re-negotiate button only when a negotiator is set and an attempt remains. */
-    private void updateRenegotiateButton() {
-        if (renegotiateButton == null) {
+    /** Arms the re-negotiation buttons only when a negotiator is set and an attempt remains, saying why otherwise. */
+    private void refreshRenegotiation() {
+        if (haggleButton == null) {
             return;
         }
         boolean hasNegotiator = contract.getPlayerNegotiator() != null;
-        boolean spent = attemptsSoFar() >= maxRenegotiationAttempts();
-        renegotiateButton.setEnabled(hasNegotiator && !spent);
-        String tooltipKey = !hasNegotiator
-                                  ? "negotiate.contractMarket.renegotiate.tooltip.noNegotiator"
-                                  : spent
-                                          ? "negotiate.contractMarket.renegotiate.tooltip.spent"
-                                          : "negotiate.contractMarket.renegotiate.tooltip";
-        renegotiateButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
+        int left = max(0, maxRenegotiationAttempts() - attemptsSoFar());
+        boolean termsChanged = termsChanged();
+        boolean available = hasNegotiator && left > 0 && !termsChanged;
+        String tooltipKey;
+        if (!hasNegotiator) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.noNegotiator";
+        } else if (left == 0) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.spent";
+        } else if (termsChanged) {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip.termsChanged";
+        } else {
+            tooltipKey = "negotiate.contractMarket.renegotiate.tooltip";
+        }
+        // The note only matters while an attempt could otherwise be made.
+        termsChangedNote.setVisible(hasNegotiator && left > 0 && termsChanged);
+        for (HudConfirmButton button : List.of(haggleButton, exceptionButton)) {
+            button.reset();
+            button.setArmed(available);
+            button.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
+        }
+        attemptsLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.left", left)
+                                    .toUpperCase(Locale.ROOT));
+        renderResults();
     }
 
-    /** Renders the active-negotiation results area from the contract's stored outcome, or a placeholder when unspent. */
+    /** Shows the last re-negotiation's outcome as a verdict banner, or nothing until an attempt has been made. */
     private void renderResults() {
-        if (resultsLabel == null) {
-            return;
-        }
         ActiveNegotiationData data = contract.getActiveNegotiationData();
         if (data == null) {
-            resultsLabel.setText("<html><span style='color:" +
-                                       MUTED_HEX +
-                                       "'>"
-                                       +
-                                       escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.none")) +
-                                       "</span></html>");
+            resultBanner.setVisible(false);
             return;
         }
 
@@ -1264,21 +1426,14 @@ public class ContractNegotiationDialog extends JDialog {
         String headlineKey = net > 0 ? "negotiate.contractMarket.results.won"
                                    : net < 0 ? "negotiate.contractMarket.results.lost"
                                            : "negotiate.contractMarket.results.stalemate";
-        String headlineColor = net > 0 ? hex(positiveHex()) : net < 0 ? hex(negativeHex()) : MUTED_HEX;
-        StringBuilder html = new StringBuilder("<html><b style='color:").append(headlineColor)
-                                   .append("'>")
-                                   .append(escape(getFormattedTextAt(RESOURCE_BUNDLE, headlineKey, Math.abs(net))))
-                                   .append("</b>");
-
-        boolean anyTerm = false;
+        Color accent = net > 0 ? READY : net < 0 ? DANGER : TEXT_FAINT;
+        List<String> lines = new ArrayList<>();
         for (Clause clause : Clause.values()) {
             int change = data.deltaFor(clause.term);
             if (change == 0) {
                 continue;
             }
-            anyTerm = true;
             String termLabel = getTextAt(RESOURCE_BUNDLE, clause.labelKey);
-            String color = change > 0 ? hex(positiveHex()) : hex(negativeHex());
             String line = switch (data.kind()) {
                 case HAGGLE -> getFormattedTextAt(RESOURCE_BUNDLE,
                       change > 0 ? "negotiate.contractMarket.results.termImproved"
@@ -1289,15 +1444,17 @@ public class ContractNegotiationDialog extends JDialog {
                             : "negotiate.contractMarket.results.termLocked",
                       termLabel);
             };
-            html.append("<br><span style='color:").append(color).append("'>").append(escape(line)).append("</span>");
+            lines.add("<span style='color:" + hex(change > 0 ? READY : DANGER) + "'>" + MarketHud.escape(line)
+                            + "</span>");
         }
-        if (!anyTerm && net != 0) {
+        if (lines.isEmpty() && net != 0) {
             // A win or loss that changed nothing (no eligible term left in that direction).
-            html.append("<br><span style='color:").append(MUTED_HEX).append("'>")
-                  .append(escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.noTerms")))
-                  .append("</span>");
+            lines.add(MarketHud.escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.noTerms")));
         }
-        resultsLabel.setText(html.append("</html>").toString());
+        resultBanner.setVerdict(getFormattedTextAt(RESOURCE_BUNDLE, headlineKey, Math.abs(net)),
+              "<html>" + String.join("<br>", lines) + "</html>",
+              getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.badge", net), accent);
+        resultBanner.setVisible(true);
     }
 
     // endregion Active negotiation
@@ -1305,75 +1462,152 @@ public class ContractNegotiationDialog extends JDialog {
     // region Rendering
 
     private void refresh() {
-        reputationBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE,
-                    "negotiate.contractMarket.budget.reputation"),
-              pips(reputationUsed, reputationPool, REPUTATION_HEX)
-                    + " " + reputationUsed + "/" + reputationPool));
-        swapsBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.swaps"),
-              pips(swapsUsed, MAXIMUM_SWAPS, SACRIFICE_HEX) + " " + swapsUsed + "/" + MAXIMUM_SWAPS));
-        bankBudgetLabel.setText(budgetHtml(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.bank"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.bank.value", sacrificeBank)));
+        Runnable restoreMain = holdScrollPosition(mainScroll);
+        Runnable restoreSide = holdScrollPosition(sideScroll);
+        refreshContent();
+        // Rebuilt rows change height for a moment; put each column back where the player had it once laid out.
+        SwingUtilities.invokeLater(() -> {
+            restoreMain.run();
+            restoreSide.run();
+        });
+    }
 
-        for (Clause clause : Clause.values()) {
-            int index = clause.ordinal();
-            termValueLabels[index].setText(termValueHtml(clause));
-            // A locked term shows a badge in place of its raise-cap counter and disables its steppers. A permanently
-            // locked term (a pirate raid's dictated terms) shows a distinct "fixed" badge, so the player knows not to
-            // spend an exception attempt trying to waive it; an ordinary non-negotiable lock (waivable) shows
-            // "non-negotiable".
-            if (isPermanentlyLocked(clause)) {
-                termCapLabels[index].setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked.permanent"));
-                termCapLabels[index].setToolTipText(getTextAt(RESOURCE_BUNDLE,
-                      "negotiate.contractMarket.locked.permanent.tooltip"));
-            } else if (isLocked(clause)) {
-                termCapLabels[index].setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked"));
-                termCapLabels[index].setToolTipText(null);
-            } else {
-                termCapLabels[index].setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
-                      max(0, currentStep[index] - originalStep[index]), capPerTerm));
-                termCapLabels[index].setToolTipText(null);
-            }
-            termRaiseButtons[index].setEnabled(canRaise(clause));
-            termLowerButtons[index].setEnabled(canLower(clause));
+    /**
+     * Notes where a column is scrolled to, returning how to put it back: at the bottom if it was at the bottom, so
+     * rows changed there stay in view, and otherwise at the same offset.
+     */
+    private static Runnable holdScrollPosition(@Nullable JScrollPane scroll) {
+        if (scroll == null) {
+            return () -> {};
+        }
+        JScrollBar bar = scroll.getVerticalScrollBar();
+        int value = bar.getValue();
+        boolean atBottom = value > 0 && value + bar.getVisibleAmount() >= bar.getMaximum() - scaleForGUI(2);
+        return () -> {
+            scroll.getViewport().validate();
+            bar.setValue(atBottom ? bar.getMaximum() - bar.getVisibleAmount() : value);
+        };
+    }
+
+    private void refreshContent() {
+        reputationReadout.set(reputationUsed, reputationPool, getFormattedTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.budget.left", reputationPool - reputationUsed));
+        swapsReadout.set(swapsUsed, MAXIMUM_SWAPS,
+              getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.left", MAXIMUM_SWAPS - swapsUsed));
+        bankValue.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.bank.value", sacrificeBank));
+
+        for (TermRow row : termRows) {
+            row.refresh();
         }
 
-        payImpactLabel.setText(payImpactHtml());
-
-        Money rentalTotal = Money.zero();
+        int changedFacilities = 0;
         if (!isPirateContract()) {
             for (int i = 0; i < facilityQuantity.length; i++) {
                 Money lineTotal = Money.of((double) facilityQuantity[i] * facilityUnitCost[i]);
-                rentalTotal = rentalTotal.plus(lineTotal);
                 facilityQuantityLabels[i].setText(Integer.toString(facilityQuantity[i]));
                 facilityTotalLabels[i].setText(lineTotal.toAmountAndSymbolString());
+                facilityLowerButtons[i].setArmed(facilityQuantity[i] > 0);
+                if (facilityQuantity[i] != initialFacilityQuantity[i]) {
+                    changedFacilities++;
+                }
             }
         }
 
-        summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
-              rentalTotal.toAmountAndSymbolString(), reputationPool - reputationUsed,
-              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), maxSacrificedSteps,
-              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), maxSacrificedTerms));
+        int changedTerms = 0;
+        for (Clause clause : Clause.values()) {
+            if (currentStep[clause.ordinal()] != originalStep[clause.ordinal()]) {
+                changedTerms++;
+            }
+        }
+        int changes = changedTerms + changedFacilities;
+        resetButton.setArmed(changes > 0);
+        String confirmText = changes == 0
+                                   ? getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate.confirm")
+                                   : getFormattedTextAt(RESOURCE_BUNDLE,
+                                         "button.contractMarket.negotiate.confirmChanges", changes);
+        confirmButton.setText(confirmText.toUpperCase(Locale.ROOT));
 
-        updateRenegotiateButton();
-        renderResults();
+        limitsLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
+              NegotiationStepMath.totalStepsSacrificed(originalStep, currentStep), maxSacrificedSteps,
+              NegotiationStepMath.distinctTermsSacrificed(originalStep, currentStep), maxSacrificedTerms, capPerTerm));
+
+        refreshNegotiatorCard();
+        refreshEmployerCard();
+        refreshRenegotiation();
+        refreshImpact();
     }
 
-    private boolean canRaise(Clause clause) {
-        if (isLocked(clause)) {
-            return false;
+    /**
+     * The impact on pay: monthly pay at the proposed base-pay step against the employer's offer, the total payout,
+     * the facility rental, and the overall change against the offer. Support, transport and salvage pay out during the
+     * contract, so they are not counted here.
+     */
+    private void refreshImpact() {
+        double originalMultiplier = ChaosContractStepsTable.fromStepValue(
+              originalStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
+        double proposedMultiplier = ChaosContractStepsTable.fromStepValue(
+              currentStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
+        Money baseMonthly = contract.getMonthlyPayOut();
+        Money projectedMonthly = originalMultiplier == 0 ? baseMonthly
+                                       : baseMonthly.multipliedBy(proposedMultiplier / originalMultiplier);
+        Money payChange = projectedMonthly.minus(baseMonthly).multipliedBy(contract.getLengthInMonths());
+        Money totalPay = contract.getTotalPay().plus(payChange);
+
+        Money rental = Money.zero();
+        Money initialRental = Money.zero();
+        if (!isPirateContract()) {
+            for (int i = 0; i < facilityQuantity.length; i++) {
+                rental = rental.plus(Money.of((double) facilityQuantity[i] * facilityUnitCost[i]));
+                initialRental = initialRental.plus(Money.of((double) initialFacilityQuantity[i] * facilityUnitCost[i]));
+            }
         }
-        int index = clause.ordinal();
-        if (currentStep[index] >= CHAOS_CONTRACT_MAXIMUM_STEP_VALUE) {
-            return false;
+        Money change = payChange.minus(rental.minus(initialRental));
+
+        JPanel impact = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.impact.money"));
+        String monthly = baseMonthly.toAmountString();
+        if (proposedMultiplier != originalMultiplier) {
+            monthly = "<html>" + MarketHud.escape(baseMonthly.toAmountString()) + " &rarr; <b style='color:"
+                            + hex(proposedMultiplier > originalMultiplier ? READY : DANGER) + "'>"
+                            + MarketHud.escape(projectedMonthly.toAmountString()) + "</b></html>";
         }
-        if (currentStep[index] < originalStep[index]) {
-            return (restoreTarget(clause) - currentStep[index]) <= sacrificeBank;
+        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.pay"), monthly, null, null,
+              false);
+        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.total"),
+              totalPay.toAmountString(), null, totalPay.toAmountAndSymbolString(), false);
+        if (!isPirateContract()) {
+            MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.rental"),
+                  ContractMarketFormatting.costAmount(rental),
+                  rental.isZero() ? null : DANGER, null, false);
         }
-        if ((currentStep[index] - originalStep[index]) >= capPerTerm) {
-            return false;
-        }
-        return reputationUsed < reputationPool
-                     || (sacrificeBank >= SACRIFICE_STEPS_PER_SWAP && swapsUsed < MAXIMUM_SWAPS);
+        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.change"),
+              ContractMarketFormatting.signedAmount(change),
+              change.isNegative() ? DANGER : READY, null, true);
+        MarketHud.addSpanning(impact, MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+              "negotiate.contractMarket.impact.note"), TEXT_FAINT, Font.PLAIN, 0.78f), 6);
+
+        impactHolder.removeAll();
+        impactHolder.add(card(impact), BorderLayout.CENTER);
+        impactHolder.revalidate();
+        impactHolder.repaint();
+    }
+
+    /** A bordered deep-surface card around a side-column block. */
+    private static JPanel card(JComponent content) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setOpaque(true);
+        card.setBackground(SURFACE_DEEP);
+        card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(10), scaleForGUI(10), scaleForGUI(10))));
+        card.add(content, BorderLayout.CENTER);
+        return card;
+    }
+
+    private static HudButton stepButton(String labelKey, Runnable action) {
+        HudButton button = new HudButton(getTextAt(RESOURCE_BUNDLE, labelKey), false, true);
+        button.setPreferredSize(new Dimension(scaleForGUI(30), button.getPreferredSize().height));
+        button.setMaximumSize(button.getPreferredSize());
+        button.addActionListener(event -> action.run());
+        return button;
     }
 
     /**
@@ -1386,74 +1620,385 @@ public class ContractNegotiationDialog extends JDialog {
         return NegotiationStepMath.restoreStep(clause.term, originalStep[index], currentStep[index]);
     }
 
-    private String termValueHtml(Clause clause) {
-        int index = clause.ordinal();
-        String originalValue = valueOf(clause, ChaosContractStepsTable.fromStepValue(originalStep[index]));
-        String proposedValue = valueOf(clause, ChaosContractStepsTable.fromStepValue(currentStep[index]));
-        int delta = currentStep[index] - originalStep[index];
-
-        StringBuilder html = new StringBuilder("<html>").append(escape(originalValue));
-        if (delta != 0) {
-            boolean valueChanged = !originalValue.equals(proposedValue);
-            String color = delta > 0 ? hex(positiveHex()) : hex(negativeHex());
-            html.append(" &rarr; <b style='color:").append(valueChanged ? color : MUTED_HEX).append("'>")
-                  .append(escape(proposedValue)).append("</b>");
-
-            for (TermFunding paidWith : funding.get(index)) {
-                String chipColor = paidWith == TermFunding.REPUTATION ? REPUTATION_HEX : SACRIFICE_HEX;
-                String chipText = getTextAt(RESOURCE_BUNDLE, paidWith == TermFunding.REPUTATION
-                                                                   ?
-                                                                   "negotiate.contractMarket.fund.rep" :
-                                                                   "negotiate.contractMarket.fund.swap");
-                html.append(" <span style='color:").append(chipColor).append("'>[").append(escape(chipText))
-                      .append("]</span>");
-            }
-
-            if (!valueChanged) {
-                html.append(" <span style='color:").append(MUTED_HEX).append("'>&mdash; ")
-                      .append(escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.plateau"))).append("</span>");
-            }
-        }
-        return html.append("</html>").toString();
-    }
-
-    private String payImpactHtml() {
-        // Show the current monthly pay against what it would become at the proposed base-pay step.
-        double originalMultiplier = ChaosContractStepsTable.fromStepValue(
-              originalStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
-        double proposedMultiplier = ChaosContractStepsTable.fromStepValue(
-              currentStep[Clause.PAY.ordinal()]).getBasePayMultiplier();
-        Money baseMonthly = contract.getMonthlyPayOut();
-        Money projectedMonthly = originalMultiplier == 0 ? baseMonthly
-                                       : baseMonthly.multipliedBy(proposedMultiplier / originalMultiplier);
-
-        StringBuilder html = new StringBuilder("<html><span style='color:").append(MUTED_HEX)
-                                   .append("'>")
-                                   .append(escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.pay")))
-                                   .append("</span> ")
-                                   .append(escape(baseMonthly.toAmountAndSymbolString()));
-        if (proposedMultiplier != originalMultiplier) {
-            String color = proposedMultiplier > originalMultiplier ? hex(positiveHex()) : hex(negativeHex());
-            html.append(" &rarr; <b style='color:").append(color).append("'>")
-                  .append(escape(projectedMonthly.toAmountAndSymbolString())).append("</b>");
-        }
-        return html.append("</html>").toString();
-    }
-
-    private String budgetHtml(String label, String value) {
-        return "<html><div style='text-align:right'><span style='color:" + MUTED_HEX + "; font-size:smaller'>"
-                     + escape(label) + "</span><br>" + value + "</div></html>";
-    }
-
-    private static String pips(int filled, int total, String filledHex) {
-        StringBuilder pips = new StringBuilder();
-        for (int i = 0; i < total; i++) {
-            pips.append("<span style='color:").append(i < filled ? filledHex : MUTED_HEX).append("'>&#9679;</span>");
-        }
-        return pips.toString();
-    }
-
     // endregion Rendering
+
+    // region Term rows
+
+    /** How one cell of a term's track is drawn. */
+    private enum CellStyle {
+        /** A step beyond the term, not part of the deal. */
+        EMPTY,
+        /** A step within the employer's offer. */
+        OFFER,
+        /** A raised step paid for with reputation. */
+        REPUTATION,
+        /** A raised step paid for with a swap of banked steps. */
+        SWAP,
+        /** A step of the offer the player has given up. */
+        GIVEN_UP;
+
+        private void paint(Graphics2D canvas, int x, int y, int width, int height) {
+            switch (this) {
+                case EMPTY -> {
+                    canvas.setColor(SURFACE_HIGHLIGHT);
+                    canvas.fillRect(x, y, width, height);
+                }
+                case OFFER -> {
+                    canvas.setColor(translucent(ACCENT, 56));
+                    canvas.fillRect(x, y, width, height);
+                }
+                case REPUTATION -> {
+                    canvas.setColor(ACCENT);
+                    canvas.fillRect(x, y, width, height);
+                }
+                case SWAP -> {
+                    canvas.setColor(AMBER);
+                    canvas.fillRect(x, y, width, height);
+                }
+                case GIVEN_UP -> {
+                    canvas.setColor(translucent(DANGER, 64));
+                    canvas.fillRect(x, y, width, height);
+                    // Hatching marks the given-up steps apart from colour alone.
+                    Graphics2D hatch = (Graphics2D) canvas.create(x, y, width, height);
+                    try {
+                        hatch.setColor(translucent(DANGER, 190));
+                        hatch.setStroke(new BasicStroke(scaleForGUI(2)));
+                        int spacing = scaleForGUI(5);
+                        for (int offset = -height; offset < width; offset += spacing) {
+                            hatch.drawLine(offset, height, offset + height, 0);
+                        }
+                    } finally {
+                        hatch.dispose();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * One term: its name (and the employer's leaning on it), its track, its value from the offer to the proposal with
+     * how it was paid for, the lower and raise buttons (or a lock badge), and beneath it why the term cannot be raised
+     * when it cannot.
+     */
+    private final class TermRow {
+        private final Clause clause;
+        private final JPanel panel = new JPanel(new GridBagLayout());
+        private final Track track;
+        private final JLabel value = new MarketHud.WrappingLabel();
+        private final JLabel why = new MarketHud.WrappingLabel();
+        private final HudButton lowerButton;
+        private final HudButton raiseButton;
+        private final JLabel lockBadge = new JLabel();
+        private final JPanel controls = Hud.transparentPanel(null);
+
+        private TermRow(Clause clause) {
+            this.clause = clause;
+            this.track = new Track(clause);
+            panel.setOpaque(false);
+            panel.setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+                  BorderFactory.createEmptyBorder(scaleForGUI(7), scaleForGUI(9), scaleForGUI(5), 0)));
+
+            JPanel label = MarketHud.column();
+            JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, clause.labelKey));
+            name.setForeground(TEXT_MUTED);
+            name.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
+            label.add(leftAligned(name));
+            String marker = factionModifierMarker(clause);
+            if (marker != null) {
+                JLabel markerLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "negotiate.contractMarket.factionModifier.employer", marker));
+                markerLabel.setForeground(TEXT_FAINT);
+                markerLabel.setFont(hudFont(Font.ITALIC, 0.82f, 0.0f));
+                label.add(leftAligned(markerLabel));
+            }
+            label.setPreferredSize(new Dimension(scaleForGUI(LABEL_WIDTH), label.getPreferredSize().height));
+            // When the window narrows, the track gives way; the name and value keep their width.
+            label.setMinimumSize(label.getPreferredSize());
+
+            value.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            value.setForeground(TEXT);
+
+            lowerButton = stepButton("negotiate.contractMarket.stepper.decrease", () -> lower(clause));
+            raiseButton = stepButton("negotiate.contractMarket.stepper.increase", () -> raise(clause));
+            lockBadge.setFont(hudFont(Font.BOLD, 0.66f, 0.12f));
+            lockBadge.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(7), scaleForGUI(4),
+                  scaleForGUI(7)));
+            controls.setLayout(new BoxLayout(controls, BoxLayout.X_AXIS));
+
+            why.setForeground(TEXT_FAINT);
+            why.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridy = 0;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.gridx = 0;
+            panel.add(label, constraints);
+            constraints.gridx = 1;
+            constraints.weightx = 1.0;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.insets = new Insets(0, scaleForGUI(12), 0, scaleForGUI(12));
+            panel.add(track, constraints);
+            constraints.gridx = 2;
+            constraints.weightx = 0;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.insets = new Insets(0, 0, 0, 0);
+            constraints.anchor = GridBagConstraints.EAST;
+            panel.add(controls, constraints);
+            // The term's effect and, when it will not move, the reason sit under the track.
+            constraints.gridx = 1;
+            constraints.gridwidth = 2;
+            constraints.weightx = 1.0;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.gridy = 1;
+            constraints.insets = new Insets(scaleForGUI(4), scaleForGUI(12), 0, 0);
+            panel.add(value, constraints);
+            constraints.gridy = 2;
+            constraints.insets = new Insets(scaleForGUI(2), scaleForGUI(12), 0, 0);
+            panel.add(why, constraints);
+        }
+
+        private void refresh() {
+            int index = clause.ordinal();
+            String originalValue = valueOf(clause, ChaosContractStepsTable.fromStepValue(originalStep[index]));
+            String proposedValue = valueOf(clause, ChaosContractStepsTable.fromStepValue(currentStep[index]));
+            int delta = currentStep[index] - originalStep[index];
+
+            StringBuilder html = new StringBuilder("<html><b>").append(MarketHud.escape(originalValue));
+            if (delta != 0) {
+                boolean valueChanged = !originalValue.equals(proposedValue);
+                Color color = !valueChanged ? TEXT_MUTED : (delta > 0 ? READY : DANGER);
+                html.append(" &rarr; <span style='color:").append(hex(color)).append("'>")
+                      .append(MarketHud.escape(proposedValue)).append("</span>");
+            }
+            html.append("</b>");
+            List<String> chips = new ArrayList<>();
+            long reputation = funding.get(index).stream().filter(paid -> paid == TermFunding.REPUTATION).count();
+            long swaps = funding.get(index).size() - reputation;
+            if (reputation > 0) {
+                chips.add(chip(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.fund.rep", reputation),
+                      ACCENT));
+            }
+            if (swaps > 0) {
+                chips.add(chip(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.fund.swap", swaps),
+                      AMBER));
+            }
+            if (delta < 0) {
+                chips.add(chip(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.fund.banked", -delta),
+                      DANGER));
+            }
+            if (delta != 0 && originalValue.equals(proposedValue)) {
+                chips.add(chip(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.plateau"), TEXT_FAINT));
+            }
+            if (!chips.isEmpty()) {
+                html.append("&nbsp;&nbsp;&nbsp;<span style='font-size:smaller'>")
+                      .append(String.join("&nbsp;&nbsp;", chips))
+                      .append("</span>");
+            }
+            value.setText(html.append("</html>").toString());
+            if (delta != 0 && originalValue.equals(proposedValue)) {
+                value.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                      "negotiate.contractMarket.plateau.tooltip")));
+            } else {
+                value.setToolTipText(null);
+            }
+
+            controls.removeAll();
+            if (isLocked(clause)) {
+                boolean fixed = isPermanentlyLocked(clause);
+                lockBadge.setText(getTextAt(RESOURCE_BUNDLE, fixed
+                                                                   ? "negotiate.contractMarket.locked.permanent"
+                                                                   : "negotiate.contractMarket.locked")
+                                        .toUpperCase(Locale.ROOT));
+                Color color = fixed ? TEXT_FAINT : AMBER;
+                lockBadge.setForeground(color);
+                lockBadge.setBorder(BorderFactory.createCompoundBorder(
+                      BorderFactory.createLineBorder(fixed ? BORDER : AMBER, scaleForGUI(1)),
+                      BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(7), scaleForGUI(4),
+                            scaleForGUI(7))));
+                lockBadge.setToolTipText(fixed ? MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                      "negotiate.contractMarket.locked.permanent.tooltip")) : null);
+                controls.add(lockBadge);
+            } else {
+                String lowerReason = lowerBlockReason(clause);
+                String raiseReason = raiseBlockReason(clause);
+                lowerButton.setArmed(lowerReason == null);
+                lowerButton.setToolTipText(lowerReason == null
+                                                 ? getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.lower.tooltip")
+                                                 : lowerReason);
+                raiseButton.setArmed(raiseReason == null);
+                raiseButton.setToolTipText(raiseReason == null
+                                                 ? getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.raise.tooltip")
+                                                 : raiseReason);
+                controls.add(lowerButton);
+                controls.add(Box.createHorizontalStrut(scaleForGUI(4)));
+                controls.add(raiseButton);
+            }
+            String reason = raiseBlockReason(clause);
+            why.setText(reason == null ? " " : "<html>" + MarketHud.escape(reason) + "</html>");
+            track.repaint();
+            controls.revalidate();
+            controls.repaint();
+        }
+
+        private String chip(String text, Color color) {
+            return "<b style='color:" + hex(color) + "'>" + MarketHud.escape(text.toUpperCase(Locale.ROOT)) + "</b>";
+        }
+    }
+
+    /**
+     * A term's seventeen steps: the employer's offer shaded, the steps raised coloured by how they were paid for, the
+     * steps given up hatched, a rule beneath the step the employer started from, and an outline on the furthest step
+     * the raise cap allows. Hovering a step shows its value.
+     */
+    private final class Track extends JComponent {
+        private final Clause clause;
+
+        private Track(Clause clause) {
+            this.clause = clause;
+            setToolTipText("");
+            setPreferredSize(new Dimension(scaleForGUI(17 * 12), scaleForGUI(24)));
+            setMinimumSize(new Dimension(scaleForGUI(17 * 6), scaleForGUI(24)));
+        }
+
+        private int stepAt(int x) {
+            return Math.clamp((long) Math.floor((double) x * CHAOS_CONTRACT_MAXIMUM_STEP_VALUE / max(1, getWidth())),
+                  0, CHAOS_CONTRACT_MAXIMUM_STEP_VALUE - 1) + 1;
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            int step = stepAt(event.getX());
+            return getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.track.tooltip", step,
+                  valueOf(clause, ChaosContractStepsTable.fromStepValue(step)));
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            Graphics2D canvas = (Graphics2D) graphics.create();
+            try {
+                int index = clause.ordinal();
+                int origin = originalStep[index];
+                int current = currentStep[index];
+                List<TermFunding> paid = funding.get(index);
+                boolean locked = isLocked(clause);
+                int steps = CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
+                int gap = scaleForGUI(2);
+                int cellHeight = scaleForGUI(18);
+                double cell = (getWidth() - gap * (steps - 1)) / (double) steps;
+                if (locked) {
+                    canvas.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.45f));
+                }
+                for (int step = 1; step <= steps; step++) {
+                    int x = (int) Math.round((step - 1) * (cell + gap));
+                    int width = (int) Math.round(step * (cell + gap) - gap) - x;
+                    CellStyle style;
+                    if (step <= Math.min(origin, current)) {
+                        style = CellStyle.OFFER;
+                    } else if (step > origin && step <= current) {
+                        int paidIndex = step - origin - 1;
+                        style = (paidIndex < paid.size() && paid.get(paidIndex) == TermFunding.SACRIFICE)
+                                      ? CellStyle.SWAP : CellStyle.REPUTATION;
+                    } else if (step > current && step <= origin) {
+                        style = CellStyle.GIVEN_UP;
+                    } else {
+                        style = CellStyle.EMPTY;
+                    }
+                    style.paint(canvas, x, 0, width, cellHeight);
+                    if (step == origin) {
+                        canvas.setColor(TEXT);
+                        canvas.fillRect(x, cellHeight + scaleForGUI(3), width, scaleForGUI(2));
+                    }
+                    if (!locked && step == Math.min(steps, origin + capPerTerm)) {
+                        canvas.setColor(BORDER_CYAN);
+                        canvas.drawRect(x, 0, width - 1, cellHeight - 1);
+                    }
+                }
+            } finally {
+                canvas.dispose();
+            }
+        }
+    }
+
+    // endregion Term rows
+
+    /** A budget readout for the command bar: a key over a row of pips and how many are left. */
+    private static final class Readout {
+        private final Color color;
+        private final Pips pips = new Pips();
+        private final JLabel text = new JLabel();
+
+        private Readout(Color color) {
+            this.color = color;
+        }
+
+        private JPanel build(String key, String toolTip) {
+            JPanel readout = new JPanel();
+            readout.setLayout(new BoxLayout(readout, BoxLayout.Y_AXIS));
+            readout.setOpaque(true);
+            readout.setBackground(SURFACE_DEEP);
+            readout.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(10), scaleForGUI(5),
+                  scaleForGUI(10)));
+            readout.setToolTipText(MarketHud.wrapToolTip(toolTip));
+            JLabel keyLabel = HudStyle.keyLabel(key.toUpperCase(Locale.ROOT));
+            keyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            JPanel value = Hud.transparentPanel(null);
+            value.setLayout(new BoxLayout(value, BoxLayout.X_AXIS));
+            value.setAlignmentX(Component.LEFT_ALIGNMENT);
+            text.setForeground(TEXT);
+            text.setFont(hudFont(Font.BOLD, 1.0f, 0.0f));
+            value.add(pips);
+            value.add(Box.createHorizontalStrut(scaleForGUI(6)));
+            value.add(text);
+            readout.add(keyLabel);
+            readout.add(Box.createVerticalStrut(scaleForGUI(2)));
+            readout.add(value);
+            return readout;
+        }
+
+        private void set(int used, int total, String left) {
+            pips.used = used;
+            pips.total = total;
+            pips.color = color;
+            pips.revalidate();
+            pips.repaint();
+            text.setText(left);
+        }
+
+        /** A row of small squares, the spent ones filled. */
+        private static final class Pips extends JComponent {
+            private int used;
+            private int total;
+            private Color color = ACCENT;
+
+            @Override
+            public Dimension getPreferredSize() {
+                int size = scaleForGUI(9);
+                int gap = scaleForGUI(3);
+                return new Dimension(max(1, total) * (size + gap), size);
+            }
+
+            @Override
+            public Dimension getMaximumSize() {
+                return getPreferredSize();
+            }
+
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                int size = scaleForGUI(9);
+                int gap = scaleForGUI(3);
+                int top = (getHeight() - size) / 2;
+                for (int index = 0; index < total; index++) {
+                    int x = index * (size + gap);
+                    graphics.setColor(index < used ? color : SURFACE_HIGHLIGHT);
+                    graphics.fillRect(x, top, size, size);
+                    graphics.setColor(index < used ? color : BORDER);
+                    graphics.drawRect(x, top, size - 1, size - 1);
+                }
+            }
+        }
+    }
 
     // region Clause helpers
 
@@ -1503,39 +2048,4 @@ public class ContractNegotiationDialog extends JDialog {
     }
 
     // endregion Clause helpers
-
-    private java.awt.Color muted() {
-        return decodeHex(MUTED_HEX);
-    }
-
-    private static java.awt.Color warning() {
-        return decodeHex(MekHQ.getMHQOptions().getFontColorWarningHexColor());
-    }
-
-    private static String positiveHex() {
-        return MekHQ.getMHQOptions().getFontColorPositiveHexColor();
-    }
-
-    private static String negativeHex() {
-        return MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-    }
-
-    private static String hex(String value) {
-        return value.startsWith("#") ? value : "#" + value;
-    }
-
-    private static Color decodeHex(String value) {
-        try {
-            return Color.decode(hex(value));
-        } catch (NumberFormatException ex) {
-            return Color.GRAY;
-        }
-    }
-
-    private static String escape(String value) {
-        if (value == null) {
-            return "";
-        }
-        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
 }

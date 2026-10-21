@@ -39,10 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
@@ -51,6 +54,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -96,15 +100,33 @@ class RefitDesignSearchTest {
     }
 
     @Test
-    void battleArmorMatchesOnSquadSize() {
+    void battleArmorOfAnySquadSizeIsOffered() {
         Entity elementals = UnitFixture.ELEMENTAL_BATTLE_ARMOR_LASER.loadEntity();
-        MekSummary sameSquadSize = new MekSummary();
-        sameSquadSize.setTWWeight(5);
+        MekSummary pointOfFour = MekSummaryCache.getSummaryFromFile(
+              new File("testresources/data/mekfiles/Elemental BA [Laser] (Sqd4).blk"));
+        assertNotNull(pointOfFour);
         MekSummary largerSquad = new MekSummary();
         largerSquad.setTWWeight(6);
 
-        assertTrue(RefitDesignSearch.isWeightMatch(elementals, sameSquadSize));
-        assertFalse(RefitDesignSearch.isWeightMatch(elementals, largerSquad));
+        assertTrue(RefitDesignSearch.isWeightMatch(elementals, pointOfFour), "A smaller squad is offered");
+        assertTrue(RefitDesignSearch.isWeightMatch(elementals, largerSquad), "A larger squad is offered");
+    }
+
+    @Test
+    void aSmallerSquadPickedFromTheSearchCanBeRefitted() throws Exception {
+        PartsScenario scenario = PartsScenario.create();
+        Unit elementals = scenario.withUnit(UnitFixture.ELEMENTAL_BATTLE_ARMOR_LASER);
+        Entity pointOfFour = MHQTestUtilities.getEntityForUnitTesting("Elemental BA [Laser] (Sqd4)", true);
+        assertNotNull(pointOfFour);
+        Refit refit = new Refit(elementals, pointOfFour, false, false, false);
+        assertNull(refit.checkFixable(), "The smaller squad may be refitted");
+        refit.begin();
+        refit.find(0, 1.0);
+        assertTrue(refit.acquireParts());
+
+        refit.succeed();
+
+        assertEquals(4, ((BattleArmor) elementals.getEntity()).getSquadSize());
     }
 
     @Test

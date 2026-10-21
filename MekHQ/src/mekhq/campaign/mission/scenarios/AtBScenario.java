@@ -760,7 +760,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardScenarioForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (combatRole.isPatrol() || combatRole.isTraining() || combatRole.isCadre()) {
+        if (combatRole.isPatrol() || combatRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;

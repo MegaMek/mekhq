@@ -35,92 +35,162 @@ package mekhq.gui.dialog.markets.contractMarket;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
+import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.GROUND;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
+import static mekhq.gui.baseComponents.hud.HudStyle.hex;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
+import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.assessmentDifficulty;
+import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.compactMoney;
+import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.marketName;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import javax.swing.*;
 
-import megamek.client.ui.comboBoxes.MMComboBox;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationDifficulty;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.utilities.ContractAcceptance;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
+import mekhq.gui.baseComponents.hud.HudModeSelector;
+import mekhq.gui.baseComponents.hud.HudStyle;
 
 /**
- * The Chaos contract market: a "job board" of 0-3 available {@link AbstractContract} offers that expands into a full
- * briefing dossier for whichever offer the player selects.
+ * The Chaos contract market, drawn as a heads-up display in the style of the Oracle Console. A one-row command bar
+ * holds the market's identity, the page selector and the player's reputation and funds; the pages are
+ * {@link MarketOffersPage Offers} (a sortable board of offers beside the selected offer's dossier) and
+ * {@link MarketComparePage Compare} (the offers side by side, with the strongest value in each row marked). The footer
+ * holds the on-departure options and the Negotiate and Accept buttons, which act on the selected offer from either
+ * page. A guide slides over the window, opened by its button or by itself the first time the market is opened.
+ *
+ * <p>The dialog keeps the market's state - the search type, the selected offer, the board's sort and which offers
+ * are compared - and the pages read it through package-private accessors, rebuilding from it on {@link #refresh}.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
 public class ChaosContractMarketDialog extends JDialog implements ContractMarketActions {
     private static final MMLogger LOGGER = MMLogger.create(ChaosContractMarketDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
+    static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
-    private final int PADDING = scaleForGUI(5);
-    private static final Dimension MINIMUM_SIZE = scaleForGUI(760, 620);
-    private static final Dimension DEFAULT_SIZE = scaleForGUI(880, 900);
-
+    private static final Dimension MINIMUM_SIZE = scaleForGUI(1040, 600);
+    private static final Dimension DEFAULT_SIZE = scaleForGUI(1180, 700);
     private static final int GENERATED_OFFERS_PER_BATCH = 1;
+    private static final int SHORTCUT_OFFERS = 9;
+
+    /** The market's pages, in the order the page selector shows them. */
+    enum MarketPage {
+        OFFERS, COMPARE;
+
+        String label() {
+            return getTextAt(RESOURCE_BUNDLE, "page.contractMarket." + name());
+        }
+
+        /** @return the label of the page's guide button, such as "How the board works" */
+        String guideLabel() {
+            return getTextAt(RESOURCE_BUNDLE, "page.contractMarket." + name() + ".guide");
+        }
+
+        /** @return the resource-key prefix the page's guide is read from */
+        String guidePrefix() {
+            return "guide.contractMarket." + name().toLowerCase(Locale.ROOT) + ".";
+        }
+    }
+
+    /** The orders the board can be sorted in. */
+    enum MarketSort {
+        BOARD, PROFIT, NET_PER_MONTH, PAY, DANGER, NEAREST;
+
+        String label() {
+            return getTextAt(RESOURCE_BUNDLE, "sort.contractMarket." + name());
+        }
+
+        String toolTip() {
+            return getTextAt(RESOURCE_BUNDLE, "sort.contractMarket." + name() + ".tooltip");
+        }
+    }
 
     private final transient Campaign campaign;
     private final JFrame parent;
     private final LocalDate currentDate;
     private final transient ContractMarket contractMarket;
-    private final transient List<AbstractContract> contracts;
+    private final transient List<AbstractContract> contracts = new ArrayList<>();
+    private final transient Map<UUID, ContractProfitEstimate> estimates = new HashMap<>();
+    private final Set<UUID> excludedFromComparison = new HashSet<>();
+    private final boolean hideContractType;
     private transient ContractSearchType searchType;
-
-    private final transient List<ContractCardPanel> cards = new ArrayList<>();
-    private JPanel content;
-    private JPanel dossierContainer;
+    private transient AbstractContract selected;
+    private MarketSort sort = MarketSort.BOARD;
+    private MarketPage page = MarketPage.OFFERS;
     private transient AbstractContract acceptedContract;
 
     /**
-     * On-departure automation options the player toggles before accepting an offer. They are fields (not rebuilt with
-     * the button bar) so their state persists across {@link #rebuildContent()} calls; read them via
-     * {@link #isMothballOnDepartureSelected()} and {@link #isTravelToSystemSelected()} when committing the accepted
-     * contract. The mothball and travel options remember the player's last choice in preferences (see
-     * {@link #setPreferences(JDialog)}).
+     * On-departure automation options the player toggles before accepting an offer. They persist across refreshes; the
+     * mothball and travel options remember the player's last choice in preferences (see {@link #setPreferences()}).
      */
-    private final JCheckBox mothballOnDepartureCheckbox = buildOptionCheckbox("checkbox.contractMarket.mothball",
+    private final HudCheckBox mothballOnDepartureCheckbox = buildOptionCheckbox("checkbox.contractMarket.mothball",
           "checkbox.contractMarket.mothball.tooltip");
-    private final JCheckBox travelToSystemCheckbox = buildOptionCheckbox("checkbox.contractMarket.travel",
+    private final HudCheckBox travelToSystemCheckbox = buildOptionCheckbox("checkbox.contractMarket.travel",
           "checkbox.contractMarket.travel.tooltip");
     /** Only shown (and only meaningful) when the campaign uses StratCon; unticked leaves the contract without one. */
-    private final JCheckBox useStratConCheckbox = buildOptionCheckbox("checkbox.contractMarket.stratcon",
+    private final HudCheckBox useStratConCheckbox = buildOptionCheckbox("checkbox.contractMarket.stratcon",
           "checkbox.contractMarket.stratcon.tooltip");
+
+    private final CardLayout pageLayout = new CardLayout();
+    private final JPanel pageHolder = new JPanel(pageLayout);
+    private HudModeSelector<MarketPage> pageSelector;
+    private MarketOffersPage offersPage;
+    private MarketComparePage comparePage;
+    private JLabel selectedLabel;
+    private HudButton acceptButton;
+    private HudButton negotiateButton;
+    private MarketGuide guide;
+    private HudButton guideButton;
 
     /**
      * Constructs and shows the contract market backed by the player force's {@link ContractMarket}.
      *
-     * <p>The board shows the offers stored under the campaign's default {@link ContractSearchType}; switching type in
-     * the header swaps to that type's map (see {@link #loadOffersForSearchType()}).</p>
+     * <p>The board shows the offers stored under the campaign's default {@link ContractSearchType}; switching type on
+     * the board swaps to that type's offers (see {@link #loadOffersForSearchType()}).</p>
      *
      * @param campaign the active campaign
      *
@@ -134,7 +204,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         this.currentDate = campaign.getLocalDate();
         this.contractMarket = campaign.getPlayerForce().getContractMarket();
         this.searchType = defaultSearchType(campaign);
-        this.contracts = new ArrayList<>();
+        this.hideContractType = campaign.getCampaignOptions().get(CampaignOption.HIDE_CONTRACT_TYPE)
+                                      && campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         loadOffersForSearchType();
 
         initializeComponents();
@@ -150,103 +221,308 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return acceptedContract;
     }
 
+    // region Layout
+
     private void initializeComponents() {
         setTitle(getTextAt(RESOURCE_BUNDLE, "title.contractMarket"));
 
-        content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        rebuildContent();
+        JPanel content = new JPanel(new BorderLayout());
+        content.setOpaque(true);
+        content.setBackground(GROUND);
 
-        getContentPane().add(content);
+        offersPage = new MarketOffersPage(this);
+        comparePage = new MarketComparePage(this);
+        pageHolder.setOpaque(true);
+        pageHolder.setBackground(GROUND);
+        pageHolder.add(offersPage.getComponent(), MarketPage.OFFERS.name());
+        pageHolder.add(comparePage.getComponent(), MarketPage.COMPARE.name());
+
+        content.add(buildCommandBar(), BorderLayout.NORTH);
+        content.add(pageHolder, BorderLayout.CENTER);
+        content.add(buildFooter(), BorderLayout.SOUTH);
+        setContentPane(content);
+
+        guide = new MarketGuide(this);
+        installKeyBindings(content);
+        refresh(true);
 
         setMinimumSize(MINIMUM_SIZE);
         pack();
         setSize(DEFAULT_SIZE); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(parent);
-        setPreferences(this); // Must be before setVisible
+        setPreferences(); // Must be before setVisible
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
+        });
         setVisible(true); // Should always be last
     }
 
-    private JPanel buildHeader() {
-        JPanel header = new JPanel(new GridBagLayout());
-        header.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+    private JPanel buildCommandBar() {
+        JPanel bar = new JPanel(new BorderLayout(scaleForGUI(20), 0));
+        bar.setOpaque(true);
+        bar.setBackground(GROUND);
+        bar.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title.contractMarket"));
-        title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 4f));
-        header.add(title, gbc);
-
-        gbc.gridy = 1;
         // getCurrentSystem() is null when the player force has no known location (e.g. in transit), so fall back to a
         // placeholder rather than dereferencing it.
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        final String locationName = currentSystem != null
-                                          ? currentSystem.getName(currentDate)
-                                          : getTextAt(RESOURCE_BUNDLE, "header.contractMarket.location.unknown");
-        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-              "header.contractMarket.location",
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        String locationName = currentSystem != null
+                                    ? currentSystem.getName(currentDate)
+                                    : getTextAt(RESOURCE_BUNDLE, "header.contractMarket.location.unknown");
+        JPanel identity = MarketHud.column();
+        identity.add(HudStyle.leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE,
+              "header.contractMarket.eyebrow",
               locationName,
-              currentDate));
-        header.add(subtitle, gbc);
+              MekHQ.getMHQOptions().getDisplayFormattedDate(currentDate)))));
+        identity.add(Box.createVerticalStrut(scaleForGUI(2)));
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title.contractMarket").toUpperCase(Locale.ROOT));
+        title.setForeground(ACCENT_BRIGHT);
+        title.setFont(hudFont(Font.BOLD, 1.2f, 0.16f));
+        identity.add(HudStyle.leftAligned(title));
 
-        JPanel right = new JPanel();
-        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-        JLabel count = new JLabel(countMessage());
-        count.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        right.add(count);
-        JPanel searchTypeControl = buildSearchTypeControl();
-        searchTypeControl.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        right.add(searchTypeControl);
+        pageSelector = new HudModeSelector<>(MarketPage.class, MarketPage::label, this::showPage);
+        pageSelector.setSelected(MarketPage.OFFERS);
+        JPanel selectorHolder = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        selectorHolder.add(pageSelector);
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridheight = 2;
-        gbc.weightx = 0.0;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        header.add(right, gbc);
+        boolean useChaosReputation = campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
+        JPanel reputationReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.reputation"),
+              Integer.toString(reputation), AMBER, SURFACE_DEEP);
+        reputationReadout.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+              "readout.contractMarket.reputation.tooltip")));
+        Money balance = campaign.getPlayerForce().getFinances().getBalance();
+        JPanel fundsReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.funds"),
+              compactMoney(balance), TEXT, SURFACE_DEEP);
+        fundsReadout.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "readout.contractMarket.funds.tooltip",
+              balance.toAmountAndSymbolString()));
 
-        return header;
+        guideButton = new HudButton("", false, true);
+        guideButton.addActionListener(event -> openGuide());
+        refreshGuideButton();
+
+        JPanel readouts = Hud.transparentPanel(null);
+        readouts.setLayout(new BoxLayout(readouts, BoxLayout.X_AXIS));
+        readouts.add(reputationReadout);
+        readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        readouts.add(fundsReadout);
+        readouts.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        readouts.add(guideButton);
+
+        bar.add(identity, BorderLayout.WEST);
+        bar.add(selectorHolder, BorderLayout.CENTER);
+        bar.add(readouts, BorderLayout.EAST);
+        return bar;
     }
 
-    private JPanel buildSearchTypeControl() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, PADDING, 0));
-        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "header.contractMarket.searchType")));
+    private JPanel buildFooter() {
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        footer.setOpaque(true);
+        footer.setBackground(SURFACE_DEEP);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(14), scaleForGUI(8), scaleForGUI(14))));
 
-        List<ContractSearchType> allowed = allowedSearchTypes(campaign);
-        MMComboBox<ContractSearchType> combo = new MMComboBox<>("contractSearchType");
-        combo.setModel(new DefaultComboBoxModel<>(allowed.toArray(new ContractSearchType[0])));
-        combo.setSelectedItem(searchType);
-        combo.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                  boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof ContractSearchType type) {
-                    setText(searchTypeLabel(type));
+        JPanel options = Hud.transparentPanel(null);
+        options.setLayout(new BoxLayout(options, BoxLayout.X_AXIS));
+        options.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "footer.contractMarket.options")
+                                            .toUpperCase(Locale.ROOT)));
+        options.add(Box.createHorizontalStrut(scaleForGUI(12)));
+        options.add(mothballOnDepartureCheckbox);
+        // The estimates cost the journey out with or without the units mothballed for it, so they follow this choice,
+        // including when it is restored from preferences after the board is first drawn.
+        mothballOnDepartureCheckbox.addItemListener(event -> {
+            estimates.clear();
+            refresh(true);
+        });
+        options.add(Box.createHorizontalStrut(scaleForGUI(14)));
+        options.add(travelToSystemCheckbox);
+        // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            options.add(Box.createHorizontalStrut(scaleForGUI(14)));
+            options.add(useStratConCheckbox);
+        }
+
+        selectedLabel = Hud.hint("");
+        negotiateButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.negotiate")
+                                              .toUpperCase(Locale.ROOT), false);
+        negotiateButton.addActionListener(event -> {
+            if (selected != null) {
+                negotiate(selected);
+            }
+        });
+        acceptButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.accept")
+                                           .toUpperCase(Locale.ROOT), true);
+        acceptButton.addActionListener(event -> {
+            if (selected != null) {
+                accept(selected);
+            }
+        });
+        HudButton close = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close")
+                                              .toUpperCase(Locale.ROOT), false);
+        close.addActionListener(event -> dispose());
+
+        JPanel actions = Hud.transparentPanel(null);
+        actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
+        actions.add(selectedLabel);
+        actions.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        actions.add(negotiateButton);
+        actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
+        actions.add(acceptButton);
+        actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
+        actions.add(close);
+
+        footer.add(options, BorderLayout.WEST);
+        footer.add(actions, BorderLayout.EAST);
+        return footer;
+    }
+
+    private void installKeyBindings(JComponent root) {
+        // Number keys pick an offer in the order on screen: the board's, or the compared columns' on the comparison, so
+        // a key never selects an offer the comparison hides. C switches between the board and the comparison.
+        for (int number = 1; number <= SHORTCUT_OFFERS; number++) {
+            final int index = number - 1;
+            String name = "offer" + number;
+            root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke((char) ('0' + number)),
+                  name);
+            root.getActionMap().put(name, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    List<AbstractContract> ordered = page == MarketPage.COMPARE
+                                                           ? comparedContracts()
+                                                           : sortedContracts();
+                    if (!guide.isOpen() && index < ordered.size()) {
+                        select(ordered.get(index));
+                    }
                 }
-                return this;
+            });
+        }
+        AbstractAction togglePage = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (!guide.isOpen()) {
+                    showPage(page == MarketPage.OFFERS ? MarketPage.COMPARE : MarketPage.OFFERS);
+                }
+            }
+        };
+        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('c'), "togglePage");
+        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('C'), "togglePage");
+        root.getActionMap().put("togglePage", togglePage);
+
+        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+              "closeGuide");
+        root.getActionMap().put("closeGuide", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                closeGuide();
             }
         });
-        combo.setEnabled(allowed.size() > 1);
-        combo.addActionListener(e -> {
-            ContractSearchType selected = combo.getSelectedItem();
-            if (selected != null && selected != searchType) {
-                changeSearchType(selected);
-            }
-        });
-        panel.add(combo);
-        return panel;
     }
 
-    private static String searchTypeLabel(ContractSearchType type) {
-        return getTextAt(RESOURCE_BUNDLE, "searchType.contractMarket." + type.name());
+    // endregion Layout
+
+    // region State and refresh
+
+    /**
+     * Brings every part of the window up to date with the market's state. Only the page on screen is rebuilt; the
+     * other is rebuilt when it is next shown.
+     *
+     * @param rebuildDossier {@code true} to rebuild the selected offer's dossier even if the selection is unchanged, as
+     *                       after its terms were negotiated or edited
+     */
+    void refresh(boolean rebuildDossier) {
+        List<AbstractContract> ordered = sortedContracts();
+        if ((selected == null || !contracts.contains(selected)) && !ordered.isEmpty()) {
+            selected = ordered.getFirst();
+        } else if (ordered.isEmpty()) {
+            selected = null;
+        }
+        Set<UUID> offerIds = new HashSet<>();
+        for (AbstractContract contract : contracts) {
+            offerIds.add(contract.getId());
+        }
+        excludedFromComparison.retainAll(offerIds);
+
+        pageSelector.setModeLabel(MarketPage.OFFERS, pageLabel(MarketPage.OFFERS, contracts.size()));
+        pageSelector.setModeLabel(MarketPage.COMPARE, pageLabel(MarketPage.COMPARE, comparedContracts().size()));
+
+        selectedLabel.setText(selected == null
+                                    ? getTextAt(RESOURCE_BUNDLE, "footer.contractMarket.selected.none")
+                                    : getFormattedTextAt(RESOURCE_BUNDLE, "footer.contractMarket.selected",
+                                          marketName(selected)));
+        acceptButton.setArmed(selected != null);
+        negotiateButton.setArmed(selected != null);
+
+        if (page == MarketPage.OFFERS) {
+            offersPage.refresh(rebuildDossier);
+        } else {
+            comparePage.refresh();
+        }
+    }
+
+    private static String pageLabel(MarketPage marketPage, int count) {
+        return "<html>" + MarketHud.escape(marketPage.label().toUpperCase(Locale.ROOT))
+                     + "&nbsp;&nbsp;<span style='color:" + hex(ACCENT_BRIGHT) + "'>" + count + "</span></html>";
+    }
+
+    void showPage(MarketPage newPage) {
+        closeGuide();
+        page = newPage;
+        pageSelector.setSelected(newPage);
+        pageLayout.show(pageHolder, newPage.name());
+        refreshGuideButton();
+        refresh(newPage == MarketPage.OFFERS);
+        maybeOpenGuide();
+    }
+
+    Campaign campaign() {
+        return campaign;
+    }
+
+    LocalDate currentDate() {
+        return currentDate;
+    }
+
+    boolean isContractTypeHidden() {
+        return hideContractType;
+    }
+
+    boolean isGM() {
+        return campaign.isGM();
+    }
+
+    boolean isMarketDisabled() {
+        return campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone();
+    }
+
+    @Nullable AbstractContract selected() {
+        return selected;
+    }
+
+    /**
+     * Selects an offer: its dossier is shown on the board, its column is marked on the comparison, and the footer's
+     * Negotiate and Accept buttons act on it.
+     */
+    void select(AbstractContract contract) {
+        if (contract == selected) {
+            return;
+        }
+        selected = contract;
+        refresh(false);
+    }
+
+    ContractSearchType searchType() {
+        return searchType;
+    }
+
+    List<ContractSearchType> allowedSearchTypes() {
+        return allowedSearchTypes(campaign);
     }
 
     /**
@@ -257,10 +533,83 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @author Illiani
      * @since 0.51.01
      */
-    private void changeSearchType(ContractSearchType newType) {
+    void changeSearchType(ContractSearchType newType) {
+        if (newType == searchType) {
+            return;
+        }
         searchType = newType;
+        selected = null;
         loadOffersForSearchType();
-        rebuildContent();
+        refresh(true);
+    }
+
+    MarketSort sort() {
+        return sort;
+    }
+
+    void setSort(MarketSort newSort) {
+        sort = newSort;
+        refresh(false);
+    }
+
+    /**
+     * @return the offers in the board's current order; ties keep the market's own order
+     */
+    List<AbstractContract> sortedContracts() {
+        List<AbstractContract> ordered = new ArrayList<>(contracts);
+        Comparator<AbstractContract> comparator = switch (sort) {
+            case BOARD -> null;
+            case PROFIT -> Comparator.comparing((AbstractContract contract) ->
+                                                      estimate(contract).getNetWithCombatPay()).reversed();
+            case NET_PER_MONTH -> Comparator.comparing((AbstractContract contract) ->
+                                                             estimate(contract).getNetPerMonth()).reversed();
+            case PAY -> Comparator.comparing(AbstractContract::getTotalPay).reversed();
+            case DANGER -> Comparator.comparingInt(ContractMarketFormatting::assessmentDifficulty);
+            // An offer with no route cannot be reached, so it sorts after every offer that can.
+            case NEAREST -> Comparator.comparingInt(contract -> estimate(contract).hasRoute()
+                                                                      ? estimate(contract).transitDays()
+                                                                      : Integer.MAX_VALUE);
+        };
+        if (comparator != null) {
+            ordered.sort(comparator);
+        }
+        return ordered;
+    }
+
+    /** @return the offers turned on for comparison, in the board's current order */
+    List<AbstractContract> comparedContracts() {
+        return sortedContracts().stream().filter(this::isCompared).toList();
+    }
+
+    boolean isCompared(AbstractContract contract) {
+        return !excludedFromComparison.contains(contract.getId());
+    }
+
+    void setCompared(AbstractContract contract, boolean compared) {
+        if (compared) {
+            excludedFromComparison.remove(contract.getId());
+        } else {
+            excludedFromComparison.add(contract.getId());
+            // Accept and Negotiate act on the selection, so it moves to an offer still on the page rather than staying
+            // on one with no column.
+            if (contract == selected) {
+                List<AbstractContract> stillCompared = comparedContracts();
+                if (!stillCompared.isEmpty()) {
+                    selected = stillCompared.getFirst();
+                }
+            }
+        }
+        refresh(false);
+    }
+
+    /**
+     * Returns the offer's profit estimate, computed once and kept until the offer's terms or the mothball on departure
+     * choice change. Estimating plots the jump path to the target, so it is too slow to repeat every time a row or cell
+     * is drawn.
+     */
+    ContractProfitEstimate estimate(AbstractContract contract) {
+        return estimates.computeIfAbsent(contract.getId(),
+              id -> ContractProfitEstimate.estimate(campaign, contract, isMothballOnDepartureSelected()));
     }
 
     /**
@@ -274,106 +623,19 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     private void loadOffersForSearchType() {
         contracts.clear();
         contracts.addAll(contractMarket.getContracts(searchType).values());
-    }
-
-    private String countMessage() {
-        int contractCount = contracts.size();
-        if (contractCount == 0) {
-            return getTextAt(RESOURCE_BUNDLE, "header.contractMarket.count.none");
-        }
-
-        return getFormattedTextAt(RESOURCE_BUNDLE, "header.contractMarket.count", contractCount);
-    }
-
-    /**
-     * Rebuilds the whole content area (header, board or empty state, and button bar) so the dialog reflects the current
-     * set of offers after one is deleted or all are cleared.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void rebuildContent() {
-        content.removeAll();
-        content.add(buildHeader(), BorderLayout.NORTH);
-        content.add(contracts.isEmpty() ? buildEmptyState() : buildBoard(), BorderLayout.CENTER);
-        content.add(buildButtonBar(), BorderLayout.SOUTH);
-        content.revalidate();
-        content.repaint();
-    }
-
-    private JPanel buildBoard() {
-        cards.clear();
-        JPanel board = new JPanel(new BorderLayout(0, PADDING));
-
-        // The cards stay on a single row (a plain FlowLayout keeps its one-row preferred width), and the
-        // FastJScrollPane scrolls horizontally when they overflow the window width rather than wrapping to a new row.
-        JPanel cardRow = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING, PADDING));
-        boolean hideContractType = campaign.getCampaignOptions().get(CampaignOption.HIDE_CONTRACT_TYPE)
-                                         && campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         for (AbstractContract contract : contracts) {
-            ContractCardPanel card = new ContractCardPanel(contract,
-                  currentDate,
-                  hideContractType,
-                  this::selectContract);
-            cards.add(card);
-            cardRow.add(card);
-        }
-        equalizeCardHeights();
-
-        FastJScrollPane cardScroll = new FastJScrollPane(cardRow,
-              ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cardScroll.setBorder(null);
-        cardScroll.getHorizontalScrollBar().setUnitIncrement(scaleForGUI(16));
-        int cardRowHeight = cards.getFirst().getPreferredSize().height + 2 * PADDING
-                                  + cardScroll.getHorizontalScrollBar().getPreferredSize().height;
-        cardScroll.setPreferredSize(new Dimension(scaleForGUI(1), cardRowHeight));
-        board.add(cardScroll, BorderLayout.NORTH);
-
-        // A width-tracking view lets the dossier shrink with the dialog: without it, the viewport keeps the panel at
-        // its wider preferred width when the window is made smaller, so the content never reflows narrower.
-        dossierContainer = new WidthTrackingPanel(new BorderLayout());
-        FastJScrollPane dossierScroll = new FastJScrollPane(dossierContainer,
-              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        dossierScroll.setBorder(null);
-        dossierScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-        board.add(dossierScroll, BorderLayout.CENTER);
-
-        // Open on the first offer so the player never faces an empty detail pane.
-        selectContract(contracts.getFirst());
-
-        return board;
-    }
-
-    /**
-     * Sets every card to the tallest card's height so a row of cards with differing name lengths lines up evenly.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void equalizeCardHeights() {
-        int maxHeight = 0;
-        for (ContractCardPanel card : cards) {
-            maxHeight = Math.max(maxHeight, card.getPreferredSize().height);
-        }
-        for (ContractCardPanel card : cards) {
-            card.setForcedHeight(maxHeight);
+            // The cached difficulty is not saved, so an offer loaded from a save has none until it is worked out here;
+            // otherwise every offer would read as an even fight and the Danger sort would do nothing.
+            if (contract.getCachedContractDifficulty() < 1) {
+                contract.setCachedContractDifficulty(
+                      ChaosContractDeterminationDifficulty.calculateContractDifficulty(campaign, contract));
+            }
         }
     }
 
+    // endregion State and refresh
 
-    private void selectContract(AbstractContract contract) {
-        for (ContractCardPanel card : cards) {
-            card.setSelected(card.getContract() == contract);
-        }
-
-        dossierContainer.removeAll();
-        dossierContainer.add(new ContractDossierPanel(campaign, contract, currentDate, this),
-              BorderLayout.NORTH);
-        dossierContainer.revalidate();
-        dossierContainer.repaint();
-    }
+    // region Actions
 
     /**
      * Commits the offer to the campaign via {@link ContractAcceptance}, honoring the player's on-departure and StratCon
@@ -401,18 +663,18 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * Opens the negotiation table for the offer. If the player confirms changes, the contract's terms, pay, and rented
-     * facilities are updated in place, so the dossier is rebuilt to reflect them.
+     * Opens the negotiation table for the offer. The contract's terms, pay, and rented facilities are updated in place,
+     * and not only on confirmation: a re-negotiation commits its result at once, even if the player then cancels. So
+     * the offer's estimate and dossier are always rebuilt once the table closes.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void negotiate(AbstractContract contract) {
-        ContractNegotiationDialog negotiation = new ContractNegotiationDialog(campaign, contract);
-        if (negotiation.wasConfirmed()) {
-            selectContract(contract);
-        }
+        new ContractNegotiationDialog(campaign, contract);
+        estimates.remove(contract.getId());
+        refresh(true);
     }
 
     /**
@@ -425,12 +687,16 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     public void delete(AbstractContract contract) {
         contractMarket.removeContract(searchType, contract);
         contracts.remove(contract);
-        rebuildContent();
+        estimates.remove(contract.getId());
+        if (contract == selected) {
+            selected = null;
+        }
+        refresh(true);
     }
 
     /**
-     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so the dossier
-     * is rebuilt to reflect them.
+     * Opens the GM editor for the offer. If the GM confirms changes, the contract is updated in place, so its estimate
+     * and dossier are rebuilt to reflect them.
      *
      * @author Illiani
      * @since 0.51.01
@@ -439,7 +705,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     public void edit(AbstractContract contract) {
         ContractEditorDialog editor = new ContractEditorDialog(campaign, contract);
         if (editor.wasConfirmed()) {
-            selectContract(contract);
+            estimates.remove(contract.getId());
+            refresh(true);
         }
     }
 
@@ -449,10 +716,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @author Illiani
      * @since 0.51.01
      */
-    private void deleteAllContracts() {
+    void deleteAllContracts() {
         contractMarket.getContracts(searchType).clear();
         contracts.clear();
-        rebuildContent();
+        estimates.clear();
+        selected = null;
+        refresh(true);
     }
 
     /**
@@ -465,8 +734,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @author Illiani
      * @since 0.51.01
      */
-    private void generateNewContracts() {
-        List<AbstractContract> generated = generateOfferBatch();
+    void generateNewContracts() {
+        List<AbstractContract> generated = ChaosContractMarketAvailability.generateOffers(campaign,
+              GENERATED_OFFERS_PER_BATCH, true, searchType);
         if (generated.isEmpty()) {
             LOGGER.info("Generate-new produced no valid contracts.");
             return;
@@ -476,21 +746,38 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         for (AbstractContract contract : generated) {
             marketOffers.put(contract.getId(), contract);
         }
-        contracts.clear();
-        contracts.addAll(marketOffers.values());
-        rebuildContent();
-        selectContract(generated.getFirst());
+        loadOffersForSearchType();
+        selected = generated.getFirst();
+        refresh(true);
     }
 
     /**
-     * Rolls up to {@link #GENERATED_OFFERS_PER_BATCH} contracts for the GM "Generate new" action.
+     * Opens the GM editor on a fresh, fully-defaulted contract. If the GM confirms, the new offer is added to the
+     * search type's market the GM chose and shown on the board.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private List<AbstractContract> generateOfferBatch() {
-        return ChaosContractMarketAvailability.generateOffers(campaign, GENERATED_OFFERS_PER_BATCH, true, searchType);
+    void createNewContract() {
+        AbstractContract contract = NewContractFactory.createBlank(campaign);
+        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract, searchType);
+        if (!editor.wasConfirmed()) {
+            return;
+        }
+
+        ContractSearchType bucket = editor.getSelectedSearchType();
+        contractMarket.addContract(bucket, contract);
+
+        // Switch the board to the bucket the GM chose so the new offer is visible.
+        searchType = bucket;
+        loadOffersForSearchType();
+        selected = contract;
+        refresh(true);
     }
+
+    // endregion Actions
+
+    // region Search types
 
     /**
      * The search type a campaign defaults to: mercenary or pirate bands default to their own type, and every other
@@ -529,62 +816,45 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return List.of(ContractSearchType.GOVERNMENT);
     }
 
-    /**
-     * Opens the GM editor on a fresh, fully-defaulted contract. If the GM confirms, the new offer is added to the
-     * current search type's market and shown on the board.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void createNewContract() {
-        AbstractContract contract = NewContractFactory.createBlank(campaign);
-        ContractEditorDialog editor = new ContractEditorDialog(campaign, contract, searchType);
-        if (!editor.wasConfirmed()) {
-            return;
+    static String searchTypeLabel(ContractSearchType type) {
+        return getTextAt(RESOURCE_BUNDLE, "searchType.contractMarket." + type.name());
+    }
+
+    // endregion Search types
+
+    // region Guide
+
+    /** Opens the guide for the page on screen, marking it seen so it does not open by itself again. */
+    private void openGuide() {
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(page.guidePrefix(), true);
+        guide.open(page.guidePrefix());
+    }
+
+    /** Opens the page's guide by itself the first time the player sees the page. */
+    private void maybeOpenGuide() {
+        if (isShowing() && ContractMarketGuidePreferences.getInstance().shouldAutoOpen(page.guidePrefix())) {
+            openGuide();
         }
-
-        ContractSearchType bucket = editor.getSelectedSearchType();
-        contractMarket.addContract(bucket, contract);
-
-        // Switch the board to the bucket the GM chose so the new offer is visible.
-        searchType = bucket;
-        loadOffersForSearchType();
-        rebuildContent();
-        selectContract(contract);
     }
 
-    private JPanel buildEmptyState() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(48), PADDING, scaleForGUI(48), PADDING));
-
-        // When the market is disabled advancing the calendar will never populate the board, so the standard
-        // "check back next month" advice would be misleading - point the player at the option instead.
-        boolean marketDisabled = campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone();
-        String titleKey = marketDisabled ? "empty.contractMarket.disabled.title" : "empty.contractMarket.title";
-        String bodyKey = marketDisabled ? "empty.contractMarket.disabled.body" : "empty.contractMarket.body";
-
-        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, titleKey), SwingConstants.CENTER);
-        title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 2f));
-
-        JLabel body = new JLabel("<html><body style='width:" +
-                                       scaleForGUI(360)
-                                       +
-                                       "px; text-align:center'>" +
-                                       getTextAt(RESOURCE_BUNDLE, bodyKey) +
-                                       "</body></html>",
-              SwingConstants.CENTER);
-        body.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-
-        panel.add(title);
-        panel.add(Box.createVerticalStrut(PADDING));
-        panel.add(body);
-        return panel;
+    private void refreshGuideButton() {
+        guideButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "button.contractMarket.guide", page.guideLabel())
+                                  .toUpperCase(Locale.ROOT));
     }
+
+    private void closeGuide() {
+        if (guide != null) {
+            guide.close();
+        }
+    }
+
+    // endregion Guide
+
+    // region Departure options
 
     /**
-     * Builds a persistent automation checkbox from its label and tooltip resource keys.
+     * Builds a persistent automation checkbox from its label and tooltip resource keys. It starts ticked; saved
+     * preferences then restore the player's last choice.
      *
      * @param labelKey   resource key of the checkbox label
      * @param tooltipKey resource key of the checkbox tooltip
@@ -592,9 +862,11 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * @author Illiani
      * @since 0.51.01
      */
-    private static JCheckBox buildOptionCheckbox(String labelKey, String tooltipKey) {
-        JCheckBox checkbox = new JCheckBox(getTextAt(RESOURCE_BUNDLE, labelKey), true);
+    private static HudCheckBox buildOptionCheckbox(String labelKey, String tooltipKey) {
+        HudCheckBox checkbox = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, labelKey));
+        checkbox.setSelected(true);
         checkbox.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
+        checkbox.setAlignmentY(Component.CENTER_ALIGNMENT);
         return checkbox;
     }
 
@@ -630,108 +902,17 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         return useStratConCheckbox.isSelected();
     }
 
-    private JPanel buildButtonBar() {
-        boolean isGM = campaign.isGM();
-
-        // Options on one row, actions on the row beneath, so the bar does not run off the dialog's width.
-        JPanel optionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
-        optionRow.add(mothballOnDepartureCheckbox);
-        optionRow.add(travelToSystemCheckbox);
-        // The StratCon opt-out is only relevant when the campaign is running StratCon at all.
-        if (campaign.getCampaignOptions().isUseStratCon()) {
-            optionRow.add(useStratConCheckbox);
-        }
-
-        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, PADDING, PADDING));
-
-        RoundedJButton instructions = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "button.contractMarket.instructions"));
-        instructions.addActionListener(e -> showInstructions());
-        actionRow.add(instructions);
-
-        RoundedJButton close = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close"));
-        close.addActionListener(e -> dispose());
-        actionRow.add(close);
-
-        RoundedJButton deleteAll = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.deleteAll"));
-        deleteAll.addActionListener(e -> deleteAllContracts());
-        deleteAll.setEnabled(!contracts.isEmpty());
-        actionRow.add(deleteAll);
-
-        RoundedJButton generateNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "button.contractMarket.generateNew"));
-        generateNew.addActionListener(e -> generateNewContracts());
-        generateNew.setEnabled(isGM);
-        actionRow.add(generateNew);
-
-        RoundedJButton createNew = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.createNew"));
-        createNew.addActionListener(e -> createNewContract());
-        createNew.setEnabled(isGM);
-        actionRow.add(createNew);
-
-        JPanel bar = new JPanel(new BorderLayout());
-        bar.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        bar.add(optionRow, BorderLayout.NORTH);
-        bar.add(actionRow, BorderLayout.SOUTH);
-        return bar;
-    }
-
-    /** Opens a modal, scrollable overview of the contract market board and what its controls do. */
-    private void showInstructions() {
-        JEditorPane pane = new JEditorPane("text/html",
-              getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.board.body"));
-        pane.setEditable(false);
-        pane.setCaretPosition(0);
-        JScrollPane scroll = new JScrollPane(pane);
-        scroll.setPreferredSize(new Dimension(scaleForGUI(580), scaleForGUI(520)));
-        JOptionPane.showMessageDialog(this, scroll,
-              getTextAt(RESOURCE_BUNDLE, "instructions.contractMarket.board.title"), JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    /**
-     * A scroll-pane view that is forced to the viewport's width but keeps its own (taller) height. This lets the
-     * dossier reflow narrower when the dialog shrinks while still scrolling vertically when its content is tall.
-     */
-    static class WidthTrackingPanel extends JPanel implements Scrollable {
-        WidthTrackingPanel(LayoutManager layout) {
-            super(layout);
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return scaleForGUI(16);
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return visibleRect.height;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
-    }
+    // endregion Departure options
 
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the
      * window bounds, it remembers the mothball and travel on-departure checkboxes between opens.
      */
-    private void setPreferences(JDialog dialog) {
+    private void setPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChaosContractMarketDialog.class);
-            dialog.setName("ChaosContractMarketDialog");
-            preferences.manage(new JWindowPreference(dialog));
+            setName("ChaosContractMarketDialog");
+            preferences.manage(new JWindowPreference(this));
 
             mothballOnDepartureCheckbox.setName("mothballOnDepartureCheckbox");
             preferences.manage(new JToggleButtonPreference(mothballOnDepartureCheckbox));
@@ -740,5 +921,11 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);
         }
+    }
+
+    /** @return the difficulty of an offer, for tooltips that explain its ring colour */
+    static String difficultyToolTip(AbstractContract contract) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "board.contractMarket.difficulty.tooltip",
+              ContractMarketFormatting.assessmentLabel(contract), assessmentDifficulty(contract));
     }
 }

@@ -107,6 +107,7 @@ import mekhq.service.enums.MRMSMode;
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
+    private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
@@ -396,7 +397,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(UIUtil.scaleForGUI(60));
+        // Tall enough for a tech's name, skills, repair abilities and day
+        techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
         techSorter = new TableRowSorter<>(techsModel);
@@ -526,6 +528,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
                 // Check grouping
                 boolean inGroup = PartsFilterGroup.matches(nGroup, part);
+
+                // Parts set aside for a refit or repair belong only in the views that track them
+                boolean isShownInThisView = part.isSpare() || (nGroupView == SV_IN_TRANSIT)
+                      || (nGroupView == SV_RESERVED);
+                if (!isShownInThisView) {
+                    return false;
+                }
 
                 // Check view
                 if (nGroupView == SV_ALL) {
@@ -708,7 +717,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
-        List<Part> parts = locationFilter.selectSpareParts(getCampaign());
+        // Reserved parts are listed too, but only the In Transit and Reserved views show them
+        List<Part> parts = locationFilter.selectHeldParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
@@ -750,6 +760,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return;
         }
         if (null == selectedTech) {
+            return;
+        }
+        if (!part.isSpare()) {
+            LOGGER.debug("[Warehouse] {} is set aside for a refit or repair, so it is not worked on here",
+                  part.getName());
             return;
         }
         partId = part.getId();

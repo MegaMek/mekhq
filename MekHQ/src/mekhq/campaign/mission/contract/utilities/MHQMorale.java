@@ -40,7 +40,6 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.LEGENDARY;
 import static mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.getContractDefinition;
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.DOMINATING;
@@ -691,7 +690,8 @@ public class MHQMorale {
             }
 
             if (today.isAfter(contract.getRoutEndDate())) {
-                int roll = randomInt(8);
+                // 0-8 inclusive, so every case in the switch below (including OVERWHELMING on 8) is reachable
+                int roll = randomInt(9);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
                 // regenerated Scenario Odds to create very high intensity spikes in otherwise low-key Garrison-type
@@ -819,7 +819,7 @@ public class MHQMorale {
                           today.getYear(), regardMultiplier);
 
                     for (String report : reports) {
-                        campaign.addReport(GENERAL, report);
+                        campaign.addReport(POLITICS, report);
                     }
                 }
                 newEnemyData = new EnemyData(newEnemyData, acceptedBatchall);

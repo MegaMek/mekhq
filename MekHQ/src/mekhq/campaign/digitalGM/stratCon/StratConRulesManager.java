@@ -69,6 +69,7 @@ import static mekhq.utilities.EntityUtilities.hasActiveProbe;
 import static mekhq.utilities.EntityUtilities.hasImprovedCommunications;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
 import static mekhq.utilities.EntityUtilities.hasReconCamera;
+import static mekhq.utilities.EntityUtilities.hasSatelliteImager;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -2013,12 +2014,14 @@ public class StratConRulesManager {
         boolean hasFatigueIncreased = false;
 
         int scanRangeIncrease = track.getScanRangeIncrease();
+        boolean isTraining = false;
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
         if (combatTeam != null) {
-            boolean isPatrol = combatTeam.getRole().isPatrol();
-            if (isPatrol) {
+            CombatRole combatRole = combatTeam.getRole();
+            if (combatRole.isPatrol()) {
                 scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
             }
+            isTraining = combatRole.isTraining();
         }
 
         // Process starting point
@@ -2051,6 +2054,11 @@ public class StratConRulesManager {
 
                 MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
             }
+        }
+
+        // A training force is busy drilling, not scouting, so it reveals only the hex it deploys to
+        if (isTraining) {
+            return;
         }
 
         if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
@@ -2231,8 +2239,8 @@ public class StratConRulesManager {
     /**
      * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
      *
-     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), and the Improved
-     * Communications quirk all count as sensor equipment. They do not stack.</p>
+     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), Satellite Imagers, and the
+     * Improved Communications quirk all count as sensor equipment. They do not stack.</p>
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
@@ -2332,6 +2340,7 @@ public class StratConRulesManager {
                 hasSensorEquipment = hasImprovedSensors(entity)
                                            || hasActiveProbe(entity)
                                            || hasReconCamera(entity)
+                                           || hasSatelliteImager(entity)
                                            || hasImprovedCommunications(entity);
 
                 if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {

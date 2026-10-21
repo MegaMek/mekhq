@@ -32,6 +32,7 @@
  */
 package mekhq.utilities;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -40,6 +41,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.Sensor;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.IBomber;
@@ -52,6 +54,12 @@ import mekhq.campaign.unit.Unit;
  * Utility class that provides helper methods for working with entities.
  */
 public class EntityUtilities {
+    /** Equipment flags that qualify as a Satellite Imager (TO:AUE p.151-152). */
+    private static final List<MiscTypeFlag> SATELLITE_IMAGER_FLAGS = List.of(MiscType.F_HYPERSPECTRAL_IMAGER,
+          MiscType.F_HIRES_IMAGER,
+          MiscType.F_INFRARED_IMAGER,
+          MiscType.F_LOOKDOWN_RADAR);
+
     /**
      * Retrieves an {@link Entity} associated with a specific unit ID.
      *
@@ -185,5 +193,20 @@ public class EntityUtilities {
         }
 
         return false;
+    }
+
+    /**
+     * Determines whether the given {@link Entity} carries a working Satellite Imager (TO:AUE p.151-152): a
+     * Hyperspectral Imager, High-Resolution Imager, Infrared Imager, or Look-Down Radar.
+     *
+     * @param entity the {@link Entity} to check for a satellite imager
+     *
+     * @return {@code true} if the entity has at least one working satellite imager
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasSatelliteImager(Entity entity) {
+        return SATELLITE_IMAGER_FLAGS.stream().anyMatch(entity::hasWorkingMisc);
     }
 }

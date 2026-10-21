@@ -1170,7 +1170,9 @@ public class ImmersiveDialogCore extends JDialog {
 
     /**
      * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon for the campaign is
-     * returned instead.
+     * returned instead. A speaker with a non-default portrait always shows that portrait, whether or not they belong
+     * to the campaign. A speaker with the default portrait shows the campaign faction icon if they belong to the
+     * campaign, or their origin faction's logo otherwise.
      *
      * @param campaign the {@link Campaign} instance containing the faction icon; can be {@code null} to use a default
      *                 image.
@@ -1188,16 +1190,14 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         Image baseImage;
-        if (campaign.getPlayerForce().getHumanResources().getPersonnel().contains(speaker)) {
-            Portrait portrait = speaker.getPortrait();
-
-            if (portrait == null ||
-                      portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                      portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME)) {
-                return campaign.getCampaignFactionIcon();
-            }
-
+        Portrait portrait = speaker.getPortrait();
+        boolean hasDefaultPortrait = portrait == null ||
+                                           portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                                           portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME);
+        if (!hasDefaultPortrait) {
             baseImage = portrait.getBaseImage();
+        } else if (campaign.getPlayerForce().getHumanResources().getPersonnel().contains(speaker)) {
+            return campaign.getCampaignFactionIcon();
         } else {
             ImageIcon factionLogo = RATGenerator.getFactionLogo(campaign.getGameYear(),
                   speaker.getOriginFaction().getShortName(), Color.BLACK);
