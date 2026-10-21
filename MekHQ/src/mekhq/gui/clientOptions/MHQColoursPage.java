@@ -125,6 +125,7 @@ class MHQColoursPage extends MHQOptionsPage {
               "optionInjuredForeground", "optionInjuredBackground",
               "optionPregnantForeground", "optionPregnantBackground",
               "optionFatiguedForeground", "optionFatiguedBackground",
+              "optionWorkingForeground", "optionWorkingBackground",
               "optionHealedInjuriesForeground", "optionHealedInjuriesBackground");
     }
 

@@ -440,6 +440,18 @@ public class LocalWarehouse implements ILocation {
                      .collect(Collectors.toList());
     }
 
+    /**
+     * The parts this warehouse holds: its spares, and parts set aside for a refit or a repair, such as a refit kit on
+     * its way. Parts fitted to a unit or to another part are left out.
+     *
+     * @return a fresh list of the held parts
+     */
+    public List<Part> getHeldParts() {
+        return new ArrayList<>(getParts()).stream()
+                     .filter(part -> (part.getUnit() == null) && !part.hasParentPart())
+                     .collect(Collectors.toList());
+    }
+
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
         // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.

@@ -32,6 +32,8 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +68,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private final CampaignGUI gui;
     private final JTable partsTable;
@@ -352,6 +355,30 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         return true;
     }
 
+    /**
+     * The menu for parts set aside for a refit or repair, such as a refit kit on its way. A GM can deliver them at
+     * once, which keeps them set aside; selling, removing or cancelling them would take them from the work they are
+     * for, so those are not offered.
+     *
+     * @param parts the selected parts
+     *
+     * @return the menu, or empty if there is nothing to offer
+     */
+    private Optional<JPopupMenu> createReservedPartsMenu(Part[] parts) {
+        boolean canDeliverNow = gui.getCampaign().isGM() && areAllPartsInTransit(parts);
+        if (!canDeliverNow) {
+            return Optional.empty();
+        }
+        JPopupMenu popup = new JPopupMenu();
+        JMenu menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "partsMenu.gmMode.text"));
+        JMenuItem menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "partsMenu.deliverNow.text"));
+        menuItem.setActionCommand("ARRIVE");
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+        popup.add(menu);
+        return Optional.of(popup);
+    }
+
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
         if (partsTable.getSelectedRowCount() == 0) {
@@ -368,6 +395,11 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         boolean oneSelected = false;
         for (int i = 0; i < rows.length; i++) {
             parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+        }
+        // A part set aside for a refit or repair is listed so it can be followed, not sold or removed
+        boolean isAnyPartReserved = Arrays.stream(parts).anyMatch(selectedPart -> !selectedPart.isSpare());
+        if (isAnyPartReserved) {
+            return createReservedPartsMenu(parts);
         }
         Part part = null;
         if (parts.length == 1) {

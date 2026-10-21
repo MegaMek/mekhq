@@ -58,7 +58,7 @@ public enum ContractCharacteristic {
     CUT_RATE(Category.COMBAT_PAY, Polarity.ADVERSE, 10, 0.95),
     /** Required victory points are raised, so the contract is harder to fulfill. */
     DEMANDING(Category.OBJECTIVES, Polarity.ADVERSE, 10, 1.0),
-    /** The enemy negotiator is Elite rather than the usual Veteran. */
+    /** The employer negotiator is one tier more skilled than the employer usually fields. */
     ELITE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.ADVERSE, 6, 1.0),
     /** Combat pay is boosted by 5%. */
     HAZARD_PAY(Category.COMBAT_PAY, Polarity.BENEFICIAL, 10, 1.05),
@@ -84,7 +84,10 @@ public enum ContractCharacteristic {
     MEDIA_BLACKOUT(Category.UNIT_REPUTATION, Polarity.NEUTRAL, 6, 0.0),
     /** The employer faction-standing change is amplified. */
     MONITORED(Category.EMPLOYER_STANDING, Polarity.BENEFICIAL, 6, 1.5),
-    /** The enemy negotiator is only Regular rather than the usual Veteran, making negotiation easier for the player. */
+    /**
+     * The employer negotiator is one tier less skilled than the employer usually fields, making negotiation easier for
+     * the player.
+     */
     NOVICE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.BENEFICIAL, 6, -1.0),
     /** The contract runs shorter than the rolled length. */
     QUICK(Category.LENGTH, Polarity.NEUTRAL, 10, 0.75),
@@ -175,7 +178,10 @@ public enum ContractCharacteristic {
         COMBAT_PAY,
         /** Credits a fraction of total pay as a lump on successful completion (the fraction is the magnitude). */
         COMPLETION_PAYMENT,
-        /** Sets the enemy negotiator's skill tier at generation (a signed step from Veteran). */
+        /**
+         * Sets the employer negotiator's skill tier at generation (a signed step from the tier the employer usually
+         * fields).
+         */
         NEGOTIATOR,
         /** Scales contract length at generation (a multiplier). */
         LENGTH,

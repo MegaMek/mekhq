@@ -215,6 +215,33 @@ class AccountantHotSpotsUpkeepTest {
 
             assertEquals(offContract, accountant.getHotSpotsUpkeepCosts());
         }
+
+        /** Units about to be mothballed for a journey are left out of the Scale the upkeep is projected from. */
+        @Test
+        void excludedUnitsAddNoUpkeep() {
+            tableOfOrganizationOfScale(2);
+            tableOfOrganizationOfScale(3);
+            Unit mothballedUnit = units.get(1);
+
+            assertEquals(supportPoints(1_000), accountant.getHotSpotsUpkeepCostsExcluding(List.of(mothballedUnit)));
+            assertEquals(supportPoints(2_500), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void excludingNothingIsTheWholeUpkeep() {
+            tableOfOrganizationOfScale(4);
+
+            assertEquals(accountant.getHotSpotsUpkeepCosts(), accountant.getHotSpotsUpkeepCostsExcluding(List.of()));
+        }
+
+        @Test
+        void excludingUnitsCostsNothingWhenTheOptionIsOff() {
+            campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
+            tableOfOrganizationOfScale(2);
+            tableOfOrganizationOfScale(3);
+
+            assertEquals(Money.zero(), accountant.getHotSpotsUpkeepCostsExcluding(List.of(units.getFirst())));
+        }
     }
 
     @Nested
