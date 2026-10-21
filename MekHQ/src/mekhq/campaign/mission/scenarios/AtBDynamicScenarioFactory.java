@@ -55,7 +55,6 @@ import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
-import static mekhq.campaign.mission.utilities.CombatRole.CADRE;
 import static mekhq.campaign.mission.utilities.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.utilities.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.utilities.CombatRole.PATROL;
@@ -3911,8 +3910,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method examines the player's available {@link CombatTeam}s and aggregates the Battle Value of all
      * forces whose roles are considered valid for StratCon Singles generation. Valid roles are:
-     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and
-     * {@link CombatRole#PATROL}.</p>
+     * {@link CombatRole#FRONTLINE}, {@link CombatRole#MANEUVER}, and {@link CombatRole#PATROL}.</p>
      *
      * <p>Only Combat Teams with a non-null {@link Formation} and a positive BV are counted. If at least one valid
      * force is found, the BV budget returned is the sum of the BVs of all qualifying forces.</p>
@@ -3934,7 +3932,7 @@ public class AtBDynamicScenarioFactory {
 
         int totalForces = 0;
         int totalBattleValue = 0;
-        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, PATROL);
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
@@ -4133,7 +4131,7 @@ public class AtBDynamicScenarioFactory {
      *
      * <p>This method inspects all player {@link CombatTeam}s and sums the number of units contained within forces
      * whose roles are considered valid for StratCon Singles generation. Valid roles are: {@link CombatRole#FRONTLINE},
-     * {@link CombatRole#MANEUVER}, {@link CombatRole#CADRE}, and {@link CombatRole#PATROL}.</p>
+     * {@link CombatRole#MANEUVER}, and {@link CombatRole#PATROL}.</p>
      *
      * <p>For each qualifying Combat Team, the force is retrieved and counted if it contains at least one unit. The
      * total number of units across all valid forces is then returned.</p>
@@ -4155,7 +4153,7 @@ public class AtBDynamicScenarioFactory {
 
         int forceCount = 0;
         int unitCount = 0;
-        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, PATROL);
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             // A combat team may have no role; validRoles is a null-hostile List.of, so guard before contains().
@@ -4187,7 +4185,7 @@ public class AtBDynamicScenarioFactory {
      * Determines an appropriate unit-count budget when generating a force without using a designated seed force.
      *
      * <p>This method reviews all player-controlled {@link CombatTeam}s whose roles fall within a predefined set of
-     * valid combat roles (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the
+     * valid combat roles (Frontline, Maneuver, and Patrol). For each qualifying team, the method retrieves the
      * associated {@link Formation} and records the number of units currently assigned to that force.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
@@ -4220,7 +4218,7 @@ public class AtBDynamicScenarioFactory {
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
         // averages will be weighted against).
         List<Integer> unitCounts = new ArrayList<>();
-        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, PATROL);
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             // A combat team may have no role; validRoles is a null-hostile List.of, so guard before contains().

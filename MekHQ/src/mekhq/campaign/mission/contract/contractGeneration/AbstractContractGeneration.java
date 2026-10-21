@@ -405,7 +405,7 @@ public abstract class AbstractContractGeneration {
      * @param campaign         the campaign, for the support-point-to-Battle-Value scale conversion option
      * @param playerForce      the player force whose committed units set the scale
      * @param detachmentHangar the hangar whose units are weighed
-     * @param contract         the contract being sized (its objective decides whether cadre units count)
+     * @param contract         the contract being sized
      *
      * @return the automatically determined exact (unrounded) scale
      */
@@ -430,7 +430,7 @@ public abstract class AbstractContractGeneration {
      * @param campaign         the campaign, for the support-point-to-Battle-Value scale conversion option
      * @param playerForce      the player force whose committed units set the scale
      * @param detachmentHangar the hangar whose units are weighed
-     * @param contract         the contract being sized (its objective decides whether cadre units count)
+     * @param contract         the contract being sized
      *
      * @return the exact (unrounded) Scale of the committed force
      *
@@ -442,7 +442,7 @@ public abstract class AbstractContractGeneration {
         boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
                                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
-              contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
+              convertSupportPointsToBattleValue);
     }
 
     /**

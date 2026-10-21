@@ -45,7 +45,6 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.unit.Unit;
 
 public class ChaosContractDeterminationScale {
@@ -104,7 +103,7 @@ public class ChaosContractDeterminationScale {
         return scale;
     }
 
-    static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty,
+    static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar,
           boolean convertSupportPointsToBattleValue) {
         int validBattleValue = 0;
 
@@ -112,9 +111,7 @@ public class ChaosContractDeterminationScale {
             int formationId = unit.getFormationId();
             Formation formation = playerForce.getFormation(formationId);
             if (formation != null) {
-                CombatRole roleInMemory = formation.getCombatRoleInMemory();
-                boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
-                if (formation.isFormationType(STANDARD) && hasCombatRole) {
+                if (formation.isFormationType(STANDARD) && formation.getCombatRoleInMemory().isCombatRole()) {
                     Entity entity = unit.getEntity();
                     validBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
                 }
@@ -126,7 +123,7 @@ public class ChaosContractDeterminationScale {
 
     /**
      * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep. Unlike
-     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean, boolean)}, every unit assigned to a
+     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean)}, every unit assigned to a
      * formation counts, regardless of formation type or combat role. Units outside the TO&amp;E and mothballed units
      * are ignored.
      *
