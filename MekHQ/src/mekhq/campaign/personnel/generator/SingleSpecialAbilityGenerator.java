@@ -130,11 +130,11 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 break;
             }
             case OptionsConstants.GUNNERY_RANGE_MASTER: {
-                final String special = switch (Compute.randomInt(2)) {
-                    case 0 -> Crew.RANGEMASTER_MEDIUM;
-                    case 1 -> Crew.RANGEMASTER_LONG;
-                    default -> Crew.RANGEMASTER_EXTREME;
-                };
+                List<String> ranges = new ArrayList<>(List.of(Crew.RANGEMASTER_MEDIUM, Crew.RANGEMASTER_LONG));
+                if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_COMBAT_TAC_OPS_RANGE)) {
+                    ranges.add(Crew.RANGEMASTER_EXTREME);
+                }
+                final String special = ObjectUtility.getRandomItem(ranges);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;

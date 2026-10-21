@@ -41,6 +41,7 @@ import static megamek.codeUtilities.MathUtility.getGaussianAverage;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.equipment.WeaponType.CLASS_ARTILLERY;
+import static megamek.common.options.OptionsConstants.ADVANCED_COMBAT_TAC_OPS_RANGE;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
@@ -5697,16 +5698,18 @@ public class AtBDynamicScenarioFactory {
      * @param campaign A pointer to the campaign
      */
     public static void upgradeBotCrews(AtBScenario scenario, Campaign campaign) {
-        CrewSkillUpgrader csu = new CrewSkillUpgrader(campaign.getCampaignOptions().get(CampaignOption.SPA_UPGRADE_INTENSITY));
+        int upgradeIntensity = campaign.getCampaignOptions().get(CampaignOption.SPA_UPGRADE_INTENSITY);
+        boolean extremeRangeEnabled = campaign.getGameOptions().booleanOption(ADVANCED_COMBAT_TAC_OPS_RANGE);
+        CrewSkillUpgrader upgrader = new CrewSkillUpgrader(upgradeIntensity, extremeRangeEnabled);
 
         for (int forceIndex = 0; forceIndex < scenario.getNumBots(); forceIndex++) {
             for (Entity entity : scenario.getBotForce(forceIndex).getFullEntityList(campaign)) {
-                csu.upgradeCrew(entity);
+                upgrader.upgradeCrew(entity);
             }
         }
 
         for (Entity entity : scenario.getAlliesPlayer()) {
-            csu.upgradeCrew(entity);
+            upgrader.upgradeCrew(entity);
         }
     }
 
