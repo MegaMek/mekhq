@@ -1834,13 +1834,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
-                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
-                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
-                      Set.of(disease.getSimpleName()));
+                List<Person> infectedPersonnel = new ArrayList<>();
                 for (Person person : people) {
-                    Inoculations.applyDisease(getCampaign(), person, disease);
+                    if (Inoculations.applyDisease(getCampaign(), person, disease)) {
+                        infectedPersonnel.add(person);
+                    }
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
+                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
+                      Map.of(disease.getSimpleName(), infectedPersonnel));
                 break;
             }
             case CMD_ADD_RANDOM_INJURIES: {
