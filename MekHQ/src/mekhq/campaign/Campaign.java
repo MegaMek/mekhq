@@ -210,6 +210,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -5966,16 +5967,16 @@ public class Campaign implements ITechManager {
      *
      * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
      *
-     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
-     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
+     * @return the {@link TurnoverPromptOutcome}, which is {@link TurnoverPromptOutcome#NOT_PROMPTED} if the turnover
+     *       prompt was not displayed
      */
-    public int checkTurnoverPrompt() {
+    public TurnoverPromptOutcome checkTurnoverPrompt() {
         if (!getPlayerForce().getForceDetachment().isOnPlanet()) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         boolean triggerTurnoverPrompt;
@@ -5995,11 +5996,11 @@ public class Campaign implements ITechManager {
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
             default:
-                return -1;
+                return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (!triggerTurnoverPrompt) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         String dialogTitle;
@@ -6017,7 +6018,7 @@ public class Campaign implements ITechManager {
                              resources.getString("turnoverAdvanceRegardless"),
                              resources.getString("turnoverCancel.text") };
 
-        return JOptionPane.showOptionDialog(null,
+        int dialogResult = JOptionPane.showOptionDialog(null,
               dialogBody,
               dialogTitle,
               JOptionPane.YES_NO_CANCEL_OPTION,
@@ -6025,6 +6026,8 @@ public class Campaign implements ITechManager {
               null,
               options,
               options[0]);
+
+        return TurnoverPromptOutcome.fromDialogResult(dialogResult);
     }
 
     /**
