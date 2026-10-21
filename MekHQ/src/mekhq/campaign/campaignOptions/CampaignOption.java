@@ -52,6 +52,7 @@ import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -791,8 +792,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForMaintain");
     public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
           of(Boolean.class, false, "payForHotSpotsUpkeep");
-    public static final CampaignOption<Boolean> USE_ALTERNATE_UNIT_COST =
-          of(Boolean.class, false, "useAlternateUnitCost");
+    public static final CampaignOption<UnitCostModel> UNIT_COST_MODEL =
+          of(UnitCostModel.class, UnitCostModel.CANON, "unitCostModel");
     public static final CampaignOption<Boolean> INCREASE_CLAN_REPAIR_COSTS =
           of(Boolean.class, false, "increaseClanRepairCosts");
     public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =

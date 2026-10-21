@@ -3253,8 +3253,8 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Estimates what {@link #getBuyCost()} will return for an entity that has not yet been made into a unit, such as
-     * one rolled by the command generator. Under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the entity is valued by
-     * its Battle Value in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
+     * one rolled by the command generator. When the {@link CampaignOption#UNIT_COST_MODEL} values the entity by Battle
+     * Value, it is valued in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
      *
      * @param unitEntity      the entity to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
@@ -3265,7 +3265,7 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+        if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(unitEntity)) {
             return calculateAlternateUnitCost(unitEntity.calculateBattleValue(true, true, true),
                   getUnitPriceMultiplier(unitEntity, campaignOptions), getQuirkPriceMultiplier(unitEntity),
                   campaignOptions);
@@ -3275,9 +3275,10 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Estimates what {@link #getBuyCost()} will return for a unit from its {@link MekSummary} alone, without loading
-     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. Under
-     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the unit is valued by the summary's Battle Value; the summary does
-     * not carry quirks, so the Good Reputation price multiplier is left out (see {@link #getQuirkPriceMultiplier}).
+     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. When the
+     * {@link CampaignOption#UNIT_COST_MODEL} values the unit by Battle Value, the summary's Battle Value is used; the
+     * summary does not carry quirks, so the Good Reputation price multiplier is left out (see
+     * {@link #getQuirkPriceMultiplier}).
      *
      * @param summary         the unit to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
@@ -3289,7 +3290,7 @@ public class Unit implements ITechnology, ILocatable {
      */
     public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions) {
         double unitPriceMultiplier = getUnitPriceMultiplier(summary.isMixedTech(), summary.isClan(), campaignOptions);
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+        if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(summary)) {
             return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
         }
 
@@ -3362,13 +3363,13 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * @return {@code true} if units are valued by Battle Value ({@link CampaignOption#USE_ALTERNATE_UNIT_COST})
+     * @return {@code true} if the {@link CampaignOption#UNIT_COST_MODEL} values this unit by Battle Value
      *
      * @author Illiani
      * @since 0.51.01
      */
     private boolean isUseAlternateUnitCost() {
-        return getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST) && (getEntity() != null);
+        return getCampaign().getCampaignOptions().get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(getEntity());
     }
 
     /**
@@ -3415,7 +3416,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets the unit's value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: one support point per point of
+     * Gets the unit's value under {@link CampaignOption#UNIT_COST_MODEL}: one support point per point of
      * Battle Value, converted to C-bills when support point conversion is enabled, then adjusted by the unit price
      * multiplier for the unit's tech base.
      *
@@ -3437,7 +3438,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Values a unit under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * Values a unit under {@link CampaignOption#UNIT_COST_MODEL} from its Battle Value (see
      * {@link #getAlternateUnitCost()}).
      *
      * @param battleValue          the unit's Battle Value, excluding pilot skill, C3, and TAG
@@ -3462,7 +3463,7 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Gets the price multiplier from quirks that affect a unit's traditional price, for use with
-     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
+     * {@link CampaignOption#UNIT_COST_MODEL}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
      * Good Reputation 2 (×1.25), which only affect 'Meks.
      *
      * @param unitEntity the unit's entity; may be {@code null}
@@ -3486,7 +3487,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets the unit's sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: half its
+     * Gets the unit's sell value under {@link CampaignOption#UNIT_COST_MODEL}: half its
      * {@link #getAlternateUnitCost()}, adjusted for the unit's quality (see {@link #getAlternateQualityMultiplier()}),
      * then reduced further by the obsolete quirk resale modifier as a traditionally priced unit would be.
      *
@@ -3506,7 +3507,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}.
+     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#UNIT_COST_MODEL}.
      * Battle Value takes no account of quality, so the Used Part Price Multipliers are applied relative to average
      * (quality D): a quality D unit sells for exactly half its value, while better and worse units sell for more and
      * less. With the default multipliers, quality A sells at x0.2 of that half and quality F at x1.8.
