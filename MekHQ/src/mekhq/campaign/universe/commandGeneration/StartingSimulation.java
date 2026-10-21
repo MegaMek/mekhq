@@ -55,8 +55,8 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
  * <p>The people generated arrive with no history. This walks back the number of years asked for and runs the
  * campaign's random marriage and procreation rules week by week over them, the way the retired AtB Company
  * Generator did, so some arrive married and some with children. The campaign's own date does not move, and
- * nothing else in the campaign is touched. Any injury a birth left behind is healed at the end, since the
- * command is meant to start ready for work.</p>
+ * nothing else in the campaign is touched. Births here leave no postpartum recovery and show no announcement, and
+ * anyone still needing treatment is healed at the end, since the command is meant to start ready for work.</p>
  *
  * <p>The rules used are the campaign's: a campaign whose random marriage or procreation method is off gets no
  * marriages or births from this, and the log says so.</p>
@@ -140,7 +140,7 @@ public final class StartingSimulation {
                     marriage.processNewWeek(campaign, date, person);
                 }
                 if (births) {
-                    procreation.processNewWeek(campaign, date, person);
+                    procreation.processNewWeek(campaign, date, person, true);
                 }
             }
             weeks++;
@@ -173,7 +173,7 @@ public final class StartingSimulation {
     }
 
     /**
-     * A birth can leave the mother injured. The command starts ready for work, so those are healed.
+     * The command starts ready for work, so anyone still needing treatment after the run is healed.
      *
      * @return how many people were healed
      */

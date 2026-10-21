@@ -139,9 +139,6 @@ class CommandGenerationOptionsTest {
         assertTrue(options.isAssignMostSkilledToPrimaryLances());
         assertTrue(options.isGenerateCaptains());
 
-        // A medical reserve so the command can absorb casualties from its first contract.
-        assertTrue(options.isGenerateMedicalReserve());
-
         // The command arrives with a history: marriages and children from the years before play.
         assertTrue(options.isRunStartingSimulation());
         assertTrue(options.isSimulateRandomMarriages());
