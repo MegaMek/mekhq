@@ -40,18 +40,17 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import jakarta.annotation.Nullable;
 
@@ -89,6 +88,8 @@ public class HudGuideDrawer extends JPanel {
           String exampleIntro, List<ExampleLine> example, List<Term> terms, @Nullable JComponent termsFooter) {}
 
     private static final int WIDTH = 440;
+    /** Dims the window behind an open guide. */
+    private static final Color SCRIM = new Color(2, 7, 13, 160);
 
     private final JLabel eyebrowLabel = new JLabel();
     private final JLabel titleLabel = new JLabel();
@@ -99,16 +100,21 @@ public class HudGuideDrawer extends JPanel {
     private final JPanel body = new JPanel(cards);
     private final HudTabStrip tabs;
     private final HudButton closeButton;
+    private final Runnable onClose;
+    private @Nullable JLayeredPane layeredPane;
+    private @Nullable JPanel scrim;
 
     /**
      * @param tabLabels  the labels of the Steps, Example and Terms tabs, in that order
      * @param footerLeft a component for the left of the footer, such as a checkbox, or {@code null}
      * @param closeLabel the close button's label
-     * @param onClose    called when the close button is pressed
+     * @param onClose    called when the close button is pressed, or (once installed) the scrim is clicked or Escape is
+     *                   pressed
      */
     public HudGuideDrawer(List<String> tabLabels, @Nullable JComponent footerLeft, String closeLabel,
           Runnable onClose) {
         super(new BorderLayout());
+        this.onClose = onClose;
         setOpaque(true);
         setBackground(SURFACE_DEEP);
         setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER_CYAN));
@@ -200,6 +206,89 @@ public class HudGuideDrawer extends JPanel {
         showTab(0);
         revalidate();
         repaint();
+    }
+
+    /**
+     * Floats the drawer over the right of a window, above a scrim that dims the window behind it. A click on the scrim,
+     * or Escape anywhere in the window, calls the drawer's close action. Call this once, after the window's content
+     * pane is set; the drawer starts hidden.
+     *
+     * @param rootPane the window's root pane
+     */
+    public void install(JRootPane rootPane) {
+        layeredPane = rootPane.getLayeredPane();
+        scrim = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                graphics.setColor(SCRIM);
+                graphics.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        scrim.setOpaque(false);
+        scrim.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                onClose.run();
+            }
+        });
+
+        layeredPane.add(scrim, JLayeredPane.MODAL_LAYER);
+        layeredPane.add(this, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1));
+        scrim.setVisible(false);
+        setVisible(false);
+        layeredPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent event) {
+                layOutOverWindow();
+            }
+        });
+
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+              "closeGuide");
+        rootPane.getActionMap().put("closeGuide", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                onClose.run();
+            }
+        });
+    }
+
+    /**
+     * Shows a guide over the window the drawer was {@link #install(JRootPane) installed} on, and moves the keyboard
+     * focus to its close button.
+     *
+     * @param guide the guide to show
+     */
+    public void open(Guide guide) {
+        showGuide(guide);
+        if (scrim != null) {
+            scrim.setVisible(true);
+        }
+        setVisible(true);
+        layOutOverWindow();
+        focusClose();
+    }
+
+    /**
+     * Hides the guide and its scrim.
+     */
+    public void close() {
+        if (scrim != null) {
+            scrim.setVisible(false);
+        }
+        setVisible(false);
+    }
+
+    private void layOutOverWindow() {
+        if (layeredPane == null || scrim == null) {
+            return;
+        }
+        int width = layeredPane.getWidth();
+        int height = layeredPane.getHeight();
+        scrim.setBounds(0, 0, width, height);
+        int drawerWidth = Math.min(drawerWidth(), width);
+        setBounds(width - drawerWidth, 0, drawerWidth, height);
+        revalidate();
     }
 
     /**
