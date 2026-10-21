@@ -353,6 +353,24 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Says what a refit is waiting for before work can begin, for example {@code Refit kit arrives in 3 days}, so the
+     * Hangar does not show work time that is not yet passing.
+     *
+     * @return the status while the refit waits for its kit or parts, or {@code null} once everything is here
+     */
+    private @Nullable String describeRefitWaitingForParts() {
+        int daysUntilArrival = refit.getDaysUntilPartsArrive();
+        if (daysUntilArrival == 0) {
+            return null;
+        }
+        String delivery = refit.isCustomJob() ? "parts" : "kit";
+        if (daysUntilArrival == Refit.PARTS_NOT_FOUND) {
+            return getTextAt(RESOURCE_BUNDLE, "Unit.status.refitWaiting." + delivery);
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Unit.status.refitArriving." + delivery, daysUntilArrival);
+    }
+
+    /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
      */
     public boolean isAvailable(boolean ignoreRefit) {
@@ -381,6 +399,10 @@ public class Unit implements ITechnology, ILocatable {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
+            String waitingForParts = describeRefitWaitingForParts();
+            if (waitingForParts != null) {
+                return waitingForParts;
+            }
             double timeLeft = refit.getTimeLeft();
             Person refitTech = refit.getTech();
 

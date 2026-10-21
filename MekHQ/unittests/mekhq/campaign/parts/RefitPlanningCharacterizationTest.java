@@ -83,12 +83,13 @@ class RefitPlanningCharacterizationTest {
 
     @Test
     void locustLct1vToLct1eKit() {
-        // No worked rulebook figure for this pair. Class D because two lasers go into each arm where one Machine Gun
-        // was (StratOps p.188 kit rule, as RefitTest cites). Time is seven 120-minute items at the halved Class D rate.
+        // No worked rulebook figure for this pair. Class C because the Medium Laser moves from the center torso to an
+        // arm (CamOps p.211); the lasers added where the Machine Guns came out are only Class B. Time is seven
+        // 120-minute items at the halved Class C rate.
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.LOCUST_LCT_1V), REFIT_KIT);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
-        assertEquals(3360, refit.getTime());
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(2100, refit.getTime());
         assertEquals(Money.of(62500).multipliedBy(1.1), refit.getCost());
         assertEquals(Map.of("Medium Laser", 1, "Small Laser", 2), PartsCensus.ofParts(refit.getShoppingList()));
         assertEquals(Map.of("Machine Gun", 2, "Machine Gun Ammo [Full] Bin", 1),
@@ -101,8 +102,8 @@ class RefitPlanningCharacterizationTest {
     void locustLct1vToLct1eCustom() {
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.LOCUST_LCT_1V), CUSTOM_JOB);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
-        assertEquals(6720, refit.getTime());
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(4200, refit.getTime());
         assertEquals(Money.of(62500), refit.getCost());
         assertEquals(Map.of("Medium Laser", 1, "Small Laser", 2), PartsCensus.ofParts(refit.getShoppingList()));
         assertEquals(Map.of("Machine Gun", 2, "Machine Gun Ammo [Full] Bin", 1),
@@ -111,14 +112,12 @@ class RefitPlanningCharacterizationTest {
     }
 
     @Test
-    void wolverineWvr6rToWvr6mKitIsClassDSeeGen1() {
-        // Campaign Operations p.211-212 works this refit through: Class C, 1,100 item minutes. MekHQ gives Class D
-        // today and multiplies by the Class D rate (8, halved for a kit); current behaviour, see GEN-1; changes when
-        // that is fixed.
+    void wolverineWvr6rToWvr6mKitMatchesTheBook() {
+        // Campaign Operations p.212 works this refit through: Class C, 1,100 item minutes, and a kit multiplier of 2.5
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.WOLVERINE_WVR_6R), REFIT_KIT);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass(), "GEN-1: book class is C");
-        assertEquals(4400, refit.getTime(), "GEN-1: 1,100 item minutes at the Class D kit rate");
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(2750, refit.getTime(), "1,100 item minutes at the halved Class C rate");
         assertEquals(Money.of(154000).multipliedBy(1.1), refit.getCost());
         assertEquals(Map.of("Heat Sink", 2, "Large Laser", 1, "Medium Laser", 1),
               PartsCensus.ofParts(refit.getShoppingList()));
@@ -128,19 +127,34 @@ class RefitPlanningCharacterizationTest {
     }
 
     @Test
-    void wolverineWvr6rToWvr6mCustomIsClassDSeeGen1() {
-        // Campaign Operations p.211-212: Class C, 1,100 item minutes. The audit found Class D and 8,800 minutes for
-        // the custom refit; current behaviour, see GEN-1; changes when that is fixed.
+    void wolverineWvr6rToWvr6mCustomMatchesTheBook() {
+        // Campaign Operations p.212: Class C, 1,100 item minutes times 5, for 5,500 minutes
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.WOLVERINE_WVR_6R), CUSTOM_JOB);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass(), "GEN-1: book class is C");
-        assertEquals(8800, refit.getTime(), "GEN-1: 1,100 item minutes at the Class D rate");
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(5500, refit.getTime(), "1,100 item minutes at the Class C rate");
         assertEquals(Money.of(154000), refit.getCost());
         assertEquals(Map.of("Heat Sink", 2, "Large Laser", 1, "Medium Laser", 1),
               PartsCensus.ofParts(refit.getShoppingList()));
         assertEquals(Map.of("AC/5", 1, "AC/5 Ammo Bin", 1, "Armor (IS Standard)", 92),
               PartsCensus.ofParts(refit.getOldUnitParts()));
         assertWolverineArmorOrder(refit);
+    }
+
+    @Test
+    void wolverineReasonsFollowTheBookExample() {
+        // CamOps p.212 lists the work: armor (A), lasers in the right arm (B), heat sinks elsewhere (C), and the
+        // SRM 6 ammo and jump jets moved (C)
+        Refit refit = planRefit(refitPairStartingWith(UnitFixture.WOLVERINE_WVR_6R), CUSTOM_JOB);
+        String reasons = String.join("; ", refit.getRefitClassReasons());
+
+        assertTrue(reasons.contains("Adding Large Laser to the Right Arm, where something was removed"), reasons);
+        assertTrue(reasons.contains("Adding Heat Sink to the Left Leg, where nothing was removed"), reasons);
+        assertTrue(reasons.contains("Moving SRM 6 Ammo Bin from the Left Torso to the Right Torso"), reasons);
+        assertTrue(reasons.contains("Moving Jump Jet from the Left Leg to the Left Torso"), reasons);
+        assertTrue(reasons.contains("Changing armor"), reasons);
+        assertTrue(refit.getRefitClassReasons().getFirst().startsWith(Refit.getRefitClassName(Refit.CLASS_C)),
+              "The biggest change is listed first");
     }
 
     /**
@@ -157,11 +171,12 @@ class RefitPlanningCharacterizationTest {
 
     @Test
     void hunchbackHbk4gToHbk4pKit() {
-        // No rulebook figure for this pair. Six Medium Lasers and ten Heat Sinks replace the AC/20 and its ammo.
+        // No rulebook figure for this pair. Six Medium Lasers and ten Heat Sinks replace the AC/20 and its ammo. A
+        // Heat Sink in the center torso, where nothing came out, makes it Class C (CamOps p.211).
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.HUNCHBACK_HBK_4G), REFIT_KIT);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
-        assertEquals(7920, refit.getTime());
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(4950, refit.getTime());
         assertEquals(Money.of(260000).multipliedBy(1.1), refit.getCost());
         assertEquals(Map.of("Heat Sink", 10, "Medium Laser", 6), PartsCensus.ofParts(refit.getShoppingList()));
         assertEquals(Map.of("AC/20", 1, "AC/20 Ammo Bin", 2), PartsCensus.ofParts(refit.getOldUnitParts()));
@@ -173,8 +188,8 @@ class RefitPlanningCharacterizationTest {
     void hunchbackHbk4gToHbk4pCustom() {
         Refit refit = planRefit(refitPairStartingWith(UnitFixture.HUNCHBACK_HBK_4G), CUSTOM_JOB);
 
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
-        assertEquals(15840, refit.getTime());
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(9900, refit.getTime());
         assertEquals(Money.of(260000), refit.getCost());
         assertEquals(Map.of("Heat Sink", 10, "Medium Laser", 6), PartsCensus.ofParts(refit.getShoppingList()));
         assertEquals(Map.of("AC/20", 1, "AC/20 Ammo Bin", 2), PartsCensus.ofParts(refit.getOldUnitParts()));
@@ -195,8 +210,8 @@ class RefitPlanningCharacterizationTest {
         assertEquals(Money.of(22500), refit.getCost());
         assertTrue(refit.getNewUnitParts().contains(spareMediumLaser),
               "The spare Medium Laser should be planned into the refitted unit");
-        assertEquals(Refit.CLASS_D, refit.getRefitClass());
-        assertEquals(6720, refit.getTime());
+        assertEquals(Refit.CLASS_C, refit.getRefitClass());
+        assertEquals(4200, refit.getTime());
         // Planning alone reserves nothing: the spare is still free for other work until the refit begins
         assertEquals(Map.of("Medium Laser", 1), PartsCensus.ofWarehouseStock(scenario.getWarehouse()));
     }

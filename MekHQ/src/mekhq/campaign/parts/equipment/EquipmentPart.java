@@ -841,7 +841,9 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasFlag(MiscTypeFlag.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
             } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
-                varCost = Money.of(getUnitTonnage() * 100000);
+                // Matches MegaMek: the system weighs 1% of the unit and costs 100,000 per ton. Long math since warship
+                // tonnages overflow an int.
+                varCost = Money.of(getUnitTonnage() * 1000L);
             }
         }
         if (varCost.isZero()) {

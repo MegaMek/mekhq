@@ -38,6 +38,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.EducationController.resolveAcademySystemId;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
@@ -1461,62 +1462,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
         return false;
-    }
-
-    /**
-     * Resolves the planetary system ID for a person's academy attendance.
-     *
-     * <p>Tries the location-tree-aware method first (works for new saves where the person is
-     * already under an {@link AcademyCampusLocation}, or when {@code legacyEduAcademySystem} was populated from an
-     * {@code <eduAcademySystem>} XML tag). Falls back to parsing the system name from the trailing {@code (SystemName)}
-     * in {@code eduAcademyName}, which is the format written by enrollment for non-local, non-homeschool
-     * academies.</p>
-     */
-    private static @Nullable String resolveAcademySystemId(Campaign campaign, Person person) {
-        String systemId = person.getEduAcademySystem();
-        if (systemId != null) {
-            return systemId;
-        }
-        String academyName = person.getEduAcademyName();
-        if (academyName == null || academyName.isBlank()) {
-            return null;
-        }
-        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-        if ((academy != null) &&
-                  !(academy.isLocal() || academy.isHomeSchool()) &&
-                  !academy.getLocationSystems().isEmpty()) {
-
-            systemId = academy.getLocationSystems().getFirst();
-            if (academy.getLocationSystems().size() == 1) {
-                LOGGER.warn("Could not resolve Academy System ID for person {}. Returning only location for " +
-                                  "non-homeschool, non-local academy: {}", person, systemId);
-            } else {
-                LOGGER.warn("Could not resolve Academy System ID for person {} for non-homeschool, " +
-                                  "non-local academy with multiple locations, returning first : {}", person, systemId);
-            }
-            return systemId;
-
-        }
-
-        if (academy != null && campaign.getCurrentSystem() != null) {
-            LOGGER.warn("Could not resolve Academy System ID for person {}. for homeschool, " +
-                              "or local academy returning campaign's location : {}", person, systemId);
-            return campaign.getCurrentSystem().getId();
-        }
-
-        // This is bad if we reach here. This resolution attempt will fail for academy's at systems with parenthesis
-        // in the name. But if we've reached here we've run out of other options for getting the academy's location
-        // and have to guess based on the limited information we have.
-        LOGGER.warn("Could not resolve Academy System ID for person: {}. Guessing based on Academy name.",
-              person);
-        int lastOpen = academyName.lastIndexOf('(');
-        int lastClose = academyName.lastIndexOf(')');
-        if (lastOpen < 0 || lastClose <= lastOpen) {
-            return null;
-        }
-        String systemName = academyName.substring(lastOpen + 1, lastClose).trim();
-        PlanetarySystem system = campaign.getSystemByName(systemName);
-        return system != null ? system.getId() : null;
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {

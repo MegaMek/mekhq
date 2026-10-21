@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.parts;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -48,11 +49,11 @@ import testUtilities.MHQTestUtilities;
 import testUtilities.parts.PartsScenario;
 
 /**
- * An omni refit that changes equipment fixed to the base chassis is refused, because the unit would lose its omni
- * capability (issues #5748 and #4148). The check compared the old design with itself, so it always passed: a Fire
- * Moth refitted to single heat sinks, or an Epona given a fixed laser, was treated as a pod swap and its fixed parts
- * were skipped. Canon pod swaps that differ only in one-shot launchers' ammunition or in the munitions loaded in
- * fixed bins stay allowed.
+ * An omni refit that changes equipment fixed to the base chassis is not a pod swap (issues #5748 and #4148). The check
+ * compared the old design with itself, so it always passed: a Fire Moth refitted to single heat sinks, or an Epona
+ * given a fixed laser, was treated as a pod swap and its fixed parts were skipped. Altering fixed components is a
+ * Class F refit worked like any other, with every part compared (Campaign Operations p.212). Canon pod swaps that
+ * differ only in one-shot launchers' ammunition or in the munitions loaded in fixed bins stay pod swaps.
  *
  * <p>The Fire Moth Prime, Batu E and Heimdall Prime and B are pinned copies from mm-data. The Fire Moth SHS (single
  * heat sinks) and the Epona with a fixed ER small laser are test designs built from the Prime files.</p>
@@ -80,13 +81,28 @@ class RefitOmniFixedEquipmentTest {
     }
 
     @Test
-    void anOmniRefitThatChangesFixedEquipmentIsRefused() {
+    void anOmniRefitThatChangesFixedEquipmentIsClassF() {
         Unit epona = scenario.getCampaign()
                            .addNewUnit(load("Epona Pursuit Tank Prime", true), false, 0, PartQuality.QUALITY_D);
 
         Refit refit = new Refit(epona, load("Epona Pursuit Tank Fixed Laser", true), true, false, false);
 
-        assertNotNull(refit.checkFixable(), "Adding a fixed laser takes away the omni capability");
+        assertNull(refit.checkFixable(), "Altering fixed components is allowed as a Class F refit");
+        assertEquals(Refit.CLASS_F, refit.getRefitClass());
+        boolean isBuyingTheLaser = refit.getShoppingList()
+                                         .stream()
+                                         .anyMatch(part -> part.getName().contains("Small Laser"));
+        assertTrue(isBuyingTheLaser, "The fixed laser is bought like any new component");
+    }
+
+    @Test
+    void aPodSwapIsQuickerThanAnyClass() {
+        Unit epona = scenario.getCampaign()
+                           .addNewUnit(load("Epona Pursuit Tank Prime", true), false, 0, PartQuality.QUALITY_D);
+
+        Refit refit = new Refit(epona, load("Epona Pursuit Tank A", true), false, false, false);
+
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass());
     }
 
     @Test
@@ -97,6 +113,18 @@ class RefitOmniFixedEquipmentTest {
         Refit refit = new Refit(epona, load("Epona Pursuit Tank A", true), false, false, false);
 
         assertNull(refit.checkFixable());
+    }
+
+    @Test
+    void aPodSwapSaysWhatEachLocationsPodsBecome() {
+        Unit batu = scenario.getCampaign().addNewUnit(load("Batu Prime", true), false, 0, PartQuality.QUALITY_D);
+
+        Refit refit = new Refit(batu, load("Batu E", true), false, false, false);
+
+        String reasons = String.join("; ", refit.getRefitClassReasons());
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass(), reasons);
+        assertTrue(reasons.contains(" becomes "), reasons);
+        assertFalse(reasons.contains("Swapping"), "No line for each single pod: " + reasons);
     }
 
     @Test

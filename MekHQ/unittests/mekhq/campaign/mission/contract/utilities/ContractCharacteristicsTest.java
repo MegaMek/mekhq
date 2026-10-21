@@ -34,7 +34,6 @@ package mekhq.campaign.mission.contract.utilities;
 
 import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -339,12 +338,23 @@ class ContractCharacteristicsTest {
     }
 
     @Test
-    void negotiatorSkillOverrideMapsToTheNegotiatorCharacteristic() {
-        assertEquals(SkillLevel.ELITE,
-              ContractCharacteristics.getNegotiatorSkillOverride(contractWith(ELITE_NEGOTIATOR)));
-        assertEquals(SkillLevel.REGULAR,
-              ContractCharacteristics.getNegotiatorSkillOverride(contractWith(NOVICE_NEGOTIATOR)));
-        assertNull(ContractCharacteristics.getNegotiatorSkillOverride(contractWith()));
+    void negotiatorTierStepMapsToTheNegotiatorCharacteristic() {
+        assertEquals(1, ContractCharacteristics.getNegotiatorTierStep(contractWith(ELITE_NEGOTIATOR)));
+        assertEquals(-1, ContractCharacteristics.getNegotiatorTierStep(contractWith(NOVICE_NEGOTIATOR)));
+        assertEquals(0, ContractCharacteristics.getNegotiatorTierStep(contractWith()));
+    }
+
+    @Test
+    void stepSkillLevelMovesFromTheEmployerTier() {
+        assertEquals(SkillLevel.REGULAR, ContractCharacteristics.stepSkillLevel(SkillLevel.GREEN, 1));
+        assertEquals(SkillLevel.GREEN, ContractCharacteristics.stepSkillLevel(SkillLevel.REGULAR, -1));
+        assertEquals(SkillLevel.VETERAN, ContractCharacteristics.stepSkillLevel(SkillLevel.VETERAN, 0));
+    }
+
+    @Test
+    void stepSkillLevelStaysBetweenUltraGreenAndLegendary() {
+        assertEquals(SkillLevel.ULTRA_GREEN, ContractCharacteristics.stepSkillLevel(SkillLevel.ULTRA_GREEN, -1));
+        assertEquals(SkillLevel.LEGENDARY, ContractCharacteristics.stepSkillLevel(SkillLevel.LEGENDARY, 1));
     }
 
     // endregion reputation / standing multipliers

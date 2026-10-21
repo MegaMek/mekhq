@@ -1857,7 +1857,8 @@ public class ContractEditorDialog extends JDialog {
             applyNpc(commanderEditor);
         }
 
-        // Tier the employer negotiator to match the Elite / Novice Negotiator characteristic (Veteran when neither).
+        // Tier the employer negotiator to the employer type's tier, stepped by the Elite / Novice Negotiator
+        // characteristic.
         // Done last, after the negotiator has been generated (create) or edited (edit).
         ContractCharacteristics.syncNegotiatorTier(contract, campaign);
 
