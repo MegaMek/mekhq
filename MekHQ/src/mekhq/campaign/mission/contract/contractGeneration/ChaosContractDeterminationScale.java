@@ -38,6 +38,7 @@ import static mekhq.campaign.force.FormationType.STANDARD;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.Collection;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
@@ -139,9 +140,28 @@ public class ChaosContractDeterminationScale {
      */
     public static double generateScaleForTableOfOrganization(PlayerForce playerForce, LocalHangar hangar,
           boolean convertSupportPointsToBattleValue) {
+        return generateScaleForTableOfOrganization(playerForce, hangar.getUnits(), convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * As {@link #generateScaleForTableOfOrganization(PlayerForce, LocalHangar, boolean)}, weighing only the given
+     * units. Used to project the Scale of a TO&amp;E some of whose units are about to be mothballed.
+     *
+     * @param playerForce                       the player force whose TO&amp;E is weighed
+     * @param units                             the units to weigh
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the exact (unrounded) Scale of those units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double generateScaleForTableOfOrganization(PlayerForce playerForce, Collection<Unit> units,
+          boolean convertSupportPointsToBattleValue) {
         int totalBattleValue = 0;
 
-        for (Unit unit : hangar.getUnits()) {
+        for (Unit unit : units) {
             if (unit.isMothballed()) {
                 continue;
             }

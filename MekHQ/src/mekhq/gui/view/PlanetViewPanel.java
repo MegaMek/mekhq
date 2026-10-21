@@ -568,8 +568,10 @@ public class PlanetViewPanel extends JScrollablePanel {
         textPane.setBackground(DOSSIER_BACKGROUND);
         textPane.setForeground(DOSSIER_TEXT);
         textPane.setBorder(BorderFactory.createEmptyBorder());
-        textPane.setText(text);
+        // Set before the text: a caret that follows the text ends up below it, and scrolling it into view would
+        // scroll any page holding this pane to the bottom.
         ((DefaultCaret) textPane.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        textPane.setText(text);
         return textPane;
     }
 

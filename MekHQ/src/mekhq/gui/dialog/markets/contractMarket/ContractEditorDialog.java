@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -984,6 +985,10 @@ public class ContractEditorDialog extends JDialog {
               () -> List.of(combatPaySpinner.getValue(), combatPayAutomatic.isSelected()), combatPaySpinner,
               combatPayAutomatic));
         section.add(leftAligned(grid.panel));
+        linkPayToTerm(payRateTrack, monthlyPaySpinner, monthlyPayAutomatic,
+              ChaosContractStepsTable::getBasePayMultiplier);
+        linkPayToTerm(transportTermTrack, transportPaySpinner, transportPayAutomatic,
+              ChaosContractStepsTable::getTransportMultiplier);
 
         section.add(leftAligned(subHeading("edit.contractMarket.section.facilities")));
         grid = new Grid();
@@ -2167,6 +2172,37 @@ public class ContractEditorDialog extends JDialog {
 
     private JCheckBox financeAutomatic(JSpinner spinner) {
         return financeAutomatic(spinner, createMode);
+    }
+
+    /**
+     * Keeps a manual pay figure in step with the term that sets it. A manual figure is saved as it stands, so without
+     * this a changed term would save the same pay and the market's estimate would not move. The figure is scaled by
+     * the term's multiplier, the same way the negotiation table projects pay. A figure that has only ever stood at a
+     * zero multiplier has nothing to scale from, so it is handed to its "Automatic" pill and worked out on save.
+     */
+    private static void linkPayToTerm(StepTrack track, JSpinner spinner, JCheckBox automatic,
+          ToDoubleFunction<ChaosContractStepsTable> multiplier) {
+        // The figure per unit of multiplier, or NaN until it has stood at a non-zero multiplier
+        double[] perMultiplier = { Double.NaN };
+        Runnable anchor = () -> {
+            double currentMultiplier = multiplier.applyAsDouble(track.getSelected());
+            if (currentMultiplier != 0) {
+                perMultiplier[0] = ((Number) spinner.getValue()).doubleValue() / currentMultiplier;
+            }
+        };
+        anchor.run();
+        spinner.addChangeListener(event -> anchor.run());
+        track.addChangeListener(() -> {
+            if (automatic.isSelected()) {
+                return;
+            }
+            if (Double.isNaN(perMultiplier[0])) {
+                automatic.setSelected(true);
+                spinner.setEnabled(false);
+                return;
+            }
+            spinner.setValue(perMultiplier[0] * multiplier.applyAsDouble(track.getSelected()));
+        });
     }
 
     /**
