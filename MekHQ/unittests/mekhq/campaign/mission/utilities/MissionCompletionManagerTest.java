@@ -67,6 +67,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -568,6 +569,36 @@ public class MissionCompletionManagerTest {
 
             verify(factionStandings).processContractCompletion(campaignFaction, employerFaction, TODAY,
                   MissionStatus.SUCCESS, 6.0, 12);
+        }
+
+        @Test
+        void trackingEnabledPostsStandingReportsToPolitics() {
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)).thenReturn(true);
+            when(campaignOptions.get(CampaignOption.REGARD_MULTIPLIER)).thenReturn(1.0);
+
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            FactionStandings factionStandings = mock(FactionStandings.class);
+            AbstractContract mission = mock(AbstractContract.class);
+
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getFactionStandings()).thenReturn(factionStandings);
+            when(factionStandings.processContractCompletion(any(), any(), any(), any(), anyDouble(), anyInt()))
+                  .thenReturn(new ArrayList<>(List.of("employer report", "", "ally report")));
+
+            try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                  ContractCharacteristics.class)) {
+                contractCharacteristics.when(() -> ContractCharacteristics.getEmployerRegardMultiplier(mission))
+                      .thenReturn(1.0);
+
+                MissionCompletionManager.updateFactionStandings(campaign, campaignOptions, mission,
+                      MissionStatus.SUCCESS);
+            }
+
+            verify(campaign).addReport(DailyReportType.POLITICS, "employer report");
+            verify(campaign).addReport(DailyReportType.POLITICS, "ally report");
+            verify(campaign, never()).addReport(DailyReportType.POLITICS, "");
         }
     }
     // endregion updateFactionStandings
