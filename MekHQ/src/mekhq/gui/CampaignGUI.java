@@ -108,6 +108,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitBriefing;
+import mekhq.campaign.parts.RefitFacility;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -115,6 +116,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitSiteChange;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -155,6 +157,9 @@ import mekhq.gui.view.CurrentLocationPanel;
 public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
     private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    /** The buttons of the refit site question, in the order they are shown */
+    private static final int REFIT_SITE_CANCEL = 0;
+    private static final int REFIT_SITE_MOVE = 2;
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1199,6 +1204,10 @@ public class CampaignGUI extends JPanel {
 
     public void refitUnit(Refit refit, boolean selectModelName) {
         Campaign campaign = getCampaign();
+        // Settled before the tech is chosen, so the tech list shows the target number at the site the work is done
+        if (!isRefitSiteSettled(refit)) {
+            return;
+        }
         if (refit.getOriginalEntity() instanceof Infantry && !(refit.getOriginalEntity() instanceof BattleArmor)) {
             refit.setTech(null);
         } else if (refit.getOriginalEntity() instanceof Dropship || refit.getOriginalEntity() instanceof Jumpship) {
@@ -1274,6 +1283,56 @@ public class CampaignGUI extends JPanel {
         campaign.refit(refit);
         getMekLabTab().clearUnit();
         logger.debug("[RefitStart] {}: refit started", refit.getUnit().getName());
+    }
+
+    /**
+     * Offers to move the unit to the repair site its refit needs when its site is too low for the refit's class, by
+     * Campaign Operations p.211 (issue #3437). For example, a Class C refit of a unit in an improvised site needs a
+     * field workshop or better. The player may move the unit, keep it where it is, or cancel the refit.
+     *
+     * @return {@code false} if the player cancelled the refit
+     */
+    private boolean isRefitSiteSettled(Refit refit) {
+        Campaign campaign = getCampaign();
+        Unit unit = refit.getOriginalUnit();
+        if (RefitFacility.isSiteGoodEnough(refit, unit.getSite())) {
+            return true;
+        }
+        int requiredSite = RefitFacility.getRequiredSite(refit);
+        String currentSiteName = Unit.getSiteName(unit.getSite());
+        String requiredSiteName = Unit.getSiteName(requiredSite);
+        logger.debug("[RefitFacility] {}: {} work needs {}, the unit is at {}; asking whether to move it",
+              unit.getName(), refit.getRefitClassName(), requiredSiteName, currentSiteName);
+
+        Person speaker = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        String inCharacter = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.text",
+              campaign.getCommanderAddress(), unit.getName(), refit.getNewEntity().getModel(),
+              refit.getRefitClassName(), RefitFacility.describeRequiredSite(refit), currentSiteName);
+        List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.cancel"),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.stay", currentSiteName),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.move", requiredSiteName));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false);
+
+        return switch (dialog.getDialogChoice()) {
+            case REFIT_SITE_CANCEL -> {
+                logger.debug("[RefitFacility] {}: the refit was cancelled at the site question", unit.getName());
+                yield false;
+            }
+            case REFIT_SITE_MOVE -> {
+                boolean isMoved = UnitSiteChange.moveToSite(campaign, new Unit[] { unit }, requiredSite);
+                logger.debug("[RefitFacility] {}: {} to {}", unit.getName(), isMoved ? "moved" : "could not move",
+                      requiredSiteName);
+                yield true;
+            }
+            default -> {
+                logger.debug("[RefitFacility] {}: stays at {} for the refit", unit.getName(), currentSiteName);
+                yield true;
+            }
+        };
     }
 
     /**

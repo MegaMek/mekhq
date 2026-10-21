@@ -58,6 +58,8 @@ public record RefitPartsStatus(State state, int itemsInStock, int itemsNeeded, L
     public enum State {
         /** Everything the refit needs is in the warehouse */
         READY,
+        /** Nothing is left to order, but some of it is on order or on its way */
+        WAITING_FOR_DELIVERY,
         /** The warehouse covers some of the refit's needs; the rest must be ordered */
         PARTLY_IN_STOCK,
         /** Nothing the refit needs is in the warehouse; everything must be ordered */
@@ -78,19 +80,28 @@ public record RefitPartsStatus(State state, int itemsInStock, int itemsNeeded, L
         List<Refit.RefitNeed> needs = refit.describeNeeds();
         int itemsInStock = (int) needs.stream().filter(Refit.RefitNeed::isInStock).count();
         List<String> itemsToOrder = needs.stream()
-                                          .filter(need -> !need.isInStock())
+                                          .filter(need -> need.supply() == Refit.Supply.TO_ORDER)
                                           .map(Refit.RefitNeed::description)
                                           .toList();
+        List<String> itemsComing = needs.stream()
+                                         .filter(need -> (need.supply() == Refit.Supply.ON_ITS_WAY)
+                                               || (need.supply() == Refit.Supply.ON_ORDER))
+                                         .map(Refit.RefitNeed::description)
+                                         .toList();
         List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
-        LOGGER.debug("[RefitParts] {}: {} of {} needs in stock, {} cannot be bought",
-              refit.getNewEntity().getShortName(), itemsInStock, needs.size(), partsThatCannotBeBought.size());
+        LOGGER.debug("[RefitParts] {}: {} of {} needs in stock, {} on order or on their way, {} cannot be bought",
+              refit.getNewEntity().getShortName(), itemsInStock, needs.size(), itemsComing.size(),
+              partsThatCannotBeBought.size());
         if (!partsThatCannotBeBought.isEmpty()) {
             return new RefitPartsStatus(State.CANNOT_BUY, itemsInStock, needs.size(), partsThatCannotBeBought);
         }
         if (itemsToOrder.isEmpty()) {
-            return new RefitPartsStatus(State.READY, itemsInStock, needs.size(), List.of());
+            return itemsComing.isEmpty()
+                         ? new RefitPartsStatus(State.READY, itemsInStock, needs.size(), List.of())
+                         : new RefitPartsStatus(State.WAITING_FOR_DELIVERY, itemsInStock, needs.size(), itemsComing);
         }
-        State state = (itemsInStock > 0) ? State.PARTLY_IN_STOCK : State.TO_ORDER;
+        boolean isAnythingCovered = (itemsInStock > 0) || !itemsComing.isEmpty();
+        State state = isAnythingCovered ? State.PARTLY_IN_STOCK : State.TO_ORDER;
         return new RefitPartsStatus(state, itemsInStock, needs.size(), itemsToOrder);
     }
 
@@ -101,6 +112,7 @@ public record RefitPartsStatus(State state, int itemsInStock, int itemsNeeded, L
         String partList = String.join(", ", parts);
         return switch (state) {
             case READY -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.ready");
+            case WAITING_FOR_DELIVERY -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.waiting", partList);
             case PARTLY_IN_STOCK -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.partly", itemsInStock,
                   itemsNeeded, partList);
             case TO_ORDER -> getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsStatus.toOrder", partList);

@@ -107,7 +107,6 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitLogEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -121,6 +120,7 @@ import mekhq.campaign.unit.BombUnloader;
 import mekhq.campaign.unit.EditedDamage;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitSiteChange;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.CancelMothballUnitAction;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
@@ -440,21 +440,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            boolean wasSiteChangeSuccessful = true;
-            Campaign campaign = gui.getCampaign();
-            if (selected >= Unit.SITE_FACILITY_MAINTENANCE &&
-                      campaign.getCampaignOptions().get(CampaignOption.RENTED_FACILITIES_COST_REPAIR_BAYS) > 0) {
-                wasSiteChangeSuccessful = FacilityRentals.processBayChangeRequest(campaign, units, selected);
-            }
-
-            if (wasSiteChangeSuccessful) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        unit.setSite(selected);
-                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
-                    }
-                }
-            }
+            UnitSiteChange.moveToSite(gui.getCampaign(), units, selected);
         } else if (command.equals(COMMAND_SALVAGE)) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {

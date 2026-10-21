@@ -33,6 +33,7 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
@@ -58,6 +59,7 @@ import javax.swing.table.TableRowSorter;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.entityreadout.EntityReadout;
 import megamek.client.ui.preferences.JSplitPanePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
@@ -73,6 +75,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitDesignSearch;
+import mekhq.campaign.parts.RefitFacility;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.unit.Unit;
@@ -99,7 +103,10 @@ public class ChooseRefitDialog extends JDialog {
 
     private JButton btnRefit;
     private JButton btnCustomize;
+    private JButton btnOrderParts;
+    private JCheckBox chkOnlySupportedRefits;
     private JTable refitTable;
+    private TableRowSorter<RefitTableModel> refitSorter;
     private JScrollPane scrShoppingList;
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
@@ -148,7 +155,7 @@ public class ChooseRefitDialog extends JDialog {
         refitTable.setShowGrid(false);
         refitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         refitTable.getSelectionModel().addListSelectionListener(evt -> refitTableValueChanged());
-        TableRowSorter<RefitTableModel> refitSorter = new TableRowSorter<>(refitModel);
+        refitSorter = new TableRowSorter<>(refitModel);
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
@@ -205,6 +212,20 @@ public class ChooseRefitDialog extends JDialog {
 
         JPanel panBtn = new JPanel(new GridBagLayout());
 
+        // Hides the refits the unit's repair site cannot support (issue #3437); the dialog remembers the choice
+        chkOnlySupportedRefits = new JCheckBox(getFormattedTextAt(RESOURCE_BUNDLE, "chkOnlySupportedRefits.text",
+              Unit.getSiteName(unit.getSite())));
+        chkOnlySupportedRefits.setName("chkOnlySupportedRefits");
+        chkOnlySupportedRefits.setToolTipText(getTextAt(RESOURCE_BUNDLE, "chkOnlySupportedRefits.tooltip"));
+        chkOnlySupportedRefits.addItemListener(event -> filterRefitsBySite());
+        panBtn.add(chkOnlySupportedRefits, new GridBagConstraints());
+
+        // Orders what the refit needs without starting it, so the unit stays in service while they arrive (#7848)
+        btnOrderParts = new JButton(getTextAt(RESOURCE_BUNDLE, "btnOrderParts.text"));
+        btnOrderParts.setEnabled(false);
+        btnOrderParts.addActionListener(event -> orderParts());
+        panBtn.add(btnOrderParts, new GridBagConstraints());
+
         btnRefit = new JButton(resourceMap.getString("btnRefit.text"));
         btnRefit.setEnabled(false);
         btnRefit.addActionListener(evt -> confirmRefit());
@@ -243,6 +264,7 @@ public class ChooseRefitDialog extends JDialog {
             preferences.manage(new JSplitPanePreference(mainSplit));
             preferences.manage(new JSplitPanePreference(refitListSplit));
             preferences.manage(new JSplitPanePreference(unitReadoutSplit));
+            preferences.manage(new JToggleButtonPreference(chkOnlySupportedRefits));
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
         }
@@ -263,6 +285,40 @@ public class ChooseRefitDialog extends JDialog {
 
     private void cancel() {
         setVisible(false);
+    }
+
+    /**
+     * Shows only the refits the unit's repair site supports, while the checkbox is ticked.
+     */
+    private void filterRefitsBySite() {
+        if (!chkOnlySupportedRefits.isSelected()) {
+            refitSorter.setRowFilter(null);
+            return;
+        }
+        refitSorter.setRowFilter(new RowFilter<>() {
+            @Override
+            public boolean include(Entry<? extends RefitTableModel, ? extends Integer> entry) {
+                Refit refit = entry.getModel().getRefitAt(entry.getIdentifier());
+                return RefitFacility.isSiteGoodEnough(refit, unit.getSite());
+            }
+        });
+        logger.debug("[RefitFacility] {}: showing only refits {} supports, {} of {}", unit.getName(),
+              Unit.getSiteName(unit.getSite()), refitTable.getRowCount(), refitModel.getRowCount());
+    }
+
+    /**
+     * Orders everything the selected refit still needs, then shows the parts as on order.
+     */
+    private void orderParts() {
+        Refit refit = getSelectedRefit();
+        if (refit == null) {
+            return;
+        }
+        RefitPartOrders.orderMissingParts(campaign, refit);
+        // Other refits of this unit may share the parts just ordered
+        refitModel.forgetPartsStatuses();
+        refitTable.repaint();
+        refitTableValueChanged();
     }
 
     public boolean isConfirmed() {
@@ -289,6 +345,7 @@ public class ChooseRefitDialog extends JDialog {
             txtNewUnit.setText("");
             btnRefit.setEnabled(false);
             btnCustomize.setEnabled(false);
+            btnOrderParts.setEnabled(false);
             return;
         }
 
@@ -299,7 +356,13 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setToolTipText(canBuyKit ? null : getTextAt(RESOURCE_BUNDLE, "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
-        JList<String> lstShopping = new JList<>(listNeeds(r).toArray(new String[0]));
+        List<Refit.RefitNeed> needs = r.describeNeeds();
+        boolean hasPartsToOrder = needs.stream().anyMatch(need -> need.supply() == Refit.Supply.TO_ORDER);
+        btnOrderParts.setEnabled(hasPartsToOrder);
+        btnOrderParts.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              hasPartsToOrder ? "btnOrderParts.tooltip" : "btnOrderParts.nothingToOrder.tooltip"));
+
+        JList<String> lstShopping = new JList<>(listNeeds(needs).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
         scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(r)));
         EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
@@ -321,33 +384,39 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     /**
-     * @return what the refit needs, under a heading for what the warehouse covers and one for what must be ordered
+     * @return what the refit needs, under a heading for what the warehouse holds, what is on its way, what is on
+     *       order and what must still be ordered
      */
-    private static List<String> listNeeds(Refit refit) {
-        List<String> inStock = new ArrayList<>();
-        List<String> toOrder = new ArrayList<>();
-        for (Refit.RefitNeed need : refit.describeNeeds()) {
-            (need.isInStock() ? inStock : toOrder).add("   " + need.description());
-        }
+    private static List<String> listNeeds(List<Refit.RefitNeed> needs) {
         List<String> lines = new ArrayList<>();
-        if (!inStock.isEmpty()) {
-            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.inStock"));
-            lines.addAll(inStock);
-        }
-        if (!toOrder.isEmpty()) {
-            lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, "RefitPartsStatus.heading.toOrder"));
-            lines.addAll(toOrder);
+        Refit.Supply lastSupply = null;
+        // The needs come grouped by where they come from
+        for (Refit.RefitNeed need : needs) {
+            if (need.supply() != lastSupply) {
+                lines.add(getTextAt(PARTS_RESOURCE_BUNDLE, getSupplyHeadingKey(need.supply())));
+                lastSupply = need.supply();
+            }
+            lines.add("   " + need.description());
         }
         return lines;
     }
 
+    private static String getSupplyHeadingKey(Refit.Supply supply) {
+        return switch (supply) {
+            case IN_STOCK -> "RefitPartsStatus.heading.inStock";
+            case ON_ITS_WAY -> "RefitPartsStatus.heading.onItsWay";
+            case ON_ORDER -> "RefitPartsStatus.heading.onOrder";
+            case TO_ORDER -> "RefitPartsStatus.heading.toOrder";
+        };
+    }
+
     /**
-     * @return green when the refit can start now, amber when the warehouse covers part of it, the normal text colour
-     *       when everything must be ordered, and red when some parts cannot be bought
+     * @return green when the refit can start now or has nothing left to order, amber when the warehouse covers part
+     *       of it, the normal text colour when everything must be ordered, and red when some parts cannot be bought
      */
     private static @Nullable Color getPartsStatusColor(RefitPartsStatus.State state) {
         return switch (state) {
-            case READY -> MekHQ.getMHQOptions().getFontColorPositive();
+            case READY, WAITING_FOR_DELIVERY -> MekHQ.getMHQOptions().getFontColorPositive();
             case PARTLY_IN_STOCK -> MekHQ.getMHQOptions().getFontColorWarning();
             case TO_ORDER -> null;
             case CANNOT_BUY -> MekHQ.getMHQOptions().getFontColorNegative();
@@ -407,7 +476,8 @@ public class ChooseRefitDialog extends JDialog {
         public final static int COL_NUM_PART = 4;
         public final static int COL_TARGET = 5;
         public final static int COL_COST = 6;
-        public final static int N_COL = 7;
+        public final static int COL_FACILITY = 7;
+        public final static int N_COL = 8;
 
         // Worked out once for each refit, since the table repaints often
         private final Map<Refit, RefitPartsStatus> partsStatusByRefit = new HashMap<>();
@@ -421,6 +491,20 @@ public class ChooseRefitDialog extends JDialog {
          */
         public RefitPartsStatus getPartsStatus(Refit refit) {
             return partsStatusByRefit.computeIfAbsent(refit, key -> RefitPartsStatus.of(campaign, key));
+        }
+
+        /**
+         * Works the parts status out again next time, after parts have been ordered.
+         */
+        public void forgetPartsStatuses() {
+            partsStatusByRefit.clear();
+        }
+
+        /**
+         * @return {@code true} if the unit's repair site is too low for the refit's class
+         */
+        private boolean isSiteTooLow(Refit refit) {
+            return !RefitFacility.isSiteGoodEnough(refit, unit.getSite());
         }
 
         @Override
@@ -443,6 +527,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_NUM_PART -> "# Parts";
                 case COL_COST -> "Cost";
                 case COL_TARGET -> "Kit TN";
+                case COL_FACILITY -> getTextAt(RESOURCE_BUNDLE, "refitTable.facility.column");
                 default -> "?";
             };
         }
@@ -471,6 +556,8 @@ public class ChooseRefitDialog extends JDialog {
                 return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, r, campaign.checkAcquisition(r))
                              .getTargetNumber()
                              .getValueAsString();
+            } else if (col == COL_FACILITY) {
+                return RefitFacility.describeRequiredSite(r);
             } else {
                 return "?";
             }
@@ -490,13 +577,14 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_MODEL -> 75;
                 case COL_CLASS -> 110;
                 case COL_COST -> 40;
+                case COL_FACILITY -> 90;
                 default -> 10;
             };
         }
 
         public int getAlignment(int col) {
             return switch (col) {
-                case COL_MODEL, COL_CLASS -> SwingConstants.LEFT;
+                case COL_MODEL, COL_CLASS, COL_FACILITY -> SwingConstants.LEFT;
                 default -> SwingConstants.RIGHT;
             };
         }
@@ -519,6 +607,11 @@ public class ChooseRefitDialog extends JDialog {
             }
             if (col == COL_MODEL) {
                 return getPartsStatus(r).describe();
+            }
+            if (col == COL_FACILITY) {
+                String key = isSiteTooLow(r) ? "refitTable.facility.tooltip.tooLow" : "refitTable.facility.tooltip.ok";
+                return getFormattedTextAt(RESOURCE_BUNDLE, key, RefitFacility.describeRequiredSite(r),
+                      Unit.getSiteName(unit.getSite()));
             }
 
             return null;
@@ -552,13 +645,19 @@ public class ChooseRefitDialog extends JDialog {
                 setHorizontalAlignment(getAlignment(actualCol));
                 setToolTipText(getTooltip(actualRow, actualCol));
                 // The model name is coloured by whether the refit needs parts ordered
-                Color partsColor = null;
+                Color foregroundColor = null;
                 boolean isColouredByParts = (actualCol == COL_MODEL) && !isSelected && !data.isEmpty();
                 if (isColouredByParts) {
-                    partsColor = getPartsStatusColor(getPartsStatus(data.get(actualRow)).state());
+                    foregroundColor = getPartsStatusColor(getPartsStatus(data.get(actualRow)).state());
                 }
-                if (partsColor != null) {
-                    setForeground(partsColor);
+                // The facility is shown in red when the unit's site is too low for the refit
+                boolean isFacilityTooLow = (actualCol == COL_FACILITY) && !isSelected && !data.isEmpty()
+                      && isSiteTooLow(data.get(actualRow));
+                if (isFacilityTooLow) {
+                    foregroundColor = MekHQ.getMHQOptions().getFontColorNegative();
+                }
+                if (foregroundColor != null) {
+                    setForeground(foregroundColor);
                 } else {
                     setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
                 }
