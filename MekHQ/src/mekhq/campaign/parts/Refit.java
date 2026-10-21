@@ -614,11 +614,16 @@ public class Refit extends Part implements IAcquisitionWork {
         boolean armorIsClan = false;
         Map<Part, Integer> partQuantity = new HashMap<>();
         List<Part> plannedReplacementParts = new ArrayList<>();
+        Map<Integer, Part> oldSuitsByTrooper = getBattleArmorSuitsByTrooper(oldUnit);
         for (Part newPart : newPartList) {
-            // We don't actually want to order new BA suits; we're just pretending that
-            // we're altering the existing suits.
+            // A trooper who already has a suit has it altered rather than replaced, so only a trooper the squad adds
+            // needs a suit bought
             if (newPart instanceof MissingBattleArmorSuit) {
-                continue;
+                if (oldSuitsByTrooper.containsKey(newPart.getLocation())) {
+                    continue;
+                }
+                LOGGER.debug("[Refit] {}: trooper {} is new to the squad and needs a suit bought", getDesc(),
+                      newPart.getLocation());
             }
 
             /* ADD TIMES AND COSTS */
@@ -1082,12 +1087,6 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_A);
             }
             time = 0;
-        }
-
-        if (isBattleArmorSquadGrowing()) {
-            // Adding troopers needs new suits bought for them; until that is supported, refuse rather than hand them
-            // out for free
-            errorStrings.add(getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.battleArmor.squadGrowth"));
         }
 
         // figure out if we are putting new stuff on a missing location
@@ -1744,14 +1743,6 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @return {@code true} if this refits a battle armor squad into a design with more troopers
-     */
-    private boolean isBattleArmorSquadGrowing() {
-        return (oldUnit.getEntity() instanceof BattleArmor) && (newEntity instanceof BattleArmor)
-              && (newEntity.locations() > oldUnit.getEntity().locations());
-    }
-
-    /**
      * @return each trooper's suit on the unit, intact or destroyed, by trooper location
      */
     private static Map<Integer, Part> getBattleArmorSuitsByTrooper(Unit unit) {
@@ -1769,7 +1760,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * a destroyed suit stays destroyed. Only the suit's design changes.
      *
      * @param newBattleArmor    the new design, already on the unit
-     * @param oldSuitsByTrooper each trooper's suit before the refit
+     * @param oldSuitsByTrooper each trooper's suit before the refit, or the suit bought for a trooper the squad adds
      *
      * @return one suit, or destroyed-suit placeholder, per trooper of the new design
      */
@@ -1795,6 +1786,36 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         LOGGER.debug("[Refit] {}: {} troopers carried into the new suit design", oldUnit.getName(), suits.size());
         return suits;
+    }
+
+    /**
+     * Gives each trooper the squad adds one of the suits bought for this refit, so the new trooper's suit takes the
+     * bought suit's quality. The bought suits themselves are removed with the rest of the refit's suits.
+     *
+     * @param newBattleArmor the new design
+     * @param suitsByTrooper each trooper's suit before the refit; the bought suits are added for the new troopers
+     */
+    private void assignBoughtSuitsToNewTroopers(BattleArmor newBattleArmor, Map<Integer, Part> suitsByTrooper) {
+        List<Part> boughtSuits = new ArrayList<>();
+        for (Part part : newUnitParts) {
+            if ((part instanceof BattleArmorSuit) && (part.getUnit() == null)) {
+                boughtSuits.add(part);
+            }
+        }
+        int newTroopers = 0;
+        for (int trooper = BattleArmor.LOC_TROOPER_1; trooper < newBattleArmor.locations(); trooper++) {
+            if (suitsByTrooper.containsKey(trooper)) {
+                continue;
+            }
+            newTroopers++;
+            if (!boughtSuits.isEmpty()) {
+                suitsByTrooper.put(trooper, boughtSuits.removeFirst());
+            }
+        }
+        if (newTroopers > 0) {
+            LOGGER.debug("[Refit] {}: {} troopers added to the squad, {} bought suits left over", oldUnit.getName(),
+                  newTroopers, boughtSuits.size());
+        }
     }
 
     /**
@@ -1907,9 +1928,12 @@ public class Refit extends Part implements IAcquisitionWork {
         if (keptCoolingSystem != null) {
             newParts.add(keptCoolingSystem);
         }
-        // Each trooper's suit becomes a suit of the new design, keeping its quality or staying destroyed
+        // Each trooper's suit becomes a suit of the new design, keeping its quality or staying destroyed. A trooper the
+        // squad adds wears a suit bought for this refit.
         if (newEntity instanceof BattleArmor newBattleArmor) {
-            newParts.addAll(createSuitsForNewDesign(newBattleArmor, oldSuitsByTrooper));
+            Map<Integer, Part> suitsByTrooper = new HashMap<>(oldSuitsByTrooper);
+            assignBoughtSuitsToNewTroopers(newBattleArmor, suitsByTrooper);
+            newParts.addAll(createSuitsForNewDesign(newBattleArmor, suitsByTrooper));
         }
 
         int expectedHeatSinkParts = 0;
