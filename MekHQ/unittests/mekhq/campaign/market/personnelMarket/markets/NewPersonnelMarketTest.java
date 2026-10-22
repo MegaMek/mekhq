@@ -503,6 +503,13 @@ class NewPersonnelMarketTest {
         Campaign mockCampaign = mockCampaign();
         mockApplicantMultipliers(mockCampaign, 0.0, 1.0);
 
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(0.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
         market.setGameYear(3050);
@@ -538,6 +545,13 @@ class NewPersonnelMarketTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         mockApplicantMultipliers(mockCampaign, 1.0, 0.0);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(0.0);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -725,6 +739,13 @@ class NewPersonnelMarketTest {
         // Setup
         Campaign mockCampaign = mockCampaign();
         mockApplicantMultipliers(mockCampaign, 1.0, 1.0);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(1.0);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
