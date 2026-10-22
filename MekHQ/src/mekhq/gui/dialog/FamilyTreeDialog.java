@@ -44,6 +44,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.Timer;
 
@@ -94,11 +95,14 @@ public class FamilyTreeDialog extends JDialog {
 
     private final EnhancedTabbedPane tabbedPane;
 
+    private final @Nullable Consumer<Person> onShowInPersonnel;
+
     private JLabel zoomLabel;
     private RoundedMMToggleButton compactToggle;
+    private RoundedJButton showInPersonnelButton;
 
     /**
-     * Constructs a new {@link FamilyTreeDialog}.
+     * Constructs a new {@link FamilyTreeDialog} without the ability to jump to a person in the Personnel Tab.
      *
      * @param owner     the parent frame that owns this dialog
      * @param genealogy the genealogy tree to display initially
@@ -108,7 +112,25 @@ public class FamilyTreeDialog extends JDialog {
      * @since 0.50.10
      */
     public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel) {
+        this(owner, genealogy, personnel, null);
+    }
+
+    /**
+     * Constructs a new {@link FamilyTreeDialog}.
+     *
+     * @param owner             the parent frame that owns this dialog
+     * @param genealogy         the genealogy tree to display initially
+     * @param personnel         the collection of all personnel in the campaign
+     * @param onShowInPersonnel called with the focused person when the user asks to view them in the Personnel Tab,
+     *                          after this dialog has been closed. If {@code null}, the option is not offered.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public FamilyTreeDialog(Frame owner, Genealogy genealogy, Collection<Person> personnel,
+          @Nullable Consumer<Person> onShowInPersonnel) {
         super(owner, getText("accessingTerminal.title"), true);
+        this.onShowInPersonnel = onShowInPersonnel;
 
         tabbedPane = new EnhancedTabbedPane();
         tabbedPane.addChangeListener(e -> syncToolbar());
@@ -215,9 +237,40 @@ public class FamilyTreeDialog extends JDialog {
         toolbar.add(buildToolbarSeparator());
         toolbar.add(compactToggle);
         toolbar.add(buildToolbarSeparator());
+
+        if (onShowInPersonnel != null) {
+            showInPersonnelButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+                  "FamilyTreeDialog.showInPersonnel.text"));
+            showInPersonnelButton.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
+                  "FamilyTreeDialog.showInPersonnel.tooltip")));
+            showInPersonnelButton.addActionListener(e -> showFocusedPersonInPersonnel());
+            toolbar.add(showInPersonnelButton);
+            toolbar.add(buildToolbarSeparator());
+        }
+
         toolbar.add(buildLegend());
 
         return toolbar;
+    }
+
+    /**
+     * Closes this dialog and hands the active tab's focused person to the {@code onShowInPersonnel} callback, so the
+     * Personnel Tab can select them. Does nothing if that person is not part of the campaign's personnel.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void showFocusedPersonInPersonnel() {
+        FamilyTreePanel panel = getActivePanel();
+        if (onShowInPersonnel == null || panel == null) {
+            return;
+        }
+        Person person = panel.getFocusedPerson();
+        if (!panel.isCampaignPerson(person)) {
+            return;
+        }
+        dispose();
+        onShowInPersonnel.accept(person);
     }
 
     private JComponent buildToolbarSeparator() {
@@ -321,8 +374,8 @@ public class FamilyTreeDialog extends JDialog {
     }
 
     /**
-     * Refreshes the toolbar controls (zoom readout and compact toggle) to reflect the active tab's panel. Called when
-     * the front tab changes and whenever a panel's zoom changes.
+     * Refreshes the toolbar controls (zoom readout, compact toggle, and the show-in-personnel button) to reflect the
+     * active tab's panel. Called when the front tab changes and whenever a panel's zoom or focused person changes.
      *
      * @author Illiani
      * @since 0.50.10
@@ -334,6 +387,10 @@ public class FamilyTreeDialog extends JDialog {
         }
         zoomLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "FamilyTreeDialog.zoomLabel", panel.getZoomPercent()));
         compactToggle.setSelected(panel.isCompactMode());
+        if (showInPersonnelButton != null) {
+            // Relatives outside the campaign (e.g. those who never joined) can't be shown in the Personnel Tab
+            showInPersonnelButton.setEnabled(panel.isCampaignPerson(panel.getFocusedPerson()));
+        }
     }
 
     /**
@@ -362,6 +419,7 @@ public class FamilyTreeDialog extends JDialog {
 
         FamilyTreePanel panel = new FamilyTreePanel(genealogy, personnel, this);
         panel.setZoomChangeListener(this::syncToolbar);
+        panel.setFocusChangeListener(this::syncToolbar);
         JScrollPane scrollPane = new FastJScrollPane(panel);
         scrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
         panel.setParentScrollPane(scrollPane);
@@ -586,6 +644,7 @@ class FamilyTreePanel extends JPanel {
     private JScrollPane parentScrollPane = null;
     private Timer zoomTimer = null;
     private Runnable onZoomChanged = null;
+    private Runnable onFocusChanged = null;
 
     /**
      * Constructs a new {@link FamilyTreePanel}.
@@ -696,6 +755,29 @@ class FamilyTreePanel extends JPanel {
         }
     }
 
+    /**
+     * Registers a callback fired whenever the focused person changes, so the owning dialog can refresh controls that
+     * act on them.
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    void setFocusChangeListener(Runnable listener) {
+        this.onFocusChanged = listener;
+    }
+
+    Person getFocusedPerson() {
+        return focusedPerson;
+    }
+
+    /**
+     * @return {@code true} if the given person belongs to the campaign's personnel, and so can be shown in the
+     *       Personnel Tab
+     */
+    boolean isCampaignPerson(@Nullable Person person) {
+        return person != null && personnel.contains(person);
+    }
+
     private void setFocusedPerson(Person person) {
         if (person != null && person != focusedPerson) {
             focusedPerson = person;
@@ -707,6 +789,9 @@ class FamilyTreePanel extends JPanel {
                 revalidate();
             }
             repaint();
+            if (onFocusChanged != null) {
+                onFocusChanged.run();
+            }
         }
     }
 
@@ -867,7 +952,7 @@ class FamilyTreePanel extends JPanel {
      *
      * <p>The graph is a genealogical family tree rather than a bare lineage chart: spouses are paired on the same row
      * and joined by a marriage line, children hang from the couple, and everyone in a generation shares a row. See
-     * {@link #buildUnions} and {@link #layoutDescendants}/{@link #layoutAncestors} for the structure and placement.</p>
+     * {@code #buildUnions} and {@link #layoutDescendants}/{@link #layoutAncestors} for the structure and placement.</p>
      *
      * @author Illiani
      * @since 0.50.10
