@@ -972,7 +972,7 @@ public final class CommandGenerator {
     /**
      * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
      * will price them once materialized (see {@link Unit#estimateBuyCost}), including Battle Value
-     * pricing when {@link CampaignOption#USE_ALTERNATE_UNIT_COST} is on. Used by the Command
+     * pricing when the {@link CampaignOption#UNIT_COST_MODEL} calls for it. Used by the Command
      * Designer's starting-cash preview to price the design model before anything is committed.
      *
      * @param campaign the campaign supplying the pricing rules and multipliers
