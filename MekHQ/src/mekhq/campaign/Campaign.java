@@ -5446,6 +5446,8 @@ public class Campaign implements ITechManager {
         entity.setSearchlightState(false);
         // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
         entity.setUnitOrders(UnitOrders.NONE);
+        // Without this, artillery fire adjustment and auto hit hexes from the last battle carry over into the next
+        entity.clearArtilleryModifiers();
 
         resetSensorChoice(entity);
 
