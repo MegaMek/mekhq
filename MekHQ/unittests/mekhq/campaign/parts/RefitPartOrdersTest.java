@@ -405,6 +405,8 @@ class RefitPartOrdersTest {
         assertTrue(nextSteps.contains("<b>Acquire and Use Refit Kit</b>") && nextSteps.contains("<b>Close</b>"),
               nextSteps);
         assertEquals("Close", getTextAt(dialogBundle, "btnClose.text"), "The way out does not read as cancelling");
+        assertEquals("Back to Refit Options", getTextAt(dialogBundle, "orderedConfirm.button.back"));
+        assertEquals("Close Refit Window", getTextAt(dialogBundle, "orderedConfirm.button.closeWindow"));
         String cannotBeBought = getFormattedTextAt(dialogBundle, "orderedConfirm.cannotBeBought", "ER Medium Laser");
         assertTrue(cannotBeBought.contains("don't allow buying ER Medium Laser"), cannotBeBought);
     }

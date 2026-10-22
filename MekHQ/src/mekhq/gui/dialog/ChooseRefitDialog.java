@@ -93,6 +93,8 @@ public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
     private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
+    /** The order confirmation's button that closes the refit window as well */
+    private static final int ORDERED_CONFIRM_CLOSE_WINDOW = 1;
     /** The smallest a panel can be dragged to, so none disappears behind a divider */
     private static final int MINIMUM_PANEL_SIZE = 100;
 
@@ -328,7 +330,8 @@ public class ChooseRefitDialog extends JDialog {
 
     /**
      * Tells the player what Order Parts did and what comes next: begin the refit now and it waits for the parts, or
-     * close the window and come back once they arrive, while the Hangar shows the unit as Pending Refit.
+     * close the window and come back once they arrive, while the Hangar shows the unit as Pending Refit. The player
+     * can go back to the refit options or close the refit window from the confirmation.
      */
     private void confirmOrders(Refit refit, RefitPartOrders.OrderResult result) {
         String orderedKey = result.ordered().isEmpty() ? "orderedConfirm.labelled" : "orderedConfirm.ordered";
@@ -339,14 +342,22 @@ public class ChooseRefitDialog extends JDialog {
             message.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.cannotBeBought",
                   String.join(", ", result.cannotBeBought())));
         }
+        String closeWindow = getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button.closeWindow");
         String nextSteps = getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.nextSteps", btnRefit.getText(),
-              btnCustomize.getText(), getTextAt(RESOURCE_BUNDLE, "btnClose.text"));
+              btnCustomize.getText(), closeWindow);
+        // Back is first, so closing the confirmation with X leaves the refit window open
+        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button.back"), closeWindow);
 
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
-        new ImmersiveDialogSimple(campaign, speaker, null, message.toString(), null, nextSteps, null, false);
+        ImmersiveDialogSimple confirmation = new ImmersiveDialogSimple(campaign, speaker, null, message.toString(),
+              buttons, nextSteps, null, false);
+        if (confirmation.getDialogChoice() == ORDERED_CONFIRM_CLOSE_WINDOW) {
+            logger.debug("[RefitParts] {}: refit window closed after ordering parts", unit.getName());
+            cancel();
+        }
     }
 
     public boolean isConfirmed() {
