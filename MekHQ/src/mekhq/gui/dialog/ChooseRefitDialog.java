@@ -339,15 +339,14 @@ public class ChooseRefitDialog extends JDialog {
             message.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.cannotBeBought",
                   String.join(", ", result.cannotBeBought())));
         }
-        message.append("<br><br>").append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.nextSteps",
-              btnRefit.getText(), btnCustomize.getText(), getTextAt(RESOURCE_BUNDLE, "btnClose.text")));
+        String nextSteps = getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.nextSteps", btnRefit.getText(),
+              btnCustomize.getText(), getTextAt(RESOURCE_BUNDLE, "btnClose.text"));
 
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
-        new ImmersiveDialogSimple(campaign, speaker, null, message.toString(),
-              List.of(getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button")), null, null, false);
+        new ImmersiveDialogSimple(campaign, speaker, null, message.toString(), null, nextSteps, null, false);
     }
 
     public boolean isConfirmed() {

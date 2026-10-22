@@ -55,6 +55,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -198,7 +199,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
         if (pendingRefitModel == null) {
             return null;
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.status.pendingRefit", pendingRefitModel);
+        boolean isReadyToBegin = RefitPartOrders.isEverythingOrderedAheadHere(unit.getCampaign(), unit);
+        String key = isReadyToBegin ? "UnitTableModel.status.pendingRefitReady" : "UnitTableModel.status.pendingRefit";
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, pendingRefitModel);
     }
 
     public @Nullable String getTooltip(int rowIndex, int columnIndex) {

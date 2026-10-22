@@ -57,10 +57,12 @@ import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.dialog.RefitPartsArrivedNotice;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
@@ -143,6 +145,9 @@ public final class LocationNewDayUtil {
             // arrive parts before attempting refit or parts will not get reserved that day
             for (Part part : arrivedParts) {
                 campaign.getQuartermaster().arrivePart(part);
+            }
+            for (Unit unit : RefitPartOrders.findRefitsReadyToBegin(campaign, arrivedParts)) {
+                RefitPartsArrivedNotice.show(campaign, unit);
             }
 
             // finish up any overnight assigned tasks

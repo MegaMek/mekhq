@@ -5793,7 +5793,8 @@ public class Unit implements ITechnology, ILocatable {
             reasons.add("colorReason.unit.queuedForTravel");
         }
         if (isPendingRefit()) {
-            reasons.add("colorReason.unit.pendingRefit");
+            boolean isReadyToBegin = !isRefitting() && RefitPartOrders.isEverythingOrderedAheadHere(getCampaign(), this);
+            reasons.add(isReadyToBegin ? "colorReason.unit.pendingRefitReady" : "colorReason.unit.pendingRefit");
         }
         if (isRefitting()) {
             reasons.add("colorReason.unit.refitting");

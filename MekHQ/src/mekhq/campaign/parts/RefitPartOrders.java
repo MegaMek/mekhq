@@ -389,19 +389,84 @@ public final class RefitPartOrders {
      * @return the procurement list's orders, then the parts in the main warehouse and the unit's own, if it differs
      */
     private static Stream<Part> streamOrdersAndParts(Campaign campaign, Unit unit) {
-        Stream<Part> orders = campaign.getPlayerForce()
-                                    .getShoppingList()
-                                    .getPartList()
-                                    .stream()
-                                    .filter(Part.class::isInstance)
-                                    .map(Part.class::cast);
+        return Stream.concat(streamOrders(campaign), streamParts(campaign, unit));
+    }
+
+    /**
+     * @return the orders on the procurement list
+     */
+    private static Stream<Part> streamOrders(Campaign campaign) {
+        return campaign.getPlayerForce()
+                     .getShoppingList()
+                     .getPartList()
+                     .stream()
+                     .filter(Part.class::isInstance)
+                     .map(Part.class::cast);
+    }
+
+    /**
+     * @return the parts in the main warehouse, then those in the unit's own warehouse if it differs
+     */
+    private static Stream<Part> streamParts(Campaign campaign, Unit unit) {
         LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
         LocalWarehouse unitWarehouse = unit.getWarehouse();
         Stream<Part> parts = mainWarehouse.getParts().stream();
         if ((unitWarehouse != null) && (unitWarehouse != mainWarehouse)) {
             parts = Stream.concat(parts, unitWarehouse.getParts().stream());
         }
-        return Stream.concat(orders, parts);
+        return parts;
+    }
+
+    /**
+     * Everything ordered ahead for the unit's refit has arrived when none of it is still on the procurement list or
+     * on its way, and some of it is in the warehouse.
+     *
+     * @return {@code true} if the refit's parts ordered ahead are all here, so it can begin without waiting for them
+     */
+    public static boolean isEverythingOrderedAheadHere(Campaign campaign, Unit unit) {
+        UUID unitId = unit.getId();
+        boolean isAnythingStillOnOrder = streamOrders(campaign)
+                                               .anyMatch(order -> unitId.equals(order.getOrderedAheadForUnitId()));
+        if (isAnythingStillOnOrder) {
+            return false;
+        }
+        List<Part> partsOrderedAhead = streamParts(campaign, unit)
+                                             .filter(part -> unitId.equals(part.getOrderedAheadForUnitId()))
+                                             .toList();
+        boolean isEverythingDelivered = partsOrderedAhead.stream().allMatch(Part::isPresent);
+        return !partsOrderedAhead.isEmpty() && isEverythingDelivered;
+    }
+
+    /**
+     * Finds the units whose parts ordered ahead have all arrived with today's deliveries, so the player can be told
+     * once, the day the last of them arrives. A unit already refitting, or no longer waiting for a refit, is left out.
+     *
+     * @param campaign     the campaign
+     * @param arrivedParts the parts that arrived today
+     *
+     * @return the units whose refit can now begin without waiting for parts
+     */
+    public static List<Unit> findRefitsReadyToBegin(Campaign campaign, List<Part> arrivedParts) {
+        Set<UUID> unitIds = new LinkedHashSet<>();
+        for (Part part : arrivedParts) {
+            if (part.getOrderedAheadForUnitId() != null) {
+                unitIds.add(part.getOrderedAheadForUnitId());
+            }
+        }
+        List<Unit> readyUnits = new ArrayList<>();
+        for (UUID unitId : unitIds) {
+            Unit unit = campaign.getUnit(unitId);
+            boolean isAwaitingTheRefit = (unit != null) && !unit.isRefitting()
+                  && (unit.getPendingRefitModel() != null);
+            if (isAwaitingTheRefit && isEverythingOrderedAheadHere(campaign, unit)) {
+                readyUnits.add(unit);
+            }
+        }
+        if (!unitIds.isEmpty()) {
+            LOGGER.info("[RefitParts] Parts ordered ahead arrived for {} units; everything is here for {}",
+                  unitIds.size(), readyUnits.stream().map(Unit::getName).toList());
+        }
+        return readyUnits;
     }
 
     /**

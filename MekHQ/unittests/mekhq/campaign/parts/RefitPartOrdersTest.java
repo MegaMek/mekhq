@@ -192,6 +192,45 @@ class RefitPartOrdersTest {
     }
 
     @Test
+    void theRefitIsReadyOnceEverythingOrderedAheadHasArrived() {
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+        // Procurement buys every labelled order, and the parts go on their way
+        List<IAcquisitionWork> orders = new ArrayList<>(campaign.getPlayerForce().getShoppingList().getPartList());
+        for (IAcquisitionWork order : orders) {
+            for (int bought = 0; bought < order.getQuantity(); bought++) {
+                order.find(3, 1.0);
+            }
+        }
+        campaign.getPlayerForce().getShoppingList().getShoppingList().removeAll(orders);
+        List<Part> onTheirWay = labelledForTheLocust();
+
+        assertFalse(onTheirWay.isEmpty(), "The bought parts keep their labels");
+        assertFalse(RefitPartOrders.isEverythingOrderedAheadHere(campaign, locust), "The parts are still on their way");
+        assertEquals(List.of(), RefitPartOrders.findRefitsReadyToBegin(campaign, List.of()));
+
+        onTheirWay.forEach(part -> part.setDaysToArrival(0));
+
+        assertTrue(RefitPartOrders.isEverythingOrderedAheadHere(campaign, locust));
+        assertEquals(List.of(locust), RefitPartOrders.findRefitsReadyToBegin(campaign, onTheirWay),
+              "The player is told the refit can begin");
+        assertTrue(locust.getColorReasonKeys().contains("colorReason.unit.pendingRefitReady"),
+              locust.getColorReasonKeys().toString());
+        assertFalse(locust.isRefitting(), "The refit does not begin by itself");
+    }
+
+    @Test
+    void theArrivalNoticeReadsForThePlayer() {
+        String inCharacter = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.inCharacter",
+              "Captain", "Uziel UZL-2S", "UZL-3S");
+        assertEquals("Captain, everything we ordered for the Uziel UZL-2S refit to the UZL-3S has arrived.",
+              inCharacter);
+        String outOfCharacter = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.outOfCharacter",
+              "Captain", "Uziel UZL-2S", "UZL-3S");
+        assertTrue(outOfCharacter.contains("has not begun") && outOfCharacter.contains("select the UZL-3S"),
+              outOfCharacter);
+    }
+
+    @Test
     void orderPartsLabelsAnOrderPlacedEarlier() {
         IAcquisitionWork earlierOrder = (IAcquisitionWork) smallLaserFromAnotherLocust().getMissingPart();
         campaign.getPlayerForce().getShoppingList().addShoppingItem(earlierOrder, 1, campaign);
