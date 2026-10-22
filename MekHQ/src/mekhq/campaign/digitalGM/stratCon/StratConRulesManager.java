@@ -76,6 +76,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -4913,6 +4914,68 @@ public class StratConRulesManager {
                 processIgnoredStratConScenario(stratConScenario, track, campaignState, campaign);
                 break;
             }
+        }
+    }
+
+    /**
+     * Moves a dynamic scenario to a new battle date, keeping its StratCon deployment, battle and return dates in step.
+     *
+     * <p>Used when the GM changes a scenario's date from the briefing room. Changing only the backing scenario's date
+     * would leave the StratCon deployment date behind, so the scenario would be treated as ignored - and removed from
+     * its sector - while still pending in the briefing room.</p>
+     *
+     * <p>The deployment and battle dates move to the new date, and the return date (as well as that of any formation
+     * already deployed to the scenario) moves with it, so formations stay deployed for the same length of time.</p>
+     *
+     * @param scenarioId    the ID of the dynamic scenario being rescheduled
+     * @param campaignState the contract's StratCon campaign state
+     * @param newDate       the scenario's new battle date
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void rescheduleDynamicScenario(int scenarioId, StratConCampaignState campaignState,
+          LocalDate newDate) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            StratConScenario scenario = track.getBackingScenariosMap().get(scenarioId);
+            if (scenario == null) {
+                continue;
+            }
+
+            LocalDate oldActionDate = scenario.getActionDate();
+            long shiftDays = (oldActionDate == null) ? 0 : ChronoUnit.DAYS.between(oldActionDate, newDate);
+
+            // A missing deployment date marks a scenario not yet placed, so we leave it to be set when it is
+            if (scenario.getDeploymentDate() != null) {
+                scenario.setDeploymentDate(newDate);
+            }
+            scenario.setActionDate(newDate);
+
+            LocalDate oldReturnDate = scenario.getReturnDate();
+            if (oldReturnDate == null) {
+                return;
+            }
+
+            LocalDate newReturnDate = oldReturnDate.plusDays(shiftDays);
+            if (newReturnDate.isBefore(newDate)) {
+                newReturnDate = newDate;
+            }
+            scenario.setReturnDate(newReturnDate);
+
+            // Formations deployed for this scenario return with it; any due back sooner stay until it is over
+            Set<Integer> deployedForceIDs = track.getAssignedCoordForces().get(scenario.getCoords());
+            if (deployedForceIDs != null) {
+                for (int forceID : deployedForceIDs) {
+                    LocalDate forceReturnDate = track.getAssignedForceReturnDates().get(forceID);
+                    if ((forceReturnDate == null) ||
+                              forceReturnDate.equals(oldReturnDate) ||
+                              forceReturnDate.isBefore(newReturnDate)) {
+                        track.getAssignedForceReturnDates().put(forceID, newReturnDate);
+                        track.getAssignedForceReturnDatesForStorage().put(forceID, newReturnDate.toString());
+                    }
+                }
+            }
+            return;
         }
     }
 
