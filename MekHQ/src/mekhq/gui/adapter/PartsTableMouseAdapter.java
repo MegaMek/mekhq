@@ -32,12 +32,14 @@
  */
 package mekhq.gui.adapter;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -58,6 +60,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MRMSDialog;
@@ -379,6 +382,29 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+    /**
+     * Offers to begin the refit the selected parts were ordered ahead for (issue #7848), when they were all ordered for
+     * the same unit. The item is greyed out, with the reason, while the unit cannot be refitted.
+     */
+    private void addBeginRefitItem(JPopupMenu popup, Part[] parts) {
+        UUID unitId = parts[0].getOrderedAheadForUnitId();
+        boolean isOrderedForOneUnit = (unitId != null)
+              && Arrays.stream(parts).allMatch(selectedPart -> unitId.equals(selectedPart.getOrderedAheadForUnitId()));
+        Unit unit = isOrderedForOneUnit ? gui.getCampaign().getUnit(unitId) : null;
+        if (unit == null) {
+            return;
+        }
+        JMenuItem beginRefit = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "partsMenu.beginRefit.text",
+              unit.getName()));
+        boolean isAvailable = unit.isAvailable();
+        beginRefit.setEnabled(isAvailable);
+        beginRefit.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE,
+              isAvailable ? "partsMenu.beginRefit.tooltip" : "partsMenu.beginRefit.unavailable.tooltip",
+              unit.getName(), unit.getPendingRefitModel()));
+        beginRefit.addActionListener(event -> gui.chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel()));
+        popup.add(beginRefit);
+    }
+
     @Override
     protected Optional<JPopupMenu> createPopupMenu() {
         if (partsTable.getSelectedRowCount() == 0) {
@@ -506,6 +532,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(ev -> gui.savePartsFile());
         menuItem.setEnabled(true);
         popup.add(menuItem);
+        addBeginRefitItem(popup, parts);
 
         // remove from OmniPods
         if (areAllPartsPodded(parts)) {

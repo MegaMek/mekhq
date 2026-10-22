@@ -82,10 +82,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
-import megamek.common.loaders.MekFileParser;
-import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
@@ -136,7 +133,6 @@ import mekhq.gui.HangarTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.control.EditUnitLogControl.UnitLogType;
 import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.EditUnitLogDialog;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
@@ -619,28 +615,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 gui.refitUnit(refit, false);
             }
         } else if (command.equals(COMMAND_REFIT_KIT)) { // Single Unit or Multiple of Units of the same type only
-            ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true, gui.getCampaign(), selectedUnit);
-            crd.setVisible(true);
-            if (crd.isConfirmed()) {
-                MekSummary summary = MekSummaryCache.getInstance()
-                                           .getMek(crd.getSelectedRefit().getNewEntity().getShortNameRaw());
-                if (summary != null) {
-                    for (Unit unit : units) {
-                        try {
-                            Entity refitEntity = new MekFileParser(summary.getSourceFile(),
-                                  summary.getEntryName()).getEntity();
-                            if (refitEntity != null) {
-                                Refit refit = new Refit(unit, refitEntity, crd.isCustomize(), false, false);
-                                if (refit.checkFixable() == null) {
-                                    gui.refitUnit(refit, false);
-                                }
-                            }
-                        } catch (EntityLoadingException ex) {
-                            LOGGER.error("", ex);
-                        }
-                    }
-                }
-            }
+            gui.chooseRefit(units, null);
         } else if (command.equals(COMMAND_CHANGE_HISTORY)) { // Single Unit only
             MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(),
                   true,

@@ -33,6 +33,9 @@
 package mekhq.gui.dialog;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -40,22 +43,26 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * Tells the player that everything ordered ahead for a unit's refit has arrived (issue #7848). The refit does not
- * begin by itself, so without this the parts would sit in the warehouse with no sign that the refit can start. For
- * example: "Captain, everything we ordered for the Uziel UZL-2S refit to the UZL-3S has arrived."
+ * Tells the player that everything ordered ahead for a unit's refit has arrived (issue #7848), and offers to begin it.
+ * The refit does not begin by itself, so without this the parts would sit in the warehouse with no sign that the
+ * refit can start. For example: "Captain, everything we ordered for the Uziel UZL-2S refit to the UZL-3S has arrived."
  */
 public final class RefitPartsArrivedNotice {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
+    /** The notice's Begin Refit button; Later comes first, so closing the notice with X does not begin anything */
+    private static final int BEGIN_REFIT = 1;
 
     private RefitPartsArrivedNotice() {}
 
     /**
-     * Has the senior administrator say the refit's parts are here and how to begin the refit.
+     * Has the senior administrator say the refit's parts are here, and asks whether to begin the refit now.
      *
      * @param campaign the campaign
      * @param unit     the unit whose parts ordered ahead have all arrived
+     *
+     * @return {@code true} if the player chose to begin the refit
      */
-    public static void show(Campaign campaign, Unit unit) {
+    public static boolean askToBegin(Campaign campaign, Unit unit) {
         String model = unit.getPendingRefitModel();
         String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.inCharacter",
               campaign.getCommanderAddress(), unit.getName(), model);
@@ -65,6 +72,10 @@ public final class RefitPartsArrivedNotice {
                                .getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
-        new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, null, outOfCharacter, null, false);
+        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.button.later"),
+              getTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.button.begin"));
+        ImmersiveDialogSimple notice = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
+              outOfCharacter, null, false);
+        return notice.getDialogChoice() == BEGIN_REFIT;
     }
 }

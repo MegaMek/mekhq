@@ -226,8 +226,15 @@ class RefitPartOrdersTest {
               inCharacter);
         String outOfCharacter = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.outOfCharacter",
               "Captain", "Uziel UZL-2S", "UZL-3S");
-        assertTrue(outOfCharacter.contains("has not begun") && outOfCharacter.contains("select the UZL-3S"),
+        assertTrue(outOfCharacter.contains("has not begun") && outOfCharacter.contains("with the UZL-3S selected"),
               outOfCharacter);
+        assertEquals("Later", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.later"));
+        assertEquals("Begin Refit", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.begin"));
+        assertEquals("Begin Refit of Uziel UZL-2S...",
+              getFormattedTextAt("mekhq.resources.GUI", "partsMenu.beginRefit.text", "Uziel UZL-2S"));
+        String unavailable = getFormattedTextAt("mekhq.resources.GUI", "partsMenu.beginRefit.unavailable.tooltip",
+              "Uziel UZL-2S", "UZL-3S");
+        assertTrue(unavailable.startsWith("The Uziel UZL-2S cannot be refitted right now"), unavailable);
     }
 
     @Test

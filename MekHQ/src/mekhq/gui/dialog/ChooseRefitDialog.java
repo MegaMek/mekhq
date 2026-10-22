@@ -360,6 +360,32 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
+    /**
+     * Selects the refit to the given model, if the list offers it, so a refit whose parts were ordered ahead opens
+     * ready to begin. A refit hidden by the repair site filter is not selected.
+     *
+     * @param model the model to select, such as {@code UZL-3S}, or {@code null} to select nothing
+     */
+    public void selectRefitModel(@Nullable String model) {
+        if (model == null) {
+            return;
+        }
+        for (int row = 0; row < refitModel.getRowCount(); row++) {
+            if (!model.equals(refitModel.getRefitAt(row).getNewEntity().getModel())) {
+                continue;
+            }
+            int viewRow = refitTable.convertRowIndexToView(row);
+            if (viewRow < 0) {
+                logger.debug("[RefitParts] {}: the {} refit is hidden by the site filter", unit.getName(), model);
+                return;
+            }
+            refitTable.setRowSelectionInterval(viewRow, viewRow);
+            refitTable.scrollRectToVisible(refitTable.getCellRect(viewRow, 0, true));
+            return;
+        }
+        logger.debug("[RefitParts] {}: no {} refit is offered to select", unit.getName(), model);
+    }
+
     public boolean isConfirmed() {
         return confirmed;
     }

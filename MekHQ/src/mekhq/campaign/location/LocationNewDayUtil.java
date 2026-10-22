@@ -53,6 +53,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.events.RefitPartsArrivedEvent;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
@@ -62,7 +63,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.dialog.RefitPartsArrivedNotice;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
@@ -147,7 +147,7 @@ public final class LocationNewDayUtil {
                 campaign.getQuartermaster().arrivePart(part);
             }
             for (Unit unit : RefitPartOrders.findRefitsReadyToBegin(campaign, arrivedParts)) {
-                RefitPartsArrivedNotice.show(campaign, unit);
+                MekHQ.triggerEvent(new RefitPartsArrivedEvent(unit));
             }
 
             // finish up any overnight assigned tasks

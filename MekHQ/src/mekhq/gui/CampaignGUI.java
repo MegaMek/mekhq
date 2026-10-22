@@ -71,6 +71,8 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.AppIcons;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -132,12 +134,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.EasyBugReportDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.RefitPartsArrivedNotice;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
@@ -1333,6 +1337,61 @@ public class CampaignGUI extends JPanel {
                 yield true;
             }
         };
+    }
+
+    /**
+     * Opens Choose Refit Kit for the units, all of one model, and begins the refit the player chooses on each of them.
+     * Used by the Hangar's Refit/Customize, by the notice that a refit's parts have arrived, and by the warehouse.
+     *
+     * @param units            the units to refit; the first one is shown in the window
+     * @param preselectedModel the model to select in the list, such as the one parts were ordered ahead for, or
+     *                         {@code null} to select nothing
+     */
+    public void chooseRefit(Unit[] units, @Nullable String preselectedModel) {
+        ChooseRefitDialog chooseRefitDialog = new ChooseRefitDialog(getFrame(), true, getCampaign(), units[0]);
+        chooseRefitDialog.selectRefitModel(preselectedModel);
+        chooseRefitDialog.setVisible(true);
+        if (!chooseRefitDialog.isConfirmed()) {
+            return;
+        }
+        MekSummary summary = MekSummaryCache.getInstance()
+                                   .getMek(chooseRefitDialog.getSelectedRefit().getNewEntity().getShortNameRaw());
+        if (summary == null) {
+            return;
+        }
+        for (Unit unit : units) {
+            try {
+                Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (refitEntity != null) {
+                    Refit refit = new Refit(unit, refitEntity, chooseRefitDialog.isCustomize(), false, false);
+                    if (refit.checkFixable() == null) {
+                        refitUnit(refit, false);
+                    }
+                }
+            } catch (EntityLoadingException exception) {
+                logger.error("", exception);
+            }
+        }
+    }
+
+    /**
+     * Tells the player that everything ordered ahead for a unit's refit has arrived, and opens Choose Refit Kit with
+     * that refit selected if they choose to begin it.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param refitPartsArrivedEvent the event naming the unit whose parts have arrived
+     */
+    @Subscribe
+    public void handleRefitPartsArrived(RefitPartsArrivedEvent refitPartsArrivedEvent) {
+        Unit unit = refitPartsArrivedEvent.getUnit();
+        if (!RefitPartsArrivedNotice.askToBegin(getCampaign(), unit)) {
+            logger.debug("[RefitParts] {}: parts arrived, the refit is left for later", unit.getName());
+            return;
+        }
+        logger.debug("[RefitParts] {}: parts arrived, opening Choose Refit Kit", unit.getName());
+        chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
     }
 
     /**
