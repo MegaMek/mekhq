@@ -187,6 +187,20 @@ public class UnitTableModel extends DataTableModel<Unit> {
      *
      * @return the tooltip for the specified row and column, or {@code null} if no tooltip is available
      */
+    /**
+     * @return the refit in progress, or the refit whose parts were ordered ahead, or {@code null} for neither
+     */
+    private static @Nullable String getStatusTooltip(Unit unit) {
+        if (unit.isRefitting()) {
+            return unit.getRefit().getDesc();
+        }
+        String pendingRefitModel = unit.getPendingRefitModel();
+        if (pendingRefitModel == null) {
+            return null;
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "UnitTableModel.status.pendingRefit", pendingRefitModel);
+    }
+
     public @Nullable String getTooltip(int rowIndex, int columnIndex) {
         Unit unit = getUnit(rowIndex);
 
@@ -195,7 +209,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         }
 
         return switch (columnIndex) {
-            case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
+            case COL_STATUS -> getStatusTooltip(unit);
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
             case COL_CREW -> getCrewTooltip(unit);
             case COL_QUIRKS -> unit.getQuirksListHTML();

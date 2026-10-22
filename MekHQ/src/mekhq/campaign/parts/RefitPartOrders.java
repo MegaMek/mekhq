@@ -302,7 +302,26 @@ public final class RefitPartOrders {
         LOGGER.info("[RefitParts] Ordered ahead of the refit of {} to {}: {}; cannot be bought: {}",
               refit.getOriginalUnit().getName(), refit.getNewEntity().getShortName(), ordered, cannotBeBought);
         reportOrders(campaign, refit, ordered, cannotBeBought);
+        markPendingRefit(refit);
         return new OrderResult(ordered, cannotBeBought);
+    }
+
+    /**
+     * Marks the unit as waiting for refit parts while anything the refit needs is on order or on its way, so the
+     * Hangar shows it in the Pending Refit colour until the refit begins.
+     */
+    private static void markPendingRefit(Refit refit) {
+        Unit unit = refit.getOriginalUnit();
+        boolean isAwaitingParts = refit.describeNeeds()
+                                        .stream()
+                                        .anyMatch(need -> (need.supply() == Refit.Supply.ON_ORDER)
+                                              || (need.supply() == Refit.Supply.ON_ITS_WAY));
+        if (!isAwaitingParts) {
+            LOGGER.debug("[RefitParts] {}: nothing is on order or on its way, so no refit is pending", unit.getName());
+            return;
+        }
+        unit.setPendingRefitModel(refit.getNewEntity().getModel());
+        LOGGER.debug("[RefitParts] {}: pending refit to {}", unit.getName(), refit.getNewEntity().getModel());
     }
 
     private static void reportOrders(Campaign campaign, Refit refit, List<String> ordered,

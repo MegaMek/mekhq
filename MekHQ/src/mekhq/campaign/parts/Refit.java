@@ -1225,6 +1225,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // Orders the player placed ahead, still on the procurement list, are now the refit's to fill (#7848)
         RefitPartOrders.takeOverOpenOrders(campaign, this);
+        // From here the refit itself shows whether it is still waiting for parts
+        oldUnit.setPendingRefitModel(null);
         reserveNewParts();
         if (customJob) {
             // add the stuff on the shopping list to the master shopping list

@@ -132,6 +132,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
     public static final String QUEUED_FOR_TRAVEL_FOREGROUND = "queuedForTravelForeground";
     public static final String QUEUED_FOR_TRAVEL_BACKGROUND = "queuedForTravelBackground";
+    public static final String PENDING_REFIT_FOREGROUND = "pendingRefitForeground";
+    public static final String PENDING_REFIT_BACKGROUND = "pendingRefitBackground";
     public static final String REFITTING_FOREGROUND = "refittingForeground";
     public static final String REFITTING_BACKGROUND = "refittingBackground";
     public static final String MOTHBALLING_FOREGROUND = "mothballingForeground";

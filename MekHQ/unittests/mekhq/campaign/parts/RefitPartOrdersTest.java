@@ -35,10 +35,16 @@ package mekhq.campaign.parts;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import megamek.Version;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -46,9 +52,11 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -125,6 +133,35 @@ class RefitPartOrdersTest {
     }
 
     @Test
+    void orderingAheadShowsTheUnitAsPendingRefit() {
+        assertFalse(locust.isPendingRefit(), "No refit is pending before anything is ordered");
+
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        assertEquals("LCT-1E", locust.getPendingRefitModel());
+        assertTrue(locust.isPendingRefit());
+        assertTrue(locust.getColorReasonKeys().contains("colorReason.unit.pendingRefit"),
+              locust.getColorReasonKeys().toString());
+    }
+
+    @Test
+    void thePendingRefitIsSavedWithTheUnit() throws Exception {
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        StringWriter unitXml = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(unitXml);
+        locust.writeToXML(printWriter, 0);
+        printWriter.flush();
+        Element unitElement = MHQXMLUtility.newSafeDocumentBuilder()
+                                    .parse(new ByteArrayInputStream(
+                                          unitXml.toString().getBytes(StandardCharsets.UTF_8)))
+                                    .getDocumentElement();
+        Unit loadedLocust = Unit.generateInstanceFromXML(unitElement, new Version(), campaign);
+
+        assertEquals("LCT-1E", loadedLocust.getPendingRefitModel());
+    }
+
+    @Test
     void orderingTwiceOrdersNothingMore() {
         Refit refit = planLocustRefit();
         RefitPartOrders.orderMissingParts(campaign, refit);
@@ -170,7 +207,16 @@ class RefitPartOrdersTest {
         assertEquals(2, reservedLasers.size(), "Both lasers are held for the refit");
         for (Part laser : reservedLasers) {
             assertEquals(5, laser.getDaysToArrival(), "A laser split off the stack still arrives with it");
+            assertEquals("Held for the refit of " + locust.getName(), laser.getRepairDesc(),
+                  "The warehouse says which refit a laser on its way is for");
         }
+        Part spareLaser = scenario.getWarehouse().getParts().stream()
+                                .filter(part -> SMALL_LASER.equals(part.getName()))
+                                .filter(part -> (part.getRefitUnit() == null) && (part.getUnit() == null))
+                                .filter(part -> !part.isPresent())
+                                .findFirst()
+                                .orElseThrow();
+        assertEquals("No repairs needed", spareLaser.getRepairDesc(), "The spare laser on its way needs no repairs");
         assertTrue(refit.partsInTransit(), "The refit waits for the lasers to arrive");
     }
 
@@ -186,6 +232,8 @@ class RefitPartOrdersTest {
         boolean isOrderedByTheRefit = campaign.getPlayerForce().getShoppingList().getPartList().stream()
                                             .anyMatch(order -> ((Part) order).getRefitUnit() == locust);
         assertTrue(isOrderedByTheRefit, "The refit placed its own orders");
+        assertNull(locust.getPendingRefitModel(), "The refit itself now tracks its parts");
+        assertTrue(locust.isPendingRefit(), "The refit is still waiting for the parts it ordered");
     }
 
     @Test

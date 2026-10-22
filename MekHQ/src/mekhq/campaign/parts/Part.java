@@ -590,6 +590,13 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return toReturn.toString();
     }
 
+    /**
+     * Describes the repair the part needs for the warehouse's Repair Details column. A part with nothing to repair
+     * says what it is for instead, so the column is not blank: for example, a Small Laser on its way for a refit is
+     * {@code Held for the refit of Locust LCT-1V}, and an ordinary spare on its way needs no repairs.
+     *
+     * @return the repair the part needs, what it is held for, or an empty string for an undamaged part in stock
+     */
     public String getRepairDesc() {
         StringBuilder toReturn = new StringBuilder();
 
@@ -608,8 +615,21 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                         formatTargetModifier(getAllMods(null))))
                   .append(getWorkModeText())
                   .append("</html>");
+        } else {
+            toReturn.append(describeWhatTheUndamagedPartIsFor());
         }
         return toReturn.toString();
+    }
+
+    private String describeWhatTheUndamagedPartIsFor() {
+        Unit unitRefitted = getRefitUnit();
+        if (unitRefitted != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairDesc.heldForRefit", unitRefitted.getName());
+        }
+        if (!isPresent()) {
+            return getTextAt(RESOURCE_BUNDLE, "Part.repairDesc.noRepairsNeeded");
+        }
+        return "";
     }
 
     public String getTechBaseName() {

@@ -210,6 +210,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CANCEL_CUSTOMIZE = "CANCEL_CUSTOMIZE";
     public static final String COMMAND_REFIT_GM_COMPLETE = "REFIT_GM_COMPLETE";
     public static final String COMMAND_ASSIGN_REFIT_TECH = "ASSIGN_REFIT_TECH";
+    public static final String COMMAND_FORGET_PENDING_REFIT = "FORGET_PENDING_REFIT";
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
@@ -600,6 +601,15 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.setSelectedTab(gui.getMekLabTab());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
+        } else if (command.equals(COMMAND_FORGET_PENDING_REFIT)) {
+            for (Unit unit : units) {
+                if (unit.getPendingRefitModel() != null) {
+                    LOGGER.debug("[RefitParts] {}: pending refit to {} forgotten", unit.getName(),
+                          unit.getPendingRefitModel());
+                    unit.setPendingRefitModel(null);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                }
+            }
         } else if (command.equals(COMMAND_ASSIGN_REFIT_TECH)) { // Single Unit only
             gui.assignRefitTech(selectedUnit.getRefit());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -1251,6 +1261,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(allAvailable && !(unit.getEntity() instanceof GunEmplacement));
+                    menu.add(menuItem);
+                }
+
+                boolean isAnyRefitPending = Arrays.stream(units)
+                                                  .anyMatch(unitInSelection -> unitInSelection.getPendingRefitModel() != null);
+                if (isAnyRefitPending) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "forgetPendingRefit.text"));
+                    menuItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, "forgetPendingRefit.tooltip"));
+                    menuItem.setActionCommand(COMMAND_FORGET_PENDING_REFIT);
+                    menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
 
