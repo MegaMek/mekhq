@@ -60,7 +60,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class UnitMarketOfferAlternateCostTest {
     private static final int SUPPORT_POINTS_TO_C_BILLS = 10_000;
-    private static final int GAME_YEAR = 3060;
+    private static final int GAME_YEAR = 3025;
 
     private CampaignOptions campaignOptions;
     private MekSummary summary;
@@ -72,7 +72,7 @@ class UnitMarketOfferAlternateCostTest {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
         campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
-        campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 2.0);
+        campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
         campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.5);
 
         summary = mock(MekSummary.class);
@@ -109,19 +109,18 @@ class UnitMarketOfferAlternateCostTest {
     }
 
     @Test
-    void clanTechMultiplierStillApplies() {
+    void clanMultiplierStillApplies() {
         when(entity.isClan()).thenReturn(true);
 
         assertEquals(Money.of(12_000_000), offer(100).getPrice(null, GAME_YEAR));
     }
 
-    /** Mixed tech pays the mixed-tech multiplier and, since it carries Clan tech, the Clan tech multiplier. */
     @Test
     void mixedTechMultiplierStillApplies() {
         when(entity.isClan()).thenReturn(true);
         when(entity.isMixedTech()).thenReturn(true);
 
-        assertEquals(Money.of(18_000_000), offer(100).getPrice(null, GAME_YEAR));
+        assertEquals(Money.of(9_000_000), offer(100).getPrice(null, GAME_YEAR));
     }
 
     @Test

@@ -443,8 +443,7 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockCampaign.getGameYear()).thenReturn(3060);
-        when(mockOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
+        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -496,8 +495,7 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockCampaign.getGameYear()).thenReturn(3060);
-        when(mockOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
+        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);

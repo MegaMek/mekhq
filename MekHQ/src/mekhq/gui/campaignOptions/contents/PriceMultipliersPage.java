@@ -92,6 +92,10 @@ class PriceMultipliersPage {
     private JSpinner spnInnerSphereUnitPriceMultiplier;
     private JLabel lblInnerSpherePartPriceMultiplier;
     private JSpinner spnInnerSpherePartPriceMultiplier;
+    private JLabel lblClanUnitPriceMultiplier;
+    private JSpinner spnClanUnitPriceMultiplier;
+    private JLabel lblClanPartPriceMultiplier;
+    private JSpinner spnClanPartPriceMultiplier;
     private JLabel lblMixedTechUnitPriceMultiplier;
     private JSpinner spnMixedTechUnitPriceMultiplier;
 
@@ -174,8 +178,8 @@ class PriceMultipliersPage {
      * Creates and configures the general multipliers panel, which includes labels
      * and spinners for various pricing
      * multipliers such as common parts, Inner Sphere units, Inner Sphere parts,
-     * and mixed tech units. Clan tech is priced by the acquisition multipliers
-     * instead. The panel is structured using a grid layout for organized placement of
+     * Clan units, Clan parts, and mixed tech
+     * units. The panel is structured using a grid layout for organized placement of
      * components.
      *
      * @return a JPanel containing the components for setting general multipliers.
@@ -205,6 +209,16 @@ class PriceMultipliersPage {
                 0.1);
         spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
 
+        lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
+        lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
+        spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier", 1.0, 0.1, 100, 0.1);
+        spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
+
+        lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
+        lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
+        spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
+        spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
+
         lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
         lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("MixedTechUnitPriceMultiplier"));
         spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
@@ -216,9 +230,11 @@ class PriceMultipliersPage {
 
         // Layout the Panel
         JComponent[] labels = { lblCommonPartPriceMultiplier, lblMixedTechUnitPriceMultiplier,
-                lblInnerSphereUnitPriceMultiplier, lblInnerSpherePartPriceMultiplier };
+                lblInnerSphereUnitPriceMultiplier, lblInnerSpherePartPriceMultiplier,
+                lblClanUnitPriceMultiplier, lblClanPartPriceMultiplier };
         JComponent[] controls = { spnCommonPartPriceMultiplier, spnMixedTechUnitPriceMultiplier,
-                spnInnerSphereUnitPriceMultiplier, spnInnerSpherePartPriceMultiplier };
+                spnInnerSphereUnitPriceMultiplier, spnInnerSpherePartPriceMultiplier,
+                spnClanUnitPriceMultiplier, spnClanPartPriceMultiplier };
 
         return createPriceMultiplierGridPanel("GeneralMultipliersPanel", labels, controls);
     }
@@ -472,6 +488,8 @@ class PriceMultipliersPage {
         spnCommonPartPriceMultiplier.setValue(model.commonPartPriceMultiplier);
         spnInnerSphereUnitPriceMultiplier.setValue(model.innerSphereUnitPriceMultiplier);
         spnInnerSpherePartPriceMultiplier.setValue(model.innerSpherePartPriceMultiplier);
+        spnClanUnitPriceMultiplier.setValue(model.clanUnitPriceMultiplier);
+        spnClanPartPriceMultiplier.setValue(model.clanPartPriceMultiplier);
         spnMixedTechUnitPriceMultiplier.setValue(model.mixedTechUnitPriceMultiplier);
         spnClanTechInvasionPriceMultiplier.setValue(model.clanTechInvasionPriceMultiplier);
         spnClanTechPostInvasionPriceMultiplier.setValue(model.clanTechPostInvasionPriceMultiplier);
@@ -504,6 +522,8 @@ class PriceMultipliersPage {
         model.commonPartPriceMultiplier = (double) spnCommonPartPriceMultiplier.getValue();
         model.innerSphereUnitPriceMultiplier = (double) spnInnerSphereUnitPriceMultiplier.getValue();
         model.innerSpherePartPriceMultiplier = (double) spnInnerSpherePartPriceMultiplier.getValue();
+        model.clanUnitPriceMultiplier = (double) spnClanUnitPriceMultiplier.getValue();
+        model.clanPartPriceMultiplier = (double) spnClanPartPriceMultiplier.getValue();
         model.mixedTechUnitPriceMultiplier = (double) spnMixedTechUnitPriceMultiplier.getValue();
         model.clanTechInvasionPriceMultiplier = (double) spnClanTechInvasionPriceMultiplier.getValue();
         model.clanTechPostInvasionPriceMultiplier = (double) spnClanTechPostInvasionPriceMultiplier.getValue();

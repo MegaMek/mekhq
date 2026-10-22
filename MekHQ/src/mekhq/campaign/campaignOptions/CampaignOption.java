@@ -852,6 +852,10 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "innerSphereUnitPriceMultiplier");
     public static final CampaignOption<Double> INNER_SPHERE_PART_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "innerSpherePartPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_UNIT_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanUnitPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_PART_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanPartPriceMultiplier");
     public static final CampaignOption<Double> MIXED_TECH_UNIT_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "mixedTechUnitPriceMultiplier");
     public static final CampaignOption<Double> CLAN_TECH_INVASION_PRICE_MULTIPLIER =

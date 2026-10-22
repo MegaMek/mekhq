@@ -340,7 +340,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                 cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                // Clan parts are priced by the Campaign Operations acquisition multipliers below
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:

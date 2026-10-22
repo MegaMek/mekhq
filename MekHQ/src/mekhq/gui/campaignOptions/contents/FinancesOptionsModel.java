@@ -86,6 +86,8 @@ class FinancesOptionsModel {
     double commonPartPriceMultiplier;
     double innerSphereUnitPriceMultiplier;
     double innerSpherePartPriceMultiplier;
+    double clanUnitPriceMultiplier;
+    double clanPartPriceMultiplier;
     double mixedTechUnitPriceMultiplier;
     double clanTechInvasionPriceMultiplier;
     double clanTechPostInvasionPriceMultiplier;
@@ -147,6 +149,8 @@ class FinancesOptionsModel {
         commonPartPriceMultiplier = options.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER);
         innerSphereUnitPriceMultiplier = options.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
         innerSpherePartPriceMultiplier = options.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER);
+        clanUnitPriceMultiplier = options.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
+        clanPartPriceMultiplier = options.get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER);
         mixedTechUnitPriceMultiplier = options.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
         clanTechInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER);
         clanTechPostInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER);
@@ -210,6 +214,8 @@ class FinancesOptionsModel {
         options.set(CampaignOption.COMMON_PART_PRICE_MULTIPLIER, commonPartPriceMultiplier);
         options.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, innerSphereUnitPriceMultiplier);
         options.set(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER, innerSpherePartPriceMultiplier);
+        options.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, clanUnitPriceMultiplier);
+        options.set(CampaignOption.CLAN_PART_PRICE_MULTIPLIER, clanPartPriceMultiplier);
         options.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, mixedTechUnitPriceMultiplier);
         options.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, clanTechInvasionPriceMultiplier);
         options.set(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER, clanTechPostInvasionPriceMultiplier);

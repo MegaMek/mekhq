@@ -3352,8 +3352,8 @@ public class Unit implements ITechnology, ILocatable {
      * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
      * @param gameYear        the current year
      *
-     * @return the campaign's Inner Sphere or mixed-tech unit price multiplier, matching the entity's tech base, times
-     *       its Campaign Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching the entity's tech base,
+     *       times its Campaign Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
      *
      * @author Illiani
      * @since 0.51.01
@@ -3369,9 +3369,7 @@ public class Unit implements ITechnology, ILocatable {
      * @param isClan          whether the unit is Clan tech
      * @param campaignOptions the campaign options holding the multipliers
      *
-     * @return the campaign's Inner Sphere or mixed-tech unit price multiplier for that tech base, or ×1 for Clan
-     *       tech, which is priced by the Campaign Operations acquisition multipliers instead (see
-     *       {@link AcquisitionPriceMultipliers})
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier for that tech base
      *
      * @author Illiani
      * @since 0.51.01
@@ -3381,7 +3379,7 @@ public class Unit implements ITechnology, ILocatable {
         if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
         } else if (isClan) {
-            return 1.0;
+            return campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
         }
         return campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
     }
