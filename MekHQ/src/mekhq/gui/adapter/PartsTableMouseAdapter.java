@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
@@ -140,11 +142,15 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                         refundAmount,
                         "refund for cancelled equipment sale");
         } else if (command.equalsIgnoreCase("ARRIVE")) {
+            List<Part> arrivedParts = new ArrayList<>();
             for (Part p : parts) {
                 if (null != p) {
                     gui.getCampaign().getQuartermaster().arrivePart(p);
+                    arrivedParts.add(p);
                 }
             }
+            // A GM delivery can complete a refit's parts ordered ahead, just as a day's deliveries can
+            RefitPartOrders.announceRefitsReadyToBegin(gui.getCampaign(), arrivedParts);
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {

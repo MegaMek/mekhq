@@ -1238,6 +1238,21 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
+                // The parts ordered ahead are all here, so the refit can begin without waiting for any (#7848)
+                boolean isPendingRefitReady = oneSelected
+                      && unit.isAvailable()
+                      && (unit.getPendingRefitModel() != null)
+                      && RefitPartOrders.isEverythingOrderedAheadHere(gui.getCampaign(), unit);
+                if (isPendingRefitReady) {
+                    String pendingRefitModel = unit.getPendingRefitModel();
+                    menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "beginPendingRefit.text",
+                          pendingRefitModel));
+                    menuItem.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "beginPendingRefit.tooltip",
+                          pendingRefitModel));
+                    menuItem.addActionListener(event -> gui.chooseRefit(units, pendingRefitModel));
+                    menu.add(menuItem);
+                }
+
                 boolean isAnyRefitPending = Arrays.stream(units)
                                                   .anyMatch(unitInSelection -> unitInSelection.getPendingRefitModel() != null);
                 if (isAnyRefitPending) {

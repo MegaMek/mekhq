@@ -48,7 +48,10 @@ import java.util.List;
 
 import megamek.Version;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.RefitPartsArrivedEvent;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.unit.Unit;
@@ -216,6 +219,26 @@ class RefitPartOrdersTest {
         assertTrue(locust.getColorReasonKeys().contains("colorReason.unit.pendingRefitReady"),
               locust.getColorReasonKeys().toString());
         assertFalse(locust.isRefitting(), "The refit does not begin by itself");
+
+        // The player is told however the parts arrived, with the day's deliveries or delivered at once by a GM
+        RefitPartsArrivedListener listener = new RefitPartsArrivedListener();
+        MekHQ.registerHandler(listener);
+        try {
+            RefitPartOrders.announceRefitsReadyToBegin(campaign, onTheirWay);
+        } finally {
+            MekHQ.unregisterHandler(listener);
+        }
+        assertEquals(List.of(locust), listener.unitsAnnounced, "The notice is raised once, for the Locust");
+    }
+
+    /** Hears the notice that a refit's parts have arrived */
+    public static class RefitPartsArrivedListener {
+        private final List<Unit> unitsAnnounced = new ArrayList<>();
+
+        @Subscribe
+        public void handle(RefitPartsArrivedEvent event) {
+            unitsAnnounced.add(event.getUnit());
+        }
     }
 
     @Test
@@ -230,6 +253,8 @@ class RefitPartOrdersTest {
               outOfCharacter);
         assertEquals("Later", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.later"));
         assertEquals("Begin Refit", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.begin"));
+        assertEquals("Begin Refit to UZL-3S...",
+              getFormattedTextAt("mekhq.resources.GUI", "beginPendingRefit.text", "UZL-3S"));
         assertEquals("Begin Refit of Uziel UZL-2S...",
               getFormattedTextAt("mekhq.resources.GUI", "partsMenu.beginRefit.text", "Uziel UZL-2S"));
         String unavailable = getFormattedTextAt("mekhq.resources.GUI", "partsMenu.beginRefit.unavailable.tooltip",

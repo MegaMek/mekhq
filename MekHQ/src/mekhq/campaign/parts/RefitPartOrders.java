@@ -47,9 +47,11 @@ import java.util.stream.Stream;
 import jakarta.annotation.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.events.RefitPartsArrivedEvent;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -435,6 +437,19 @@ public final class RefitPartOrders {
                                              .toList();
         boolean isEverythingDelivered = partsOrderedAhead.stream().allMatch(Part::isPresent);
         return !partsOrderedAhead.isEmpty() && isEverythingDelivered;
+    }
+
+    /**
+     * Tells the player about every refit whose parts ordered ahead have now all arrived, however they arrived: with the
+     * day's deliveries, or delivered at once by a GM. The GUI shows the notice and offers to begin the refit.
+     *
+     * @param campaign     the campaign
+     * @param arrivedParts the parts that just arrived
+     */
+    public static void announceRefitsReadyToBegin(Campaign campaign, List<Part> arrivedParts) {
+        for (Unit unit : findRefitsReadyToBegin(campaign, arrivedParts)) {
+            MekHQ.triggerEvent(new RefitPartsArrivedEvent(unit));
+        }
     }
 
     /**
