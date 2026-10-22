@@ -57,15 +57,20 @@ public final class RefitPartsArrivedNotice {
     /**
      * Has the senior administrator say the refit's parts are here, and asks whether to begin the refit now.
      *
-     * @param campaign the campaign
-     * @param unit     the unit whose parts ordered ahead have all arrived
+     * @param campaign   the campaign
+     * @param unit       the unit whose parts ordered ahead have all arrived
+     * @param stillToBuy what the refit still has to buy, such as parts the campaign could not order, or empty
      *
      * @return {@code true} if the player chose to begin the refit
      */
-    public static boolean askToBegin(Campaign campaign, Unit unit) {
+    public static boolean askToBegin(Campaign campaign, Unit unit, List<String> stillToBuy) {
         String model = unit.getPendingRefitModel();
         String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.inCharacter",
               campaign.getCommanderAddress(), unit.getName(), model);
+        if (!stillToBuy.isEmpty()) {
+            inCharacter += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.stillToBuy",
+                  String.join(", ", stillToBuy));
+        }
         String outOfCharacter = getFormattedTextAt(RESOURCE_BUNDLE, "RefitPartsArrivedNotice.outOfCharacter",
               campaign.getCommanderAddress(), unit.getName(), model);
         Person speaker = campaign.getPlayerForce()

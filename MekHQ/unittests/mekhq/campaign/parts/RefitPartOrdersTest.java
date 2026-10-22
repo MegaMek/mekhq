@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -242,6 +243,19 @@ class RefitPartOrdersTest {
     }
 
     @Test
+    void thePendingRefitIsPlannedAsAKitRefitOfTheOrderedDesign() {
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        Refit pendingRefit = RefitPartOrders.planPendingRefit(locust);
+
+        assertNotNull(pendingRefit, "The ordered design is found and planned");
+        assertEquals("LCT-1E", pendingRefit.getNewEntity().getModel());
+        assertFalse(pendingRefit.isCustomJob(), "The parts ordered ahead stand in for a kit");
+        assertTrue(RefitPartOrders.describeStillToBuy(pendingRefit).isEmpty(),
+              "Everything was ordered, so nothing more is to buy: " + pendingRefit.describeNeeds());
+    }
+
+    @Test
     void theArrivalNoticeReadsForThePlayer() {
         String inCharacter = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.inCharacter",
               "Captain", "Uziel UZL-2S", "UZL-3S");
@@ -249,8 +263,13 @@ class RefitPartOrdersTest {
               inCharacter);
         String outOfCharacter = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.outOfCharacter",
               "Captain", "Uziel UZL-2S", "UZL-3S");
-        assertTrue(outOfCharacter.contains("has not begun") && outOfCharacter.contains("with the UZL-3S selected"),
+        assertTrue(outOfCharacter.startsWith("Begin Refit starts the refit now, as a kit refit")
+              && outOfCharacter.contains("Begin Refit to UZL-3S...") && outOfCharacter.contains("kit's -2"),
               outOfCharacter);
+        String stillToBuy = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.stillToBuy",
+              "ER Medium Laser");
+        assertEquals("We still need ER Medium Laser, which I couldn't order; the refit buys it as a kit when it begins.",
+              stillToBuy);
         assertEquals("Later", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.later"));
         assertEquals("Begin Refit", getTextAt("mekhq.resources.Parts", "RefitPartsArrivedNotice.button.begin"));
         assertEquals("Begin Refit to UZL-3S...",
@@ -423,23 +442,37 @@ class RefitPartOrdersTest {
     }
 
     @Test
-    void theOrderConfirmationTellsThePlayerWhatComesNext() {
+    void theOrderQuestionListsThePartsAndExplainsTheChoice() {
         String dialogBundle = "mekhq.resources.ChooseRefitDialog";
-        String ordered = getFormattedTextAt(dialogBundle, "orderedConfirm.ordered", "Captain", "Uziel UZL-2S",
-              "UZL-3S", "LB 2-X AC, 2 × ER Small Laser");
-        assertTrue(ordered.startsWith("Captain, I've ordered what the Uziel UZL-2S needs for its refit to the UZL-3S: "
-              + "LB 2-X AC, 2 × ER Small Laser."), ordered);
-        String labelled = getFormattedTextAt(dialogBundle, "orderedConfirm.labelled", "Captain", "Uziel UZL-2S",
-              "UZL-3S", "");
-        assertTrue(labelled.contains("already on order") && labelled.contains("Pending Refit"), labelled);
-        String nextSteps = getFormattedTextAt(dialogBundle, "orderedConfirm.nextSteps",
-              "Acquire and Use Refit Kit", "Customize to Model", "Close");
-        assertTrue(nextSteps.contains("<b>Acquire and Use Refit Kit</b>") && nextSteps.contains("<b>Close</b>"),
-              nextSteps);
-        assertEquals("Close", getTextAt(dialogBundle, "btnClose.text"), "The way out does not read as cancelling");
-        assertEquals("Back to Refit Options", getTextAt(dialogBundle, "orderedConfirm.button.back"));
-        assertEquals("Close Refit Window", getTextAt(dialogBundle, "orderedConfirm.button.closeWindow"));
-        String cannotBeBought = getFormattedTextAt(dialogBundle, "orderedConfirm.cannotBeBought", "ER Medium Laser");
+        String partList = "<ul><li>LB 2-X AC</li><li>2 × ER Small Laser</li></ul>";
+        String toOrder = getFormattedTextAt(dialogBundle, "orderConfirm.toOrder", "Captain", "Uziel UZL-2S", "UZL-3S",
+              partList);
+        assertEquals("Captain, to refit the Uziel UZL-2S to the UZL-3S we still need to buy:" + partList, toOrder);
+        assertEquals("Shall I place the orders?", getTextAt(dialogBundle, "orderConfirm.question.order"));
+        String explanation = getFormattedTextAt(dialogBundle, "orderConfirm.explanation", "Acquire and Use Refit Kit",
+              "Customize to Model");
+        assertTrue(explanation.startsWith("Ordering parts does not begin the refit.")
+              && explanation.contains("<b>Acquire and Use Refit Kit</b>") && explanation.contains("10% more"),
+              explanation);
+        assertEquals("Back to Refit Options", getTextAt(dialogBundle, "orderConfirm.button.back"));
+        assertEquals("Order Parts", getTextAt(dialogBundle, "orderConfirm.button.order"));
+        String cannotBeBought = getFormattedTextAt(dialogBundle, "orderConfirm.cannotBeBought", "ER Medium Laser");
         assertTrue(cannotBeBought.contains("don't allow buying ER Medium Laser"), cannotBeBought);
+        for (String key : new String[] { "btnRefit.tooltip", "btnCustomize.tooltip", "btnOrderParts.tooltip" }) {
+            assertTrue(getTextAt(dialogBundle, key).contains("purchase roll"), key);
+        }
+        assertEquals("Close", getTextAt(dialogBundle, "btnClose.text"), "The way out does not read as cancelling");
+    }
+
+    @Test
+    void previewingTheOrdersOrdersNothing() {
+        Refit refit = planLocustRefit();
+
+        RefitPartOrders.OrderResult preview = RefitPartOrders.previewOrders(campaign, refit);
+
+        assertEquals(0, countPlayerOrders(SMALL_LASER), "Nothing is ordered until the player agrees");
+        assertFalse(locust.isPendingRefit());
+        assertEquals(preview.ordered(), RefitPartOrders.orderMissingParts(campaign, refit).ordered(),
+              "The player is shown exactly what is then ordered");
     }
 }

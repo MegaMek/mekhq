@@ -403,11 +403,26 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         JMenuItem beginRefit = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "partsMenu.beginRefit.text",
               unit.getName()));
         boolean isAvailable = unit.isAvailable();
+        // With everything here the refit begins at once; with parts still coming the player chooses how to begin
+        boolean isEverythingHere = RefitPartOrders.isEverythingOrderedAheadHere(gui.getCampaign(), unit);
+        String tooltipKey;
+        if (!isAvailable) {
+            tooltipKey = "partsMenu.beginRefit.unavailable.tooltip";
+        } else if (isEverythingHere) {
+            tooltipKey = "partsMenu.beginRefit.tooltip";
+        } else {
+            tooltipKey = "partsMenu.beginRefit.early.tooltip";
+        }
         beginRefit.setEnabled(isAvailable);
-        beginRefit.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE,
-              isAvailable ? "partsMenu.beginRefit.tooltip" : "partsMenu.beginRefit.unavailable.tooltip",
-              unit.getName(), unit.getPendingRefitModel()));
-        beginRefit.addActionListener(event -> gui.chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel()));
+        beginRefit.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, tooltipKey, unit.getName(),
+              unit.getPendingRefitModel()));
+        beginRefit.addActionListener(event -> {
+            if (isEverythingHere) {
+                gui.beginPendingRefit(unit);
+            } else {
+                gui.chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
+            }
+        });
         popup.add(beginRefit);
     }
 

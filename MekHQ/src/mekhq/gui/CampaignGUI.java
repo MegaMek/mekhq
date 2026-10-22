@@ -111,6 +111,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitBriefing;
 import mekhq.campaign.parts.RefitFacility;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1386,12 +1387,37 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleRefitPartsArrived(RefitPartsArrivedEvent refitPartsArrivedEvent) {
         Unit unit = refitPartsArrivedEvent.getUnit();
-        if (!RefitPartsArrivedNotice.askToBegin(getCampaign(), unit)) {
+        Refit plannedRefit = RefitPartOrders.planPendingRefit(unit);
+        List<String> stillToBuy = (plannedRefit == null) ? List.of() : RefitPartOrders.describeStillToBuy(plannedRefit);
+        if (!RefitPartsArrivedNotice.askToBegin(getCampaign(), unit, stillToBuy)) {
             logger.debug("[RefitParts] {}: parts arrived, the refit is left for later", unit.getName());
             return;
         }
-        logger.debug("[RefitParts] {}: parts arrived, opening Choose Refit Kit", unit.getName());
-        chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
+        beginPendingRefit(unit, plannedRefit);
+    }
+
+    /**
+     * Begins the refit a unit's parts were ordered ahead for, as a kit refit, going straight to the repair site
+     * question, the choice of tech and the tech's briefing. The player already chose the design when ordering.
+     *
+     * @param unit the unit with a pending refit
+     */
+    public void beginPendingRefit(Unit unit) {
+        beginPendingRefit(unit, RefitPartOrders.planPendingRefit(unit));
+    }
+
+    private void beginPendingRefit(Unit unit, @Nullable Refit plannedRefit) {
+        String fixableProblem = (plannedRefit == null) ? null : plannedRefit.checkFixable();
+        if ((plannedRefit == null) || (fixableProblem != null)) {
+            // Fall back to choosing the refit by hand, with the ordered design selected
+            logger.debug("[RefitParts] {}: the pending refit cannot begin directly ({}); opening Choose Refit Kit",
+                  unit.getName(), (plannedRefit == null) ? "design not loaded" : fixableProblem);
+            chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
+            return;
+        }
+        logger.debug("[RefitParts] {}: beginning the pending refit to {} as a kit refit", unit.getName(),
+              unit.getPendingRefitModel());
+        refitUnit(plannedRefit, false);
     }
 
     /**

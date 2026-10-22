@@ -1249,7 +1249,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                           pendingRefitModel));
                     menuItem.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "beginPendingRefit.tooltip",
                           pendingRefitModel));
-                    menuItem.addActionListener(event -> gui.chooseRefit(units, pendingRefitModel));
+                    menuItem.addActionListener(event -> gui.beginPendingRefit(unit));
                     menu.add(menuItem);
                 }
 

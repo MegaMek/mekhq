@@ -46,6 +46,11 @@ import java.util.stream.Stream;
 
 import jakarta.annotation.Nullable;
 import megamek.common.equipment.AmmoType;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -277,6 +282,28 @@ public final class RefitPartOrders {
      * @return what was ordered
      */
     public static OrderResult orderMissingParts(Campaign campaign, Refit refit) {
+        return placeOrders(campaign, refit, true);
+    }
+
+    /**
+     * Describes what Order Parts would order for a planned refit, without ordering anything, so the player can see it
+     * before deciding.
+     *
+     * @param campaign the campaign
+     * @param refit    a planned refit
+     *
+     * @return what would be ordered, and the parts that could not be
+     */
+    public static OrderResult previewOrders(Campaign campaign, Refit refit) {
+        return placeOrders(campaign, refit, false);
+    }
+
+    /**
+     * Works out what the refit still has to buy and, when placing, orders it.
+     *
+     * @param isPlacing {@code true} to place the orders, {@code false} only to describe them
+     */
+    private static OrderResult placeOrders(Campaign campaign, Refit refit, boolean isPlacing) {
         RefitPartOrders openOrders = find(campaign, refit);
         Shortfall shortfall = openOrders.findShortfall();
         UUID unitId = refit.getOriginalUnit().getId();
@@ -290,7 +317,9 @@ public final class RefitPartOrders {
             if (cannotBeBought.contains(part.getName()) || !(part instanceof IAcquisitionWork work)) {
                 continue;
             }
-            procurementList.addShoppingItem(labelled(Refit.newOrderFor(work), unitId), 1, campaign, place);
+            if (isPlacing) {
+                procurementList.addShoppingItem(labelled(Refit.newOrderFor(work), unitId), 1, campaign, place);
+            }
             partNames.add(part.getName());
         }
         ordered.addAll(tally(partNames));
@@ -298,7 +327,9 @@ public final class RefitPartOrders {
             if ((ammo.toOrder() > 0) && (ammo.ammoType() != null)) {
                 IAcquisitionWork order = new AmmoStorage(0, ammo.ammoType(), 0, campaign).getAcquisitionWork();
                 int tons = ordersFor(ammo.toOrder(), (Part) order);
-                procurementList.addShoppingItem(labelled(order, unitId), tons, campaign, place);
+                if (isPlacing) {
+                    procurementList.addShoppingItem(labelled(order, unitId), tons, campaign, place);
+                }
                 ordered.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitNeed.rounds", ammo.ammoType().getName(),
                       tons * amountPerOrder((Part) order)));
             }
@@ -307,11 +338,18 @@ public final class RefitPartOrders {
         if ((armor != null) && (armor.toOrder() > 0)) {
             Part order = refit.getNewArmorSupplies().getNewPart();
             int lots = ordersFor(armor.toOrder(), order);
-            procurementList.addShoppingItem(labelled((IAcquisitionWork) order, unitId), lots, campaign, place);
+            if (isPlacing) {
+                procurementList.addShoppingItem(labelled((IAcquisitionWork) order, unitId), lots, campaign, place);
+            }
             ordered.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitNeed.armor", order.getName(),
                   lots * amountPerOrder(order)));
         }
 
+        if (!isPlacing) {
+            LOGGER.debug("[RefitParts] {}: Order Parts would order {}; cannot be bought: {}",
+                  refit.getOriginalUnit().getName(), ordered, cannotBeBought);
+            return new OrderResult(ordered, cannotBeBought);
+        }
         LOGGER.info("[RefitParts] Ordered ahead of the refit of {} to {}: {}; cannot be bought: {}",
               refit.getOriginalUnit().getName(), refit.getNewEntity().getShortName(), ordered, cannotBeBought);
         reportOrders(campaign, refit, ordered, cannotBeBought);
@@ -437,6 +475,46 @@ public final class RefitPartOrders {
                                              .toList();
         boolean isEverythingDelivered = partsOrderedAhead.stream().allMatch(Part::isPresent);
         return !partsOrderedAhead.isEmpty() && isEverythingDelivered;
+    }
+
+    /**
+     * Plans the refit the unit's parts were ordered ahead for, ready to begin. It is a kit refit: the parts ordered
+     * ahead stand in for the kit, so the refit gets a kit's shorter time, easier check and no loss of quality, and only
+     * what is still missing is bought, as a kit, when it begins.
+     *
+     * @param unit the unit with a pending refit
+     *
+     * @return the planned refit, or {@code null} if the unit has no pending refit or its design cannot be loaded
+     */
+    public static @Nullable Refit planPendingRefit(Unit unit) {
+        String model = unit.getPendingRefitModel();
+        if (model == null) {
+            return null;
+        }
+        String designName = unit.getEntity().getChassis() + ' ' + model;
+        MekSummary summary = MekSummaryCache.getInstance().getMek(designName);
+        if (summary == null) {
+            LOGGER.debug("[RefitParts] {}: the {} design is not in the unit list", unit.getName(), designName);
+            return null;
+        }
+        try {
+            Entity design = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            return (design == null) ? null : new Refit(unit, design, false, false, false);
+        } catch (EntityLoadingException exception) {
+            LOGGER.error("[RefitParts] {}: the {} design could not be loaded", unit.getName(), designName, exception);
+            return null;
+        }
+    }
+
+    /**
+     * @return what a planned refit still has to buy, because it was neither ordered ahead nor is it in stock
+     */
+    public static List<String> describeStillToBuy(Refit refit) {
+        return refit.describeNeeds()
+                     .stream()
+                     .filter(need -> need.supply() == Refit.Supply.TO_ORDER)
+                     .map(Refit.RefitNeed::description)
+                     .toList();
     }
 
     /**

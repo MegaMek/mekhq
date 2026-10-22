@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -93,8 +94,8 @@ public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChooseRefitDialog";
     private static final String PARTS_RESOURCE_BUNDLE = "mekhq.resources.Parts";
-    /** The order confirmation's button that closes the refit window as well */
-    private static final int ORDERED_CONFIRM_CLOSE_WINDOW = 1;
+    /** The order confirmation's button that places the orders; going back is the first */
+    private static final int ORDER_CONFIRMED = 1;
     /** The smallest a panel can be dragged to, so none disappears behind a divider */
     private static final int MINIMUM_PANEL_SIZE = 100;
 
@@ -231,11 +232,13 @@ public class ChooseRefitDialog extends JDialog {
         panBtn.add(btnOrderParts, new GridBagConstraints());
 
         btnRefit = new JButton(resourceMap.getString("btnRefit.text"));
+        btnRefit.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnRefit.tooltip"));
         btnRefit.setEnabled(false);
         btnRefit.addActionListener(evt -> confirmRefit());
         panBtn.add(btnRefit, new GridBagConstraints());
 
         btnCustomize = new JButton(resourceMap.getString("btnCustomize.text"));
+        btnCustomize.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnCustomize.tooltip"));
         btnCustomize.setEnabled(false);
         btnCustomize.addActionListener(evt -> confirmCustomize());
         panBtn.add(btnCustomize, new GridBagConstraints());
@@ -312,52 +315,66 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     /**
-     * Orders everything the selected refit still needs, then shows the parts as on order and has the senior
-     * administrator say what was ordered and what to do next.
+     * Shows what Order Parts would buy and asks before ordering anything. Ordering keeps the unit in service and does
+     * not begin the refit; the parts are bought one by one, and the refit window closes once they are ordered. Going
+     * back orders nothing.
      */
     private void orderParts() {
         Refit refit = getSelectedRefit();
         if (refit == null) {
             return;
         }
-        RefitPartOrders.OrderResult result = RefitPartOrders.orderMissingParts(campaign, refit);
-        // Other refits of this unit may share the parts just ordered
-        refitModel.forgetPartsStatuses();
-        refitTable.repaint();
-        refitTableValueChanged();
-        confirmOrders(refit, result);
+        RefitPartOrders.OrderResult plannedOrders = RefitPartOrders.previewOrders(campaign, refit);
+        if (!isOrderConfirmed(refit, plannedOrders)) {
+            logger.debug("[RefitParts] {}: went back to the refit options; nothing ordered", unit.getName());
+            return;
+        }
+        RefitPartOrders.orderMissingParts(campaign, refit);
+        // The daily report lists the orders, and the Hangar shows the unit as Pending Refit
+        cancel();
     }
 
     /**
-     * Tells the player what Order Parts did and what comes next: begin the refit now and it waits for the parts, or
-     * close the window and come back once they arrive, while the Hangar shows the unit as Pending Refit. The player
-     * can go back to the refit options or close the refit window from the confirmation.
+     * Has the senior administrator list what would be ordered, or say everything is already on order, and explain how
+     * ordering parts differs from beginning the refit now.
+     *
+     * @return {@code true} if the player chose to order
      */
-    private void confirmOrders(Refit refit, RefitPartOrders.OrderResult result) {
-        String orderedKey = result.ordered().isEmpty() ? "orderedConfirm.labelled" : "orderedConfirm.ordered";
-        StringBuilder message = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, orderedKey,
-              campaign.getCommanderAddress(), unit.getName(), refit.getNewEntity().getModel(),
-              String.join(", ", result.ordered())));
-        if (!result.cannotBeBought().isEmpty()) {
-            message.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.cannotBeBought",
-                  String.join(", ", result.cannotBeBought())));
+    private boolean isOrderConfirmed(Refit refit, RefitPartOrders.OrderResult plannedOrders) {
+        boolean isAnythingToOrder = !plannedOrders.ordered().isEmpty();
+        String model = refit.getNewEntity().getModel();
+        StringBuilder message = new StringBuilder();
+        if (isAnythingToOrder) {
+            // Each part goes on its own line, so a long order reads at a glance
+            String partList = plannedOrders.ordered()
+                                    .stream()
+                                    .map(item -> "<li>" + item + "</li>")
+                                    .collect(Collectors.joining("", "<ul>", "</ul>"));
+            message.append(getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.toOrder", campaign.getCommanderAddress(),
+                  unit.getName(), model, partList));
+        } else {
+            message.append(getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.alreadyOrdered",
+                  campaign.getCommanderAddress(), unit.getName(), model));
         }
-        String closeWindow = getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button.closeWindow");
-        String nextSteps = getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.nextSteps", btnRefit.getText(),
-              btnCustomize.getText(), closeWindow);
-        // Back is first, so closing the confirmation with X leaves the refit window open
-        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button.back"), closeWindow);
+        if (!plannedOrders.cannotBeBought().isEmpty()) {
+            message.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.cannotBeBought",
+                  String.join(", ", plannedOrders.cannotBeBought())));
+        }
+        message.append(' ').append(getTextAt(RESOURCE_BUNDLE,
+              isAnythingToOrder ? "orderConfirm.question.order" : "orderConfirm.question.mark"));
+        String explanation = getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.explanation", btnRefit.getText(),
+              btnCustomize.getText());
 
+        // Back is first, so closing the dialog with X orders nothing
+        List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "orderConfirm.button.back"),
+              getTextAt(RESOURCE_BUNDLE, isAnythingToOrder ? "orderConfirm.button.order" : "orderConfirm.button.mark"));
         Person speaker = campaign.getPlayerForce()
                                .getHumanResources()
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
         ImmersiveDialogSimple confirmation = new ImmersiveDialogSimple(campaign, speaker, null, message.toString(),
-              buttons, nextSteps, null, false);
-        if (confirmation.getDialogChoice() == ORDERED_CONFIRM_CLOSE_WINDOW) {
-            logger.debug("[RefitParts] {}: refit window closed after ordering parts", unit.getName());
-            cancel();
-        }
+              buttons, explanation, null, false);
+        return confirmation.getDialogChoice() == ORDER_CONFIRMED;
     }
 
     /**
@@ -418,7 +435,7 @@ public class ChooseRefitDialog extends JDialog {
               || r.getNewEntity().isCanon();
         boolean canBuyKit = !RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(campaign, r);
         btnRefit.setEnabled(isAllowedDesign && canBuyKit);
-        btnRefit.setToolTipText(canBuyKit ? null : getTextAt(RESOURCE_BUNDLE, "btnRefit.cannotBuy.tooltip"));
+        btnRefit.setToolTipText(getTextAt(RESOURCE_BUNDLE, canBuyKit ? "btnRefit.tooltip" : "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
         List<Refit.RefitNeed> needs = r.describeNeeds();
