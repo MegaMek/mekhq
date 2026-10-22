@@ -151,6 +151,8 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
@@ -2492,17 +2494,18 @@ public class StratConRulesManager {
 
         if (isGMReinforcement) {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
-                  scenario.getHyperlinkedName()));
+                  scenario.getName()));
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         } else {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
-                  scenario.getHyperlinkedName(),
+                  scenario.getName(),
                   roll,
                   maneuverRoleReport,
                   reinforcementTargetNumber));
@@ -2514,7 +2517,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2524,9 +2527,10 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         }
 
         // Reinforcement roll failed, make interception check
@@ -2539,7 +2543,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
@@ -2558,7 +2562,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2571,11 +2575,9 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
-
-        campaign.addReport(BATTLE, reportStatus.toString());
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_TACTICS, campaign)
@@ -2585,7 +2587,8 @@ public class StratConRulesManager {
             String reportString = commander.getSkill(S_TACTICS) != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
-            campaign.addReport(BATTLE, String.format(reportString,
+            reportStatus.append("<p>");
+            reportStatus.append(String.format(reportString,
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
@@ -2593,10 +2596,12 @@ public class StratConRulesManager {
                 increaseFatigue(formation.getId(), campaign);
             }
 
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
-        campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+        reportStatus.append("<p>");
+        reportStatus.append(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               actionCheckResult.getRollResult(),
@@ -2604,12 +2609,42 @@ public class StratConRulesManager {
 
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
+        showReinforcementResultsDialog(campaign, formation, INTERCEPTED, reportStatus.toString());
+
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
               campaign.getPlayerForce().getHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
 
         return INTERCEPTED;
+    }
+
+    /**
+     * Presents the outcome of a reinforcement check in an immersive dialog, rather than the daily report, so the player
+     * can't miss it.
+     *
+     * @param campaign  the current campaign
+     * @param formation the reinforcing formation; its commander, if any, delivers the message
+     * @param result    the outcome of the reinforcement check
+     * @param report    the breakdown of the check, shown as the out-of-character message
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void showReinforcementResultsDialog(Campaign campaign, Formation formation,
+          ReinforcementResultsType result, String report) {
+        UUID commanderId = formation.getFormationCommanderID();
+        Person speaker = (commanderId == null) ?
+                               null :
+                               campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
+
+        String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
+              "StratConRulesManager.reinforcements.inCharacter." + result.name(),
+              campaign.getCommanderAddress(),
+              formation.getName());
+
+        new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, null, report, null, false,
+              ImmersiveDialogWidth.SMALL);
     }
 
     /**
