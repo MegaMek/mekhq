@@ -33,6 +33,7 @@
 package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -348,5 +349,24 @@ class RefitPartOrdersTest {
               cannotBeBought);
         String waiting = getFormattedTextAt("mekhq.resources.Parts", "RefitPartsStatus.waiting", "Small Laser");
         assertEquals("Nothing left to order. Waiting for: Small Laser", waiting);
+    }
+
+    @Test
+    void theOrderConfirmationTellsThePlayerWhatComesNext() {
+        String dialogBundle = "mekhq.resources.ChooseRefitDialog";
+        String ordered = getFormattedTextAt(dialogBundle, "orderedConfirm.ordered", "Captain", "Uziel UZL-2S",
+              "UZL-3S", "LB 2-X AC, 2 × ER Small Laser");
+        assertTrue(ordered.startsWith("Captain, I've ordered what the Uziel UZL-2S needs for its refit to the UZL-3S: "
+              + "LB 2-X AC, 2 × ER Small Laser."), ordered);
+        String labelled = getFormattedTextAt(dialogBundle, "orderedConfirm.labelled", "Captain", "Uziel UZL-2S",
+              "UZL-3S", "");
+        assertTrue(labelled.contains("already on order") && labelled.contains("Pending Refit"), labelled);
+        String nextSteps = getFormattedTextAt(dialogBundle, "orderedConfirm.nextSteps",
+              "Acquire and Use Refit Kit", "Customize to Model", "Close");
+        assertTrue(nextSteps.contains("<b>Acquire and Use Refit Kit</b>") && nextSteps.contains("<b>Close</b>"),
+              nextSteps);
+        assertEquals("Close", getTextAt(dialogBundle, "btnClose.text"), "The way out does not read as cancelling");
+        String cannotBeBought = getFormattedTextAt(dialogBundle, "orderedConfirm.cannotBeBought", "ER Medium Laser");
+        assertTrue(cannotBeBought.contains("don't allow buying ER Medium Laser"), cannotBeBought);
     }
 }

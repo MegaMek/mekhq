@@ -79,10 +79,12 @@ import mekhq.campaign.parts.RefitFacility;
 import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.campaign.work.WorkTimeFormatter;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * @author Taharqa
@@ -237,6 +239,7 @@ public class ChooseRefitDialog extends JDialog {
         panBtn.add(btnCustomize, new GridBagConstraints());
 
         JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnClose.setToolTipText(getTextAt(RESOURCE_BUNDLE, "btnClose.tooltip"));
         btnClose.addActionListener(evt -> cancel());
         panBtn.add(btnClose, new GridBagConstraints());
 
@@ -307,18 +310,44 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     /**
-     * Orders everything the selected refit still needs, then shows the parts as on order.
+     * Orders everything the selected refit still needs, then shows the parts as on order and has the senior
+     * administrator say what was ordered and what to do next.
      */
     private void orderParts() {
         Refit refit = getSelectedRefit();
         if (refit == null) {
             return;
         }
-        RefitPartOrders.orderMissingParts(campaign, refit);
+        RefitPartOrders.OrderResult result = RefitPartOrders.orderMissingParts(campaign, refit);
         // Other refits of this unit may share the parts just ordered
         refitModel.forgetPartsStatuses();
         refitTable.repaint();
         refitTableValueChanged();
+        confirmOrders(refit, result);
+    }
+
+    /**
+     * Tells the player what Order Parts did and what comes next: begin the refit now and it waits for the parts, or
+     * close the window and come back once they arrive, while the Hangar shows the unit as Pending Refit.
+     */
+    private void confirmOrders(Refit refit, RefitPartOrders.OrderResult result) {
+        String orderedKey = result.ordered().isEmpty() ? "orderedConfirm.labelled" : "orderedConfirm.ordered";
+        StringBuilder message = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, orderedKey,
+              campaign.getCommanderAddress(), unit.getName(), refit.getNewEntity().getModel(),
+              String.join(", ", result.ordered())));
+        if (!result.cannotBeBought().isEmpty()) {
+            message.append(' ').append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.cannotBeBought",
+                  String.join(", ", result.cannotBeBought())));
+        }
+        message.append("<br><br>").append(getFormattedTextAt(RESOURCE_BUNDLE, "orderedConfirm.nextSteps",
+              btnRefit.getText(), btnCustomize.getText(), getTextAt(RESOURCE_BUNDLE, "btnClose.text")));
+
+        Person speaker = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        new ImmersiveDialogSimple(campaign, speaker, null, message.toString(),
+              List.of(getTextAt(RESOURCE_BUNDLE, "orderedConfirm.button")), null, null, false);
     }
 
     public boolean isConfirmed() {
