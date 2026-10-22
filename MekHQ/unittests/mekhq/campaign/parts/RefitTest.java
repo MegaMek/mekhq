@@ -132,14 +132,20 @@ public class RefitTest {
         // Read when a unit's crew gets its Natural Aptitudes and Small Arms skill
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
-        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
-        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
         // Read when a unit's crew gets its Fatigue
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
         double[] usedPartMultipliers = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
         lenient().when(mockCampaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)).thenReturn(usedPartMultipliers);
 

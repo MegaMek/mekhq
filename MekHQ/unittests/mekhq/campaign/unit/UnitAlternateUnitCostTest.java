@@ -80,6 +80,7 @@ import testUtilities.MHQTestUtilities;
  */
 class UnitAlternateUnitCostTest {
     private static final int SUPPORT_POINTS_TO_C_BILLS = 10_000;
+    private static final int GAME_YEAR = 3060;
 
     @BeforeAll
     static void initializeTypes() {
@@ -102,9 +103,9 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
             campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
-            campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 1.0);
             campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.0);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(campaign.getGameYear()).thenReturn(GAME_YEAR);
 
             entity = mock(Mek.class);
             equipment = new ArrayList<>();
@@ -185,7 +186,7 @@ class UnitAlternateUnitCostTest {
             @BeforeEach
             void distinctMultipliers() {
                 campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.1);
-                campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
+                campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 2.0);
                 campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.5);
             }
 
@@ -195,26 +196,26 @@ class UnitAlternateUnitCostTest {
             }
 
             @Test
-            void clanMultiplierApplies() {
+            void clanTechMultiplierApplies() {
                 when(entity.isClan()).thenReturn(true);
 
                 assertEquals(Money.of(500 * 2.0 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
                 assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getSellValue());
             }
 
-            /** Mixed tech takes priority over Clan, as it does for construction cost. */
+            /** Mixed tech pays the mixed-tech multiplier and, since it carries Clan tech, the Clan tech multiplier. */
             @Test
-            void mixedTechMultiplierTakesPriority() {
+            void mixedTechPaysTheMixedTechAndClanTechMultipliers() {
                 when(entity.isClan()).thenReturn(true);
                 when(entity.isMixedTech()).thenReturn(true);
 
-                assertEquals(Money.of(500 * 1.5 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(500 * 1.5 * 2.0 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
             }
 
             /** The refactor into a shared helper must leave the ordinary price unchanged. */
             @ParameterizedTest
-            @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 4500000",
-                         "true, true, 4500000" })
+            @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 9000000",
+                         "true, true, 9000000" })
             void optionOffStillAppliesTheSameMultipliers(boolean isClan, boolean isMixedTech, int expected) {
                 campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
                 when(entity.isClan()).thenReturn(isClan);
@@ -231,13 +232,13 @@ class UnitAlternateUnitCostTest {
              * @since 0.51.01
              */
             @ParameterizedTest
-            @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 1.5", "true, true, 1.5" })
+            @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 3.0", "true, true, 3.0" })
             void estimateBuyCostMatchesTheBattleValueBuyCost(boolean isClan, boolean isMixedTech,
                   double multiplier) {
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
-                Money estimate = Unit.estimateBuyCost(entity, campaignOptions);
+                Money estimate = Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR);
                 assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS), estimate);
                 assertEquals(unit.getBuyCost(), estimate);
             }
@@ -253,7 +254,7 @@ class UnitAlternateUnitCostTest {
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
-                assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+                assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR));
                 verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
             }
         }
@@ -295,7 +296,7 @@ class UnitAlternateUnitCostTest {
             when(entity.isLargeCraft()).thenReturn(true);
 
             assertEquals(Money.of(3_000_000), unit.getBuyCost());
-            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR));
             verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
         }
 
@@ -598,7 +599,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
             campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.1);
-            campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
+            campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 2.0);
             campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.5);
 
             summary = mock(MekSummary.class);
@@ -613,13 +614,13 @@ class UnitAlternateUnitCostTest {
          * @since 0.51.01
          */
         @ParameterizedTest
-        @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 1.5", "true, true, 1.5" })
+        @CsvSource({ "false, false, 1.1", "true, false, 2.0", "false, true, 3.0", "true, true, 3.0" })
         void alternateUnitCostPricesTheSummaryBattleValue(boolean isClan, boolean isMixedTech, double multiplier) {
             when(summary.isClan()).thenReturn(isClan);
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
             assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS),
-                  Unit.estimateBuyCost(summary, campaignOptions));
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -630,7 +631,7 @@ class UnitAlternateUnitCostTest {
         void withoutConversionTheSummaryIsPricedInRawSupportPoints() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
 
-            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -638,13 +639,13 @@ class UnitAlternateUnitCostTest {
          * @since 0.51.01
          */
         @ParameterizedTest
-        @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 4500000", "true, true, 4500000" })
+        @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 9000000", "true, true, 9000000" })
         void optionOffPricesTheConstructionCost(boolean isClan, boolean isMixedTech, int expected) {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             when(summary.isClan()).thenReturn(isClan);
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
-            assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -655,7 +656,8 @@ class UnitAlternateUnitCostTest {
         void mekHQPricesOrdinarySummariesByBattleValue() {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS),
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -668,7 +670,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -680,7 +682,8 @@ class UnitAlternateUnitCostTest {
         void chaosCampaignPricesLargeCraftSummariesByBattleValue(int unitType) {
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS),
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -695,7 +698,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
     }
 

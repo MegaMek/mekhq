@@ -368,7 +368,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     private JScrollPane createMarketTablePane() {
         // Create Model
-        setMarketModel(new UnitMarketTableModel(getCampaign().getUnitMarket().getOffers()));
+        setMarketModel(new UnitMarketTableModel(getCampaign().getUnitMarket().getOffers(),
+              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear()));
 
         // Create Sorter
         setMarketSorter(new TableRowSorter<>(getMarketModel()));
@@ -412,7 +413,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     protected Component createRightComponent() {
         setEntityViewPane(new EntityViewPane(getFrame(), null));
         // The preview's Cost line shows what the campaign values the unit at, before the offer's market percentage
-        getEntityViewPane().setCostProvider(entity -> Unit.estimateBuyCost(entity, getCampaign().getCampaignOptions())
+        getEntityViewPane().setCostProvider(entity -> Unit.estimateBuyCost(entity,
+                    getCampaign().getCampaignOptions(), getCampaign().getPlayerForce().getFaction(),
+                    getCampaign().getGameYear())
                                                             .getAmount()
                                                             .doubleValue());
         return getEntityViewPane();
@@ -486,7 +489,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 continue;
             }
 
-            final Money price = offer.getPrice();
+            final Money price = offer.getPrice(getCampaign().getPlayerForce().getFaction(),
+                  getCampaign().getGameYear());
             if (getCampaign().getPlayerForce().getFunds().isLessThan(price)) {
                 getCampaign().addReport(FINANCES, String.format("<font color='" +
                                                                       ReportingUtilities.getNegativeColor() +
@@ -575,7 +579,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }
-        getMarketModel().setData(getCampaign().getUnitMarket().getOffers());
+        getMarketModel().setData(getCampaign().getUnitMarket().getOffers(),
+              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear());
     }
 
     public void removeSelectedOffers() {
@@ -584,7 +589,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             return;
         }
         getCampaign().getUnitMarket().getOffers().removeAll(offers);
-        getMarketModel().setData(getCampaign().getUnitMarket().getOffers());
+        getMarketModel().setData(getCampaign().getUnitMarket().getOffers(),
+              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear());
     }
     // endregion Button Actions
 

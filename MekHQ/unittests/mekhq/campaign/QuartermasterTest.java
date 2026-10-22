@@ -443,7 +443,8 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
+        when(mockCampaign.getGameYear()).thenReturn(3060);
+        when(mockOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -495,7 +496,8 @@ public class QuartermasterTest {
 
         // ...and clan units cost 2x...
         double clanMultiplier = 2.0;
-        when(mockOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
+        when(mockCampaign.getGameYear()).thenReturn(3060);
+        when(mockOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(clanMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -1749,6 +1751,8 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         when(mockCampaignOptions.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER)).thenReturn(1d);
+        // OmniPods are tech rating E
+        when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
 
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
 

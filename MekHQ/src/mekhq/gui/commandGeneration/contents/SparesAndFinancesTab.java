@@ -409,7 +409,8 @@ public class SparesAndFinancesTab {
             return;
         }
         int percent = (Integer) spnStartingCashPercent.getValue();
-        Money unitValue = CommandGenerator.estimateUnitValue(campaign, entities);
+        Money unitValue = CommandGenerator.estimateUnitValue(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().getFaction(), campaign.getGameYear(), entities);
         Money estimate = unitValue.multipliedBy(percent).dividedBy(100).round();
         lblStartingCashPreviewValue.setText(getFormattedTextAt(getCommandGenerationResourceBundle(),
               "startingCashPreview.value", estimate.toAmountAndSymbolString(), percent,

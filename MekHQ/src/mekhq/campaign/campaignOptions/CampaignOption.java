@@ -852,12 +852,24 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "innerSphereUnitPriceMultiplier");
     public static final CampaignOption<Double> INNER_SPHERE_PART_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "innerSpherePartPriceMultiplier");
-    public static final CampaignOption<Double> CLAN_UNIT_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "clanUnitPriceMultiplier");
-    public static final CampaignOption<Double> CLAN_PART_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "clanPartPriceMultiplier");
     public static final CampaignOption<Double> MIXED_TECH_UNIT_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "mixedTechUnitPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechInvasionPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechPostInvasionPriceMultiplier");
+    public static final CampaignOption<Double> SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "successionWarsAdvancedTechPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_E_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingEPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_F_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingFPriceMultiplier");
+    public static final CampaignOption<Double> COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "combatVehicleFusionEnginePriceMultiplier");
+    public static final CampaignOption<Double> XL_ENGINE_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "xlEnginePriceMultiplier");
+    public static final CampaignOption<Double> LIGHT_ENGINE_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "lightEnginePriceMultiplier");
     public static final CampaignOption<Double> DAMAGED_PARTS_VALUE_MULTIPLIER =
           of(Double.class, 0.33, "damagedPartsValueMultiplier");
     public static final CampaignOption<Double> UNREPAIRABLE_PARTS_VALUE_MULTIPLIER =

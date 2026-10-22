@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -47,12 +48,14 @@ import javax.swing.SpinnerNumberModel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import mekhq.campaign.parts.enums.PartQuality;
+import megamek.Version;
 import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
+import mekhq.campaign.finances.AcquisitionPriceMultipliers;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -89,12 +92,26 @@ class PriceMultipliersPage {
     private JSpinner spnInnerSphereUnitPriceMultiplier;
     private JLabel lblInnerSpherePartPriceMultiplier;
     private JSpinner spnInnerSpherePartPriceMultiplier;
-    private JLabel lblClanUnitPriceMultiplier;
-    private JSpinner spnClanUnitPriceMultiplier;
-    private JLabel lblClanPartPriceMultiplier;
-    private JSpinner spnClanPartPriceMultiplier;
     private JLabel lblMixedTechUnitPriceMultiplier;
     private JSpinner spnMixedTechUnitPriceMultiplier;
+
+    private JPanel pnlAcquisitionMultipliers;
+    private JLabel lblClanTechInvasionPriceMultiplier;
+    private JSpinner spnClanTechInvasionPriceMultiplier;
+    private JLabel lblClanTechPostInvasionPriceMultiplier;
+    private JSpinner spnClanTechPostInvasionPriceMultiplier;
+    private JLabel lblSuccessionWarsAdvancedTechPriceMultiplier;
+    private JSpinner spnSuccessionWarsAdvancedTechPriceMultiplier;
+    private JLabel lblTechRatingEPriceMultiplier;
+    private JSpinner spnTechRatingEPriceMultiplier;
+    private JLabel lblTechRatingFPriceMultiplier;
+    private JSpinner spnTechRatingFPriceMultiplier;
+    private JLabel lblCombatVehicleFusionEnginePriceMultiplier;
+    private JSpinner spnCombatVehicleFusionEnginePriceMultiplier;
+    private JLabel lblXLEnginePriceMultiplier;
+    private JSpinner spnXLEnginePriceMultiplier;
+    private JLabel lblLightEnginePriceMultiplier;
+    private JSpinner spnLightEnginePriceMultiplier;
 
     private JPanel pnlUsedPartsMultipliers;
     private JLabel[] lblUsedPartPriceMultipliers;
@@ -125,6 +142,7 @@ class PriceMultipliersPage {
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
+        pnlAcquisitionMultipliers = createAcquisitionMultipliersPanel();
         pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
         pnlOtherMultipliers = createOtherMultipliersPanel();
 
@@ -135,6 +153,9 @@ class PriceMultipliersPage {
                 .section("lblGeneralMultipliersPanel.text",
                         "lblGeneralMultipliersPanel.summary",
                         pnlGeneralMultipliers)
+                .section("lblAcquisitionMultipliersPanel.text",
+                        "lblAcquisitionMultipliersPanel.summary",
+                        pnlAcquisitionMultipliers)
                 .section("lblUsedPartsMultiplierPanel.text",
                         "lblUsedPartsMultiplierPanel.summary",
                         pnlUsedPartsMultipliers)
@@ -153,8 +174,8 @@ class PriceMultipliersPage {
      * Creates and configures the general multipliers panel, which includes labels
      * and spinners for various pricing
      * multipliers such as common parts, Inner Sphere units, Inner Sphere parts,
-     * Clan units, Clan parts, and mixed tech
-     * units. The panel is structured using a grid layout for organized placement of
+     * and mixed tech units. Clan tech is priced by the acquisition multipliers
+     * instead. The panel is structured using a grid layout for organized placement of
      * components.
      *
      * @return a JPanel containing the components for setting general multipliers.
@@ -184,16 +205,6 @@ class PriceMultipliersPage {
                 0.1);
         spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
 
-        lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
-        lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
-        spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier", 1.0, 0.1, 100, 0.1);
-        spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
-
-        lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
-        lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
-        spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
-        spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
-
         lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
         lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("MixedTechUnitPriceMultiplier"));
         spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
@@ -205,13 +216,121 @@ class PriceMultipliersPage {
 
         // Layout the Panel
         JComponent[] labels = { lblCommonPartPriceMultiplier, lblMixedTechUnitPriceMultiplier,
-                lblInnerSphereUnitPriceMultiplier, lblInnerSpherePartPriceMultiplier,
-                lblClanUnitPriceMultiplier, lblClanPartPriceMultiplier };
+                lblInnerSphereUnitPriceMultiplier, lblInnerSpherePartPriceMultiplier };
         JComponent[] controls = { spnCommonPartPriceMultiplier, spnMixedTechUnitPriceMultiplier,
-                spnInnerSphereUnitPriceMultiplier, spnInnerSpherePartPriceMultiplier,
-                spnClanUnitPriceMultiplier, spnClanPartPriceMultiplier };
+                spnInnerSphereUnitPriceMultiplier, spnInnerSpherePartPriceMultiplier };
 
         return createPriceMultiplierGridPanel("GeneralMultipliersPanel", labels, controls);
+    }
+
+    /**
+     * Creates the Campaign Operations acquisition multipliers panel (CO p.14): the era- and faction-dependent Clan tech
+     * and tech rating multipliers, and the engine multipliers. These stack additively with each other (see
+     * {@link AcquisitionPriceMultipliers}).
+     *
+     * @return a JPanel containing the components for setting the acquisition multipliers.
+     */
+    private @Nonnull JPanel createAcquisitionMultipliersPanel() {
+        // Contents
+        lblClanTechInvasionPriceMultiplier = new CampaignOptionsLabel("ClanTechInvasionPriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblClanTechInvasionPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanTechInvasionPriceMultiplier"));
+        spnClanTechInvasionPriceMultiplier = new CampaignOptionsSpinner("ClanTechInvasionPriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnClanTechInvasionPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanTechInvasionPriceMultiplier"));
+
+        lblClanTechPostInvasionPriceMultiplier = new CampaignOptionsLabel("ClanTechPostInvasionPriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblClanTechPostInvasionPriceMultiplier.addMouseListener(
+                createTipPanelUpdater("ClanTechPostInvasionPriceMultiplier"));
+        spnClanTechPostInvasionPriceMultiplier = new CampaignOptionsSpinner("ClanTechPostInvasionPriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnClanTechPostInvasionPriceMultiplier.addMouseListener(
+                createTipPanelUpdater("ClanTechPostInvasionPriceMultiplier"));
+
+        lblSuccessionWarsAdvancedTechPriceMultiplier = new CampaignOptionsLabel(
+              "SuccessionWarsAdvancedTechPriceMultiplier", getMetadata(new Version(0, 51, 1)));
+        lblSuccessionWarsAdvancedTechPriceMultiplier.addMouseListener(
+                createTipPanelUpdater("SuccessionWarsAdvancedTechPriceMultiplier"));
+        spnSuccessionWarsAdvancedTechPriceMultiplier = new CampaignOptionsSpinner(
+                "SuccessionWarsAdvancedTechPriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnSuccessionWarsAdvancedTechPriceMultiplier.addMouseListener(
+                createTipPanelUpdater("SuccessionWarsAdvancedTechPriceMultiplier"));
+
+        lblTechRatingEPriceMultiplier = new CampaignOptionsLabel("TechRatingEPriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblTechRatingEPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingEPriceMultiplier"));
+        spnTechRatingEPriceMultiplier = new CampaignOptionsSpinner("TechRatingEPriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnTechRatingEPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingEPriceMultiplier"));
+
+        lblTechRatingFPriceMultiplier = new CampaignOptionsLabel("TechRatingFPriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblTechRatingFPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingFPriceMultiplier"));
+        spnTechRatingFPriceMultiplier = new CampaignOptionsSpinner("TechRatingFPriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnTechRatingFPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingFPriceMultiplier"));
+
+        lblCombatVehicleFusionEnginePriceMultiplier = new CampaignOptionsLabel(
+              "CombatVehicleFusionEnginePriceMultiplier", getMetadata(new Version(0, 51, 1)));
+        lblCombatVehicleFusionEnginePriceMultiplier.addMouseListener(
+                createTipPanelUpdater("CombatVehicleFusionEnginePriceMultiplier"));
+        spnCombatVehicleFusionEnginePriceMultiplier = new CampaignOptionsSpinner(
+                "CombatVehicleFusionEnginePriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnCombatVehicleFusionEnginePriceMultiplier.addMouseListener(
+                createTipPanelUpdater("CombatVehicleFusionEnginePriceMultiplier"));
+
+        lblXLEnginePriceMultiplier = new CampaignOptionsLabel("XLEnginePriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblXLEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("XLEnginePriceMultiplier"));
+        spnXLEnginePriceMultiplier = new CampaignOptionsSpinner("XLEnginePriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnXLEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("XLEnginePriceMultiplier"));
+
+        lblLightEnginePriceMultiplier = new CampaignOptionsLabel("LightEnginePriceMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        lblLightEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("LightEnginePriceMultiplier"));
+        spnLightEnginePriceMultiplier = new CampaignOptionsSpinner("LightEnginePriceMultiplier",
+                1.0,
+                0.1,
+                100,
+                0.1);
+        spnLightEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("LightEnginePriceMultiplier"));
+
+        // Layout the Panel
+        JComponent[] labels = { lblClanTechInvasionPriceMultiplier, lblClanTechPostInvasionPriceMultiplier,
+                lblSuccessionWarsAdvancedTechPriceMultiplier, lblTechRatingEPriceMultiplier,
+                lblTechRatingFPriceMultiplier, lblCombatVehicleFusionEnginePriceMultiplier,
+                lblXLEnginePriceMultiplier, lblLightEnginePriceMultiplier };
+        JComponent[] controls = { spnClanTechInvasionPriceMultiplier, spnClanTechPostInvasionPriceMultiplier,
+                spnSuccessionWarsAdvancedTechPriceMultiplier, spnTechRatingEPriceMultiplier,
+                spnTechRatingFPriceMultiplier, spnCombatVehicleFusionEnginePriceMultiplier,
+                spnXLEnginePriceMultiplier, spnLightEnginePriceMultiplier };
+
+        return createPriceMultiplierGridPanel("AcquisitionMultipliersPanel", labels, controls);
     }
 
     /**
@@ -353,9 +472,15 @@ class PriceMultipliersPage {
         spnCommonPartPriceMultiplier.setValue(model.commonPartPriceMultiplier);
         spnInnerSphereUnitPriceMultiplier.setValue(model.innerSphereUnitPriceMultiplier);
         spnInnerSpherePartPriceMultiplier.setValue(model.innerSpherePartPriceMultiplier);
-        spnClanUnitPriceMultiplier.setValue(model.clanUnitPriceMultiplier);
-        spnClanPartPriceMultiplier.setValue(model.clanPartPriceMultiplier);
         spnMixedTechUnitPriceMultiplier.setValue(model.mixedTechUnitPriceMultiplier);
+        spnClanTechInvasionPriceMultiplier.setValue(model.clanTechInvasionPriceMultiplier);
+        spnClanTechPostInvasionPriceMultiplier.setValue(model.clanTechPostInvasionPriceMultiplier);
+        spnSuccessionWarsAdvancedTechPriceMultiplier.setValue(model.successionWarsAdvancedTechPriceMultiplier);
+        spnTechRatingEPriceMultiplier.setValue(model.techRatingEPriceMultiplier);
+        spnTechRatingFPriceMultiplier.setValue(model.techRatingFPriceMultiplier);
+        spnCombatVehicleFusionEnginePriceMultiplier.setValue(model.combatVehicleFusionEnginePriceMultiplier);
+        spnXLEnginePriceMultiplier.setValue(model.xlEnginePriceMultiplier);
+        spnLightEnginePriceMultiplier.setValue(model.lightEnginePriceMultiplier);
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             spnUsedPartPriceMultipliers[i].setValue(model.usedPartPriceMultipliers[i]);
@@ -379,9 +504,17 @@ class PriceMultipliersPage {
         model.commonPartPriceMultiplier = (double) spnCommonPartPriceMultiplier.getValue();
         model.innerSphereUnitPriceMultiplier = (double) spnInnerSphereUnitPriceMultiplier.getValue();
         model.innerSpherePartPriceMultiplier = (double) spnInnerSpherePartPriceMultiplier.getValue();
-        model.clanUnitPriceMultiplier = (double) spnClanUnitPriceMultiplier.getValue();
-        model.clanPartPriceMultiplier = (double) spnClanPartPriceMultiplier.getValue();
         model.mixedTechUnitPriceMultiplier = (double) spnMixedTechUnitPriceMultiplier.getValue();
+        model.clanTechInvasionPriceMultiplier = (double) spnClanTechInvasionPriceMultiplier.getValue();
+        model.clanTechPostInvasionPriceMultiplier = (double) spnClanTechPostInvasionPriceMultiplier.getValue();
+        model.successionWarsAdvancedTechPriceMultiplier =
+                (double) spnSuccessionWarsAdvancedTechPriceMultiplier.getValue();
+        model.techRatingEPriceMultiplier = (double) spnTechRatingEPriceMultiplier.getValue();
+        model.techRatingFPriceMultiplier = (double) spnTechRatingFPriceMultiplier.getValue();
+        model.combatVehicleFusionEnginePriceMultiplier =
+                (double) spnCombatVehicleFusionEnginePriceMultiplier.getValue();
+        model.xlEnginePriceMultiplier = (double) spnXLEnginePriceMultiplier.getValue();
+        model.lightEnginePriceMultiplier = (double) spnLightEnginePriceMultiplier.getValue();
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             model.usedPartPriceMultipliers[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();

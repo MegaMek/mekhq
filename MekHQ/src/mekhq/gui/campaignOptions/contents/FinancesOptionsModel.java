@@ -86,9 +86,15 @@ class FinancesOptionsModel {
     double commonPartPriceMultiplier;
     double innerSphereUnitPriceMultiplier;
     double innerSpherePartPriceMultiplier;
-    double clanUnitPriceMultiplier;
-    double clanPartPriceMultiplier;
     double mixedTechUnitPriceMultiplier;
+    double clanTechInvasionPriceMultiplier;
+    double clanTechPostInvasionPriceMultiplier;
+    double successionWarsAdvancedTechPriceMultiplier;
+    double techRatingEPriceMultiplier;
+    double techRatingFPriceMultiplier;
+    double combatVehicleFusionEnginePriceMultiplier;
+    double xlEnginePriceMultiplier;
+    double lightEnginePriceMultiplier;
     double[] usedPartPriceMultipliers;
     double damagedPartsValueMultiplier;
     double unrepairablePartsValueMultiplier;
@@ -141,9 +147,15 @@ class FinancesOptionsModel {
         commonPartPriceMultiplier = options.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER);
         innerSphereUnitPriceMultiplier = options.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
         innerSpherePartPriceMultiplier = options.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER);
-        clanUnitPriceMultiplier = options.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
-        clanPartPriceMultiplier = options.get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER);
         mixedTechUnitPriceMultiplier = options.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
+        clanTechInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER);
+        clanTechPostInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER);
+        successionWarsAdvancedTechPriceMultiplier = options.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER);
+        techRatingEPriceMultiplier = options.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER);
+        techRatingFPriceMultiplier = options.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER);
+        combatVehicleFusionEnginePriceMultiplier = options.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER);
+        xlEnginePriceMultiplier = options.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER);
+        lightEnginePriceMultiplier = options.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER);
         usedPartPriceMultipliers = Arrays.copyOf(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS),
               options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length);
         damagedPartsValueMultiplier = options.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER);
@@ -198,9 +210,15 @@ class FinancesOptionsModel {
         options.set(CampaignOption.COMMON_PART_PRICE_MULTIPLIER, commonPartPriceMultiplier);
         options.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, innerSphereUnitPriceMultiplier);
         options.set(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER, innerSpherePartPriceMultiplier);
-        options.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, clanUnitPriceMultiplier);
-        options.set(CampaignOption.CLAN_PART_PRICE_MULTIPLIER, clanPartPriceMultiplier);
         options.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, mixedTechUnitPriceMultiplier);
+        options.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, clanTechInvasionPriceMultiplier);
+        options.set(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER, clanTechPostInvasionPriceMultiplier);
+        options.set(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER, successionWarsAdvancedTechPriceMultiplier);
+        options.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, techRatingEPriceMultiplier);
+        options.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, techRatingFPriceMultiplier);
+        options.set(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER, combatVehicleFusionEnginePriceMultiplier);
+        options.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, xlEnginePriceMultiplier);
+        options.set(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER, lightEnginePriceMultiplier);
         for (int i = 0; i < Math.min(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length,
               usedPartPriceMultipliers.length); i++) {
             options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[i] = usedPartPriceMultipliers[i];

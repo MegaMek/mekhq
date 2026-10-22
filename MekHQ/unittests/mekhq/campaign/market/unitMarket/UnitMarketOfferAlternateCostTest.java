@@ -60,6 +60,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class UnitMarketOfferAlternateCostTest {
     private static final int SUPPORT_POINTS_TO_C_BILLS = 10_000;
+    private static final int GAME_YEAR = 3060;
 
     private CampaignOptions campaignOptions;
     private MekSummary summary;
@@ -71,7 +72,7 @@ class UnitMarketOfferAlternateCostTest {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
         campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
-        campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
+        campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 2.0);
         campaignOptions.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, 1.5);
 
         summary = mock(MekSummary.class);
@@ -91,40 +92,41 @@ class UnitMarketOfferAlternateCostTest {
     @Test
     void offerIsPricedFromBattleValue() {
         // BV 600 -> 600 SP -> 6,000,000 C-bills at 100%
-        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice());
+        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice(null, GAME_YEAR));
     }
 
     @ParameterizedTest
     @CsvSource({ "85, 5100000", "100, 6000000", "115, 6900000" })
     void marketPercentageStillApplies(int percent, int expected) {
-        assertEquals(Money.of(expected), offer(percent).getPrice());
+        assertEquals(Money.of(expected), offer(percent).getPrice(null, GAME_YEAR));
     }
 
     @Test
     void offerStaysInSupportPointsWithoutTheConversion() {
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
 
-        assertEquals(Money.of(600), offer(100).getPrice());
+        assertEquals(Money.of(600), offer(100).getPrice(null, GAME_YEAR));
     }
 
     @Test
-    void clanMultiplierStillApplies() {
+    void clanTechMultiplierStillApplies() {
         when(entity.isClan()).thenReturn(true);
 
-        assertEquals(Money.of(12_000_000), offer(100).getPrice());
+        assertEquals(Money.of(12_000_000), offer(100).getPrice(null, GAME_YEAR));
     }
 
+    /** Mixed tech pays the mixed-tech multiplier and, since it carries Clan tech, the Clan tech multiplier. */
     @Test
     void mixedTechMultiplierStillApplies() {
         when(entity.isClan()).thenReturn(true);
         when(entity.isMixedTech()).thenReturn(true);
 
-        assertEquals(Money.of(9_000_000), offer(100).getPrice());
+        assertEquals(Money.of(18_000_000), offer(100).getPrice(null, GAME_YEAR));
     }
 
     @Test
     void constructionCostIsNotUsed() {
-        offer(100).getPrice();
+        offer(100).getPrice(null, GAME_YEAR);
 
         verify(summary, never()).getCost();
     }
@@ -133,7 +135,7 @@ class UnitMarketOfferAlternateCostTest {
     void optionOffKeepsConstructionCostPricing() {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
-        assertEquals(Money.of(4_000_000), offer(100).getPrice());
+        assertEquals(Money.of(4_000_000), offer(100).getPrice(null, GAME_YEAR));
         verify(summary, never()).getBV();
     }
 
@@ -148,7 +150,7 @@ class UnitMarketOfferAlternateCostTest {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
         when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.DROPSHIP));
 
-        assertEquals(Money.of(4_000_000), offer(100).getPrice());
+        assertEquals(Money.of(4_000_000), offer(100).getPrice(null, GAME_YEAR));
         verify(summary, never()).getBV();
     }
 
@@ -161,7 +163,7 @@ class UnitMarketOfferAlternateCostTest {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
         when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
 
-        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice());
+        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice(null, GAME_YEAR));
     }
 
     /** An offer whose unit file can't be loaded is still priced, without a tech-base multiplier. */
@@ -170,13 +172,13 @@ class UnitMarketOfferAlternateCostTest {
         UnitMarketOffer offer = offer(100);
         doReturn(null).when(offer).getEntity();
 
-        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer.getPrice());
+        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer.getPrice(null, GAME_YEAR));
     }
 
     @Test
     void largeVesselPricesDoNotOverflow() {
         when(summary.getBV()).thenReturn(1_500_000);
 
-        assertEquals(Money.of(15_000_000_000.0), offer(100).getPrice());
+        assertEquals(Money.of(15_000_000_000.0), offer(100).getPrice(null, GAME_YEAR));
     }
 }
