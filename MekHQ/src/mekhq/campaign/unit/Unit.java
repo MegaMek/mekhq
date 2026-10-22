@@ -7028,13 +7028,17 @@ public class Unit implements ITechnology, ILocatable {
             return false;
         }
 
+        NeuralInterfaceMode neuralInterfaceMode = NeuralInterfaceMode.from(campaign.getGameOptions());
+        if (!neuralInterfaceMode.isOn()) {
+            return false;
+        }
+
         boolean hasDniDriver = drivers.stream().anyMatch(driver -> {
             PersonnelOptions options = driver.getOptions();
             return options.booleanOption(OptionsConstants.MD_VDNI) || options.booleanOption(OptionsConstants.MD_BVDNI);
         });
 
-        return NeuralInterfaceMode.from(campaign.getGameOptions()).grantsBenefit(hasDniDriver,
-              entity.hasDNICockpitMod());
+        return neuralInterfaceMode.grantsBenefit(hasDniDriver, entity.hasDNICockpitMod());
     }
 
     public int getTotalDriverNeeds() {
