@@ -4506,12 +4506,25 @@ public class Campaign implements ITechManager {
      * @return the simplified travel time in days
      */
     public int getSimplifiedTravelTime(PlanetarySystem destination) {
-        if (Objects.equals(getCurrentSystem(), destination)) {
+        return getSimplifiedTravelTime(getCurrentSystem(), destination);
+    }
+
+    /**
+     * Calculates simplified travel time between two systems. Travel time is calculated by dividing distance (in LY) by
+     * 20 and multiplying the result by 7.
+     *
+     * @param origin      the planetary system being traveled from
+     * @param destination the planetary system being traveled to
+     *
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem origin, PlanetarySystem destination) {
+        if (Objects.equals(origin, destination)) {
             return 0;
         } else {
             // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
             // It looked to be around 15-20LY, so 20LY seemed a good gauge
-            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+            return (int) ((origin.getDistanceTo(destination) / 20) * 7);
         }
     }
 
