@@ -37,8 +37,12 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import jakarta.annotation.Nullable;
 import megamek.common.equipment.AmmoType;
@@ -75,6 +79,8 @@ public final class RefitPartOrders {
     private final Map<IAcquisitionWork, Integer> countedOrders = new LinkedHashMap<>();
     /** Ammunition and armor already bought and on their way, with the rounds or points not yet counted */
     private final Map<Part, Integer> uncountedDeliveries = new LinkedHashMap<>();
+    /** The deliveries on their way that this refit has counted some of */
+    private final Set<Part> countedDeliveries = new LinkedHashSet<>();
 
     /**
      * How much of an amount of ammunition or armor is covered.
@@ -211,6 +217,9 @@ public final class RefitPartOrders {
         for (Map.Entry<Part, Integer> delivery : uncountedDeliveries.entrySet()) {
             if ((amountLeft > 0) && delivery.getKey().isSamePartType(wanted)) {
                 int amountTaken = Math.min(amountLeft, delivery.getValue());
+                if (amountTaken > 0) {
+                    countedDeliveries.add(delivery.getKey());
+                }
                 delivery.setValue(delivery.getValue() - amountTaken);
                 onItsWay += amountTaken;
                 amountLeft -= amountTaken;
@@ -266,7 +275,9 @@ public final class RefitPartOrders {
      * @return what was ordered
      */
     public static OrderResult orderMissingParts(Campaign campaign, Refit refit) {
-        Shortfall shortfall = find(campaign, refit).findShortfall();
+        RefitPartOrders openOrders = find(campaign, refit);
+        Shortfall shortfall = openOrders.findShortfall();
+        UUID unitId = refit.getOriginalUnit().getId();
         List<String> cannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
         ForceShoppingList procurementList = campaign.getPlayerForce().getShoppingList();
         IPlace place = findBaseOf(campaign, refit.getOriginalUnit());
@@ -277,7 +288,7 @@ public final class RefitPartOrders {
             if (cannotBeBought.contains(part.getName()) || !(part instanceof IAcquisitionWork work)) {
                 continue;
             }
-            procurementList.addShoppingItem(Refit.newOrderFor(work), 1, campaign, place);
+            procurementList.addShoppingItem(labelled(Refit.newOrderFor(work), unitId), 1, campaign, place);
             partNames.add(part.getName());
         }
         ordered.addAll(tally(partNames));
@@ -285,7 +296,7 @@ public final class RefitPartOrders {
             if ((ammo.toOrder() > 0) && (ammo.ammoType() != null)) {
                 IAcquisitionWork order = new AmmoStorage(0, ammo.ammoType(), 0, campaign).getAcquisitionWork();
                 int tons = ordersFor(ammo.toOrder(), (Part) order);
-                procurementList.addShoppingItem(order, tons, campaign, place);
+                procurementList.addShoppingItem(labelled(order, unitId), tons, campaign, place);
                 ordered.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitNeed.rounds", ammo.ammoType().getName(),
                       tons * amountPerOrder((Part) order)));
             }
@@ -294,7 +305,7 @@ public final class RefitPartOrders {
         if ((armor != null) && (armor.toOrder() > 0)) {
             Part order = refit.getNewArmorSupplies().getNewPart();
             int lots = ordersFor(armor.toOrder(), order);
-            procurementList.addShoppingItem((IAcquisitionWork) order, lots, campaign, place);
+            procurementList.addShoppingItem(labelled((IAcquisitionWork) order, unitId), lots, campaign, place);
             ordered.add(getFormattedTextAt(RESOURCE_BUNDLE, "RefitNeed.armor", order.getName(),
                   lots * amountPerOrder(order)));
         }
@@ -302,8 +313,95 @@ public final class RefitPartOrders {
         LOGGER.info("[RefitParts] Ordered ahead of the refit of {} to {}: {}; cannot be bought: {}",
               refit.getOriginalUnit().getName(), refit.getNewEntity().getShortName(), ordered, cannotBeBought);
         reportOrders(campaign, refit, ordered, cannotBeBought);
+        int ordersLabelled = openOrders.labelWhatCoversTheRefit(unitId);
+        LOGGER.debug("[RefitParts] {}: {} open orders and deliveries already covering the refit now say so",
+              refit.getOriginalUnit().getName(), ordersLabelled);
         markPendingRefit(refit);
         return new OrderResult(ordered, cannotBeBought);
+    }
+
+    private static IAcquisitionWork labelled(IAcquisitionWork order, UUID unitId) {
+        if (order instanceof Part orderPart) {
+            orderPart.setOrderedAheadForUnitId(unitId);
+        }
+        return order;
+    }
+
+    /**
+     * Labels the open orders and the deliveries on their way that this refit counted, so they say which refit they
+     * cover. An order or delivery already labelled for another unit's refit keeps its label.
+     *
+     * @return how many were labelled
+     */
+    private int labelWhatCoversTheRefit(UUID unitId) {
+        List<Part> covering = new ArrayList<>();
+        for (IAcquisitionWork order : countedOrders.keySet()) {
+            if (order instanceof Part orderPart) {
+                covering.add(orderPart);
+            }
+        }
+        covering.addAll(countedDeliveries);
+        for (Part part : refit.getNewUnitParts()) {
+            boolean isSpareOnItsWay = !part.isPresent() && (part.getUnit() == null) && !part.isReservedForRefit();
+            if (isSpareOnItsWay) {
+                covering.add(part);
+            }
+        }
+        int labelled = 0;
+        for (Part part : covering) {
+            if (part.getOrderedAheadForUnitId() == null) {
+                part.setOrderedAheadForUnitId(unitId);
+                labelled++;
+            }
+        }
+        return labelled;
+    }
+
+    /**
+     * @return {@code true} if anything ordered ahead for the unit's refit is still on order, on its way or in the
+     *       warehouse
+     */
+    public static boolean isAnythingOrderedAheadFor(Campaign campaign, Unit unit) {
+        UUID unitId = unit.getId();
+        return streamOrdersAndParts(campaign, unit).anyMatch(part -> unitId.equals(part.getOrderedAheadForUnitId()));
+    }
+
+    /**
+     * Clears the labels on everything ordered ahead for the unit's refit, and the unit's Pending Refit mark. Called
+     * when the refit begins and claims the parts, or when the player forgets the pending refit. The parts and orders
+     * themselves stay, as ordinary spares.
+     *
+     * @return how many labels were cleared
+     */
+    public static int forgetOrdersAheadFor(Campaign campaign, Unit unit) {
+        UUID unitId = unit.getId();
+        List<Part> labelledParts = streamOrdersAndParts(campaign, unit)
+                                         .filter(part -> unitId.equals(part.getOrderedAheadForUnitId()))
+                                         .toList();
+        labelledParts.forEach(part -> part.setOrderedAheadForUnitId(null));
+        unit.setPendingRefitModel(null);
+        LOGGER.debug("[RefitParts] {}: pending refit forgotten, {} orders and parts no longer labelled for it",
+              unit.getName(), labelledParts.size());
+        return labelledParts.size();
+    }
+
+    /**
+     * @return the procurement list's orders, then the parts in the main warehouse and the unit's own, if it differs
+     */
+    private static Stream<Part> streamOrdersAndParts(Campaign campaign, Unit unit) {
+        Stream<Part> orders = campaign.getPlayerForce()
+                                    .getShoppingList()
+                                    .getPartList()
+                                    .stream()
+                                    .filter(Part.class::isInstance)
+                                    .map(Part.class::cast);
+        LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
+        LocalWarehouse unitWarehouse = unit.getWarehouse();
+        Stream<Part> parts = mainWarehouse.getParts().stream();
+        if ((unitWarehouse != null) && (unitWarehouse != mainWarehouse)) {
+            parts = Stream.concat(parts, unitWarehouse.getParts().stream());
+        }
+        return Stream.concat(orders, parts);
     }
 
     /**

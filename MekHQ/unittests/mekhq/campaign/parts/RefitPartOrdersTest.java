@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.Version;
@@ -103,6 +104,30 @@ class RefitPartOrdersTest {
         return count;
     }
 
+    /** Every order and part labelled as ordered ahead for the Locust's refit */
+    private List<Part> labelledForTheLocust() {
+        List<Part> labelled = new ArrayList<>();
+        for (IAcquisitionWork order : campaign.getPlayerForce().getShoppingList().getPartList()) {
+            if ((order instanceof Part orderPart) && locust.getId().equals(orderPart.getOrderedAheadForUnitId())) {
+                labelled.add(orderPart);
+            }
+        }
+        for (Part part : scenario.getWarehouse().getParts()) {
+            if (locust.getId().equals(part.getOrderedAheadForUnitId())) {
+                labelled.add(part);
+            }
+        }
+        return labelled;
+    }
+
+    private IAcquisitionWork firstSmallLaserOrder() {
+        return campaign.getPlayerForce().getShoppingList().getPartList().stream()
+                     .filter(order -> (order.getNewEquipment() instanceof Part orderedPart)
+                           && SMALL_LASER.equals(orderedPart.getName()))
+                     .findFirst()
+                     .orElseThrow();
+    }
+
     private static List<String> describe(List<Refit.RefitNeed> needs, Refit.Supply supply) {
         return needs.stream().filter(need -> need.supply() == supply).map(Refit.RefitNeed::description).toList();
     }
@@ -142,6 +167,64 @@ class RefitPartOrdersTest {
         assertTrue(locust.isPendingRefit());
         assertTrue(locust.getColorReasonKeys().contains("colorReason.unit.pendingRefit"),
               locust.getColorReasonKeys().toString());
+        assertEquals(locust.getId(), ((Part) firstSmallLaserOrder()).getOrderedAheadForUnitId(),
+              "The order says which refit it is for");
+    }
+
+    @Test
+    void aPartBoughtFromAnOrderSaysWhichRefitItIsFor() {
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        firstSmallLaserOrder().find(5, 1.0);
+
+        Part boughtLaser = scenario.getWarehouse().getParts().stream()
+                                 .filter(part -> SMALL_LASER.equals(part.getName()) && !part.isPresent())
+                                 .findFirst()
+                                 .orElseThrow();
+        assertEquals(locust.getId(), boughtLaser.getOrderedAheadForUnitId());
+        assertEquals("Ordered ahead for the refit of " + locust.getName(), boughtLaser.getRepairDesc());
+        Part plainSpare = boughtLaser.clone();
+        plainSpare.setDaysToArrival(boughtLaser.getDaysToArrival());
+        assertFalse(boughtLaser.isSamePartTypeAndStatus(plainSpare),
+              "A part ordered ahead does not stack with a plain spare, so it keeps its label");
+        assertTrue(locust.isPendingRefit(), "The laser on its way keeps the refit pending");
+    }
+
+    @Test
+    void orderPartsLabelsAnOrderPlacedEarlier() {
+        IAcquisitionWork earlierOrder = (IAcquisitionWork) smallLaserFromAnotherLocust().getMissingPart();
+        campaign.getPlayerForce().getShoppingList().addShoppingItem(earlierOrder, 1, campaign);
+
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        assertEquals(locust.getId(), ((Part) earlierOrder).getOrderedAheadForUnitId(),
+              "An order already covering the refit, such as one in an older save, is labelled for it");
+    }
+
+    @Test
+    void cancellingTheOrdersEndsThePendingRefit() {
+        RefitPartOrders.orderMissingParts(campaign, planLocustRefit());
+
+        campaign.getPlayerForce().getShoppingList().getShoppingList().removeIf(order -> order instanceof Part);
+
+        assertFalse(locust.isPendingRefit(), "Nothing is left on order for the refit");
+    }
+
+    @Test
+    void theLabelIsSavedWithThePart() throws Exception {
+        Part laser = smallLaserFromAnotherLocust();
+        laser.setOrderedAheadForUnitId(locust.getId());
+
+        StringWriter partXml = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(partXml);
+        laser.writeToXML(printWriter, 0);
+        printWriter.flush();
+        Element partElement = MHQXMLUtility.newSafeDocumentBuilder()
+                                    .parse(new ByteArrayInputStream(
+                                          partXml.toString().getBytes(StandardCharsets.UTF_8)))
+                                    .getDocumentElement();
+
+        assertEquals(locust.getId(), Part.generateInstanceFromXML(partElement, new Version()).getOrderedAheadForUnitId());
     }
 
     @Test
@@ -233,6 +316,7 @@ class RefitPartOrdersTest {
                                             .anyMatch(order -> ((Part) order).getRefitUnit() == locust);
         assertTrue(isOrderedByTheRefit, "The refit placed its own orders");
         assertNull(locust.getPendingRefitModel(), "The refit itself now tracks its parts");
+        assertEquals(List.of(), labelledForTheLocust(), "The refit claims the orders, so their labels go");
         assertTrue(locust.isPendingRefit(), "The refit is still waiting for the parts it ordered");
     }
 

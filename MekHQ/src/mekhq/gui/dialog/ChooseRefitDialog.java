@@ -358,9 +358,13 @@ public class ChooseRefitDialog extends JDialog {
 
         List<Refit.RefitNeed> needs = r.describeNeeds();
         boolean hasPartsToOrder = needs.stream().anyMatch(need -> need.supply() == Refit.Supply.TO_ORDER);
-        btnOrderParts.setEnabled(hasPartsToOrder);
-        btnOrderParts.setToolTipText(getTextAt(RESOURCE_BUNDLE,
-              hasPartsToOrder ? "btnOrderParts.tooltip" : "btnOrderParts.nothingToOrder.tooltip"));
+        // Orders placed some other way, or in an older save, are not yet labelled for this refit
+        boolean hasUnlabelledOrders = !hasPartsToOrder && !unit.isPendingRefit() && needs.stream()
+              .anyMatch(need -> (need.supply() == Refit.Supply.ON_ORDER) || (need.supply() == Refit.Supply.ON_ITS_WAY));
+        btnOrderParts.setEnabled(hasPartsToOrder || hasUnlabelledOrders);
+        String tooltipKey = hasPartsToOrder ? "btnOrderParts.tooltip"
+              : (hasUnlabelledOrders ? "btnOrderParts.labelOrders.tooltip" : "btnOrderParts.nothingToOrder.tooltip");
+        btnOrderParts.setToolTipText(getTextAt(RESOURCE_BUNDLE, tooltipKey));
 
         JList<String> lstShopping = new JList<>(listNeeds(needs).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);

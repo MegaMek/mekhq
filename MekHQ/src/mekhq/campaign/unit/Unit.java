@@ -8253,7 +8253,8 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * A refit is pending while its parts are awaited: either the refit has begun and its kit or parts are still to be
-     * found or on their way, or the player ordered its parts ahead and has not begun it yet.
+     * found or on their way, or the player ordered its parts ahead and has not begun it yet. Parts ordered ahead count
+     * only while some are still on order, on their way or in the warehouse, so cancelling the orders ends it.
      *
      * @return {@code true} if the unit is waiting for parts for a refit
      */
@@ -8261,7 +8262,7 @@ public class Unit implements ITechnology, ILocatable {
         if (isRefitting()) {
             return refit.getDaysUntilPartsArrive() != 0;
         }
-        return pendingRefitModel != null;
+        return (pendingRefitModel != null) && RefitPartOrders.isAnythingOrderedAheadFor(getCampaign(), this);
     }
 
     public String getName() {

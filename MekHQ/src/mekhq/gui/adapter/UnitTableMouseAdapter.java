@@ -110,6 +110,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -604,9 +605,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_FORGET_PENDING_REFIT)) {
             for (Unit unit : units) {
                 if (unit.getPendingRefitModel() != null) {
-                    LOGGER.debug("[RefitParts] {}: pending refit to {} forgotten", unit.getName(),
-                          unit.getPendingRefitModel());
-                    unit.setPendingRefitModel(null);
+                    RefitPartOrders.forgetOrdersAheadFor(gui.getCampaign(), unit);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
