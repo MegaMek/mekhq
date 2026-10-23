@@ -106,6 +106,10 @@ public class CommandGenerationOptions {
     private boolean generateMedics;
     private boolean medicsAsPersonnel;
     private SkillLevel medicSkillLevel;
+    // Medical reserve (generation-only): optionally create spare unassigned combat personnel as injury
+    // replacements, sized as a percentage of the people generated in each combat role.
+    private boolean generateMedicalReserve;
+    private int medicalReservePercent;
 
     // Tech-to-unit assignment sort grid. Three sort slots each holding a
     // TechAssignmentSortFactor; the assigner chains them in slot order (primary -> secondary ->
@@ -206,6 +210,8 @@ public class CommandGenerationOptions {
         setGenerateMedics(true);
         setMedicsAsPersonnel(false);
         setMedicSkillLevel(SkillLevel.NONE);
+        setGenerateMedicalReserve(true);
+        setMedicalReservePercent(10);
 
         // Tech-to-unit assignment grid defaults: officers first, then heaviest, then best pilot.
         setAssignTechsToUnits(true);
@@ -372,6 +378,22 @@ public class CommandGenerationOptions {
 
     public void setMedicSkillLevel(final SkillLevel medicSkillLevel) {
         this.medicSkillLevel = medicSkillLevel;
+    }
+
+    public boolean isGenerateMedicalReserve() {
+        return generateMedicalReserve;
+    }
+
+    public void setGenerateMedicalReserve(final boolean generateMedicalReserve) {
+        this.generateMedicalReserve = generateMedicalReserve;
+    }
+
+    public int getMedicalReservePercent() {
+        return medicalReservePercent;
+    }
+
+    public void setMedicalReservePercent(final int medicalReservePercent) {
+        this.medicalReservePercent = medicalReservePercent;
     }
 
     public boolean isAssignTechsToUnits() {
@@ -776,6 +798,8 @@ public class CommandGenerationOptions {
               && (generateMedics == other.generateMedics)
               && (medicsAsPersonnel == other.medicsAsPersonnel)
               && Objects.equals(medicSkillLevel, other.medicSkillLevel)
+              && (generateMedicalReserve == other.generateMedicalReserve)
+              && (medicalReservePercent == other.medicalReservePercent)
               && (assignTechsToUnits == other.assignTechsToUnits)
               && Objects.equals(techAssignmentPrimarySort, other.techAssignmentPrimarySort)
               && (techAssignmentPrimaryDescending == other.techAssignmentPrimaryDescending)
@@ -836,6 +860,8 @@ public class CommandGenerationOptions {
               generateMedics,
               medicsAsPersonnel,
               medicSkillLevel,
+              generateMedicalReserve,
+              medicalReservePercent,
               assignTechsToUnits,
               techAssignmentPrimarySort,
               techAssignmentPrimaryDescending,
