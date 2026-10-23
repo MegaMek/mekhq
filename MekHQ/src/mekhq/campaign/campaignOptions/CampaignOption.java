@@ -269,6 +269,8 @@ public final class CampaignOption<T> {
           of(Integer.class, CampaignOptions.TRANSIT_UNIT_MONTH, "unitTransitTime");
     public static final CampaignOption<Boolean> NO_DELIVERIES_IN_TRANSIT =
           of(Boolean.class, false, "noDeliveriesInTransit");
+    public static final CampaignOption<Boolean> USE_MARGIN_OF_SUCCESS_DELIVERY =
+          of(Boolean.class, false, "useMarginOfSuccessDelivery");
     public static final CampaignOption<Boolean> USE_PLANETARY_ACQUISITION =
           of(Boolean.class, false, "usePlanetaryAcquisition");
     public static final CampaignOption<Integer> MAX_JUMPS_PLANETARY_ACQUISITION =
