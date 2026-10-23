@@ -50,8 +50,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import megamek.SuiteOptions;
 import megamek.client.ui.util.UIUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.education.Academy;
@@ -259,7 +259,7 @@ public class PlanetViewPanel extends JScrollablePanel {
                     String.valueOf(planet.getSourcedHPG(currentDate).getValue()), false);
             }
             planet.getPopulation(currentDate);
-            String population = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getNumberFormatLocale())
+            String population = NumberFormat.getIntegerInstance(SuiteOptions.getNumberFormatLocale())
                                       .format(planet.getPopulation(currentDate));
             addMetric(summary, metricIndex++, "summary.population.text", population, false);
             addMetric(summary, metricIndex++, "summary.hiringHall.text", getHiringHallText(planet), false);

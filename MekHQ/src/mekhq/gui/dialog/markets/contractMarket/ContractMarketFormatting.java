@@ -50,7 +50,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import mekhq.MekHQ;
+import megamek.SuiteOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -283,7 +283,7 @@ public final class ContractMarketFormatting {
         String sign = amount < 0 ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.minus") : "";
         double magnitude = Math.abs(amount);
 
-        NumberFormat format = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getNumberFormatLocale());
+        NumberFormat format = NumberFormat.getNumberInstance(SuiteOptions.getNumberFormatLocale());
         // The unit is chosen after rounding, so an amount just short of a million reads "1.00M" rather than "1,000K",
         // and one just short of a thousand reads "1K" rather than "1,000".
         if (Math.round(magnitude / THOUSAND) >= THOUSAND) {
@@ -346,7 +346,7 @@ public final class ContractMarketFormatting {
      */
     public static DecimalFormat decimalFormat(String pattern) {
         return new DecimalFormat(pattern,
-              DecimalFormatSymbols.getInstance(MekHQ.getMHQOptions().getNumberFormatLocale()));
+              DecimalFormatSymbols.getInstance(SuiteOptions.getNumberFormatLocale()));
     }
 
     private static String ratingLetter(int equipmentRating) {

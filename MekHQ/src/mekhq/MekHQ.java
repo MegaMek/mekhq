@@ -67,6 +67,7 @@ import jakarta.annotation.Nullable;
 import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
+import megamek.SuiteOptions;
 import megamek.client.Client;
 import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
@@ -393,7 +394,7 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
-        Locale.setDefault(Locale.Category.FORMAT, getMHQOptions().getNumberFormatLocale());
+        Locale.setDefault(Locale.Category.FORMAT, SuiteOptions.getNumberFormatLocale());
         Config.setSerialFilter(sanityInputFilter);
         MegaMek.setOriginProject(MHQConstants.PROJECT_NAME);
 

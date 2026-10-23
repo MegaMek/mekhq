@@ -44,7 +44,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
-import mekhq.MekHQ;
+import megamek.SuiteOptions;
 import mekhq.campaign.finances.Money;
 
 /**
@@ -55,7 +55,7 @@ public class JMoneyTextField extends JFormattedTextField implements FocusListene
 
     public JMoneyTextField() {
         this.formatter = new StrictNumberFormatter(
-              NumberFormat.getInstance(MekHQ.getMHQOptions().getNumberFormatLocale()));
+              NumberFormat.getInstance(SuiteOptions.getNumberFormatLocale()));
         this.addFocusListener(this);
         this.setFormatterFactory(new DefaultFormatterFactory(this.formatter));
     }

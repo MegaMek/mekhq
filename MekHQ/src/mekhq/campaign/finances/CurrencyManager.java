@@ -44,9 +44,9 @@ import java.util.Objects;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 
+import megamek.SuiteOptions;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
@@ -299,7 +299,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     private void createFormatters() {
-        final Locale numberFormatLocale = MekHQ.getMHQOptions().getNumberFormatLocale();
+        final Locale numberFormatLocale = SuiteOptions.getNumberFormatLocale();
 
         this.uiAmountPrinter = new MoneyFormatterBuilder().appendAmountLocalized().toFormatter(numberFormatLocale);
 
