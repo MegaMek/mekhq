@@ -111,6 +111,7 @@ import mekhq.campaign.parts.RefitBriefing;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.roleplay.CampaignChronicleListener;
@@ -1985,28 +1986,18 @@ public class CampaignGUI extends JPanel {
 
         // Optional New Day Blocker
         if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) {
-            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+            TurnoverPromptOutcome turnoverPrompt = getCampaign().checkTurnoverPrompt();
 
             switch (turnoverPrompt) {
-                case -1:
-                    // the user wasn't presented with the dialog
-                    break;
-                case 0:
-                    // the user launched the turnover dialog
+                case NOT_PROMPTED, ADVANCE_DAY_REGARDLESS -> {
+                    // Nothing blocks the new day
+                }
+                case EMPLOYEE_TURNOVER -> {
                     if (!showRetirementDefectionDialog()) {
                         dayEndingEvent.cancel();
-                        return;
                     }
-                case 1:
-                    // the user picked 'Advance Day Regardless'
-                    break;
-                case 2:
-                    // the user canceled
-                    dayEndingEvent.cancel();
-                    return;
-                default:
-                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
-                                                          turnoverPrompt);
+                }
+                case CANCEL_ADVANCE_DAY -> dayEndingEvent.cancel();
             }
         }
     }
