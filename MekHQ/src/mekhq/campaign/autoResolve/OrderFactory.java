@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -186,8 +186,8 @@ public class OrderFactory {
                                                        .equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
                                                  return currentUnits < objective.getFixedAmount() || timeLimit;
                                              } else {
-                                                 int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                                                 return percent < objective.getPercentage() || timeLimit;
+                                                 return (currentUnits * 100 < objective.getPercentage() * totalUnits)
+                                                              || timeLimit;
                                              }
                                          } else {
                                              if (timeLimit) {
@@ -229,8 +229,8 @@ public class OrderFactory {
                                                .equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
                                          return currentUnits < objective.getFixedAmount() || timeLimit;
                                      } else {
-                                         int percent = (int) ((totalUnits / (double) currentUnits) * 100);
-                                         return percent < objective.getPercentage() || timeLimit;
+                                         return (currentUnits * 100 < objective.getPercentage() * totalUnits)
+                                                      || timeLimit;
                                      }
                                  });
         return orderBuilder.build();
@@ -257,8 +257,7 @@ public class OrderFactory {
                 if (objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Fixed)) {
                     return (totalUnits - currentUnits) < objective.getFixedAmount();
                 } else {
-                    var currentPercent = 100 - (int) (currentUnits / (double) totalUnits);
-                    return (objective.getPercentage() - currentPercent) > 0;
+                    return (totalUnits - currentUnits) * 100 < objective.getPercentage() * totalUnits;
                 }
             });
         }
