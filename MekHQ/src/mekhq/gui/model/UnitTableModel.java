@@ -375,7 +375,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 if (unitCampaign == null) {
                     yield "-";
                 }
-                int id = unit.getFormationId();
+                int id = unit.getDisplayFormationId();
                 Formation formation = unitCampaign.getPlayerForce().getFormation(id);
                 yield (formation != null) ? formation.getFullName() : "-";
             }
@@ -530,7 +530,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 }
                 case COL_FORCE: {
                     Campaign campaign1 = getCampaign();
-                    Formation formation = campaign1.getPlayerForce().getFormationFor(u);
+                    Formation formation = campaign1.getPlayerForce().getFormation(u.getDisplayFormationId());
                     if (formation != null) {
                         boolean includeTopLevel = getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME);
                         List<String> path = formation.getDisplayPath(includeTopLevel);
