@@ -8533,7 +8533,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
+        double timeIncrease = Maintenance.getDailyMaintenanceProgress(campaign);
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;
