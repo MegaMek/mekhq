@@ -259,6 +259,8 @@ public class Unit implements ITechnology, ILocatable {
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
     private int mothballTime;
+    /** The model the player ordered refit parts for ahead of the refit (issue #7848), or {@code null} */
+    private @Nullable String pendingRefitModel;
     private boolean mothballed;
 
     private double daysSinceMaintenance;
@@ -3711,6 +3713,10 @@ public class Unit implements ITechnology, ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballed", true);
         }
 
+        if (pendingRefitModel != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pendingRefitModel", pendingRefitModel);
+        }
+
         if (!fluffName.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fluffName", fluffName);
         }
@@ -3944,6 +3950,8 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.salvaged = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("pendingRefitModel")) {
+                    retVal.pendingRefitModel = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, campaign);
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
@@ -5736,6 +5744,8 @@ public class Unit implements ITechnology, ILocatable {
             return MekHQ.getMHQOptions().getInTransitForeground();
         } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             return MekHQ.getMHQOptions().getQueuedForTravelForeground();
+        } else if (isPendingRefit()) {
+            return MekHQ.getMHQOptions().getPendingRefitForeground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingForeground();
         } else if (isMothballing()) {
@@ -5764,6 +5774,8 @@ public class Unit implements ITechnology, ILocatable {
             return MekHQ.getMHQOptions().getInTransitBackground();
         } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             return MekHQ.getMHQOptions().getQueuedForTravelBackground();
+        } else if (isPendingRefit()) {
+            return MekHQ.getMHQOptions().getPendingRefitBackground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingBackground();
         } else if (isMothballing()) {
@@ -5802,6 +5814,10 @@ public class Unit implements ITechnology, ILocatable {
         }
         if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             reasons.add("colorReason.unit.queuedForTravel");
+        }
+        if (isPendingRefit()) {
+            boolean isReadyToBegin = !isRefitting() && RefitPartOrders.isEverythingOrderedAheadHere(getCampaign(), this);
+            reasons.add(isReadyToBegin ? "colorReason.unit.pendingRefitReady" : "colorReason.unit.pendingRefit");
         }
         if (isRefitting()) {
             reasons.add("colorReason.unit.refitting");
@@ -6889,8 +6905,10 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
-     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
-     * previous engineer.</p>
+     * <p>A vessel's engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer. Infantry's engineer is not flagged: the flag shares the engineer's minutes with the whole
+     * crew, which suits a vessel crew working as one team but not a support platoon whose techs each look after their
+     * own units.</p>
      *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
@@ -6936,7 +6954,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
-            engineer.setEngineer(true);
+            // Flagging infantry's engineer would give every trooper the engineer's minutes, so a support platoon's
+            // techs would lose their day whenever the ranking tech worked on their own units (#10654)
+            boolean isVesselEngineer = !(getEntity() instanceof Infantry);
+            engineer.setEngineer(isVesselEngineer);
             // change reference for any scheduled tasks
             for (IPartWork scheduledWork : getScheduledWork()) {
                 scheduledWork.setTech(engineer);
@@ -8279,6 +8300,37 @@ public class Unit implements ITechnology, ILocatable {
         return null != refit;
     }
 
+    /**
+     * @return the model the player ordered refit parts for ahead of the refit, for example {@code LCT-1E}, or
+     *       {@code null} when no parts were ordered ahead
+     */
+    public @Nullable String getPendingRefitModel() {
+        return pendingRefitModel;
+    }
+
+    /**
+     * Marks the unit as waiting for parts ordered ahead of a refit, or clears the mark.
+     *
+     * @param pendingRefitModel the model the parts were ordered for, or {@code null} to clear the mark
+     */
+    public void setPendingRefitModel(@Nullable String pendingRefitModel) {
+        this.pendingRefitModel = pendingRefitModel;
+    }
+
+    /**
+     * A refit is pending while its parts are awaited: either the refit has begun and its kit or parts are still to be
+     * found or on their way, or the player ordered its parts ahead and has not begun it yet. Parts ordered ahead count
+     * only while some are still on order, on their way or in the warehouse, so cancelling the orders ends it.
+     *
+     * @return {@code true} if the unit is waiting for parts for a refit
+     */
+    public boolean isPendingRefit() {
+        if (isRefitting()) {
+            return refit.getDaysUntilPartsArrive() != 0;
+        }
+        return (pendingRefitModel != null) && RefitPartOrders.isAnythingOrderedAheadFor(getCampaign(), this);
+    }
+
     public String getName() {
         return getFluffName().isBlank() ?
                      getEntity().getShortName() :
@@ -8554,7 +8606,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
+        double timeIncrease = Maintenance.getDailyMaintenanceProgress(campaign);
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;
