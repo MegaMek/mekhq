@@ -169,6 +169,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
+import mekhq.campaign.unit.enums.CrewSeat;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -7560,6 +7561,90 @@ public class Unit implements ITechnology, ILocatable {
                   person,
                   getCampaign().getLocalDate(),
                   campaign1.getPlayerForce().getFormationFor(this));
+        }
+    }
+
+    /**
+     * Finds the crew seat a person holds in this unit.
+     *
+     * @param person the person to look for
+     *
+     * @return the seat they hold, or {@code null} if they do not crew this unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable CrewSeat getCrewSeat(final @Nullable Person person) {
+        if (person == null) {
+            return null;
+        }
+
+        if (person.equals(techOfficer)) {
+            return CrewSeat.TECH_OFFICER;
+        }
+
+        if (person.equals(navigator)) {
+            return CrewSeat.NAVIGATOR;
+        }
+
+        // addPilotOrSoldier puts the person in both lists whenever the cockpit has one position for both jobs
+        boolean isDriver = drivers.contains(person);
+        boolean isGunner = gunners.contains(person);
+        if (isDriver && isGunner) {
+            return CrewSeat.PILOT_OR_SOLDIER;
+        } else if (isDriver) {
+            return CrewSeat.DRIVER;
+        } else if (isGunner) {
+            return CrewSeat.GUNNER;
+        }
+
+        if (vesselCrew.contains(person)) {
+            return CrewSeat.VESSEL_CREW;
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks whether this unit has room for one more person in the given seat.
+     *
+     * @param crewSeat the seat to check
+     *
+     * @return {@code true} if the seat is open
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasOpenCrewSeat(final CrewSeat crewSeat) {
+        return switch (crewSeat) {
+            case PILOT_OR_SOLDIER -> usesSoldiers() ? canTakeMoreGunners() : canTakeMoreDrivers();
+            case DRIVER -> canTakeMoreDrivers();
+            case GUNNER -> canTakeMoreGunners();
+            case VESSEL_CREW -> canTakeMoreVesselCrew();
+            case NAVIGATOR -> canTakeNavigator();
+            case TECH_OFFICER -> canTakeTechOfficer();
+        };
+    }
+
+    /**
+     * Seats a person in the given crew seat of this unit, using the same assignment method the seat was filled with.
+     *
+     * <p>This does not check that the seat is open; see {@link #hasOpenCrewSeat(CrewSeat)}.</p>
+     *
+     * @param person   the person to seat
+     * @param crewSeat the seat to give them
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addToCrewSeat(final Person person, final CrewSeat crewSeat) {
+        switch (crewSeat) {
+            case PILOT_OR_SOLDIER -> addPilotOrSoldier(person);
+            case DRIVER -> addDriver(person);
+            case GUNNER -> addGunner(person);
+            case VESSEL_CREW -> addVesselCrew(person);
+            case NAVIGATOR -> setNavigator(person);
+            case TECH_OFFICER -> setTechOfficer(person);
         }
     }
 
