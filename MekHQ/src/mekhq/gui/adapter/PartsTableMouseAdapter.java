@@ -394,9 +394,15 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
      */
     private void addBeginRefitItem(JPopupMenu popup, Part[] parts) {
         UUID unitId = parts[0].getOrderedAheadForUnitId();
-        boolean isOrderedForOneUnit = (unitId != null)
-              && Arrays.stream(parts).allMatch(selectedPart -> unitId.equals(selectedPart.getOrderedAheadForUnitId()));
-        Unit unit = isOrderedForOneUnit ? gui.getCampaign().getUnit(unitId) : null;
+        if (unitId == null) {
+            return;
+        }
+        for (Part selectedPart : parts) {
+            if (!unitId.equals(selectedPart.getOrderedAheadForUnitId())) {
+                return;
+            }
+        }
+        Unit unit = gui.getCampaign().getUnit(unitId);
         if (unit == null) {
             return;
         }

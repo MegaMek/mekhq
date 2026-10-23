@@ -382,8 +382,9 @@ public final class RefitPartOrders {
         }
         covering.addAll(countedDeliveries);
         for (Part part : refit.getNewUnitParts()) {
-            boolean isSpareOnItsWay = !part.isPresent() && (part.getUnit() == null) && !part.isReservedForRefit();
-            if (isSpareOnItsWay) {
+            boolean isOnItsWay = !part.isPresent();
+            boolean isSpare = (part.getUnit() == null) && !part.isReservedForRefit();
+            if (isOnItsWay && isSpare) {
                 covering.add(part);
             }
         }
@@ -473,8 +474,12 @@ public final class RefitPartOrders {
         List<Part> partsOrderedAhead = streamParts(campaign, unit)
                                              .filter(part -> unitId.equals(part.getOrderedAheadForUnitId()))
                                              .toList();
-        boolean isEverythingDelivered = partsOrderedAhead.stream().allMatch(Part::isPresent);
-        return !partsOrderedAhead.isEmpty() && isEverythingDelivered;
+        for (Part part : partsOrderedAhead) {
+            if (!part.isPresent()) {
+                return false;
+            }
+        }
+        return !partsOrderedAhead.isEmpty();
     }
 
     /**
@@ -510,11 +515,13 @@ public final class RefitPartOrders {
      * @return what a planned refit still has to buy, because it was neither ordered ahead nor is it in stock
      */
     public static List<String> describeStillToBuy(Refit refit) {
-        return refit.describeNeeds()
-                     .stream()
-                     .filter(need -> need.supply() == Refit.Supply.TO_ORDER)
-                     .map(Refit.RefitNeed::description)
-                     .toList();
+        List<String> stillToBuy = new ArrayList<>();
+        for (Refit.RefitNeed need : refit.describeNeeds()) {
+            if (need.supply() == Refit.Supply.TO_ORDER) {
+                stillToBuy.add(need.description());
+            }
+        }
+        return stillToBuy;
     }
 
     /**
@@ -547,17 +554,21 @@ public final class RefitPartOrders {
             }
         }
         List<Unit> readyUnits = new ArrayList<>();
+        List<String> readyUnitNames = new ArrayList<>();
         for (UUID unitId : unitIds) {
             Unit unit = campaign.getUnit(unitId);
-            boolean isAwaitingTheRefit = (unit != null) && !unit.isRefitting()
-                  && (unit.getPendingRefitModel() != null);
+            if (unit == null) {
+                continue;
+            }
+            boolean isAwaitingTheRefit = !unit.isRefitting() && (unit.getPendingRefitModel() != null);
             if (isAwaitingTheRefit && isEverythingOrderedAheadHere(campaign, unit)) {
                 readyUnits.add(unit);
+                readyUnitNames.add(unit.getName());
             }
         }
         if (!unitIds.isEmpty()) {
             LOGGER.info("[RefitParts] Parts ordered ahead arrived for {} units; everything is here for {}",
-                  unitIds.size(), readyUnits.stream().map(Unit::getName).toList());
+                  unitIds.size(), readyUnitNames);
         }
         return readyUnits;
     }
@@ -568,10 +579,13 @@ public final class RefitPartOrders {
      */
     private static void markPendingRefit(Refit refit) {
         Unit unit = refit.getOriginalUnit();
-        boolean isAwaitingParts = refit.describeNeeds()
-                                        .stream()
-                                        .anyMatch(need -> (need.supply() == Refit.Supply.ON_ORDER)
-                                              || (need.supply() == Refit.Supply.ON_ITS_WAY));
+        boolean isAwaitingParts = false;
+        for (Refit.RefitNeed need : refit.describeNeeds()) {
+            if (need.isComing()) {
+                isAwaitingParts = true;
+                break;
+            }
+        }
         if (!isAwaitingParts) {
             LOGGER.debug("[RefitParts] {}: nothing is on order or on its way, so no refit is pending", unit.getName());
             return;

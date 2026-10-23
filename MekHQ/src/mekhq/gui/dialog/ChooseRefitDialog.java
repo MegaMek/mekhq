@@ -50,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -346,10 +345,11 @@ public class ChooseRefitDialog extends JDialog {
         StringBuilder message = new StringBuilder();
         if (isAnythingToOrder) {
             // Each part goes on its own line, so a long order reads at a glance
-            String partList = plannedOrders.ordered()
-                                    .stream()
-                                    .map(item -> "<li>" + item + "</li>")
-                                    .collect(Collectors.joining("", "<ul>", "</ul>"));
+            StringBuilder partList = new StringBuilder("<ul>");
+            for (String item : plannedOrders.ordered()) {
+                partList.append("<li>").append(item).append("</li>");
+            }
+            partList.append("</ul>");
             message.append(getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.toOrder", campaign.getCommanderAddress(),
                   unit.getName(), model, partList));
         } else {
@@ -420,8 +420,8 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     private void refitTableValueChanged() {
-        Refit r = getSelectedRefit();
-        if (null == r) {
+        Refit selectedRefit = getSelectedRefit();
+        if (null == selectedRefit) {
             scrShoppingList.setViewportView(null);
             scrShoppingList.setColumnHeaderView(null);
             txtNewUnit.setText("");
@@ -432,17 +432,22 @@ public class ChooseRefitDialog extends JDialog {
         }
 
         boolean isAllowedDesign = !campaign.getCampaignOptions().get(CampaignOption.ALLOW_CANON_REFIT_ONLY)
-              || r.getNewEntity().isCanon();
-        boolean canBuyKit = !RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(campaign, r);
+              || selectedRefit.getNewEntity().isCanon();
+        boolean canBuyKit = !RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(campaign, selectedRefit);
         btnRefit.setEnabled(isAllowedDesign && canBuyKit);
         btnRefit.setToolTipText(getTextAt(RESOURCE_BUNDLE, canBuyKit ? "btnRefit.tooltip" : "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
 
-        List<Refit.RefitNeed> needs = r.describeNeeds();
-        boolean hasPartsToOrder = needs.stream().anyMatch(need -> need.supply() == Refit.Supply.TO_ORDER);
+        List<Refit.RefitNeed> needs = selectedRefit.describeNeeds();
+        boolean hasPartsToOrder = false;
+        boolean hasPartsComing = false;
+        for (Refit.RefitNeed need : needs) {
+            hasPartsToOrder |= (need.supply() == Refit.Supply.TO_ORDER);
+            hasPartsComing |= need.isComing();
+        }
         // Orders placed some other way, or in an older save, are not yet labelled for this refit
-        boolean hasUnlabelledOrders = !hasPartsToOrder && !unit.isPendingRefit() && needs.stream()
-              .anyMatch(need -> (need.supply() == Refit.Supply.ON_ORDER) || (need.supply() == Refit.Supply.ON_ITS_WAY));
+        boolean isAlreadyLabelled = unit.isPendingRefit();
+        boolean hasUnlabelledOrders = !hasPartsToOrder && hasPartsComing && !isAlreadyLabelled;
         btnOrderParts.setEnabled(hasPartsToOrder || hasUnlabelledOrders);
         String tooltipKey = hasPartsToOrder ? "btnOrderParts.tooltip"
               : (hasUnlabelledOrders ? "btnOrderParts.labelOrders.tooltip" : "btnOrderParts.nothingToOrder.tooltip");
@@ -450,9 +455,9 @@ public class ChooseRefitDialog extends JDialog {
 
         JList<String> lstShopping = new JList<>(listNeeds(needs).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
-        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(r)));
-        EntityReadout mv = EntityReadout.createReadout(r.getNewEntity(), false, true);
-        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getFullReadout() + "</div>");
+        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(selectedRefit)));
+        EntityReadout newUnitReadout = EntityReadout.createReadout(selectedRefit.getNewEntity(), false, true);
+        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + newUnitReadout.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
 
@@ -623,27 +628,27 @@ public class ChooseRefitDialog extends JDialog {
             if (data.isEmpty()) {
                 return "";
             }
-            Refit r = data.get(row);
+            Refit refit = data.get(row);
 
             if (col == COL_MODEL) {
-                return r.getNewEntity().getModel();
+                return refit.getNewEntity().getModel();
             } else if (col == COL_CLASS) {
-                return r.getRefitClassName();
+                return refit.getRefitClassName();
             } else if (col == COL_BV) {
-                return r.getNewEntity().calculateBattleValue(true, true);
+                return refit.getNewEntity().calculateBattleValue(true, true);
             } else if (col == COL_TIME) {
-                return new RefitTime(r.getTime(), WorkTimeFormatter.formatDuration(r.getTime(),
+                return new RefitTime(refit.getTime(), WorkTimeFormatter.formatDuration(refit.getTime(),
                       getRefitMinutesPerDay(), campaign.getLocalDate(), MekHQ.getMHQOptions().getWorkTimeDisplay()));
             } else if (col == COL_NUM_PART) {
-                return r.getShoppingList().size();
+                return refit.getShoppingList().size();
             } else if (col == COL_COST) {
-                return r.getCost().toAmountAndSymbolString();
+                return refit.getCost().toAmountAndSymbolString();
             } else if (col == COL_TARGET) {
-                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, r, campaign.checkAcquisition(r))
+                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, refit, campaign.checkAcquisition(refit))
                              .getTargetNumber()
                              .getValueAsString();
             } else if (col == COL_FACILITY) {
-                return RefitFacility.describeRequiredSite(r);
+                return RefitFacility.describeRequiredSite(refit);
             } else {
                 return "?";
             }
@@ -676,27 +681,27 @@ public class ChooseRefitDialog extends JDialog {
         }
 
         public String getTooltip(int row, int col) {
-            Refit r;
+            Refit refit;
             if (data.isEmpty()) {
                 return "";
             } else {
-                r = data.get(row);
+                refit = data.get(row);
             }
 
             if (col == COL_TARGET) {
-                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, r, campaign.checkAcquisition(r))
+                return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, refit, campaign.checkAcquisition(refit))
                              .getTargetNumber()
                              .getDesc();
             }
             if (col == COL_TIME) {
-                return WorkTimeFormatter.describeWorkingDays(r.getTime(), getRefitMinutesPerDay());
+                return WorkTimeFormatter.describeWorkingDays(refit.getTime(), getRefitMinutesPerDay());
             }
             if (col == COL_MODEL) {
-                return getPartsStatus(r).describe();
+                return getPartsStatus(refit).describe();
             }
             if (col == COL_FACILITY) {
-                String key = isSiteTooLow(r) ? "refitTable.facility.tooltip.tooLow" : "refitTable.facility.tooltip.ok";
-                return getFormattedTextAt(RESOURCE_BUNDLE, key, RefitFacility.describeRequiredSite(r),
+                String key = isSiteTooLow(refit) ? "refitTable.facility.tooltip.tooLow" : "refitTable.facility.tooltip.ok";
+                return getFormattedTextAt(RESOURCE_BUNDLE, key, RefitFacility.describeRequiredSite(refit),
                       Unit.getSiteName(unit.getSite()));
             }
 
@@ -737,8 +742,8 @@ public class ChooseRefitDialog extends JDialog {
                     foregroundColor = getPartsStatusColor(getPartsStatus(data.get(actualRow)).state());
                 }
                 // The facility is shown in red when the unit's site is too low for the refit
-                boolean isFacilityTooLow = (actualCol == COL_FACILITY) && !isSelected && !data.isEmpty()
-                      && isSiteTooLow(data.get(actualRow));
+                boolean isUnselectedFacilityCell = (actualCol == COL_FACILITY) && !isSelected && !data.isEmpty();
+                boolean isFacilityTooLow = isUnselectedFacilityCell && isSiteTooLow(data.get(actualRow));
                 if (isFacilityTooLow) {
                     foregroundColor = MekHQ.getMHQOptions().getFontColorNegative();
                 }

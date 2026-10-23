@@ -1253,8 +1253,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                boolean isAnyRefitPending = Arrays.stream(units)
-                                                  .anyMatch(unitInSelection -> unitInSelection.getPendingRefitModel() != null);
+                boolean isAnyRefitPending = false;
+                for (Unit unitInSelection : units) {
+                    if (unitInSelection.getPendingRefitModel() != null) {
+                        isAnyRefitPending = true;
+                        break;
+                    }
+                }
                 if (isAnyRefitPending) {
                     menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "forgetPendingRefit.text"));
                     menuItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, "forgetPendingRefit.tooltip"));

@@ -407,6 +407,13 @@ public class Refit extends Part implements IAcquisitionWork {
         public boolean isInStock() {
             return supply == Supply.IN_STOCK;
         }
+
+        /**
+         * @return {@code true} if it is bought and on its way, or on the procurement list
+         */
+        public boolean isComing() {
+            return (supply == Supply.ON_ITS_WAY) || (supply == Supply.ON_ORDER);
+        }
     }
 
     /**
@@ -453,7 +460,10 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     private static void addPartNeeds(List<RefitNeed> needs, List<Part> parts, Supply supply) {
-        List<String> names = parts.stream().map(Part::getName).toList();
+        List<String> names = new ArrayList<>();
+        for (Part part : parts) {
+            names.add(part.getName());
+        }
         for (String part : tallyPartNames(names)) {
             needs.add(new RefitNeed(part, supply));
         }

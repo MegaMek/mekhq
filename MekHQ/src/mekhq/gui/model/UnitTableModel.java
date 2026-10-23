@@ -181,14 +181,6 @@ public class UnitTableModel extends DataTableModel<Unit> {
     }
 
     /**
-     * Returns the tooltip for the specified row and column.
-     *
-     * @param rowIndex    the index of the row
-     * @param columnIndex the index of the column
-     *
-     * @return the tooltip for the specified row and column, or {@code null} if no tooltip is available
-     */
-    /**
      * @return the refit in progress, or the refit whose parts were ordered ahead, or {@code null} for neither
      */
     private static @Nullable String getStatusTooltip(Unit unit) {
@@ -204,6 +196,14 @@ public class UnitTableModel extends DataTableModel<Unit> {
         return getFormattedTextAt(RESOURCE_BUNDLE, key, pendingRefitModel);
     }
 
+    /**
+     * Returns the tooltip for the specified row and column.
+     *
+     * @param rowIndex    the index of the row
+     * @param columnIndex the index of the column
+     *
+     * @return the tooltip for the specified row and column, or {@code null} if no tooltip is available
+     */
     public @Nullable String getTooltip(int rowIndex, int columnIndex) {
         Unit unit = getUnit(rowIndex);
 

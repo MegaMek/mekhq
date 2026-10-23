@@ -34,6 +34,7 @@ package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.logging.MMLogger;
@@ -83,11 +84,12 @@ public record RefitPartsStatus(State state, int itemsInStock, int itemsNeeded, L
                                           .filter(need -> need.supply() == Refit.Supply.TO_ORDER)
                                           .map(Refit.RefitNeed::description)
                                           .toList();
-        List<String> itemsComing = needs.stream()
-                                         .filter(need -> (need.supply() == Refit.Supply.ON_ITS_WAY)
-                                               || (need.supply() == Refit.Supply.ON_ORDER))
-                                         .map(Refit.RefitNeed::description)
-                                         .toList();
+        List<String> itemsComing = new ArrayList<>();
+        for (Refit.RefitNeed need : needs) {
+            if (need.isComing()) {
+                itemsComing.add(need.description());
+            }
+        }
         List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
         LOGGER.debug("[RefitParts] {}: {} of {} needs in stock, {} on order or on their way, {} cannot be bought",
               refit.getNewEntity().getShortName(), itemsInStock, needs.size(), itemsComing.size(),
