@@ -2249,13 +2249,22 @@ public class Campaign implements ITechManager {
                     }
 
                     if (shoppingItem.getDaysToWait() <= 0) {
-                        PartAcquisitionResult result = findContactForAcquisition(shoppingItem, person, system);
+                        AcquisitionContactResult contact = findContactForAcquisition(shoppingItem, person, system);
+                        PartAcquisitionResult result = contact.result();
                         if (result == PartAcquisitionResult.Success) {
                             int transitTime = calculatePartTransitTime(system);
 
                             PersonnelOptions options = person.getOptions();
                             double logisticianModifier = options.booleanOption(ADMIN_LOGISTICIAN) ? 0.9 : 1.0;
                             transitTime = (int) Math.round(transitTime * logisticianModifier);
+
+                            String deliveryReport = "";
+                            if (getCampaignOptions().get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
+                                int deliveryMargin = contact.deliveryMarginOfSuccess();
+                                transitTime = AcquisitionDeliveryTime.applyMarginOfSuccess(transitTime,
+                                      deliveryMargin);
+                                deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                            }
 
                             int requestedQuantity = shoppingItem.getQuantity();
                             int totalQuantity = 0;
@@ -2278,7 +2287,8 @@ public class Campaign implements ITechManager {
                                                               system.getPrintableName(currentDate) +
                                                               ". Delivery in " +
                                                               transitTime +
-                                                              " days.</b></font>");
+                                                              " days.</b></font> " +
+                                                              deliveryReport);
                             }
                         } else if (result == PartAcquisitionResult.PartInherentFailure) {
                             shelvedItems.add(shoppingItem);
@@ -2380,9 +2390,9 @@ public class Campaign implements ITechManager {
      * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be
      *                    null if the user is not using planetary acquisition.
      *
-     * @return The result of the rolls.
+     * @return The result of the rolls, with the Margin of Success that shortens the delivery time on a success.
      */
-    public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
+    public AcquisitionContactResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
           PlanetarySystem system) {
         SkillCheck skillCheck = checkAcquisition(acquisition, person);
         boolean inherentFailure = skillCheck.getTargetNumber().isImpossible();
@@ -2395,8 +2405,8 @@ public class Campaign implements ITechManager {
                       ReportingUtilities.getNegativeColor(), person.getFullName(), acquisition.getAcquisitionName(),
                       system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getDesc()));
             }
-            return inherentFailure ? PartAcquisitionResult.PartInherentFailure :
-                         PartAcquisitionResult.PlanetSpecificFailure;
+            return new AcquisitionContactResult(inherentFailure ? PartAcquisitionResult.PartInherentFailure :
+                                                      PartAcquisitionResult.PlanetSpecificFailure, 0);
         }
 
         ActionCheckResult result = skillCheck.resolve(false, null);
@@ -2416,8 +2426,21 @@ public class Campaign implements ITechManager {
                   system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getValue(),
                   techBonus, industryBonus, outputsBonus));
         }
-        return result.isSuccess() ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
+        if (!result.isSuccess()) {
+            return new AcquisitionContactResult(PartAcquisitionResult.PlanetSpecificFailure, 0);
+        }
+        return new AcquisitionContactResult(PartAcquisitionResult.Success,
+              AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck, result));
     }
+
+    /**
+     * The outcome of a planetary acquisition contact roll.
+     *
+     * @param result                  whether a contact was found, or why not
+     * @param deliveryMarginOfSuccess the Margin of Success that shortens the delivery time when 'Margin of Success
+     *                                Affects Delivery' is on; 0 unless {@code result} is a success
+     */
+    public record AcquisitionContactResult(PartAcquisitionResult result, int deliveryMarginOfSuccess) {}
 
     /***
      * Attempt to acquire a given <code>IAcquisitionWork</code> object.
@@ -2521,10 +2544,19 @@ public class Campaign implements ITechManager {
                 appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
             }
 
+            String deliveryReport = "";
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
+                // Under Planetary Acquisition the contact roll has already set (and shortened) the delivery time
+                if (campaignOptions.get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
+                    int deliveryMargin = AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck,
+                          skillCheckResult);
+                    transitDays = AcquisitionDeliveryTime.applyMarginOfSuccess(transitDays, deliveryMargin);
+                    deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                }
             }
-            report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
+            report = report + acquisition.find(transitDays, valueChange) + ' ' + deliveryReport + ' ' +
+                           appraisalReport;
             found = true;
             // Infantry weapons and ammo ship as a single bulk order: this one successful roll supplies the rest of the
             // platoon's quantity too (while it can be paid for), counting as a single acquisition for the daily limit.

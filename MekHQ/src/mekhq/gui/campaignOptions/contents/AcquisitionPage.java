@@ -145,6 +145,7 @@ class AcquisitionPage {
     private static final int TRANSIT_UNIT_MONTH = 2;
     private static final int TRANSIT_UNIT_NUM = 3;
     private JCheckBox chkNoDeliveriesInTransit;
+    private JCheckBox chkUseMarginOfSuccessDelivery;
 
     private boolean created;
 
@@ -259,11 +260,16 @@ class AcquisitionPage {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater("NoDeliveriesInTransit"));
 
+        chkUseMarginOfSuccessDelivery = new CampaignOptionsCheckBox("UseMarginOfSuccessDelivery",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseMarginOfSuccessDelivery.addMouseListener(createTipPanelUpdater("UseMarginOfSuccessDelivery"));
+
         final SettingsFormPanel panel = new SettingsFormPanel("DeliveryPanel",
                 acquisitionSectionLabelWidth,
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
         panel.addCheckBox(chkNoDeliveriesInTransit);
+        panel.addCheckBox(chkUseMarginOfSuccessDelivery);
 
         return panel;
     }
@@ -519,6 +525,7 @@ class AcquisitionPage {
         spnAutoLogisticsBomb.setValue(model.autoLogisticsBomb);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
+        chkUseMarginOfSuccessDelivery.setSelected(model.useMarginOfSuccessDelivery);
     }
 
     /**
@@ -556,5 +563,6 @@ class AcquisitionPage {
         model.autoLogisticsBomb = (int) spnAutoLogisticsBomb.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
+        model.useMarginOfSuccessDelivery = chkUseMarginOfSuccessDelivery.isSelected();
     }
 }
