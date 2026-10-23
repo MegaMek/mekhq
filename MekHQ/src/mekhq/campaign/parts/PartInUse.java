@@ -96,9 +96,10 @@ public class PartInUse {
                 this.tonnagePerItem = 1.0 / ammoType.getShots();
             }
         }
-        if (part instanceof Armor) {
+        if (part instanceof Armor armor) {
             // Armor needs different tonnage values
-            this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
+            double pointsPerTon = armor.getArmorPointsPerTon();
+            this.tonnagePerItem = (pointsPerTon > 0) ? 1.0 / pointsPerTon : 0.0;
             this.isBundle = true;
         }
         if (null != partToBuy) {

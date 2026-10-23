@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.units.Entity;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
 import org.junit.jupiter.api.Test;
@@ -137,6 +139,16 @@ class PartInUseTest {
         assertEquals(price, entry.getCost());
         assertEquals(price, entry.getCost());
         verify(acquisitionWork, times(1)).getBuyCost();
+    }
+
+    @Test
+    void armorThatDoesNotExistAtItsTechRatingWeighsNothing() {
+        // BAR 10 armor only exists from tech rating D, so it has no points per ton at C
+        SVArmor armor = new SVArmor(10, TechRating.C, 0, Entity.LOC_NONE, null);
+
+        PartInUse entry = new PartInUse(armor);
+
+        assertEquals(0.0, entry.getTonnagePerItem());
     }
 
     /**

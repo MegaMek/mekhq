@@ -338,6 +338,11 @@ public class EducationController {
         // setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
+        // remember where the student left from, so they can return there once their education ends
+        person.setEduOriginBaseId(LocationUtils.findEffectiveBase(person) instanceof PlayerBase originBase
+                                        ? originBase.getId()
+                                        : null);
+
         if (academy.isHomeSchool()) {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
@@ -822,8 +827,7 @@ public class EducationController {
             // the travel-progress display; arrival is driven by the travel node.
             person.setEduJourneyTime(2);
             person.setEduDaysOfTravel(0);
-            campaign.getCampaignLocationManager()
-                  .queueTravel(List.of(person), campaign.getPlayerForce().getForceDetachment());
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), findReturnLocation(person, campaign));
             campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
                   person.getHyperlinkedFullTitle(), 2));
             person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
@@ -852,14 +856,15 @@ public class EducationController {
             }
         }
 
-        campaign.getCampaignLocationManager()
-              .queueTravel(List.of(person), campaign.getPlayerForce().getForceDetachment());
+        IPlace returnLocation = findReturnLocation(person, campaign);
+        PlanetarySystem returnSystem = findReturnSystem(returnLocation, campaign);
+        campaign.getCampaignLocationManager().queueTravel(List.of(person), returnLocation);
 
-        JumpPath returnPath = LocationUtils.planJumpPath(academySystem, campaign.getCurrentSystem(), campaign);
+        JumpPath returnPath = LocationUtils.planJumpPath(academySystem, returnSystem, campaign);
         int travelDays = returnPath != null
                                ? LocationUtils.computeJourneyDays(returnPath, campaign.getLocalDate(),
               LocationUtils.computeStartTransit(academySystem, campaign))
-                               : max(2, campaign.getSimplifiedTravelTime(academySystem));
+                               : max(2, campaign.getSimplifiedTravelTime(academySystem, returnSystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
 
@@ -881,13 +886,34 @@ public class EducationController {
     }
 
     /**
+     * Returns the place a student returns to once their education ends: the player base they left from, or the main
+     * force when they left from the main force or that base no longer exists.
+     */
+    private static IPlace findReturnLocation(Person person, Campaign campaign) {
+        UUID originBaseId = person.getEduOriginBaseId();
+        if (originBaseId != null) {
+            PlayerBase originBase = campaign.getCampaignLocationManager().getPlayerBaseById(originBaseId);
+            if (originBase != null) {
+                return originBase;
+            }
+        }
+        return campaign.getPlayerForce().getForceDetachment();
+    }
+
+    /** The planetary system of {@code returnLocation}, or the campaign's when it has none. */
+    private static @Nullable PlanetarySystem findReturnSystem(IPlace returnLocation, Campaign campaign) {
+        PlanetarySystem returnSystem = returnLocation.getCurrentSystem();
+        return returnSystem != null ? returnSystem : campaign.getCurrentSystem();
+    }
+
+    /**
      * Processes the journey home for a person.
      *
      * @param campaign the campaign the person is in
      * @param person   the person whose journey home is being processed
      */
     private static void processJourneyHome(Campaign campaign, Person person) {
-        PlanetarySystem targetSystem = campaign.getCurrentSystem();
+        PlanetarySystem targetSystem = findReturnSystem(findReturnLocation(person, campaign), campaign);
         processJourney(campaign, person, targetSystem,
               () -> arriveHome(campaign, person, null),
               cl -> arriveHome(campaign, person, cl));
@@ -917,7 +943,8 @@ public class EducationController {
             Academy fallbackAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
             PlanetarySystem academySystem = campaign.getSystemById(person.getEduAcademySystem());
             if ((academySystem != null) && (fallbackAcademy == null || !fallbackAcademy.isLocal())) {
-                int travelTime = max(2, campaign.getSimplifiedTravelTime(academySystem));
+                PlanetarySystem homeSystem = findReturnSystem(findReturnLocation(person, campaign), campaign);
+                int travelTime = max(2, campaign.getSimplifiedTravelTime(homeSystem, academySystem));
                 if (travelTime != person.getEduJourneyTime()) {
                     person.setEduJourneyTime(travelTime);
                 }
@@ -1018,11 +1045,7 @@ public class EducationController {
 
     private static void arriveHome(Campaign campaign, Person person,
           @Nullable AbstractMobileLocation returnLocation) {
-        Academy returningFromAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-        boolean isLocal = returningFromAcademy != null && returningFromAcademy.isLocal();
-        LocalPersonnel arrivingAtPersonnel;
-        arrivingAtPersonnel = isLocal ? findPersonnelWhenReturningFromLocal(campaign,
-              person.getEduAcademySystem()) : campaign.getPlayerForce().getPersonnel();
+        LocalPersonnel arrivingAtPersonnel = findReturnLocation(person, campaign).getPersonnel();
         // changing the student's status reactivates and clears their tag-alongs, so capture them first
         List<UUID> tagAlongs = new ArrayList<>(person.getEduTagAlongs());
         person.setParent(arrivingAtPersonnel);
@@ -1036,18 +1059,6 @@ public class EducationController {
         }
 
         LocationDispatch.removeTravelNode(returnLocation, campaign.getCampaignLocationManager());
-    }
-
-    private static LocalPersonnel findPersonnelWhenReturningFromLocal(Campaign campaign, @Nullable String systemId) {
-        if (systemId != null) {
-            for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-                PlanetarySystem system = base.getCurrentSystem();
-                if (system != null && systemId.equals(system.getId())) {
-                    return base.getPersonnel();
-                }
-            }
-        }
-        return campaign.getPlayerForce().getPersonnel();
     }
 
     /**

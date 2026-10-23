@@ -1265,6 +1265,11 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 while (armorSupplied < armorNeeded) {
                     Armor armorPart = (Armor) (newArmorSupplies.getNewPart());
+                    if (armorPart.getAmount() <= 0) {
+                        LOGGER.warn("[Refit] {}: {} cannot be ordered, {} armor points are not ordered", getDesc(),
+                              armorPart.getName(), armorNeeded - armorSupplied);
+                        break;
+                    }
                     armorSupplied += armorPart.getAmount();
                     orderForThisRefit(armorPart, 1);
                 }
