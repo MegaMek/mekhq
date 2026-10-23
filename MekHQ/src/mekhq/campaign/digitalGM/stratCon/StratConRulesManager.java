@@ -2076,9 +2076,8 @@ public class StratConRulesManager {
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = useAdvancedScouting && scoutData.unitWeight() <= 35 ?
-                                            scanRangeIncrease + 1 :
-                                            scanRangeIncrease;
+            int individualScanRange = getIndividualScanRange(scoutData.unitWeight(), scanRangeIncrease,
+                  useAdvancedScouting);
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
@@ -4846,6 +4845,7 @@ public class StratConRulesManager {
               MekHQ.getMHQOptions().getLocale());
 
         List<Integer> forcesToUndeploy = new ArrayList<>();
+        List<Integer> patrolsToScout = new ArrayList<>();
         LocalDate date = campaign.getLocalDate();
 
         // for each force on the track, if the return date is today or in the past,
@@ -4857,8 +4857,16 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId()) ||
-                      track.getStickyForces().contains(forceID)) {
+            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId())) {
+                continue;
+            }
+
+            if (track.getStickyForces().contains(forceID)) {
+                // A patrol told to remain deployed scouts again instead of returning
+                boolean isDueToReturn = !track.getAssignedForceReturnDates().get(forceID).isAfter(date);
+                if (isDueToReturn && isPatrolScoutingUntilDone(forceID, track, campaign)) {
+                    patrolsToScout.add(forceID);
+                }
                 continue;
             }
 
@@ -4888,9 +4896,182 @@ public class StratConRulesManager {
             }
         }
 
+        for (int forceID : patrolsToScout) {
+            String formationName = campaign.getPlayerForce().getFormation(forceID).getName();
+            if (scoutRemainingPatrolArea(forceID, track, campaign)) {
+                forcesToUndeploy.add(forceID);
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.scoutingComplete"), formationName));
+            } else {
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.stillScouting"), formationName));
+            }
+        }
+
         for (int forceID : forcesToUndeploy) {
             track.unassignFormation(forceID);
         }
+    }
+
+    /**
+     * Whether a formation told to Remain Deployed is a patrol that keeps scouting until its area is fully scouted,
+     * instead of staying in place until recalled.
+     *
+     * <p>This only applies under Advanced Scouting, where a patrol may need several attempts to scout its whole area,
+     * and never to a formation held in place by a facility order - that order decides when it may leave.</p>
+     *
+     * @param forceID  the deployed formation's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the formation should scout again, rather than return, whenever it would normally return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isPatrolScoutingUntilDone(int forceID, StratConTrackState track, Campaign campaign) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING)) {
+            return false;
+        }
+
+        if (track.getFacilityOrder(forceID) != null) {
+            return false;
+        }
+
+        // Matches the role scanNeighboringCoords uses to grant the patrol its extra scan range
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+        return (combatTeam != null) && combatTeam.getRole().isPatrol();
+    }
+
+    /**
+     * Has a patrol told to Remain Deployed make another round of Advanced Scouting checks around its hex, as it would
+     * when first deploying. Once every hex within its scouts' reach has been scouted the patrol is done; otherwise it
+     * stays out until it would next return, when it tries again.
+     *
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the patrol's whole area is now scouted, and it should return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean scoutRemainingPatrolArea(int forceID, StratConTrackState track, Campaign campaign) {
+        StratConCoords coords = track.getAssignedForceCoords().get(forceID);
+        if (coords == null) {
+            return true;
+        }
+
+        int radius = getPatrolScoutingRadius(coords, forceID, track, campaign);
+        if (!isAreaFullyScouted(coords, radius, track)) {
+            scanNeighboringCoords(coords, forceID, campaign, track);
+            StratConReconnaissance.updateObjectives(track);
+        }
+
+        if (isAreaFullyScouted(coords, radius, track)) {
+            return true;
+        }
+
+        track.setReturnDate(forceID, campaign.getLocalDate().plusDays(track.getDeploymentTime()));
+        return false;
+    }
+
+    /**
+     * The furthest, in hexes, a deployed patrol can scout from its hex under Advanced Scouting: the patrol's scan
+     * range, plus one for any scout in a unit of 35 tons or less. A patrol with no scouts, or sitting on a scenario
+     * or a hostile facility, can't scout past its own hex.
+     *
+     * @param coords   the hex the patrol is deployed to
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return the patrol's scouting radius
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getPatrolScoutingRadius(StratConCoords coords, int forceID, StratConTrackState track,
+          Campaign campaign) {
+        // scanNeighboringCoords scouts nothing past a hex holding a scenario or a hostile facility
+        StratConFacility facility = track.getFacility(coords);
+        if ((track.getScenario(coords) != null) || ((facility != null) && !facility.isOwnerAlliedToPlayer())) {
+            return 0;
+        }
+
+        // Patrols increase their scan range by 1
+        int scanRangeIncrease = track.getScanRangeIncrease() + 1;
+        int radius = 0;
+        for (ScoutRecord scout : buildScoutMap(campaign.getPlayerForce().getFormation(forceID),
+              campaign.getPlayerForce().getHangar(), campaign)) {
+            radius = max(radius, getIndividualScanRange(scout.unitWeight(), scanRangeIncrease, true));
+        }
+        return radius;
+    }
+
+    /**
+     * How far, in hexes, a single scout can reveal from where its formation deploys. Under Advanced Scouting, a scout
+     * in a unit of 35 tons or less reaches one hex further.
+     *
+     * @param unitWeight          the weight of the scout's unit, in tons
+     * @param scanRangeIncrease   the formation's scan range
+     * @param useAdvancedScouting whether Advanced Scouting is enabled
+     *
+     * @return the scout's scan range
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getIndividualScanRange(double unitWeight, int scanRangeIncrease, boolean useAdvancedScouting) {
+        return useAdvancedScouting && unitWeight <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+    }
+
+    /**
+     * Whether every hex on the track within the given radius of a hex has been scouted. Like scouting itself, this
+     * never looks past the edge of the track.
+     *
+     * @param center the hex at the center of the area
+     * @param radius how far from the center, in hexes, the area reaches
+     * @param track  the track to check
+     *
+     * @return {@code true} if every on-track hex in the area has been revealed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAreaFullyScouted(StratConCoords center, int radius, StratConTrackState track) {
+        Set<StratConCoords> revealedCoords = track.getRevealedCoords();
+        if (!revealedCoords.contains(center)) {
+            return false;
+        }
+
+        Queue<Pair<StratConCoords, Integer>> queue = new LinkedList<>();
+        Set<StratConCoords> visited = new HashSet<>();
+        queue.add(new Pair<>(center, 0));
+        visited.add(center);
+
+        while (!queue.isEmpty()) {
+            Pair<StratConCoords, Integer> current = queue.poll();
+            int distance = current.getValue();
+            if (distance >= radius) {
+                continue;
+            }
+
+            for (int direction = 0; direction < 6; direction++) {
+                StratConCoords checkCoords = current.getKey().translate(direction);
+                if (track.isOffTrack(checkCoords) || !visited.add(checkCoords)) {
+                    continue;
+                }
+
+                if (!revealedCoords.contains(checkCoords)) {
+                    return false;
+                }
+                queue.add(new Pair<>(checkCoords, distance + 1));
+            }
+        }
+
+        return true;
     }
 
     /**
