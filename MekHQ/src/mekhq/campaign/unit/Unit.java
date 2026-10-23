@@ -6868,8 +6868,10 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
-     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
-     * previous engineer.</p>
+     * <p>A vessel's engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer. Infantry's engineer is not flagged: the flag shares the engineer's minutes with the whole
+     * crew, which suits a vessel crew working as one team but not a support platoon whose techs each look after their
+     * own units.</p>
      *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
@@ -6915,7 +6917,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
-            engineer.setEngineer(true);
+            // Flagging infantry's engineer would give every trooper the engineer's minutes, so a support platoon's
+            // techs would lose their day whenever the ranking tech worked on their own units (#10654)
+            boolean isVesselEngineer = !(getEntity() instanceof Infantry);
+            engineer.setEngineer(isVesselEngineer);
             // change reference for any scheduled tasks
             for (IPartWork scheduledWork : getScheduledWork()) {
                 scheduledWork.setTech(engineer);
@@ -8533,7 +8538,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
+        double timeIncrease = Maintenance.getDailyMaintenanceProgress(campaign);
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;
