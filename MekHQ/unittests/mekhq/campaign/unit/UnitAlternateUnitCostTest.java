@@ -80,6 +80,7 @@ import testUtilities.MHQTestUtilities;
  */
 class UnitAlternateUnitCostTest {
     private static final int SUPPORT_POINTS_TO_C_BILLS = 10_000;
+    private static final int GAME_YEAR = 3025;
 
     @BeforeAll
     static void initializeTypes() {
@@ -237,7 +238,7 @@ class UnitAlternateUnitCostTest {
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
-                Money estimate = Unit.estimateBuyCost(entity, campaignOptions);
+                Money estimate = Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR);
                 assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS), estimate);
                 assertEquals(unit.getBuyCost(), estimate);
             }
@@ -253,7 +254,7 @@ class UnitAlternateUnitCostTest {
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
-                assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+                assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR));
                 verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
             }
         }
@@ -295,7 +296,7 @@ class UnitAlternateUnitCostTest {
             when(entity.isLargeCraft()).thenReturn(true);
 
             assertEquals(Money.of(3_000_000), unit.getBuyCost());
-            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions, null, GAME_YEAR));
             verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
         }
 
@@ -619,7 +620,7 @@ class UnitAlternateUnitCostTest {
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
             assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS),
-                  Unit.estimateBuyCost(summary, campaignOptions));
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -630,7 +631,7 @@ class UnitAlternateUnitCostTest {
         void withoutConversionTheSummaryIsPricedInRawSupportPoints() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
 
-            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -644,7 +645,7 @@ class UnitAlternateUnitCostTest {
             when(summary.isClan()).thenReturn(isClan);
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
-            assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -655,7 +656,8 @@ class UnitAlternateUnitCostTest {
         void mekHQPricesOrdinarySummariesByBattleValue() {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS),
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -668,7 +670,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -680,7 +682,8 @@ class UnitAlternateUnitCostTest {
         void chaosCampaignPricesLargeCraftSummariesByBattleValue(int unitType) {
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS),
+                  Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
 
         /**
@@ -695,7 +698,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions, null, GAME_YEAR));
         }
     }
 

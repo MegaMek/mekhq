@@ -45,8 +45,8 @@ import java.math.BigDecimal;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.meks.MekCockpit;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -81,6 +81,14 @@ public class TotalBuyCostTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER)).thenReturn(1d);
         double[] usedPartMultipliers = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
         lenient().when(mockCampaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)).thenReturn(usedPartMultipliers);
 

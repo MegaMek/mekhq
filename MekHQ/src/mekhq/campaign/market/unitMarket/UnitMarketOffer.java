@@ -48,6 +48,7 @@ import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -137,25 +138,22 @@ public class UnitMarketOffer {
     }
 
     /**
+     * @param faction  the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear the current year
+     *
      * @return the final price of this Offer
      */
-    public Money getPrice() {
+    public Money getPrice(@Nullable Faction faction, int gameYear) {
         Money cost = getBaseCost().multipliedBy(getPercent()).dividedBy(100);
 
         final Entity entity = getEntity();
         if (entity == null) {
-            // The unit failed to load; skip the tech-based price multiplier rather than crashing the market display.
+            // The unit failed to load; skip the unit price multiplier rather than crashing the market display.
             // We should be dropping it elsewhere, so this is just added security.
             return cost;
         }
 
-        if (entity.isMixedTech()) {
-            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER));
-        } else if (entity.isClan()) {
-            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
-        } else { // Inner Sphere Entity
-            cost = cost.multipliedBy(campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
-        }
+        cost = cost.multipliedBy(Unit.getUnitPriceMultiplier(entity, campaignOptions, faction, gameYear));
 
         // Battle Value ignores price quirks, which the construction cost already includes
         if (isBattleValueCost()) {
@@ -176,7 +174,7 @@ public class UnitMarketOffer {
     }
 
     /**
-     * @return the offered unit's list price before the market percentage and tech base multipliers: its construction
+     * @return the offered unit's list price before the market percentage and unit price multipliers: its construction
      *       cost, or, when the {@link CampaignOption#UNIT_COST_MODEL} values it by Battle Value, one support point per
      *       point of Battle Value
      *

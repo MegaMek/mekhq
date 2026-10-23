@@ -69,6 +69,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.location.ILocatable;
@@ -342,16 +343,19 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
                 cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER));
                 break;
         }
+
+        cost = cost.multipliedBy(AcquisitionPriceMultipliers.getPartMultiplier(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this));
 
         if (!isBrandNew()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions()
