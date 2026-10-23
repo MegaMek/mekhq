@@ -57,6 +57,7 @@ import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
@@ -144,6 +145,7 @@ public final class LocationNewDayUtil {
             for (Part part : arrivedParts) {
                 campaign.getQuartermaster().arrivePart(part);
             }
+            RefitPartOrders.announceRefitsReadyToBegin(campaign, arrivedParts);
 
             // finish up any overnight assigned tasks
             for (Part part : assignedParts) {

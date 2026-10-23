@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.function.IntFunction;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -155,6 +156,8 @@ public class Refit extends Part implements IAcquisitionWork {
     private RefitClassGrader classGrader = new RefitClassGrader();
     // Where the planned refit's parts and ammunition come from, kept only while the refit is planned
     private final List<String> partsTakenFromStock = new ArrayList<>();
+    /** Parts the refit waits for because they are already bought and on their way, such as ones ordered ahead */
+    private final List<String> partsOnTheirWay = new ArrayList<>();
     private final Map<AmmoType, Integer> ammoShotsInStock = new LinkedHashMap<>();
     private final Map<AmmoType, Integer> ammoShotsToBuy = new LinkedHashMap<>();
 
@@ -379,59 +382,117 @@ public class Refit extends Part implements IAcquisitionWork {
         return descriptions;
     }
 
-    /**
-     * One thing a planned refit needs, and whether the warehouse already holds it.
-     *
-     * @param description the part, armor or ammunition, for example {@code 2 \u00d7 ER Medium Laser}
-     * @param isInStock   {@code true} if it comes from the warehouse, {@code false} if it must be ordered
-     */
-    public record RefitNeed(String description, boolean isInStock) {}
+    /** Where something a planned refit needs will come from, in the order the parts list shows them. */
+    public enum Supply {
+        /** In the warehouse now */
+        IN_STOCK,
+        /** Already bought and on its way to the warehouse */
+        ON_ITS_WAY,
+        /** On the player's procurement list, not yet bought */
+        ON_ORDER,
+        /** Still to be ordered */
+        TO_ORDER
+    }
 
     /**
-     * Lists what this planned refit needs: the parts it takes from the warehouse, the parts it must order, and its
-     * armor and ammunition, split between what is in stock and what must be bought. Ammunition is counted in rounds,
-     * since a refit fills its new bins from the warehouse's ammunition; the bins themselves are not ordered.
+     * One thing a planned refit needs, and where it will come from.
      *
-     * @return what the refit needs, the items in stock first; empty for a refit loaded from a save
+     * @param description the part, armor or ammunition, for example {@code 2 \u00d7 ER Medium Laser}
+     * @param supply      where it will come from
+     */
+    public record RefitNeed(String description, Supply supply) {
+        /**
+         * @return {@code true} if the warehouse holds it now
+         */
+        public boolean isInStock() {
+            return supply == Supply.IN_STOCK;
+        }
+
+        /**
+         * @return {@code true} if it is bought and on its way, or on the procurement list
+         */
+        public boolean isComing() {
+            return (supply == Supply.ON_ITS_WAY) || (supply == Supply.ON_ORDER);
+        }
+    }
+
+    /**
+     * Lists what this planned refit needs: the parts it takes from the warehouse, the parts already on their way, the
+     * parts on the player's procurement list, and the parts still to order, with its armor and ammunition split the
+     * same way. Ammunition is counted in rounds, since a refit fills its new bins from the warehouse's ammunition; the
+     * bins themselves are not ordered.
+     *
+     * <p>What is on order is read from the procurement list each time, so parts ordered ahead with Order Parts show
+     * as on order straight away (issue #7848).</p>
+     *
+     * @return what the refit needs, the items in stock first and those still to order last; empty for a refit loaded
+     *       from a save
      */
     public List<RefitNeed> describeNeeds() {
         List<RefitNeed> needs = new ArrayList<>();
         for (String part : tallyPartNames(partsTakenFromStock)) {
-            needs.add(new RefitNeed(part, true));
+            needs.add(new RefitNeed(part, Supply.IN_STOCK));
         }
         for (Map.Entry<AmmoType, Integer> ammo : ammoShotsInStock.entrySet()) {
-            needs.add(new RefitNeed(describeRounds(ammo.getKey(), ammo.getValue()), true));
+            needs.add(new RefitNeed(describeRounds(ammo.getKey(), ammo.getValue()), Supply.IN_STOCK));
         }
         int armorPointsToBuy = getArmorPointsToBuy();
         boolean hasArmorInStock = (newArmorSupplies != null) && (armorNeeded > armorPointsToBuy);
         if (hasArmorInStock) {
-            needs.add(new RefitNeed(describeArmorPoints(armorNeeded - armorPointsToBuy), true));
+            needs.add(new RefitNeed(describeArmorPoints(armorNeeded - armorPointsToBuy), Supply.IN_STOCK));
+        }
+        for (String part : tallyPartNames(partsOnTheirWay)) {
+            needs.add(new RefitNeed(part, Supply.ON_ITS_WAY));
         }
 
-        List<String> partsToOrder = new ArrayList<>();
-        for (Part part : shoppingList) {
-            boolean isOrderedSeparately = (part instanceof Armor) || (part instanceof AmmoBin)
-                  || (part instanceof AmmoStorage);
-            if (!isOrderedSeparately) {
-                partsToOrder.add(part.getName());
-            }
+        RefitPartOrders.Shortfall shortfall = RefitPartOrders.find(getCampaign(), this).findShortfall();
+        addPartNeeds(needs, shortfall.partsOnOrder(), Supply.ON_ORDER);
+        addPartNeeds(needs, shortfall.partsToOrder(), Supply.TO_ORDER);
+        for (RefitPartOrders.AmountShortfall ammo : shortfall.ammunition()) {
+            addAmountNeeds(needs, ammo, rounds -> describeRounds(ammo.ammoType(), rounds));
         }
-        for (String part : tallyPartNames(partsToOrder)) {
-            needs.add(new RefitNeed(part, false));
+        if (shortfall.armor() != null) {
+            addAmountNeeds(needs, shortfall.armor(), this::describeArmorPoints);
         }
-        for (Map.Entry<AmmoType, Integer> ammo : ammoShotsToBuy.entrySet()) {
-            needs.add(new RefitNeed(describeRounds(ammo.getKey(), ammo.getValue()), false));
-        }
-        if (armorPointsToBuy > 0) {
-            needs.add(new RefitNeed(describeArmorPoints(armorPointsToBuy), false));
-        }
+        // A stable sort keeps each group in the order it was added
+        needs.sort(Comparator.comparing(RefitNeed::supply));
         return needs;
+    }
+
+    private static void addPartNeeds(List<RefitNeed> needs, List<Part> parts, Supply supply) {
+        List<String> names = new ArrayList<>();
+        for (Part part : parts) {
+            names.add(part.getName());
+        }
+        for (String part : tallyPartNames(names)) {
+            needs.add(new RefitNeed(part, supply));
+        }
+    }
+
+    private static void addAmountNeeds(List<RefitNeed> needs, RefitPartOrders.AmountShortfall shortfall,
+          IntFunction<String> describe) {
+        if (shortfall.onItsWay() > 0) {
+            needs.add(new RefitNeed(describe.apply(shortfall.onItsWay()), Supply.ON_ITS_WAY));
+        }
+        if (shortfall.onOrder() > 0) {
+            needs.add(new RefitNeed(describe.apply(shortfall.onOrder()), Supply.ON_ORDER));
+        }
+        if (shortfall.toOrder() > 0) {
+            needs.add(new RefitNeed(describe.apply(shortfall.toOrder()), Supply.TO_ORDER));
+        }
+    }
+
+    /**
+     * @return the rounds of each ammunition this planned refit must buy, after the ammunition already in stock
+     */
+    Map<AmmoType, Integer> getAmmoRoundsToBuy() {
+        return Collections.unmodifiableMap(ammoShotsToBuy);
     }
 
     /**
      * @return the armor points this refit must still buy, after recycled armor and the armor already in stock
      */
-    private int getArmorPointsToBuy() {
+    int getArmorPointsToBuy() {
         if (newArmorSupplies == null) {
             return 0;
         }
@@ -485,6 +546,7 @@ public class Refit extends Part implements IAcquisitionWork {
         refitClass = NO_CHANGE;
         classGrader = new RefitClassGrader();
         partsTakenFromStock.clear();
+        partsOnTheirWay.clear();
         ammoShotsInStock.clear();
         ammoShotsToBuy.clear();
         boolean isOmniUnit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
@@ -755,27 +817,9 @@ public class Refit extends Part implements IAcquisitionWork {
             /* ADD TIMES AND COSTS */
             if (newPart instanceof MissingPart newMissingPart) {
                 time += newPart.getBaseTime();
-                Part replacement = newMissingPart.findReplacement(true);
-                // check quantity
                 // TODO : the one weakness here is that we will not pick up damaged parts
-                if ((null != replacement) && (null == partQuantity.get(replacement))) {
-                    partQuantity.put(replacement, replacement.getQuantity());
-                }
-
-                if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
-                    newUnitParts.add(replacement);
-                    partsTakenFromStock.add(replacement.getName());
-                    // adjust quantity
-                    partQuantity.put(replacement, partQuantity.get(replacement) - 1);
-                    // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement
-                    // ignores this item
-                    if (partQuantity.get(replacement) == 0) {
-                        replacement.setUsedForRefitPlanning(true);
-                        plannedReplacementParts.add(replacement);
-                    }
-
-                } else {
-                    replacement = newMissingPart.getNewPart();
+                if (!isFoundInTheWarehouse(newMissingPart, partQuantity, plannedReplacementParts)) {
+                    Part replacement = newMissingPart.getNewPart();
                     // set entity for variable cost items
                     replacement.setUnit(newUnit);
                     cost = cost.plus(replacement.getActualValue());
@@ -1003,22 +1047,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         for (Part newHeatSinkPart : newIntegratedHeatSinks) {
             // Check warehouse for spare heat sinks before adding to shopping list
-            Part replacement = ((MissingPart) newHeatSinkPart).findReplacement(true);
-            // check quantity
-            if ((null != replacement) && (null == partQuantity.get(replacement))) {
-                partQuantity.put(replacement, replacement.getQuantity());
-            }
-            if ((null != replacement) && (partQuantity.get(replacement) > 0)) {
-                newUnitParts.add(replacement);
-                partsTakenFromStock.add(replacement.getName());
-                // adjust quantity
-                partQuantity.put(replacement, partQuantity.get(replacement) - 1);
-                // If the quantity is now 0 set usedForRefitPlanning flag so findReplacement ignores this item
-                if (partQuantity.get(replacement) == 0) {
-                    replacement.setUsedForRefitPlanning(true);
-                    plannedReplacementParts.add(replacement);
-                }
-            } else {
+            if (!isFoundInTheWarehouse((MissingPart) newHeatSinkPart, partQuantity, plannedReplacementParts)) {
                 // Heat sinks built into the engine are parts of the kit like any other: a double heat sink costs the
                 // same inside the engine as outside it (TM p.277)
                 cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getActualValue());
@@ -1204,6 +1233,10 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+        // Orders the player placed ahead, still on the procurement list, are now the refit's to fill (#7848)
+        RefitPartOrders.takeOverOpenOrders(campaign, this);
+        // From here the refit itself shows whether it is still waiting for parts
+        RefitPartOrders.forgetOrdersAheadFor(campaign, oldUnit);
         reserveNewParts();
         if (customJob) {
             // add the stuff on the shopping list to the master shopping list
@@ -1304,7 +1337,7 @@ public class Refit extends Part implements IAcquisitionWork {
      *
      * @return a new order for the same part, or the entry itself when no new order can be made from it
      */
-    private static IAcquisitionWork newOrderFor(IAcquisitionWork shoppingListEntry) {
+    static IAcquisitionWork newOrderFor(IAcquisitionWork shoppingListEntry) {
         if (shoppingListEntry.getNewEquipment() instanceof Part newPart) {
             return newPart.getAcquisitionWork();
         }
@@ -1335,6 +1368,76 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Looks in the warehouse for a part the new design needs: first a spare on the shelf, then a spare already bought
+     * and on its way, such as one ordered ahead with Order Parts (issue #7848). A spare found is added to the parts the
+     * refit uses, and the refit waits for one on its way rather than buying another.
+     *
+     * @param missingPart             the part the new design needs
+     * @param partQuantity            how much of each spare stack the refit has not yet counted
+     * @param plannedReplacementParts the spares the refit has counted in full, to clear their planning flag after
+     *
+     * @return {@code true} if a spare was found, {@code false} if the part must be bought
+     */
+    private boolean isFoundInTheWarehouse(MissingPart missingPart, Map<Part, Integer> partQuantity,
+          List<Part> plannedReplacementParts) {
+        Part spare = takeSpare(missingPart.findReplacement(true), partQuantity, plannedReplacementParts);
+        if (spare != null) {
+            newUnitParts.add(spare);
+            partsTakenFromStock.add(spare.getName());
+            return true;
+        }
+        Part spareOnItsWay = takeSpare(findSpareOnItsWay(missingPart), partQuantity, plannedReplacementParts);
+        if (spareOnItsWay != null) {
+            newUnitParts.add(spareOnItsWay);
+            partsOnTheirWay.add(spareOnItsWay.getName());
+            LOGGER.debug("[RefitParts] {}: {} is on its way, arriving in {} days", getDesc(), spareOnItsWay.getName(),
+                  spareOnItsWay.getDaysToArrival());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Counts one of a spare stack towards this refit while it is planned, so the same spare is not counted twice.
+     *
+     * @return the spare, or {@code null} if there is none or the refit has already counted all of it
+     */
+    private static @Nullable Part takeSpare(@Nullable Part spare, Map<Part, Integer> partQuantity,
+          List<Part> plannedReplacementParts) {
+        if (spare == null) {
+            return null;
+        }
+        int quantityLeft = partQuantity.computeIfAbsent(spare, Part::getQuantity);
+        if (quantityLeft <= 0) {
+            return null;
+        }
+        partQuantity.put(spare, quantityLeft - 1);
+        if (quantityLeft == 1) {
+            // Flagged so the next lookup skips this stack and finds another
+            spare.setUsedForRefitPlanning(true);
+            plannedReplacementParts.add(spare);
+        }
+        return spare;
+    }
+
+    /**
+     * @return a spare that fits the part and is still on its way to the warehouse, or {@code null} if there is none
+     */
+    private static @Nullable Part findSpareOnItsWay(MissingPart missingPart) {
+        LocalWarehouse warehouse = missingPart.getWarehouse();
+        if (warehouse == null) {
+            return null;
+        }
+        return warehouse.streamSpareParts()
+                     .filter(part -> !part.isPresent())
+                     .filter(part -> !part.isUsedForRefitPlanning())
+                     .filter(part -> !part.isReservedForReplacement() && !part.hasParentPart())
+                     .filter(part -> missingPart.isAcceptableReplacement(part, true))
+                     .findFirst()
+                     .orElse(null);
+    }
+
+    /**
      * Goes through the required parts and marks them as reserved in the warehouse
      */
     public void reserveNewParts() {
@@ -1347,9 +1450,11 @@ public class Refit extends Part implements IAcquisitionWork {
             if (newPart.isSpare()) {
                 if (newPart.getQuantity() > 1) {
                     newPart.changeQuantity(-1);
+                    // A part split off a stack still on its way arrives with the rest of it
+                    int daysToArrival = newPart.getDaysToArrival();
                     newPart = newPart.clone();
                     newPart.setRefitUnit(oldUnit);
-                    getCampaign().getQuartermaster().addPart(newPart, 0, newPart.isBrandNew());
+                    getCampaign().getQuartermaster().addPart(newPart, daysToArrival, newPart.isBrandNew());
                     newNewUnitParts.add(newPart);
                 } else {
                     newPart.setRefitUnit(oldUnit);

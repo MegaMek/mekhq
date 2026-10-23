@@ -55,6 +55,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -180,6 +181,22 @@ public class UnitTableModel extends DataTableModel<Unit> {
     }
 
     /**
+     * @return the refit in progress, or the refit whose parts were ordered ahead, or {@code null} for neither
+     */
+    private static @Nullable String getStatusTooltip(Unit unit) {
+        if (unit.isRefitting()) {
+            return unit.getRefit().getDesc();
+        }
+        String pendingRefitModel = unit.getPendingRefitModel();
+        if (pendingRefitModel == null) {
+            return null;
+        }
+        boolean isReadyToBegin = RefitPartOrders.isEverythingOrderedAheadHere(unit.getCampaign(), unit);
+        String key = isReadyToBegin ? "UnitTableModel.status.pendingRefitReady" : "UnitTableModel.status.pendingRefit";
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, pendingRefitModel);
+    }
+
+    /**
      * Returns the tooltip for the specified row and column.
      *
      * @param rowIndex    the index of the row
@@ -195,7 +212,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
         }
 
         return switch (columnIndex) {
-            case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
+            case COL_STATUS -> getStatusTooltip(unit);
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
             case COL_CREW -> getCrewTooltip(unit);
             case COL_QUIRKS -> unit.getQuirksListHTML();

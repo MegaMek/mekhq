@@ -344,6 +344,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays, double valueMultiplier) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
+        newPart.setOrderedAheadForUnitId(getOrderedAheadForUnitId());
         // Deliver to the warehouse kept with the unit the ammunition is for, which may be a base's
         if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, deliveryWarehouse())) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
