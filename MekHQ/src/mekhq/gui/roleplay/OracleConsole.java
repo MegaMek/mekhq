@@ -666,7 +666,7 @@ public class OracleConsole extends JDialog {
      * @return the number grouped as MekHQ's locale writes it, such as "1,234", matching counts in formatted text
      */
     static String formatCount(final long count) {
-        return NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale()).format(count);
+        return NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getNumberFormatLocale()).format(count);
     }
 
     /**

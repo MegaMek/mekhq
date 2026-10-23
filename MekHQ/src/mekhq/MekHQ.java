@@ -49,6 +49,7 @@ import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -392,6 +393,7 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
+        Locale.setDefault(Locale.Category.FORMAT, getMHQOptions().getNumberFormatLocale());
         Config.setSerialFilter(sanityInputFilter);
         MegaMek.setOriginProject(MHQConstants.PROJECT_NAME);
 

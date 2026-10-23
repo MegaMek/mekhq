@@ -283,7 +283,7 @@ public final class ContractMarketFormatting {
         String sign = amount < 0 ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.compact.minus") : "";
         double magnitude = Math.abs(amount);
 
-        NumberFormat format = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
+        NumberFormat format = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getNumberFormatLocale());
         // The unit is chosen after rounding, so an amount just short of a million reads "1.00M" rather than "1,000K",
         // and one just short of a thousand reads "1K" rather than "1,000".
         if (Math.round(magnitude / THOUSAND) >= THOUSAND) {
@@ -345,7 +345,8 @@ public final class ContractMarketFormatting {
      * than the system default.
      */
     public static DecimalFormat decimalFormat(String pattern) {
-        return new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(MekHQ.getMHQOptions().getLocale()));
+        return new DecimalFormat(pattern,
+              DecimalFormatSymbols.getInstance(MekHQ.getMHQOptions().getNumberFormatLocale()));
     }
 
     private static String ratingLetter(int equipmentRating) {

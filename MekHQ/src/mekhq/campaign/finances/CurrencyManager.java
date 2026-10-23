@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -45,6 +46,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Faction;
@@ -297,7 +299,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     private void createFormatters() {
-        this.uiAmountPrinter = new MoneyFormatterBuilder().appendAmountLocalized().toFormatter();
+        final Locale numberFormatLocale = MekHQ.getMHQOptions().getNumberFormatLocale();
+
+        this.uiAmountPrinter = new MoneyFormatterBuilder().appendAmountLocalized().toFormatter(numberFormatLocale);
 
         this.xmlMoneyFormatter = new MoneyFormatterBuilder().append(new XmlMoneyWriter(), new XmlMoneyParser())
                                        .toFormatter();
@@ -305,11 +309,11 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder().appendAmountLocalized()
                                               .appendLiteral(" ")
                                               .append(new CurrencyDataLookupWriter(this.currencyCodeToSymbolMap), null)
-                                              .toFormatter();
+                                              .toFormatter(numberFormatLocale);
 
         this.uiAmountAndNamePrinter = new MoneyFormatterBuilder().appendAmountLocalized()
                                             .appendLiteral(" ")
                                             .append(new CurrencyDataLookupWriter(this.currencyCodeToNameMap), null)
-                                            .toFormatter();
+                                            .toFormatter(numberFormatLocale);
     }
 }

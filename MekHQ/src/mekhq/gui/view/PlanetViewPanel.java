@@ -258,11 +258,10 @@ public class PlanetViewPanel extends JScrollablePanel {
                 addMetric(summary, metricIndex++, "summary.hpg.text",
                     String.valueOf(planet.getSourcedHPG(currentDate).getValue()), false);
             }
-            if (planet.getPopulation(currentDate) != null) {
-                String population = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
-                                .format(planet.getPopulation(currentDate));
-                addMetric(summary, metricIndex++, "summary.population.text", population, false);
-            }
+            planet.getPopulation(currentDate);
+            String population = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getNumberFormatLocale())
+                                      .format(planet.getPopulation(currentDate));
+            addMetric(summary, metricIndex++, "summary.population.text", population, false);
             addMetric(summary, metricIndex++, "summary.hiringHall.text", getHiringHallText(planet), false);
         }
 

@@ -553,7 +553,7 @@ public class CampaignExportWizard extends JDialog {
         double money = 0;
 
         try {
-            money = parseExportMoney(txtExportMoney.getText(), MekHQ.getMHQOptions().getLocale());
+            money = parseExportMoney(txtExportMoney.getText(), MekHQ.getMHQOptions().getNumberFormatLocale());
             if (money > 0) {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL,
                       Money.of(money),

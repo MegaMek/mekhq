@@ -8041,11 +8041,11 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         private String formatMeasurement(LegAssessment assessment) {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getNumberFormatLocale());
         numberFormat.setMaximumFractionDigits(3);
         numberFormat.setMinimumFractionDigits(0);
         String distance = numberFormat.format(assessment.facts().distanceLy());
-        String jumps = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
+        String jumps = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getNumberFormatLocale())
                              .format(assessment.facts().minimumStandardJumps());
         String circuitSuffix = assessment.facts().commandCircuitAssumed()
               ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.measurement.circuitSuffix.text")
@@ -8468,7 +8468,7 @@ public class InterstellarMapPanel extends JPanel {
         if (!currentLocationShipBounds.contains(point) && (ringDistance > 4.0)) {
             return null;
         }
-        NumberFormat days = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
+        NumberFormat days = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getNumberFormatLocale());
         days.setMaximumFractionDigits(2);
         StringBuilder text = new StringBuilder("<html>").append(MHQInternationalization.getFormattedTextAt(
               RESOURCE_BUNDLE, status.finalLeg() ? "map.nextJump.tooltip.arrival" : "map.nextJump.tooltip.jump",
