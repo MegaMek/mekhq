@@ -342,10 +342,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
