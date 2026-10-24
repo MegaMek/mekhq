@@ -920,9 +920,10 @@ public class AutoAwardsController {
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> KillAwardsManager(List<UUID> personnel) {
-        // prep the kill award data so that we only have to process it once
-        Map<Integer, List<Kill>> missionKillData = personnel.stream()
-                                                         .flatMap(person -> campaign.getKillsFor(person).stream())
+        // prep the kill award data so that we only have to process it once. We use all campaign kills, not just
+        // those of the personnel being processed, so that kills made by personnel who have since been killed,
+        // captured, or otherwise become ineligible still count towards their formation's total
+        Map<Integer, List<Kill>> missionKillData = campaign.getKills().stream()
                                                          .filter(kill -> mission != null &&
                                                                                (Objects.equals(kill.getMissionId(),
                                                                                      mission.getId())))
