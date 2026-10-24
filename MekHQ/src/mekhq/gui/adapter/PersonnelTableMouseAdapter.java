@@ -1513,7 +1513,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 new FamilyTreeDialog(gui.getFrame(),
                       selectedPerson.getGenealogy(),
-                      getCampaign().getPlayerForce().getPersonnel().values());
+                      getCampaign().getPlayerForce().getPersonnel().values(),
+                      gui::focusOnPerson);
                 break;
             }
             case CMD_EDIT: {
