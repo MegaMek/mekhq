@@ -2102,7 +2102,9 @@ public class StratConRulesManager {
                 }
 
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
-                for (int direction = 0; direction < 6; direction++) {
+                // Directions are shuffled so scouts don't sweep each ring in a fixed clockwise order. The BFS still
+                // finishes each ring before moving outward, so the closest hexes are always scouted first.
+                for (int direction : getShuffledDirections()) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
                     //ensure we are scouting on the StratCon track
@@ -2179,6 +2181,22 @@ public class StratConRulesManager {
                 }
             }
         }
+    }
+
+    /**
+     * Returns the six hex directions (0-5) in a random order.
+     *
+     * @return an array containing each hex direction exactly once, shuffled
+     */
+    private static int[] getShuffledDirections() {
+        int[] directions = { 0, 1, 2, 3, 4, 5 };
+        for (int i = directions.length - 1; i > 0; i--) {
+            int swapIndex = randomInt(i + 1);
+            int temp = directions[i];
+            directions[i] = directions[swapIndex];
+            directions[swapIndex] = temp;
+        }
+        return directions;
     }
 
     /**
