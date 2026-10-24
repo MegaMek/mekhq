@@ -50,6 +50,8 @@ class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
+    double personnelMarketNormalApplicantMultiplier;
+    double personnelMarketCivilianApplicantMultiplier;
     UnitMarketMethod unitMarketMethod;
     boolean unitMarketRegionalMekVariations;
     int unitMarketArtilleryUnitChance;
@@ -111,6 +113,10 @@ class MarketsOptionsModel {
         personnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
         personnelMarketReportRefresh = options.get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH);
         usePersonnelHireHiringHallOnly = options.get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
+        personnelMarketNormalApplicantMultiplier = options.get(
+              CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER);
+        personnelMarketCivilianApplicantMultiplier = options.get(
+              CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER);
         unitMarketMethod = options.get(CampaignOption.UNIT_MARKET_METHOD);
         unitMarketRegionalMekVariations = options.get(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS);
         unitMarketArtilleryUnitChance = options.get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
@@ -190,6 +196,10 @@ class MarketsOptionsModel {
 
         options.set(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY, usePersonnelHireHiringHallOnly);
         options.set(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH, personnelMarketReportRefresh);
+        options.set(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER,
+              personnelMarketNormalApplicantMultiplier);
+        options.set(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER,
+              personnelMarketCivilianApplicantMultiplier);
         options.set(CampaignOption.UNIT_MARKET_METHOD, unitMarketMethod);
         options.set(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS, unitMarketRegionalMekVariations);
         options.set(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE, unitMarketArtilleryUnitChance);

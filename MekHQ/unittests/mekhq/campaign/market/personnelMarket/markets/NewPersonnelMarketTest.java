@@ -33,6 +33,7 @@
 package mekhq.campaign.market.personnelMarket.markets;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.CLOWN;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT;
@@ -45,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -56,6 +58,8 @@ import java.util.Map;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -74,6 +78,16 @@ class NewPersonnelMarketTest {
 
     private static PersonnelMarketEntry entry(PersonnelRole role, int weight, int count) {
         return new PersonnelMarketEntry(weight, role, count, 3050, 3100, DEPENDENT);
+    }
+
+    private static void mockApplicantMultipliers(Campaign mockCampaign, double normalMultiplier,
+          double civilianMultiplier) {
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER))
+              .thenReturn(normalMultiplier);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER))
+              .thenReturn(civilianMultiplier);
     }
 
     @Test
@@ -372,6 +386,203 @@ class NewPersonnelMarketTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
+    void testPickEntry_zeroCivilianMultiplierNeverPicksCivilian(int randomValue) {
+        // Setup
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 100, 1);
+        PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 10, 1);
+        List<PersonnelMarketEntry> entries = List.of(civilianClown, weightedMekWarrior);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
+            mockedRandom.when(() -> Compute.randomInt(1000)).thenReturn(randomValue * 100);
+
+            // Assert
+            assertEquals(weightedMekWarrior, market.pickEntry(entries, 1.0, 0.0));
+        }
+    }
+
+    @Test
+    void testPickEntry_zeroCivilianMultiplierWithOnlyCiviliansReturnsNull() {
+        // Setup
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 100, 1);
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        PersonnelMarketEntry pick = market.pickEntry(List.of(civilianClown), 1.0, 0.0);
+
+        // Assert
+        assertNull(pick);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "0, CLOWN", "149, CLOWN", "150, MEKWARRIOR", "249, MEKWARRIOR" })
+    void testPickEntry_civilianMultiplierScalesCivilianWeight(int randomValue, String expectedEntryKey) {
+        // Setup
+        // Clown weight 1 * 1.5 multiplier * 100 precision = 150; MekWarrior weight 1 * 100 precision = 100
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 1, 1);
+        PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 1, 1);
+        List<PersonnelMarketEntry> entries = List.of(civilianClown, weightedMekWarrior);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
+            mockedRandom.when(() -> Compute.randomInt(250)).thenReturn(randomValue);
+
+            PersonnelRole expectedProfession = PersonnelRole.fromString(expectedEntryKey);
+            PersonnelRole actualProfession = market.pickEntry(entries, 1.0, 1.5).profession();
+
+            // Assert
+            assertEquals(expectedProfession, actualProfession);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
+    void testPickEntry_zeroNormalMultiplierNeverPicksNormal(int randomValue) {
+        // Setup
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 10, 1);
+        PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 100, 1);
+        List<PersonnelMarketEntry> entries = List.of(weightedMekWarrior, civilianClown);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
+            mockedRandom.when(() -> Compute.randomInt(1000)).thenReturn(randomValue * 100);
+
+            // Assert
+            assertEquals(civilianClown, market.pickEntry(entries, 0.0, 1.0));
+        }
+    }
+
+    @Test
+    void testPickEntry_zeroNormalAndCivilianMultipliersReturnsNull() {
+        // Setup
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 100, 1);
+        PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 100, 1);
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        PersonnelMarketEntry pick = market.pickEntry(List.of(civilianClown, weightedMekWarrior), 0.0, 0.0);
+
+        // Assert
+        assertNull(pick);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "0, CLOWN", "99, CLOWN", "100, MEKWARRIOR", "349, MEKWARRIOR" })
+    void testPickEntry_normalMultiplierScalesNormalWeight(int randomValue, String expectedEntryKey) {
+        // Setup
+        // Clown weight 1 * 100 precision = 100; MekWarrior weight 1 * 2.5 multiplier * 100 precision = 250
+        PersonnelMarketEntry civilianClown = entry(CLOWN, 1, 1);
+        PersonnelMarketEntry weightedMekWarrior = entry(MEKWARRIOR, 1, 1);
+        List<PersonnelMarketEntry> entries = List.of(civilianClown, weightedMekWarrior);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        // Act
+        try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
+            mockedRandom.when(() -> Compute.randomInt(350)).thenReturn(randomValue);
+
+            PersonnelRole expectedProfession = PersonnelRole.fromString(expectedEntryKey);
+            PersonnelRole actualProfession = market.pickEntry(entries, 2.5, 1.0).profession();
+
+            // Assert
+            assertEquals(expectedProfession, actualProfession);
+        }
+    }
+
+    @Test
+    void generateSingleApplicant_returnNullForNormalFallbackWhenNormalsDisabled() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        mockApplicantMultipliers(mockCampaign, 0.0, 1.0);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(0.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+        market.setGameYear(3050);
+
+        Faction faction = new Faction();
+        market.setApplicantOriginFactions(List.of(faction));
+
+        // Ensure an applicant would be generated if the normal profession check didn't block it
+        Person person = new Person(mockCampaign);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(person);
+
+        // Clowns aren't available until 3060, so fall back to a normal profession
+        PersonnelMarketEntry clown = new PersonnelMarketEntry(1, CLOWN, 1, 3060, 3100, SOLDIER);
+        PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3000, 3100, SOLDIER);
+
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = Map.of(SOLDIER, soldier, CLOWN, clown);
+        List<PersonnelMarketEntry> orderedMarketEntries = market.getMarketEntriesAsList(unorderedMarketEntries);
+
+        // Act
+        Person applicant = market.generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+
+        // Assert
+        assertNull(applicant);
+    }
+
+    @Test
+    void generateSingleApplicant_returnNullForCivilianFallbackWhenCiviliansDisabled() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        mockApplicantMultipliers(mockCampaign, 1.0, 0.0);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(0.0);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+        market.setGameYear(3050);
+
+        Faction faction = new Faction();
+        market.setApplicantOriginFactions(List.of(faction));
+
+        // Ensure an applicant would be generated if the civilian check didn't block it
+        Person person = new Person(mockCampaign);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(person);
+
+        // Soldiers aren't available until 3060, so fall back to a civilian profession
+        PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3060, 3100, CLOWN);
+        PersonnelMarketEntry clown = new PersonnelMarketEntry(1, CLOWN, 1, 3000, 3100, CLOWN);
+
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = Map.of(SOLDIER, soldier, CLOWN, clown);
+        List<PersonnelMarketEntry> orderedMarketEntries = market.getMarketEntriesAsList(unorderedMarketEntries);
+
+        // Act
+        Person applicant = market.generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+
+        // Assert
+        assertNull(applicant);
+    }
+
     @Test
     void generateSingleApplicant_returnNullForNoPick() {
         // Setup
@@ -491,6 +702,7 @@ class NewPersonnelMarketTest {
     void generateSingleApplicant_returnNullIfApplicantIsNull() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        mockApplicantMultipliers(mockCampaign, 1.0, 1.0);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -526,6 +738,14 @@ class NewPersonnelMarketTest {
     void generateSingleApplicant_returnApplicantIfApplicantIsNotNull() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        mockApplicantMultipliers(mockCampaign, 1.0, 1.0);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER)).thenReturn(1.0);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER)).thenReturn(1.0);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);

@@ -107,6 +107,7 @@ public class NewPersonnelMarket {
     private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
+    private static final int PROFESSION_MULTIPLIER_WEIGHT_PRECISION = 100;
 
     private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -975,6 +976,11 @@ public class NewPersonnelMarket {
      * <p>This method selects an entry from the ordered market entries, iterates through available fallback
      * professions if necessary, and creates a new {@link Person}.</p>
      *
+     * <p>The likelihood of picking a profession is scaled by
+     * {@link CampaignOption#PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER} for normal professions and
+     * {@link CampaignOption#PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER} for civilian professions. If a multiplier
+     * is {@code 0}, no applicants of that kind are generated, even via fallback professions.</p>
+     *
      * @param unorderedMarketEntries a mapping of {@link PersonnelRole} to {@link PersonnelMarketEntry} representing all
      *                               personnel market entries.
      * @param orderedMarketEntries   a list of {@link PersonnelMarketEntry} objects, ordered by profession.
@@ -985,9 +991,13 @@ public class NewPersonnelMarket {
     @Nullable
     Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
           List<PersonnelMarketEntry> orderedMarketEntries) {
-        PersonnelMarketEntry entry = pickEntry(orderedMarketEntries);
+        double normalMultiplier = getNormalApplicantMultiplier();
+        double civilianMultiplier = getCivilianApplicantMultiplier();
+        PersonnelMarketEntry entry = pickEntry(orderedMarketEntries, normalMultiplier, civilianMultiplier);
         if (entry == null) {
-            logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
+            if ((normalMultiplier > 0 && civilianMultiplier > 0) || orderedMarketEntries.isEmpty()) {
+                logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
+            }
             return null;
         }
 
@@ -998,6 +1008,13 @@ public class NewPersonnelMarket {
                                "fallback structure of the YAML file is incorrect.",
                   originalEntry.profession(),
                   getGameYear());
+            return null;
+        }
+
+        // A profession can fall back to one of the other kind (normal or civilian), so double-check it's permitted
+        if (getProfessionMultiplier(entry.profession(), normalMultiplier, civilianMultiplier) <= 0) {
+            logger.debug("Skipping fallback profession {} as applicants of that kind are disabled.",
+                  entry.profession());
             return null;
         }
 
@@ -1171,12 +1188,30 @@ public class NewPersonnelMarket {
      */
     @Nullable
     PersonnelMarketEntry pickEntry(List<PersonnelMarketEntry> marketEntries) {
+        return pickEntry(marketEntries, 1.0, 1.0);
+    }
+
+    /**
+     * Picks a personnel market entry from the given entry set based on weighting, with the weight of normal and
+     * civilian professions scaled by the supplied multipliers.
+     *
+     * @param marketEntries      list of market entries to pick from
+     * @param normalMultiplier   multiplier applied to the weight of normal (non-civilian) professions; {@code 0}
+     *                           prevents normal professions from being picked
+     * @param civilianMultiplier multiplier applied to the weight of civilian professions; {@code 0} prevents civilian
+     *                           professions from being picked
+     *
+     * @return selected market entry, or null if none available
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nullable
+    PersonnelMarketEntry pickEntry(List<PersonnelMarketEntry> marketEntries, double normalMultiplier,
+          double civilianMultiplier) {
         int totalWeight = 0;
         for (PersonnelMarketEntry entry : marketEntries) {
-            // These entries should have already been filtered out, but a little insurance goes a long way
-            if (entry.weight() > 0 && entry.count() > 0) {
-                totalWeight += entry.weight();
-            }
+            totalWeight += getEffectiveWeight(entry, normalMultiplier, civilianMultiplier);
         }
         if (totalWeight <= 0) {
             return null;
@@ -1185,12 +1220,92 @@ public class NewPersonnelMarket {
         int roll = randomInt(totalWeight);
         int cumulative = 0;
         for (PersonnelMarketEntry entry : marketEntries) {
-            cumulative += entry.weight();
+            cumulative += getEffectiveWeight(entry, normalMultiplier, civilianMultiplier);
             if (roll < cumulative) {
                 return entry;
             }
         }
         return null; // Should never hit here if weights > 0
+    }
+
+    /**
+     * Returns the weight of the supplied entry, adjusted for the normal and civilian applicant multipliers.
+     *
+     * <p>When either multiplier is anything other than {@code 1.0}, all weights are scaled up by
+     * {@link #PROFESSION_MULTIPLIER_WEIGHT_PRECISION} so that fractional multipliers retain their accuracy. As weights
+     * are only meaningful relative to one another, this does not otherwise affect the outcome.</p>
+     *
+     * @param entry              the entry to weigh
+     * @param normalMultiplier   multiplier applied to the weight of normal (non-civilian) professions
+     * @param civilianMultiplier multiplier applied to the weight of civilian professions
+     *
+     * @return the effective weight, or {@code 0} if the entry should never be picked
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getEffectiveWeight(PersonnelMarketEntry entry, double normalMultiplier,
+          double civilianMultiplier) {
+        // These entries should have already been filtered out, but a little insurance goes a long way
+        if (entry.weight() <= 0 || entry.count() <= 0) {
+            return 0;
+        }
+
+        if (normalMultiplier == 1.0 && civilianMultiplier == 1.0) {
+            return entry.weight();
+        }
+
+        double multiplier = getProfessionMultiplier(entry.profession(), normalMultiplier, civilianMultiplier);
+        return (int) Math.round(entry.weight() * PROFESSION_MULTIPLIER_WEIGHT_PRECISION * multiplier);
+    }
+
+    /**
+     * Returns the applicant multiplier relevant to the supplied profession.
+     *
+     * @param profession         the profession to check
+     * @param normalMultiplier   multiplier applied to normal (non-civilian) professions
+     * @param civilianMultiplier multiplier applied to civilian professions
+     *
+     * @return the relevant multiplier, to a minimum of {@code 0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getProfessionMultiplier(PersonnelRole profession, double normalMultiplier,
+          double civilianMultiplier) {
+        return Math.max(0, profession.isCivilian() ? civilianMultiplier : normalMultiplier);
+    }
+
+    /**
+     * Returns the multiplier applied to the likelihood of normal (non-civilian) applicants appearing on the market.
+     *
+     * @return the normal applicant multiplier, or {@code 1.0} if no campaign has been attached
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double getNormalApplicantMultiplier() {
+        if (campaign == null) {
+            return 1.0;
+        }
+
+        return campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER);
+    }
+
+    /**
+     * Returns the multiplier applied to the likelihood of civilian applicants appearing on the market.
+     *
+     * @return the civilian applicant multiplier, or {@code 1.0} if no campaign has been attached
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double getCivilianApplicantMultiplier() {
+        if (campaign == null) {
+            return 1.0;
+        }
+
+        return campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER);
     }
 
     /**
