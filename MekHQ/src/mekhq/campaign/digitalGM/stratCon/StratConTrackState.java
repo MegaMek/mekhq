@@ -320,6 +320,19 @@ public class StratConTrackState {
             returnDate = date.plusDays(deploymentTime);
         }
 
+        setReturnDate(forceID, returnDate);
+    }
+
+    /**
+     * Sets the date a deployed force is next due to return from this track.
+     *
+     * @param forceID    the deployed force's ID
+     * @param returnDate the date it is next due to return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setReturnDate(int forceID, LocalDate returnDate) {
         getAssignedForceReturnDates().put(forceID, returnDate);
         getAssignedForceReturnDatesForStorage().put(forceID, returnDate.toString());
     }
