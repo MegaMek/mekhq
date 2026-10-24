@@ -901,7 +901,7 @@ public class Planet {
                     neutrals = true;
                 }
 
-                if (faction.isClan()) {
+                if (planetFaction.isClan()) {
                     noClansPresent = false;
                 }
                 if (faction.isClan() == planetFaction.isClan()) {
