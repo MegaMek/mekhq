@@ -7617,6 +7617,19 @@ public class Unit implements ITechnology, ILocatable {
         return formationId;
     }
 
+    /**
+     * Gets the formation to display for this unit. Mothballing removes a unit from its formation, so while a
+     * pre-mothball restore is pending this falls back to the formation the unit will be returned to on activation.
+     *
+     * @return the current formation ID, the pre-mothball formation ID, or {@link Formation#FORMATION_NONE}
+     */
+    public int getDisplayFormationId() {
+        if ((formationId == Formation.FORMATION_NONE) && (mothballInfo != null)) {
+            return mothballInfo.getFormationId();
+        }
+        return formationId;
+    }
+
     public void setFormationId(int id) {
         this.formationId = id;
     }
