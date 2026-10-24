@@ -5447,6 +5447,8 @@ public class Campaign implements ITechManager {
         entity.setSearchlightState(false);
         // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
         entity.setUnitOrders(UnitOrders.NONE);
+        // Needed to stop state leaks between scenarios
+        entity.clearGameState();
 
         resetSensorChoice(entity);
 
