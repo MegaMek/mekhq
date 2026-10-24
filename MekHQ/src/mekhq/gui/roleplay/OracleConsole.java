@@ -56,6 +56,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import jakarta.annotation.Nullable;
+import megamek.SuiteOptions;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -666,7 +667,7 @@ public class OracleConsole extends JDialog {
      * @return the number grouped as MekHQ's locale writes it, such as "1,234", matching counts in formatted text
      */
     static String formatCount(final long count) {
-        return NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale()).format(count);
+        return NumberFormat.getIntegerInstance(SuiteOptions.getNumberFormatLocale()).format(count);
     }
 
     /**
