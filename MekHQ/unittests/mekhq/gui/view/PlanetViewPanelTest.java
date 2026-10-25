@@ -43,7 +43,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
@@ -56,11 +55,15 @@ import testUtilities.MHQTestUtilities;
 
 class PlanetViewPanelTest {
     @Test
-    void administrationPathPreservesHierarchyOrder() {
-        assertEquals("Pesht Military District > Kagoshima Prefecture",
-              PlanetViewPanel.formatAdministrationPath(
-                    List.of("Pesht Military District", "Kagoshima Prefecture")));
-        assertEquals("", PlanetViewPanel.formatAdministrationPath(List.of()));
+    void administrationLevelsIndentOneStepPerDepth() {
+        JLabel topLevel = PlanetViewPanel.createAdministrationLevel("Pesht Military District", 0);
+        JLabel secondLevel = PlanetViewPanel.createAdministrationLevel("Kagoshima Prefecture", 1);
+        JLabel thirdLevel = PlanetViewPanel.createAdministrationLevel("Kagoshima Prefecture", 2);
+
+        assertEquals("Pesht Military District", topLevel.getText());
+        assertEquals(0, topLevel.getInsets().left);
+        assertTrue(secondLevel.getInsets().left > 0);
+        assertEquals(2 * secondLevel.getInsets().left, thirdLevel.getInsets().left);
     }
 
     @Test

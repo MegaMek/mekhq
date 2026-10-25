@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,6 +82,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private static final Color DOSSIER_DIVIDER = new Color(35, 66, 82);
     private static final int HORIZONTAL_PADDING = UIUtil.scaleForGUI(12);
     private static final int LABEL_COLUMN_WIDTH = UIUtil.scaleForGUI(150);
+    private static final int ADMINISTRATION_INDENT = UIUtil.scaleForGUI(14);
     private static final int REVEAL_FRAME_DELAY_MS = 16;
     private static final long HEADER_REVEAL_DURATION_NS = 200_000_000L;
     private static final long SUMMARY_REVEAL_DELAY_NS = 120_000_000L;
@@ -314,10 +315,12 @@ public class PlanetViewPanel extends JScrollablePanel {
                                            "</i></nobr></html>");
         section.addRow("lblOwner.text", lblOwner);
 
+        // Administration, one row per level, each indented one step below its parent
         List<String> administration = planet.getAdministration(currentDate);
-        if (!administration.isEmpty()) {
-            section.addRow("lblAdministration.text",
-                  createClippedDossierValue(formatAdministrationPath(administration)));
+        String administrationLabelKey = "lblAdministration.text";
+        for (int depth = 0; depth < administration.size(); depth++) {
+            section.addRow(administrationLabelKey, createAdministrationLevel(administration.get(depth), depth));
+            administrationLabelKey = null;
         }
 
         CapitalType capitalType = planet.getCapitalType(currentDate);
@@ -382,8 +385,10 @@ public class PlanetViewPanel extends JScrollablePanel {
         return section;
     }
 
-    static String formatAdministrationPath(List<String> administration) {
-        return String.join(" > ", administration);
+    static JLabel createAdministrationLevel(String level, int depth) {
+        JLabel label = createClippedDossierValue(level);
+        label.setBorder(BorderFactory.createEmptyBorder(0, depth * ADMINISTRATION_INDENT, 0, 0));
+        return label;
     }
 
     static JLabel createClippedDossierValue(String text) {
