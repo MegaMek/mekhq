@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,6 +45,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
@@ -50,10 +53,26 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 class PlanetViewPanelTest {
+    @Test
+    void sharedWorldListsEachFactionAlphabeticallyAsABullet() {
+        Faction lyranCommonwealth = mock(Faction.class);
+        when(lyranCommonwealth.getFullName(3025)).thenReturn("Lyran Commonwealth");
+        Faction draconisCombine = mock(Faction.class);
+        when(draconisCombine.getFullName(3025)).thenReturn("Draconis Combine");
+
+        List<String> factionNames = PlanetViewPanel.getSortedFactionNames(
+              List.of(lyranCommonwealth, draconisCombine), 3025);
+
+        assertEquals(List.of("Draconis Combine", "Lyran Commonwealth"), factionNames);
+        assertEquals("<html><nobr><i>&bull; Draconis Combine</i></nobr></html>",
+              PlanetViewPanel.createAffiliationBullet("Draconis Combine").getText());
+    }
+
     @Test
     void administrationLevelsIndentOneStepPerDepth() {
         JLabel topLevel = PlanetViewPanel.createAdministrationLevel("Pesht Military District", 0);

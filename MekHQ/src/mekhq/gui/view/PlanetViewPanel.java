@@ -40,6 +40,8 @@ import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +57,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -310,10 +313,20 @@ public class PlanetViewPanel extends JScrollablePanel {
         DossierSection section = createDossierSection("section.worldProfile.text");
         LocalDate currentDate = campaign.getLocalDate();
 
-        JLabel lblOwner = new JLabel("<html><nobr><i>" +
-                                           planet.getFactionDesc(currentDate) +
-                                           "</i></nobr></html>");
-        section.addRow("lblOwner.text", lblOwner);
+        // Affiliation, one bulleted row per faction when more than one holds the world
+        List<String> factionNames = getSortedFactionNames(planet.getFactionSet(currentDate), currentDate.getYear());
+        if (factionNames.size() > 1) {
+            String affiliationLabelKey = "lblOwner.text";
+            for (String factionName : factionNames) {
+                section.addRow(affiliationLabelKey, createAffiliationBullet(factionName));
+                affiliationLabelKey = null;
+            }
+        } else {
+            JLabel ownerLabel = new JLabel("<html><nobr><i>" +
+                                                 planet.getFactionDesc(currentDate) +
+                                                 "</i></nobr></html>");
+            section.addRow("lblOwner.text", ownerLabel);
+        }
 
         // Administration, one row per level, each indented one step below its parent
         List<String> administration = planet.getAdministration(currentDate);
@@ -383,6 +396,19 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         return section;
+    }
+
+    static List<String> getSortedFactionNames(Collection<Faction> factions, int year) {
+        List<String> factionNames = new ArrayList<>(factions.size());
+        for (Faction faction : factions) {
+            factionNames.add(faction.getFullName(year));
+        }
+        Collections.sort(factionNames);
+        return factionNames;
+    }
+
+    static JLabel createAffiliationBullet(String factionName) {
+        return new JLabel("<html><nobr><i>&bull; " + factionName + "</i></nobr></html>");
     }
 
     static JLabel createAdministrationLevel(String level, int depth) {
