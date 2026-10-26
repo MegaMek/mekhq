@@ -93,6 +93,7 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.OffBoardDirection;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRollModifier;
@@ -115,6 +116,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.orders.UnitOrders;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
@@ -208,6 +210,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -2829,6 +2832,7 @@ public class Campaign implements ITechManager {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -4503,12 +4507,25 @@ public class Campaign implements ITechManager {
      * @return the simplified travel time in days
      */
     public int getSimplifiedTravelTime(PlanetarySystem destination) {
-        if (Objects.equals(getCurrentSystem(), destination)) {
+        return getSimplifiedTravelTime(getCurrentSystem(), destination);
+    }
+
+    /**
+     * Calculates simplified travel time between two systems. Travel time is calculated by dividing distance (in LY) by
+     * 20 and multiplying the result by 7.
+     *
+     * @param origin      the planetary system being traveled from
+     * @param destination the planetary system being traveled to
+     *
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem origin, PlanetarySystem destination) {
+        if (Objects.equals(origin, destination)) {
             return 0;
         } else {
             // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
             // It looked to be around 15-20LY, so 20LY seemed a good gauge
-            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+            return (int) ((origin.getDistanceTo(destination) / 20) * 7);
         }
     }
 
@@ -5420,10 +5437,16 @@ public class Campaign implements ITechManager {
         entity.setConversionMode(0);
         entity.setDoomed(false);
         entity.setDestroyed(false);
+        // Without this a unit wrecked, recovered and repaired is written off again the next time it only flees
+        entity.clearBattleOutcome();
+        // Without this a unit that fled the last battle still reports the edge it left by
+        entity.setRetreatedDirection(OffBoardDirection.NONE);
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
         entity.setShutDown(false);
         entity.setSearchlightState(false);
+        // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
+        entity.setUnitOrders(UnitOrders.NONE);
 
         resetSensorChoice(entity);
 
@@ -5957,16 +5980,16 @@ public class Campaign implements ITechManager {
      *
      * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
      *
-     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
-     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
+     * @return the {@link TurnoverPromptOutcome}, which is {@link TurnoverPromptOutcome#NOT_PROMPTED} if the turnover
+     *       prompt was not displayed
      */
-    public int checkTurnoverPrompt() {
+    public TurnoverPromptOutcome checkTurnoverPrompt() {
         if (!getPlayerForce().getForceDetachment().isOnPlanet()) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         boolean triggerTurnoverPrompt;
@@ -5986,11 +6009,11 @@ public class Campaign implements ITechManager {
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
             default:
-                return -1;
+                return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (!triggerTurnoverPrompt) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         String dialogTitle;
@@ -6008,7 +6031,7 @@ public class Campaign implements ITechManager {
                              resources.getString("turnoverAdvanceRegardless"),
                              resources.getString("turnoverCancel.text") };
 
-        return JOptionPane.showOptionDialog(null,
+        int dialogResult = JOptionPane.showOptionDialog(null,
               dialogBody,
               dialogTitle,
               JOptionPane.YES_NO_CANCEL_OPTION,
@@ -6016,6 +6039,8 @@ public class Campaign implements ITechManager {
               null,
               options,
               options[0]);
+
+        return TurnoverPromptOutcome.fromDialogResult(dialogResult);
     }
 
     /**

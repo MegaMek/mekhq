@@ -58,6 +58,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
@@ -207,7 +208,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
         long bv = 0;
         Money cost = Money.zero();
-        boolean isUseAlternateUnitCost = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST);
+        UnitCostModel unitCostModel = campaign.getCampaignOptions().get(CampaignOption.UNIT_COST_MODEL);
         double ton = 0;
         String lanceTech = "";
         String assigned = "";
@@ -228,7 +229,7 @@ public class ForceViewPanel extends JScrollablePanel {
             if (null != unit) {
                 // Never factor in C3 or the TAG force bonus in this check. It will cause the TO&E to lock up for large campaigns.
                 bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot(), true);
-                cost = cost.plus(isUseAlternateUnitCost
+                cost = cost.plus(unitCostModel.isBattleValueCost(unit.getEntity())
                                        ? unit.getBuyCost()
                                        : Money.of(unit.getEntity().getCost(true)));
                 ton += unit.getEntity().getWeight();
@@ -721,7 +722,7 @@ public class ForceViewPanel extends JScrollablePanel {
     public String getForceSummary(Formation formation) {
         int battleValue = 0;
         Money cost = Money.zero();
-        boolean isUseAlternateUnitCost = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST);
+        UnitCostModel unitCostModel = campaign.getCampaignOptions().get(CampaignOption.UNIT_COST_MODEL);
         double tonnage = 0;
         int number = 0;
         String commander = "No personnel found";
@@ -731,7 +732,7 @@ public class ForceViewPanel extends JScrollablePanel {
             if (null != unit) {
                 boolean crewExists = unit.getCommander() != null;
                 battleValue += unit.getEntity().calculateBattleValue(true, !crewExists, true);
-                cost = cost.plus(isUseAlternateUnitCost
+                cost = cost.plus(unitCostModel.isBattleValueCost(unit.getEntity())
                                        ? unit.getBuyCost()
                                        : Money.of(unit.getEntity().getCost(true)));
                 tonnage += unit.getEntity().getWeight();

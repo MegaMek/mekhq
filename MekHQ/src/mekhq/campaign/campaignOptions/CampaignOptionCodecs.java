@@ -57,6 +57,7 @@ import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -168,6 +169,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));
         register(CampaignOption.CHASSIS_FAMILIARITY_MODE, enumCodec(Familiarity::valueOf));
         register(CampaignOption.LITHIUM_FUSION_BATTERY_MODE, enumCodec(LithiumFusionBatteryMode::valueOf));
+        register(CampaignOption.UNIT_COST_MODEL, enumCodec(UnitCostModel::valueOf));
 
         // Enums persisted by a lookup name/key rather than Enum.name().
         register(CampaignOption.ACQUISITIONS_TYPE,
@@ -416,7 +418,9 @@ final class CampaignOptionCodecs {
                     options.get(CampaignOption.ATB_BATTLE_CHANCE)),
               (node, text, version, option, options) -> {
                   final String[] values = text.split(",");
-                  for (int i = 0; i < values.length; i++) {
+                  // Older saves can carry entries for since-removed roles (such as Cadre), so ignore any extras
+                  final int count = Math.min(values.length, options.get(CampaignOption.ATB_BATTLE_CHANCE).length);
+                  for (int i = 0; i < count; i++) {
                       try {
                           options.setAtBBattleChance(i, parseInt(values[i]));
                       } catch (Exception ignored) {

@@ -52,6 +52,7 @@ import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -791,8 +792,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForMaintain");
     public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
           of(Boolean.class, false, "payForHotSpotsUpkeep");
-    public static final CampaignOption<Boolean> USE_ALTERNATE_UNIT_COST =
-          of(Boolean.class, false, "useAlternateUnitCost");
+    public static final CampaignOption<UnitCostModel> UNIT_COST_MODEL =
+          of(UnitCostModel.class, UnitCostModel.TOTAL_WARFARE, "unitCostModel");
     public static final CampaignOption<Boolean> INCREASE_CLAN_REPAIR_COSTS =
           of(Boolean.class, false, "increaseClanRepairCosts");
     public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =
@@ -997,6 +998,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "usePersonnelHireHiringHallOnly");
     public static final CampaignOption<Boolean> PERSONNEL_MARKET_REPORT_REFRESH =
           of(Boolean.class, true, "personnelMarketReportRefresh");
+    public static final CampaignOption<Boolean> PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST =
+          of(Boolean.class, false, "personnelMarketDisableShowOfInterest");
+    public static final CampaignOption<Boolean> PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION =
+          of(Boolean.class, false, "personnelMarketDisableCombatManeuversRestriction");
     public static final CampaignOption<UnitMarketMethod> UNIT_MARKET_METHOD =
           of(UnitMarketMethod.class, UnitMarketMethod.NONE, "unitMarketMethod");
     public static final CampaignOption<Boolean> UNIT_MARKET_REGIONAL_MEK_VARIATIONS =

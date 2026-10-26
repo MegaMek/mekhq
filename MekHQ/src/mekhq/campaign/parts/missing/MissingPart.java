@@ -463,6 +463,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
         // Which shopping method is this used for?
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
+        newPart.setOrderedAheadForUnitId(getOrderedAheadForUnitId());
         newPart.setDaysToArrival(transitDays);
         // Deliver to this order's own warehouse (a base warehouse for a base order, else the campaign warehouse).
         StringBuilder toReturn = new StringBuilder();

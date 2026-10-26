@@ -69,12 +69,14 @@ import static mekhq.utilities.EntityUtilities.hasActiveProbe;
 import static mekhq.utilities.EntityUtilities.hasImprovedCommunications;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
 import static mekhq.utilities.EntityUtilities.hasReconCamera;
+import static mekhq.utilities.EntityUtilities.hasSatelliteImager;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -150,6 +152,8 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
@@ -2013,12 +2017,14 @@ public class StratConRulesManager {
         boolean hasFatigueIncreased = false;
 
         int scanRangeIncrease = track.getScanRangeIncrease();
+        boolean isTraining = false;
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
         if (combatTeam != null) {
-            boolean isPatrol = combatTeam.getRole().isPatrol();
-            if (isPatrol) {
+            CombatRole combatRole = combatTeam.getRole();
+            if (combatRole.isPatrol()) {
                 scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
             }
+            isTraining = combatRole.isTraining();
         }
 
         // Process starting point
@@ -2053,6 +2059,11 @@ public class StratConRulesManager {
             }
         }
 
+        // A training force is busy drilling, not scouting, so it reveals only the hex it deploys to
+        if (isTraining) {
+            return;
+        }
+
         if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
             return;
         }
@@ -2066,9 +2077,8 @@ public class StratConRulesManager {
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = useAdvancedScouting && scoutData.unitWeight() <= 35 ?
-                                            scanRangeIncrease + 1 :
-                                            scanRangeIncrease;
+            int individualScanRange = getIndividualScanRange(scoutData.unitWeight(), scanRangeIncrease,
+                  useAdvancedScouting);
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
@@ -2091,7 +2101,9 @@ public class StratConRulesManager {
                 }
 
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
-                for (int direction = 0; direction < 6; direction++) {
+                // Directions are shuffled so scouts don't sweep each ring in a fixed clockwise order. The BFS still
+                // finishes each ring before moving outward, so the closest hexes are always scouted first.
+                for (int direction : getShuffledDirections()) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
                     //ensure we are scouting on the StratCon track
@@ -2171,6 +2183,22 @@ public class StratConRulesManager {
     }
 
     /**
+     * Returns the six hex directions (0-5) in a random order.
+     *
+     * @return an array containing each hex direction exactly once, shuffled
+     */
+    private static int[] getShuffledDirections() {
+        int[] directions = { 0, 1, 2, 3, 4, 5 };
+        for (int i = directions.length - 1; i > 0; i--) {
+            int swapIndex = randomInt(i + 1);
+            int temp = directions[i];
+            directions[i] = directions[swapIndex];
+            directions[swapIndex] = temp;
+        }
+        return directions;
+    }
+
+    /**
      * Returns a TargetRollModifier based on the provided unit weight. Lighter units gain bonuses, heavier units gain
      * penalties.
      *
@@ -2231,8 +2259,8 @@ public class StratConRulesManager {
     /**
      * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
      *
-     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), and the Improved
-     * Communications quirk all count as sensor equipment. They do not stack.</p>
+     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), Satellite Imagers, and the
+     * Improved Communications quirk all count as sensor equipment. They do not stack.</p>
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
@@ -2332,6 +2360,7 @@ public class StratConRulesManager {
                 hasSensorEquipment = hasImprovedSensors(entity)
                                            || hasActiveProbe(entity)
                                            || hasReconCamera(entity)
+                                           || hasSatelliteImager(entity)
                                            || hasImprovedCommunications(entity);
 
                 if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
@@ -2483,17 +2512,18 @@ public class StratConRulesManager {
 
         if (isGMReinforcement) {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
-                  scenario.getHyperlinkedName()));
+                  scenario.getName()));
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         } else {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
-                  scenario.getHyperlinkedName(),
+                  scenario.getName(),
                   roll,
                   maneuverRoleReport,
                   reinforcementTargetNumber));
@@ -2505,7 +2535,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2515,9 +2545,10 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         }
 
         // Reinforcement roll failed, make interception check
@@ -2530,7 +2561,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
@@ -2549,7 +2580,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2562,11 +2593,9 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
-
-        campaign.addReport(BATTLE, reportStatus.toString());
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_TACTICS, campaign)
@@ -2576,7 +2605,8 @@ public class StratConRulesManager {
             String reportString = commander.getSkill(S_TACTICS) != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
-            campaign.addReport(BATTLE, String.format(reportString,
+            reportStatus.append("<p>");
+            reportStatus.append(String.format(reportString,
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
@@ -2584,10 +2614,12 @@ public class StratConRulesManager {
                 increaseFatigue(formation.getId(), campaign);
             }
 
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
-        campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+        reportStatus.append("<p>");
+        reportStatus.append(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               actionCheckResult.getRollResult(),
@@ -2595,12 +2627,42 @@ public class StratConRulesManager {
 
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
+        showReinforcementResultsDialog(campaign, formation, INTERCEPTED, reportStatus.toString());
+
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
               campaign.getPlayerForce().getHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
 
         return INTERCEPTED;
+    }
+
+    /**
+     * Presents the outcome of a reinforcement check in an immersive dialog, rather than the daily report, so the player
+     * can't miss it.
+     *
+     * @param campaign  the current campaign
+     * @param formation the reinforcing formation; its commander, if any, delivers the message
+     * @param result    the outcome of the reinforcement check
+     * @param report    the breakdown of the check, shown as the out-of-character message
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void showReinforcementResultsDialog(Campaign campaign, Formation formation,
+          ReinforcementResultsType result, String report) {
+        UUID commanderId = formation.getFormationCommanderID();
+        Person speaker = (commanderId == null) ?
+                               null :
+                               campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
+
+        String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
+              "StratConRulesManager.reinforcements.inCharacter." + result.name(),
+              campaign.getCommanderAddress(),
+              formation.getName());
+
+        new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, null, report, null, false,
+              ImmersiveDialogWidth.SMALL);
     }
 
     /**
@@ -4802,6 +4864,7 @@ public class StratConRulesManager {
               MekHQ.getMHQOptions().getLocale());
 
         List<Integer> forcesToUndeploy = new ArrayList<>();
+        List<Integer> patrolsToScout = new ArrayList<>();
         LocalDate date = campaign.getLocalDate();
 
         // for each force on the track, if the return date is today or in the past,
@@ -4813,8 +4876,16 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId()) ||
-                      track.getStickyForces().contains(forceID)) {
+            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId())) {
+                continue;
+            }
+
+            if (track.getStickyForces().contains(forceID)) {
+                // A patrol told to remain deployed scouts again instead of returning
+                boolean isDueToReturn = !track.getAssignedForceReturnDates().get(forceID).isAfter(date);
+                if (isDueToReturn && isPatrolScoutingUntilDone(forceID, track, campaign)) {
+                    patrolsToScout.add(forceID);
+                }
                 continue;
             }
 
@@ -4844,9 +4915,182 @@ public class StratConRulesManager {
             }
         }
 
+        for (int forceID : patrolsToScout) {
+            String formationName = campaign.getPlayerForce().getFormation(forceID).getName();
+            if (scoutRemainingPatrolArea(forceID, track, campaign)) {
+                forcesToUndeploy.add(forceID);
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.scoutingComplete"), formationName));
+            } else {
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.stillScouting"), formationName));
+            }
+        }
+
         for (int forceID : forcesToUndeploy) {
             track.unassignFormation(forceID);
         }
+    }
+
+    /**
+     * Whether a formation told to Remain Deployed is a patrol that keeps scouting until its area is fully scouted,
+     * instead of staying in place until recalled.
+     *
+     * <p>This only applies under Advanced Scouting, where a patrol may need several attempts to scout its whole area,
+     * and never to a formation held in place by a facility order - that order decides when it may leave.</p>
+     *
+     * @param forceID  the deployed formation's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the formation should scout again, rather than return, whenever it would normally return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isPatrolScoutingUntilDone(int forceID, StratConTrackState track, Campaign campaign) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING)) {
+            return false;
+        }
+
+        if (track.getFacilityOrder(forceID) != null) {
+            return false;
+        }
+
+        // Matches the role scanNeighboringCoords uses to grant the patrol its extra scan range
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+        return (combatTeam != null) && combatTeam.getRole().isPatrol();
+    }
+
+    /**
+     * Has a patrol told to Remain Deployed make another round of Advanced Scouting checks around its hex, as it would
+     * when first deploying. Once every hex within its scouts' reach has been scouted the patrol is done; otherwise it
+     * stays out until it would next return, when it tries again.
+     *
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the patrol's whole area is now scouted, and it should return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean scoutRemainingPatrolArea(int forceID, StratConTrackState track, Campaign campaign) {
+        StratConCoords coords = track.getAssignedForceCoords().get(forceID);
+        if (coords == null) {
+            return true;
+        }
+
+        int radius = getPatrolScoutingRadius(coords, forceID, track, campaign);
+        if (!isAreaFullyScouted(coords, radius, track)) {
+            scanNeighboringCoords(coords, forceID, campaign, track);
+            StratConReconnaissance.updateObjectives(track);
+        }
+
+        if (isAreaFullyScouted(coords, radius, track)) {
+            return true;
+        }
+
+        track.setReturnDate(forceID, campaign.getLocalDate().plusDays(track.getDeploymentTime()));
+        return false;
+    }
+
+    /**
+     * The furthest, in hexes, a deployed patrol can scout from its hex under Advanced Scouting: the patrol's scan
+     * range, plus one for any scout in a unit of 35 tons or less. A patrol with no scouts, or sitting on a scenario
+     * or a hostile facility, can't scout past its own hex.
+     *
+     * @param coords   the hex the patrol is deployed to
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return the patrol's scouting radius
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getPatrolScoutingRadius(StratConCoords coords, int forceID, StratConTrackState track,
+          Campaign campaign) {
+        // scanNeighboringCoords scouts nothing past a hex holding a scenario or a hostile facility
+        StratConFacility facility = track.getFacility(coords);
+        if ((track.getScenario(coords) != null) || ((facility != null) && !facility.isOwnerAlliedToPlayer())) {
+            return 0;
+        }
+
+        // Patrols increase their scan range by 1
+        int scanRangeIncrease = track.getScanRangeIncrease() + 1;
+        int radius = 0;
+        for (ScoutRecord scout : buildScoutMap(campaign.getPlayerForce().getFormation(forceID),
+              campaign.getPlayerForce().getHangar(), campaign)) {
+            radius = max(radius, getIndividualScanRange(scout.unitWeight(), scanRangeIncrease, true));
+        }
+        return radius;
+    }
+
+    /**
+     * How far, in hexes, a single scout can reveal from where its formation deploys. Under Advanced Scouting, a scout
+     * in a unit of 35 tons or less reaches one hex further.
+     *
+     * @param unitWeight          the weight of the scout's unit, in tons
+     * @param scanRangeIncrease   the formation's scan range
+     * @param useAdvancedScouting whether Advanced Scouting is enabled
+     *
+     * @return the scout's scan range
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getIndividualScanRange(double unitWeight, int scanRangeIncrease, boolean useAdvancedScouting) {
+        return useAdvancedScouting && unitWeight <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+    }
+
+    /**
+     * Whether every hex on the track within the given radius of a hex has been scouted. Like scouting itself, this
+     * never looks past the edge of the track.
+     *
+     * @param center the hex at the center of the area
+     * @param radius how far from the center, in hexes, the area reaches
+     * @param track  the track to check
+     *
+     * @return {@code true} if every on-track hex in the area has been revealed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAreaFullyScouted(StratConCoords center, int radius, StratConTrackState track) {
+        Set<StratConCoords> revealedCoords = track.getRevealedCoords();
+        if (!revealedCoords.contains(center)) {
+            return false;
+        }
+
+        Queue<Pair<StratConCoords, Integer>> queue = new LinkedList<>();
+        Set<StratConCoords> visited = new HashSet<>();
+        queue.add(new Pair<>(center, 0));
+        visited.add(center);
+
+        while (!queue.isEmpty()) {
+            Pair<StratConCoords, Integer> current = queue.poll();
+            int distance = current.getValue();
+            if (distance >= radius) {
+                continue;
+            }
+
+            for (int direction = 0; direction < 6; direction++) {
+                StratConCoords checkCoords = current.getKey().translate(direction);
+                if (track.isOffTrack(checkCoords) || !visited.add(checkCoords)) {
+                    continue;
+                }
+
+                if (!revealedCoords.contains(checkCoords)) {
+                    return false;
+                }
+                queue.add(new Pair<>(checkCoords, distance + 1));
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -4869,6 +5113,68 @@ public class StratConRulesManager {
                 processIgnoredStratConScenario(stratConScenario, track, campaignState, campaign);
                 break;
             }
+        }
+    }
+
+    /**
+     * Moves a dynamic scenario to a new battle date, keeping its StratCon deployment, battle and return dates in step.
+     *
+     * <p>Used when the GM changes a scenario's date from the briefing room. Changing only the backing scenario's date
+     * would leave the StratCon deployment date behind, so the scenario would be treated as ignored - and removed from
+     * its sector - while still pending in the briefing room.</p>
+     *
+     * <p>The deployment and battle dates move to the new date, and the return date (as well as that of any formation
+     * already deployed to the scenario) moves with it, so formations stay deployed for the same length of time.</p>
+     *
+     * @param scenarioId    the ID of the dynamic scenario being rescheduled
+     * @param campaignState the contract's StratCon campaign state
+     * @param newDate       the scenario's new battle date
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void rescheduleDynamicScenario(int scenarioId, StratConCampaignState campaignState,
+          LocalDate newDate) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            StratConScenario scenario = track.getBackingScenariosMap().get(scenarioId);
+            if (scenario == null) {
+                continue;
+            }
+
+            LocalDate oldActionDate = scenario.getActionDate();
+            long shiftDays = (oldActionDate == null) ? 0 : ChronoUnit.DAYS.between(oldActionDate, newDate);
+
+            // A missing deployment date marks a scenario not yet placed, so we leave it to be set when it is
+            if (scenario.getDeploymentDate() != null) {
+                scenario.setDeploymentDate(newDate);
+            }
+            scenario.setActionDate(newDate);
+
+            LocalDate oldReturnDate = scenario.getReturnDate();
+            if (oldReturnDate == null) {
+                return;
+            }
+
+            LocalDate newReturnDate = oldReturnDate.plusDays(shiftDays);
+            if (newReturnDate.isBefore(newDate)) {
+                newReturnDate = newDate;
+            }
+            scenario.setReturnDate(newReturnDate);
+
+            // Formations deployed for this scenario return with it; any due back sooner stay until it is over
+            Set<Integer> deployedForceIDs = track.getAssignedCoordForces().get(scenario.getCoords());
+            if (deployedForceIDs != null) {
+                for (int forceID : deployedForceIDs) {
+                    LocalDate forceReturnDate = track.getAssignedForceReturnDates().get(forceID);
+                    if ((forceReturnDate == null) ||
+                              forceReturnDate.equals(oldReturnDate) ||
+                              forceReturnDate.isBefore(newReturnDate)) {
+                        track.getAssignedForceReturnDates().put(forceID, newReturnDate);
+                        track.getAssignedForceReturnDatesForStorage().put(forceID, newReturnDate.toString());
+                    }
+                }
+            }
+            return;
         }
     }
 

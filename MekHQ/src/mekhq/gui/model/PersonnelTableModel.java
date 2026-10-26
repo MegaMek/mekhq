@@ -60,11 +60,13 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.TechJobs;
 import mekhq.gui.baseComponents.tables.MHQTableModel;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.gui.utilities.PersonnelStateColors;
+import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 
 /**
  * A table Model for displaying information about personnel
@@ -82,6 +84,8 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
 
     private final Campaign campaign;
     private boolean groupByUnit;
+    // The jobs each tech is in the middle of, taken once per refresh so painting a row does not search the campaign
+    private TechJobs techJobs = TechJobs.none();
     private final PersonnelRenderer renderer = new PersonnelRenderer();
 
     public PersonnelTableModel(Campaign c) {
@@ -112,6 +116,18 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
 
     public @Nullable Person getPerson(final int row) {
         return getRow(row);
+    }
+
+    /**
+     * Shows these people, and takes a fresh snapshot of the jobs each tech is in the middle of, so the rows are
+     * colored from the campaign as it is now.
+     *
+     * @param people the people to show
+     */
+    @Override
+    public void setData(List<Person> people) {
+        techJobs = TechJobs.find(campaign);
+        super.setData(people);
     }
 
     public void refreshData() {
@@ -155,7 +171,7 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
         private static final ComponentColors DEFAULT_COLORS =
               new ComponentColors(UIManager.getColor("Table.foreground"), UIManager.getColor("Table.background"));
 
-        private final List<String> personalStateFlags = new ArrayList<>();
+        private final List<ColorReason> personalStateFlags = new ArrayList<>();
         private final Map<Portrait, ImageIcon> portraitCache = new WeakHashMap<>();
         private final Map<Long, ImageIcon> entityImageCache = new WeakHashMap<>();
         private final Map<StandardFormationIcon, ImageIcon> formationIconCache = new WeakHashMap<>();
@@ -198,8 +214,9 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
         /**
          * Populates a list with personal state flags. Selects a color for the most important state.
          */
-        private ComponentColors populatePersonalStateFlags(Person person, List<String> colorReasonKeys) {
-            ComponentColors cellColors = PersonnelStateColors.getStateColors(campaign, person, colorReasonKeys);
+        private ComponentColors populatePersonalStateFlags(Person person, List<ColorReason> colorReasons) {
+            ComponentColors cellColors = PersonnelStateColors.getStateColors(campaign, person, colorReasons,
+                  techJobs.getJobs(person));
             return (cellColors == null) ? DEFAULT_COLORS : cellColors;
         }
 

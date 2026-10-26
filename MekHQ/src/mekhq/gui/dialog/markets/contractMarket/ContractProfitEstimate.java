@@ -32,7 +32,9 @@
  */
 package mekhq.gui.dialog.markets.contractMarket;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -44,6 +46,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.ContractAutomation;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -61,6 +64,11 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * the target planet. Maintenance is projected per unit for each leg: off contract and travelling during the transit,
  * then on contract on the planet, where a combat contract maintains more often but at its own cost multiplier. Straight
  * support covers repairs, not maintenance (Hot Spots: Draconis Reach pg 27), so it is not counted.</p>
+ *
+ * <p>When the player has chosen to mothball units on departure, the units contract automation will mothball (see
+ * {@link ContractAutomation#getAutomatedMothballCandidates}) cost nothing on the way out: they leave the TO&amp;E, so
+ * add no Hot Spots upkeep or peacetime operating costs, and need no maintenance until they are activated on arrival.
+ * Their crews are still paid and fed.</p>
  *
  * <p>The estimated net is deliberately conservative: it counts only guaranteed pay, and excludes repairs and
  * battlefield losses (which depend on how the fighting goes). Combat pay is given separately, as the most the contract
@@ -99,10 +107,15 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
     /**
      * Computes the profit estimate for the given offer in the context of the supplied campaign.
      *
+     * @param campaign            the campaign
+     * @param contract            the offer to estimate
+     * @param mothballOnDeparture whether eligible units will be mothballed for the journey out
+     *
      * @author Illiani
      * @since 0.51.01
      */
-    public static ContractProfitEstimate estimate(Campaign campaign, AbstractContract contract) {
+    public static ContractProfitEstimate estimate(Campaign campaign, AbstractContract contract,
+          boolean mothballOnDeparture) {
         PlayerForce playerForce = campaign.getPlayerForce();
         Detachment detachment = playerForce.getForceDetachment();
         FactionStandings factionStandings = playerForce.getFactionStandings();
@@ -122,20 +135,32 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
         double transitMonths = costedTransitDays / ContractExpenseProjection.DAYS_PER_MONTH;
         double engagementMonths = months + transitMonths;
 
+        // Contract automation only mothballs when there is a journey ahead. The units are activated on arrival, so the
+        // contract term is costed with the whole force.
+        List<Unit> mothballedForTransit = List.of();
+        if (mothballOnDeparture && (costedTransitDays > 0)) {
+            mothballedForTransit = ContractAutomation.getAutomatedMothballCandidates(campaign, detachment);
+        }
+
         Accountant accountant = campaign.getAccountant();
         Money salaries = getMonthlySalaries(campaign, accountant).multipliedBy(engagementMonths);
         Money overhead = accountant.getOverheadExpenses().multipliedBy(engagementMonths);
-        Money hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts().multipliedBy(engagementMonths);
+        Money hotSpotsUpkeep = getHotSpotsUpkeep(accountant, months, transitMonths, mothballedForTransit);
         Money foodAndHousing = getFoodAndHousing(campaign, contract, months, transitMonths);
-        Money maintenance = getMaintenance(campaign, contract, months, costedTransitDays);
+        Money maintenance = getMaintenance(campaign, contract, months, costedTransitDays, mothballedForTransit);
         Money spareParts = Money.zero();
         Money trainingMunitions = Money.zero();
         Money fuel = Money.zero();
         if (campaign.getCampaignOptions().isChargingPeacetimeCost()) {
             Collection<Unit> units = accountant.getUnitsInFormations();
-            spareParts = Accountant.getSparePartsTotal(units).multipliedBy(engagementMonths);
-            trainingMunitions = Accountant.getAmmoTotal(units).multipliedBy(engagementMonths);
-            fuel = Accountant.getFuelTotal(units).multipliedBy(engagementMonths);
+            List<Unit> transitUnits = new ArrayList<>(units);
+            transitUnits.removeAll(mothballedForTransit);
+            spareParts = Accountant.getSparePartsTotal(units).multipliedBy(months)
+                               .plus(Accountant.getSparePartsTotal(transitUnits).multipliedBy(transitMonths));
+            trainingMunitions = Accountant.getAmmoTotal(units).multipliedBy(months)
+                                      .plus(Accountant.getAmmoTotal(transitUnits).multipliedBy(transitMonths));
+            fuel = Accountant.getFuelTotal(units).multipliedBy(months)
+                         .plus(Accountant.getFuelTotal(transitUnits).multipliedBy(transitMonths));
         }
 
         Money operatingCosts = salaries.plus(maintenance)
@@ -234,13 +259,33 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
     }
 
     /**
+     * Hot Spots upkeep on the whole TO&amp;E for the term, and without the units mothballed for the journey while
+     * travelling out.
+     *
+     * @return the Hot Spots upkeep across the contract term and the transit out
+     */
+    private static Money getHotSpotsUpkeep(Accountant accountant, int months, double transitMonths,
+          List<Unit> mothballedForTransit) {
+        Money contractUpkeep = accountant.getHotSpotsUpkeepCosts().multipliedBy(months);
+        if (transitMonths <= 0) {
+            return contractUpkeep;
+        }
+        return contractUpkeep.plus(accountant.getHotSpotsUpkeepCostsExcluding(mothballedForTransit)
+                                         .multipliedBy(transitMonths));
+    }
+
+    /**
      * Unit maintenance off contract while travelling out, then on contract for the term. Straight support covers
-     * repairs, not maintenance (Hot Spots: Draconis Reach pg 27), so none of it is reimbursed.
+     * repairs, not maintenance (Hot Spots: Draconis Reach pg 27), so none of it is reimbursed. Units mothballed for the
+     * journey need no maintenance until they are activated on arrival.
      *
      * @return the maintenance across the contract term and the transit out
      */
-    private static Money getMaintenance(Campaign campaign, AbstractContract contract, int months, int transitDays) {
-        Money transitMaintenance = ContractExpenseProjection.getTransitMaintenance(campaign, transitDays);
+    private static Money getMaintenance(Campaign campaign, AbstractContract contract, int months, int transitDays,
+          List<Unit> mothballedForTransit) {
+        Money transitMaintenance = ContractExpenseProjection.getTransitMaintenance(campaign,
+              transitDays,
+              mothballedForTransit);
         Money contractMaintenance = ContractExpenseProjection.getMonthlyContractMaintenance(campaign, contract)
                                           .multipliedBy(months);
         return transitMaintenance.plus(contractMaintenance);

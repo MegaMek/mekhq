@@ -188,6 +188,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     /** This tracks the unit which reserved the part for a refit */
     private Unit refitUnit;
     /**
+     * The unit whose refit this part was ordered ahead for with Order Parts (issue #7848), or {@code null}. The part
+     * stays an ordinary spare; the label only says what it was bought for. It is an id rather than the unit, because
+     * an order read back from a save keeps an unresolved reference to its unit.
+     */
+    private @Nullable UUID orderedAheadForUnitId;
+    /**
      * The unique identifier of the tech who is reserving this part for overnight work
      */
     private Person reservedBy;
@@ -336,10 +342,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
@@ -590,6 +596,14 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return toReturn.toString();
     }
 
+    /**
+     * Describes the repair the part needs for the warehouse's Repair Details column. A part with nothing to repair
+     * says what it is for instead, so the column is not blank: for example, a Small Laser on its way for a refit is
+     * {@code Held for the refit of Locust LCT-1V}, one ordered ahead of a refit names the unit, and an ordinary spare
+     * on its way needs no repairs.
+     *
+     * @return the repair the part needs, what it is held for, or an empty string for an undamaged part in stock
+     */
     public String getRepairDesc() {
         StringBuilder toReturn = new StringBuilder();
 
@@ -608,8 +622,25 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                         formatTargetModifier(getAllMods(null))))
                   .append(getWorkModeText())
                   .append("</html>");
+        } else {
+            toReturn.append(describeWhatTheUndamagedPartIsFor());
         }
         return toReturn.toString();
+    }
+
+    private String describeWhatTheUndamagedPartIsFor() {
+        Unit unitRefitted = getRefitUnit();
+        if (unitRefitted != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairDesc.heldForRefit", unitRefitted.getName());
+        }
+        Unit unitOrderedFor = (orderedAheadForUnitId == null) ? null : getCampaign().getUnit(orderedAheadForUnitId);
+        if (unitOrderedFor != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairDesc.orderedAhead", unitOrderedFor.getName());
+        }
+        if (!isPresent()) {
+            return getTextAt(RESOURCE_BUNDLE, "Part.repairDesc.noRepairsNeeded");
+        }
+        return "";
     }
 
     public String getTechBaseName() {
@@ -671,7 +702,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @param part The part to be compared with the current part
      */
     public boolean isSamePartTypeAndStatus(Part part) {
-        return isSamePartType(part) && isSameStatus(part);
+        // A part ordered ahead for a refit stays in its own stack, so it keeps saying which refit it is for
+        boolean isOrderedAheadForTheSameRefit = Objects.equals(orderedAheadForUnitId, part.orderedAheadForUnitId);
+        return isSamePartType(part) && isSameStatus(part) && isOrderedAheadForTheSameRefit;
     }
 
     public abstract boolean isSamePartType(Part part);
@@ -736,6 +769,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (refitUnit != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
+        }
+
+        if (orderedAheadForUnitId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "orderedAheadForUnitId", orderedAheadForUnitId);
         }
 
         if (daysToArrival > 0) {
@@ -957,6 +994,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.refitUnit = new PartUnitRef(UUID.fromString(wn2.getTextContent()));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("orderedAheadForUnitId")) {
+                    retVal.orderedAheadForUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
@@ -1107,9 +1146,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             mods.append(getUnit().getSiteMod());
             if (getUnit().getEntity() != null) {
                 if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                    mods.addModifier(-1, "easy to maintain");
+                    mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
                 } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                    mods.addModifier(1, "difficult to maintain");
+                    mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
                 }
 
                 // Apply obsolete quirk modifier
@@ -1125,7 +1164,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (this instanceof MissingMekLocation) ||
                              (this instanceof MekActuator) ||
                              (this instanceof MissingMekActuator))) {
-                mods.addModifier(2, "prototype TSM");
+                mods.addModifier(2, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
             }
         } else {
             // Parts repaired in the warehouse work under the same conditions a unit would be assigned on arrival,
@@ -1138,12 +1177,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1153,11 +1192,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(1, "Maintainer");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
@@ -1179,9 +1218,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         mods.append(getUnit().getSiteMod());
         if (getUnit().getEntity() != null) {
             if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                mods.addModifier(-1, "easy to maintain");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
             } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                mods.addModifier(1, "difficult to maintain");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
             }
 
             // Apply obsolete quirk modifier
@@ -1196,12 +1235,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1211,16 +1250,16 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(-1, "Maintainer");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
         if (getUnit().hasPrototypeTSM()) {
-            mods.addModifier(1, "prototype TSM");
+            mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
         }
 
         return getCampaign().getCampaignOptions().get(CampaignOption.USE_QUALITY_MAINTENANCE) ?
@@ -1242,7 +1281,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                   (null != tech) &&
                   tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             // fixers can ignore the first point of penalty for poor quality
-            mods.addModifier(-1, "Mr/Ms Fix-it");
+            mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.fixer"));
         }
         return mods;
     }
@@ -1646,6 +1685,22 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public boolean isReservedForRefit() {
         return refitUnit != null;
+    }
+
+    /**
+     * @return the id of the unit whose refit this part was ordered ahead for, or {@code null} for an ordinary spare
+     */
+    public @Nullable UUID getOrderedAheadForUnitId() {
+        return orderedAheadForUnitId;
+    }
+
+    /**
+     * Labels the part, or its order, with the unit whose refit it was ordered ahead for.
+     *
+     * @param unitId the unit's id, or {@code null} to clear the label
+     */
+    public void setOrderedAheadForUnitId(@Nullable UUID unitId) {
+        orderedAheadForUnitId = unitId;
     }
 
     /**

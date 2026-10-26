@@ -60,14 +60,14 @@ import jakarta.annotation.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumData;
-import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumManifest;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumSide;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
 
 /**
  * A developer tool for editing Faction Standing ultimatum files (JSON). Each ultimatum is its own file; this editor
- * exposes every persisted field with New / Load / Save / Add to Manifest, mirroring the point of interest editor.
+ * exposes every persisted field with New / Load / Save, mirroring the point of interest editor. The game loads every
+ * ultimatum file in its directory, so a saved file needs no further registration.
  *
  * <p>An ultimatum's sides are edited as an ordered list: the picker shows them in this order, and the first side
  * delivers the opening offer.</p>
@@ -102,9 +102,6 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private static final Pattern ID_PATTERN = Pattern.compile("[A-Z0-9_]+");
 
     private final JFrame frame;
-    // The file the current ultimatum was last loaded from or saved to; null until then. Registering with the manifest
-    // needs a concrete file name, so the button stays disabled until this is set.
-    private File currentFile;
 
     private final JTextField txtName = new JTextField(30);
     private final JTextField txtDate = new JTextField(12);
@@ -124,7 +121,6 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private final JCheckBox chkViolentTransition = new JCheckBox();
     private final JSpinner spnDivisiveness = new JSpinner(new SpinnerNumberModel(0,
           FactionStandingUltimatumData.MINIMUM_DIVISIVENESS, FactionStandingUltimatumData.MAXIMUM_DIVISIVENESS, 1));
-    private final JButton btnAddToManifest = new JButton(getTextAt(RESOURCE_BUNDLE, "button.addToManifest"));
 
     /**
      * @param parent the owning frame
@@ -332,17 +328,11 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private JPanel buildButtonBar() {
         JPanel bar = new JPanel();
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
-        btnNew.addActionListener(event -> {
-            currentFile = null;
-            clearForm();
-            updateManifestButtonState();
-        });
+        btnNew.addActionListener(event -> clearForm());
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
         btnLoad.addActionListener(event -> loadFromFile());
         JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
         btnSave.addActionListener(event -> saveToFile());
-        btnAddToManifest.addActionListener(event -> addToManifest());
-        btnAddToManifest.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "addToManifest.tooltip")));
         JButton btnTextKeys = new JButton(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.button"));
         btnTextKeys.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.button.tooltip")));
         btnTextKeys.addActionListener(event -> showTextKeys());
@@ -351,19 +341,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         bar.add(btnNew);
         bar.add(btnLoad);
         bar.add(btnSave);
-        bar.add(btnAddToManifest);
         bar.add(btnTextKeys);
         bar.add(btnClose);
-        updateManifestButtonState();
         return bar;
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void updateManifestButtonState() {
-        btnAddToManifest.setEnabled(currentFile != null);
     }
 
     /**
@@ -457,9 +437,7 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
             return;
         }
 
-        currentFile = file;
         load(loaded);
-        updateManifestButtonState();
     }
 
     /**
@@ -490,8 +468,6 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
                 return;
             }
 
-            currentFile = file;
-            updateManifestButtonState();
             warnAboutMissingText(ultimatum);
         });
     }
@@ -687,55 +663,6 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
             sideIds.add(side.id());
         }
         return sideIds;
-    }
-
-    /**
-     * Registers the current ultimatum's file name in the {@code ultimatummanifest.json} that sits alongside it, so the
-     * game will load it. A manifest that exists but can't be read is left unchanged, as writing a new one over it would
-     * drop every other entry.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void addToManifest() {
-        if (currentFile == null) {
-            return;
-        }
-
-        String fileName = currentFile.getName();
-        File manifestFile = new File(currentFile.getParentFile(), FactionStandingUltimatumManifest.MANIFEST_FILE_NAME);
-        String manifestTitle = getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "manifest.title");
-
-        FactionStandingUltimatumManifest manifest;
-        if (manifestFile.exists()) {
-            manifest = FactionStandingUltimatumManifest.deserialize(manifestFile);
-            if (manifest == null) {
-                JOptionPane.showMessageDialog(this,
-                      getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "manifest.loadError.message",
-                            manifestFile.getPath()),
-                      manifestTitle, JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        } else {
-            manifest = new FactionStandingUltimatumManifest();
-        }
-
-        if (manifest.ultimatumFileNames.contains(fileName)) {
-            JOptionPane.showMessageDialog(this,
-                  getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "manifest.alreadyPresent.message", fileName),
-                  manifestTitle, JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        manifest.ultimatumFileNames.add(fileName);
-        if (manifest.serialize(manifestFile)) {
-            JOptionPane.showMessageDialog(this,
-                  getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "manifest.added.message", fileName),
-                  manifestTitle, JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "manifest.error.message"),
-                  manifestTitle, JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     /**

@@ -1513,7 +1513,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 new FamilyTreeDialog(gui.getFrame(),
                       selectedPerson.getGenealogy(),
-                      getCampaign().getPlayerForce().getPersonnel().values());
+                      getCampaign().getPlayerForce().getPersonnel().values(),
+                      gui::focusOnPerson);
                 break;
             }
             case CMD_EDIT: {
@@ -1834,13 +1835,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
-                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
-                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
-                      Set.of(disease.getSimpleName()));
+                List<Person> infectedPersonnel = new ArrayList<>();
                 for (Person person : people) {
-                    Inoculations.applyDisease(getCampaign(), person, disease);
+                    if (Inoculations.applyDisease(getCampaign(), person, disease)) {
+                        infectedPersonnel.add(person);
+                    }
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
+                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
+                      Map.of(disease.getSimpleName(), infectedPersonnel));
                 break;
             }
             case CMD_ADD_RANDOM_INJURIES: {
@@ -4213,12 +4217,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editAssignmentLog.text"));
-            menuItem.setActionCommand(CMD_ADD_ASSIGNMENT_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_ASSIGNMENT_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
-            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_PERFORMANCE_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
         } else {

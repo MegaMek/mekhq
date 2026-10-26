@@ -64,7 +64,6 @@ import megamek.client.ui.util.UIUtil;
  * @since 0.51.01
  */
 public class HudButton extends JPanel {
-    /** How strongly a disarmed button's label shows, from 0 (invisible) to 255; dimmer than any armed label. */
     private static final int DISARMED_TEXT_ALPHA = 150;
 
     private final JLabel label;

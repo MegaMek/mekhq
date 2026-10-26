@@ -105,7 +105,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(1, teams);
@@ -122,7 +122,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(1, teams);
@@ -141,7 +141,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(3, teams);
@@ -160,7 +160,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(9, teams);
@@ -177,7 +177,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(1, teams);
@@ -196,7 +196,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(3, teams);
@@ -215,7 +215,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(9, teams);
@@ -233,7 +233,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(2, teams);
@@ -253,7 +253,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(4, teams);
@@ -331,7 +331,7 @@ class ContractUtilitiesFormationSizingTest {
         when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
         // Act
-        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
+        int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, true, 1.0);
         int requiredUnits = ContractUtilities.calculateBaseNumberOfUnitsRequiredInCombatTeams(mockCampaign);
         // Assert
         assertEquals(1, teams);

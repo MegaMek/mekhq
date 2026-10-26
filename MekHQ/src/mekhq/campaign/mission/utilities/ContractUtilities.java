@@ -65,14 +65,13 @@ public class ContractUtilities {
      * Calculates the number of lances used for this contract, based on [campaign].
      *
      * @param campaign       The campaign to reference.
-     * @param isCadreDuty    {@code true} if {@link CombatRole#CADRE} should be considered a combat role
      * @param bypassVariance a flag indicating whether variance adjustments should be bypassed
      * @param varianceFactor the degree of variance to apply to required combat elements
      *
      * @return The number of lances required.
      */
-    public static int calculateBaseNumberOfRequiredLances(Campaign campaign, boolean isCadreDuty,
-          boolean bypassVariance, double varianceFactor) {
+    public static int calculateBaseNumberOfRequiredLances(Campaign campaign, boolean bypassVariance,
+          double varianceFactor) {
         int combatForceCount = 0;
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (0 >= combatTeam.getSize(campaign)) { // Don't count empty combat teams (or warship-only)
@@ -84,9 +83,7 @@ public class ContractUtilities {
                 continue;
             }
 
-            CombatRole roleInMemory = formation.getCombatRoleInMemory();
-            boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
-            if (formation.isFormationType(STANDARD) && hasCombatRole) {
+            if (formation.isFormationType(STANDARD) && formation.getCombatRoleInMemory().isCombatRole()) {
                 combatForceCount++;
             }
         }

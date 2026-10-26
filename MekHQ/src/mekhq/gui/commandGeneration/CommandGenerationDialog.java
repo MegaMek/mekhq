@@ -740,14 +740,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (options.isGenerateMedicalReserve()) {
             Map<PersonnelRole, Integer> sparesByRole = getMedicalReserveSparesByRole(generatedPersons,
                   options.getMedicalReservePercent());
-            if (!sparesByRole.isEmpty()) {
-                new ImmersiveDialogNotification(campaign,
-                      resources.getString("CommandGenerationDialog.campaignOptions.altAdvancedMedical"),
-                      true);
-                for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
-                    for (int i = 0; i < entry.getValue(); i++) {
-                        generateSparePersonnel(options, entry.getKey());
-                    }
+            for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    generateSparePersonnel(options, entry.getKey());
                 }
             }
         }

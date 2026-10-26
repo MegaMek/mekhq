@@ -32,14 +32,18 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
+import java.awt.Component;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -50,6 +54,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -88,7 +93,8 @@ class FinancesGeneralPage {
     private JCheckBox chkPlanetaryCostReductionsOnContract;
     private JCheckBox chkPlanetaryCostReductionsForMaintenance;
     private JCheckBox chkIncreaseClanRepairCosts;
-    private JCheckBox chkUseAlternateUnitCost;
+    private JLabel lblUnitCostModel;
+    private MMComboBox<UnitCostModel> comboUnitCostModel;
 
     private JPanel pnlPayments;
     private JCheckBox payForPartsBox;
@@ -363,9 +369,22 @@ class FinancesGeneralPage {
         chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts",
                 getMetadata(new Version(0, 51, 1)));
         chkIncreaseClanRepairCosts.addMouseListener(createTipPanelUpdater("IncreaseClanRepairCosts"));
-        chkUseAlternateUnitCost = new CampaignOptionsCheckBox("UseAlternateUnitCost",
-                getMetadata(new Version(0, 51, 1)));
-        chkUseAlternateUnitCost.addMouseListener(createTipPanelUpdater("UseAlternateUnitCost"));
+        lblUnitCostModel = new CampaignOptionsLabel("UnitCostModel",
+                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+        lblUnitCostModel.addMouseListener(createTipPanelUpdater("UnitCostModel"));
+        comboUnitCostModel = new MMComboBox<>("comboUnitCostModel", UnitCostModel.values());
+        comboUnitCostModel.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                    final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof UnitCostModel unitCostModel) {
+                    list.setToolTipText(wordWrap(unitCostModel.getTooltip()));
+                }
+                return this;
+            }
+        });
+        comboUnitCostModel.addMouseListener(createTipPanelUpdater("UnitCostModel"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("GeneralOptionsPanel",
@@ -382,9 +401,9 @@ class FinancesGeneralPage {
                 chkUsePlanetaryCostReductions,
                 chkPlanetaryCostReductionsOnContract,
                 chkPlanetaryCostReductionsForMaintenance,
-                chkIncreaseClanRepairCosts,
-                chkUseAlternateUnitCost);
+                chkIncreaseClanRepairCosts);
         panel.addRow(lblFinancialYearDuration, comboFinancialYearDuration);
+        panel.addRow(lblUnitCostModel, comboUnitCostModel);
 
         return panel;
     }
@@ -562,7 +581,7 @@ class FinancesGeneralPage {
         chkPlanetaryCostReductionsOnContract.setSelected(model.planetaryCostReductionsOnContract);
         chkPlanetaryCostReductionsForMaintenance.setSelected(model.planetaryCostReductionsForMaintenance);
         chkIncreaseClanRepairCosts.setSelected(model.increaseClanRepairCosts);
-        chkUseAlternateUnitCost.setSelected(model.useAlternateUnitCost);
+        comboUnitCostModel.setSelectedItem(model.unitCostModel);
         payForPartsBox.setSelected(model.payForParts);
         payForRepairsBox.setSelected(model.payForRepairs);
         payForUnitsBox.setSelected(model.payForUnits);
@@ -655,7 +674,7 @@ class FinancesGeneralPage {
         model.planetaryCostReductionsOnContract = chkPlanetaryCostReductionsOnContract.isSelected();
         model.planetaryCostReductionsForMaintenance = chkPlanetaryCostReductionsForMaintenance.isSelected();
         model.increaseClanRepairCosts = chkIncreaseClanRepairCosts.isSelected();
-        model.useAlternateUnitCost = chkUseAlternateUnitCost.isSelected();
+        model.unitCostModel = comboUnitCostModel.getSelectedItem();
         model.payForParts = payForPartsBox.isSelected();
         model.payForRepairs = payForRepairsBox.isSelected();
         model.payForUnits = payForUnitsBox.isSelected();

@@ -86,6 +86,7 @@ import mekhq.campaign.mission.scenarios.salvage.SalvageTechFilter.HiddenReason;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.TechJobs;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard;
@@ -96,6 +97,7 @@ import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.utilities.PersonnelStateColors;
+import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 
 /**
  * The pre-scenario salvage planner, where the player picks the formations that recover wrecks after the battle (the
@@ -122,6 +124,8 @@ public class SalvageOperationPlanner extends JDialog {
     private static final int TECH_TIME_METER_SCALE = SalvageOperationDraft.LOW_TECH_MINUTES * 2;
 
     private final transient Campaign campaign;
+    // The jobs each tech is in the middle of, taken when the planner opens
+    private final transient TechJobs techJobs;
     private final transient SalvageOperationDraft draft;
     private boolean isCommitted;
     private Page page = Page.TEAMS;
@@ -192,6 +196,7 @@ public class SalvageOperationPlanner extends JDialog {
 
     // Buttons
     private final HudButton backNextButton = new HudButton("", false);
+    private final HudButton commitButton = new HudButton(upper(text("button.commit")), true);
     private final JLabel footer = new JLabel();
 
     /** The planner's pages. */
@@ -249,6 +254,7 @@ public class SalvageOperationPlanner extends JDialog {
     public SalvageOperationPlanner(Campaign campaign, SalvageOperationDraft draft) {
         super((Frame) null, text("title"), true);
         this.campaign = campaign;
+        this.techJobs = TechJobs.find(campaign);
         this.draft = draft;
 
         if (draft.isInSpace()) {
@@ -572,7 +578,6 @@ public class SalvageOperationPlanner extends JDialog {
         actions.add(cancelButton);
         backNextButton.addActionListener(event -> showPage((page == Page.TEAMS) ? Page.TECHS : Page.TEAMS));
         actions.add(backNextButton);
-        HudButton commitButton = new HudButton(upper(text("button.commit")), true);
         commitButton.addActionListener(event -> commit());
         actions.add(commitButton);
         buttons.add(actions, BorderLayout.EAST);
@@ -1056,12 +1061,12 @@ public class SalvageOperationPlanner extends JDialog {
                              tech.getHits();
         techInjuryTile.setValue(String.valueOf(injuries), candidate.isInjured() ? DANGER : TEXT);
 
-        List<String> reasonKeys = new ArrayList<>();
-        PersonnelStateColors.getStateColors(campaign, tech, reasonKeys);
-        techStatus.setText(reasonKeys.isEmpty() ?
+        List<ColorReason> colorReasons = new ArrayList<>();
+        PersonnelStateColors.getStateColors(campaign, tech, colorReasons, techJobs.getJobs(tech));
+        techStatus.setText(colorReasons.isEmpty() ?
                                  text("status.ready") :
-                                 "<html>" + PersonnelStateColors.getColorReasonsText(reasonKeys) + "</html>");
-        techStatus.setForeground(statusColor(reasonKeys));
+                                 "<html>" + PersonnelStateColors.getColorReasonsText(colorReasons) + "</html>");
+        techStatus.setForeground(statusColor(colorReasons));
 
         boolean isSelected = draft.isTechSelected(tech.getId());
         selectButton.setText(upper(isSelected ? text("deselect") : text("select")));
@@ -1070,6 +1075,31 @@ public class SalvageOperationPlanner extends JDialog {
     private void refreshButtons() {
         backNextButton.setText(upper((page == Page.TEAMS) ? text("button.next") : text("button.back")));
         footer.setText((page == Page.TEAMS) ? text("footer.teams") : text("footer.techs"));
+
+        String commitBlockReason = commitBlockReason();
+        commitButton.setArmed(commitBlockReason == null);
+        commitButton.setToolTipText((commitBlockReason == null) ?
+                                          null :
+                                          "<html><div style='width:" + scaleForGUI(280) + "px'>" +
+                                                commitBlockReason + "</div></html>");
+    }
+
+    /**
+     * A plan with teams but no techs, or techs but no teams, cannot recover anything, so the player is not allowed to
+     * commit it. A plan with neither is fine: that is the player choosing not to salvage.
+     *
+     * @return why the plan cannot be committed yet, or {@code null} if it can
+     */
+    private @Nullable String commitBlockReason() {
+        boolean hasTeams = !draft.getStagedTeams().isEmpty();
+        boolean hasTechs = !draft.getSelectedTechs().isEmpty();
+        if (hasTeams && !hasTechs) {
+            return text("button.commit.blocked.noTechs");
+        }
+        if (hasTechs && !hasTeams) {
+            return text("button.commit.blocked.noTeams");
+        }
+        return null;
     }
 
     // endregion Refresh
@@ -1166,11 +1196,13 @@ public class SalvageOperationPlanner extends JDialog {
      * Colors the tech's status from the same reasons it lists, so every listed reason is flagged: injuries as danger,
      * anything else as a caution.
      */
-    private static Color statusColor(List<String> reasonKeys) {
-        if (reasonKeys.isEmpty()) {
+    private static Color statusColor(List<ColorReason> colorReasons) {
+        if (colorReasons.isEmpty()) {
             return READY;
         }
-        return reasonKeys.contains(PersonnelStateColors.INJURED_REASON_KEY) ? DANGER : CAUTION;
+        boolean isInjured = colorReasons.stream()
+                                  .anyMatch(reason -> PersonnelStateColors.INJURED_REASON_KEY.equals(reason.key()));
+        return isInjured ? DANGER : CAUTION;
     }
 
     private Color techRingColor(SalvageTechCandidate candidate) {

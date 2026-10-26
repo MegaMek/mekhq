@@ -46,6 +46,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.market.enums.UnitMarketType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ class UnitMarketOfferAlternateCostTest {
     @BeforeEach
     void setUp() {
         campaignOptions = new CampaignOptions();
-        campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, true);
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
         campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
         campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
@@ -130,10 +131,37 @@ class UnitMarketOfferAlternateCostTest {
 
     @Test
     void optionOffKeepsConstructionCostPricing() {
-        campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
         assertEquals(Money.of(4_000_000), offer(100).getPrice());
         verify(summary, never()).getBV();
+    }
+
+    /**
+     * MekHQ prices large craft offers from their construction cost.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void mekHQPricesLargeCraftFromConstructionCost() {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.DROPSHIP));
+
+        assertEquals(Money.of(4_000_000), offer(100).getPrice());
+        verify(summary, never()).getBV();
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void mekHQPricesOrdinaryUnitsFromBattleValue() {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
+
+        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice());
     }
 
     /** An offer whose unit file can't be loaded is still priced, without a tech-base multiplier. */
