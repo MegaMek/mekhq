@@ -1,0 +1,201 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-c919-78ef-9607-716dc76336b4
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Avatar
+model:AV1-OB
+mul id:162
+
+Config:Biped OmniMek
+techbase:Inner Sphere
+era:3056
+source:TR:3058U,TR:CI
+published:RS:CI
+rules level:2
+role:Missile Boat
+
+weaponquirk:stable_weapon:CT:10:Medium Laser
+weaponquirk:stable_weapon:CT:11:Medium Laser
+
+mass:70
+engine:280 XL Engine
+structure:IS Standard
+myomer:Standard
+
+heat sinks:10 IS Double
+base chassis heat sinks:10
+walk mp:4
+jump mp:0
+
+armor:Standard(Inner Sphere)
+LA armor:16
+RA armor:16
+LT armor:22
+RT armor:22
+CT armor:30
+HD armor:9
+LL armor:26
+RL armor:26
+RTL armor:8
+RTR armor:8
+RTC armor:9
+
+Weapons:6
+LRM 15, Left Arm
+LRM 15, Right Arm
+LRM 10, Left Torso
+LRM 10, Right Torso
+Medium Laser, Center Torso
+Medium Laser, Center Torso
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+LRM 15 (OMNIPOD)
+LRM 15 (OMNIPOD)
+LRM 15 (OMNIPOD)
+ISArtemisIV (OMNIPOD)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+LRM 15 (OMNIPOD)
+LRM 15 (OMNIPOD)
+LRM 15 (OMNIPOD)
+ISArtemisIV (OMNIPOD)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+LRM 10 (OMNIPOD)
+LRM 10 (OMNIPOD)
+ISArtemisIV (OMNIPOD)
+IS Ammo LRM-10 Artemis-capable (OMNIPOD)
+IS Ammo LRM-15 Artemis-capable (OMNIPOD)
+IS Ammo LRM-15 Artemis-capable (OMNIPOD)
+ISCASE
+-Empty-
+-Empty-
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+LRM 10 (OMNIPOD)
+LRM 10 (OMNIPOD)
+ISArtemisIV (OMNIPOD)
+IS Ammo LRM-10 Artemis-capable (OMNIPOD)
+IS Ammo LRM-15 Artemis-capable (OMNIPOD)
+IS Ammo LRM-15 Artemis-capable (OMNIPOD)
+ISCASE
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Medium Laser
+Medium Laser
+
+Head:
+Life Support
+Sensors
+Cockpit
+-Empty-
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Avatar is a seventy-ton Inner Sphere OmniMech born from the Draconis Combine's ambitious effort to reverse-engineer Clan technology following the Battle of Luthien in 3052. Luthien Armor Works began development using captured Mad Dog OmniMechs as the basis for the design, making the Avatar the first Inner Sphere OmniMech conceptualized. Prolonged integration difficulties between Clan and Inner Sphere technologies, however, meant it was among the last of the Combine's first generation OmniMechs to enter production in 3056. Filling the role of a versatile heavy fire support platform, the Avatar leverages a generous thirty-four tons of pod space to accommodate a wide variety of weapon configurations. Licensed production through StarCorps Industries, Victory Industries, and General Motors has spread the design across multiple Successor States, establishing it as one of the most widely manufactured Inner Sphere OmniMechs in service.</p>
+
+capabilities:<p>The Avatar's chassis mounts a Hermes 280 XL engine, providing a top speed of sixty-four kilometers per hour. While particularly slower than its Clan-designed ancestor, this trade-off in mobility purchases considerably more internal volume and pod capacity than the original Mad Dog offered. With thirty-four tons of available pod space, the Avatar can mount firepower rivaling many assault-weight designs while retaining the tactical flexibility inherent to OmniMech technology. Twelve tons of StarSlab/4 armor provide respectable protection for its weight class, supplemented by CASE systems in both side torsos to mitigate the catastrophic risk of ammunition detonation.</p><p>A distinctive feature of the design is its two permanently mounted Victory 23R medium lasers in the center torso. These hardwired weapons trace their origin to early testing phases when OmniPod connector faults risked leaving the entire weapons array disabled. Though the underlying issue was resolved before deployment, the fixed lasers remain as a design vestige ensuring the Avatar is never completely unarmed. In its Prime configuration, the Avatar combines an LB 10-X autocannon with dual LRM-10 launchers equipped with Artemis IV fire control, supplemented by medium pulse lasers and machine guns for a balanced loadout emphasizing ranged engagement with credible close-in capability.</p>
+
+deployment:<p>The Alternate Configuration B is a dedicated fire support variant that maximizes the Avatar's missile delivery potential. Mounting two LRM-15 and two LRM-10 launchers, all equipped with Artemis IV fire control systems, this configuration can deliver sustained indirect fire barrages at long range. The sheer volume of guided missiles makes the B configuration a preferred choice for combined-arms operations where the Avatar can operate behind a screen of lighter units, providing continuous suppressive fire against enemy formations.</p>
+
+history:<p>The Avatar's genesis lies in the aftermath of the Battle of Luthien in 3052, when the Draconis Combine Mustered Soldiery found itself in possession of significant Clan salvage but unable to maintain the captured equipment. Within months, the majority of trophy Clan machines in DCMS service were rendered combat ineffective due to maintenance failures. Luthien Armor Works was tasked with finding a practical solution, and their engineers responded by combining captured Vulture components with Inner Sphere technology. The process of melding the two tech bases proved far more difficult than anticipated, and while the Raptor, Owens, and Black Hawk-KU all reached service first, the Avatar's troubled development ultimately produced one of the Combine's most capable and enduring OmniMech designs.</p><p>Initial production during the late 3050s went primarily to DCMS units stationed along the Clan border, with limited quantities sold to ComStar and the Federated Commonwealth for deployment in the Lyran half's Clan frontier. The secession of the Lyran Alliance in 3057 prompted the Combine to redirect the reserved FedCom allotment to ComStar instead, an arrangement that persisted through the conclusion of the First Combine-Dominion War. The Davion half of the rump Federated Commonwealth instead received output from locally licensed production, as StarCorps Industries plants on Crofton, Son Hoa, St. Ives, and Loburg brought the Avatar into broader Successor State service during the 3060s. General Motors began production at New Valencia, and Victory Industries on Marduk received a subcontract from Luthien Armor Works, further broadening the manufacturing base within Combine borders.</p><p>This distributed production network proved critical when the Word of Blake's assault on Luthien during the opening years of the Jihad resulted in the nuclear destruction of Luthien Armor Works' massive OmniMech production complex. The Guthry Island facility where the Avatar and other OmniMechs were built was reportedly obliterated in the midst of a simultaneous Black Dragon coup, eliminating the design's primary production line along with capacity for several other Combine OmniMechs. The loss was compounded by the destruction of General Motors' facilities on Kathil. However, the surviving StarCorps and Victory Industries lines ensured the Avatar's continued production, albeit at reduced volume.</p><p>The Avatar remains in active service across multiple Successor States well into the post-Jihad era. Its widespread distribution across the Draconis Combine, Federated Suns, Lyran Commonwealth, and Capellan Confederation ensures that the design continues to see regular deployment along numerous frontiers, a reflection of both the robustness of its engineering and the foresight of its licensing arrangements.</p>
+
+manufacturer:Luthien Armor Works|StarCorps Industries|StarCorps Industries|StarCorps Industries|StarCorps Industries|Victory Industries (formerly Norse BattleMech Works)|General Motors/Blackwell Corporation
+
+primaryfactory:Luthien|Crofton|Loburg|Son Hoa|St. Ives|Marduk|New Valencia
+
+fluffdate:2026-02-28 17:47:08
+
+systemmanufacturer:CHASSIS:Alshain
+systemmode:CHASSIS:Hagetaga-O7
+systemmanufacturer:ENGINE:Hermes
+systemmode:ENGINE:280 XL
+systemmanufacturer:ARMOR:StarSlab
+systemmode:ARMOR:StarSlab/4 with CASE
+systemmanufacturer:COMMUNICATIONS:Sipher
+systemmode:COMMUNICATIONS:CommCon SCU-9
+systemmanufacturer:TARGETING:Matabushi
+systemmode:TARGETING:Stalker
