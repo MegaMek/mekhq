@@ -32,6 +32,12 @@
  */
 package mekhq.campaign.roleplay;
 
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import jakarta.annotation.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -41,6 +47,7 @@ import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.UltimatumResolvedEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
@@ -51,7 +58,8 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.roleplay.CampaignChronicle.UltimatumChoice;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Passes MekHQ's campaign events to a {@link CampaignChronicle} and keeps the {@link TravelLog} up to date. Register
@@ -134,34 +142,25 @@ public class CampaignChronicleListener {
         });
     }
 
-    /** Records a battle being resolved. */
+    /** Records a battle being resolved, if the cast fought in it. */
     @Subscribe
     public void handle(final ScenarioResolvedEvent event) {
         guard(() -> {
             Scenario scenario = event.getScenario();
             if (scenario != null && campaign.getScenario(scenario.getId()) == scenario) {
-                chronicle.battleResolved(scenario.getId(), scenario.getName(), scenario.getStatus().toString());
+                chronicle.battleResolved(scenario.getId(), scenario.getName(), scenario.getStatus().toString(),
+                      event.getParticipantIds());
             }
         });
     }
 
-    /** Records the company arriving at the end of a journey. */
+    /** Records travel when a journey ends. Arrivals stay in the travel log rather than the journal. */
     @Subscribe
     public void handle(final TransitCompleteEvent event) {
-        guard(() -> {
-            // Bases and convoys finish journeys too; only the main force's arrival is the company arriving.
-            if (event.getLocation() != campaign.getPlayerForce().getForceDetachment().getCurrentLocation()) {
-                return;
-            }
-            PlanetarySystem system = campaign.getCurrentSystem();
-            if (system != null) {
-                chronicle.arrived(system.getName(campaign.getLocalDate()));
-            }
-        });
         updateTravelLog();
     }
 
-    /** Records someone joining or being born; prisoners are left out. */
+    /** Records a cast member joining, or a cast member's child being born; prisoners are left out. */
     @Subscribe
     public void handle(final PersonNewEvent event) {
         guard(() -> {
@@ -170,12 +169,38 @@ public class CampaignChronicleListener {
                 return;
             }
             boolean born = campaign.getLocalDate().equals(person.getDateOfBirth());
+            List<UUID> parents = new ArrayList<>();
+            if (born) {
+                for (Person parent : person.getGenealogy().getParents()) {
+                    parents.add(parent.getId());
+                }
+            }
             chronicle.personChanged(born ? PersonChange.BORN : PersonChange.JOINED, person.getId(),
-                  person.getFullName(), born ? null : person.getPrimaryRoleDesc());
+                  person.getFullName(), born ? null : person.getPrimaryRoleDesc(), parents);
         });
     }
 
-    /** Records someone dying, going missing, being captured or leaving. */
+    /** Records the answer to a Faction Standing ultimatum. */
+    @Subscribe
+    public void handle(final UltimatumResolvedEvent event) {
+        guard(() -> {
+            if (event.getCampaign() != campaign) {
+                return;
+            }
+            Faction faction = event.getChosenFaction();
+            UltimatumChoice choice = !event.isWentRogue() ? UltimatumChoice.SIDE
+                                           : PIRATE_FACTION_CODE.equals(faction.getShortName())
+                                                   ? UltimatumChoice.PIRATE : UltimatumChoice.MERCENARY;
+            List<UUID> departed = new ArrayList<>();
+            for (Person person : event.getDeparted()) {
+                departed.add(person.getId());
+            }
+            chronicle.ultimatumResolved(event.getUltimatumName(), choice,
+                  event.isWentRogue() ? null : faction.getFullName(campaign.getGameYear()), departed);
+        });
+    }
+
+    /** Records a cast member dying, going missing, being captured or leaving. */
     @Subscribe
     public void handle(final PersonStatusChangedEvent event) {
         guard(() -> {
