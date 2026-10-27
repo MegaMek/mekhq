@@ -36,6 +36,7 @@ import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.*;
 
 import java.util.UUID;
 
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
@@ -278,7 +279,8 @@ public class AtBScenarioModifierApplicator {
      * Helper function that sets up and "ambush", meaning declaring as "hidden" some portion of: all non-airborne units
      * on the specified side that will be on the battlefield at the start of the scenario
      * <p>
-     * Also marks any such forces as able to deploy "anywhere".
+     * Also marks any such forces as able to deploy "anywhere". Bot forces with a destination edge are left alone, as
+     * they need to keep moving toward that edge.
      */
     public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
         if (eventRecipient == ForceAlignment.Player) {
@@ -322,7 +324,18 @@ public class AtBScenarioModifierApplicator {
         } else if (eventRecipient == ForceAlignment.Opposing) {
             for (int x = 0; x < scenario.getNumBots(); x++) {
                 BotForce currentBotForce = scenario.getBotForce(x);
+
+                if (currentBotForce.getTeam() != ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
+                    continue;
+                }
+
                 ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
+
+                // Forces with a destination edge (such as convoys) are meant to cross the map. Hidden units never
+                // move, and redeploying the force breaks its route, so leave these forces out of the ambush.
+                if (forceTemplate.getDestinationZone() != CardinalEdge.NONE.getIndex()) {
+                    continue;
+                }
 
                 if (forceTemplate.getArrivalTurn() == 0) {
                     forceTemplate.setActualDeploymentZone(Board.START_ANY);
