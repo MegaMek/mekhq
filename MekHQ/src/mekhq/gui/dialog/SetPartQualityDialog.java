@@ -33,6 +33,8 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -63,6 +65,8 @@ import mekhq.campaign.unit.Unit;
  * only applied when the dialog is confirmed.</p>
  */
 public class SetPartQualityDialog extends AbstractButtonDialog {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     private final Unit unit;
     private final boolean reverseQualityNames;
 
@@ -80,7 +84,7 @@ public class SetPartQualityDialog extends AbstractButtonDialog {
         this.unit = unit;
         this.reverseQualityNames = reverseQualityNames;
         initialize();
-        setTitle(String.format(resources.getString("SetPartQualityDialog.Unit.title"), unit.getName()));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "SetPartQualityDialog.Unit.title", unit.getName()));
     }
 
     @Override
@@ -117,13 +121,15 @@ public class SetPartQualityDialog extends AbstractButtonDialog {
         cboSelectedQuality.setName("cboSelectedQuality");
         cboSelectedQuality.setSelectedItem(PartQuality.QUALITY_D);
 
-        JButton btnApplyToSelected = new JButton(resources.getString("SetPartQualityDialog.btnApplyToSelected.text"));
+        JButton btnApplyToSelected = new JButton(getTextAt(RESOURCE_BUNDLE,
+              "SetPartQualityDialog.btnApplyToSelected.text"));
         btnApplyToSelected.setName("btnApplyToSelected");
-        btnApplyToSelected.setToolTipText(resources.getString("SetPartQualityDialog.btnApplyToSelected.toolTipText"));
+        btnApplyToSelected.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              "SetPartQualityDialog.btnApplyToSelected.toolTipText"));
         btnApplyToSelected.addActionListener(evt -> applyToSelectedRows());
 
         JPanel bulkPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        bulkPanel.add(new JLabel(resources.getString("SetPartQualityDialog.lblSelectedQuality.text")));
+        bulkPanel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "SetPartQualityDialog.lblSelectedQuality.text")));
         bulkPanel.add(cboSelectedQuality);
         bulkPanel.add(btnApplyToSelected);
 
@@ -256,9 +262,9 @@ public class SetPartQualityDialog extends AbstractButtonDialog {
         @Override
         public String getColumnName(int column) {
             return switch (column) {
-                case COL_LOCATION -> resources.getString("SetPartQualityDialog.colLocation.text");
-                case COL_PART -> resources.getString("SetPartQualityDialog.colPart.text");
-                case COL_QUALITY -> resources.getString("SetPartQualityDialog.colQuality.text");
+                case COL_LOCATION -> getTextAt(RESOURCE_BUNDLE, "SetPartQualityDialog.colLocation.text");
+                case COL_PART -> getTextAt(RESOURCE_BUNDLE, "SetPartQualityDialog.colPart.text");
+                case COL_QUALITY -> getTextAt(RESOURCE_BUNDLE, "SetPartQualityDialog.colQuality.text");
                 default -> "";
             };
         }

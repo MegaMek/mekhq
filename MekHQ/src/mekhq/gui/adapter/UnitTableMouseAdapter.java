@@ -1580,7 +1580,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(menuItem);
 
                 if (oneSelected) {
-                    menuItem = new JMenuItem(getText("setPartQuality.text"));
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "setPartQuality.text"));
                     menuItem.setActionCommand(COMMAND_SET_PART_QUALITY);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
