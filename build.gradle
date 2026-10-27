@@ -15,15 +15,16 @@ allprojects {
 }
 
 ['suiteReleaseVersion', 'suiteMegaMekVersion', 'suiteMegaMekLabVersion', 'suiteMekHQVersion'].each { name ->
-    if (!hasProperty(name)) {
+    // Qualify with project: inside a closure, a bare hasProperty() inspects the closure itself.
+    if (!project.hasProperty(name)) {
         return
     }
-    if (name != 'suiteReleaseVersion' && !hasProperty('suiteReleaseVersion')) {
+    if (name != 'suiteReleaseVersion' && !project.hasProperty('suiteReleaseVersion')) {
         throw new GradleException("${name} requires suiteReleaseVersion")
     }
-    def requested = property(name).toString()
-    if (!(requested ==~ /(?:0|[1-9][0-9]*)\.(?:[0-9]{2}|[1-9][0-9]{2,})\.(?:[0-9]{2}|[1-9][0-9]{2,})/)) {
-        throw new GradleException("${name} must be canonical padded major.minor.patch (e.g. 0.51.01); got ${requested}")
+    def requested = project.property(name).toString()
+    if (!(requested ==~ /(?:0|[1-9][0-9]*)\.(?:[0-9]{2}|[1-9][0-9]{2,})\.(?:[0-9]{2}|[1-9][0-9]{2,})(?:\.[1-9][0-9]*)?/)) {
+        throw new GradleException("${name} must be canonical padded major.minor.patch[.revision] (e.g. 0.51.01 or 0.51.00.2); got ${requested}")
     }
     requested.split(/\./).each { component ->
         try {
