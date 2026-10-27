@@ -304,8 +304,9 @@ public class SpecialAbility {
     }
 
     /**
-     * Whether an ability read from a file no longer exists, such as the retired Natural Aptitude SPAs. Such abilities
-     * are skipped: offering them would let players spend XP on an ability that does nothing.
+     * Whether an ability read from a file no longer exists, such as the retired Natural Aptitude SPAs or a custom SPA
+     * from an older version. Such abilities are skipped: offering them would let players spend XP on an ability that
+     * does nothing.
      *
      * @param lookupName the ability's lookup name
      * @param options    the options the ability must exist in, or {@code null} to skip the check
@@ -546,6 +547,10 @@ public class SpecialAbility {
                 if (null != option) {
                     specialAbility.desc = option.getDescription();
                 }
+            }
+
+            if (isRemovedAbility(specialAbility.lookupName, options)) {
+                return;
             }
 
             repairRemovedAbilities(specialAbility, defaultAbility, version);
