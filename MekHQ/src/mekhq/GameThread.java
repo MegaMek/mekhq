@@ -35,9 +35,12 @@ package mekhq;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.sentry.Sentry;
@@ -148,12 +151,33 @@ class GameThread extends Thread implements CloseClientListener {
         this.password = password;
         this.client = client;
         this.app = app;
-        this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
+        this.units = inTOEOrder(Objects.requireNonNull(units), campaign);
         this.scenario = Objects.requireNonNull(scenario);
     }
     // endregion Constructors
+
+    /**
+     * Returns the units in the order the TO&amp;E lists them: each formation's own units, then its sub formations,
+     * depth first. MegaMek builds its force tree in the order units arrive, so sending them this way makes the lobby's
+     * Force View match the TO&amp;E. Units outside the TO&amp;E come last, in their given order.
+     *
+     * @param units    the units to deploy, in any order
+     * @param campaign the campaign whose TO&amp;E sets the order
+     *
+     * @return a new list holding the same units in TO&amp;E order
+     */
+    static List<Unit> inTOEOrder(List<Unit> units, Campaign campaign) {
+        Map<UUID, Integer> toePositions = new HashMap<>();
+        List<UUID> toeUnitIds = campaign.getPlayerForce().getAllUnitsInTheTOE(false);
+        for (int index = 0; index < toeUnitIds.size(); index++) {
+            toePositions.putIfAbsent(toeUnitIds.get(index), index);
+        }
+        List<Unit> result = new ArrayList<>(units);
+        result.sort(Comparator.comparingInt(unit -> toePositions.getOrDefault(unit.getId(), Integer.MAX_VALUE)));
+        return result;
+    }
 
     public Client getClient() {
         return client;

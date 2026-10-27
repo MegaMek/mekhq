@@ -290,6 +290,18 @@ public class Maintenance {
     }
 
     /**
+     * How far each unit's maintenance cycle advances in one day: a full day on a combat contract, otherwise a quarter.
+     * The daily maintenance and the schedule check both use this, so the schedule predicts the day a check falls due.
+     *
+     * @param campaign the campaign to check
+     *
+     * @return {@code 1} on a combat contract, otherwise {@code 0.25}
+     */
+    public static double getDailyMaintenanceProgress(Campaign campaign) {
+        return isOnCombatContract(campaign) ? 1 : 0.25;
+    }
+
+    /**
      * Checks whether the campaign is on a contract that runs maintenance at the full, weekly pace. Only active
      * contracts other than Garrison Duty and Retainer count; otherwise maintenance progresses at x0.25 speed.
      *
@@ -788,7 +800,7 @@ public class Maintenance {
         final int maintenanceCycleDuration = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
         final boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
-        final boolean hasActiveMission = !campaign.getActiveContracts().isEmpty();
+        final double dailyProgress = getDailyMaintenanceProgress(campaign);
         final LocalDate today = campaign.getLocalDate();
 
         List<Person> allTechs = campaign.getPlayerForce()
@@ -825,7 +837,7 @@ public class Maintenance {
             LinkedHashMap<LocalDate, List<Unit>> correctedSchedule = new LinkedHashMap<>();
             LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = buildSchedule(techUnits,
                   maintenanceCycleDuration,
-                  hasActiveMission,
+                  dailyProgress,
                   today,
                   correctedSchedule);
 
@@ -872,8 +884,8 @@ public class Maintenance {
      *   <li>Calculates the number of days until each unit's next maintenance is due using
      *   {@link Unit#getDaysUntilNextMaintenance(int)}.</li>
      *   <li>Any negative or zero values are treated as due today to ensure overdue units are handled promptly.</li>
-     *   <li>If the campaign has no active mission, multiplies the computed days by four to account for slower
-     *   maintenance progress when idle. This only affects scheduling, not technician work time.</li>
+     *   <li>Divides the days by the cycle's daily progress, as the clock advances by that much each day. The clock
+     *   advances before the check, so the check falls on the day of the last advance needed, not the day after.</li>
      *   <li>Populates {@code maintenanceSchedule} with each unit keyed by its scheduled maintenance date.</li>
      *   <li>Determines the final day represented in the schedule and populates {@code correctedSchedule} with all
      *   dates from today through that day, initializing each with an empty list to ensure coverage for all days in
@@ -884,8 +896,8 @@ public class Maintenance {
      *
      * @param techUnits                the list of units assigned to the technician
      * @param maintenanceCycleDuration the duration of a full maintenance cycle in days
-     * @param hasActiveMission         {@code true} if the campaign currently has an active mission, affecting
-     *                                 scheduling
+     * @param dailyProgress            how far the maintenance cycle advances each day, from
+     *                                 {@link #getDailyMaintenanceProgress(Campaign)}
      * @param today                    the current in-game date
      * @param correctedSchedule        the map to populate with empty lists for all days between today and the last
      *                                 scheduled maintenance date
@@ -893,9 +905,10 @@ public class Maintenance {
      * @return a {@link LinkedHashMap} of maintenance jobs sorted by maintenance date (soonest -> latest)
      */
     private static LinkedHashMap<LocalDate, List<Unit>> buildSchedule(List<Unit> techUnits,
-          int maintenanceCycleDuration, boolean hasActiveMission, LocalDate today,
+          int maintenanceCycleDuration, double dailyProgress, LocalDate today,
           LinkedHashMap<LocalDate, List<Unit>> correctedSchedule) {
         LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = new LinkedHashMap<>();
+        List<String> scheduledDays = new ArrayList<>();
 
         for (Unit maintainedUnit : techUnits) {
             if (!maintainedUnit.requiresMaintenance()) {
@@ -906,15 +919,15 @@ public class Maintenance {
             double daysUntilNextMaintenance =
                   max(0.0, maintainedUnit.getDaysUntilNextMaintenance(maintenanceCycleDuration));
 
-            // Adjust when not under contract: maintenance progress is x0.25 normal
-            if (!hasActiveMission) {
-                daysUntilNextMaintenance *= 4;
-            }
-
-            LocalDate scheduleMaintenance = today.plusDays((int) Math.ceil(daysUntilNextMaintenance));
+            // The clock advances before the check each day, so a unit one advance short is due today, not tomorrow
+            int advancesNeeded = (int) Math.ceil(daysUntilNextMaintenance / dailyProgress);
+            LocalDate scheduleMaintenance = today.plusDays(max(0, advancesNeeded - 1));
+            scheduledDays.add(maintainedUnit.getName() + " due " + scheduleMaintenance);
             maintenanceSchedule.computeIfAbsent(scheduleMaintenance, k -> new ArrayList<>())
                   .add(maintainedUnit);
         }
+
+        LOGGER.debug("[Maintenance] Schedule at {} cycle days a day: {}", dailyProgress, scheduledDays);
 
         LocalDate lastDay = maintenanceSchedule.keySet().stream()
                                   .max(Comparator.naturalOrder())

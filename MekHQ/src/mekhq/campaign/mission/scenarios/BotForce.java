@@ -50,6 +50,7 @@ import megamek.common.board.Board;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IStartingPositions;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityListFile;
 import megamek.common.units.UnitNameTracker;
@@ -91,11 +92,7 @@ public class BotForce implements IPlayerSettings {
         fixedEntityList = new ArrayList<>();
         generatedEntityList = new ArrayList<>();
         traitors = new ArrayList<>();
-        try {
-            behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
-        } catch (PrincessException ex) {
-            LOGGER.error("Error getting Princess default behaviors", ex);
-        }
+        behaviorSettings = getFavoriteBehaviorSettings();
         bfRandomizer = null;
     }
 
@@ -129,13 +126,28 @@ public class BotForce implements IPlayerSettings {
         setColour(colour);
         generatedEntityList = new ArrayList<>();
         traitors = new ArrayList<>();
-        try {
-            behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
-        } catch (PrincessException ex) {
-            LOGGER.error("Error getting Princess default behaviors", ex);
-        }
+        behaviorSettings = getFavoriteBehaviorSettings();
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
+    }
+
+    /**
+     * Returns a copy of the player's favorite Princess behavior, as chosen in the MegaMek Client Settings. Falls back
+     * to the default behavior if the favorite can't be found.
+     *
+     * @return a copy of the favorite Princess behavior settings
+     */
+    private static BehaviorSettings getFavoriteBehaviorSettings() {
+        BehaviorSettingsFactory behaviorSettingsFactory = BehaviorSettingsFactory.getInstance();
+        BehaviorSettings favoriteBehavior = behaviorSettingsFactory.getBehaviorOrDefault(
+              PreferenceManager.getClientPreferences().getFavoritePrincessBehaviorSetting(),
+              behaviorSettingsFactory.DEFAULT_BEHAVIOR);
+        try {
+            return favoriteBehavior.getCopy();
+        } catch (PrincessException ex) {
+            LOGGER.error("Error getting Princess favorite behavior", ex);
+            return new BehaviorSettings();
+        }
     }
 
     @Override
@@ -159,7 +171,6 @@ public class BotForce implements IPlayerSettings {
         }
         // UUID is immutable so this should work
         copy.traitors = new ArrayList<>(traitors);
-        copy.setBehaviorSettings(new BehaviorSettings());
         copy.getBehaviorSettings().setAutoFlee(this.getBehaviorSettings().shouldAutoFlee());
         copy.getBehaviorSettings().setForcedWithdrawal(this.getBehaviorSettings().isForcedWithdrawal());
         copy.getBehaviorSettings().setDestinationEdge(this.getBehaviorSettings().getDestinationEdge());
