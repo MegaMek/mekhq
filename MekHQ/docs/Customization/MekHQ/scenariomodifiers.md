@@ -19,8 +19,10 @@
   implemented.
 - `unitRemovalCount` - get rid of # randomly selected units from the eventRecipient.
 - `allowedMapLocations` - which map types this modifier should be applicable to. Not implemented.
-- `useAmbushLogic` - pretty sure this hides some random number of units for the eventRecipient. Not sure if
-  implemented.
+- `useAmbushLogic` - if true, up to half of the non-airborne units in this modifier's `forceDefinition` start hidden
+  (requires the hidden units game option). The force still deploys in its own `deploymentZones`. Only applies if that
+  force arrives on turn 0 and has no destination edge; no other force is affected. Does nothing without a
+  `forceDefinition`. Implemented.
 - `switchSides` - causes units from the `eventRecepient` to switch to the opposing side if allied. Not sure if
   implemented.
 - `objectives` - one or more ScenarioObjectives to be added to the scenario template. Implemented.

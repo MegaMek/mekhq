@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.atb;
 
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.*;
 
-import java.util.UUID;
+import java.util.List;
 
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.enums.SkillGeneratorType;
@@ -42,7 +42,6 @@ import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.common.HitData;
 import megamek.common.ToHitData;
-import megamek.common.board.Board;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.Mounted;
@@ -52,16 +51,13 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -276,89 +272,52 @@ public class AtBScenarioModifierApplicator {
     }
 
     /**
-     * Helper function that sets up and "ambush", meaning declaring as "hidden" some portion of: all non-airborne units
-     * on the specified side that will be on the battlefield at the start of the scenario
+     * Helper function that sets up an "ambush" for the force added by a scenario modifier. If that force will be on
+     * the battlefield at the start of the scenario, some portion of its non-airborne units are declared as "hidden".
+     * The force keeps the deployment zone from its own definition. No other force in the scenario is affected.
      * <p>
-     * Also marks any such forces as able to deploy "anywhere". Bot forces with a destination edge are left alone, as
-     * they need to keep moving toward that edge.
+     * Forces with a destination edge are left alone, as they need to keep moving toward that edge.
+     *
+     * @param scenario    The scenario to process.
+     * @param campaign    The current campaign.
+     * @param ambushForce The force template added by the scenario modifier.
      */
-    public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
-        if (eventRecipient == ForceAlignment.Player) {
-            for (int forceID : scenario.getForceIDs()) {
-                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+    public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ScenarioForceTemplate ambushForce) {
+        // Prevent Hidden Units from Causing Issues if Disabled
+        if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+            return;
+        }
 
-                if (forceTemplate.getArrivalTurn() == 0) {
-                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
+        if (ambushForce.getArrivalTurn() != 0) {
+            return;
+        }
 
-                    // Prevent Hidden Units from Causing Issues if Disabled
-                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
-                        continue;
-                    }
+        // Forces with a destination edge (such as convoys) are meant to cross the map. Hidden units never move, so leave
+        // these forces out of the ambush.
+        if (ambushForce.getDestinationZone() != CardinalEdge.NONE.getIndex()) {
+            return;
+        }
 
-                    Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
+        for (BotForce botForce : scenario.getBotForces()) {
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
 
-                    // we can hide the "commander tactics skill" number of units, but we must keep
-                    // at least one visible
-                    // as the bot is unable to handle an invisible op for at the moment.
-                    int maxHiddenUnits = Math.min(playerFormation.getAllUnits(false).size() - 1,
-                          scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
-                    int numHiddenUnits = 0;
-
-                    for (UUID unitID : playerFormation.getAllUnits(false)) {
-                        if (numHiddenUnits >= maxHiddenUnits) {
-                            break;
-                        }
-
-                        Unit currentUnit = campaign.getUnit(unitID);
-                        // to hide, a unit must exist and not be in midair
-                        if (currentUnit != null &&
-                                  !currentUnit.getEntity().isAero() &&
-                                  !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
-                            currentUnit.getEntity().setHidden(true);
-                            numHiddenUnits++;
-                        }
-                    }
-                }
+            if ((forceTemplate == null) || !forceTemplate.getForceName().equals(ambushForce.getForceName())) {
+                continue;
             }
-            // logic for bot ambushes is a little different
-        } else if (eventRecipient == ForceAlignment.Opposing) {
-            for (int x = 0; x < scenario.getNumBots(); x++) {
-                BotForce currentBotForce = scenario.getBotForce(x);
 
-                if (currentBotForce.getTeam() != ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
-                    continue;
+            List<Entity> entities = botForce.getFullEntityList(campaign);
+            int maxHiddenUnits = entities.size() / 2;
+            int numHiddenUnits = 0;
+
+            for (Entity entity : entities) {
+                if (numHiddenUnits >= maxHiddenUnits) {
+                    break;
                 }
 
-                ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-
-                // Forces with a destination edge (such as convoys) are meant to cross the map. Hidden units never
-                // move, and redeploying the force breaks its route, so leave these forces out of the ambush.
-                if (forceTemplate.getDestinationZone() != CardinalEdge.NONE.getIndex()) {
-                    continue;
-                }
-
-                if (forceTemplate.getArrivalTurn() == 0) {
-                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
-
-                    // Prevent Hidden Units from Causing Issues if Disabled
-                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
-                        continue;
-                    }
-
-                    int maxHiddenUnits = currentBotForce.getFullEntityList(campaign).size() / 2;
-                    int numHiddenUnits = 0;
-
-                    for (Entity entity : currentBotForce.getFullEntityList(campaign)) {
-                        if (numHiddenUnits >= maxHiddenUnits) {
-                            break;
-                        }
-
-                        // to hide, a unit must not be in midair
-                        if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
-                            entity.setHidden(true);
-                            numHiddenUnits++;
-                        }
-                    }
+                // to hide, a unit must not be in midair
+                if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+                    entity.setHidden(true);
+                    numHiddenUnits++;
                 }
             }
         }
