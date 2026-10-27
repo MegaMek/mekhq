@@ -2660,7 +2660,7 @@ public class Refit extends Part implements IAcquisitionWork {
             } else {
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
-        } catch (IOException | EntitySavingException ex) {
+        } catch (IOException | EntitySavingException | RuntimeException ex) {
             LOGGER.error(ex, "Could not save refit entity {} to {}", unitName, fileNameCampaign);
             deleteBadRefitFile(fileNameCampaign);
             throw new IOException("Could not save " + unitName + " to " + fileNameCampaign + ": " + ex.getMessage(),
@@ -2675,12 +2675,15 @@ public class Refit extends Part implements IAcquisitionWork {
 
             newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             LOGGER.info("Saved {} to {}", unitName, summary.getSourceFile());
-        } catch (EntityLoadingException ex) {
+        } catch (EntityLoadingException | RuntimeException ex) {
             LOGGER.error(ex, "Could not read back refit entity {}", unitName);
             deleteBadRefitFile(fileNameCampaign);
             // Reload the mek cache since we had to delete the file
             MekSummaryCache.refreshUnitData(false);
-            throw ex;
+            if (ex instanceof EntityLoadingException entityLoadingException) {
+                throw entityLoadingException;
+            }
+            throw new EntityLoadingException("Could not read back " + unitName + ": " + ex.getMessage(), ex);
         }
     }
 
