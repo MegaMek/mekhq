@@ -49,9 +49,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -62,16 +65,18 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifierJson;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.scenarioTemplateEditor.ObjectivesPanel;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * A developer tool for editing scenario modifier files (JSON). The force definition is edited in a sub-dialog that
- * reuses the scenario template editor's force panel. Objectives and linked modifiers can't be edited here, so they are
- * carried on the loaded modifier and saved back untouched.
+ * A developer tool for editing scenario modifier files (JSON). The force definition and objectives are edited with the
+ * scenario template editor's own force and objective panels, so both tools share one implementation. Linked modifiers
+ * can't be edited here, so they are carried on the loaded modifier and saved back untouched.
  */
 public class ScenarioModifierEditorDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioModifierEditorDialog.class);
@@ -93,6 +98,11 @@ public class ScenarioModifierEditorDialog extends JDialog {
     private final JLabel lblForceDefinition = new JLabel();
     private final JButton btnEditForceDefinition = new JButton();
     private final JButton btnRemoveForceDefinition = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
+
+    // The objectives being edited, a copy of the modifier's list. Edited objectives replace their originals in this
+    // list rather than changing them, so the modifier itself only changes on save.
+    private List<ScenarioObjective> objectives = new ArrayList<>();
+    private final ObjectivesPanel objectivesPanel = new ObjectivesPanel();
 
     private final JTextField txtModifierName = new JTextField(30);
     private final JTextArea txtAdditionalBriefingText = new JTextArea(3, 40);
@@ -189,6 +199,12 @@ public class ScenarioModifierEditorDialog extends JDialog {
         specificGroundTerrainCheck.addActionListener(e -> updateTerrainListEnabled());
         addRow(panel, gbc, "modifierEditor.allowedTerrainTypes", new FastJScrollPane(lstTerrainTypes));
 
+        // the shared objectives panel carries its own "Objectives:" label, so it spans both columns
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        panel.add(objectivesPanel, gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
@@ -238,6 +254,27 @@ public class ScenarioModifierEditorDialog extends JDialog {
         if (!hasForce) {
             chkUseAmbushLogic.setSelected(false);
         }
+    }
+
+    /**
+     * Builds the force IDs an objective can be tied to: the force IDs the scenario templates define, the primary
+     * player force, and this modifier's own force. A modifier's objectives apply to whichever scenario it lands in, so
+     * they can name any of these.
+     *
+     * @param knownForceIds   the force IDs the scenario templates define
+     * @param forceDefinition the modifier's force, or {@code null} if it has none
+     *
+     * @return the distinct force IDs, sorted
+     */
+    static List<String> objectiveForceIds(Collection<String> knownForceIds,
+          @Nullable ScenarioForceTemplate forceDefinition) {
+        Set<String> forceIds = new TreeSet<>(knownForceIds);
+        forceIds.add(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+        if ((forceDefinition != null) && (forceDefinition.getForceName() != null)
+                  && !forceDefinition.getForceName().isBlank()) {
+            forceIds.add(forceDefinition.getForceName());
+        }
+        return new ArrayList<>(forceIds);
     }
 
     private static String describeForce(@Nullable ScenarioForceTemplate force) {
@@ -382,6 +419,10 @@ public class ScenarioModifierEditorDialog extends JDialog {
         chkSwitchSides.setSelected(Boolean.TRUE.equals(source.getSwitchSides()));
         // after the ambush checkbox is loaded, so a modifier without a force clears it
         updateForceDefinitionControls();
+        objectives = (source.getObjectives() == null) ? new ArrayList<>() : new ArrayList<>(source.getObjectives());
+        // read the force IDs when the objective editor opens, so a force definition added since is offered
+        objectivesPanel.load(objectives,
+              () -> objectiveForceIds(StratConScenarioFactory.getAllScenarioForceIds(), forceDefinition));
         List<MapLocation> allowed = source.getAllowedMapLocations();
         for (Map.Entry<MapLocation, JCheckBox> entry : mapLocationChecks.entrySet()) {
             entry.getValue().setSelected((allowed != null) && allowed.contains(entry.getKey()));
@@ -407,6 +448,7 @@ public class ScenarioModifierEditorDialog extends JDialog {
         target.setEventTiming((EventTiming) cboEventTiming.getSelectedItem());
         target.setEventRecipient((ForceAlignment) cboEventRecipient.getSelectedItem());
         target.setForceDefinition(forceDefinition);
+        target.setObjectives(new ArrayList<>(objectives));
         target.setSkillAdjustment(textToInt(txtSkillAdjustment.getText()));
         target.setQualityAdjustment(textToInt(txtQualityAdjustment.getText()));
         target.setBattleDamageIntensity(textToInt(txtBattleDamageIntensity.getText()));

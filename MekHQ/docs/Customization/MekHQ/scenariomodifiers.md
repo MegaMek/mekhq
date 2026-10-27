@@ -26,4 +26,5 @@
   `forceDefinition`. Implemented.
 - `switchSides` - if true, causes units from the `eventRecepient` to switch to the opposing side if allied. `null` or
   `false` leaves sides alone. Implemented.
-- `objectives` - one or more ScenarioObjectives to be added to the scenario template. Implemented.
+- `objectives` - one or more ScenarioObjectives to be added to the scenario template. Implemented. In the Scenario
+  Modifier Editor developer tool they are edited with the same objective editor as the Scenario Template Editor.

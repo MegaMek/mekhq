@@ -637,6 +637,10 @@ public class AtBScenarioModifier implements Cloneable {
         return objectives;
     }
 
+    public void setObjectives(List<ScenarioObjective> objectives) {
+        this.objectives = objectives;
+    }
+
     public Integer getNumExtraEvents() {
         return numExtraEvents;
     }

@@ -34,6 +34,9 @@ package mekhq.gui.scenarioTemplateEditor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
@@ -61,6 +64,21 @@ class ObjectivesPanelTest {
         ObjectivesPanel panel = new ObjectivesPanel();
         panel.load(template);
 
+        assertEquals(2, panel.getObjectiveListModelSize());
+    }
+
+    @Test
+    void loadBindsAPlainObjectiveList() {
+        // the scenario modifier editor binds the modifier's objective list rather than a template
+        List<ScenarioObjective> objectives = new ArrayList<>();
+        objectives.add(objective("Hold the line", ObjectiveCriterion.Preserve));
+
+        ObjectivesPanel panel = new ObjectivesPanel();
+        panel.load(objectives, List::of);
+        assertEquals(1, panel.getObjectiveListModelSize());
+
+        objectives.add(objective("Break through", ObjectiveCriterion.ReachMapEdge));
+        panel.refresh();
         assertEquals(2, panel.getObjectiveListModelSize());
     }
 
