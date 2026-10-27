@@ -64,6 +64,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.*;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
@@ -475,6 +476,13 @@ public class CustomizeScenarioDialog extends JDialog {
         scenario.setDeploymentLimit(deploymentLimits);
         Utilities.updatePlayerSettings(scenario, player);
         scenario.readPlanetaryConditions(planetaryConditions);
+
+        if ((scenario instanceof AtBDynamicScenario) &&
+                  !date.equals(scenario.getDate()) &&
+                  (mission != null) &&
+                  (mission.getStratConCampaignState() != null)) {
+            StratConRulesManager.rescheduleDynamicScenario(scenario.getId(), mission.getStratConCampaignState(), date);
+        }
         scenario.setDate(date);
         scenario.setBotForces(botForces);
         scenario.setScenarioObjectives(objectives);

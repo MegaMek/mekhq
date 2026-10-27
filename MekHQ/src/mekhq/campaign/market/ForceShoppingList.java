@@ -204,6 +204,13 @@ public class ForceShoppingList {
         return ordersRemoved;
     }
 
+    /**
+     * @return the unit whose refit an order was placed ahead for, or {@code null} for an ordinary order
+     */
+    private static @Nullable UUID orderedAheadForId(IAcquisitionWork shoppingItem) {
+        return (shoppingItem instanceof Part part) ? part.getOrderedAheadForUnitId() : null;
+    }
+
     /** The place an existing order resolves to (a base for a base order), or {@code null} for the main force. */
     private static @Nullable IPlace orderPlace(IAcquisitionWork shoppingItem) {
         return (shoppingItem instanceof Part part) ? part.getPlace() : null;
@@ -227,12 +234,13 @@ public class ForceShoppingList {
         }
 
         // If the same equipment is already ordered for the same destination and the same refit (or neither is for a
-        // refit), add the quantity to that order and return
+        // refit), and ordered ahead for the same unit or for none, add the quantity to that order and return
         Object newEquipment = newWork.getNewEquipment();
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (holdsSameEquipment(shoppingItem, newEquipment)
                       && orderPlace(shoppingItem) == destination
-                      && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))) {
+                      && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))
+                      && Objects.equals(orderedAheadForId(shoppingItem), orderedAheadForId(newWork))) {
                 campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
                 while (quantity > 0) {
                     shoppingItem.incrementQuantity();

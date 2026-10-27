@@ -1513,7 +1513,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 new FamilyTreeDialog(gui.getFrame(),
                       selectedPerson.getGenealogy(),
-                      getCampaign().getPlayerForce().getPersonnel().values());
+                      getCampaign().getPlayerForce().getPersonnel().values(),
+                      gui::focusOnPerson);
                 break;
             }
             case CMD_EDIT: {
@@ -4216,12 +4217,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editAssignmentLog.text"));
-            menuItem.setActionCommand(CMD_ADD_ASSIGNMENT_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_ASSIGNMENT_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
-            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_PERFORMANCE_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
         } else {

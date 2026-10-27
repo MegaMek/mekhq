@@ -50,6 +50,8 @@ class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
+    boolean personnelMarketDisableShowOfInterest;
+    boolean personnelMarketDisableCombatManeuversRestriction;
     double personnelMarketNormalApplicantMultiplier;
     double personnelMarketCivilianApplicantMultiplier;
     UnitMarketMethod unitMarketMethod;
@@ -113,6 +115,9 @@ class MarketsOptionsModel {
         personnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
         personnelMarketReportRefresh = options.get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH);
         usePersonnelHireHiringHallOnly = options.get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
+        personnelMarketDisableShowOfInterest = options.get(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST);
+        personnelMarketDisableCombatManeuversRestriction = options.get(
+              CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION);
         personnelMarketNormalApplicantMultiplier = options.get(
               CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER);
         personnelMarketCivilianApplicantMultiplier = options.get(
@@ -195,6 +200,9 @@ class MarketsOptionsModel {
         }
 
         options.set(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY, usePersonnelHireHiringHallOnly);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST, personnelMarketDisableShowOfInterest);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION,
+              personnelMarketDisableCombatManeuversRestriction);
         options.set(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH, personnelMarketReportRefresh);
         options.set(CampaignOption.PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER,
               personnelMarketNormalApplicantMultiplier);

@@ -166,6 +166,9 @@ public class SetupTab {
     private MMComboBox<SkillLevel> cmbMedicSkillLevel;
 
     // Tech Assignment — three-slot sort grid + per-slot direction
+    private CommandGenerationCheckBox chkGenerateMedicalReserve;
+    private JSpinner spnMedicalReservePercent;
+
     private CommandGenerationCheckBox chkAssignTechsToUnits;
     private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentPrimary;
     private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentSecondary;
@@ -405,6 +408,20 @@ public class SetupTab {
         section.add(rdoMedicsAsPersonnel, constraints);
         constraints.gridx = 1;
         section.add(cmbMedicSkillLevel, constraints);
+
+        // Medical reserve: generation-only spare combat personnel as injury replacements, sized by a
+        // percentage of each combat role. The spinner is live only when the box is checked.
+        chkGenerateMedicalReserve = new CommandGenerationCheckBox("GenerateMedicalReserve");
+        spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
+        spnMedicalReservePercent.setToolTipText(chkGenerateMedicalReserve.getToolTipText());
+        chkGenerateMedicalReserve.addActionListener(event ->
+              spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected()));
+        constraints.gridy = 6;
+        constraints.gridx = 0;
+        constraints.gridwidth = 1;
+        section.add(chkGenerateMedicalReserve, constraints);
+        constraints.gridx = 1;
+        section.add(spnMedicalReservePercent, constraints);
 
         addLeftAlignFiller(section, 2);
         return section;
@@ -924,6 +941,10 @@ public class SetupTab {
         cmbMedicSkillLevel.setSelectedItem(sourceOptions.getMedicSkillLevel());
         refreshMedicEnablement();
 
+        chkGenerateMedicalReserve.setSelected(sourceOptions.isGenerateMedicalReserve());
+        spnMedicalReservePercent.setValue(sourceOptions.getMedicalReservePercent());
+        spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected());
+
         // Tech Assignment
         chkAssignTechsToUnits.setSelected(sourceOptions.isAssignTechsToUnits());
         cmbTechAssignmentPrimary.setSelectedItem(
@@ -1027,6 +1048,8 @@ public class SetupTab {
         targetOptions.setAstechSkillLevel(cmbAstechSkillLevel.getSelectedItem());
         targetOptions.setGenerateMedics(chkGenerateMedics.isSelected());
         targetOptions.setMedicsAsPersonnel(rdoMedicsAsPersonnel.isSelected());
+        targetOptions.setGenerateMedicalReserve(chkGenerateMedicalReserve.isSelected());
+        targetOptions.setMedicalReservePercent((Integer) spnMedicalReservePercent.getValue());
         targetOptions.setMedicSkillLevel(cmbMedicSkillLevel.getSelectedItem());
         // Tech Assignment
         targetOptions.setAssignTechsToUnits(chkAssignTechsToUnits.isSelected());

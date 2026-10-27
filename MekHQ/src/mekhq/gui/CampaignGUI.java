@@ -71,6 +71,8 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.AppIcons;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -108,6 +110,8 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitBriefing;
+import mekhq.campaign.parts.RefitFacility;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -116,6 +120,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitSiteChange;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -131,12 +136,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.EasyBugReportDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.RefitPartsArrivedNotice;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
@@ -156,6 +163,9 @@ import mekhq.gui.view.CurrentLocationPanel;
 public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
     private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    /** The buttons of the refit site question, in the order they are shown */
+    private static final int REFIT_SITE_CANCEL = 0;
+    private static final int REFIT_SITE_MOVE = 2;
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1200,6 +1210,10 @@ public class CampaignGUI extends JPanel {
 
     public void refitUnit(Refit refit, boolean selectModelName) {
         Campaign campaign = getCampaign();
+        // Settled before the tech is chosen, so the tech list shows the target number at the site the work is done
+        if (!isRefitSiteSettled(refit)) {
+            return;
+        }
         if (refit.getOriginalEntity() instanceof Infantry && !(refit.getOriginalEntity() instanceof BattleArmor)) {
             refit.setTech(null);
         } else if (refit.getOriginalEntity() instanceof Dropship || refit.getOriginalEntity() instanceof Jumpship) {
@@ -1275,6 +1289,136 @@ public class CampaignGUI extends JPanel {
         campaign.refit(refit);
         getMekLabTab().clearUnit();
         logger.debug("[RefitStart] {}: refit started", refit.getUnit().getName());
+    }
+
+    /**
+     * Offers to move the unit to the repair site its refit needs when its site is too low for the refit's class, by
+     * Campaign Operations p.211 (issue #3437). For example, a Class C refit of a unit in an improvised site needs a
+     * field workshop or better. The player may move the unit, keep it where it is, or cancel the refit.
+     *
+     * @return {@code false} if the player cancelled the refit
+     */
+    private boolean isRefitSiteSettled(Refit refit) {
+        Campaign campaign = getCampaign();
+        Unit unit = refit.getOriginalUnit();
+        if (RefitFacility.isSiteGoodEnough(refit, unit.getSite())) {
+            return true;
+        }
+        int requiredSite = RefitFacility.getRequiredSite(refit);
+        String currentSiteName = Unit.getSiteName(unit.getSite());
+        String requiredSiteName = Unit.getSiteName(requiredSite);
+        logger.debug("[RefitFacility] {}: {} work needs {}, the unit is at {}; asking whether to move it",
+              unit.getName(), refit.getRefitClassName(), requiredSiteName, currentSiteName);
+
+        Person speaker = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        String inCharacter = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.text",
+              campaign.getCommanderAddress(), unit.getName(), refit.getNewEntity().getModel(),
+              refit.getRefitClassName(), RefitFacility.describeRequiredSite(refit), currentSiteName);
+        List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.cancel"),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.stay", currentSiteName),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.move", requiredSiteName));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false);
+
+        return switch (dialog.getDialogChoice()) {
+            case REFIT_SITE_CANCEL -> {
+                logger.debug("[RefitFacility] {}: the refit was cancelled at the site question", unit.getName());
+                yield false;
+            }
+            case REFIT_SITE_MOVE -> {
+                boolean isMoved = UnitSiteChange.moveToSite(campaign, new Unit[] { unit }, requiredSite);
+                logger.debug("[RefitFacility] {}: {} to {}", unit.getName(), isMoved ? "moved" : "could not move",
+                      requiredSiteName);
+                yield true;
+            }
+            default -> {
+                logger.debug("[RefitFacility] {}: stays at {} for the refit", unit.getName(), currentSiteName);
+                yield true;
+            }
+        };
+    }
+
+    /**
+     * Opens Choose Refit Kit for the units, all of one model, and begins the refit the player chooses on each of them.
+     * Used by the Hangar's Refit/Customize, by the notice that a refit's parts have arrived, and by the warehouse.
+     *
+     * @param units            the units to refit; the first one is shown in the window
+     * @param preselectedModel the model to select in the list, such as the one parts were ordered ahead for, or
+     *                         {@code null} to select nothing
+     */
+    public void chooseRefit(Unit[] units, @Nullable String preselectedModel) {
+        ChooseRefitDialog chooseRefitDialog = new ChooseRefitDialog(getFrame(), true, getCampaign(), units[0]);
+        chooseRefitDialog.selectRefitModel(preselectedModel);
+        chooseRefitDialog.setVisible(true);
+        if (!chooseRefitDialog.isConfirmed()) {
+            return;
+        }
+        MekSummary summary = MekSummaryCache.getInstance()
+                                   .getMek(chooseRefitDialog.getSelectedRefit().getNewEntity().getShortNameRaw());
+        if (summary == null) {
+            return;
+        }
+        for (Unit unit : units) {
+            try {
+                Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (refitEntity != null) {
+                    Refit refit = new Refit(unit, refitEntity, chooseRefitDialog.isCustomize(), false, false);
+                    if (refit.checkFixable() == null) {
+                        refitUnit(refit, false);
+                    }
+                }
+            } catch (EntityLoadingException exception) {
+                logger.error("", exception);
+            }
+        }
+    }
+
+    /**
+     * Tells the player that everything ordered ahead for a unit's refit has arrived, and opens Choose Refit Kit with
+     * that refit selected if they choose to begin it.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param refitPartsArrivedEvent the event naming the unit whose parts have arrived
+     */
+    @Subscribe
+    public void handleRefitPartsArrived(RefitPartsArrivedEvent refitPartsArrivedEvent) {
+        Unit unit = refitPartsArrivedEvent.getUnit();
+        Refit plannedRefit = RefitPartOrders.planPendingRefit(unit);
+        List<String> stillToBuy = (plannedRefit == null) ? List.of() : RefitPartOrders.describeStillToBuy(plannedRefit);
+        if (!RefitPartsArrivedNotice.askToBegin(getCampaign(), unit, stillToBuy)) {
+            logger.debug("[RefitParts] {}: parts arrived, the refit is left for later", unit.getName());
+            return;
+        }
+        beginPendingRefit(unit, plannedRefit);
+    }
+
+    /**
+     * Begins the refit a unit's parts were ordered ahead for, as a kit refit, going straight to the repair site
+     * question, the choice of tech and the tech's briefing. The player already chose the design when ordering.
+     *
+     * @param unit the unit with a pending refit
+     */
+    public void beginPendingRefit(Unit unit) {
+        beginPendingRefit(unit, RefitPartOrders.planPendingRefit(unit));
+    }
+
+    private void beginPendingRefit(Unit unit, @Nullable Refit plannedRefit) {
+        String fixableProblem = (plannedRefit == null) ? null : plannedRefit.checkFixable();
+        if ((plannedRefit == null) || (fixableProblem != null)) {
+            // Fall back to choosing the refit by hand, with the ordered design selected
+            logger.debug("[RefitParts] {}: the pending refit cannot begin directly ({}); opening Choose Refit Kit",
+                  unit.getName(), (plannedRefit == null) ? "design not loaded" : fixableProblem);
+            chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
+            return;
+        }
+        logger.debug("[RefitParts] {}: beginning the pending refit to {} as a kit refit", unit.getName(),
+              unit.getPendingRefitModel());
+        refitUnit(plannedRefit, false);
     }
 
     /**
