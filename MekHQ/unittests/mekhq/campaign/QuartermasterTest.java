@@ -49,6 +49,7 @@ import java.util.UUID;
 
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoType;
+import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
@@ -479,6 +480,47 @@ public class QuartermasterTest {
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
     }
 
+    /** The acquisition multipliers raise what a unit costs to buy, but not what the unit is worth once owned. */
+    @Test
+    public void buyUnitAppliesAcquisitionMultiplierOnlyToThePurchase() {
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions mockOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.UNIT_COST_MODEL)).thenReturn(UnitCostModel.TOTAL_WARFARE);
+        lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1.0);
+        lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
+        lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
+        ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
+
+        // If we pay for units...
+        when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
+
+        // ...and XL engines cost 2.5x to buy...
+        double xlMultiplier = 2.5;
+        when(mockOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER)).thenReturn(xlMultiplier);
+
+        // ...and can afford a unit...
+        Finances mockFinances = mock(Finances.class);
+        when(mockCampaign.getPlayerForce().getFinances()).thenReturn(mockFinances);
+        ArgumentCaptor<Money> captor = ArgumentCaptor.forClass(Money.class);
+        doReturn(true).when(mockFinances)
+              .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
+
+        // ...and the unit has an XL engine...
+        Entity mockEntity = mock(Entity.class);
+        when(mockEntity.hasEngine()).thenReturn(true);
+        when(mockEntity.getEngine()).thenReturn(new Engine(200, Engine.XL_ENGINE, 0));
+        double cost = 1.0;
+        doReturn(cost).when(mockEntity).getCost(anyBoolean());
+
+        // ...then buying it should cost the multiplied amount...
+        assertTrue(quartermaster.buyUnit(mockEntity, 0));
+        assertEquals(Money.of(xlMultiplier * cost), captor.getValue());
+
+        // ...but the unit's value should not change.
+        assertEquals(Money.of(cost), new Unit(mockEntity, mockCampaign).getBuyCost());
+    }
+
     @Test
     public void buyUnitAppliesClanCostMultiplierToInfantryAlso() {
         Campaign mockCampaign = mockCampaign();
@@ -646,7 +688,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getActualValue()).thenReturn(cost);
+        when(mockPart.getPurchaseCost()).thenReturn(cost);
 
         // ...and we can't afford the part...
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -678,7 +720,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
-        when(mockRefit.getActualValue()).thenReturn(cost);
+        when(mockRefit.getPurchaseCost()).thenReturn(cost);
 
         // ...and we can't afford the refit kit...
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -710,7 +752,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
-        when(mockPart.getActualValue()).thenReturn(cost);
+        when(mockPart.getPurchaseCost()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -743,7 +785,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(1.0);
-        when(mockPart.getActualValue()).thenReturn(cost);
+        when(mockPart.getPurchaseCost()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -777,7 +819,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
-        when(mockRefit.getActualValue()).thenReturn(cost);
+        when(mockRefit.getPurchaseCost()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -810,7 +852,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(1.0);
-        when(mockRefit.getActualValue()).thenReturn(cost);
+        when(mockRefit.getPurchaseCost()).thenReturn(cost);
 
         ArgumentCaptor<Money> costCaptor = ArgumentCaptor.forClass(Money.class);
         doReturn(false).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE),
@@ -844,7 +886,7 @@ public class QuartermasterTest {
 
         Part mockPart = mock(Part.class);
         Money cost = Money.of(42.0);
-        when(mockPart.getActualValue()).thenReturn(cost);
+        when(mockPart.getPurchaseCost()).thenReturn(cost);
 
         // ...and we can afford the part...
         doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -876,7 +918,7 @@ public class QuartermasterTest {
 
         Refit mockRefit = mock(Refit.class);
         Money cost = Money.of(42.0);
-        when(mockRefit.getActualValue()).thenReturn(cost);
+        when(mockRefit.getPurchaseCost()).thenReturn(cost);
 
         // ...and we can afford the refit kit...
         doReturn(true).when(mockFinances).debit(eq(TransactionType.EQUIPMENT_PURCHASE), any(), eq(cost), anyString());
@@ -1749,8 +1791,6 @@ public class QuartermasterTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         when(mockCampaignOptions.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER)).thenReturn(1d);
-        // OmniPods are tech rating E
-        when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
 
         LocalWarehouse mockWarehouse = mock(LocalWarehouse.class);
 

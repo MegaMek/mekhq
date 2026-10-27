@@ -219,6 +219,16 @@ class AcquisitionPriceMultipliersTest {
             assertEquals(3.5, engineMultiplier(Engine.XL_ENGINE, true), DELTA);
         }
 
+        /** ×0.5 for an XL engine and ×0.5 for tech rating E: 0.5 × 0.5, where adding them would make it free. */
+        @Test
+        void discountsStackMultiplicatively() {
+            campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, 0.5);
+
+            assertEquals(0.25, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, false,
+                  TechRating.E, Engine.XL_ENGINE, false), DELTA);
+        }
+
         @Test
         void discountsCanNotMakeAnItemFree() {
             campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 0.1);
@@ -226,8 +236,17 @@ class AcquisitionPriceMultipliersTest {
             campaignOptions.set(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER, 0.1);
             campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.1);
 
-            assertEquals(0.0, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
+            assertEquals(0.0001, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
                   TechRating.F, Engine.XL_ENGINE, true), DELTA);
+        }
+
+        /** ×5 for Clan tech before 3071, then ×0.5 for an XL engine: (1 + 4) × 0.5. */
+        @Test
+        void discountsApplyAfterTheSurcharges() {
+            campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.5);
+
+            assertEquals(2.5, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
+                  TechRating.D, Engine.XL_ENGINE, false), DELTA);
         }
     }
 
@@ -249,14 +268,36 @@ class AcquisitionPriceMultipliersTest {
                   entity), DELTA);
         }
 
-        /** Mixed tech carries Clan tech. */
+        /** A mixed-tech unit on a Clan chassis is Clan tech. */
         @Test
-        void mixedTechEntitiesPayTheClanTechMultiplier() {
+        void clanChassisMixedTechEntitiesPayTheClanTechMultiplier() {
             Entity entity = mock(Entity.class);
+            when(entity.isClan()).thenReturn(true);
             when(entity.isMixedTech()).thenReturn(true);
 
             assertEquals(5.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
                   entity), DELTA);
+        }
+
+        /** An Inner Sphere unit carrying some Clan equipment is not priced as a Clan unit. */
+        @Test
+        void innerSphereChassisMixedTechEntitiesDoNotPayTheClanTechMultiplier() {
+            Entity entity = mock(Entity.class);
+            when(entity.isMixedTech()).thenReturn(true);
+
+            assertEquals(1.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
+                  entity), DELTA);
+        }
+
+        @Test
+        void innerSphereChassisMixedTechSummariesDoNotPayTheClanTechMultiplier() {
+            MekSummary summary = mock(MekSummary.class);
+            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
+            when(summary.isMixedTech()).thenReturn(true);
+            when(summary.getEngineType()).thenReturn(Engine.NORMAL_ENGINE);
+
+            assertEquals(1.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
+                  summary), DELTA);
         }
 
         /** Tech rating F during the Succession Wars, a fusion engine in a combat vehicle, and an XL engine. */

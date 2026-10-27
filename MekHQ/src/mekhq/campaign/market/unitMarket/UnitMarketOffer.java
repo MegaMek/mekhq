@@ -45,6 +45,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.unit.Unit;
@@ -153,7 +154,9 @@ public class UnitMarketOffer {
             return cost;
         }
 
-        cost = cost.multipliedBy(Unit.getUnitPriceMultiplier(entity, campaignOptions, faction, gameYear));
+        cost = cost.multipliedBy(Unit.getUnitPriceMultiplier(entity, campaignOptions))
+                     .multipliedBy(AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear,
+                           entity));
 
         // Battle Value ignores price quirks, which the construction cost already includes
         if (isBattleValueCost()) {

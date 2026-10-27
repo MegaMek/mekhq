@@ -976,17 +976,14 @@ public final class CommandGenerator {
      * Designer's starting-cash preview to price the design model before anything is committed.
      *
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
-     * @param faction         the campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
-     * @param gameYear        the current year
      * @param entities        the rolled entities to price (e.g. from {@link #collectEntities})
      *
      * @return the estimated total purchase value
      */
-    public static Money estimateUnitValue(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
-          List<Entity> entities) {
+    public static Money estimateUnitValue(CampaignOptions campaignOptions, List<Entity> entities) {
         Money total = Money.zero();
         for (Entity entity : entities) {
-            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions, faction, gameYear));
+            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));
         }
         return total;
     }

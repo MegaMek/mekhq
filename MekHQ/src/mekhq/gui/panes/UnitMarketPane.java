@@ -413,7 +413,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     protected Component createRightComponent() {
         setEntityViewPane(new EntityViewPane(getFrame(), null));
         // The preview's Cost line shows what the campaign values the unit at, before the offer's market percentage
-        getEntityViewPane().setCostProvider(entity -> Unit.estimateBuyCost(entity,
+        getEntityViewPane().setCostProvider(entity -> Unit.estimatePurchaseCost(entity,
                     getCampaign().getCampaignOptions(), getCampaign().getPlayerForce().getFaction(),
                     getCampaign().getGameYear())
                                                             .getAmount()

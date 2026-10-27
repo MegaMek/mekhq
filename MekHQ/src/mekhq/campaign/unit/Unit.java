@@ -3248,12 +3248,35 @@ public class Unit implements ITechnology, ILocatable {
     // End Transport Assignments
 
     public Money getBuyCost() {
+        return calculateBuyCost();
+    }
+
+    /**
+     * @return what the campaign pays to buy this unit: its {@link #getBuyCost()} times its Campaign Operations
+     *       acquisition multiplier (see {@link AcquisitionPriceMultipliers}). The acquisition multiplier only applies
+     *       when buying, so it never touches the unit's value once owned (selling, maintenance, contract pay).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getPurchaseCost() {
+        return calculateBuyCost().multipliedBy(AcquisitionPriceMultipliers.getUnitMultiplier(
+              getCampaign().getCampaignOptions(), getCampaign().getPlayerForce().getFaction(),
+              getCampaign().getGameYear(), getEntity()));
+    }
+
+    /**
+     * Kept apart from {@link #getBuyCost()} so {@link #getPurchaseCost()} stays correct for subclasses, such as
+     * {@link UnitOrder}, whose buy cost is their purchase cost.
+     *
+     * @return the unit's value before any acquisition multiplier
+     */
+    private Money calculateBuyCost() {
         if (isUseAlternateUnitCost()) {
             return getAlternateUnitCost();
         }
 
-        return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions(),
-              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear());
+        return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions());
     }
 
     /**
@@ -3263,22 +3286,19 @@ public class Unit implements ITechnology, ILocatable {
      *
      * @param unitEntity      the entity to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
-     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
-     * @param gameYear        the current year
      *
      * @return the entity's purchase value
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions,
-          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
+    public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
         if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(unitEntity)) {
             return calculateAlternateUnitCost(unitEntity.calculateBattleValue(true, true, true),
-                  getUnitPriceMultiplier(unitEntity, campaignOptions, faction, gameYear),
-                  getQuirkPriceMultiplier(unitEntity), campaignOptions);
+                  getUnitPriceMultiplier(unitEntity, campaignOptions), getQuirkPriceMultiplier(unitEntity),
+                  campaignOptions);
         }
-        return getTraditionalBuyCost(unitEntity, campaignOptions, faction, gameYear);
+        return getTraditionalBuyCost(unitEntity, campaignOptions);
     }
 
     /**
@@ -3290,19 +3310,14 @@ public class Unit implements ITechnology, ILocatable {
      *
      * @param summary         the unit to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
-     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
-     * @param gameYear        the current year
      *
      * @return the unit's estimated purchase value
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions,
-          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
-        double unitPriceMultiplier = getTechBasePriceMultiplier(summary.isMixedTech(), summary.isClan(),
-              campaignOptions) * AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear,
-              summary);
+    public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions) {
+        double unitPriceMultiplier = getUnitPriceMultiplier(summary.isMixedTech(), summary.isClan(), campaignOptions);
         if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(summary)) {
             return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
         }
@@ -3315,55 +3330,84 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Estimates what {@link #getPurchaseCost()} will return for an entity that has not yet been made into a unit: its
+     * {@link #estimateBuyCost(Entity, CampaignOptions)} times its acquisition multiplier.
+     *
      * @param unitEntity      the entity to price
-     * @param campaignOptions the campaign options supplying the unit price multipliers
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
      * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
      * @param gameYear        the current year
      *
-     * @return the entity's construction cost (alternate cost for conventional infantry) times its unit price
-     *       multiplier (see {@link #getUnitPriceMultiplier(Entity, CampaignOptions, mekhq.campaign.universe.Faction,
-     *       int)})
+     * @return what the campaign would pay to buy the entity
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static Money getTraditionalBuyCost(Entity unitEntity, CampaignOptions campaignOptions,
+    public static Money estimatePurchaseCost(Entity unitEntity, CampaignOptions campaignOptions,
           @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
+        return estimateBuyCost(unitEntity, campaignOptions).multipliedBy(
+              AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear, unitEntity));
+    }
+
+    /**
+     * Estimates what {@link #getPurchaseCost()} will return for a unit from its {@link MekSummary} alone: its
+     * {@link #estimateBuyCost(MekSummary, CampaignOptions)} times its acquisition multiplier.
+     *
+     * @param summary         the unit to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear        the current year
+     *
+     * @return what the campaign would pay to buy the unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimatePurchaseCost(MekSummary summary, CampaignOptions campaignOptions,
+          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
+        return estimateBuyCost(summary, campaignOptions).multipliedBy(
+              AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear, summary));
+    }
+
+    /**
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the unit price multipliers
+     *
+     * @return the entity's construction cost (alternate cost for conventional infantry) times the unit price
+     *       multiplier for its tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money getTraditionalBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
         Money cost = Money.of((unitEntity instanceof Infantry) ?
                                     unitEntity.getAlternateCost() :
                                     unitEntity.getCost(false));
 
-        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions, faction, gameYear));
+        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions));
     }
 
     /**
-     * @return this unit's price multiplier (see
-     *       {@link #getUnitPriceMultiplier(Entity, CampaignOptions, mekhq.campaign.universe.Faction, int)})
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching this unit's tech base
      *
      * @author Illiani
      * @since 0.51.01
      */
     private double getUnitPriceMultiplier() {
-        return getUnitPriceMultiplier(getEntity(), getCampaign().getCampaignOptions(),
-              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear());
+        return getUnitPriceMultiplier(getEntity(), getCampaign().getCampaignOptions());
     }
 
     /**
-     * @param unitEntity      the entity to price
+     * @param unitEntity      the entity whose tech base picks the multiplier
      * @param campaignOptions the campaign options holding the multipliers
-     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
-     * @param gameYear        the current year
      *
-     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching the entity's tech base,
-     *       times its Campaign Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching the entity's tech base
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions,
-          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
-        return getTechBasePriceMultiplier(unitEntity.isMixedTech(), unitEntity.isClan(), campaignOptions)
-                     * AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear, unitEntity);
+    public static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
+        return getUnitPriceMultiplier(unitEntity.isMixedTech(), unitEntity.isClan(), campaignOptions);
     }
 
     /**
@@ -3376,7 +3420,7 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private static double getTechBasePriceMultiplier(boolean isMixedTech, boolean isClan,
+    private static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
           CampaignOptions campaignOptions) {
         if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);

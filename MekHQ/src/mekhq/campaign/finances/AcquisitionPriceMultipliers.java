@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.finances;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.annotation.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
@@ -64,11 +67,16 @@ import mekhq.campaign.universe.Faction;
  *     <li>A light fusion engine: {@link CampaignOption#LIGHT_ENGINE_PRICE_MULTIPLIER}.</li>
  * </ul>
  *
- * <p>Every multiplier that applies stacks additively: ×5 and ×1.25 together make ×5.25. Outside the listed years,
- * nothing replaces the era multipliers, so tech rating E and F fall back to their usual multipliers and Clan tech has
- * no multiplier at all.</p>
+ * <p>Every surcharge that applies stacks additively: ×5 and ×1.25 together make ×5.25. Discounts (multipliers below
+ * ×1) are multiplied in afterwards, so no combination of them can make an item free: ×0.5 and ×0.5 make ×0.25. Outside
+ * the listed years, nothing replaces the era multipliers, so tech rating E and F fall back to their usual multipliers
+ * and Clan tech has no multiplier at all.</p>
  *
  * <p>The multiplier for a unit covers its whole price. Engine multipliers also apply to engines bought as parts.</p>
+ *
+ * <p>These are acquisition multipliers: they only apply to what the campaign pays when buying (see
+ * {@link mekhq.campaign.unit.Unit#getPurchaseCost()} and {@link Part#getPurchaseCost()}), never to the value of what
+ * it already owns.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -91,7 +99,9 @@ public final class AcquisitionPriceMultipliers {
      * @param gameYear        the current year
      * @param entity          the unit's entity
      *
-     * @return the acquisition price multiplier for the whole unit
+     * @return the acquisition price multiplier for the whole unit. Only a unit built on a Clan chassis pays the Clan
+     *       tech multiplier: an Inner Sphere unit carrying some Clan equipment is priced as Inner Sphere tech (its
+     *       mixed-tech unit price multiplier already covers that equipment).
      *
      * @author Illiani
      * @since 0.51.01
@@ -99,7 +109,7 @@ public final class AcquisitionPriceMultipliers {
     public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Entity entity) {
         int engineType = entity.hasEngine() ? entity.getEngine().getEngineType() : NO_ENGINE_TYPE;
-        return getMultiplier(campaignOptions, faction, gameYear, entity.isClan() || entity.isMixedTech(),
+        return getMultiplier(campaignOptions, faction, gameYear, entity.isClan(),
               entity.getTechRating(), engineType, entity.isCombatVehicle());
     }
 
@@ -120,7 +130,7 @@ public final class AcquisitionPriceMultipliers {
         int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
         boolean isVehicle = (unitTypeCode == UnitType.TANK) || (unitTypeCode == UnitType.VTOL)
                                   || (unitTypeCode == UnitType.NAVAL);
-        return getMultiplier(campaignOptions, faction, gameYear, summary.isClan() || summary.isMixedTech(),
+        return getMultiplier(campaignOptions, faction, gameYear, summary.isClan(),
               summary.getTechRating(), summary.getEngineType(), isVehicle && !summary.isSupport());
     }
 
@@ -153,12 +163,12 @@ public final class AcquisitionPriceMultipliers {
      * @param campaignOptions the campaign options holding the multipliers
      * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
      * @param gameYear        the current year
-     * @param isClanTech      whether the item is, or carries, Clan tech
+     * @param isClanTech      whether the item is Clan tech
      * @param techRating      the item's tech rating, or {@code null} if it is unknown
      * @param engineType      the item's engine type, such as {@link Engine#XL_ENGINE}, or a negative value for none
      * @param isCombatVehicle whether the item is a combat vehicle, or an engine built for one
      *
-     * @return the sum of every applicable multiplier's increase over ×1, never below zero
+     * @return the sum of every applicable surcharge's increase over ×1, times every applicable discount
      *
      * @author Illiani
      * @since 0.51.01
@@ -169,12 +179,12 @@ public final class AcquisitionPriceMultipliers {
         // The Word of Blake grew out of ComStar and kept its stockpiles of advanced technology
         boolean isComStarFaction = (faction != null) && faction.isComStarOrWoB();
 
-        double multiplier = 1.0;
+        List<Double> multipliers = new ArrayList<>();
         if (isClanTech && !isClanFaction) {
             if ((gameYear >= CLAN_INVASION_START_YEAR) && (gameYear <= CLAN_INVASION_END_YEAR)) {
-                multiplier += campaignOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER));
             } else if (gameYear > CLAN_INVASION_END_YEAR) {
-                multiplier += campaignOptions.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER));
             }
         }
 
@@ -182,26 +192,47 @@ public final class AcquisitionPriceMultipliers {
             boolean isSuccessionWars = (gameYear >= SUCCESSION_WARS_START_YEAR)
                                              && (gameYear <= SUCCESSION_WARS_END_YEAR);
             if (isSuccessionWars && !isClanFaction && !isComStarFaction) {
-                multiplier += campaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER));
             } else if (techRating == TechRating.E) {
-                multiplier += campaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER));
             } else {
-                multiplier += campaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER));
             }
         }
 
         if (engineType >= 0) {
             if (isCombatVehicle && Engine.isFusion(engineType)) {
-                multiplier += campaignOptions.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER));
             }
 
             if (engineType == Engine.XL_ENGINE) {
-                multiplier += campaignOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER));
             } else if (engineType == Engine.LIGHT_ENGINE) {
-                multiplier += campaignOptions.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER) - 1.0;
+                multipliers.add(campaignOptions.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER));
             }
         }
 
-        return Math.max(0.0, multiplier);
+        return combine(multipliers);
+    }
+
+    /**
+     * Surcharges stack additively, as Campaign Operations does. Adding discounts the same way would let two ×0.5
+     * discounts make an item free, so they are multiplied in instead.
+     *
+     * @param multipliers the applicable multipliers
+     *
+     * @return the sum of every surcharge's increase over ×1, times every discount; never below zero
+     */
+    private static double combine(List<Double> multipliers) {
+        double surcharge = 1.0;
+        double discount = 1.0;
+        for (double multiplier : multipliers) {
+            if (multiplier >= 1.0) {
+                surcharge += multiplier - 1.0;
+            } else {
+                discount *= Math.max(0.0, multiplier);
+            }
+        }
+        return surcharge * discount;
     }
 }

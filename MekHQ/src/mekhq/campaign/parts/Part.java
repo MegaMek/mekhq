@@ -306,6 +306,21 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
+    /**
+     * The acquisition multiplier only applies when buying, so it never touches the part's value once owned (selling,
+     * salvage, the parts-based unit value).
+     *
+     * @return what the campaign pays to buy this part: its {@link #getActualValue()} times its Campaign Operations
+     *       acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getPurchaseCost() {
+        return getActualValue().multipliedBy(AcquisitionPriceMultipliers.getPartMultiplier(
+              campaign.getCampaignOptions(), campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this));
+    }
+
     @Override
     public Money getUndamagedValue() {
         return adjustCostsForCampaignOptions(getStickerPrice(), true);
@@ -353,9 +368,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                 cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER));
                 break;
         }
-
-        cost = cost.multipliedBy(AcquisitionPriceMultipliers.getPartMultiplier(campaign.getCampaignOptions(),
-              campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this));
 
         if (!isBrandNew()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions()

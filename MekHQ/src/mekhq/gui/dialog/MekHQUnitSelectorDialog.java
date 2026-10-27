@@ -111,7 +111,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         updateOptionValues();
         initialize();
         // The preview's Cost line shows what the campaign would charge, matching the table's price column
-        panePreview.setCostProvider(entity -> Unit.estimateBuyCost(entity, campaign.getCampaignOptions(),
+        panePreview.setCostProvider(entity -> Unit.estimatePurchaseCost(entity, campaign.getCampaignOptions(),
                     campaign.getPlayerForce().getFaction(), campaign.getGameYear())
                                                     .getAmount()
                                                     .doubleValue());
@@ -366,7 +366,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      */
     @Override
     protected long getDisplayedPrice(MekSummary summary) {
-        return Unit.estimateBuyCost(summary, campaign.getCampaignOptions(), campaign.getPlayerForce().getFaction(),
+        return Unit.estimatePurchaseCost(summary, campaign.getCampaignOptions(), campaign.getPlayerForce().getFaction(),
               campaign.getGameYear()).round().getAmount().longValue();
     }
 
