@@ -5036,7 +5036,7 @@ public class Person implements ILocatable {
                     if (version.isLowerThan(new Version("0.50.10"))) { // <50.10 compatibility handler
                         person.performanceExamScore = parsedReasoning.getExamScore();
                     }
-                } else if ((nodeName.equalsIgnoreCase("reasoning"))) {
+                } else if (nodeName.equalsIgnoreCase("performanceExamScore")) {
                     person.performanceExamScore = MathUtility.parseInt(wn2.getTextContent().trim(), 50);
                 } else if (nodeName.equalsIgnoreCase("personalityDescription")) {
                     person.personalityDescription = wn2.getTextContent();
