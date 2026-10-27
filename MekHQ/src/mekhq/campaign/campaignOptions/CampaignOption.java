@@ -1002,10 +1002,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "personnelMarketDisableShowOfInterest");
     public static final CampaignOption<Boolean> PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION =
           of(Boolean.class, false, "personnelMarketDisableCombatManeuversRestriction");
-    public static final CampaignOption<Double> PERSONNEL_MARKET_NORMAL_APPLICANT_MULTIPLIER =
-          of(Double.class, 1.0, "personnelMarketNormalApplicantMultiplier");
-    public static final CampaignOption<Double> PERSONNEL_MARKET_CIVILIAN_APPLICANT_MULTIPLIER =
-          of(Double.class, 1.0, "personnelMarketCivilianApplicantMultiplier");
     public static final CampaignOption<UnitMarketMethod> UNIT_MARKET_METHOD =
           of(UnitMarketMethod.class, UnitMarketMethod.NONE, "unitMarketMethod");
     public static final CampaignOption<Boolean> UNIT_MARKET_REGIONAL_MEK_VARIATIONS =
