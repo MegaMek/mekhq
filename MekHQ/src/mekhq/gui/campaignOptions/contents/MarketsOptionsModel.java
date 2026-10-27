@@ -52,6 +52,8 @@ class MarketsOptionsModel {
     boolean usePersonnelHireHiringHallOnly;
     boolean personnelMarketDisableShowOfInterest;
     boolean personnelMarketDisableCombatManeuversRestriction;
+    boolean personnelMarketDisableCivilianApplicants;
+    double personnelMarketApplicantMultiplier;
     UnitMarketMethod unitMarketMethod;
     boolean unitMarketRegionalMekVariations;
     int unitMarketArtilleryUnitChance;
@@ -116,6 +118,9 @@ class MarketsOptionsModel {
         personnelMarketDisableShowOfInterest = options.get(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST);
         personnelMarketDisableCombatManeuversRestriction = options.get(
               CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION);
+        personnelMarketDisableCivilianApplicants = options.get(
+              CampaignOption.PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS);
+        personnelMarketApplicantMultiplier = options.get(CampaignOption.PERSONNEL_MARKET_APPLICANT_MULTIPLIER);
         unitMarketMethod = options.get(CampaignOption.UNIT_MARKET_METHOD);
         unitMarketRegionalMekVariations = options.get(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS);
         unitMarketArtilleryUnitChance = options.get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
@@ -197,6 +202,9 @@ class MarketsOptionsModel {
         options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST, personnelMarketDisableShowOfInterest);
         options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION,
               personnelMarketDisableCombatManeuversRestriction);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS,
+              personnelMarketDisableCivilianApplicants);
+        options.set(CampaignOption.PERSONNEL_MARKET_APPLICANT_MULTIPLIER, personnelMarketApplicantMultiplier);
         options.set(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH, personnelMarketReportRefresh);
         options.set(CampaignOption.UNIT_MARKET_METHOD, unitMarketMethod);
         options.set(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS, unitMarketRegionalMekVariations);

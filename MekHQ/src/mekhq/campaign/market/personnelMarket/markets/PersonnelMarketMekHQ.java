@@ -342,7 +342,12 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             addApplicant(applicant);
         }
 
-        int dependentsCount = d6();
+        // Dependents are civilians
+        if (isCivilianApplicantsDisabled()) {
+            return;
+        }
+
+        int dependentsCount = applyApplicantMultiplier(d6());
 
         for (int roll = 0; roll < dependentsCount; roll++) {
             Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
@@ -406,7 +411,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
             rolls += additionalRecruits;
         }
 
-        setRecruitmentRolls(max(rolls, 0));
+        setRecruitmentRolls(applyApplicantMultiplier(max(rolls, 0)));
     }
 
     /**
