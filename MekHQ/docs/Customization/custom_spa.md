@@ -25,7 +25,28 @@ an spa that is either set or not. The second most common is `&CHOICE;`, which is
 list of available values. The actual values will be provided in the next step.
 
 Adding to `customspa.xml` will add the option to the hard-coded options, but just as with the hard-coded options it
-still needs an entry in `defaultspa.xml` to provide XP costs, display name, and description used by MekHQ. This is done
-as for any other SPA, or HQ-specific edge triggers and implants. The one addition is that custom SPAs of type CHOICE
-should list all the possible settings in a `<choiceValues>` node using two colons as a separator between values. The
-`defaultspa.xml` has a comment section showing the entries corresponding to the examples in `customspa.xml` at the end.
+still needs an entry in `data/universe/defaultspa.yml` to provide XP costs, display name, and description used by
+MekHQ. This is done as for any other SPA, or HQ-specific edge triggers and implants: add an item to the `abilities`
+list. The one addition is that custom SPAs of type CHOICE should list all the possible settings in a `choiceValues`
+list. `defaultspa.yml` has a commented-out section at the end showing the entries corresponding to the examples in
+`customspa.xml`.
+
+A `defaultspa.yml` entry looks like this. Only `lookupName` is required; it must match the option's name.
+
+```yaml
+  - lookupName: tetris_master
+    displayName: Tetris Master
+    desc: Increase the capacity of a cargo or transport bay.
+    xpCost: 4                     # defaults to 1
+    originOnly: false             # true if it can only be gained during character creation; defaults to false
+    weight: 2                     # likelihood of being picked at random; defaults to 1
+    prereqAbilities: []           # abilities the character must already have
+    invalidAbilities: []          # abilities that prevent taking this one
+    removeAbilities: []           # abilities removed when this one is gained
+    choiceValues: [None, Cargo, Mek, Vehicle, Fighter, Infantry]
+    skillPrereqs:                 # every listed requirement must be met
+      - Administration: Regular   # a requirement is met by any one of its skills at or above the level shown
+```
+
+Skill levels are `Ultra-Green` (any level), `Green`, `Regular`, `Veteran`, `Elite`, `Heroic`, or `Legendary`. Multi-line
+descriptions can use a YAML block (`desc: |-` followed by the indented text).

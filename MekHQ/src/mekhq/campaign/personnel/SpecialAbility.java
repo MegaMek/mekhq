@@ -33,8 +33,7 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,8 +66,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -76,8 +73,8 @@ import org.w3c.dom.NodeList;
  * This object will serve as a wrapper for a specific pilot special ability. In the actual person object we will use
  * PersonnelOptions, so these objects will not get written to actual personnel. Instead, we will keep track of a full
  * static hash of SPAs that will contain important information on XP costs and pre-reqs that can be looked up to see if
- * a person is eligible for a particular option. All of this will be customizable via an external XML file that can be
- * user selected in the campaign options (and possibly user editable).
+ * a person is eligible for a particular option. The defaults are read from {@code data/universe/defaultspa.yml} and can
+ * be customized in the campaign options.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -86,8 +83,8 @@ public class SpecialAbility {
 
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLAN_PILOT = "clanperson";
-    private static String SPA_DIRECTORY = "data/universe/defaultspa.xml";
-    private static String TEST_DIRECTORY = "testresources/data/universe/defaultspa_test.xml";
+    private static String SPA_DIRECTORY = "data/universe/defaultspa.yml";
+    private static String TEST_DIRECTORY = "testresources/data/universe/defaultspa_test.yml";
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static final Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
@@ -349,66 +346,75 @@ public class SpecialAbility {
         }
     }
 
-    public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
-        try {
-            SpecialAbility retVal = new SpecialAbility();
-            NodeList nl = wn.getChildNodes();
-
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
-                    retVal.displayName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
-                    retVal.lookupName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
-                    retVal.xpCost = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originOnly")) {
-                    retVal.originOnly = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-                    retVal.weight = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
-                    retVal.prereqAbilities = Utilities.splitString(wn2.getTextContent(), "::");
-                } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
-                    retVal.invalidAbilities = Utilities.splitString(wn2.getTextContent(), "::");
-                } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
-                    retVal.removeAbilities = Utilities.splitString(wn2.getTextContent(), "::");
-                } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
-                    retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
-                } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
-                    SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
-                    if (!skill.isEmpty()) {
-                        retVal.prereqSkills.add(skill);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
-                    String[] fields = wn2.getTextContent().split(":");
-                    retVal.prereqMisc.put(fields[0], fields[1]);
-                }
-            }
-
-            if (retVal.displayName.isEmpty()) {
-                IOption option = options.getOption(retVal.lookupName);
-                if (null != option) {
-                    retVal.displayName = option.getDisplayableName();
-                }
-            }
-
-            if (retVal.desc.isEmpty()) {
-                IOption option = options.getOption(retVal.lookupName);
-                if (null != option) {
-                    retVal.desc = option.getDescription();
-                }
-            }
-
-            if (isRemovedAbility(retVal.lookupName, options)) {
-                return;
-            }
-
-            specialAbilities.put(retVal.lookupName, retVal);
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
+    /**
+     * Adds a default ability read from the ability YAML file to the active abilities. A missing display name or
+     * description is taken from the matching personnel option.
+     *
+     * @param data    the ability as read from the file
+     * @param options the personnel options the ability must exist in
+     *
+     * @author Illiani
+     * @since 0.51.02
+     */
+    private static void addDefaultAbility(SpecialAbilityYamlLoader.AbilityData data, PersonnelOptions options) {
+        if ((data.lookupName() == null) || data.lookupName().isBlank()) {
+            LOGGER.warn("Skipping a special ability with no lookup name");
+            return;
         }
+
+        SpecialAbility specialAbility = new SpecialAbility(data.lookupName().trim());
+        if (data.displayName() != null) {
+            specialAbility.displayName = data.displayName();
+        }
+        if (data.desc() != null) {
+            specialAbility.desc = data.desc();
+        }
+        if (data.xpCost() != null) {
+            specialAbility.xpCost = data.xpCost();
+        }
+        if (data.originOnly() != null) {
+            specialAbility.originOnly = data.originOnly();
+        }
+        if (data.weight() != null) {
+            specialAbility.weight = data.weight();
+        }
+        if (data.prereqAbilities() != null) {
+            specialAbility.prereqAbilities = new Vector<>(data.prereqAbilities());
+        }
+        if (data.invalidAbilities() != null) {
+            specialAbility.invalidAbilities = new Vector<>(data.invalidAbilities());
+        }
+        if (data.removeAbilities() != null) {
+            specialAbility.removeAbilities = new Vector<>(data.removeAbilities());
+        }
+        if (data.choiceValues() != null) {
+            specialAbility.choiceValues = new Vector<>(data.choiceValues());
+        }
+        if (data.miscPrereqs() != null) {
+            specialAbility.prereqMisc = new HashMap<>(data.miscPrereqs());
+        }
+        specialAbility.prereqSkills = SpecialAbilityYamlLoader.toSkillPrerequisites(specialAbility.lookupName,
+              data.skillPrereqs());
+
+        if (specialAbility.displayName.isEmpty()) {
+            IOption option = options.getOption(specialAbility.lookupName);
+            if (null != option) {
+                specialAbility.displayName = option.getDisplayableName();
+            }
+        }
+
+        if (specialAbility.desc.isEmpty()) {
+            IOption option = options.getOption(specialAbility.lookupName);
+            if (null != option) {
+                specialAbility.desc = option.getDescription();
+            }
+        }
+
+        if (isRemovedAbility(specialAbility.lookupName, options)) {
+            return;
+        }
+
+        specialAbilities.put(specialAbility.lookupName, specialAbility);
     }
 
     public static void generateInstanceFromCampaignXML(Node wn, PersonnelOptions options, Version v) {
@@ -555,36 +561,17 @@ public class SpecialAbility {
             return;
         }
 
-        Document xmlDoc;
-        try (InputStream is = new FileInputStream(useTestDirectory ? TEST_DIRECTORY : SPA_DIRECTORY)) {
-            xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
+        List<SpecialAbilityYamlLoader.AbilityData> abilityData;
+        try {
+            abilityData = SpecialAbilityYamlLoader.load(new File(useTestDirectory ? TEST_DIRECTORY : SPA_DIRECTORY));
         } catch (Exception ex) {
             LOGGER.error("", ex);
             return;
         }
 
-        Element spaEle = xmlDoc.getDocumentElement();
-        spaEle.normalize();
-
         PersonnelOptions options = new PersonnelOptions();
-
-        NodeList nl = spaEle.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn = nl.item(x);
-
-            if (wn.getParentNode() != spaEle) {
-                continue;
-            }
-
-            int xc = wn.getNodeType();
-
-            if (xc == Node.ELEMENT_NODE) {
-                String xn = wn.getNodeName();
-
-                if (xn.equalsIgnoreCase("ability")) {
-                    SpecialAbility.generateInstanceFromXML(wn, options, null);
-                }
-            }
+        for (SpecialAbilityYamlLoader.AbilityData data : abilityData) {
+            addDefaultAbility(data, options);
         }
 
         for (final Entry<String, SpecialAbility> entry : getSpecialAbilities().entrySet()) {

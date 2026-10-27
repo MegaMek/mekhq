@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -70,11 +71,12 @@ class TechRepairAbilitiesTest {
      */
     @Test
     void everyRepairAbilityIsDefinedInTheGamesAbilityFile() throws Exception {
-        String abilityFile = Files.readString(Path.of("data/universe/defaultspa.xml"));
+        String abilityFile = Files.readString(Path.of("data/universe/defaultspa.yml"));
 
         for (String abilityName : TechRepairAbilities.REPAIR_ABILITIES) {
-            assertTrue(abilityFile.contains("<lookupName>" + abilityName + "</lookupName>"),
-                  abilityName + " is defined");
+            Pattern entry = Pattern.compile("^\\s*- lookupName: " + Pattern.quote(abilityName) + "\\s*$",
+                  Pattern.MULTILINE);
+            assertTrue(entry.matcher(abilityFile).find(), abilityName + " is defined");
         }
     }
 
