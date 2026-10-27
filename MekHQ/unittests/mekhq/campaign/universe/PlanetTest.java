@@ -48,7 +48,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link Planet}'s event-sourced accessors, in particular the internal {@code CurrentEvents} cache's handling
+ * Tests {@link Planet}'s event-sourced accessors, in particular the {@link CurrentEvents} cache's handling
  * of out-of-order date queries.
  */
 public class PlanetTest {
@@ -86,7 +86,7 @@ public class PlanetTest {
     }
 
     /**
-     * Regression test: {@code Planet.CurrentEvents} merges every event up to a queried date into a single shared,
+     * Regression test: {@code CurrentEvents} merges every event up to a queried date into a single shared,
      * mutable accumulator and never un-merges them. A query for a date <i>after</i> the campaign's actual current
      * date (e.g. looking up a contract's target system by its calculated start date, rather than the campaign's
      * current date) used to fast-forward that accumulator permanently, because the cache only reset when queried
