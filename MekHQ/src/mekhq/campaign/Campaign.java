@@ -93,7 +93,6 @@ import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.OffBoardDirection;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRollModifier;
@@ -102,8 +101,6 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
-import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
@@ -116,17 +113,13 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.orders.UnitOrders;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.units.Aero;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
@@ -5398,56 +5391,7 @@ public class Campaign implements ITechManager {
      * @param entity the entity to clear the game data for
      */
     public void clearGameData(Entity entity) {
-        // First, lets remove any improvised clubs picked up during the combat
-        entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.GIRDER_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.TREE_CLUB);
-
-        // Then reset mounted equipment
-        for (Mounted<?> m : entity.getEquipment()) {
-            m.setUsedThisRound(false);
-            m.resetJam();
-        }
-
-        // And clear out all the flags
-        entity.setDeployed(false);
-        entity.setElevation(0);
-        entity.setPassedThrough(new Vector<>());
-        entity.resetFiringArcs();
-        entity.resetBays();
-        entity.setEvading(false);
-        entity.setFacing(0);
-        entity.setPosition(null);
-        entity.setProne(false);
-        entity.setHullDown(false);
-        entity.heat = 0;
-        entity.heatBuildup = 0;
-        entity.underwaterRounds = 0;
-        entity.setTransportId(Entity.NONE);
-        entity.resetTransporter();
-        entity.setDeployRound(0);
-        entity.setSwarmAttackerId(Entity.NONE);
-        entity.setSwarmTargetId(Entity.NONE);
-        entity.setUnloaded(false);
-        entity.setDone(false);
-        entity.setLastTarget(Entity.NONE);
-        entity.setNeverDeployed(true);
-        entity.setStuck(false);
-        entity.resetCoolantFailureAmount();
-        entity.setConversionMode(0);
-        entity.setDoomed(false);
-        entity.setDestroyed(false);
-        // Without this a unit wrecked, recovered and repaired is written off again the next time it only flees
-        entity.clearBattleOutcome();
-        // Without this a unit that fled the last battle still reports the edge it left by
-        entity.setRetreatedDirection(OffBoardDirection.NONE);
-        entity.setHidden(false);
-        entity.clearNarcAndiNarcPods();
-        entity.setShutDown(false);
-        entity.setSearchlightState(false);
-        // Orders given to the unit's bot in this battle, such as a flee order, must not steer it in the next one
-        entity.setUnitOrders(UnitOrders.NONE);
-        // Needed to stop state leaks between scenarios
+        // The battle state MegaMek tracks on the unit, from position and heat to artillery fire adjustment
         entity.clearGameState();
 
         resetSensorChoice(entity);
@@ -5473,24 +5417,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof Mek m) {
-            m.setCoolingFlawActive(false);
-        } else if (entity instanceof Aero a) {
-
-            if (a.isSpheroid()) {
-                entity.setMovementMode(EntityMovementMode.SPHEROID);
-            } else {
-                entity.setMovementMode(EntityMovementMode.AERODYNE);
-            }
-            a.setAltitude(5);
-            a.setCurrentVelocity(0);
-            a.setNextVelocity(0);
-        } else if (entity instanceof Tank t) {
-            t.unjamTurret(t.getLocTurret());
-            t.unjamTurret(t.getLocTurret2());
-            t.resetJammedWeapons();
-        }
-        entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
