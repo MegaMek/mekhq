@@ -102,7 +102,7 @@ public class PostScenarioDialogHandler {
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
         // currentScenario may become null
         try {
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario, tracker.getPeopleStatus().keySet()));
         } catch (Exception e) {
             LOGGER.error(e, "An error occurred during scenario resolution: {}", e.getMessage());
             LOGGER.errorDialog(

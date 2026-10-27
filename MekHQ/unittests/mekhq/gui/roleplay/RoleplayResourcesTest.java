@@ -143,6 +143,9 @@ class RoleplayResourcesTest {
         for (CampaignChronicle.PersonChange change : CampaignChronicle.PersonChange.values()) {
             assertTrue(properties.containsKey("Chronicle.person." + change.name()), change.name());
         }
+        for (CampaignChronicle.UltimatumChoice choice : CampaignChronicle.UltimatumChoice.values()) {
+            assertTrue(properties.containsKey("Chronicle.ultimatum." + choice.name()), choice.name());
+        }
         for (JournalEntryType type : JournalEntryType.values()) {
             assertTrue(properties.containsKey("JournalEntryType." + type.name() + ".label"));
         }

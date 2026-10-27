@@ -33,14 +33,35 @@
 
 package mekhq.campaign.events.scenarios;
 
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
+
 import mekhq.campaign.mission.scenarios.Scenario;
 
 /**
  * Triggered when a scenario is resolved.
  */
 public class ScenarioResolvedEvent extends ScenarioChangedEvent {
+    private final Set<UUID> participantIds;
 
     public ScenarioResolvedEvent(Scenario scenario) {
+        this(scenario, Set.of());
+    }
+
+    /**
+     * @param scenario       the resolved scenario
+     * @param participantIds the ids of the campaign's people who took part
+     */
+    public ScenarioResolvedEvent(Scenario scenario, Collection<UUID> participantIds) {
         super(scenario);
+        this.participantIds = Set.copyOf(participantIds);
+    }
+
+    /**
+     * @return the ids of the campaign's people who took part, or an empty set if they weren't recorded
+     */
+    public Set<UUID> getParticipantIds() {
+        return participantIds;
     }
 }
