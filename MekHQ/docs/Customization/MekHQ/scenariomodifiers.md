@@ -7,7 +7,8 @@
 - `blockFurtherEvents` - used to indicate that no further events should be processed after this modifier. Not sure if
   working or not, probably not.
 - `eventTiming` - PreForceGeneration or PostForceGeneration. Indicates when the modifier is eligible to be applied.
-- `forceDefinition` - a ScenarioForceTemplate definition.
+- `forceDefinition` - a ScenarioForceTemplate definition. In the Scenario Modifier Editor developer tool it is edited
+  with the same force editor as the Scenario Template Editor.
 - `skillAdjustment` - adjusts the skill rating of all the units generated up until this point up or down the
   indicated # of levels.
 - `qualityAdjustment` - adjusts the equipment quality of all units generated from this point on up or down the
@@ -23,6 +24,6 @@
   (requires the hidden units game option). The force still deploys in its own `deploymentZones`. Only applies if that
   force arrives on turn 0 and has no destination edge; no other force is affected. Does nothing without a
   `forceDefinition`. Implemented.
-- `switchSides` - causes units from the `eventRecepient` to switch to the opposing side if allied. Not sure if
-  implemented.
+- `switchSides` - if true, causes units from the `eventRecepient` to switch to the opposing side if allied. `null` or
+  `false` leaves sides alone. Implemented.
 - `objectives` - one or more ScenarioObjectives to be added to the scenario template. Implemented.

@@ -429,7 +429,7 @@ public class AtBScenarioModifier implements Cloneable {
                       getUnitRemovalCount());
             }
 
-            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
+            if (Boolean.TRUE.equals(getSwitchSides()) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
             }
 
