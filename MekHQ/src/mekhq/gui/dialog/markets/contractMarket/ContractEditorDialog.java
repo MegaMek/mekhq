@@ -1328,12 +1328,12 @@ public class ContractEditorDialog extends JDialog {
                                    .append(MarketHud.escape(nameField.getText().isBlank()
                                                                   ? contract.getName()
                                                                   : nameField.getText().trim()))
-                                   .append("</b><br><span style='font-size:smaller; color:")
+                                   .append("</b><br><span style='color:")
                                    .append(HudStyle.hex(TEXT_MUTED)).append("'>")
                                    .append(MarketHud.escape(String.join(separator, parts))).append("</span>");
         List<String> tags = previewTags();
         if (!tags.isEmpty()) {
-            html.append("<br><span style='font-size:smaller'><b>").append(String.join(separator, tags))
+            html.append("<br><span><b>").append(String.join(separator, tags))
                   .append("</b></span>");
         }
         JLabel text = new JLabel(html.append("</html>").toString());
@@ -2007,7 +2007,7 @@ public class ContractEditorDialog extends JDialog {
         effectLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
         effectLabel.setForeground(TEXT);
         Runnable showEffect = () -> effectLabel.setText("<html>" + MarketHud.escape(termEffectText(effect,
-              track.getSelected())) + "<br><span style='font-weight:normal; font-size:smaller; color:"
+              track.getSelected())) + "<br><span style='font-weight:normal; color:"
                                                               + HudStyle.hex(TEXT_FAINT) + "'>"
                                                               + MarketHud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.stepLabel", track.getSelected().stepValue())) + "</span></html>");
