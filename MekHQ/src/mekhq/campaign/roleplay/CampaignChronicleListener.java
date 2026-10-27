@@ -52,9 +52,7 @@ import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
-import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
@@ -138,18 +136,6 @@ public class CampaignChronicleListener {
             if (contract != null && contract.getStatus() != null) {
                 campaign.getRoleplay().getTravelLog().recordContractEnd(contract.getId(), campaign.getLocalDate());
                 chronicle.contractEnded(contract.getId(), contract.getName(), contract.getStatus().toString());
-            }
-        });
-    }
-
-    /** Records a battle being resolved, if the cast fought in it. */
-    @Subscribe
-    public void handle(final ScenarioResolvedEvent event) {
-        guard(() -> {
-            Scenario scenario = event.getScenario();
-            if (scenario != null && campaign.getScenario(scenario.getId()) == scenario) {
-                chronicle.battleResolved(scenario.getId(), scenario.getName(), scenario.getStatus().toString(),
-                      event.getParticipantIds());
             }
         });
     }

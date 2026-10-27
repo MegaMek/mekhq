@@ -51,9 +51,9 @@ import jakarta.annotation.Nullable;
 
 /**
  * Writes what happens in the campaign into the Oracle log, so the journal records the story MekHQ plays out as well as
- * the player's own: contracts, ultimatums, battles the cast fought in, and cast members joining, dying or leaving.
- * Everything else is left out, and travel has its own {@link TravelLog}. People events on the same day are
- * gathered into one entry, such as "Killed: Ana, Ben", so a hard battle does not bury the journal.
+ * the player's own: contracts, ultimatums, and cast members joining, dying or leaving. Everything else, such as
+ * battles, is left out, and travel has its own {@link TravelLog}. People events on the same day are gathered into one
+ * entry, such as "Killed: Ana, Ben", so a hard battle does not bury the journal.
  *
  * <p>This class holds the rules; {@link CampaignChronicleListener} feeds it MekHQ's events.</p>
  */
@@ -136,31 +136,6 @@ public class CampaignChronicle {
     public @Nullable JournalEntry contractEnded(final UUID id, final String name, final String outcome) {
         return record("contract-end:" + id, getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.contractEnded", name,
               outcome));
-    }
-
-    /**
-     * Records a resolved battle, if anyone in the current cast fought in it. The cast members who did are tagged.
-     *
-     * @param id             the scenario's id
-     * @param name           the scenario's name
-     * @param outcome        how it ended, such as "Victory"
-     * @param participantIds the ids of the campaign's people who took part
-     *
-     * @return the entry written, or {@code null} if the chronicle is off, no cast member fought, or this was already
-     *       recorded today
-     */
-    public @Nullable JournalEntry battleResolved(final int id, final String name, final String outcome,
-          final Collection<UUID> participantIds) {
-        List<OracleCharacter> castMembers = castMembersFor(participantIds);
-        if (castMembers.isEmpty()) {
-            return null;
-        }
-        JournalEntry entry = record("battle:" + id, getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.battle", name,
-              outcome));
-        if (entry != null) {
-            castMembers.forEach(entry::tagCharacter);
-        }
-        return entry;
     }
 
     /**

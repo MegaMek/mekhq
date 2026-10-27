@@ -61,10 +61,8 @@ import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
-import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
@@ -91,36 +89,16 @@ class CampaignChronicleTest {
     }
 
     @Test
-    void contractsAndCastBattlesAreRecorded() {
+    void contractsAreRecorded() {
         UUID contract = UUID.randomUUID();
         chronicle.contractStarted(contract, "Operation Hammer", "Lyran Commonwealth", "Helm");
-        chronicle.battleResolved(7, "Ridge Assault", "Victory", List.of(castMember("Ana")));
         chronicle.contractEnded(contract, "Operation Hammer", "Success");
 
-        assertEquals(3, roleplay.getOracleLog().size());
+        assertEquals(2, roleplay.getOracleLog().size());
         assertEquals("Contract accepted: Operation Hammer, for Lyran Commonwealth, at Helm.",
               roleplay.getOracleLog().get(0).getText());
-        assertEquals("Battle fought: Ridge Assault (Victory).", roleplay.getOracleLog().get(1).getText());
-        assertEquals("Contract ended: Operation Hammer (Success).", roleplay.getOracleLog().get(2).getText());
+        assertEquals("Contract ended: Operation Hammer (Success).", roleplay.getOracleLog().get(1).getText());
         assertTrue(roleplay.getOracleLog().stream().allMatch(entry -> entry.getType() == JournalEntryType.CHRONICLE));
-    }
-
-    @Test
-    void onlyBattlesTheCastFoughtInAreRecorded() {
-        UUID anaId = castMember("Ana");
-        UUID formerId = UUID.randomUUID();
-        roleplay.removeCharacter(roleplay.addLinkedCharacter(formerId, "Former"));
-
-        assertNull(chronicle.battleResolved(1, "Skirmish", "Victory", List.of(UUID.randomUUID())));
-        assertNull(chronicle.battleResolved(2, "Raid", "Defeat", List.of()));
-        assertNull(chronicle.battleResolved(3, "Ambush", "Draw", List.of(formerId)),
-              "someone removed from the cast is no longer followed");
-        JournalEntry battle = chronicle.battleResolved(4, "Ridge Assault", "Victory",
-              List.of(UUID.randomUUID(), anaId));
-
-        assertNotNull(battle);
-        assertEquals(Set.of(roleplay.findByName("Ana").getId()), battle.getCharacters());
-        assertEquals(1, roleplay.getOracleLog().size());
     }
 
     @Test
@@ -134,9 +112,6 @@ class CampaignChronicleTest {
         UUID contract = UUID.randomUUID();
         assertNotNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null));
         assertNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null));
-        List<UUID> fighters = List.of(castMember("Ana"));
-        assertNotNull(chronicle.battleResolved(7, "Ridge", "Victory", fighters));
-        assertNull(chronicle.battleResolved(7, "Ridge", "Victory", fighters), "a second announcement the same day");
         today[0] = today[0].plusDays(1);
         assertNotNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null), "a new day starts afresh");
     }
@@ -145,8 +120,7 @@ class CampaignChronicleTest {
     void nothingIsRecordedWhenTheChronicleIsOff() {
         enabled[0] = false;
         assertNull(chronicle.contractStarted(UUID.randomUUID(), "Hammer", "Lyrans", null));
-        assertNull(chronicle.battleResolved(7, "Ridge", "Victory", List.of(castMember("Ana"))));
-        assertNull(chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", "KIA"));
+        assertNull(chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", "KIA"));
         assertTrue(roleplay.getOracleLog().isEmpty());
     }
 
@@ -388,27 +362,6 @@ class CampaignChronicleTest {
 
         assertTrue(chronicled().isEmpty());
         assertNull(journal.getTravelLog().getContractEnd(ours.getId()));
-    }
-
-    @Test
-    void onlyThisCampaignsBattlesAreChronicled() {
-        CampaignChronicleListener listener = listener();
-        Scenario ours = mock(Scenario.class, RETURNS_DEEP_STUBS);
-        when(ours.getId()).thenReturn(7);
-        when(ours.getName()).thenReturn("Ridge Assault");
-        Scenario copy = mock(Scenario.class, RETURNS_DEEP_STUBS);
-        when(copy.getId()).thenReturn(7);
-        when(campaign.getScenario(7)).thenReturn(ours);
-        UUID anaId = UUID.randomUUID();
-        journal.addLinkedCharacter(anaId, "Ana");
-
-        listener.handle(new ScenarioResolvedEvent(copy, List.of(anaId)));
-        assertTrue(chronicled().isEmpty());
-        listener.handle(new ScenarioResolvedEvent(ours, List.of(UUID.randomUUID())));
-        assertTrue(chronicled().isEmpty(), "nobody in the cast fought");
-        listener.handle(new ScenarioResolvedEvent(ours, List.of(anaId)));
-        assertEquals(1, chronicled().size());
-        assertTrue(chronicled().get(0).startsWith("Battle fought: Ridge Assault"), chronicled().get(0));
     }
 
     @Test
