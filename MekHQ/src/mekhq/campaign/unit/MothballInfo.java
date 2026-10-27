@@ -86,6 +86,15 @@ public class MothballInfo {
     }
 
     /**
+     * Which formation was this unit in before it was mothballed?
+     *
+     * @return The original formation's ID, or {@link Formation#FORMATION_NONE} if it had none
+     */
+    public int getFormationId() {
+        return forceId;
+    }
+
+    /**
      * Creates a set of mothball info for a given unit
      *
      * @param unit The unit to work with

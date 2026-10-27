@@ -73,7 +73,7 @@ class RefitKitPriceTest {
     @Test
     void theAmmoInAKitIsPricedWithTheCampaignPriceMultipliers() throws Exception {
         campaign.getCampaignOptions().set(CampaignOption.COMMON_PART_PRICE_MULTIPLIER, 2.0);
-        campaign.getCampaignOptions().set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 2.0);
+        campaign.getCampaignOptions().set(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER, 2.0);
         Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
 
         Refit refit = new Refit(locust, UnitFixture.LOCUST_LCT_5V.loadEntity(), false, false, false);

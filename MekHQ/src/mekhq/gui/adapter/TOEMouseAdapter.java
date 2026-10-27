@@ -183,8 +183,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
-    private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|FORMATION_LEVEL|";
-    private static final String COMMAND_CHANGE_ROLE_PREFERENCE = "CHANGE_ROLE_PREFERENCE|FORCE|COMBAT_ROLE|";
+    private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|";
+    private static final String COMMAND_CHANGE_ROLE_PREFERENCE = "CHANGE_ROLE_PREFERENCE|FORCE|";
 
     // C3 Network-related
     private static final String C3I = "C3I";
@@ -221,23 +221,25 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         String command = st.nextToken();
         String type = st.nextToken();
         String target = st.nextToken();
-        String forceId = st.nextToken();
 
         Vector<Formation> formations = new Vector<>();
         Vector<Unit> units = new Vector<>();
 
-        if (type.equals(TOEMouseAdapter.FORCE)) {
-            Campaign campaign = gui.getCampaign();
-            Formation formation = campaign.getPlayerForce().getFormation(Integer.parseInt(forceId));
-            if (null != formation) {
-                formations.add(formation);
+        while (st.hasMoreTokens()) {
+            String id = st.nextToken();
+            if (type.equals(TOEMouseAdapter.FORCE)) {
+                Campaign campaign = gui.getCampaign();
+                Formation formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
+                if (null != formation) {
+                    formations.add(formation);
+                }
             }
-        }
 
-        if (type.equals(TOEMouseAdapter.UNIT)) {
-            Unit unit = gui.getCampaign().getUnit(UUID.fromString(forceId));
-            if (null != unit) {
-                units.add(unit);
+            if (type.equals(TOEMouseAdapter.UNIT)) {
+                Unit unit = gui.getCampaign().getUnit(UUID.fromString(id));
+                if (null != unit) {
+                    units.add(unit);
+                }
             }
         }
 
@@ -454,7 +456,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            FormationLevel formationLevel = FormationLevel.parseFromString(st.nextToken());
+            FormationLevel formationLevel = FormationLevel.parseFromString(target);
             singleFormation.setOverrideFormationLevel(formationLevel);
 
             Formation.populateFormationLevelsFromOrigin(gui.getCampaign());
@@ -463,7 +465,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            CombatRole combatRole = CombatRole.parseFromString(st.nextToken());
+            CombatRole combatRole = CombatRole.parseFromString(target);
             singleFormation.setCombatRoleInMemory(combatRole);
             Campaign campaign = gui.getCampaign();
             CombatTeam team = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(singleFormation.getId());
@@ -523,18 +525,21 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
+            // The menu label is based on the first formation, so apply its toggled state to the whole selection
             boolean formationState = singleFormation.isCombatTeam();
-            singleFormation.setCombatTeamStatus(!formationState);
-            singleFormation.setOverrideCombatTeam(formationState ?
-                                                        COMBAT_TEAM_OVERRIDE_FALSE :
-                                                        COMBAT_TEAM_OVERRIDE_TRUE);
+            for (Formation formation : formations) {
+                formation.setCombatTeamStatus(!formationState);
+                formation.setOverrideCombatTeam(formationState ?
+                                                      COMBAT_TEAM_OVERRIDE_FALSE :
+                                                      COMBAT_TEAM_OVERRIDE_TRUE);
 
-            for (Formation childFormation : singleFormation.getAllSubFormations()) {
-                childFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
-            }
+                for (Formation childFormation : formation.getAllSubFormations()) {
+                    childFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+                }
 
-            for (Formation parentFormation : singleFormation.getAllParents()) {
-                parentFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+                for (Formation parentFormation : formation.getAllParents()) {
+                    parentFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+                }
             }
 
             recalculateCombatTeams(gui.getCampaign());
@@ -543,7 +548,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            singleFormation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            for (Formation formation : formations) {
+                formation.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            }
             recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Formation formation : formations) {
@@ -555,7 +562,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                           formation.getFullName()),
                                     getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.deleteForce.title"),
                                     JOptionPane.YES_NO_OPTION)) {
-                        return;
+                        continue;
                     }
                     // Clear any transport assignments of units in the deleted force
                     clearTransportAssignment(formation.getAllUnits(false));
@@ -580,15 +587,17 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 Campaign campaign = gui.getCampaign();
                 final UUID id = singleFormation.getTechID();
                 Person oldTech = campaign.getPlayerForce().getHumanResources().getPerson(id);
-                oldTech.clearTechUnits();
 
-                AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleFormation.getName());
+                // The tech may no longer exist; still clear the stale ID from the formation
+                if (null != oldTech) {
+                    AssignmentLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleFormation.getName());
 
-                if (singleFormation.getAllUnits(false) != null) {
-                    for (UUID uuid : singleFormation.getAllUnits(false)) {
-                        Unit u = gui.getCampaign().getUnit(uuid);
-                        if (null != u.getTech()) {
-                            u.removeTech();
+                    if (singleFormation.getAllUnits(false) != null) {
+                        for (UUID uuid : singleFormation.getAllUnits(false)) {
+                            Unit unit = gui.getCampaign().getUnit(uuid);
+                            if (null != unit && oldTech.equals(unit.getTech())) {
+                                unit.removeTech();
+                            }
                         }
                     }
                 }
@@ -845,9 +854,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             menuItem = new JMenuItem(formationLevel.toString());
                             menuItem.setToolTipText(formationLevel.getDescription());
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL +
-                                                            formation.getId() +
+                                                            formationLevel +
                                                             '|' +
-                                                            formationLevel);
+                                                            formation.getId());
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
                             menu.add(menuItem);
@@ -856,8 +865,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeRole.text"));
-                menu.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE + forceIds);
-                menu.addActionListener(this);
                 menu.setEnabled(true);
                 popup.add(menu);
 
@@ -870,9 +877,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     menuItem = new JMenuItem(displayText);
                     menuItem.setToolTipText(combatRole.getToolTipText());
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE +
-                                                    formation.getId() +
+                                                    combatRole.name() +
                                                     '|' +
-                                                    combatRole.name());
+                                                    formation.getId());
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     menu.add(menuItem);
@@ -1279,8 +1286,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                       "TOEMouseAdapter.removeCombatTeamOverride.text"));
                 optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionRemoveStrategicForceOverride.addActionListener(this);
-                optionRemoveStrategicForceOverride.setVisible(formation.getOverrideCombatTeam() !=
-                                                                    COMBAT_TEAM_OVERRIDE_NONE);
+                optionRemoveStrategicForceOverride.setVisible(formations.stream()
+                                                                    .anyMatch(selectedFormation ->
+                                                                                    selectedFormation.getOverrideCombatTeam() !=
+                                                                                          COMBAT_TEAM_OVERRIDE_NONE));
                 popup.add(optionRemoveStrategicForceOverride);
             }
 
