@@ -36,29 +36,33 @@ package mekhq.gui.utilities;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Objects;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import megamek.SuiteOptions;
 import mekhq.campaign.finances.Money;
 
 /**
  * Control used when a field in the UI represents an editable money amount.
  */
 public class JMoneyTextField extends JFormattedTextField implements FocusListener {
-    private final NumberFormat format;
+    private final NumberFormatter formatter;
 
     public JMoneyTextField() {
-        this.format = NumberFormat.getInstance();
+        this.formatter = new StrictNumberFormatter(
+              NumberFormat.getInstance(SuiteOptions.getNumberFormatLocale()));
         this.addFocusListener(this);
-        this.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(this.format)));
+        this.setFormatterFactory(new DefaultFormatterFactory(this.formatter));
     }
 
     public Money getMoney() {
         try {
-            return Money.of(format.parse(getText()).doubleValue());
+            return Money.of(((Number) formatter.stringToValue(getText())).doubleValue());
         } catch (Exception ignored) {
             return Money.zero();
         }
@@ -76,5 +80,28 @@ public class JMoneyTextField extends JFormattedTextField implements FocusListene
     @Override
     public void focusLost(FocusEvent evt) {
 
+    }
+
+    /**
+     * A {@link NumberFormatter} that rejects text with trailing characters it cannot parse. The default formatter
+     * stops at the first unexpected character, so "1.000.000" (German grouping) would silently become 1.
+     */
+    private static class StrictNumberFormatter extends NumberFormatter {
+        StrictNumberFormatter(NumberFormat format) {
+            super(format);
+        }
+
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            if (text != null) {
+                String trimmed = text.trim();
+                ParsePosition position = new ParsePosition(0);
+                getFormat().parseObject(trimmed, position);
+                if (position.getIndex() != trimmed.length()) {
+                    throw new ParseException("Unparseable number: \"" + text + '"', position.getIndex());
+                }
+            }
+            return super.stringToValue(text);
+        }
     }
 }

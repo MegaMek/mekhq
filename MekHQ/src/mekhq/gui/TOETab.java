@@ -360,15 +360,16 @@ public final class TOETab extends CampaignGuiTab {
                     }
                 }
             }
-            TreePath selectionPath = orgTree.getSelectionPath();
+            // Keep every selected path, not just the first, so a refresh doesn't collapse a multi-selection
+            TreePath[] selectionPaths = orgTree.getSelectionPaths();
 
             orgTree.updateUI();
 
             for (TreePath path : expandedPaths) {
                 orgTree.expandPath(path);
             }
-            if (selectionPath != null) {
-                orgTree.setSelectionPath(selectionPath);
+            if (selectionPaths != null) {
+                orgTree.setSelectionPaths(selectionPaths);
             }
             refreshForceView();
         });

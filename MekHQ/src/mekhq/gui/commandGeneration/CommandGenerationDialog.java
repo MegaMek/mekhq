@@ -33,6 +33,9 @@
 package mekhq.gui.commandGeneration;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
+import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
+import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.BorderLayout;
@@ -44,7 +47,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -70,6 +75,7 @@ import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -504,13 +510,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void runStartingSimulationThen(CommandGenerationOptions options, List<Person> generatedPersons) {
         if (!options.isRunStartingSimulation()) {
             LOGGER.info("[CompanyGen][Simulation] off; the command starts with no history");
-            applyPostGenerationExtras(generatedPersons);
+            applyPostGenerationExtras(options, generatedPersons);
             return;
         }
         runGenerationPhase("Simulating the command's history...",
               simulationListener -> StartingSimulation.run(getCampaign(), options, generatedPersons,
                     simulationListener),
-              simulationResult -> applyPostGenerationExtras(generatedPersons));
+              simulationResult -> applyPostGenerationExtras(options, generatedPersons));
     }
 
     /**
@@ -701,7 +707,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * units) after {@link CommandGenerator#generate} completes. Split out of {@link #okAction()} so
      * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
      */
-    private void applyPostGenerationExtras(List<Person> generatedPersons) {
+    private void applyPostGenerationExtras(CommandGenerationOptions options, List<Person> generatedPersons) {
         long startNanos = System.nanoTime();
         LOGGER.info("[CompanyGen][PostGen] START (thread={}, generatedPersons={})",
               Thread.currentThread().getName(), generatedPersons.size());
@@ -720,13 +726,27 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         campaign.getPlayerForce().setCamOpsReputation(reputationController);
 
         LOGGER.info("[CompanyGen][PostGen] running processBonusUnitsBasedOnCampaignOptions");
-        processBonusUnitsBasedOnCampaignOptions();
+        processBonusUnitsBasedOnCampaignOptions(generatedPersons, options);
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);
     }
 
-    private void processBonusUnitsBasedOnCampaignOptions() {
+    private void processBonusUnitsBasedOnCampaignOptions(List<Person> generatedPersons,
+          CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        // Medical reserve: a generation-only option (independent of the campaign-wide Alternative
+        // Advanced Medical rule). Creates spare unassigned personnel as injury replacements for every
+        // combat role, each role's reserve sized as a percentage of the people generated in it.
+        if (options.isGenerateMedicalReserve()) {
+            Map<PersonnelRole, Integer> sparesByRole = getMedicalReserveSparesByRole(generatedPersons,
+                  options.getMedicalReservePercent());
+            for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    generateSparePersonnel(options, entry.getKey());
+                }
+            }
+        }
+
         // Support-vehicle generation (salvage, MASH, fatigue, StratCon convoy, security) is handled
         // during generation by SupportPersonnelToTOE and SupportUnitGenerator, so it is not repeated
         // here. The settings-panel confirmation dialogs still cover toggling those options later.
@@ -734,6 +754,67 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING) && campaignOptions.isUseStratCon()) {
             AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
         }
+    }
+
+    /**
+     * Works out how many medical reserve spares to generate for each combat role. Each generated person is counted
+     * under their primary role if it is a combat role, otherwise under their secondary role if that is; anyone with
+     * no combat role is ignored. Each role's spares are the given percentage of its headcount, rounded up, so every
+     * combat role present gets at least one spare whenever the percentage is above zero.
+     *
+     * @param generatedPersons       the personnel produced by the generator
+     * @param medicalReservePercent  the reserve size as a percentage of each role's headcount
+     *
+     * @return the number of spares to generate for each combat role, omitting roles that need none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Map<PersonnelRole, Integer> getMedicalReserveSparesByRole(List<Person> generatedPersons,
+          int medicalReservePercent) {
+        Map<PersonnelRole, Integer> combatantsByRole = new EnumMap<>(PersonnelRole.class);
+        for (Person person : generatedPersons) {
+            PersonnelRole combatRole = null;
+            if (person.getPrimaryRole().isCombat()) {
+                combatRole = person.getPrimaryRole();
+            } else if (person.getSecondaryRole().isCombat()) {
+                combatRole = person.getSecondaryRole();
+            }
+
+            if (combatRole != null) {
+                combatantsByRole.merge(combatRole, 1, Integer::sum);
+            }
+        }
+
+        Map<PersonnelRole, Integer> sparesByRole = new EnumMap<>(PersonnelRole.class);
+        for (Map.Entry<PersonnelRole, Integer> entry : combatantsByRole.entrySet()) {
+            int spares = (int) Math.ceil(entry.getValue() * medicalReservePercent / 100.0);
+            if (spares > 0) {
+                sparesByRole.put(entry.getKey(), spares);
+            }
+        }
+        return sparesByRole;
+    }
+
+    private void generateSparePersonnel(CommandGenerationOptions options, PersonnelRole role) {
+        Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
+
+        overrideSkills(campaign, person, role, SkillLevel.GREEN, true);
+
+        SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
+        reRollLoyalty(person, actualSkillLevel);
+        reRollAdvantages(campaign, person, actualSkillLevel);
+
+        if (options.isAutomaticallyAssignRanks()) {
+            final Faction faction = options.isUseSpecifiedFactionToAssignRanks()
+                                          ? options.getSpecifiedFaction()
+                                          : campaign.getPlayerForce().getFaction();
+            person.setRank((faction.isComStarOrWoB() || faction.isClan())
+                                 ? 4
+                                 : 12);
+        }
+
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, true, true);
     }
 
     @Override

@@ -202,41 +202,31 @@ public class KillAwards {
                                 List<Kill> temporaryKills = new ArrayList<>();
 
                                 try {
-                                    // Get the current formation depth of the origin force
-                                    int depth = campaign.getPlayerForce()
-                                                      .getFormation(originForce)
-                                                      .getFormationLevel()
-                                                      .getDepth();
+                                    Formation originNode = campaign.getPlayerForce().getFormation(originForce);
 
-                                    // Continue the loop until the depth of the original force is not smaller than
-                                    // the award depth
-                                    while (depth < awardDepth.getDepth()) {
-                                        // Get the ID of the origin force's parent force
-                                        int parentForce = campaign.getPlayerForce()
-                                                                .getFormation(originForce)
-                                                                .getParentFormation()
-                                                                .getId();
+                                    // Climb the TO&E until we reach the award's formation level. We never climb into
+                                    // a parent larger than the award's formation level, as that would credit the
+                                    // character with kills made by unrelated branches of the TO&E (for example, a
+                                    // company-level support branch sitting directly under the origin force would
+                                    // otherwise be credited with every kill in the campaign).
+                                    while (originNode.getFormationLevel().getDepth() < awardDepth.getDepth()) {
+                                        Formation parentNode = originNode.getParentFormation();
 
-                                        // If the depth is greater or equal to the maximum depth, exit the loop
-                                        if (depth >= maximumDepth.getDepth()) {
+                                        if ((parentNode == null)
+                                                  || (parentNode.getFormationLevel().getDepth()
+                                                            > awardDepth.getDepth())) {
                                             break;
                                         }
 
-                                        // Set the origin force to its parent force
-                                        originForce = parentForce;
-                                        // Update the depth to the depth of the new origin force
-                                        depth = campaign.getPlayerForce()
-                                                      .getFormation(originForce)
-                                                      .getFormationLevel()
-                                                      .getDepth();
+                                        originNode = parentNode;
                                     }
 
-                                    Formation originNode = campaign.getPlayerForce().getFormation(originForce);
+                                    originForce = originNode.getId();
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",
                                           originForce, e.getMessage(), e.getStackTrace());
-                                    temporaryKills.addAll(killData.get(forceId));
+                                    temporaryKills.addAll(killData.getOrDefault(forceId, List.of()));
                                 }
 
                                 Set<String> identifiers = new HashSet<>();
