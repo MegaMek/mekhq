@@ -378,6 +378,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public String find(int transitDays, double valueMultiplier) {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
+        newPart.setOrderedAheadForUnitId(getOrderedAheadForUnitId());
         newPart.setDaysToArrival(transitDays);
         // Deliver to this order's own warehouse — a base warehouse for a base order, or the campaign warehouse for the
         // main force.

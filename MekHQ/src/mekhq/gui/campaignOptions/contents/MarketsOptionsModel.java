@@ -50,6 +50,8 @@ class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
+    boolean personnelMarketDisableShowOfInterest;
+    boolean personnelMarketDisableCombatManeuversRestriction;
     UnitMarketMethod unitMarketMethod;
     boolean unitMarketRegionalMekVariations;
     int unitMarketArtilleryUnitChance;
@@ -111,6 +113,9 @@ class MarketsOptionsModel {
         personnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
         personnelMarketReportRefresh = options.get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH);
         usePersonnelHireHiringHallOnly = options.get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
+        personnelMarketDisableShowOfInterest = options.get(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST);
+        personnelMarketDisableCombatManeuversRestriction = options.get(
+              CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION);
         unitMarketMethod = options.get(CampaignOption.UNIT_MARKET_METHOD);
         unitMarketRegionalMekVariations = options.get(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS);
         unitMarketArtilleryUnitChance = options.get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
@@ -189,6 +194,9 @@ class MarketsOptionsModel {
         }
 
         options.set(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY, usePersonnelHireHiringHallOnly);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST, personnelMarketDisableShowOfInterest);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION,
+              personnelMarketDisableCombatManeuversRestriction);
         options.set(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH, personnelMarketReportRefresh);
         options.set(CampaignOption.UNIT_MARKET_METHOD, unitMarketMethod);
         options.set(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS, unitMarketRegionalMekVariations);

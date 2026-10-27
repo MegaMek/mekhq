@@ -74,7 +74,6 @@ import org.junit.jupiter.api.io.TempDir;
  */
 class FactionStandingUltimatumsLibraryTest {
     private static final File FIXTURE_DIRECTORY = new File("testresources/data/universe/factionStandingUltimatums");
-    private static final File FIXTURE_MANIFEST = new File(FIXTURE_DIRECTORY, "ultimatummanifest.json");
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionStandingUltimatumDialog";
     private static final String MISSING_RESOURCE_TAG = "!";
 
@@ -85,7 +84,7 @@ class FactionStandingUltimatumsLibraryTest {
 
     @BeforeAll
     static void loadFixture() {
-        fixtureLibrary = new FactionStandingUltimatumsLibrary(FIXTURE_MANIFEST);
+        fixtureLibrary = new FactionStandingUltimatumsLibrary(FIXTURE_DIRECTORY);
     }
 
     /**
@@ -125,7 +124,7 @@ class FactionStandingUltimatumsLibraryTest {
         }
 
         assertEquals(Set.of("AMARIS_COUP", "EXODUS", "ESPINOSA_COUP", "ST_IVES_SPLIT", "RASALHAGUE_INDEPENDENCE",
-              "COMSTAR_SCHISM", "FED_COM_CIVIL_WAR", "CLAN_WOLF_SPLIT"), names);
+              "COMSTAR_SCHISM", "FED_COM_CIVIL_WAR", "CLAN_WOLF_SPLIT", "RONIN_EXIT"), names);
     }
 
     @Test
@@ -243,39 +242,61 @@ class FactionStandingUltimatumsLibraryTest {
     @Test
     @DisplayName("Every ultimatum file is named after its ultimatum")
     void testFileNamesMatchUltimatumNames() {
-        FactionStandingUltimatumManifest manifest = FactionStandingUltimatumManifest.deserialize(FIXTURE_MANIFEST);
+        File[] ultimatumFiles = FIXTURE_DIRECTORY.listFiles((directory, name) -> name.endsWith(".json"));
 
-        assertNotNull(manifest);
-        for (String fileName : manifest.ultimatumFileNames) {
-            FactionStandingUltimatumData ultimatum = FactionStandingUltimatumData.deserialize(
-                  new File(FIXTURE_DIRECTORY, fileName));
-            assertNotNull(ultimatum, fileName);
-            assertEquals(ultimatum.name() + ".json", fileName);
+        assertNotNull(ultimatumFiles);
+        for (File ultimatumFile : ultimatumFiles) {
+            FactionStandingUltimatumData ultimatum = FactionStandingUltimatumData.deserialize(ultimatumFile);
+            assertNotNull(ultimatum, ultimatumFile.getName());
+            assertEquals(ultimatum.name() + ".json", ultimatumFile.getName());
         }
     }
 
     @Test
-    @DisplayName("A missing manifest fails loudly")
-    void testMissingManifestThrows() {
-        File missingFile = new File(FIXTURE_DIRECTORY, "doesNotExist.json");
+    @DisplayName("A missing directory, or a file in place of one, fails loudly")
+    void testMissingDirectoryThrows() {
+        File missingDirectory = new File(FIXTURE_DIRECTORY, "doesNotExist");
+        File notADirectory = new File(FIXTURE_DIRECTORY, "EXODUS.json");
 
-        assertThrows(RuntimeException.class, () -> new FactionStandingUltimatumsLibrary(missingFile));
+        assertThrows(RuntimeException.class, () -> new FactionStandingUltimatumsLibrary(missingDirectory));
+        assertThrows(RuntimeException.class, () -> new FactionStandingUltimatumsLibrary(notADirectory));
     }
 
     @Test
-    @DisplayName("A manifest entry whose file is missing is skipped, keeping the others")
-    void testMissingUltimatumFileIsSkipped(@TempDir Path temporaryDirectory) throws IOException {
+    @DisplayName("Files that aren't JSON, and subdirectories, are ignored")
+    void testNonJsonFilesAreIgnored(@TempDir Path temporaryDirectory) throws IOException {
         Files.copy(new File(FIXTURE_DIRECTORY, "EXODUS.json").toPath(), temporaryDirectory.resolve("EXODUS.json"));
-        FactionStandingUltimatumManifest manifest = new FactionStandingUltimatumManifest();
-        manifest.ultimatumFileNames.add("EXODUS.json");
-        manifest.ultimatumFileNames.add("MISSING.json");
-        File manifestFile = temporaryDirectory.resolve("ultimatummanifest.json").toFile();
-        assertTrue(manifest.serialize(manifestFile));
+        Files.copy(new File(FIXTURE_DIRECTORY, "AMARIS_COUP.json").toPath(),
+              temporaryDirectory.resolve("AMARIS_COUP.json.disabled"));
+        Files.writeString(temporaryDirectory.resolve("notes.txt"), "Not an ultimatum");
+        Files.createDirectory(temporaryDirectory.resolve("nested.json"));
 
-        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(manifestFile);
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile());
 
         assertNotNull(library.getUltimatum(EXODUS_DATE, "TH"));
         assertEquals(1, library.getUltimatums().size());
+    }
+
+    @Test
+    @DisplayName("An empty directory loads an empty library")
+    void testEmptyDirectoryLoadsNothing(@TempDir Path temporaryDirectory) {
+        assertTrue(new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile()).getUltimatums().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Files load in name order, so the first by name wins a date clash")
+    void testFilesLoadInNameOrder(@TempDir Path temporaryDirectory) {
+        // Written in reverse order, so the result doesn't depend on creation order
+        assertTrue(buildUltimatum("B_SECOND", TEST_DATE, List.of("FC")).serialize(
+              temporaryDirectory.resolve("B_SECOND.json").toFile()));
+        assertTrue(buildUltimatum("A_FIRST", TEST_DATE, List.of("FC")).serialize(
+              temporaryDirectory.resolve("A_FIRST.json").toFile()));
+
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile());
+
+        FactionStandingUltimatumData ultimatum = library.getUltimatum(TEST_DATE, "FC");
+        assertNotNull(ultimatum);
+        assertEquals("A_FIRST", ultimatum.name());
     }
 
     @Test
@@ -422,9 +443,8 @@ class FactionStandingUltimatumsLibraryTest {
         String broken = Files.readString(new File(FIXTURE_DIRECTORY, "FED_COM_CIVIL_WAR.json").toPath())
                               .replace("\"NOBLE\"", "\"WIZARD\"");
         Files.writeString(temporaryDirectory.resolve("FED_COM_CIVIL_WAR.json"), broken);
-        File manifestFile = writeManifest(temporaryDirectory, "EXODUS.json", "FED_COM_CIVIL_WAR.json");
 
-        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(manifestFile);
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile());
 
         assertNotNull(library.getUltimatum(EXODUS_DATE, "TH"));
         assertNull(library.getUltimatum(LocalDate.of(3057, 9, 18), "FC"));
@@ -445,44 +465,19 @@ class FactionStandingUltimatumsLibraryTest {
               """);
 
         assertNull(FactionStandingUltimatumData.deserialize(ultimatumFile.toFile()));
-        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(
-              writeManifest(temporaryDirectory, "NULL_SIDE.json"));
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile());
         assertTrue(library.getUltimatums().isEmpty());
     }
 
     @Test
-    @DisplayName("A file listed twice in the manifest is only indexed once")
-    void testDuplicateManifestEntryIsHarmless(@TempDir Path temporaryDirectory) throws IOException {
+    @DisplayName("A malformed file is skipped without stopping the other files loading")
+    void testMalformedFileIsSkipped(@TempDir Path temporaryDirectory) throws IOException {
         Files.copy(new File(FIXTURE_DIRECTORY, "EXODUS.json").toPath(), temporaryDirectory.resolve("EXODUS.json"));
+        Files.writeString(temporaryDirectory.resolve("MALFORMED.json"), "{ \"name\": [ ");
 
-        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(
-              writeManifest(temporaryDirectory, "EXODUS.json", "EXODUS.json"));
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(temporaryDirectory.toFile());
 
+        assertNotNull(library.getUltimatum(EXODUS_DATE, "TH"));
         assertEquals(1, library.getUltimatums().size());
-        assertEquals(3, library.getUltimatums().get(EXODUS_DATE).size());
-    }
-
-    @Test
-    @DisplayName("A manifest with no file list loads an empty library, but an unreadable one fails loudly")
-    void testEmptyAndMalformedManifests(@TempDir Path temporaryDirectory) throws IOException {
-        Path emptyManifest = temporaryDirectory.resolve("empty.json");
-        Files.writeString(emptyManifest, "# header comment\n{}\n");
-        Path malformedManifest = temporaryDirectory.resolve("malformed.json");
-        Files.writeString(malformedManifest, "{ \"ultimatumFileNames\": [ ");
-
-        assertTrue(new FactionStandingUltimatumsLibrary(emptyManifest.toFile()).getUltimatums().isEmpty());
-        assertThrows(RuntimeException.class, () -> new FactionStandingUltimatumsLibrary(malformedManifest.toFile()));
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static File writeManifest(Path directory, String... fileNames) {
-        FactionStandingUltimatumManifest manifest = new FactionStandingUltimatumManifest();
-        manifest.ultimatumFileNames.addAll(List.of(fileNames));
-        File manifestFile = directory.resolve("ultimatummanifest.json").toFile();
-        assertTrue(manifest.serialize(manifestFile));
-        return manifestFile;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,8 @@ import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +52,12 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import megamek.SuiteOptions;
 import megamek.client.ui.util.UIUtil;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -82,6 +85,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private static final Color DOSSIER_DIVIDER = new Color(35, 66, 82);
     private static final int HORIZONTAL_PADDING = UIUtil.scaleForGUI(12);
     private static final int LABEL_COLUMN_WIDTH = UIUtil.scaleForGUI(150);
+    private static final int ADMINISTRATION_INDENT = UIUtil.scaleForGUI(14);
     private static final int REVEAL_FRAME_DELAY_MS = 16;
     private static final long HEADER_REVEAL_DURATION_NS = 200_000_000L;
     private static final long SUMMARY_REVEAL_DELAY_NS = 120_000_000L;
@@ -258,11 +262,10 @@ public class PlanetViewPanel extends JScrollablePanel {
                 addMetric(summary, metricIndex++, "summary.hpg.text",
                     String.valueOf(planet.getSourcedHPG(currentDate).getValue()), false);
             }
-            if (planet.getPopulation(currentDate) != null) {
-                String population = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
-                                .format(planet.getPopulation(currentDate));
-                addMetric(summary, metricIndex++, "summary.population.text", population, false);
-            }
+            planet.getPopulation(currentDate);
+            String population = NumberFormat.getIntegerInstance(SuiteOptions.getNumberFormatLocale())
+                                      .format(planet.getPopulation(currentDate));
+            addMetric(summary, metricIndex++, "summary.population.text", population, false);
             addMetric(summary, metricIndex++, "summary.hiringHall.text", getHiringHallText(planet), false);
         }
 
@@ -310,15 +313,27 @@ public class PlanetViewPanel extends JScrollablePanel {
         DossierSection section = createDossierSection("section.worldProfile.text");
         LocalDate currentDate = campaign.getLocalDate();
 
-        JLabel lblOwner = new JLabel("<html><nobr><i>" +
-                                           planet.getFactionDesc(currentDate) +
-                                           "</i></nobr></html>");
-        section.addRow("lblOwner.text", lblOwner);
+        // Affiliation, one bulleted row per faction when more than one holds the world
+        List<String> factionNames = getSortedFactionNames(planet.getFactionSet(currentDate), currentDate.getYear());
+        if (factionNames.size() > 1) {
+            String affiliationLabelKey = "lblOwner.text";
+            for (String factionName : factionNames) {
+                section.addRow(affiliationLabelKey, createAffiliationBullet(factionName));
+                affiliationLabelKey = null;
+            }
+        } else {
+            JLabel ownerLabel = new JLabel("<html><nobr><i>" +
+                                                 planet.getFactionDesc(currentDate) +
+                                                 "</i></nobr></html>");
+            section.addRow("lblOwner.text", ownerLabel);
+        }
 
+        // Administration, one row per level, each indented one step below its parent
         List<String> administration = planet.getAdministration(currentDate);
-        if (!administration.isEmpty()) {
-            section.addRow("lblAdministration.text",
-                  createClippedDossierValue(formatAdministrationPath(administration)));
+        String administrationLabelKey = "lblAdministration.text";
+        for (int depth = 0; depth < administration.size(); depth++) {
+            section.addRow(administrationLabelKey, createAdministrationLevel(administration.get(depth), depth));
+            administrationLabelKey = null;
         }
 
         CapitalType capitalType = planet.getCapitalType(currentDate);
@@ -383,8 +398,23 @@ public class PlanetViewPanel extends JScrollablePanel {
         return section;
     }
 
-    static String formatAdministrationPath(List<String> administration) {
-        return String.join(" > ", administration);
+    static List<String> getSortedFactionNames(Collection<Faction> factions, int year) {
+        List<String> factionNames = new ArrayList<>(factions.size());
+        for (Faction faction : factions) {
+            factionNames.add(faction.getFullName(year));
+        }
+        Collections.sort(factionNames);
+        return factionNames;
+    }
+
+    static JLabel createAffiliationBullet(String factionName) {
+        return new JLabel("<html><nobr><i>&bull; " + factionName + "</i></nobr></html>");
+    }
+
+    static JLabel createAdministrationLevel(String level, int depth) {
+        JLabel label = createClippedDossierValue(level);
+        label.setBorder(BorderFactory.createEmptyBorder(0, depth * ADMINISTRATION_INDENT, 0, 0));
+        return label;
     }
 
     static JLabel createClippedDossierValue(String text) {

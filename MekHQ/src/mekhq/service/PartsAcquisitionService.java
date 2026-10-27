@@ -161,6 +161,33 @@ public class PartsAcquisitionService {
         generateSummaryCounts(campaign);
     }
 
+    /**
+     * Counts the spares of a part that sit in OmniPods, ready to be pulled out for a repair.
+     *
+     * <p>Only parts that can be podded and have an empty-slot counterpart are counted. Armor and ammunition
+     * spares match each other whether or not they are flagged as podded, so counting them would report all
+     * ordinary spare stock as pod stock and offer a "Remove One From Pod" action that cannot work.</p>
+     *
+     * @param campaign the campaign whose warehouse is searched
+     * @param part     the part needed for the repair
+     *
+     * @return the number of podded spares, or {@code 0} when the part cannot be held in a pod
+     */
+    static int countPoddedSpares(Campaign campaign, Part part) {
+        boolean isAlreadyPodded = part.isOmniPodded();
+        boolean canBeHeldInPod = part.isOmniPoddable() && (part.getMissingPart() != null);
+        if (isAlreadyPodded || !canBeHeldInPod) {
+            return 0;
+        }
+
+        part.setOmniPodded(true);
+        try {
+            return Math.max(0, campaign.getPartInventory(part).getSupply());
+        } finally {
+            part.setOmniPodded(false);
+        }
+    }
+
     public static void generateSummaryCounts(Campaign campaign) {
         partCountInfoMap = new HashMap<>();
 
@@ -179,18 +206,7 @@ public class PartsAcquisitionService {
 
             int inTransit = inventories.getTransit();
             int onOrder = inventories.getOrdered();
-            int omniPod = 0;
-
-            if (!part.isOmniPodded()) {
-                part.setOmniPodded(true);
-                PartInventory omniPodInventory = campaign.getPartInventory(part);
-
-                if (omniPodInventory.getSupply() > 0) {
-                    omniPod = omniPodInventory.getSupply();
-                }
-
-                part.setOmniPodded(false);
-            }
+            int omniPod = countPoddedSpares(campaign, part);
 
             int missing = Math.max(0, awList.size() - inTransit - onOrder);
 

@@ -280,6 +280,8 @@ class MHQOptionsModel {
         statusColours.put("optionInTransitBackground", options.getInTransitBackground());
         statusColours.put("optionQueuedForTravelForeground", options.getQueuedForTravelForeground());
         statusColours.put("optionQueuedForTravelBackground", options.getQueuedForTravelBackground());
+        statusColours.put("optionPendingRefitForeground", options.getPendingRefitForeground());
+        statusColours.put("optionPendingRefitBackground", options.getPendingRefitBackground());
         statusColours.put("optionRefittingForeground", options.getRefittingForeground());
         statusColours.put("optionRefittingBackground", options.getRefittingBackground());
         statusColours.put("optionMothballingForeground", options.getMothballingForeground());
@@ -475,6 +477,8 @@ class MHQOptionsModel {
         options.setInTransitBackground(statusColours.get("optionInTransitBackground"));
         options.setQueuedForTravelForeground(statusColours.get("optionQueuedForTravelForeground"));
         options.setQueuedForTravelBackground(statusColours.get("optionQueuedForTravelBackground"));
+        options.setPendingRefitForeground(statusColours.get("optionPendingRefitForeground"));
+        options.setPendingRefitBackground(statusColours.get("optionPendingRefitBackground"));
         options.setRefittingForeground(statusColours.get("optionRefittingForeground"));
         options.setRefittingBackground(statusColours.get("optionRefittingBackground"));
         options.setMothballingForeground(statusColours.get("optionMothballingForeground"));
