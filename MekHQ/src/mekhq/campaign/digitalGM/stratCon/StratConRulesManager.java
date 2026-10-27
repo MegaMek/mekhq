@@ -4286,21 +4286,29 @@ public class StratConRulesManager {
     }
 
     /**
-     * Check if the unit's force (if one exists) has been deployed to a StratCon track
+     * Check if the unit's force (if one exists), or any formation above it, has been deployed to a StratCon track. A
+     * formation deployed as a whole takes the units of its sub-formations with it.
      */
     public static boolean isUnitDeployedToStratCon(Unit unit) {
-        if (!unit.getCampaign().getCampaignOptions().isUseStratCon()) {
+        Campaign campaign = unit.getCampaign();
+        if (!campaign.getCampaignOptions().isUseStratCon()) {
             return false;
+        }
+
+        List<Integer> formationIds = new ArrayList<>();
+        formationIds.add(unit.getFormationId());
+
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        if (formation != null) {
+            for (Formation parent : formation.getAllParents()) {
+                formationIds.add(parent.getId());
+            }
         }
 
         // this is a little inefficient, but probably there aren't too many active AtB
         // contracts at a time
-        return unit.getCampaign()
-                     .getActiveContracts()
-                     .stream()
-                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
-                                                 contract.getStratConCampaignState()
-                                                       .isForceDeployedHere(unit.getFormationId()));
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        return formationIds.stream().anyMatch(formationId -> isForceDeployedToStratCon(activeContracts, formationId));
     }
 
     public static boolean isForceDeployedToStratCon(List<AbstractContract> activeAtBContracts, int forceId) {
