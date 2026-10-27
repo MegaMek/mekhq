@@ -1014,6 +1014,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "usePersonnelHireHiringHallOnly");
     public static final CampaignOption<Boolean> PERSONNEL_MARKET_REPORT_REFRESH =
           of(Boolean.class, true, "personnelMarketReportRefresh");
+    public static final CampaignOption<Boolean> PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST =
+          of(Boolean.class, false, "personnelMarketDisableShowOfInterest");
+    public static final CampaignOption<Boolean> PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION =
+          of(Boolean.class, false, "personnelMarketDisableCombatManeuversRestriction");
     public static final CampaignOption<UnitMarketMethod> UNIT_MARKET_METHOD =
           of(UnitMarketMethod.class, UnitMarketMethod.NONE, "unitMarketMethod");
     public static final CampaignOption<Boolean> UNIT_MARKET_REGIONAL_MEK_VARIATIONS =

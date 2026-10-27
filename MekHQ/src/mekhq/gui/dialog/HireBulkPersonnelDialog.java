@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
@@ -274,7 +275,9 @@ public class HireBulkPersonnelDialog extends JDialog {
             gridBagConstraints = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
 
+            String skillLevelTooltip = wordWrap(resourceMap.getString("lblSkillLevel.tooltip"));
             JCheckBox skillRangeCheck = new JCheckBox(resourceMap.getString("lblSkillLevel.text"));
+            skillRangeCheck.setToolTipText(skillLevelTooltip);
             skillRangeCheck.addActionListener(e -> {
                 useSkill = ((JCheckBox) e.getSource()).isSelected();
                 skillLevel.setEnabled(useSkill);
@@ -291,6 +294,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             SkillLevelPickerUtility.applyRandomRenderer(skillLevel);
             skillLevel.setSelectedItem(SkillLevel.NONE);
             skillLevel.setEnabled(false);
+            skillLevel.setToolTipText(skillLevelTooltip);
 
             JLabel labelMinSkill = new JLabel("Minimum Skill:");
             labelMinSkill.setLabelFor(skillLevel);

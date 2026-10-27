@@ -39,6 +39,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import javax.swing.JComponent;
@@ -88,12 +90,17 @@ public class TOETransferHandler extends TransferHandler {
     protected Transferable createTransferable(JComponent c) {
         JTree tree = (JTree) c;
         Object node = tree.getLastSelectedPathComponent();
-        if (node instanceof Unit unit) {
-            if (unit.isDeployed()) {
-                showCannotMoveDialog(c, unit.getEntity().getShortName());
-                return null;
+        if (node instanceof Unit) {
+            // Carry every selected unit, not just the lead selection, so multi-unit drags move the whole selection
+            StringBuilder transferData = new StringBuilder("UNIT");
+            for (Unit unit : getSelectedUnits(tree)) {
+                if (unit.isDeployed()) {
+                    showCannotMoveDialog(c, unit.getEntity().getShortName());
+                    return null;
+                }
+                transferData.append('|').append(unit.getId());
             }
-            return new StringSelection("UNIT|" + unit.getId().toString());
+            return new StringSelection(transferData.toString());
         } else if (node instanceof Formation formation) {
             if (formation.isDeployed()) {
                 showCannotMoveDialog(c, formation.toString());
@@ -103,6 +110,19 @@ public class TOETransferHandler extends TransferHandler {
         } else {
             return null;
         }
+    }
+
+    private static List<Unit> getSelectedUnits(JTree tree) {
+        List<Unit> units = new ArrayList<>();
+        TreePath[] paths = tree.getSelectionPaths();
+        if (paths != null) {
+            for (TreePath path : paths) {
+                if (path.getLastPathComponent() instanceof Unit unit) {
+                    units.add(unit);
+                }
+            }
+        }
+        return units;
     }
 
     /**
@@ -194,22 +214,25 @@ public class TOETransferHandler extends TransferHandler {
             return false;
         }
         // Extract transfer data.
-        Unit unit = null;
+        List<Unit> units = new ArrayList<>();
         Formation formation = null;
         Transferable t = support.getTransferable();
         try {
             StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
             String type = st.nextToken();
-            String id = st.nextToken();
             if (type.equals("UNIT")) {
-                unit = gui.getCampaign().getUnit(UUID.fromString(id));
-                if (unit == null || unit.isDeployed()) {
-                    return false;
+                // Validate the whole selection before moving anything, so a bad drop doesn't leave it half-moved
+                while (st.hasMoreTokens()) {
+                    Unit unit = gui.getCampaign().getUnit(UUID.fromString(st.nextToken()));
+                    if (unit == null || unit.isDeployed()) {
+                        return false;
+                    }
+                    units.add(unit);
                 }
             }
             if (type.equals("FORCE")) {
                 Campaign campaign = gui.getCampaign();
-                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
+                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(st.nextToken()));
                 if (formation == null || formation.isDeployed()) {
                     return false;
                 }
@@ -235,10 +258,12 @@ public class TOETransferHandler extends TransferHandler {
         }
 
         if (superFormation != null) {
-            if (unit != null) {
+            if (!units.isEmpty()) {
                 Campaign campaign = gui.getCampaign();
                 int id = superFormation.getId();
-                campaign.getPlayerForce().addUnitToFormation(unit, id, campaign);
+                for (Unit unit : units) {
+                    campaign.getPlayerForce().addUnitToFormation(unit, id, campaign);
+                }
                 return true;
             }
             if (formation != null) {

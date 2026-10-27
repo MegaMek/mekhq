@@ -3868,9 +3868,8 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return The number of heat sinks the unit mounts that are not tracked as parts.
      */
     private static int untrackedHeatSinkCount(Entity entity) {
-        if (entity instanceof Mek) {
-            return Math.min(((Mek) entity).heatSinks(),
-                  entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
+        if (entity instanceof Mek mek) {
+            return countEngineHeatSinks(mek);
 
         } else if (isAerospaceFighter(entity)) {
             return entity.getEngine().getWeightFreeEngineHeatSinks();
@@ -3888,6 +3887,27 @@ public class Refit extends Part implements IAcquisitionWork {
                 return 0;
             }
         }
+    }
+
+    /**
+     * Counts the heat sinks MegaMek placed inside a Mek's engine, which are the ones the unit does not track as parts.
+     * An engine can have room for more than the design uses: every Avatar has 10 in a 280 engine that could take 11,
+     * so working the number out from the engine's capacity counts a heat sink that is not there (#10673).
+     *
+     * @param mek the starting or the ending unit of the refit
+     *
+     * @return the number of heat sinks in the engine
+     */
+    private static int countEngineHeatSinks(Mek mek) {
+        int engineHeatSinks = 0;
+        for (MiscMounted mounted : mek.getMisc()) {
+            boolean isHeatSink = mounted.getType().hasFlag(MiscType.F_HEAT_SINK)
+                  || mounted.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK);
+            if (isHeatSink && (mounted.getLocation() == Entity.LOC_NONE)) {
+                engineHeatSinks++;
+            }
+        }
+        return engineHeatSinks;
     }
 
     /**
