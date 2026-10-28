@@ -59,12 +59,14 @@ import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentFlag;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.EquipmentTypeLookup;
+import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.MMRoll;
 import megamek.common.units.Aero;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
@@ -1279,6 +1281,120 @@ public class EquipmentPartTest {
         assertTrue(equipmentPart.getId() < 0);
         assertNull(equipmentPart.getUnit());
         assertFalse(warehouse.getParts().contains(equipmentPart));
+    }
+
+    /** A field gun destroyed in MegaMek (lost to uncrewing) must be replaced, not left intact (MekHQ #5455). */
+    @Test
+    public void updateConditionFromEntityDestroyedFieldGunTest() {
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
+        when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
+
+        Unit unit = mock(Unit.class);
+        ConvInfantry entity = mock(ConvInfantry.class);
+        when(unit.getEntity()).thenReturn(entity);
+        List<Part> addedParts = new ArrayList<>();
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(unit);
+            addedParts.add(part);
+            return null;
+        }).when(unit).addPart(any());
+        doAnswer(inv -> {
+            Part part = inv.getArgument(0);
+            part.setUnit(null);
+            return null;
+        }).when(unit).removePart(any());
+
+        WeaponType type = mock(WeaponType.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 3;
+        WeaponMounted mounted = mock(WeaponMounted.class);
+        when(mounted.getType()).thenReturn(type);
+        when(mounted.getLocation()).thenReturn(ConvInfantry.LOC_FIELD_GUNS);
+        when(mounted.isDestroyed()).thenReturn(true);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        EquipmentPart equipmentPart = new EquipmentPart(3, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setId(19);
+        equipmentPart.setUnit(unit);
+
+        warehouse.addPart(equipmentPart);
+
+        // No destruction roll is involved: the field gun is always lost
+        equipmentPart.updateConditionFromEntity(false);
+
+        assertTrue(equipmentPart.getId() < 0);
+        assertNull(equipmentPart.getUnit());
+        assertFalse(warehouse.getParts().contains(equipmentPart));
+        assertTrue(addedParts.stream().anyMatch(MissingEquipmentPart.class::isInstance));
+    }
+
+    /** An uncrewed but not destroyed field gun is not lost, it only waits for its crew to return. */
+    @Test
+    public void updateConditionFromEntityUncrewedFieldGunTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        ConvInfantry entity = mock(ConvInfantry.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        WeaponType type = mock(WeaponType.class);
+
+        int equipmentNum = 3;
+        WeaponMounted mounted = mock(WeaponMounted.class);
+        when(mounted.getType()).thenReturn(type);
+        when(mounted.getLocation()).thenReturn(ConvInfantry.LOC_FIELD_GUNS);
+        when(mounted.isHit()).thenReturn(true);
+        when(mounted.isDestroyed()).thenReturn(false);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        EquipmentPart equipmentPart = new EquipmentPart(3, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setUnit(unit);
+
+        equipmentPart.updateConditionFromEntity(false);
+
+        assertEquals(unit, equipmentPart.getUnit());
+        assertFalse(equipmentPart.needsFixing());
+        verify(unit, never()).addPart(any());
+    }
+
+    @Test
+    public void isDestroyedFieldGunTest() {
+        WeaponType weaponType = mock(WeaponType.class);
+        WeaponMounted fieldGun = mock(WeaponMounted.class);
+        when(fieldGun.getType()).thenReturn(weaponType);
+        when(fieldGun.getLocation()).thenReturn(ConvInfantry.LOC_FIELD_GUNS);
+        when(fieldGun.isDestroyed()).thenReturn(true);
+
+        assertTrue(EquipmentPart.isDestroyedFieldGun(mock(ConvInfantry.class), fieldGun));
+        // Only conventional infantry have field guns
+        assertFalse(EquipmentPart.isDestroyedFieldGun(mock(Mek.class), fieldGun));
+        assertFalse(EquipmentPart.isDestroyedFieldGun(null, fieldGun));
+
+        // Field gun ammo shares the location but is not a field gun
+        MiscMounted fieldGunAmmo = mock(MiscMounted.class);
+        when(fieldGunAmmo.getType()).thenReturn(mock(MiscType.class));
+        when(fieldGunAmmo.getLocation()).thenReturn(ConvInfantry.LOC_FIELD_GUNS);
+        when(fieldGunAmmo.isDestroyed()).thenReturn(true);
+        assertFalse(EquipmentPart.isDestroyedFieldGun(mock(ConvInfantry.class), fieldGunAmmo));
+
+        // Infantry weapons outside the field gun location are not affected
+        WeaponMounted trooperWeapon = mock(WeaponMounted.class);
+        when(trooperWeapon.getType()).thenReturn(weaponType);
+        when(trooperWeapon.getLocation()).thenReturn(ConvInfantry.LOC_INFANTRY);
+        when(trooperWeapon.isDestroyed()).thenReturn(true);
+        assertFalse(EquipmentPart.isDestroyedFieldGun(mock(ConvInfantry.class), trooperWeapon));
+
+        // A field gun that is merely uncrewed (hit) is not destroyed
+        WeaponMounted uncrewedFieldGun = mock(WeaponMounted.class);
+        when(uncrewedFieldGun.getType()).thenReturn(weaponType);
+        when(uncrewedFieldGun.getLocation()).thenReturn(ConvInfantry.LOC_FIELD_GUNS);
+        when(uncrewedFieldGun.isHit()).thenReturn(true);
+        assertFalse(EquipmentPart.isDestroyedFieldGun(mock(ConvInfantry.class), uncrewedFieldGun));
     }
 
     @Test

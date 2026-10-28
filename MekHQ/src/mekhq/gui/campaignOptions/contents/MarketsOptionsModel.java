@@ -86,6 +86,7 @@ class MarketsOptionsModel {
     boolean contractMarketReportRefresh;
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
+    boolean useDropShipBonusInSpace;
     int pityContracts;
     double contractBasePayMultiplier;
     double contractStraightSupportMultiplier;
@@ -153,6 +154,7 @@ class MarketsOptionsModel {
         contractMarketReportRefresh = options.get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH);
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
+        useDropShipBonusInSpace = options.get(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE);
         pityContracts = options.get(CampaignOption.PITY_CONTRACTS);
         contractBasePayMultiplier = options.get(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER);
         contractStraightSupportMultiplier = options.get(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER);
@@ -238,6 +240,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH, contractMarketReportRefresh);
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);
+        options.set(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE, useDropShipBonusInSpace);
         options.set(CampaignOption.PITY_CONTRACTS, pityContracts);
         options.set(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER, contractBasePayMultiplier);
         options.set(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER, contractStraightSupportMultiplier);

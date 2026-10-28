@@ -1363,6 +1363,18 @@ public enum ProstheticType {
         return associatedPersonnelOptions;
     }
 
+    /**
+     * Checks whether this is a cloned limb replacement rather than an artificial prosthetic.
+     *
+     * @return {@code true} if this prosthetic type is a {@link ProstheticComplexity#CLONE}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isClonedLimb() {
+        return prostheticType == CLONE;
+    }
+
     public boolean isElectiveImplant() {
         return this == ELECTIVE_MYOMER_ARM ||
                      this == ELECTIVE_MYOMER_HAND ||
@@ -1827,6 +1839,11 @@ public enum ProstheticType {
         int toughness = effect.getToughnessModifier();
         if (toughness != 0) {
             detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.toughness", toughness));
+        }
+
+        if (isClonedLimb()) {
+            detailLines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.clonedHealing",
+                  AdvancedMedicalAlternateHealing.PROSTHETIC_PENALTY));
         }
 
         // 9) Skills

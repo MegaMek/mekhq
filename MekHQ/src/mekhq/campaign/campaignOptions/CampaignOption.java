@@ -1036,6 +1036,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 100, "contractMaxSalvagePercentage");
     public static final CampaignOption<Integer> DROP_SHIP_BONUS_PERCENTAGE =
           of(Integer.class, 0, "dropShipBonusPercentage");
+    public static final CampaignOption<Boolean> USE_DROP_SHIP_BONUS_IN_SPACE =
+          of(Boolean.class, false, "useDropShipBonusInSpace");
     public static final CampaignOption<Integer> PITY_CONTRACTS =
           of(Integer.class, 4, "pityContracts");
     public static final CampaignOption<Boolean> IS_USE_TWO_WAY_PAY =
