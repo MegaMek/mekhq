@@ -109,6 +109,8 @@ public class StratConTrackState {
     private Set<StratConCoords> cutOffFacilities;
     private StratConSupplyNetwork playerSupplyNetwork;
     private StratConSupplyNetwork enemySupplyNetwork;
+    // whether the player's side was without any source of supply when last checked, so it is warned only once
+    private boolean playerSupplyUnsourced;
 
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
@@ -983,6 +985,21 @@ public class StratConTrackState {
 
     public void setEnemySupplyNetwork(StratConSupplyNetwork enemySupplyNetwork) {
         this.enemySupplyNetwork = (enemySupplyNetwork == null) ? new StratConSupplyNetwork() : enemySupplyNetwork;
+    }
+
+    /**
+     * @return {@code true} if, when supply was last checked, the player's side had facilities in this sector but no
+     *       source of supply to route them to; see {@code StratConFacilitySupply}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isPlayerSupplyUnsourced() {
+        return playerSupplyUnsourced;
+    }
+
+    public void setPlayerSupplyUnsourced(boolean playerSupplyUnsourced) {
+        this.playerSupplyUnsourced = playerSupplyUnsourced;
     }
 
     /**

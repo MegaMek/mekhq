@@ -44,6 +44,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -676,6 +677,79 @@ class StratConFacilitySupplyTest {
             assertEquals(0, countInterdictions());
             assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
         }
+    }
+
+    /** @return the report for a player side left with no source of supply, read from the bundle as the game does */
+    private String unsourcedReport() {
+        return getFormattedTextAt("mekhq.resources.StratConEnemyFacilityActivity",
+              "report.unsourced",
+              track.getDisplayableName());
+    }
+
+    @Nested
+    class NoSupplySource {
+        @BeforeEach
+        void holdTheOnlyRoadOut() {
+            // The enemy holds the hex where the only road leaves the sector, so it is no source for the player's side.
+            place(road[0], ForceAlignment.Opposing, FacilityType.MekBase);
+        }
+
+        @Test
+        void aPlayerSideWithNoSourceIsCutOffAndWarnedOnce() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.TankBase);
+
+            StratConFacilitySupply.processSupply(track, campaign, false);
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            assertTrue(StratConFacilitySupply.isCutOff(track, roadEnd));
+            assertTrue(track.isPlayerSupplyUnsourced());
+            verify(campaign, times(1)).addReport(any(), eq(unsourcedReport()));
+        }
+
+        @Test
+        void theWarningComesAgainOnlyAfterASourceIsRegainedAndLostAgain() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.TankBase);
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            StratConCoords commandCenter = new StratConCoords(3, 15);
+            place(commandCenter, ForceAlignment.Allied, FacilityType.CommandCenter);
+            StratConFacilitySupply.processSupply(track, campaign, false);
+            assertFalse(track.isPlayerSupplyUnsourced());
+            assertFalse(StratConFacilitySupply.isCutOff(track, roadEnd));
+
+            track.removeFacility(commandCenter);
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            verify(campaign, times(2)).addReport(any(), eq(unsourcedReport()));
+        }
+
+        @Test
+        void noWarningWithoutAnyFacilityOfThePlayersSide() {
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            assertFalse(track.isPlayerSupplyUnsourced());
+            verify(campaign, never()).addReport(any(), eq(unsourcedReport()));
+        }
+
+        @Test
+        void noWarningWhileSupplyLinesAreOff() {
+            when(options.get(CampaignOption.USE_SUPPLY_LINES)).thenReturn(false);
+            place(roadEnd, ForceAlignment.Allied, FacilityType.TankBase);
+
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            verify(campaign, never()).addReport(any(), eq(unsourcedReport()));
+        }
+    }
+
+    @Test
+    void noWarningWhileARoadOutIsOpenToThePlayersSide() {
+        place(roadEnd, ForceAlignment.Allied, FacilityType.TankBase);
+
+        StratConFacilitySupply.processSupply(track, campaign, false);
+
+        assertFalse(track.isPlayerSupplyUnsourced());
+        verify(campaign, never()).addReport(any(), eq(unsourcedReport()));
     }
 
     /** @return the report for a facility back on its supply lines, read from the resource bundle as the game does */

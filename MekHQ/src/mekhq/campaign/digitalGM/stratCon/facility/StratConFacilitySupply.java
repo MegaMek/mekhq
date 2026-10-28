@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.facility;
 
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -68,6 +69,7 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Ste
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Supply lines: the routes that keep each side's facilities supplied.
@@ -86,7 +88,10 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * (see {@link StratConSupplyInterdictionBehavior}), so either blocks everything beyond it on the route.</p>
  *
  * <p>A facility whose route reaches a source unblocked is Connected. One whose route is blocked, or that has no route
- * at all, is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month.</p>
+ * at all, is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month. When the player's
+ * side has facilities in a sector but no source there at all - every road out runs through ground the enemy holds,
+ * and neither the player nor the employer holds a source facility - all of them are cut off, and the player is told
+ * why (see {@link #isPlayerSideWithoutSupply}).</p>
  *
  * <p>The enemy also sends Supply Interdictions against the player's routes, as often as it sends engineers to build
  * outposts (see {@link #processSupplyInterdictions}).</p>
@@ -410,10 +415,18 @@ public final class StratConFacilitySupply {
 
         if (!isSupplyLinesActive(campaign)) {
             track.getCutOffFacilities().clear();
+            track.setPlayerSupplyUnsourced(false);
             return;
         }
 
         reconcileNetworks(track);
+
+        // Told once each time the player's side is left with no source here, not every day it stays that way.
+        boolean isWithoutSupply = isPlayerSideWithoutSupply(track);
+        if (isWithoutSupply && !track.isPlayerSupplyUnsourced()) {
+            warnPlayerSideWithoutSupply(campaign, track);
+        }
+        track.setPlayerSupplyUnsourced(isWithoutSupply);
 
         // Only a facility still with the side it was cut off on can be back on its supply lines: changing sides clears
         // its mark, so it must be read before the check below sets the mark afresh.
@@ -584,6 +597,39 @@ public final class StratConFacilitySupply {
             }
         }
         return candidates;
+    }
+
+    /**
+     * @param track the sector
+     *
+     * @return {@code true} if the player's side has facilities in the sector but nowhere for its supply to start from:
+     *       no Comms Center, Base of Operations or Space Port of its own, and no road out of the sector the enemy
+     *       doesn't hold. Every one of those facilities is then cut off. A sector with no roads has no supply lines,
+     *       so it never counts.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isPlayerSideWithoutSupply(StratConTrackState track) {
+        return !track.getRoads().isEmpty()
+                     && getSourceHexes(track, true).isEmpty()
+                     && !getFacilityHexes(track, true).isEmpty();
+    }
+
+    private static void warnPlayerSideWithoutSupply(Campaign campaign, StratConTrackState track) {
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
+              "report.unsourced",
+              track.getDisplayableName()));
+
+        if (campaign.getGUI() == null) {
+            return;
+        }
+
+        new ImmersiveDialogSimple(campaign,
+              null,
+              getFormattedTextAt(RESOURCE_BUNDLE, "unsourced.message", track.getDisplayableName()),
+              List.of(getTextAt(RESOURCE_BUNDLE, "unsourced.button")),
+              getTextAt(RESOURCE_BUNDLE, "unsourced.ooc"));
     }
 
     /**
