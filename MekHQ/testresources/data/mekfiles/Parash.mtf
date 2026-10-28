@@ -1,0 +1,198 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-cfed-70da-9660-6e47fdaad251
+generator:MegaMek Suite 0.51.01 on 2026-07-20
+chassis:Parash
+model:
+mul id:2428
+
+Config:Biped
+techbase:Clan
+era:3083
+source:TR:3085
+published:RS:3085u-CE
+rules level:2
+role:Striker
+
+quirk:low_profile
+weaponquirk:jettison_capable:RA:4:CLLargePulseLaser
+
+mass:35
+engine:245 XL (Clan) Engine
+structure:Clan Standard
+myomer:Standard
+
+heat sinks:10 Clan Double
+walk mp:7
+jump mp:7
+
+armor:Standard(Clan)
+LA armor:12
+RA armor:12
+LT armor:10
+RT armor:10
+CT armor:16
+HD armor:9
+LL armor:16
+RL armor:16
+RTL armor:3
+RTR armor:3
+RTC armor:5
+
+Weapons:2
+TAG, Left Arm
+Large Pulse Laser, Right Arm
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLTAG
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLLargePulseLaser
+CLLargePulseLaser
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+Jump Jet
+CLECMSuite
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+CLDoubleHeatSink
+CLDoubleHeatSink
+Jump Jet
+CLActiveProbe
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Jump Jet
+-Empty-
+
+Head:
+Life Support
+Sensors
+Cockpit
+-Empty-
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Jump Jet
+Jump Jet
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Jump Jet
+Jump Jet
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Parash is a thirty-five-ton light BattleMech developed by Clan Hell's Horses in the early 3080s, entering production around 3083 at Manufacturing Site #3 on New Oslo. Conceived in the aftermath of the Jihad, the design addressed a critical shortage of light BattleMechs within the Clan's touman. Rather than filling the traditional scout role, the Parash was purpose-built to provide reconnaissance and electronic warfare support to the Clan's extensive combat vehicle formations, reflecting the Hell's Horses' distinctive combined-arms doctrine.</p><p>The Parash combines high speed with robust electronic warfare capabilities and above-average armor protection for its weight class, earning it a reputation as one of the more capable dedicated electronic warfare platforms among Clan light designs. Its Hebrew-derived name, meaning "cavalryman," reinforces the Hell's Horses' deep cultural connection to their armored vehicle traditions.</p>
+
+capabilities:<p>The Parash mounts a Magna 245 XL engine that propels the thirty-five-ton chassis to a maximum speed of 118 kilometers per hour, while Model KT Boosters jump jets provide a jumping range of 210 meters. This combination of ground speed and jump capability gives the Parash exceptional tactical mobility across varied terrain. Seven tons of Compound 12A1 standard armor provide noticeably better protection than most light designs in its weight class, allowing the Parash to absorb incidental fire that would cripple lesser scouts.</p><p>The design's sole offensive weapon is a single Series 44h large pulse laser mounted in the right arm. While limited in raw firepower, the pulse laser's accuracy at medium range makes it effective against lighter targets and vehicles. The Parash's true strength lies in its electronic warfare suite: an integrated ECM suite disrupts enemy sensors, an active probe detects hidden units, and TAG designates targets for artillery and missile support. This sensor package transforms the Parash from a simple scout into a force multiplier for the vehicle formations it supports.</p><p>The design's compact, unusually short and squat profile contributes to a low battlefield silhouette, though the Parash's primary weakness remains its reliance on a single weapon system. If the large pulse laser is disabled, the 'Mech is left with no offensive capability beyond its electronic warfare contributions, forcing it to withdraw from direct combat entirely.</p>
+
+deployment:<p>The baseline production model represents the Parash's core design philosophy, combining a single Series 44h large pulse laser with a comprehensive electronic warfare suite comprising an ECM system, active probe, and TAG designator. Intended to operate alongside Hell's Horses vehicle formations rather than in traditional BattleMech lances, this configuration concentrates electronic warfare capability in a single fast-moving platform, freeing accompanying vehicles to focus on direct combat. Production at Manufacturing Site #3 on New Oslo has seen the design deployed to every frontline Cluster in the Clan's touman, establishing it as a standard element of the Horses' combined-arms doctrine.</p>
+
+history:<p>The Parash's development traces directly to Clan Hell's Horses' precarious strategic position in the early 3080s. Having only recently claimed their Inner Sphere occupation zone, the Clan found its light BattleMech formations dangerously depleted. Attempts to compensate by fielding Dasher support configurations proved inadequate, as casualties continued to mount regardless. The Clan leadership ultimately authorized the development of an entirely new light chassis, one tailored specifically to the Horses' combined-arms operational philosophy rather than the traditional Clan emphasis on individual combat prowess.</p><p>Manufacturing Site #3 on New Oslo, a facility with a long and complex ownership history stretching back through the Draconis Combine, Free Rasalhague Republic, and Clan Wolf before falling to the Hell's Horses during the Jihad, was converted for Parash production. The transition proved challenging, limiting initial output, though by the mid-3080s the design had been distributed to every frontline Cluster in the Clan's touman.</p><p>The circumstances surrounding the Hell's Horses' severe losses of light 'Mechs since their reappearance in the Inner Sphere remain unclear. Actions against Clans Wolf and Jade Falcon account for some attrition, but not enough to explain the scale of the deficit. Persistent rumors suggest the Clan suffered significant internal conflict during the Jihad era, though the Horses' characteristically secretive nature has prevented any confirmation. The Parash itself became a subject of intelligence interest when reports emerged of a highly experimental interface cockpit variant observed during inter-Clan skirmishes as early as 3086, suggesting the design served as a testbed for radical human-machine integration technology.</p><p>New Oslo itself changed hands again during the Republic era, falling under the Rasalhague Dominion's control from approximately 3100 through the 3140s, before reverting to Hell's Horses authority by the ilClan era. Throughout these political transitions, Manufacturing Site #3 continued Parash production, ensuring a steady supply of these specialized scouts regardless of which power nominally controlled the world. A notable operational account from 3094 on Nyserta demonstrated the Parash's intended role when a single unit detected and tagged an SRM carrier concealed by electronic countermeasures, directing artillery fire to destroy the hidden threat.</p>
+
+manufacturer:Manufacturing Site #3
+
+primaryfactory:New Oslo
+
+fluffdate:2026-02-26 19:50:04
+
+systemmanufacturer:CHASSIS:Unknown
+systemmode:CHASSIS:Model MH-26
+systemmanufacturer:ENGINE:Magna
+systemmode:ENGINE:245 XL
+systemmanufacturer:ARMOR:Compound
+systemmode:ARMOR:Compound 12A1 Standard
+systemmanufacturer:JUMP_JET:Unknown
+systemmode:JUMP_JET:Model KT Boosters
+systemmanufacturer:COMMUNICATIONS:Unknown
+systemmode:COMMUNICATIONS:CH2 Series Integrated with ECM Suite
+systemmanufacturer:TARGETING:Unknown
+systemmode:TARGETING:Version Gamma-V

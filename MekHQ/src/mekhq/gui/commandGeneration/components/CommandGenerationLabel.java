@@ -39,7 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JLabel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A specialized {@link JLabel} for the Command Generation dialog.

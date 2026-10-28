@@ -55,10 +55,11 @@ public class PartInUse {
     private int transferCount;
     private int plannedCount;
     private int missingCount;
-    private Money cost = Money.zero();
+    private Money cost;
     private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
     private boolean isBundle;
+    private Part comparisonPart;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -95,13 +96,13 @@ public class PartInUse {
                 this.tonnagePerItem = 1.0 / ammoType.getShots();
             }
         }
-        if (part instanceof Armor) {
+        if (part instanceof Armor armor) {
             // Armor needs different tonnage values
-            this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
+            double pointsPerTon = armor.getArmorPointsPerTon();
+            this.tonnagePerItem = (pointsPerTon > 0) ? 1.0 / pointsPerTon : 0.0;
             this.isBundle = true;
         }
         if (null != partToBuy) {
-            this.cost = partToBuy.getBuyCost();
             String descString = partToBuy.getAcquisitionName();
             if (!(descString.contains("(") && descString.contains(")")) && !(part instanceof EnginePart)) {
                 descString = descString.split(",")[0];
@@ -231,7 +232,17 @@ public class PartInUse {
         this.missingCount = missingCount;
     }
 
+    /**
+     * Returns the price of one of this part. It is worked out on first use and kept, because only the Parts Report
+     * shows it, while the Warehouse tab and the weekly top-up build an entry for every part and throw most of them
+     * away. For a missing part the price means building a whole new part.
+     *
+     * @return the buy cost of one of this part, or zero when there is nothing to buy
+     */
     public Money getCost() {
+        if (cost == null) {
+            cost = (partToBuy == null) ? Money.zero() : partToBuy.getBuyCost();
+        }
         return cost;
     }
 
@@ -271,20 +282,37 @@ public class PartInUse {
             return false;
         }
 
+        // The cheap checks run first, so the parts needed for the last check are only built for likely matches.
         // First, try to match using String comparison. This is weak, so we need extra checks
         final PartInUse otherPartInUse = (PartInUse) object;
-        boolean haveMatchingDescriptions = this.description.equals(otherPartInUse.description);
+        if (!description.equals(otherPartInUse.description)) {
+            return false;
+        }
 
-        // Next, check they're the same item
-        Part targetPart = getPartToBuy().getAcquisitionPart();
-        Part otherTargetPart = otherPartInUse.getPartToBuy().getAcquisitionPart();
-        boolean isSamePart = targetPart.isSamePartType(otherTargetPart);
-
-        // Finally, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
+        // Next, make sure both parts use the same tech base. Otherwise, Parts in Use will think a Clan ER Large
         // Laser and IS ER Large Laser are the same thing.
-        boolean haveMatchingTechBases = Objects.equals(getTechBase(), otherPartInUse.getTechBase());
+        if (!Objects.equals(getTechBase(), otherPartInUse.getTechBase())) {
+            return false;
+        }
 
-        // Check everything matches up
-        return isSamePart && haveMatchingDescriptions && haveMatchingTechBases;
+        // Finally, check they're the same item
+        return getComparisonPart().isSamePartType(otherPartInUse.getComparisonPart());
+    }
+
+    /**
+     * Returns the part used to check whether two entries are the same item. It is built on first use and kept, because
+     * {@link IAcquisitionWork#getAcquisitionPart()} creates a new part on every call for a missing part, and the parts
+     * in use report compares entries once for every part in the warehouse.
+     *
+     * <p>This copy is only compared, never handed out. Callers that need a part to deliver should keep calling
+     * {@code getPartToBuy().getAcquisitionPart()}, which builds a fresh one each time.</p>
+     *
+     * @return the part this entry would buy
+     */
+    private Part getComparisonPart() {
+        if (comparisonPart == null) {
+            comparisonPart = partToBuy.getAcquisitionPart();
+        }
+        return comparisonPart;
     }
 }

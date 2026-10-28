@@ -34,7 +34,7 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;

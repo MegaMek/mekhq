@@ -34,7 +34,7 @@ package mekhq.campaign.unit.cleanup;
 
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.unit.Unit;
 
 public class EquipmentUnscramblerResult {

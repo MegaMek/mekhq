@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.TankTrailerHitch;
 import megamek.common.equipment.Transporter;
 import megamek.common.units.Entity;

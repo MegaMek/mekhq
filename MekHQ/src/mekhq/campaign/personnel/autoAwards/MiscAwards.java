@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -295,7 +295,7 @@ public class MiscAwards {
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person)) && campaign.hasActiveAtBContract()) {
             return campaign.getPlayerForce().getCombatTeamsAsList(campaign).stream()
-                         .anyMatch(lance -> (lance.getRole().isTraining() || lance.getRole().isCadre()) &&
+                         .anyMatch(lance -> lance.getRole().isTraining() &&
                                                   (lance.getCommanderId().equals(person)));
         }
 

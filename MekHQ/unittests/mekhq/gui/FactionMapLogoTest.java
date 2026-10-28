@@ -55,13 +55,13 @@ import javax.imageio.ImageIO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,22 +70,28 @@ import org.mockito.MockedStatic;
 
 class FactionMapLogoTest {
     private static final int GAME_YEAR = 3025;
-    private static final int CUSTOM_PIXEL = 0x804080c0;
+    private static final int ICON_PIXEL = 0x804080c0;
+    private static final int LEGACY_PIXEL = 0xffabcdef;
     private static final int FALLBACK_PIXEL = 0xff123456;
 
     @TempDir
     Path temporaryDirectory;
 
     private final Map<String, Faction2> factionData = new HashMap<>();
+    private Path icon;
+    private Path fallback;
     private ClientPreferences preferences;
     private MockedStatic<Factions2> factionsMock;
     private MockedStatic<PreferenceManager> preferencesMock;
-    private MockedStatic<Factions> logosMock;
+    private MockedStatic<RATGenerator> logosMock;
 
     @BeforeEach
     void setUp() throws IOException {
-        Path fallback = temporaryDirectory.resolve("fallback.png");
+        icon = temporaryDirectory.resolve("icon.png");
+        writeImage(icon, ICON_PIXEL);
+        fallback = temporaryDirectory.resolve("fallback.png");
         writeImage(fallback, FALLBACK_PIXEL);
+
         preferences = mock(ClientPreferences.class);
         when(preferences.getUserDir()).thenReturn(temporaryDirectory.toString());
         Factions2 factions = mock(Factions2.class);
@@ -96,11 +102,11 @@ class FactionMapLogoTest {
         factionsMock.when(Factions2::getInstance).thenReturn(factions);
         preferencesMock = mockStatic(PreferenceManager.class);
         preferencesMock.when(PreferenceManager::getClientPreferences).thenReturn(preferences);
-        logosMock = mockStatic(Factions.class);
-        logosMock.when(() -> Factions.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
-              .thenReturn(fallback.toString());
-        logosMock.when(() -> Factions.getFactionLogoAddress(3080, "CUSTOM"))
-              .thenReturn(fallback.toString());
+        logosMock = mockStatic(RATGenerator.class);
+        logosMock.when(() -> RATGenerator.getCanonicalFactionLogoAddress(GAME_YEAR, "ICON"))
+              .thenReturn(icon.toString());
+        logosMock.when(() -> RATGenerator.getFactionLogoFile(GAME_YEAR, "ICON")).thenReturn(icon.toFile());
+        logosMock.when(() -> RATGenerator.getGenericFactionLogoFile(anyString())).thenReturn(fallback.toFile());
     }
 
     @AfterEach
@@ -111,25 +117,55 @@ class FactionMapLogoTest {
     }
 
     @Test
-    void loadsUserDirectoryLogoWithOriginalDimensionsAndTransparency() throws IOException {
+    void loadsFactionIconWithOriginalDimensionsAndTransparency() {
+        BufferedImage image = FactionMapLogo.load(GAME_YEAR, "ICON");
+
+        assertNotNull(image);
+        assertEquals(3, image.getWidth());
+        assertEquals(2, image.getHeight());
+        assertEquals(ICON_PIXEL, image.getRGB(1, 0));
+        assertEquals(0, image.getRGB(0, 0));
+        assertTrue(FactionMapLogo.hasIcon(GAME_YEAR, "ICON"));
+    }
+
+    @Test
+    void invalidFactionIconUsesGenericFallback() throws IOException {
+        Path invalidIcon = temporaryDirectory.resolve("invalid.png");
+        Files.writeString(invalidIcon, "not an image");
+        logosMock.when(() -> RATGenerator.getFactionLogoFile(GAME_YEAR, "ICON")).thenReturn(invalidIcon.toFile());
+
+        assertEquals(FALLBACK_PIXEL, loadedPixel("ICON", GAME_YEAR));
+    }
+
+    @Test
+    void factionWithoutIconUsesGenericFallback() {
+        assertEquals(FALLBACK_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
+        assertFalse(FactionMapLogo.hasIcon(GAME_YEAR, "CUSTOM"));
+    }
+
+    @Test
+    void unreadableFallbackDoesNotProduceAnImage() {
+        logosMock.when(() -> RATGenerator.getGenericFactionLogoFile("CUSTOM"))
+              .thenReturn(temporaryDirectory.resolve("missing-fallback.png").toFile());
+
+        assertNull(FactionMapLogo.load(GAME_YEAR, "CUSTOM"));
+    }
+
+    @Test
+    void loadsLegacyLogoFromUserDirectory() throws IOException {
         registerFaction("""
               key: CUSTOM
               name: Custom Faction
               logo: Custom/My Faction.png
               """);
-        writeImage(userLogo("Custom/My Faction.png"), CUSTOM_PIXEL);
+        writeImage(userLegacyLogo("Custom/My Faction.png"), LEGACY_PIXEL);
 
-        BufferedImage image = FactionMapLogo.load(GAME_YEAR, "CUSTOM");
-
-        assertNotNull(image);
-        assertEquals(3, image.getWidth());
-        assertEquals(2, image.getHeight());
-        assertEquals(CUSTOM_PIXEL, image.getRGB(1, 0));
-        assertEquals(0, image.getRGB(0, 0));
+        assertEquals(LEGACY_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
+        assertTrue(FactionMapLogo.hasIcon(GAME_YEAR, "CUSTOM"));
     }
 
     @Test
-    void honorsEraDependentCustomLogos() throws IOException {
+    void honorsEraDependentLegacyLogos() throws IOException {
         registerFaction("""
               key: CUSTOM
               name: Custom Faction
@@ -137,75 +173,30 @@ class FactionMapLogoTest {
               logoChanges:
                 3080: Custom/Later.png
               """);
-        writeImage(userLogo("Custom/Base.png"), CUSTOM_PIXEL);
-        writeImage(userLogo("Custom/Later.png"), 0xffabcdef);
+        writeImage(userLegacyLogo("Custom/Base.png"), LEGACY_PIXEL);
+        writeImage(userLegacyLogo("Custom/Later.png"), ICON_PIXEL);
 
-        assertEquals(CUSTOM_PIXEL, loadedPixel(GAME_YEAR));
-        assertEquals(0xffabcdef, loadedPixel(3080));
+        assertEquals(LEGACY_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
+        assertEquals(ICON_PIXEL, loadedPixel("CUSTOM", 3080));
     }
 
     @Test
-    void missingOrInvalidCustomArtworkUsesGenericFallback() throws IOException {
+    void missingOrInvalidLegacyLogoUsesGenericFallback() throws IOException {
         registerFaction("""
               key: CUSTOM
               name: Custom Faction
               logo: Custom/Missing.png
               """);
-        assertEquals(FALLBACK_PIXEL, loadedPixel(GAME_YEAR));
+        assertEquals(FALLBACK_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
 
-        Path invalidLogo = userLogo("Custom/Missing.png");
+        Path invalidLogo = userLegacyLogo("Custom/Missing.png");
         Files.createDirectories(invalidLogo.getParent());
         Files.writeString(invalidLogo, "not an image");
-        assertEquals(FALLBACK_PIXEL, loadedPixel(GAME_YEAR));
+        assertEquals(FALLBACK_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
     }
 
     @Test
-    void absentOrBlankLogoUsesGenericFallbackWithoutGrantingEmblemEligibility() throws IOException {
-        registerFaction("""
-              key: CUSTOM
-              name: Custom Faction
-              """);
-        assertFalse(FactionMapLogo.hasCustomLogo(GAME_YEAR, "CUSTOM"));
-        assertEquals(FALLBACK_PIXEL, loadedPixel(GAME_YEAR));
-        assertEquals(-1, priority("CUSTOM"));
-
-        registerFaction("""
-              key: CUSTOM
-              name: Custom Faction
-              logo: '  '
-              """);
-        assertFalse(FactionMapLogo.hasCustomLogo(GAME_YEAR, "CUSTOM"));
-        assertEquals(FALLBACK_PIXEL, loadedPixel(GAME_YEAR));
-    }
-
-    @Test
-    void unknownFactionStillUsesFallback() {
-        assertFalse(FactionMapLogo.hasCustomLogo(GAME_YEAR, "CUSTOM"));
-        assertEquals(FALLBACK_PIXEL, loadedPixel(GAME_YEAR));
-    }
-
-    @Test
-    void unreadableFallbackDoesNotProduceAnImage() {
-        logosMock.when(() -> Factions.getFactionLogoAddress(GAME_YEAR, "CUSTOM"))
-              .thenReturn(temporaryDirectory.resolve("missing-fallback.png").toString());
-
-        assertNull(FactionMapLogo.load(GAME_YEAR, "CUSTOM"));
-    }
-
-    @Test
-    void userArtworkTakesPrecedenceOverInstalledFormationLogo() throws IOException {
-        registerFaction("""
-              key: CUSTOM
-              name: Custom Faction
-              logo: Inner Sphere/Federated Suns.png
-              """);
-        writeImage(userLogo("Inner Sphere/Federated Suns.png"), CUSTOM_PIXEL);
-
-        assertEquals(CUSTOM_PIXEL, loadedPixel(GAME_YEAR));
-    }
-
-    @Test
-    void installedFormationLogoWorksWhenUserArtworkIsAbsent() throws IOException {
+    void installedLegacyLogoWorksWhenUserArtworkIsAbsent() throws IOException {
         registerFaction("""
               key: CUSTOM
               name: Custom Faction
@@ -215,66 +206,80 @@ class FactionMapLogoTest {
               new File(MHQConstants.FORCE_ICON_PATH, MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH),
               "Custom/Installed.png");
         BufferedImage installedImage = new BufferedImage(3, 2, BufferedImage.TYPE_INT_ARGB);
-        installedImage.setRGB(1, 0, CUSTOM_PIXEL);
+        installedImage.setRGB(1, 0, LEGACY_PIXEL);
         try (MockedStatic<ImageIO> images = mockStatic(ImageIO.class)) {
             images.when(() -> ImageIO.read(expectedFile)).thenReturn(installedImage);
 
             for (String userDirectory : new String[] { "", temporaryDirectory.toString() }) {
                 when(preferences.getUserDir()).thenReturn(userDirectory);
-                assertEquals(CUSTOM_PIXEL, loadedPixel(GAME_YEAR));
+                assertEquals(LEGACY_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
             }
             images.verify(() -> ImageIO.read(expectedFile), times(2));
         }
     }
 
     @Test
-    void builtInArtworkRetainsPrecedenceOverFormationLogo() throws IOException {
+    void iconTakesPrecedenceOverLegacyLogo() throws IOException {
         registerFaction("""
-              key: FS
-              name: Federated Suns
+              key: ICON
+              name: Faction With Icon
               logo: Custom/Replacement.png
               """);
-        writeImage(userLogo("Custom/Replacement.png"), CUSTOM_PIXEL);
-        Path canonicalImage = temporaryDirectory.resolve("canonical.png");
-        writeImage(canonicalImage, FALLBACK_PIXEL);
-        logosMock.when(() -> Factions.getCanonicalFactionLogoAddress(GAME_YEAR, "FS"))
-              .thenReturn(canonicalImage.toString());
+        writeImage(userLegacyLogo("Custom/Replacement.png"), LEGACY_PIXEL);
 
-        BufferedImage image = FactionMapLogo.load(GAME_YEAR, "FS");
-
-        assertNotNull(image);
-        assertEquals(FALLBACK_PIXEL, image.getRGB(1, 0));
-        assertFalse(FactionMapLogo.hasCustomLogo(GAME_YEAR, "FS"));
+        assertEquals(ICON_PIXEL, loadedPixel("ICON", GAME_YEAR));
     }
 
     @Test
-    void eraOnlyLogoGrantsEligibilityOnlyAfterItsIntroduction() throws IOException {
+    void blankLegacyLogoDoesNotGrantEmblemEligibility() throws IOException {
+        registerFaction("""
+              key: CUSTOM
+              name: Custom Faction
+              logo: '  '
+              """);
+
+        assertFalse(FactionMapLogo.hasIcon(GAME_YEAR, "CUSTOM"));
+        assertEquals(FALLBACK_PIXEL, loadedPixel("CUSTOM", GAME_YEAR));
+        assertEquals(-1, priority("CUSTOM"));
+    }
+
+    @Test
+    void eraOnlyLegacyLogoGrantsEligibilityOnlyAfterItsIntroduction() throws IOException {
         registerFaction("""
               key: CUSTOM
               name: Custom Faction
               logoChanges:
                 3080: Custom/Later.png
               """);
-        writeImage(userLogo("Custom/Later.png"), CUSTOM_PIXEL);
 
-        assertFalse(FactionMapLogo.hasCustomLogo(GAME_YEAR, "CUSTOM"));
-        assertTrue(FactionMapLogo.hasCustomLogo(3080, "CUSTOM"));
+        assertFalse(FactionMapLogo.hasIcon(GAME_YEAR, "CUSTOM"));
+        assertTrue(FactionMapLogo.hasIcon(3080, "CUSTOM"));
         assertEquals(-1, priority("CUSTOM"));
         assertEquals(1, InterstellarMapPanel.getFactionLogoPriority(new Faction(factionData.get("CUSTOM")), 3080));
-        assertEquals(CUSTOM_PIXEL, loadedPixel(3080));
     }
 
     @Test
-    void customLogoGrantsCompactPriorityWithoutPowerTags() throws IOException {
+    void iconOrLegacyLogoGrantsCompactPriorityWithoutPowerTags() throws IOException {
         registerFaction("""
-              key: CUSTOM
-              name: Custom Faction
+              key: ICON
+              name: Faction With Icon
+              tags: [PLAYABLE]
+              """);
+        registerFaction("""
+              key: LEGACY
+              name: Faction With Legacy Logo
               tags: [PLAYABLE]
               logo: Custom/Logo.png
               """);
+        registerFaction("""
+              key: CUSTOM
+              name: Faction Without Icon
+              tags: [PLAYABLE]
+              """);
 
-        assertTrue(FactionMapLogo.hasCustomLogo(GAME_YEAR, "CUSTOM"));
-        assertEquals(1, priority("CUSTOM"));
+        assertEquals(1, priority("ICON"));
+        assertEquals(1, priority("LEGACY"));
+        assertEquals(-1, priority("CUSTOM"));
     }
 
     @Test
@@ -282,36 +287,35 @@ class FactionMapLogoTest {
         for (String tag : new String[] { "MAJOR", "SUPER", "CLAN", "MINOR", "PERIPHERY", "DEEP_PERIPHERY",
                                        "PIRATE" }) {
             registerFaction("""
-                  key: CUSTOM
-                  name: Custom Faction
+                  key: ICON
+                  name: Faction With Icon
                   tags: [%s]
-                  logo: Custom/Logo.png
                   """.formatted(tag));
             int expectedPriority = switch (tag) {
                 case "MAJOR", "SUPER", "CLAN" -> 0;
                 case "PIRATE" -> 2;
                 default -> 1;
             };
-            assertEquals(expectedPriority, priority("CUSTOM"), tag);
+            assertEquals(expectedPriority, priority("ICON"), tag);
         }
     }
 
     @Test
     void independentAndAbandonedTerritoriesRemainExcluded() throws IOException {
+        logosMock.when(() -> RATGenerator.getCanonicalFactionLogoAddress(GAME_YEAR, "IND"))
+              .thenReturn(icon.toString());
         registerFaction("""
               key: IND
               name: Independent
-              logo: Custom/Logo.png
               """);
         registerFaction("""
-              key: CUSTOM
+              key: ICON
               name: Abandoned
               tags: [ABANDONED]
-              logo: Custom/Logo.png
               """);
 
         assertEquals(-1, priority("IND"));
-        assertEquals(-1, priority("CUSTOM"));
+        assertEquals(-1, priority("ICON"));
     }
 
     private void registerFaction(String yaml) throws IOException {
@@ -319,7 +323,7 @@ class FactionMapLogoTest {
         factionData.put(faction.getKey(), faction);
     }
 
-    private Path userLogo(String logo) {
+    private Path userLegacyLogo(String logo) {
         return temporaryDirectory.resolve(MHQConstants.FORCE_ICON_PATH)
                      .resolve(MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH).resolve(logo);
     }
@@ -331,8 +335,8 @@ class FactionMapLogoTest {
         assertTrue(ImageIO.write(image, "png", path.toFile()));
     }
 
-    private static int loadedPixel(int year) {
-        BufferedImage image = FactionMapLogo.load(year, "CUSTOM");
+    private static int loadedPixel(String factionCode, int year) {
+        BufferedImage image = FactionMapLogo.load(year, factionCode);
         assertNotNull(image);
         return image.getRGB(1, 0);
     }

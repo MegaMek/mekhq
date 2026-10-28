@@ -52,11 +52,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
@@ -107,6 +107,7 @@ import mekhq.service.enums.MRMSMode;
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
+    private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
@@ -396,7 +397,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(UIUtil.scaleForGUI(60));
+        // Tall enough for a tech's name, skills, repair abilities and day
+        techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
         techSorter = new TableRowSorter<>(techsModel);
@@ -527,6 +529,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 // Check grouping
                 boolean inGroup = PartsFilterGroup.matches(nGroup, part);
 
+                // Parts set aside for a refit or repair belong only in the views that track them
+                boolean isShownInThisView = part.isSpare() || (nGroupView == SV_IN_TRANSIT)
+                      || (nGroupView == SV_RESERVED);
+                if (!isShownInThisView) {
+                    return false;
+                }
+
                 // Check view
                 if (nGroupView == SV_ALL) {
                     inView = true;
@@ -631,6 +640,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     private void refreshTechsList() {
+        // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
+        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
         Campaign campaign = getCampaign();
@@ -702,7 +717,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
-        List<Part> parts = locationFilter.selectSpareParts(getCampaign());
+        // Reserved parts are listed too, but only the In Transit and Reserved views show them
+        List<Part> parts = locationFilter.selectHeldParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
@@ -744,6 +760,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             return;
         }
         if (null == selectedTech) {
+            return;
+        }
+        if (!part.isSpare()) {
+            LOGGER.debug("[Warehouse] {} is set aside for a refit or repair, so it is not worked on here",
+                  part.getName());
             return;
         }
         partId = part.getId();
@@ -841,11 +862,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * A force generation adds its parts while {@link Campaign#isBulkGenerationInProgress()} is true, so every
      * {@link PartNewEvent} it raises is dropped by the guard at the top of {@link #refreshPartsList()}. Generation ends
      * by firing this event and nothing else, so without this handler no refresh ever runs against the finished
-     * campaign: the warehouse is full and the table still shows what it held before the build.
+     * campaign: the warehouse is full and the table still shows what it held before the build. The tech list is
+     * skipped during generation in the same way, so it is rescheduled here too.
      */
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         partsScheduler.schedule();
+        techsScheduler.schedule();
     }
 
     @Subscribe

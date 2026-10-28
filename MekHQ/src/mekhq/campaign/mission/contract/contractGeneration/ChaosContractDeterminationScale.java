@@ -36,7 +36,9 @@ import static java.lang.Math.ceil;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.Collection;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
@@ -44,13 +46,19 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
-import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.unit.Unit;
 
 public class ChaosContractDeterminationScale {
     private final static double BATTLE_VALUE_PER_SCALE = 4_500.0; // Draconis Reach first printing pg 36
     private final static double BATTLEFIELD_SUPPORT_POINTS_PER_SCALE = 32.0; // Draconis Reach first printing pg 36
     private final static double BATTLE_VALUE_PER_BSP = 500.0; // Battle for Tukayyid, pg24
+    /** The smallest Scale the Fractional Scale option ever charges or pays for */
+    public final static double MINIMUM_FRACTIONAL_SCALE = 0.1;
+    /**
+     * Exact Scale is held to this many decimal places, enough to keep a single point of Battle Value while stripping
+     * the floating-point noise that would otherwise round 2.0000000001 up to Scale 3
+     */
+    private final static double EXACT_SCALE_PRECISION = 1_000_000.0;
 
     /**
      * The last whole-TO&amp;E Scale worked out, reused until the day, the hangar's size, or the conversion option
@@ -58,7 +66,7 @@ public class ChaosContractDeterminationScale {
      * contract offer would otherwise repeat.
      */
     private record TableOfOrganizationScale(WeakReference<Campaign> campaign, LocalDate date, int unitCount,
-          boolean convertSupportPointsToBattleValue, int scale) {}
+          boolean convertSupportPointsToBattleValue, double scale) {}
 
     private static volatile TableOfOrganizationScale cachedTableOfOrganizationScale;
 
@@ -68,12 +76,12 @@ public class ChaosContractDeterminationScale {
      *
      * @param campaign the campaign
      *
-     * @return the Scale of the whole TO&amp;E
+     * @return the exact (unrounded) Scale of the whole TO&amp;E
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int getScaleForTableOfOrganization(Campaign campaign) {
+    public static double getScaleForTableOfOrganization(Campaign campaign) {
         PlayerForce playerForce = campaign.getPlayerForce();
         LocalHangar hangar = playerForce.getHangar();
         LocalDate today = campaign.getLocalDate();
@@ -90,13 +98,13 @@ public class ChaosContractDeterminationScale {
             return cached.scale();
         }
 
-        int scale = generateScaleForTableOfOrganization(playerForce, hangar, convertSupportPointsToBattleValue);
+        double scale = generateScaleForTableOfOrganization(playerForce, hangar, convertSupportPointsToBattleValue);
         cachedTableOfOrganizationScale = new TableOfOrganizationScale(new WeakReference<>(campaign), today, unitCount,
               convertSupportPointsToBattleValue, scale);
         return scale;
     }
 
-    static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty,
+    static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar,
           boolean convertSupportPointsToBattleValue) {
         int validBattleValue = 0;
 
@@ -104,21 +112,19 @@ public class ChaosContractDeterminationScale {
             int formationId = unit.getFormationId();
             Formation formation = playerForce.getFormation(formationId);
             if (formation != null) {
-                CombatRole roleInMemory = formation.getCombatRoleInMemory();
-                boolean hasCombatRole = roleInMemory.isCombatRole() || (isCadreDuty && roleInMemory.isCadre());
-                if (formation.isFormationType(STANDARD) && hasCombatRole) {
+                if (formation.isFormationType(STANDARD) && formation.getCombatRoleInMemory().isCombatRole()) {
                     Entity entity = unit.getEntity();
                     validBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
                 }
             }
         }
 
-        return convertBattleValueToScale(validBattleValue, convertSupportPointsToBattleValue);
+        return convertBattleValueToExactScale(validBattleValue, convertSupportPointsToBattleValue);
     }
 
     /**
      * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep. Unlike
-     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean, boolean)}, every unit assigned to a
+     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean)}, every unit assigned to a
      * formation counts, regardless of formation type or combat role. Units outside the TO&amp;E and mothballed units
      * are ignored.
      *
@@ -127,16 +133,35 @@ public class ChaosContractDeterminationScale {
      * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
      *                                          the per-Scale Battle Value
      *
-     * @return the Scale of the whole TO&amp;E
+     * @return the exact (unrounded) Scale of the whole TO&amp;E
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int generateScaleForTableOfOrganization(PlayerForce playerForce, LocalHangar hangar,
+    public static double generateScaleForTableOfOrganization(PlayerForce playerForce, LocalHangar hangar,
+          boolean convertSupportPointsToBattleValue) {
+        return generateScaleForTableOfOrganization(playerForce, hangar.getUnits(), convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * As {@link #generateScaleForTableOfOrganization(PlayerForce, LocalHangar, boolean)}, weighing only the given
+     * units. Used to project the Scale of a TO&amp;E some of whose units are about to be mothballed.
+     *
+     * @param playerForce                       the player force whose TO&amp;E is weighed
+     * @param units                             the units to weigh
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the exact (unrounded) Scale of those units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double generateScaleForTableOfOrganization(PlayerForce playerForce, Collection<Unit> units,
           boolean convertSupportPointsToBattleValue) {
         int totalBattleValue = 0;
 
-        for (Unit unit : hangar.getUnits()) {
+        for (Unit unit : units) {
             if (unit.isMothballed()) {
                 continue;
             }
@@ -148,28 +173,98 @@ public class ChaosContractDeterminationScale {
             }
         }
 
-        return convertBattleValueToScale(totalBattleValue, convertSupportPointsToBattleValue);
+        return convertBattleValueToExactScale(totalBattleValue, convertSupportPointsToBattleValue);
     }
 
     /**
-     * Converts a Battle Value total into Scale, rounding up.
+     * Converts a Battle Value total into exact, unrounded Scale. Rules as written round it up; see
+     * {@link #roundUpScale(double)}.
      *
      * @param battleValue                       the Battle Value to convert
      * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
      *                                          the per-Scale Battle Value
      *
-     * @return the resulting Scale
+     * @return the resulting exact Scale
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static int convertBattleValueToScale(int battleValue, boolean convertSupportPointsToBattleValue) {
+    private static double convertBattleValueToExactScale(int battleValue, boolean convertSupportPointsToBattleValue) {
         double battleValuePerScale = BATTLE_VALUE_PER_SCALE;
         if (convertSupportPointsToBattleValue) {
             // Fold the battlefield-support-point allotment into the per-scale Battle Value by converting it to BV.
             battleValuePerScale += BATTLEFIELD_SUPPORT_POINTS_PER_SCALE * BATTLE_VALUE_PER_BSP;
         }
 
-        return (int) ceil(battleValue / battleValuePerScale);
+        return cleanExactScale(battleValue / battleValuePerScale);
+    }
+
+    /**
+     * Strips floating-point noise from an exact Scale, so a value that should be whole is not rounded up a full point.
+     *
+     * @param exactScale the exact Scale
+     *
+     * @return the exact Scale held to {@link #EXACT_SCALE_PRECISION}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double cleanExactScale(double exactScale) {
+        return Math.round(exactScale * EXACT_SCALE_PRECISION) / EXACT_SCALE_PRECISION;
+    }
+
+    /**
+     * Rounds an exact Scale up to a whole number, as Hot Spots: Draconis Reach uses it.
+     *
+     * @param exactScale the exact Scale
+     *
+     * @return the Scale rounded up
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int roundUpScale(double exactScale) {
+        return (int) ceil(cleanExactScale(exactScale));
+    }
+
+    /**
+     * The Scale money and supplies are worked out from: the exact Scale when {@link CampaignOption#USE_FRACTIONAL_SCALE}
+     * is set, so a small change to the force only moves pay and upkeep a little; otherwise the rules-as-written whole
+     * Scale. Under the option any force at all is at least {@link #MINIMUM_FRACTIONAL_SCALE}, just as rules as written
+     * it is at least Scale 1, while no force at all stays Scale 0.
+     *
+     * @param exactScale         the exact Scale
+     * @param useFractionalScale whether the Fractional Scale option is set
+     *
+     * @return the economic Scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getEconomicScale(double exactScale, boolean useFractionalScale) {
+        if (useFractionalScale) {
+            double cleanedScale = cleanExactScale(exactScale);
+            return cleanedScale <= 0 ? 0 : Math.max(MINIMUM_FRACTIONAL_SCALE, cleanedScale);
+        }
+        return roundUpScale(exactScale);
+    }
+
+    /**
+     * Formats a Scale for display: to two decimal places when {@link CampaignOption#USE_FRACTIONAL_SCALE} is set,
+     * otherwise as the whole number the rules use.
+     *
+     * @param exactScale         the exact Scale
+     * @param useFractionalScale whether the Fractional Scale option is set
+     *
+     * @return the Scale as display text
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String formatScale(double exactScale, boolean useFractionalScale) {
+        if (useFractionalScale) {
+            return new DecimalFormat("0.00").format(getEconomicScale(exactScale, true));
+        }
+        return String.valueOf(roundUpScale(exactScale));
     }
 }

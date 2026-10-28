@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.quartermaster;
 
 import static mekhq.campaign.personnel.skills.SkillType.*;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -177,6 +178,18 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
      */
     public static List<String> optionKitNames() {
         return optionKitNames(NO_DEFAULT_KIT, allKitNames());
+    }
+
+    /**
+     * The choices for a technician profession's default-kit dropdown: the "none" sentinel first, then only the kits
+     * that count as a tool kit ({@link #REPAIR_KITS}). The default goes into the slot a technician works from, so a kit
+     * that cannot make repairs on its own, such as a Descartes diagnostic scanner, would leave every new technician
+     * unable to repair when "Techs Need a Tool Kit" is on.
+     *
+     * @return the option values, "none" first
+     */
+    public static List<String> technicianOptionKitNames() {
+        return optionKitNames(NO_DEFAULT_KIT, REPAIR_KITS);
     }
 
     /**
@@ -459,5 +472,23 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
         }
 
         return false;
+    }
+
+    /**
+     * Counts the technicians who carry no tool kit (see {@link #hasToolKit(Person)}), so a repair that found no one to
+     * do the work can say why.
+     *
+     * @param technicians the technicians to check
+     *
+     * @return how many of them carry no tool kit
+     */
+    public static int countWithoutToolKit(Collection<Person> technicians) {
+        int withoutToolKit = 0;
+        for (Person technician : technicians) {
+            if (!hasToolKit(technician)) {
+                withoutToolKit++;
+            }
+        }
+        return withoutToolKit;
     }
 }

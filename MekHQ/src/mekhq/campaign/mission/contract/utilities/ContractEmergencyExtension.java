@@ -56,6 +56,12 @@ public class ContractEmergencyExtension {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractEmergencyExtension";
 
     public static boolean contractExtended(Campaign campaign, AbstractContract contract) {
+        // A contract whose outcome is already decided (e.g. breached by salvage theft, or canceled when its employer
+        // lost the planet) has ended for good, so the employer can't invoke the emergency clause to extend it.
+        if (contract.getMandatedCompletionStatus() != null) {
+            return false;
+        }
+
         Factions factions = Factions.getInstance();
         // We use anchor faction to allow for the breadth of faction political interactions
         Faction employerFaction = factions.getFaction(contract.getEmployerData().anchorFactionCode());
@@ -89,6 +95,11 @@ public class ContractEmergencyExtension {
 
         LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
+
+        // The active-contract flag was last set at the start of the day, when this contract had already passed its
+        // old end date. Without a refresh, the next day's nags (e.g. prisoners) would still treat the campaign as
+        // having no active contract.
+        campaign.setHasActiveContract();
 
         // StratCon's schedule was rolled to the old end date, so it is rolled again to cover the extension.
         StratConCampaignState campaignState = contract.getStratConCampaignState();

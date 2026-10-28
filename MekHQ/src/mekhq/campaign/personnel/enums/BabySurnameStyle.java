@@ -32,9 +32,11 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -59,8 +61,16 @@ public enum BabySurnameStyle {
     ICELANDIC_COMBINATION_NYMICS("BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.text",
           "BabySurnameStyle.ICELANDIC_COMBINATION_NYMICS.toolTipText"),
     RUSSIAN_PATRONYMICS("BabySurnameStyle.RUSSIAN_PATRONYMICS.text",
-          "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText");
+          "BabySurnameStyle.RUSSIAN_PATRONYMICS.toolTipText"),
+    RANDOM("BabySurnameStyle.RANDOM.text", "BabySurnameStyle.RANDOM.toolTipText");
     // endregion Enum Declaration
+
+    /**
+     * The styles {@link #RANDOM} picks between. Cultural naming conventions (patronymics and matronymics) are
+     * excluded, as they aren't something individual parents would typically choose between.
+     */
+    private static final List<BabySurnameStyle> RANDOM_STYLES = List.of(FATHERS, MOTHERS, MOTHERS_FATHERS,
+          MOTHERS_HYPHEN_FATHERS, FATHERS_MOTHERS, FATHERS_HYPHEN_MOTHERS);
 
     // region Variable Declarations
     private final String name;
@@ -130,9 +140,18 @@ public enum BabySurnameStyle {
     public boolean isRussianPatronymics() {
         return this == RUSSIAN_PATRONYMICS;
     }
+
+    public boolean isRandom() {
+        return this == RANDOM;
+    }
     // endregion Boolean Comparison Methods
 
     public String generateBabySurname(final Person mother, final @Nullable Person father, final Gender babyGender) {
+        if (isRandom()) {
+            // Simulates the parents choosing how to name their child, so each baby rolls independently
+            return ObjectUtility.getRandomItem(RANDOM_STYLES).generateBabySurname(mother, father, babyGender);
+        }
+
         final boolean hasFather = father != null;
         switch (this) {
             case WELSH_PATRONYMICS:

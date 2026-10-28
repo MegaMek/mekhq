@@ -33,18 +33,20 @@
 package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JFrame;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignNewDayManager;
@@ -53,6 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
@@ -92,6 +95,7 @@ import mekhq.gui.roleplay.ContractJournalPrompt;
  * @since 0.51.01
  */
 public class MissionCompletionManager {
+    private static final MMLogger LOGGER = MMLogger.create(MissionCompletionManager.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     private final MekHQ app;
@@ -106,6 +110,7 @@ public class MissionCompletionManager {
     private PrisonerMissionEndEvent prisonerMissionEndEvent;
     private boolean marketPreviouslyDisabled;
     private List<Person> powPersonnel;
+    private RetirementDefectionDialog turnoverDialog;
 
     /**
      * Creates a manager for completing a single mission.
@@ -129,9 +134,10 @@ public class MissionCompletionManager {
     /**
      * Runs the full mission-completion process.
      *
-     * <p>The player is offered several confirmation and resolution dialogs. If they cancel at any of them the process
-     * stops immediately and this method returns {@code false} without further mutating the campaign beyond what had
-     * already been applied up to that point (matching the previous inline behaviour).</p>
+     * <p>The player is offered several confirmation and resolution dialogs. Every step that can cancel completion
+     * (including turnover) runs before the contract is closed, so if they cancel at any of them this method returns
+     * {@code false} and the contract is left active. Turnover rolls and bonuses already paid while rolling are kept, and
+     * a later attempt shows those results rather than rolling again.</p>
      *
      * @return {@code true} if the mission was fully completed, {@code false} if the player aborted at a confirmation
      *       point
@@ -154,10 +160,18 @@ public class MissionCompletionManager {
             return false;
         }
 
+        if (!rollTurnover()) {
+            return false;
+        }
+
         captureMarketState();
 
+        // Nothing past this point can cancel completion: once the contract is closed every remaining step must run,
+        // or forces are left deployed to scenarios of a contract that is no longer active.
         campaign.completeMission(mission, missionStatus);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+
+        applyTurnover();
 
         payCompletionBonusAndReputation(campaign, mission, missionStatus);
 
@@ -167,20 +181,13 @@ public class MissionCompletionManager {
 
         powPersonnel = resolvePrisoners(campaign, prisonerMissionEndEvent, missionStatus);
 
-        if (!resolveTurnover()) {
-            return false;
-        }
-
         promptAutoAwards();
 
         updateFactionStandings(campaign, campaignOptions, mission, missionStatus);
 
         refreshPersonnelMarketIfNeeded();
 
-        boolean hadCadreForces = undeployFormations(campaign, mission);
-        if (hadCadreForces) {
-            new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "cadreReassignment.text"), true);
-        }
+        undeployFormations(campaign, mission);
         undeployUnits(campaign, mission);
 
         resolveOutstandingScenarios(mission);
@@ -259,37 +266,80 @@ public class MissionCompletionManager {
     }
 
     /**
-     * Resolves contract-completion turnover through the {@link RetirementDefectionDialog}, if enabled.
+     * Rolls contract-completion turnover through the {@link RetirementDefectionDialog}, if enabled. This runs before
+     * the contract is closed, so cancelling the dialog, or being unable to afford the payouts, cancels completion
+     * without leaving the contract half-completed. The payouts themselves are applied by {@link #applyTurnover()}
+     * once the contract's final payment has been credited.
      *
-     * @return {@code true} to continue, {@code false} if turnover could not be resolved and completion should abort
+     * <p>Turnover modifiers depend on how the contract ended, so the chosen status is applied to the contract
+     * provisionally and restored if completion is cancelled here. If the rolls were already made on an earlier,
+     * cancelled, attempt, the dialog shows those results instead of rolling again.</p>
+     *
+     * @return {@code true} to continue, {@code false} if the player cancelled or cannot afford the payouts
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private boolean resolveTurnover() {
+    private boolean rollTurnover() {
         if (!campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT) ||
                   !campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)) {
             return true;
         }
 
-        RetirementDefectionDialog retirementDefectionDialog = new RetirementDefectionDialog(campaignGui, mission, true);
+        PlayerForce playerForce = campaign.getPlayerForce();
+        boolean alreadyRolled = playerForce.getHumanResources()
+                                      .getRetirementDefectionTracker()
+                                      .isOutstanding(mission.getId());
+
+        MissionStatus previousStatus = mission.getStatus();
+        mission.setStatus(missionStatus);
+
+        Money pendingIncome = campaign.getProjectedCompletionIncome(mission, missionStatus);
+        turnoverDialog = new RetirementDefectionDialog(campaignGui, mission, !alreadyRolled, pendingIncome);
+
+        if (turnoverDialog.wasAborted()) {
+            mission.setStatus(previousStatus);
+            turnoverDialog = null;
+            return false;
+        }
+
+        // Read the balance after the dialog closes, as any turnover bonuses are paid while rolling.
+        Money availableFunds = playerForce.getFinances().getBalance().plus(pendingIncome);
+        Money totalPayout = turnoverDialog.totalPayout();
+        if (totalPayout.isGreaterThan(availableFunds)) {
+            new ImmersiveDialogNotification(campaign,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "turnoverUnaffordable.text",
+                        totalPayout.toAmountAndSymbolString(),
+                        availableFunds.toAmountAndSymbolString()),
+                  true);
+            mission.setStatus(previousStatus);
+            turnoverDialog = null;
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Applies the turnover rolled by {@link #rollTurnover()}: pays the payouts, processes departures and awards
+     * administrators experience. Runs straight after the contract's final payment is credited, which the payouts
+     * were judged affordable against.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void applyTurnover() {
+        if (turnoverDialog == null) {
+            return;
+        }
 
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceHumanResources humanResources = playerForce.getHumanResources();
 
-        if (retirementDefectionDialog.wasAborted()) {
-            /*
-             * Once the retirement rolls have been made, the outstanding payouts can be resolved without a reference to
-             * the contract and the dialog can be accessed through the menu provided they aren't still assigned to the
-             * mission in question.
-             */
-            return humanResources.getRetirementDefectionTracker().isOutstanding(mission.getId());
-        }
-
         if ((humanResources.getRetirementDefectionTracker().getRetirees(mission) != null) &&
                   playerForce.getFinances()
                         .getBalance()
-                        .isGreaterOrEqualThan(retirementDefectionDialog.totalPayout())) {
+                        .isGreaterOrEqualThan(turnoverDialog.totalPayout())) {
             for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
                 Person admin = humanResources.findBestInRole(role,
                       SkillType.S_ADMIN,
@@ -303,8 +353,11 @@ public class MissionCompletionManager {
             }
         }
 
-        return campaign.applyRetirement(retirementDefectionDialog.totalPayout(),
-              retirementDefectionDialog.getUnitAssignments());
+        // Affordability was checked before the contract was closed, so this should not fail. If it does, the payouts
+        // stay outstanding and can still be resolved from the turnover menu.
+        if (!campaign.applyRetirement(turnoverDialog.totalPayout(), turnoverDialog.getUnitAssignments())) {
+            LOGGER.error("Turnover payouts for {} could not be applied after completion", mission.getName());
+        }
     }
 
     /**
@@ -358,9 +411,10 @@ public class MissionCompletionManager {
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.usesSpecialRule(USE_PIRATE_LOOTING)) {
+                boolean useFractionalScale = campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE);
                 PirateLooting.resolveActOfPiracy(campaign,
                       personnel,
-                      mission.getScale(),
+                      mission.getEconomicScale(useFractionalScale),
                       mission.getScenarios(),
                       mission.getStratConCampaignState(),
                       status.isOverallSuccess(),
@@ -464,34 +518,31 @@ public class MissionCompletionManager {
 
         // A covert sponsor, if any, takes the standing change in the visible employer's place.
         Faction employer = mission.getStandingEmployerFaction();
-        factionStandings.processContractCompletion(playerForce.getFaction(),
+        List<String> reports = factionStandings.processContractCompletion(playerForce.getFaction(),
               employer,
               campaign.getLocalDate(),
               status,
               regardMultiplier,
               mission.getLengthInMonths());
+
+        for (String report : reports) {
+            if (report != null && !report.isBlank()) {
+                campaign.addReport(POLITICS, report);
+            }
+        }
     }
 
     /**
-     * Undeploys all formations from the completed mission's scenarios, reverting cadre roles to frontline.
+     * Undeploys all formations from the completed mission's scenarios.
      *
      * @param campaign the campaign being updated
      * @param mission  the completed mission
      *
-     * @return {@code true} if any cadre formations were reassigned, so the caller can notify the player
-     *
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean undeployFormations(Campaign campaign, AbstractContract mission) {
-        boolean isCadreDuty = mission.getObjectiveType().isCadreDuty();
-        boolean hadCadreForces = false;
+    static void undeployFormations(Campaign campaign, AbstractContract mission) {
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
-                formation.setCombatRoleInMemory(CombatRole.FRONTLINE);
-                hadCadreForces = true;
-            }
-
             int scenarioAssignment = formation.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
                 Scenario scenario = campaign.getScenario(scenarioAssignment);
@@ -502,8 +553,6 @@ public class MissionCompletionManager {
                 }
             }
         }
-
-        return hadCadreForces;
     }
 
     /**
@@ -527,6 +576,67 @@ public class MissionCompletionManager {
                 }
             }
         }
+    }
+
+    /**
+     * Repairs contracts whose completion was interrupted after the contract had been closed, which earlier versions
+     * allowed. Any of their scenarios still current are resolved as a draw, and any formation or unit still deployed to
+     * a scenario that no longer exists, or that belongs to a contract that is no longer active, is undeployed. Called
+     * when a campaign is loaded.
+     *
+     * @param campaign the loaded campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void releaseCompletedContractDeployments(Campaign campaign) {
+        for (AbstractContract contract : campaign.getCompletedContracts()) {
+            resolveOutstandingScenarios(contract);
+        }
+
+        int releasedFormations = 0;
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (isDeployedToInactiveContract(campaign, formation.getScenarioId())) {
+                formation.setScenarioId(NO_ASSIGNED_SCENARIO, campaign);
+                releasedFormations++;
+            }
+        }
+
+        int releasedUnits = 0;
+        for (Unit unit : campaign.getUnits()) {
+            if (isDeployedToInactiveContract(campaign, unit.getScenarioId())) {
+                unit.setScenarioId(NO_ASSIGNED_SCENARIO);
+                releasedUnits++;
+            }
+        }
+
+        if ((releasedFormations > 0) || (releasedUnits > 0)) {
+            LOGGER.info("Released {} formation(s) and {} unit(s) left deployed to inactive contracts",
+                  releasedFormations, releasedUnits);
+        }
+    }
+
+    /**
+     * @param campaign   the campaign holding the scenario
+     * @param scenarioId the scenario a formation or unit is deployed to
+     *
+     * @return {@code true} if the scenario no longer exists or belongs to a contract that is no longer active
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isDeployedToInactiveContract(Campaign campaign, int scenarioId) {
+        if (scenarioId == NO_ASSIGNED_SCENARIO) {
+            return false;
+        }
+
+        Scenario scenario = campaign.getScenario(scenarioId);
+        if (scenario == null) {
+            return true;
+        }
+
+        AbstractContract contract = campaign.getContract(scenario.getMissionId());
+        return (contract != null) && (contract.getStatus() != null) && !contract.getStatus().isActive();
     }
 
     /**

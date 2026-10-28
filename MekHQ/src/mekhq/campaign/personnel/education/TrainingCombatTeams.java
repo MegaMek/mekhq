@@ -32,15 +32,12 @@
  */
 package mekhq.campaign.personnel.education;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
-import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
-import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -59,6 +56,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 
+import jakarta.annotation.Nonnull;
 import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -70,7 +68,6 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
@@ -81,9 +78,9 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Manages the daily training progression of combat teams and their personnel within a campaign.
@@ -271,8 +268,8 @@ public class TrainingCombatTeams {
             for (Person trainee : unit.getActiveCrew()) {
                 if (isUseFatigue) {
                     LOGGER.info("adding fatigue to {}", trainee.getFullTitle());
-                    int fatigueChangeRate = getFatigueChangeRate(trainee, fatigueRate);
-                    trainee.changeFatigue(fatigueChangeRate);
+                    trainee.changeFatigue(fatigueRate);
+                    Fatigue.processFatigueActions(campaign, trainee);
                 }
 
                 if (educatorCrew.contains(trainee)) {
@@ -319,22 +316,6 @@ public class TrainingCombatTeams {
                 }
             }
         }
-    }
-
-    private static int getFatigueChangeRate(Person trainee, int fatigueRate) {
-        PersonnelOptions options = trainee.getOptions();
-        boolean hasGlassJaw = options.booleanOption(FLAW_GLASS_JAW);
-        boolean hasToughness = options.booleanOption(ATOW_TOUGHNESS);
-        boolean hasGlassJawAndToughness = hasGlassJaw && hasToughness;
-
-        int fatigueChangeRate = fatigueRate;
-        if (hasGlassJaw && !hasGlassJawAndToughness) {
-            fatigueChangeRate *= 2;
-        } else if (hasToughness && !hasGlassJawAndToughness) {
-            fatigueChangeRate = max(1, (int) ceil(fatigueChangeRate * 0.5));
-        }
-
-        return fatigueChangeRate;
     }
 
     /**
@@ -483,7 +464,7 @@ public class TrainingCombatTeams {
      * @author Illiani
      * @since 0.51.01
      */
-    private static @NonNull String processCompletedTraining(Campaign campaign, Person educator, Person trainee,
+    private static @Nonnull String processCompletedTraining(Campaign campaign, Person educator, Person trainee,
           boolean isLogSkillChange, LocalDate today, Skill targetSkill, int baseCostToImprove, String skillName,
           int targetSkillLevel) {
         improveSkill(campaign, trainee, targetSkill, baseCostToImprove);

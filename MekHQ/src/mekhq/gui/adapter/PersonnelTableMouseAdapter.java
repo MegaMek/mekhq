@@ -111,13 +111,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
@@ -1513,7 +1513,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 new FamilyTreeDialog(gui.getFrame(),
                       selectedPerson.getGenealogy(),
-                      getCampaign().getPlayerForce().getPersonnel().values());
+                      getCampaign().getPlayerForce().getPersonnel().values(),
+                      gui::focusOnPerson);
                 break;
             }
             case CMD_EDIT: {
@@ -1834,13 +1835,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
-                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
-                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
-                      Set.of(disease.getSimpleName()));
+                List<Person> infectedPersonnel = new ArrayList<>();
                 for (Person person : people) {
-                    Inoculations.applyDisease(getCampaign(), person, disease);
+                    if (Inoculations.applyDisease(getCampaign(), person, disease)) {
+                        infectedPersonnel.add(person);
+                    }
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
+                Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
+                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
+                      Map.of(disease.getSimpleName(), infectedPersonnel));
                 break;
             }
             case CMD_ADD_RANDOM_INJURIES: {
@@ -4213,12 +4217,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editAssignmentLog.text"));
-            menuItem.setActionCommand(CMD_ADD_ASSIGNMENT_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_ASSIGNMENT_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
 
             menuItem = new JMenuItem(resources.getString("editPerformanceLog.text"));
-            menuItem.setActionCommand(CMD_ADD_PERFORMANCE_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_EDIT_PERFORMANCE_LOG);
             menuItem.addActionListener(this);
             editLogsMenu.add(menuItem);
         } else {
@@ -4364,6 +4368,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         addFlagMenuItem(menu, selected, "miHidePersonality", null, Person::isHidePersonality,
               Person::setHidePersonality);
         addFlagMenuItem(menu, selected, "miImmortal", null, Person::isImmortal, Person::setImmortal);
+        addFlagMenuItem(menu, selected, "miLeadNegotiator", null, Person::isLeadNegotiator,
+              Person::setLeadNegotiator);
         addFlagMenuItem(menu, selected, "miPrefersMen", null, Person::isPrefersMen, Person::setPrefersMen);
         addFlagMenuItem(menu, selected, "miPrefersWomen", null, Person::isPrefersWomen, Person::setPrefersWomen);
         addFlagMenuItem(menu, selected, "miQuickTrainIgnore", null, Person::isQuickTrainIgnore,
@@ -5206,15 +5212,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     boolean payForSkillTraining(Person person, String skillName) {
         Campaign campaign = getCampaign();
         Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(campaign, person, skillName);
-        if (trainingCost.isZero()) {
-            return true;
-        }
-
-        if (campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
-              campaign.getLocalDate(),
-              trainingCost,
-              getFormattedTextAt(GUI_RESOURCE_BUNDLE, "skillTraining.transaction", person.getFullTitle(),
-                    skillName))) {
+        if (SkillTrainingCosts.payForSkillImprovement(campaign, person, skillName, trainingCost)) {
             return true;
         }
 

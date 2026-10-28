@@ -42,8 +42,8 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;

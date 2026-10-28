@@ -34,7 +34,6 @@ package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -119,11 +118,18 @@ class RefitBattleArmorTest {
     }
 
     @Test
-    void aLargerSquadIsRefusedRatherThanGivenFreeSuits() {
+    void aLargerSquadBuysItsNewSuitRatherThanGettingItFree() {
         Refit refit = new Refit(elementals, UnitFixture.ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX.loadEntity(), false,
               false, false);
 
-        assertNotNull(refit.checkFixable(), "Growing the squad is refused with a reason");
+        assertNull(refit.checkFixable(), "Growing the squad is allowed");
+        int suitsToBuy = 0;
+        for (Part part : refit.getShoppingList()) {
+            if (part instanceof MissingBattleArmorSuit) {
+                suitsToBuy++;
+            }
+        }
+        assertEquals(1, suitsToBuy, "The sixth trooper's suit is bought with the refit kit");
     }
 
     @Test

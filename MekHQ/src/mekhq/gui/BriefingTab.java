@@ -57,13 +57,13 @@ import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
 import megamek.common.game.Game;
@@ -952,9 +952,14 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        StratConCampaignState campaignState = comboMission.getSelectedItem().getStratConCampaignState();
+        final AbstractContract contract = comboMission.getSelectedItem();
+        if (contract == null) {
+            return;
+        }
+
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState != null) {
-            generateDailyScenariosForTrack(getCampaign(), campaignState, comboMission.getSelectedItem(), 1);
+            generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
             this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
             return;
         }
@@ -1126,7 +1131,7 @@ public final class BriefingTab extends CampaignGuiTab {
                   scenario.getName());
             return false;
         }
-        if (!mission.canSalvage()) {
+        if (!salvageSystem.getSalvage().canRecoverSalvage(mission)) {
             logger.debug("[Salvage] Skipping the salvage planner for {}: {} has no salvage rights",
                   scenario.getName(), mission.getName());
             return false;
@@ -1881,9 +1886,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (!chosen.isEmpty()) {
-            getCampaignGui().getApplication().joinGame(scenario, chosen);
+        if (chosen.isEmpty()) {
+            return;
         }
+
+        if (handleSalvageAssignments(scenario)) {
+            return;
+        }
+
+        getCampaignGui().getApplication().joinGame(scenario, chosen);
     }
 
     private void deployListFile() {
@@ -2129,6 +2140,12 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void refreshLanceAssignments() {
+        // Walks combat teams and their formations, which a bulk generation builds off the EDT; the
+        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
         refreshAssignmentsTabAvailability();
@@ -2154,7 +2171,6 @@ public final class BriefingTab extends CampaignGuiTab {
             btnCompleteMission.setEnabled(false);
             btnDeleteMission.setEnabled(false);
             btnAddScenario.setEnabled(false);
-            btnGMGenerateScenarios.setEnabled(false);
         } else {
             missionViewPanel = new MissionViewPanel(mission, getCampaignGui());
             scrollMissionView.setViewportView(missionViewPanel);
@@ -2165,14 +2181,31 @@ public final class BriefingTab extends CampaignGuiTab {
             btnCompleteMission.setEnabled(mission.getStatus().isActive());
             btnDeleteMission.setEnabled(true);
             btnAddScenario.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()));
-            btnGMGenerateScenarios.setEnabled(mission.isActiveOn(getCampaign().getLocalDate()) &&
-                                                    getCampaign().isGM() &&
-                                                    getCampaignOptions().isUseStratCon());
         }
+        refreshGMGenerateScenariosAvailability();
         refreshScenarioTableData();
     }
 
+    /**
+     * Enables the GM scenario generation button only when it can do something: the campaign is in GM mode, StratCon
+     * is enabled, and the selected contract is active and StratCon-enabled.
+     */
+    private void refreshGMGenerateScenariosAvailability() {
+        final AbstractContract mission = comboMission.getSelectedItem();
+        btnGMGenerateScenarios.setEnabled((mission != null) &&
+                                                mission.isActiveOn(getCampaign().getLocalDate()) &&
+                                                (mission.getStratConCampaignState() != null) &&
+                                                getCampaign().isGM() &&
+                                                getCampaignOptions().isUseStratCon());
+    }
+
     public void refreshScenarioTableData() {
+        // Reads scenario force assignments, which a bulk generation can be rearranging off the EDT; the
+        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
@@ -2313,6 +2346,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         refreshAssignmentsTabAvailability();
+        refreshGMGenerateScenariosAvailability();
     }
 
     @Subscribe
@@ -2388,6 +2422,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(GMModeEvent ev) {
-        btnGMGenerateScenarios.setEnabled(ev.isGMMode());
+        refreshGMGenerateScenariosAvailability();
     }
 }

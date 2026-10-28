@@ -54,13 +54,12 @@ import java.util.UUID;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Entity;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
@@ -107,7 +106,6 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * in as method parameters and does its own reporting around the force's state changes.</p>
  */
 public abstract class AbstractForce {
-    private static final MMLogger LOGGER = MMLogger.create(AbstractForce.class);
 
     private ForceHumanResources humanResources = new ForceHumanResources();
     private ForceShoppingList shoppingList = new ForceShoppingList();
@@ -606,7 +604,7 @@ public abstract class AbstractForce {
      * there is no cap. Takes a {@link Campaign} for the contract/location context the force does not hold.
      */
     public boolean getMashTheatresWithinCapacity(Campaign campaign) {
-        if (campaign.isOnContractAndPlanetside()) {
+        if (!campaign.isOnContractAndPlanetside()) {
             return true;
         }
 
@@ -912,8 +910,6 @@ public abstract class AbstractForce {
 
         Formation formation = formationIds.get(id);
         Formation prevFormation = formationIds.get(unit.getFormationId());
-        LOGGER.info("TOE-DEBUG: addUnitToFormation unit={} targetId={} formationFound={} prevFound={}",
-              unit.getId(), id, formation != null, prevFormation != null);
         boolean useTransfers = false;
         boolean transferLog = !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
 
@@ -949,13 +945,7 @@ public abstract class AbstractForce {
                 }
             }
             formation.addUnit(campaign, unit.getId(), useTransfers, prevFormation);
-            try {
-                LOGGER.info("TOE-DEBUG: about to construct+trigger OrganizationChangedEvent for add");
-                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, formation, unit));
-                LOGGER.info("TOE-DEBUG: trigger returned normally");
-            } catch (Exception ex) {
-                LOGGER.error(ex, "TOE-DEBUG: EXCEPTION during event construct/trigger");
-            }
+            MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, formation, unit));
         }
 
         if (campaign.getCampaignOptions().isUseStratCon()) {

@@ -33,7 +33,13 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
+import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
 import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
 import static mekhq.gui.roleplay.OracleConsole.formatDate;
@@ -66,7 +72,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.Roleplay;

@@ -41,8 +41,8 @@ import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 
 /**
  * A dice expression such as {@code 2d6+1}, {@code d100}, {@code 4d6kh3} or {@code 1d20+1d4-2}, for rules from other

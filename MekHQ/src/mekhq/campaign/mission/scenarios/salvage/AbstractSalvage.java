@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
@@ -58,7 +58,7 @@ import mekhq.campaign.unit.Unit;
  *   <li><b>Which units can recover them</b>: what a unit needs to take part in salvage operations (see
  *   {@link #canSalvage(Unit, boolean)} and {@link #isAvailableForSalvage(Unit, boolean)}).</li>
  *   <li><b>How salvage is paid for</b>: how the contract's salvage rights divide the salvage between the player and
- *   their employer (see {@link #createSettlement(AbstractContract)}).</li>
+ *   their employer (see {@link #createSettlement(AbstractContract, Campaign)}).</li>
  * </ul>
  *
  * <p>Where a rule has a sensible default, it is that of {@link CamOpsStrictSalvage CamOps (Strict)}.</p>
@@ -239,20 +239,55 @@ public abstract class AbstractSalvage {
     }
 
     /**
+     * Checks whether the player may steal the salvage they recover.
+     *
+     * <p>Stolen salvage is kept without paying the employer anything, whatever the settlement would otherwise allow,
+     * but the theft breaches the contract, which ends immediately (see
+     * {@link CamOpsSalvageUtilities#breachContractForSalvageTheft}).</p>
+     *
+     * @return {@code true} if salvage may be stolen
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSalvageTheftAllowed() {
+        return false;
+    }
+
+    /**
+     * Checks whether the player may recover a contract's salvage at all.
+     *
+     * <p>Normally this needs the contract to grant some salvage rights. Where salvage may be stolen (see
+     * {@link #isSalvageTheftAllowed()}), the player may recover salvage even without them: there is nothing they may
+     * claim under the settlement, but they can still steal it.</p>
+     *
+     * @param contract the contract the salvage would be recovered under
+     *
+     * @return {@code true} if the player may recover the contract's salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean canRecoverSalvage(AbstractContract contract) {
+        return contract.canSalvage() || isSalvageTheftAllowed();
+    }
+
+    /**
      * Creates the settlement that decides how a contract's salvage is divided between the player and their employer.
      *
-     * <p>By default, the contract's salvage rights cap how much of the salvage the player may claim, or, under
-     * salvage exchange rights, set the player's cash share of the employer's salvage.</p>
+     * <p>By default, the contract's salvage rights cap how much of the salvage the player may claim, or, when salvage
+     * is treated as exchange, set the player's cash share of the employer's salvage.</p>
      *
      * @param contract the contract the salvage was recovered under
+     * @param campaign the current campaign
      *
      * @return the salvage settlement for the contract
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public SalvageSettlement createSettlement(AbstractContract contract) {
-        return SalvageSettlement.forCappedSalvageRights(contract);
+    public SalvageSettlement createSettlement(AbstractContract contract, Campaign campaign) {
+        return SalvageSettlement.forCappedSalvageRights(contract, campaign);
     }
 
     /**
@@ -309,7 +344,10 @@ public abstract class AbstractSalvage {
               session.getEmployerSalvage().size());
 
         CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, session.getSettlement(),
-              session.getKeptSalvage(), session.getSoldSalvage(), session.getEmployerSalvage());
+              session.getKeptSalvage(), session.getSoldSalvage(), session.getEmployerSalvage(), session.isStolen());
+        if (session.isStolen()) {
+            CamOpsSalvageUtilities.breachContractForSalvageTheft(campaign, contract, scenario);
+        }
         return session;
     }
 }

@@ -45,9 +45,9 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
@@ -901,7 +901,7 @@ public class Planet {
                     neutrals = true;
                 }
 
-                if (faction.isClan()) {
+                if (planetFaction.isClan()) {
                     noClansPresent = false;
                 }
                 if (faction.isClan() == planetFaction.isClan()) {

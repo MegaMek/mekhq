@@ -36,16 +36,18 @@ package mekhq.campaign.parts.missing;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.IArmorState;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.EntityMovementMode;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.BAArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
@@ -142,6 +144,35 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     public String getModel() {
         return model;
+    }
+
+    /**
+     * Counts the spare suits this suit would accept as its replacement. A bought suit gets its weapons and armor
+     * attached and is priced from them, while a new suit with nothing attached is priced from its unit file, so the
+     * usual same-part check, which compares prices, never counted a bought suit and the repair showed none in transit.
+     */
+    @Override
+    protected PartInventory getReplacementInventory() {
+        PartInventory inventory = super.getReplacementInventory();
+        LocalWarehouse warehouse = getWarehouse();
+        if (warehouse == null) {
+            return inventory;
+        }
+        int suitsOnHand = 0;
+        int suitsInTransit = 0;
+        for (Part spare : warehouse.getParts()) {
+            if (!spare.isSpare() || !isAcceptableReplacement(spare, false)) {
+                continue;
+            }
+            if (spare.isPresent()) {
+                suitsOnHand += spare.getTotalQuantity();
+            } else {
+                suitsInTransit += spare.getTotalQuantity();
+            }
+        }
+        inventory.setSupply(suitsOnHand);
+        inventory.setTransit(suitsInTransit);
+        return inventory;
     }
 
     @Override

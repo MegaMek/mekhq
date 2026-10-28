@@ -51,6 +51,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.settings.SettingsIconLegend;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.AppIcons;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -131,6 +132,54 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, mode);
         this.mode = mode;
+        finishConstruction(frame, preset);
+    }
+
+    /**
+     * Constructs a {@code CampaignOptionsDialog} owned by the given dialog, or with no owner window if {@code owner}
+     * is {@code null}. See {@link #create}.
+     */
+    private CampaignOptionsDialog(@Nullable final JDialog owner, @Nullable final JFrame frame,
+          @Nonnull final Campaign campaign, @Nullable CampaignPreset preset, CampaignOptionsDialogMode mode) {
+        super(owner,
+              frame,
+              true,
+              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
+              "CampaignOptionsDialog",
+              "campaignOptions.title");
+        if (owner == null) {
+            AppIcons.applyToWindow(this, "mekhq");
+        }
+        this.campaign = campaign;
+        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, mode);
+        this.mode = mode;
+        finishConstruction(frame, preset);
+    }
+
+    /**
+     * Creates a {@code CampaignOptionsDialog} that stays reachable when the application's main window is hidden or
+     * missing, such as while a campaign is being created or loaded.
+     *
+     * <p>If {@code frame} is showing, the dialog is owned by it as usual. Otherwise the dialog has no owner window
+     * and carries the MekHQ icon, because Windows leaves windows owned by a hidden frame out of the taskbar and
+     * Alt+Tab.</p>
+     *
+     * @param frame    the application frame, or {@code null}
+     * @param campaign the {@link Campaign} instance for the current or preconfigured campaign
+     * @param preset   an optional {@link CampaignPreset} to initialize the campaign (can be {@code null})
+     * @param mode     the {@link CampaignOptionsDialogMode} defining the behavior of the dialog
+     *
+     * @return the new dialog, not yet visible
+     */
+    public static CampaignOptionsDialog create(@Nullable final JFrame frame, @Nonnull final Campaign campaign,
+          @Nullable CampaignPreset preset, CampaignOptionsDialogMode mode) {
+        if ((frame != null) && frame.isShowing()) {
+            return new CampaignOptionsDialog(frame, campaign, preset, mode);
+        }
+        return new CampaignOptionsDialog((JDialog) null, frame, campaign, preset, mode);
+    }
+
+    private void finishConstruction(@Nullable final JFrame frame, @Nullable CampaignPreset preset) {
         initialize();
 
         if (preset != null) {
@@ -148,6 +197,15 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      */
     public boolean wasCanceled() {
         return wasCanceled;
+    }
+
+    /**
+     * Disposes the dialog on Escape as well, matching the Cancel button. The inherited behavior only hides it, which
+     * would leave a dialog without an owner window alive.
+     */
+    @Override
+    protected void cancelAction() {
+        dispose();
     }
 
     /**
@@ -334,7 +392,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @return {@code true} if the user chose to overwrite the existing file
      */
     private boolean confirmPresetOverwrite(final CampaignPreset preset) {
-        final int choice = JOptionPane.showConfirmDialog(getFrame(),
+        final int choice = JOptionPane.showConfirmDialog(this,
               getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
               getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
               JOptionPane.YES_NO_OPTION,
@@ -388,7 +446,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
               getTextAt(bundle, "savePresetSuccess.location"),
               pathPanel };
 
-        JOptionPane.showMessageDialog(getFrame(),
+        JOptionPane.showMessageDialog(this,
               message,
               getTextAt(bundle, "savePresetSuccess.title"),
               JOptionPane.INFORMATION_MESSAGE);
@@ -449,14 +507,17 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
 
         Object[] options = { getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.button") };
 
-        JOptionPane.showOptionDialog(null,
-              panel,
-              title,
-              JOptionPane.DEFAULT_OPTION,
+        // Shown after this dialog closes, while the startup screen is still hidden, so give the notice no owner window
+        // and the MekHQ icon to keep it in the Windows taskbar and Alt+Tab
+        final JDialog dialog = new JOptionPane(panel,
               JOptionPane.INFORMATION_MESSAGE,
+              JOptionPane.DEFAULT_OPTION,
               null,
               options,
-              options[0]);
+              options[0]).createDialog(title);
+        AppIcons.applyToWindow(dialog, "mekhq");
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     @Override

@@ -34,7 +34,6 @@ package mekhq.campaign.mission.contract.utilities;
 
 import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,6 +63,7 @@ import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -186,6 +186,24 @@ class ContractCharacteristicsTest {
         assertEquals(base, ContractCharacteristics.bakeCombatPay(base, contractWith()));
         // HIGH_PAY is a PAY characteristic and must not touch combat pay.
         assertEquals(base, ContractCharacteristics.bakeCombatPay(base, contractWith(HIGH_PAY)));
+    }
+
+    /** An intensity step changes the track count combat pay was worked out from, so it is recomputed and rebaked. */
+    @Test
+    void refreshCombatPayRecomputesFromTheFinalTrackCountAndRebakesTheCharacteristic() {
+        AbstractContract contract = contractWith(HIGH_INTENSITY, HAZARD_PAY);
+        Campaign campaign = mock(Campaign.class);
+        Money recomputed = Money.of(200);
+
+        try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
+            generation.when(() -> AbstractContractGeneration.determineCombatPay(campaign, contract))
+                  .thenReturn(recomputed);
+
+            ContractCharacteristics.refreshCombatPayForTrackCount(contract, campaign);
+        }
+
+        assertEquals(recomputed.multipliedBy(HAZARD_PAY.getMagnitude()),
+              contract.getContractFinanceData().combatPay());
     }
 
     @Test
@@ -320,12 +338,23 @@ class ContractCharacteristicsTest {
     }
 
     @Test
-    void negotiatorSkillOverrideMapsToTheNegotiatorCharacteristic() {
-        assertEquals(SkillLevel.ELITE,
-              ContractCharacteristics.getNegotiatorSkillOverride(contractWith(ELITE_NEGOTIATOR)));
-        assertEquals(SkillLevel.REGULAR,
-              ContractCharacteristics.getNegotiatorSkillOverride(contractWith(NOVICE_NEGOTIATOR)));
-        assertNull(ContractCharacteristics.getNegotiatorSkillOverride(contractWith()));
+    void negotiatorTierStepMapsToTheNegotiatorCharacteristic() {
+        assertEquals(1, ContractCharacteristics.getNegotiatorTierStep(contractWith(ELITE_NEGOTIATOR)));
+        assertEquals(-1, ContractCharacteristics.getNegotiatorTierStep(contractWith(NOVICE_NEGOTIATOR)));
+        assertEquals(0, ContractCharacteristics.getNegotiatorTierStep(contractWith()));
+    }
+
+    @Test
+    void stepSkillLevelMovesFromTheEmployerTier() {
+        assertEquals(SkillLevel.REGULAR, ContractCharacteristics.stepSkillLevel(SkillLevel.GREEN, 1));
+        assertEquals(SkillLevel.GREEN, ContractCharacteristics.stepSkillLevel(SkillLevel.REGULAR, -1));
+        assertEquals(SkillLevel.VETERAN, ContractCharacteristics.stepSkillLevel(SkillLevel.VETERAN, 0));
+    }
+
+    @Test
+    void stepSkillLevelStaysBetweenUltraGreenAndLegendary() {
+        assertEquals(SkillLevel.ULTRA_GREEN, ContractCharacteristics.stepSkillLevel(SkillLevel.ULTRA_GREEN, -1));
+        assertEquals(SkillLevel.LEGENDARY, ContractCharacteristics.stepSkillLevel(SkillLevel.LEGENDARY, 1));
     }
 
     // endregion reputation / standing multipliers

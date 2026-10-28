@@ -33,9 +33,11 @@
 package mekhq.campaign.parts.utilities;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.battleValue.BVCalculator;
 import megamek.common.battleValue.BattleArmorBVCalculator;
@@ -60,16 +62,18 @@ import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 public class BattleArmorSuitUtility {
     private static final MMLogger LOGGER = MMLogger.create(BattleArmorSuitUtility.class);
 
-    String chassis;
-    String model;
+    /**
+     * Suit details by chassis and model. Working them out means reading the unit file from disk, and the parts in use
+     * report compares suits once per warehouse part on every refresh, each time with a freshly built part.
+     */
+    private static final Map<String, SuitDetails> SUIT_DETAILS_CACHE = new ConcurrentHashMap<>();
 
-    Entity entity;
+    private record SuitDetails(int suitBV, int weaponTypeListHash) {}
+
+    private final @Nullable SuitDetails suitDetails;
 
     public BattleArmorSuitUtility(String chassis, String model) {
-        this.chassis = chassis;
-        this.model = model;
-
-        entity = getEntity(this.chassis, this.model);
+        suitDetails = getSuitDetails(chassis, model);
     }
 
     /**
@@ -78,7 +82,7 @@ public class BattleArmorSuitUtility {
      * @return true if the entity exists, false if the entity is null
      */
     public boolean hasEntity() {
-        return entity != null;
+        return suitDetails != null;
     }
 
     /**
@@ -87,7 +91,7 @@ public class BattleArmorSuitUtility {
      * @return int BV of the individual BA suit
      */
     public int getBattleArmorSuitBV() {
-        return getBattleArmorSuitBV(entity);
+        return (suitDetails == null) ? 0 : suitDetails.suitBV();
     }
 
     /**
@@ -98,7 +102,24 @@ public class BattleArmorSuitUtility {
      * @return int the list of weapon types this BA entity has, hashed
      */
     public int getWeaponTypeListHash() {
-        return getWeaponTypeListHash(entity);
+        return (suitDetails == null) ? 0 : suitDetails.weaponTypeListHash();
+    }
+
+    private static @Nullable SuitDetails getSuitDetails(String chassis, @Nullable String model) {
+        String key = chassis + '\u0000' + model;
+        SuitDetails cached = SUIT_DETAILS_CACHE.get(key);
+        if (cached != null) {
+            return cached;
+        }
+
+        // A suit whose unit could not be found is not cached, so it is found once the unit becomes available.
+        Entity entity = getEntity(chassis, model);
+        if (entity == null) {
+            return null;
+        }
+        SuitDetails details = new SuitDetails(getBattleArmorSuitBV(entity), getWeaponTypeListHash(entity));
+        SUIT_DETAILS_CACHE.put(key, details);
+        return details;
     }
 
     private static int getWeaponTypeListHash(Entity entity) {

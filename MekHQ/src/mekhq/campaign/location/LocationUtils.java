@@ -35,7 +35,7 @@ package mekhq.campaign.location;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;
@@ -199,6 +199,19 @@ public final class LocationUtils {
         }
         JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
         return (path == null || path.isEmpty()) ? null : path;
+    }
+
+    /**
+     * Builds a single-system path, so a {@link CurrentLocation} already in {@code system} completes its in-system
+     * transit to the planet. A travel node short of the planet with no path never advances.
+     *
+     * @param system the system the travel node is in and must arrive at; must not be {@code null}
+     * @return a path containing only {@code system}
+     */
+    public static JumpPath inSystemPath(PlanetarySystem system) {
+        JumpPath path = new JumpPath();
+        path.addSystem(system);
+        return path;
     }
 
     /**

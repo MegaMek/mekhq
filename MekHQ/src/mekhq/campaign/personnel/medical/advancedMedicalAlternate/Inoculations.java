@@ -48,15 +48,17 @@ import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
@@ -590,9 +592,9 @@ public class Inoculations {
     private static void getSpreadingDiseases(Campaign campaign, Collection<Person> allPersonnel,
           String planetCode, String systemCode, Set<InjuryType> activeDiseases, Set<InjuryType> canonDiseases,
           int diseaseChance) {
-        Set<String> spreadingGenericDiseases = new HashSet<>();
-        Set<String> spreadingCanonDiseasesWithCure = new HashSet<>();
-        Set<String> spreadingCanonDiseasesNoCure = new HashSet<>();
+        Map<String, List<Person>> spreadingGenericDiseases = new HashMap<>();
+        Map<String, List<Person>> spreadingCanonDiseasesWithCure = new HashMap<>();
+        Map<String, List<Person>> spreadingCanonDiseasesNoCure = new HashMap<>();
 
         LocalDate today = campaign.getLocalDate();
         Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemCode, today, false);
@@ -623,8 +625,9 @@ public class Inoculations {
                     }
 
                     if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
-                        applyDisease(campaign, person, disease);
-                        spreadingGenericDiseases.add(disease.getSimpleName());
+                        if (applyDisease(campaign, person, disease)) {
+                            addInfectedPerson(spreadingGenericDiseases, disease, person);
+                        }
                     }
                 }
             }
@@ -643,11 +646,10 @@ public class Inoculations {
                 }
 
                 if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
-                    applyDisease(campaign, person, disease);
-                    if (availableCures.contains(disease)) {
-                        spreadingCanonDiseasesWithCure.add(disease.getSimpleName());
-                    } else {
-                        spreadingCanonDiseasesNoCure.add(disease.getSimpleName());
+                    if (applyDisease(campaign, person, disease)) {
+                        addInfectedPerson(availableCures.contains(disease) ?
+                                                spreadingCanonDiseasesWithCure :
+                                                spreadingCanonDiseasesNoCure, disease, person);
                     }
                 }
             }
@@ -661,8 +663,8 @@ public class Inoculations {
 
     private static void getSpreadingBioweapons(Campaign campaign, Collection<Person> allPersonnel,
           boolean isOnPlanet, String systemCode, Set<InjuryType> activeBioweapons, int diseaseChance) {
-        Set<String> spreadingBioweaponsWithCure = new HashSet<>();
-        Set<String> spreadingBioweaponsDiseasesNoCure = new HashSet<>();
+        Map<String, List<Person>> spreadingBioweaponsWithCure = new HashMap<>();
+        Map<String, List<Person>> spreadingBioweaponsDiseasesNoCure = new HashMap<>();
 
         LocalDate today = campaign.getLocalDate();
         Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemCode, today, false);
@@ -693,11 +695,10 @@ public class Inoculations {
                 }
 
                 if (personalInfectionChance == 0 || randomInt(personalInfectionChance) == 0) {
-                    applyDisease(campaign, person, disease);
-                    if (availableCures.contains(disease)) {
-                        spreadingBioweaponsWithCure.add(disease.getSimpleName());
-                    } else {
-                        spreadingBioweaponsDiseasesNoCure.add(disease.getSimpleName());
+                    if (applyDisease(campaign, person, disease)) {
+                        addInfectedPerson(availableCures.contains(disease) ?
+                                                spreadingBioweaponsWithCure :
+                                                spreadingBioweaponsDiseasesNoCure, disease, person);
                     }
                 }
             }
@@ -705,6 +706,11 @@ public class Inoculations {
 
         triggerBioweaponSpreadMessages(campaign, !isOnPlanet, true, spreadingBioweaponsWithCure);
         triggerBioweaponSpreadMessages(campaign, !isOnPlanet, false, spreadingBioweaponsDiseasesNoCure);
+    }
+
+    private static void addInfectedPerson(Map<String, List<Person>> spreadingDiseases, InjuryType disease,
+          Person person) {
+        spreadingDiseases.computeIfAbsent(disease.getSimpleName(), key -> new ArrayList<>()).add(person);
     }
 
     public record DiseaseScanResult(boolean hasSuperSpreader, Set<InjuryType> activeDiseases,
@@ -775,71 +781,68 @@ public class Inoculations {
      * Applies a disease to a person.
      *
      * <p>Creates a new disease injury with random duration and adds it to the person's injury list. Children are
-     * excluded from disease application. If the disease is fatal, changes the person's status to
-     * {@link PersonnelStatus#CONTAGIOUS_DISEASE}.</p>
+     * excluded from disease application. The infection is recorded in the person's medical log. If the disease is
+     * fatal, changes the person's status to {@link PersonnelStatus#CONTAGIOUS_DISEASE}.</p>
      *
      * @param campaign the current campaign
      * @param person   the person to infect with the disease
      * @param disease  the type of disease to apply
      *
+     * @return {@code true} if the person was infected, {@code false} otherwise
+     *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void applyDisease(Campaign campaign, Person person, InjuryType disease) {
+    public static boolean applyDisease(Campaign campaign, Person person, InjuryType disease) {
         // Some diseases are of a venereal nature, we deliberately exclude children for that reason.
         if (person.isChild(campaign.getLocalDate(), true)) {
-            return;
+            return false;
         }
 
         Injury newDisease = disease.newInjury(campaign, person, BodyLocation.INTERNAL, 1);
         if (newDisease == null) {
             LOGGER.error("Failed to generate disease of type {} at body location {} with duration multiplier {}",
                   disease, BodyLocation.INTERNAL, 1);
-        } else {
-            if (newDisease.getOriginalTime() == 0) {
-                int duration = DiseaseService.getDiseaseDuration();
-                newDisease.setOriginalTime(duration);
-                newDisease.setTime(duration);
-            }
-            person.addInjury(newDisease);
-
-            if (disease.impliesDead(BodyLocation.INTERNAL)) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.CONTAGIOUS_DISEASE);
-            }
+            return false;
         }
+
+        if (newDisease.getOriginalTime() == 0) {
+            int duration = DiseaseService.getDiseaseDuration();
+            newDisease.setOriginalTime(duration);
+            newDisease.setTime(duration);
+        }
+        person.addInjury(newDisease);
+        MedicalLogger.contractedDisease(person, campaign.getLocalDate(), disease.getSimpleName());
+
+        if (disease.impliesDead(BodyLocation.INTERNAL)) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.CONTAGIOUS_DISEASE);
+        }
+
+        return true;
     }
 
     /**
      * Triggers campaign reports for diseases that have spread.
      *
-     * <p>Displays colored alerts for each spreading disease. Alert color is red if in transit (higher danger) or
-     * yellow if on a planet.</p>
+     * <p>Displays colored alerts for each spreading disease, followed by the personnel who were infected. Alert color
+     * is red if in transit (higher danger) or yellow if on a planet.</p>
      *
      * @param campaign          the current campaign
      * @param isInTransit       true if the campaign is in transit between planets
-     * @param spreadingDiseases the set of disease names that have spread
+     * @param spreadingDiseases the names of the diseases that have spread, mapped to the personnel they infected
      *
      * @author Illiani
      * @since 0.50.10
      */
     public static void triggerDiseaseSpreadMessages(Campaign campaign, boolean isInTransit,
-          Set<String> spreadingDiseases) {
+          Map<String, List<Person>> spreadingDiseases) {
         String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
-        for (String spread : spreadingDiseases) {
-            String reportKey;
-            if (isInTransit) {
-                reportKey = "Inoculations.spread.transit";
-            } else {
-                reportKey = "Inoculations.spread.normal";
-            }
-
-            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
-                  spread));
-        }
+        String reportKey = isInTransit ? "Inoculations.spread.transit" : "Inoculations.spread.normal";
+        addSpreadReports(campaign, reportKey, alertColor, spreadingDiseases);
     }
 
     public static void triggerCanonDiseaseSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
-          Set<String> diseases) {
+          Map<String, List<Person>> diseases) {
         String alertColor = isInTransit ? getNegativeColor() : getWarningColor();
         alertColor = spanOpeningWithCustomColor(hasCure ? alertColor : getNegativeColor());
 
@@ -850,14 +853,11 @@ public class Inoculations {
             reportKey = "Inoculations.spread.transit";
         }
 
-        for (String disease : diseases) {
-            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
-                  disease));
-        }
+        addSpreadReports(campaign, reportKey, alertColor, diseases);
     }
 
     public static void triggerBioweaponSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
-          Set<String> diseases) {
+          Map<String, List<Person>> diseases) {
         String alertColor = isInTransit ? getNegativeColor() : getWarningColor();
         alertColor = spanOpeningWithCustomColor(hasCure ? alertColor : getNegativeColor());
 
@@ -865,14 +865,37 @@ public class Inoculations {
         if (!hasCure) {
             reportKey = "Inoculations.spread.bioweapon.noCure";
         } else if (isInTransit) {
-            reportKey = "Inoculations.spread.bioweapon.normal";
+            reportKey = "Inoculations.spread.bioweapon.transit";
         } else {
-            reportKey = "Inoculations.spread.bioweapon";
+            reportKey = "Inoculations.spread.bioweapon.normal";
         }
 
-        for (String disease : diseases) {
-            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
-                  disease));
+        addSpreadReports(campaign, reportKey, alertColor, diseases);
+    }
+
+    /**
+     * Adds one daily report per spreading disease, each naming the personnel who were infected.
+     *
+     * @param campaign   the current campaign
+     * @param reportKey  the resource key of the alert message
+     * @param alertColor the opening span tag used to color the alert
+     * @param diseases   the names of the diseases that have spread, mapped to the personnel they infected
+     */
+    private static void addSpreadReports(Campaign campaign, String reportKey, String alertColor,
+          Map<String, List<Person>> diseases) {
+        for (Map.Entry<String, List<Person>> spread : diseases.entrySet()) {
+            String infectedPersonnel = spread.getValue()
+                                             .stream()
+                                             .map(Person::getHyperlinkedFullTitle)
+                                             .collect(Collectors.joining(", "));
+
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey, alertColor, CLOSING_SPAN_TAG,
+                  spread.getKey());
+            if (!infectedPersonnel.isEmpty()) {
+                report += getFormattedTextAt(RESOURCE_BUNDLE, "Inoculations.spread.infected", infectedPersonnel);
+            }
+
+            campaign.addReport(MEDICAL, report);
         }
     }
 }

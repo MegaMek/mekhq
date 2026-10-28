@@ -42,9 +42,9 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.IntStream;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
@@ -71,7 +71,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -844,6 +843,12 @@ public class MekLocation extends Part {
         return (loc != Mek.LOC_CENTER_TORSO) && super.isSalvaging();
     }
 
+    /** A Mek's centre torso can never be scrapped, so it can never be replaced either. */
+    @Override
+    public boolean isReplaceable() {
+        return loc != Mek.LOC_CENTER_TORSO;
+    }
+
     @Override
     public String checkScrappable() {
         // Can't scrap a center torso
@@ -946,15 +951,11 @@ public class MekLocation extends Part {
               .append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
+            toReturn.append(getTimeLeftText());
             if (isBlownOff()) {
-                toReturn.append(" <b>TN:</b> ")
-                      .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                      .append(getAllMods(null).getValueAsString());
+                toReturn.append(' ').append(getTargetNumberText());
             }
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getWorkModeText());
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -1011,10 +1012,15 @@ public class MekLocation extends Part {
     }
 
     @Override
+    public boolean canTakeMaintenanceDamage() {
+        return (getUnit() != null) && (getUnit().getEntity().getInternal(getLoc()) >= 1);
+    }
+
+    @Override
     public void doMaintenanceDamage(int d) {
         if ((getUnit() != null) && (d > 0)) {
             int points = getUnit().getEntity().getInternal(getLoc());
-            getUnit().getEntity().setInternal(Math.max(points - d, 1), getLoc());
+            getUnit().getEntity().setInternal(getStructureAfterMaintenanceDamage(points, d), getLoc());
             updateConditionFromEntity(false);
         }
     }

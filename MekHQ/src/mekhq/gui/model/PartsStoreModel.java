@@ -42,7 +42,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -50,6 +50,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.gui.CampaignGUI;
 
 /**
@@ -319,7 +320,8 @@ public class PartsStoreModel extends AbstractTableModel {
                 }
                 if (null != shoppingItem) {
                     targetProxy = new TargetProxy(
-                          campaign.checkAcquisition(shoppingItem, getLogisticsPerson(), true).getTargetNumber());
+                          PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, shoppingItem,
+                                campaign.checkAcquisition(shoppingItem, getLogisticsPerson(), true)).getTargetNumber());
                 } else {
                     targetProxy = new TargetProxy(null);
                 }

@@ -127,15 +127,18 @@ class PersonnelEquipmentPage {
         cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
         cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
         cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
-        cboMekTechDefaultToolKit = toolKitCombo("mekTechDefaultToolKit");
-        cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
-        cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
-        cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
-        cboVesselCrewDefaultToolKit = toolKitCombo("vesselCrewDefaultToolKit");
-        cboAstechDefaultToolKit = toolKitCombo("astechDefaultToolKit");
-        cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
-        cboMedicDefaultToolKit = toolKitCombo("medicDefaultToolKit");
-        cboAdminDefaultToolKit = toolKitCombo("adminDefaultToolKit");
+        // A technician's default goes into the slot they repair from, so only kits that count as a tool kit are offered
+        List<String> technicianKits = EquipmentKitCatalog.technicianOptionKitNames();
+        List<String> everyKit = EquipmentKitCatalog.optionKitNames();
+        cboMekTechDefaultToolKit = toolKitCombo("mekTechDefaultToolKit", technicianKits);
+        cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit", technicianKits);
+        cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit", technicianKits);
+        cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit", technicianKits);
+        cboVesselCrewDefaultToolKit = toolKitCombo("vesselCrewDefaultToolKit", technicianKits);
+        cboAstechDefaultToolKit = toolKitCombo("astechDefaultToolKit", everyKit);
+        cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit", everyKit);
+        cboMedicDefaultToolKit = toolKitCombo("medicDefaultToolKit", everyKit);
+        cboAdminDefaultToolKit = toolKitCombo("adminDefaultToolKit", everyKit);
 
         JPanel pnlGeneral = createGeneralPanel();
         JPanel pnlArmorKits = createArmorKitsPanel();
@@ -296,8 +299,8 @@ class PersonnelEquipmentPage {
         }
     }
 
-    private MMComboBox<String> toolKitCombo(String name) {
-        MMComboBox<String> combo = new MMComboBox<>(name, EquipmentKitCatalog.optionKitNames().toArray(new String[0]));
+    private MMComboBox<String> toolKitCombo(String name, List<String> kitNames) {
+        MMComboBox<String> combo = new MMComboBox<>(name, kitNames.toArray(new String[0]));
         combo.setRenderer(new ToolKitRenderer());
         return combo;
     }

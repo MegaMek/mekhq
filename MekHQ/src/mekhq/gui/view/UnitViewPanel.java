@@ -219,6 +219,8 @@ public class UnitViewPanel extends JScrollablePanel {
         JTextPane txtReadout = new JTextPane();
 
         EntityReadout entityReadout = EntityReadout.createReadout(entity, false, true);
+        // Show what the campaign values the unit at, rather than its construction cost
+        entityReadout.setCostOverride(unit.getBuyCost().getAmount().doubleValue());
         txtReadout.setName("txtReadout");
         txtReadout.setContentType(getTextAt(RESOURCE_BUNDLE, "txtReadout.contentType"));
         txtReadout.setEditable(false);

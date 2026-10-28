@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 
 /**
  * A table model for displaying acquisitions. Unlike the other table models here, this one can apply to multiple tables,
@@ -131,7 +132,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
-                TargetRoll target = getCampaign().checkGenericAcquisition(shoppingItem).getTargetNumber();
+                TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
+                      getCampaign().checkGenericAcquisition(shoppingItem)).getTargetNumber();
                 String value = target.getValueAsString();
                 if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
                     value += "+";
@@ -183,7 +185,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
 
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
         if (column == COL_TARGET) {
-            return getCampaign().checkAcquisition(shoppingItem).getTargetNumber().getDesc();
+            return PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
+                  getCampaign().checkAcquisition(shoppingItem)).getTargetNumber().getDesc();
         }
         return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
     }

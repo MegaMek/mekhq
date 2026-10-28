@@ -32,11 +32,13 @@
  */
 package mekhq.gui;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,7 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 
 /**
@@ -67,9 +69,16 @@ import megamek.logging.MMLogger;
 final class MapTileLayer {
     private static final MMLogger LOGGER = MMLogger.create(MapTileLayer.class);
     static final int TILE_SIZE = 256;
-    private static final int MAX_TILES = 320;
+    /** Zoom levels' worth of visible tiles, including the prefetch ring, that a layer keeps images for. */
+    private static final int TILE_BUDGET_LEVELS = 2;
+    private static final int MIN_TILE_BUDGET = 64;
+    /** Used until the first request reveals the viewport size. */
+    private static final int DEFAULT_TILE_BUDGET = 320;
+    /** Empty tiles are cheap; they are only bounded so the cache cannot grow without limit. */
+    private static final int TILE_ENTRIES_PER_IMAGE = 4;
     private static final int PREFETCH_RING = 1;
     private static final int MAX_REQUESTED_CONTENTS = 8;
+    private static final int MAX_POOLED_IMAGES = 64;
     private static final AtomicLong SEQUENCE = new AtomicLong();
     private static final ThreadPoolExecutor RENDERERS = createRenderers();
 
@@ -128,6 +137,19 @@ final class MapTileLayer {
     record TileKey(Level level, int column, int row) {
     }
 
+    /** Which tiles {@link #paint} requests for the target camera. */
+    enum RequestMode {
+        /** Request nothing. */
+        NONE,
+        /** Request the target's visible tiles and a prefetch ring around them. */
+        WITH_PREFETCH,
+        /**
+         * Request only the target's visible tiles, for use while the zoom is still changing: a prefetch ring for a zoom
+         * level the camera passes straight through would be rendered and discarded.
+         */
+        VISIBLE_ONLY
+    }
+
     private record Tile(@Nullable BufferedImage image) {
     }
 
@@ -151,8 +173,12 @@ final class MapTileLayer {
                   return size() > MAX_REQUESTED_CONTENTS;
               }
           });
+    /** Evicted tile images, reused by workers instead of allocating a new raster per tile. */
+    private final ArrayDeque<BufferedImage> imagePool = new ArrayDeque<>();
     private long generation;
     private int renderedTileCount;
+    private int imageTileCount;
+    private int tileBudget = DEFAULT_TILE_BUDGET;
 
     MapTileLayer(boolean opaque, int margin, Runnable repaint) {
         this(opaque, margin, repaint, SwingUtilities::invokeLater);
@@ -166,15 +192,16 @@ final class MapTileLayer {
     }
 
     /**
-     * Paints the layer for {@code view}. Exact tiles are requested for {@code target} (the camera destination during an
-     * animation) unless {@code requestTiles} is false. When no cached level of the same content exists, visible tiles
+     * Paints the layer for {@code view}. Tiles are requested for {@code target} (the camera destination during an
+     * animation) as selected by {@code requestMode}. When no cached level of the same content exists, visible tiles
      * are rendered in parallel before returning, because there is nothing to show in their place.
      *
      * @return {@code true} when every visible tile was drawn at the exact view scale
      */
     boolean paint(Graphics2D graphics, Object content, LevelSource source, Camera view, Camera target,
-          boolean requestTiles, @Nullable Color holeFill) {
+          RequestMode requestMode, @Nullable Color holeFill) {
         Level exactLevel = Level.of(content, view.scale(), view.pixelScale());
+        tileBudget = tileBudget(view);
         Graphics2D deviceGraphics = (Graphics2D) graphics.create();
         try {
             InterstellarMapPanel.prepareLayerBlit(deviceGraphics, view.pixelScale());
@@ -201,6 +228,8 @@ final class MapTileLayer {
                     try {
                         tileGraphics.clipRect(bounds.x, bounds.y, bounds.width, bounds.height);
                         if (holeFill != null) {
+                            tileGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                  RenderingHints.VALUE_ANTIALIAS_OFF);
                             tileGraphics.setPaint(holeFill);
                             tileGraphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
                         }
@@ -219,8 +248,9 @@ final class MapTileLayer {
                           (key.row() * TILE_SIZE) + offsetY, null);
                 }
             }
-            if (requestTiles) {
-                request(Level.of(content, target.scale(), target.pixelScale()), source, target);
+            if (requestMode != RequestMode.NONE) {
+                request(Level.of(content, target.scale(), target.pixelScale()), source, target,
+                      requestMode == RequestMode.WITH_PREFETCH ? PREFETCH_RING : 0);
             }
             return missing.isEmpty();
         } finally {
@@ -230,7 +260,11 @@ final class MapTileLayer {
 
     void clear() {
         generation++;
+        for (Tile tile : tiles.values()) {
+            recycle(tile.image());
+        }
         tiles.clear();
+        imageTileCount = 0;
         levelTileCounts.clear();
         completeLevels.clear();
         inFlight.clear();
@@ -245,7 +279,7 @@ final class MapTileLayer {
     /** Requests the visible tiles of {@code content} at {@code camera} and reports whether all are already present. */
     boolean prepare(Object content, LevelSource source, Camera camera) {
         Level level = Level.of(content, camera.scale(), camera.pixelScale());
-        request(level, source, camera);
+        request(level, source, camera, PREFETCH_RING);
         return tiles.keySet().containsAll(visibleKeys(level, camera, 0));
     }
 
@@ -261,6 +295,10 @@ final class MapTileLayer {
 
     int tileCount() {
         return tiles.size();
+    }
+
+    int imageTileCount() {
+        return imageTileCount;
     }
 
     int renderedTileCount() {
@@ -296,9 +334,20 @@ final class MapTileLayer {
               pixelScale), margin, key.column() * TILE_SIZE, key.row() * TILE_SIZE);
     }
 
-    private void request(Level level, LevelSource source, Camera camera) {
+    /**
+     * Sizes the image cache to the viewport: the visible tiles and their prefetch ring for the current zoom level,
+     * plus room for another level to stand in while the zoom changes.
+     */
+    static int tileBudget(Camera camera) {
+        int columns = Math.ceilDiv(camera.deviceWidth(), TILE_SIZE) + 1 + (PREFETCH_RING * 2);
+        int rows = Math.ceilDiv(camera.deviceHeight(), TILE_SIZE) + 1 + (PREFETCH_RING * 2);
+        return Math.max(MIN_TILE_BUDGET, columns * rows * TILE_BUDGET_LEVELS);
+    }
+
+    private void request(Level level, LevelSource source, Camera camera, int prefetchRing) {
+        tileBudget = tileBudget(camera);
         List<TileKey> visible = visibleKeys(level, camera, 0);
-        List<TileKey> requested = new ArrayList<>(visibleKeys(level, camera, PREFETCH_RING));
+        List<TileKey> requested = prefetchRing == 0 ? visible : visibleKeys(level, camera, prefetchRing);
         Set<TileKey> visibleSet = new HashSet<>(visible);
         requests.put(level.content(), new Request(level, Set.copyOf(visibleSet), Set.copyOf(requested)));
         markCompleteWhenReady(level);
@@ -327,6 +376,8 @@ final class MapTileLayer {
                     if (requestGeneration == generation) {
                         install(key, image);
                         repaint.run();
+                    } else {
+                        recycle(image);
                     }
                 });
             }));
@@ -356,19 +407,47 @@ final class MapTileLayer {
     }
 
     private @Nullable BufferedImage renderTile(TileKey key, TileRenderer renderer) {
-        BufferedImage image = new BufferedImage(TILE_SIZE, TILE_SIZE,
-              opaque ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB_PRE);
+        BufferedImage image = obtainImage();
         Graphics2D graphics = image.createGraphics();
+        boolean drawn = false;
         try {
+            if (!opaque) {
+                graphics.setComposite(AlphaComposite.Clear);
+                graphics.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+                graphics.setComposite(AlphaComposite.SrcOver);
+            }
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.scale(key.level().pixelScale(), key.level().pixelScale());
-            boolean drawn = renderer.render(graphics, tileContext(key, margin));
-            return (drawn || opaque) ? image : null;
+            drawn = renderer.render(graphics, tileContext(key, margin)) || opaque;
         } catch (RuntimeException exception) {
             LOGGER.error("Failed to render interstellar map tile", exception);
-            return null;
         } finally {
             graphics.dispose();
+        }
+        if (drawn) {
+            return image;
+        }
+        recycle(image);
+        return null;
+    }
+
+    private BufferedImage obtainImage() {
+        BufferedImage image;
+        synchronized (imagePool) {
+            image = imagePool.pollFirst();
+        }
+        return image != null ? image : new BufferedImage(TILE_SIZE, TILE_SIZE,
+              opaque ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB_PRE);
+    }
+
+    /** Returns an image that is no longer drawn to the pool. Called from the event dispatch thread and workers. */
+    private void recycle(@Nullable BufferedImage image) {
+        if (image != null) {
+            synchronized (imagePool) {
+                if (imagePool.size() < MAX_POOLED_IMAGES) {
+                    imagePool.addFirst(image);
+                }
+            }
         }
     }
 
@@ -387,16 +466,38 @@ final class MapTileLayer {
     }
 
     private void install(TileKey key, @Nullable BufferedImage image) {
-        if (tiles.put(key, new Tile(image)) == null) {
+        Tile previous = tiles.put(key, new Tile(image));
+        if (previous == null) {
             levelTileCounts.merge(key.level(), 1, Integer::sum);
+        } else {
+            recycle(previous.image());
+            if (previous.image() != null) {
+                imageTileCount--;
+            }
+        }
+        if (image != null) {
+            imageTileCount++;
         }
         renderedTileCount++;
+        // Images are the only real cost, so only the image budget evicts images and the entry limit only evicts empty
+        // tiles; that keeps image evictions in step with image installs, so every evicted image goes straight back to
+        // a worker through the pool.
+        int maxEntries = tileBudget * TILE_ENTRIES_PER_IMAGE;
         Iterator<Map.Entry<TileKey, Tile>> iterator = tiles.entrySet().iterator();
-        while ((tiles.size() > MAX_TILES) && iterator.hasNext()) {
-            TileKey evicted = iterator.next().getKey();
+        while (((imageTileCount > tileBudget) || (tiles.size() > maxEntries)) && iterator.hasNext()) {
+            Map.Entry<TileKey, Tile> eldest = iterator.next();
+            BufferedImage evictedImage = eldest.getValue().image();
+            if ((evictedImage == null) ? (tiles.size() <= maxEntries) : (imageTileCount <= tileBudget)) {
+                continue;
+            }
             iterator.remove();
-            completeLevels.remove(evicted.level());
-            levelTileCounts.computeIfPresent(evicted.level(), (level, count) -> count > 1 ? count - 1 : null);
+            if (evictedImage != null) {
+                imageTileCount--;
+                recycle(evictedImage);
+            }
+            completeLevels.remove(eldest.getKey().level());
+            levelTileCounts.computeIfPresent(eldest.getKey().level(),
+                  (level, count) -> count > 1 ? count - 1 : null);
         }
         markCompleteWhenReady(key.level());
     }

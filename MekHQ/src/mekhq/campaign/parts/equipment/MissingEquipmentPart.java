@@ -37,9 +37,9 @@ import static megamek.common.units.Entity.LOC_NONE;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -250,6 +250,8 @@ public class MissingEquipmentPart extends MissingPart {
         boolean tonnageMatches = newPart.getTonnage() == equipmentPart.getTonnage();
         boolean sizeMatches = newPart.getSize() == equipmentPart.getSize();
         boolean omniPoddedMatches = newPart.isOmniPodded() == equipmentPart.isOmniPodded();
+        // An armored slot takes only an armored component, and a plain slot only a plain one
+        boolean armoringMatches = newPart.isArmored() == equipmentPart.isArmored();
 
         Money newPartPrice = newPart.getStickerPrice();
         Money equipmentPartPrice = equipmentPart.getStickerPrice();
@@ -269,7 +271,8 @@ public class MissingEquipmentPart extends MissingPart {
             }
         }
 
-        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && stickerPriceOrTonnageMatches;
+        return typeMatches && tonnageMatches && sizeMatches && omniPoddedMatches && armoringMatches
+                     && stickerPriceOrTonnageMatches;
     }
 
     protected @Nullable Mounted<?> getMounted() {
@@ -348,7 +351,25 @@ public class MissingEquipmentPart extends MissingPart {
     public EquipmentPart getNewPart() {
         EquipmentPart ePart = new EquipmentPart(getUnitTonnage(), type, -1, size, omniPodded, campaign);
         ePart.setEquipTonnage(equipTonnage);
-        return ePart;
+        return withArmoringOfSlot(ePart);
+    }
+
+    /**
+     * Makes a new part armored when the slot it will fill is armored, so an armored slot is bought and filled with an
+     * armored component at the armored price.
+     *
+     * @param newPart the new part for this slot
+     * @param <T>     the part class
+     *
+     * @return the same part
+     */
+    protected <T extends EquipmentPart> T withArmoringOfSlot(T newPart) {
+        Mounted<?> mounted = getMounted();
+        if ((mounted != null) && mounted.isArmored()) {
+            newPart.setArmored(EquipmentPart.armoringCostOf(type, unit.getEntity(), mounted.getLocation(),
+                  getSize()));
+        }
+        return newPart;
     }
 
     @Override

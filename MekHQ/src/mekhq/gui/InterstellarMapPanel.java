@@ -40,17 +40,7 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.event.AWTEventListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -69,18 +59,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
@@ -90,14 +70,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicMenuItemUI;
 import javax.swing.plaf.basic.BasicMenuUI;
 import javax.vecmath.Vector2d;
 
+import jakarta.annotation.Nullable;
+import megamek.SuiteOptions;
 import megamek.client.ui.util.FontHandler;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -1523,10 +1505,15 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     record TerritoryVisualProfile(double secondaryDetailAlpha, double disputedBandWidth) {
+        /**
+         * Disputed-territory stripes have a fixed width on the map, so they scale with the zoom instead of being redrawn
+         * at a new phase for every zoom level.
+         */
+        static final double DISPUTED_BAND_WIDTH_LIGHT_YEARS = 4.0;
+
         static TerritoryVisualProfile create(double scale) {
             double detailAlpha = fadeBetween(scale, 1.8, 3.2);
-            double bandWidth = interpolate(12.0, 22.0, fadeBetween(scale, 3.2, 5.6));
-            return new TerritoryVisualProfile(detailAlpha, bandWidth);
+            return new TerritoryVisualProfile(detailAlpha, DISPUTED_BAND_WIDTH_LIGHT_YEARS * scale);
         }
     }
 
@@ -1906,6 +1893,11 @@ public class InterstellarMapPanel extends JPanel {
     private final MapTileLayer starTiles = new MapTileLayer(false, 0, this::repaintMapPanel);
     private final MapTileLayer mapModeArtTiles = new MapTileLayer(false, 0, this::repaintMapPanel);
     private boolean tiledMapActive;
+    /** Outlaw marker state per system id, valid for {@link #outlawCacheInputs}. Accessed on the event thread only. */
+    private final Map<String, Boolean> outlawedSystems = new HashMap<>();
+    private @Nullable OutlawCacheInputs outlawCacheInputs;
+    private Map<String, Double> outlawCacheRegard = Map.of();
+    private Map<String, Double> outlawCacheClimateRegard = Map.of();
     private final StaticCartographyPreparationQueue<TerritoryDataKey> territoryPreparationQueue =
           new StaticCartographyPreparationQueue<>(this::isShowing, SwingUtilities::invokeLater,
                 this::prepareRequestedStaticCartography);
@@ -1926,6 +1918,9 @@ public class InterstellarMapPanel extends JPanel {
               }
           };
     private final Set<FactionLogoKey> missingFactionLogoImages = new HashSet<>();
+    private @Nullable TerritoryAtlas factionLogoLayoutAtlas;
+    private @Nullable FactionLogoLayoutKey factionLogoLayoutKey;
+    private List<PlacedFactionLogo> factionLogoLayout = List.of();
     private MapPresentationData mapPresentationData = MapPresentationData.empty();
     private Map<String, SystemRenderData> systemLabelWidthRenderData = Map.of();
     private Font systemLabelWidthFont;
@@ -2340,12 +2335,16 @@ public class InterstellarMapPanel extends JPanel {
                       conf.centerY, conf.scale, pixelScale);
                 TileFrame tileFrame = new TileFrame(atlas, systemRenderData,
                       new TerritoryDataKey(now, cartographyDataRevision), semanticZoomReference, tileCamera,
-                      getCameraDestination(pixelScale, tileCamera));
+                      getCameraDestination(pixelScale, tileCamera),
+                      zoomAnimationTimer.isRunning() ? MapTileLayer.RequestMode.VISIBLE_ONLY
+                            : MapTileLayer.RequestMode.WITH_PREFETCH);
                 if (tiledMap) {
                     enterTiledMap();
                     territoryLayerSettling = false;
                     prepareTiledTransitions(tileFrame);
                     paintTiledBase(g2, tileFrame);
+                    paintTiledFactionLogos(g2, tileFrame,
+                          semanticZoom.factionLogoAlpha() * getFactionMapModeAlpha() * FACTION_LOGO_OPACITY);
                 } else {
                     tiledMapActive = false;
                     paintStaticCartographyBackground(g2, renderViewKey);
@@ -2570,6 +2569,10 @@ public class InterstellarMapPanel extends JPanel {
                 Set<Faction> contractTargets = presentationData.contractTargets();
 
                 FactionHints factionHints = FactionHints.getInstance();
+                if (isUseFactionStandingOutlawing) {
+                    validateOutlawCache(new OutlawCacheInputs(campaignFaction, factionStandings, today,
+                          presentationData, systemRenderData, factionHints));
+                }
 
                 Graphics2D previousMapModeGraphics = null;
                 Graphics2D targetMapModeGraphics = g2;
@@ -2660,9 +2663,13 @@ public class InterstellarMapPanel extends JPanel {
 
                         // Outlaw status image
                         if (isUseFactionStandingOutlawing) {
-                            boolean isOutlawedInSystem = !FactionStandingUtilities.canEnterTargetSystem(campaignFaction,
-                                  factionStandings, null, renderData.population(), renderData.factions(), today,
-                                  contractEmployers, contractTargets, factionHints);
+                            Boolean isOutlawedInSystem = outlawedSystems.get(system.getId());
+                            if (isOutlawedInSystem == null) {
+                                isOutlawedInSystem = !FactionStandingUtilities.canEnterTargetSystem(campaignFaction,
+                                      factionStandings, null, renderData.population(), renderData.factions(), today,
+                                      contractEmployers, contractTargets, factionHints);
+                                outlawedSystems.put(system.getId(), isOutlawedInSystem);
+                            }
                             if (isOutlawedInSystem) {
                                   drawRestrictedSystemMarker(g2, markerLayout,
                                       semanticZoom.detailedOverlayAlpha());
@@ -5142,9 +5149,7 @@ public class InterstellarMapPanel extends JPanel {
               semanticZoom, overscan, true, true);
         }
 
-    record BaseTileContent(TerritoryDataKey dataKey, boolean territory, boolean factionLogos,
-          long semanticReferenceBits, int logoMajorMinimumSize, int logoCompactMinimumSize, int logoMaximumSize,
-          int logoCollisionPadding, int logoShadowOffset) {
+    record BaseTileContent(TerritoryDataKey dataKey, boolean territory) {
     }
 
     record AdministrativeTileContent(TerritoryDataKey dataKey, AdministrativeDisplayDetail detail) {
@@ -5160,8 +5165,12 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     /** A faction logo placed in global physical pixels for one zoom level; sources are scaled while drawing. */
-    record TileLogo(BufferedImage tinted, BufferedImage shadow, int deviceX, int deviceY, int deviceWidth,
-          int deviceHeight, int shadowOffset) {
+    private record PlacedFactionLogo(FactionLogoKey logoKey, FactionLogoImage source, int deviceX, int deviceY,
+          int deviceWidth, int deviceHeight, int shadowOffset) {
+    }
+
+    private record FactionLogoLayoutKey(int year, long scaleBits, long pixelScaleBits, int majorMinimumSize,
+          int compactMinimumSize, int maximumSize, int collisionPadding, int shadowOffset) {
     }
 
     record HpgTileLink(double primaryX, double primaryY, double secondaryX, double secondaryY, boolean classA) {
@@ -5192,21 +5201,15 @@ public class InterstellarMapPanel extends JPanel {
     /** Inputs shared by the tile layers for one painted frame. */
     private record TileFrame(@Nullable TerritoryAtlas atlas, Map<String, SystemRenderData> systemRenderData,
           TerritoryDataKey dataKey, double semanticReference, MapTileLayer.Camera camera,
-          MapTileLayer.Camera target) {
+          MapTileLayer.Camera target, MapTileLayer.RequestMode requestMode) {
     }
 
-    private BaseTileContent baseTileContent(TileFrame frame, boolean territory, boolean factionLogos) {
-        return new BaseTileContent(frame.dataKey(), territory, factionLogos,
-              Double.doubleToLongBits(frame.semanticReference()),
-              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_MIN_SIZE)),
-              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_COMPACT_MIN_SIZE)),
-              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_MAX_SIZE)),
-              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_COLLISION_PADDING)),
-              Math.max(1, UIUtil.scaleForGUI(2)));
+    private static BaseTileContent baseTileContent(TileFrame frame, boolean territory) {
+        return new BaseTileContent(frame.dataKey(), territory);
     }
 
-    private MapTileLayer.LevelSource baseTileSource(TileFrame frame, BaseTileContent content) {
-        return (scale, pixelScale) -> createBaseTileRenderer(frame.atlas(), content, scale, pixelScale);
+    private static MapTileLayer.LevelSource baseTileSource(TileFrame frame, BaseTileContent content) {
+        return (scale, pixelScale) -> createBaseTileRenderer(frame.atlas(), content, scale);
     }
 
     private HpgTileContent hpgTileContent(TileFrame frame) {
@@ -5224,10 +5227,6 @@ public class InterstellarMapPanel extends JPanel {
         return (scale, pixelScale) -> createSystemArtTileRenderer(frame.systemRenderData(), content, scale);
     }
 
-    private boolean hasFactionLogos(MapMode mapMode) {
-        return optEmblems.isSelected() && (mapMode == MapMode.FACTION);
-    }
-
     /** The territory variants composited for the current fade: absent, present, or both. */
     private List<Boolean> visibleTerritoryVariants() {
         if (territoryLayerAlpha >= 1.0) {
@@ -5242,9 +5241,8 @@ public class InterstellarMapPanel extends JPanel {
      */
     private void prepareTiledTransitions(TileFrame frame) {
         if (territoryLayerAnimating) {
-            boolean logos = hasFactionLogos(targetMapMode);
-            BaseTileContent without = baseTileContent(frame, false, logos);
-            BaseTileContent with = baseTileContent(frame, true, logos);
+            BaseTileContent without = baseTileContent(frame, false);
+            BaseTileContent with = baseTileContent(frame, true);
             boolean ready = baseTiles.prepare(without, baseTileSource(frame, without), frame.target())
                   & baseTiles.prepare(with, baseTileSource(frame, with), frame.target());
             if (!ready) {
@@ -5264,7 +5262,7 @@ public class InterstellarMapPanel extends JPanel {
             SystemArtTileContent art = systemArtTileContent(frame, targetMapMode);
             boolean ready = mapModeArtTiles.prepare(art, systemArtTileSource(frame, art), frame.target());
             for (boolean territory : visibleTerritoryVariants()) {
-                BaseTileContent base = baseTileContent(frame, territory, hasFactionLogos(targetMapMode));
+                BaseTileContent base = baseTileContent(frame, territory);
                 ready &= baseTiles.prepare(base, baseTileSource(frame, base), frame.target());
             }
             if (ready) {
@@ -5275,21 +5273,107 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private void paintTiledBase(Graphics2D graphics, TileFrame frame) {
-        boolean previousLogos = hasFactionLogos(mapModeAnimating ? previousMapMode : targetMapMode);
-        boolean targetLogos = hasFactionLogos(targetMapMode);
-        paintBaseVariants(graphics, frame, previousLogos, 1.0);
-        if ((targetLogos != previousLogos) && (mapModeAnimationProgress > 0.0)) {
-            paintBaseVariants(graphics, frame, targetLogos, mapModeAnimationProgress);
-        }
-    }
-
-    private void paintBaseVariants(Graphics2D graphics, TileFrame frame, boolean factionLogos, double alpha) {
         for (boolean territory : visibleTerritoryVariants()) {
-            double variantAlpha = (territory && (territoryLayerAlpha < 1.0)) ? alpha * territoryLayerAlpha : alpha;
-            BaseTileContent content = baseTileContent(frame, territory, factionLogos);
+            double variantAlpha = (territory && (territoryLayerAlpha < 1.0)) ? territoryLayerAlpha : 1.0;
+            BaseTileContent content = baseTileContent(frame, territory);
             paintTileLayer(graphics, baseTiles, content, baseTileSource(frame, content), frame, variantAlpha,
                   MAP_BACKGROUND_TOP);
         }
+    }
+
+    /**
+     * Draws the faction logos every frame on top of the base tiles. Logos keep a capped on-screen size and fade with
+     * the zoom, so tiles of another zoom level stretched into place during a zoom would show them at the wrong size
+     * and opacity until the exact tiles arrive.
+     */
+    private void paintTiledFactionLogos(Graphics2D graphics, TileFrame frame, double alpha) {
+        if ((alpha <= 0.0) || (frame.atlas() == null) || !optEmblems.isSelected()) {
+            return;
+        }
+        MapTileLayer.Camera camera = frame.camera();
+        List<PlacedFactionLogo> logos = placedFactionLogos(frame.atlas(), frame.dataKey().date().getYear(),
+              camera.scale(), camera.pixelScale());
+        if (logos.isEmpty()) {
+            return;
+        }
+        Graphics2D deviceGraphics = createLayerGraphicsWithAlpha(graphics, alpha);
+        boolean zooming = frame.requestMode() == MapTileLayer.RequestMode.VISIBLE_ONLY;
+        try {
+            prepareLayerBlit(deviceGraphics, camera.pixelScale());
+            deviceGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                  RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            int offsetX = (int) Math.rint(camera.offsetX());
+            int offsetY = (int) Math.rint(camera.offsetY());
+            for (PlacedFactionLogo logo : logos) {
+                int x = logo.deviceX() + offsetX;
+                int y = logo.deviceY() + offsetY;
+                if ((x + logo.deviceWidth() + logo.shadowOffset() <= 0)
+                      || (y + logo.deviceHeight() + logo.shadowOffset() <= 0)
+                      || (x >= camera.deviceWidth()) || (y >= camera.deviceHeight())) {
+                    continue;
+                }
+                FactionLogoImage image = factionLogoImage(logo, !zooming);
+                if ((image.tinted().getWidth() == logo.deviceWidth())
+                      && (image.tinted().getHeight() == logo.deviceHeight())) {
+                    deviceGraphics.drawImage(image.shadow(), x + logo.shadowOffset(), y + logo.shadowOffset(), null);
+                    deviceGraphics.drawImage(image.tinted(), x, y, null);
+                } else {
+                    deviceGraphics.drawImage(image.shadow(), x + logo.shadowOffset(), y + logo.shadowOffset(),
+                          logo.deviceWidth(), logo.deviceHeight(), null);
+                    deviceGraphics.drawImage(image.tinted(), x, y, logo.deviceWidth(), logo.deviceHeight(), null);
+                }
+            }
+        } finally {
+            deviceGraphics.dispose();
+        }
+    }
+
+    /**
+     * Returns the logo at its exact drawn size when that is cached or {@code createExact} allows it. While a zoom
+     * changes logo sizes every frame, a cached reduction is scaled instead, so no image is created per frame.
+     */
+    private FactionLogoImage factionLogoImage(PlacedFactionLogo logo, boolean createExact) {
+        ScaledFactionLogoKey exactKey = new ScaledFactionLogoKey(logo.logoKey(), logo.deviceWidth(),
+              logo.deviceHeight());
+        FactionLogoImage exact = scaledFactionLogoImages.get(exactKey);
+        if (exact != null) {
+            return exact;
+        }
+        return createExact
+              ? getScaledFactionLogoImage(logo.logoKey(), logo.source(), logo.deviceWidth(), logo.deviceHeight())
+              : factionLogoMipmap(logo);
+    }
+
+    /** Returns the smallest power-of-two reduction of the logo that is still at least its drawn size. */
+    private FactionLogoImage factionLogoMipmap(PlacedFactionLogo logo) {
+        FactionLogoImage source = logo.source();
+        int width = source.tinted().getWidth();
+        int height = source.tinted().getHeight();
+        while ((width > 1) && (height > 1) && ((width + 1) / 2 >= logo.deviceWidth())
+              && ((height + 1) / 2 >= logo.deviceHeight())) {
+            width = (width + 1) / 2;
+            height = (height + 1) / 2;
+        }
+        return (width == source.tinted().getWidth())
+              ? source
+              : getScaledFactionLogoImage(logo.logoKey(), source, width, height);
+    }
+
+    private List<PlacedFactionLogo> placedFactionLogos(TerritoryAtlas atlas, int year, double scale,
+          double pixelScale) {
+        FactionLogoLayoutKey key = new FactionLogoLayoutKey(year, Double.doubleToLongBits(scale),
+              Double.doubleToLongBits(pixelScale),
+              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_MIN_SIZE)),
+              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_COMPACT_MIN_SIZE)),
+              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_MAX_SIZE)),
+              Math.max(1, UIUtil.scaleForGUI(FACTION_LOGO_COLLISION_PADDING)),
+              Math.max(1, UIUtil.scaleForGUI(2)));
+        if ((atlas != factionLogoLayoutAtlas) || !key.equals(factionLogoLayoutKey)) {
+            factionLogoLayout = layoutFactionLogos(atlas, key, scale, pixelScale);
+            factionLogoLayoutAtlas = atlas;
+            factionLogoLayoutKey = key;
+        }
+        return factionLogoLayout;
     }
 
     private void paintTiledOverlays(Graphics2D graphics, TileFrame frame) {
@@ -5329,7 +5413,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         Graphics2D layerGraphics = alpha >= 1.0 ? graphics : createLayerGraphicsWithAlpha(graphics, alpha);
         try {
-            layer.paint(layerGraphics, content, source, frame.camera(), frame.target(), true, holeFill);
+            layer.paint(layerGraphics, content, source, frame.camera(), frame.target(), frame.requestMode(), holeFill);
         } finally {
             if (layerGraphics != graphics) {
                 layerGraphics.dispose();
@@ -5337,24 +5421,15 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
-    private MapTileLayer.TileRenderer createBaseTileRenderer(TerritoryAtlas atlas, BaseTileContent content,
-          double scale, double pixelScale) {
-        SemanticZoomProfile zoom = SemanticZoomProfile.create(scale,
-              Double.longBitsToDouble(content.semanticReferenceBits()));
-        double territoryAlpha = content.territory() ? zoom.territoryAlpha() : 0.0;
-        double logoAlpha = content.factionLogos() ? zoom.factionLogoAlpha() * FACTION_LOGO_OPACITY : 0.0;
-        List<TileLogo> logos = logoAlpha > 0.0
-              ? layoutTileLogos(atlas, content, scale, pixelScale)
-              : List.of();
+    private static MapTileLayer.TileRenderer createBaseTileRenderer(TerritoryAtlas atlas, BaseTileContent content,
+          double scale) {
+        double territoryAlpha = content.territory() ? TERRITORY_LAYER_OPACITY : 0.0;
         double gridSpacing = getGridSpacing(scale);
         return (graphics, context) -> {
             drawTileBackground(graphics, context.view(), gridSpacing);
             if (territoryAlpha > 0.0) {
                 paintLayerWithAlpha(graphics, territoryAlpha,
                       layerGraphics -> drawTerritoryLayer(layerGraphics, atlas, context.view(), context.margin()));
-            }
-            if (!logos.isEmpty()) {
-                paintLayerWithAlpha(graphics, logoAlpha, layerGraphics -> drawTileLogos(layerGraphics, context, logos));
             }
             return true;
         };
@@ -5387,13 +5462,13 @@ public class InterstellarMapPanel extends JPanel {
         graphics.setStroke(oldStroke);
     }
 
-    /** Lays out faction logos for a whole zoom level, so tiles agree on collisions across their borders. */
-    private List<TileLogo> layoutTileLogos(TerritoryAtlas atlas, BaseTileContent content, double scale,
-          double pixelScale) {
-        int year = content.dataKey().date().getYear();
-        int majorMinimumLogoSize = content.logoMajorMinimumSize();
-        int compactMinimumLogoSize = content.logoCompactMinimumSize();
-        int maximumLogoSize = Math.max(majorMinimumLogoSize, content.logoMaximumSize());
+    /** Lays out faction logos for a whole zoom level in global physical pixels, resolving collisions. */
+    private List<PlacedFactionLogo> layoutFactionLogos(TerritoryAtlas atlas, FactionLogoLayoutKey layoutKey,
+          double scale, double pixelScale) {
+        int year = layoutKey.year();
+        int majorMinimumLogoSize = layoutKey.majorMinimumSize();
+        int compactMinimumLogoSize = layoutKey.compactMinimumSize();
+        int maximumLogoSize = Math.max(majorMinimumLogoSize, layoutKey.maximumSize());
         double projectedCellArea = TERRITORY_HEX_SPACING_X * TERRITORY_HEX_SIZE * scale * scale;
         List<FactionLogoCandidate> candidates = new ArrayList<>();
         for (TerritoryComponent component : atlas.components()) {
@@ -5453,10 +5528,10 @@ public class InterstellarMapPanel extends JPanel {
               .thenComparing(candidate -> candidate.component().faction().getShortName())
               .thenComparingInt(candidate -> candidate.component().anchorHex().column())
               .thenComparingInt(candidate -> candidate.component().anchorHex().row()));
-        int collisionPadding = content.logoCollisionPadding();
-        int shadowOffset = Math.max(1, (int) Math.round(content.logoShadowOffset() * pixelScale));
+        int collisionPadding = layoutKey.collisionPadding();
+        int shadowOffset = Math.max(1, (int) Math.round(layoutKey.shadowOffset() * pixelScale));
         List<Rectangle2D.Double> acceptedBounds = new ArrayList<>();
-        List<TileLogo> logos = new ArrayList<>();
+        List<PlacedFactionLogo> logos = new ArrayList<>();
         for (FactionLogoCandidate candidate : candidates) {
             Rectangle2D.Double bounds = candidate.bounds();
             Rectangle2D.Double paddedBounds = new Rectangle2D.Double(bounds.x - collisionPadding,
@@ -5470,35 +5545,10 @@ public class InterstellarMapPanel extends JPanel {
             int deviceY = (int) Math.round(bounds.y * pixelScale);
             int deviceWidth = Math.max(1, (int) Math.round(bounds.width * pixelScale));
             int deviceHeight = Math.max(1, (int) Math.round(bounds.height * pixelScale));
-            logos.add(new TileLogo(candidate.image().tinted(), candidate.image().shadow(), deviceX, deviceY,
-                  deviceWidth, deviceHeight, shadowOffset));
+            logos.add(new PlacedFactionLogo(new FactionLogoKey(year, candidate.component().faction().getShortName()),
+                  candidate.image(), deviceX, deviceY, deviceWidth, deviceHeight, shadowOffset));
         }
         return List.copyOf(logos);
-    }
-
-    private static void drawTileLogos(Graphics2D graphics, MapTileLayer.TileContext context, List<TileLogo> logos) {
-        AffineTransform logicalTransform = graphics.getTransform();
-        Graphics2D deviceGraphics = (Graphics2D) graphics.create();
-        try {
-            deviceGraphics.setTransform(AffineTransform.getTranslateInstance(logicalTransform.getTranslateX(),
-                  logicalTransform.getTranslateY()));
-            deviceGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                  RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            for (TileLogo logo : logos) {
-                int x = logo.deviceX() - context.deviceOriginX();
-                int y = logo.deviceY() - context.deviceOriginY();
-                if ((x + logo.deviceWidth() + logo.shadowOffset() < 0)
-                      || (y + logo.deviceHeight() + logo.shadowOffset() < 0)
-                      || (x > MapTileLayer.TILE_SIZE) || (y > MapTileLayer.TILE_SIZE)) {
-                    continue;
-                }
-                deviceGraphics.drawImage(logo.shadow(), x + logo.shadowOffset(), y + logo.shadowOffset(),
-                      logo.deviceWidth(), logo.deviceHeight(), null);
-                deviceGraphics.drawImage(logo.tinted(), x, y, logo.deviceWidth(), logo.deviceHeight(), null);
-            }
-        } finally {
-            deviceGraphics.dispose();
-        }
     }
 
     private static MapTileLayer.TileRenderer createAdministrativeTileRenderer(TerritoryAtlas atlas,
@@ -5803,7 +5853,7 @@ public class InterstellarMapPanel extends JPanel {
         Graphics2D boundaryGraphics = (Graphics2D) graphics.create();
         try {
             boundaryGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Shape screenShape = mapToScreen.createTransformedShape(boundary.shape());
+            Shape screenShape = TransformedShapeView.of(boundary.shape(), mapToScreen);
             boolean region = boundary.level() == AdministrativeBoundaryLevel.REGION;
             float[] dash = region ? null : new float[] { 4.0f, 5.0f };
             boundaryGraphics.setPaint(ADMINISTRATIVE_BOUNDARY_DARK);
@@ -5835,7 +5885,7 @@ public class InterstellarMapPanel extends JPanel {
         try {
             territoryGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                   RenderingHints.VALUE_ANTIALIAS_ON);
-            Shape screenShape = mapToScreen.createTransformedShape(contour.shape());
+            Shape screenShape = TransformedShapeView.of(contour.shape(), mapToScreen);
                         Shape renderClip = graphics.getClip();
                         Rectangle2D screenBounds = screenShape.getBounds2D();
                         double paintMargin = 4.0;
@@ -6730,7 +6780,7 @@ public class InterstellarMapPanel extends JPanel {
         if ((priority >= 0) || faction.isIndependent() || faction.is(FactionTag.ABANDONED)) {
             return priority;
         }
-        return FactionMapLogo.hasCustomLogo(gameYear, faction.getShortName()) ? 1 : -1;
+        return FactionMapLogo.hasIcon(gameYear, faction.getShortName()) ? 1 : -1;
     }
 
     static int resolveLogoSize(double size, int minimumSize, int maximumSize) {
@@ -6799,6 +6849,9 @@ public class InterstellarMapPanel extends JPanel {
         scaledFactionLogoImages.clear();
         missingFactionLogoImages.clear();
         factionLogoRenderCache.clear();
+        factionLogoLayoutAtlas = null;
+        factionLogoLayoutKey = null;
+        factionLogoLayout = List.of();
     }
 
     static HpgNetworkDetail effectiveHpgNetworkDetail(HpgNetworkDetail selectedDetail, double scale,
@@ -7059,6 +7112,27 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
+    /**
+     * Star auras share one unit-radius paint per spectral color, because the JDK caches a gradient's color lookup
+     * tables on the paint instance and rebuilding them for every star dominated tile allocation. The cache is
+     * per thread, since that lookup cache is not safe to fill from several tile renderers at once.
+     */
+    private static final ThreadLocal<Map<Color, RadialGradientPaint>> STAR_AURA_PAINTS =
+          ThreadLocal.withInitial(HashMap::new);
+
+    private static RadialGradientPaint starAuraPaint(Color spectralColor) {
+        return STAR_AURA_PAINTS.get().computeIfAbsent(spectralColor,
+              color -> new RadialGradientPaint(new Point2D.Double(), 1.0f,
+                    new float[] { 0.0f, 0.16f, 0.38f, 0.68f, 1.0f },
+                    new Color[] {
+                        withAlpha(brighten(color), 245),
+                        withAlpha(color, 225),
+                        withAlpha(color, 130),
+                        withAlpha(color, 42),
+                        withAlpha(color, 0)
+                    }, CycleMethod.NO_CYCLE));
+    }
+
     private static void drawIntrinsicStar(Graphics2D graphics, Arc2D.Double arc, PlanetarySystem system,
           double x, double y, double size, double alpha) {
         if (alpha <= 0.0) {
@@ -7071,17 +7145,13 @@ public class InterstellarMapPanel extends JPanel {
             Color spectralColor = getSpectralColor(system.getStar());
             double luminosityScale = getLuminosityClassVisualScale(system.getStar());
             double auraRadius = Math.max(2.0, size * 1.65) * luminosityScale;
-            graphics.setPaint(new RadialGradientPaint(new Point2D.Double(x, y), (float) auraRadius,
-                  new float[] { 0.0f, 0.16f, 0.38f, 0.68f, 1.0f },
-                  new Color[] {
-                      withAlpha(brighten(spectralColor), 245),
-                      withAlpha(spectralColor, 225),
-                      withAlpha(spectralColor, 130),
-                      withAlpha(spectralColor, 42),
-                      withAlpha(spectralColor, 0)
-                  }, CycleMethod.NO_CYCLE));
-            arc.setArcByCenter(x, y, auraRadius, 0, 360, Arc2D.OPEN);
+            AffineTransform oldTransform = graphics.getTransform();
+            graphics.translate(x, y);
+            graphics.scale(auraRadius, auraRadius);
+            graphics.setPaint(starAuraPaint(spectralColor));
+            arc.setArcByCenter(0.0, 0.0, 1.0, 0, 360, Arc2D.OPEN);
             graphics.fill(arc);
+            graphics.setTransform(oldTransform);
 
             double coreRadius = Math.max(0.65, size * 0.3) * luminosityScale;
             arc.setArcByCenter(x, y, coreRadius, 0, 360, Arc2D.OPEN);
@@ -7135,18 +7205,64 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
+    /**
+     * Everything the outlaw marker depends on. Regard values are compared by content, because faction standings
+     * change in place.
+     */
+    private record OutlawCacheInputs(Faction campaignFaction, FactionStandings factionStandings, LocalDate today,
+          MapPresentationData presentationData, Map<String, SystemRenderData> systemRenderData,
+          FactionHints factionHints) {
+        /** Compares by identity, except the date: the other inputs are replaced, not mutated, when they change. */
+        boolean sameAs(@Nullable OutlawCacheInputs other) {
+            return (other != null) && (campaignFaction == other.campaignFaction)
+                  && (factionStandings == other.factionStandings) && today.equals(other.today)
+                  && (presentationData == other.presentationData) && (systemRenderData == other.systemRenderData)
+                  && (factionHints == other.factionHints);
+        }
+    }
+
+    /** Clears the cached outlaw markers when any of their inputs has changed since they were computed. */
+    private void validateOutlawCache(OutlawCacheInputs inputs) {
+        FactionStandings standings = inputs.factionStandings();
+        if (inputs.sameAs(outlawCacheInputs)
+              && outlawCacheRegard.equals(standings.getAllFactionStandings())
+              && outlawCacheClimateRegard.equals(standings.getAllClimateRegard())) {
+            return;
+        }
+        outlawCacheInputs = inputs;
+        outlawCacheRegard = new HashMap<>(standings.getAllFactionStandings());
+        outlawCacheClimateRegard = new HashMap<>(standings.getAllClimateRegard());
+        outlawedSystems.clear();
+    }
+
     private void refreshMapPresentationData() {
         List<AbstractContract> activeContracts = campaign.getActiveContracts();
-          mapPresentationData = createMapPresentationData(activeContracts, campaign.getActiveScenarios(),
-              campaign::getContract, playerBaseCountsBySystem());
+          // Accepted contracts that haven't started yet still grant system access, matching route planning
+          mapPresentationData = createMapPresentationData(activeContracts, campaign.getActiveContracts(true),
+              campaign.getActiveScenarios(), campaign::getContract, playerBaseCountsBySystem());
         }
 
         static MapPresentationData createMapPresentationData(List<AbstractContract> activeContracts,
             List<Scenario> activeScenarios, Function<java.util.UUID, AbstractContract> missionLookup,
             Map<String, Integer> playerBaseCounts) {
+        return createMapPresentationData(activeContracts, activeContracts, activeScenarios, missionLookup,
+              playerBaseCounts);
+    }
+
+    /**
+     * @param activeContracts the started contracts used for operation markers
+     * @param accessContracts the contracts whose employers and targets grant system access, including accepted
+     *                        contracts that haven't started yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static MapPresentationData createMapPresentationData(List<AbstractContract> activeContracts,
+          List<AbstractContract> accessContracts, List<Scenario> activeScenarios,
+          Function<java.util.UUID, AbstractContract> missionLookup, Map<String, Integer> playerBaseCounts) {
         Set<Faction> contractEmployers = new HashSet<>();
         Set<Faction> contractTargets = new HashSet<>();
-        for (AbstractContract contract : activeContracts) {
+        for (AbstractContract contract : accessContracts) {
             contractEmployers.add(contract.getEmployerFaction());
             contractTargets.add(contract.getEnemyFaction());
         }
@@ -7926,11 +8042,11 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         private String formatMeasurement(LegAssessment assessment) {
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(SuiteOptions.getNumberFormatLocale());
         numberFormat.setMaximumFractionDigits(3);
         numberFormat.setMinimumFractionDigits(0);
         String distance = numberFormat.format(assessment.facts().distanceLy());
-        String jumps = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
+        String jumps = NumberFormat.getIntegerInstance(SuiteOptions.getNumberFormatLocale())
                              .format(assessment.facts().minimumStandardJumps());
         String circuitSuffix = assessment.facts().commandCircuitAssumed()
               ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.measurement.circuitSuffix.text")
@@ -8353,7 +8469,7 @@ public class InterstellarMapPanel extends JPanel {
         if (!currentLocationShipBounds.contains(point) && (ringDistance > 4.0)) {
             return null;
         }
-        NumberFormat days = NumberFormat.getNumberInstance(MekHQ.getMHQOptions().getLocale());
+        NumberFormat days = NumberFormat.getNumberInstance(SuiteOptions.getNumberFormatLocale());
         days.setMaximumFractionDigits(2);
         StringBuilder text = new StringBuilder("<html>").append(MHQInternationalization.getFormattedTextAt(
               RESOURCE_BUNDLE, status.finalLeg() ? "map.nextJump.tooltip.arrival" : "map.nextJump.tooltip.jump",

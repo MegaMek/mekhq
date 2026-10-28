@@ -38,6 +38,7 @@ import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.finances.enums.UnitCostModel;
 
 class FinancesOptionsModel {
     boolean useLoanLimits;
@@ -58,12 +59,15 @@ class FinancesOptionsModel {
     boolean escalatingHotSpotsUpkeep;
     boolean usePlanetaryCostReductions;
     boolean increaseClanRepairCosts;
-    boolean useAlternateUnitCost;
+    UnitCostModel unitCostModel;
     boolean planetaryCostReductionsOnContract;
     boolean planetaryCostReductionsForMaintenance;
     boolean payForTransport;
     boolean payForRecruitment;
     double recruitmentTrainingCostMultiplier;
+    double recruitmentProfessionSkillCostMultiplier;
+    double recruitmentUtilitySkillCostMultiplier;
+    double recruitmentRoleplaySkillCostMultiplier;
     boolean payForFood;
     boolean payForHousing;
     boolean sellUnits;
@@ -109,12 +113,16 @@ class FinancesOptionsModel {
         escalatingHotSpotsUpkeep = options.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP);
         usePlanetaryCostReductions = options.get(CampaignOption.USE_PLANETARY_COST_REDUCTIONS);
         increaseClanRepairCosts = options.get(CampaignOption.INCREASE_CLAN_REPAIR_COSTS);
-        useAlternateUnitCost = options.get(CampaignOption.USE_ALTERNATE_UNIT_COST);
+        unitCostModel = options.get(CampaignOption.UNIT_COST_MODEL);
         planetaryCostReductionsOnContract = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT);
         planetaryCostReductionsForMaintenance = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE);
         payForTransport = options.get(CampaignOption.PAY_FOR_TRANSPORT);
         payForRecruitment = options.get(CampaignOption.PAY_FOR_RECRUITMENT);
         recruitmentTrainingCostMultiplier = options.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
+        recruitmentProfessionSkillCostMultiplier =
+              options.get(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER);
+        recruitmentUtilitySkillCostMultiplier = options.get(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER);
+        recruitmentRoleplaySkillCostMultiplier = options.get(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER);
         payForFood = options.get(CampaignOption.PAY_FOR_FOOD);
         payForHousing = options.get(CampaignOption.PAY_FOR_HOUSING);
         sellUnits = options.get(CampaignOption.SELL_UNITS);
@@ -162,12 +170,16 @@ class FinancesOptionsModel {
         options.set(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP, escalatingHotSpotsUpkeep);
         options.set(CampaignOption.USE_PLANETARY_COST_REDUCTIONS, usePlanetaryCostReductions);
         options.set(CampaignOption.INCREASE_CLAN_REPAIR_COSTS, increaseClanRepairCosts);
-        options.set(CampaignOption.USE_ALTERNATE_UNIT_COST, useAlternateUnitCost);
+        options.set(CampaignOption.UNIT_COST_MODEL, unitCostModel);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT, planetaryCostReductionsOnContract);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, planetaryCostReductionsForMaintenance);
         options.set(CampaignOption.PAY_FOR_TRANSPORT, payForTransport);
         options.set(CampaignOption.PAY_FOR_RECRUITMENT, payForRecruitment);
         options.set(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER, recruitmentTrainingCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER,
+              recruitmentProfessionSkillCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER, recruitmentUtilitySkillCostMultiplier);
+        options.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, recruitmentRoleplaySkillCostMultiplier);
         options.set(CampaignOption.PAY_FOR_FOOD, payForFood);
         options.set(CampaignOption.PAY_FOR_HOUSING, payForHousing);
         options.set(CampaignOption.SELL_UNITS, sellUnits);

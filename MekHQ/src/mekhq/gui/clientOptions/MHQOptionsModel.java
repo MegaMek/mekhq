@@ -42,6 +42,7 @@ import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.work.WorkTimeDisplay;
 import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
@@ -110,6 +111,7 @@ class MHQOptionsModel {
     // region Display - General
     String displayDateFormat;
     String longDisplayDateFormat;
+    WorkTimeDisplay workTimeDisplay;
     int guiScaleValue;
     boolean expandOptionSections;
     boolean hideUnitFluff;
@@ -228,6 +230,7 @@ class MHQOptionsModel {
         // Display - General
         displayDateFormat = options.getDisplayDateFormat();
         longDisplayDateFormat = options.getLongDisplayDateFormat();
+        workTimeDisplay = options.getWorkTimeDisplay();
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         expandOptionSections = GUIPreferences.getInstance().getExpandOptionSections();
         hideUnitFluff = options.getHideUnitFluff();
@@ -277,6 +280,8 @@ class MHQOptionsModel {
         statusColours.put("optionInTransitBackground", options.getInTransitBackground());
         statusColours.put("optionQueuedForTravelForeground", options.getQueuedForTravelForeground());
         statusColours.put("optionQueuedForTravelBackground", options.getQueuedForTravelBackground());
+        statusColours.put("optionPendingRefitForeground", options.getPendingRefitForeground());
+        statusColours.put("optionPendingRefitBackground", options.getPendingRefitBackground());
         statusColours.put("optionRefittingForeground", options.getRefittingForeground());
         statusColours.put("optionRefittingBackground", options.getRefittingBackground());
         statusColours.put("optionMothballingForeground", options.getMothballingForeground());
@@ -307,6 +312,8 @@ class MHQOptionsModel {
         statusColours.put("optionAbsentBackground", options.getAbsentBackground());
         statusColours.put("optionFatiguedForeground", options.getFatiguedForeground());
         statusColours.put("optionFatiguedBackground", options.getFatiguedBackground());
+        statusColours.put("optionWorkingForeground", options.getWorkingForeground());
+        statusColours.put("optionWorkingBackground", options.getWorkingBackground());
         statusColours.put("optionAwayFromMainForceForeground", options.getAwayFromMainForceForeground());
         statusColours.put("optionAwayFromMainForceBackground", options.getAwayFromMainForceBackground());
         statusColours.put("optionStratConHexCoordForeground", options.getStratConHexCoordForeground());
@@ -416,6 +423,7 @@ class MHQOptionsModel {
         // Display - General
         options.setDisplayDateFormat(displayDateFormat);
         options.setLongDisplayDateFormat(longDisplayDateFormat);
+        options.setWorkTimeDisplay(workTimeDisplay);
         GUIPreferences.getInstance().setExpandOptionSections(expandOptionSections);
         // Compare on the integer scale (the slider's units) so floating-point noise in the stored scale cannot trigger
         // a spurious rescale; the look-and-feel is only refreshed when the value actually changed.
@@ -469,6 +477,8 @@ class MHQOptionsModel {
         options.setInTransitBackground(statusColours.get("optionInTransitBackground"));
         options.setQueuedForTravelForeground(statusColours.get("optionQueuedForTravelForeground"));
         options.setQueuedForTravelBackground(statusColours.get("optionQueuedForTravelBackground"));
+        options.setPendingRefitForeground(statusColours.get("optionPendingRefitForeground"));
+        options.setPendingRefitBackground(statusColours.get("optionPendingRefitBackground"));
         options.setRefittingForeground(statusColours.get("optionRefittingForeground"));
         options.setRefittingBackground(statusColours.get("optionRefittingBackground"));
         options.setMothballingForeground(statusColours.get("optionMothballingForeground"));
@@ -499,6 +509,8 @@ class MHQOptionsModel {
         options.setAbsentBackground(statusColours.get("optionAbsentBackground"));
         options.setFatiguedForeground(statusColours.get("optionFatiguedForeground"));
         options.setFatiguedBackground(statusColours.get("optionFatiguedBackground"));
+        options.setWorkingForeground(statusColours.get("optionWorkingForeground"));
+        options.setWorkingBackground(statusColours.get("optionWorkingBackground"));
         options.setAwayFromMainForceForeground(statusColours.get("optionAwayFromMainForceForeground"));
         options.setAwayFromMainForceBackground(statusColours.get("optionAwayFromMainForceBackground"));
         options.setStratConHexCoordForeground(statusColours.get("optionStratConHexCoordForeground"));

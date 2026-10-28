@@ -35,11 +35,11 @@ package mekhq.campaign.parts.protomeks;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.TechAdvancement.AdvancementPhase;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -59,7 +59,6 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingProtoMekLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
@@ -545,6 +544,12 @@ public class ProtoMekLocation extends Part {
         return (loc != ProtoMek.LOC_TORSO) && super.isSalvaging();
     }
 
+    /** A ProtoMek's torso can never be scrapped, so it can never be replaced either. */
+    @Override
+    public boolean isReplaceable() {
+        return loc != ProtoMek.LOC_TORSO;
+    }
+
     @Override
     public @Nullable String checkScrappable() {
         // Can't scrap a center torso
@@ -625,15 +630,11 @@ public class ProtoMekLocation extends Part {
         toReturn.append("</b><br/>").append(getDetails()).append("<br/>");
 
         if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
-            toReturn.append(getTimeLeft()).append(" minutes").append(null != getTech() ? " (scheduled)" : "");
+            toReturn.append(getTimeLeftText());
             if (isBlownOff()) {
-                toReturn.append(" <b>TN:</b> ")
-                      .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                      .append(getAllMods(null).getValueAsString());
+                toReturn.append(' ').append(getTargetNumberText());
             }
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getWorkModeText());
         }
         toReturn.append("</html>");
         return toReturn.toString();
@@ -645,9 +646,14 @@ public class ProtoMekLocation extends Part {
     }
 
     @Override
+    public boolean canTakeMaintenanceDamage() {
+        return unit.getEntity().getInternal(loc) >= 1;
+    }
+
+    @Override
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
-        points = Math.max(points - d, 1);
+        points = getStructureAfterMaintenanceDamage(points, d);
         unit.getEntity().setInternal(points, loc);
         updateConditionFromEntity(false);
     }

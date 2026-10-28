@@ -74,6 +74,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.ui.FastJScrollPane;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -938,7 +939,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         DefaultComboBoxModel<String> assignModel;
         int gridY = 2;
         int killIndex = 0;
-        for (String killName : tracker.getKillCredits().keySet()) {
+
+        List<String> sortedKillNames = new ArrayList<>(tracker.getKillCredits().keySet());
+        sortedKillNames.sort(new NaturalOrderComparator());
+        for (String killName : sortedKillNames) {
             JLabel nameLbl = new JLabel(killName);
             assignModel = new DefaultComboBoxModel<>();
             assignModel.addElement(resourceMap.getString("none"));
@@ -1738,7 +1742,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 case PRISONER_PANEL -> !tracker.getOppositionPersonnel().isEmpty();
                 case SALVAGE_PANEL -> !tracker.getPotentialSalvage().isEmpty() &&
                                             tracker.getMission() != null &&
-                                            tracker.getMission().canSalvage();
+                                            campaign.getCampaignOptions()
+                                                  .get(CampaignOption.SALVAGE_SYSTEM)
+                                                  .getSalvage()
+                                                  .canRecoverSalvage(tracker.getMission());
                 case KILLS_PANEL -> !tracker.getKillCredits().isEmpty();
                 case REWARD_PANEL -> !loots.isEmpty();
                 case PREVIEW_PANEL -> true;

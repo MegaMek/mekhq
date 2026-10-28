@@ -35,7 +35,7 @@ package mekhq.campaign.digitalGM.stratCon;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.contract.AbstractContract;

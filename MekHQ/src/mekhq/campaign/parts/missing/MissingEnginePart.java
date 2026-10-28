@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,9 +35,9 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
@@ -180,7 +180,7 @@ public class MissingEnginePart extends MissingPart {
             if (null != eng) {
                 return (getEngine().getEngineType() == eng.getEngineType())
                              && (getEngine().getRating() == eng.getRating())
-                             && (getEngine().getTechType(year) == eng.getTechType(year))
+                             && (getEngine().getTechLevel(year) == eng.getTechLevel(year))
                              && (getUnitTonnage() == part.getUnitTonnage())
                              && (getTonnage() == part.getTonnage());
             }

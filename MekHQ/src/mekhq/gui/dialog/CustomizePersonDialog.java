@@ -56,6 +56,7 @@ import java.time.Period;
 import java.util.*;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.clientGUI.DialogOptionListener;
@@ -66,7 +67,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
@@ -87,6 +87,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.BloodGroup;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -2051,6 +2052,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         setSkills();
         setOptions();
+
+        // Advanced Alternate Medical works some implants out each day from the prosthetics a person carries, so one
+        // granted here needs its prosthetics recorded, or the next day's check takes it away again.
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
+        }
 
         person.validateRoles(campaign);
 

@@ -36,8 +36,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
 
 /**
@@ -58,12 +58,13 @@ public enum GlossaryEntry {
     AGGREGATE_COMBAT_VIEW("AGGREGATE_COMBAT_VIEW", new Version("0.51.0")),
     AGGREGATE_TECH_VIEW("AGGREGATE_TECH_VIEW", new Version("0.51.01")),
     AGING("AGING", new Version("0.50.06")),
-    ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
+    ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.51.01")),
     ALTERNATE_UNIT_COST("ALTERNATE_UNIT_COST", new Version("0.51.01")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
     ATB("ATB", new Version("0.50.10")),
     ATTRIBUTE_SCORES("ATTRIBUTE_SCORES", new Version("0.50.06")),
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
+    BATCHALL("BATCHALL", new Version("0.51.01")),
     BLOODHOUSE("BLOODHOUSE", new Version("0.51.01")),
     BLOODMARK("BLOODMARK", new Version("0.51.00")),
     BLOODNAME("BLOODNAME", new Version("0.51.01")),
@@ -105,9 +106,9 @@ public enum GlossaryEntry {
     EXPERIENCE_RATING("EXPERIENCE_RATING", new Version("0.50.06")),
     EXTRA_INCOME("EXTRA_INCOME", new Version("0.50.10")),
     FAME("FAME", new Version("0.51.01")),
-    FATIGUE("FATIGUE", new Version("0.50.06")),
+    FATIGUE("FATIGUE", new Version("0.51.01")),
     FIELD_CONTROL("FIELD_CONTROL", new Version("0.50.06")),
-    FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.50.06")),
+    FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.51.01")),
     FORCE_GENERATION("FORCE_GENERATION", new Version("0.50.11")),
     FORCE_REPUTATION("FORCE_REPUTATION", new Version("0.51.01")),
     FORCE_SCALE("FORCE_SCALE", new Version("0.51.01")),
@@ -182,7 +183,7 @@ public enum GlossaryEntry {
     RELEASE_TYPE_MILESTONE("RELEASE_TYPE_MILESTONE", new Version("0.50.06")),
     RELEASE_TYPE_NIGHTLY("RELEASE_TYPE_NIGHTLY", new Version("0.50.06")),
     RELOADING_FIELD_GUNS("RELOADING_FIELD_GUNS", new Version("0.50.06")),
-    REMAIN_DEPLOYED("REMAIN_DEPLOYED", new Version("0.50.06")),
+    REMAIN_DEPLOYED("REMAIN_DEPLOYED", new Version("0.51.01")),
     REPAIRING_DAMAGED_HIP_SHOULDER("REPAIRING_DAMAGED_HIP_SHOULDER", new Version("0.50.06")),
     REPAIR_SITE("REPAIR_SITE", new Version("0.50.06")),
     RESUPPLY("RESUPPLY", new Version("0.50.06")),
@@ -214,7 +215,7 @@ public enum GlossaryEntry {
     TEMP_CREWS("TEMP_CREWS", new Version("0.51.01")),
     TEMP_PERSONNEL("TEMP_PERSONNEL", new Version("0.50.06")),
     TOE("TOE", new Version("0.50.06")),
-    TRAINING_COMBAT_TEAMS("TRAINING_COMBAT_TEAMS", new Version("0.50.10")),
+    TRAINING_COMBAT_TEAMS("TRAINING_COMBAT_TEAMS", new Version("0.51.01")),
     TRAITS("TRAITS", new Version("0.51.01")),
     TRAINING_COSTS("TRAINING_COSTS", new Version("0.51.01")),
     TRIAL_OF_POSSESSION("TRIAL_OF_POSSESSION", new Version("0.51.01")),

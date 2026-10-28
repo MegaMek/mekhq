@@ -34,7 +34,7 @@ package mekhq.campaign.universe.factionHints;
 
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Each participant in a war or an alliance has one instance of this class for each of the other factions involved.

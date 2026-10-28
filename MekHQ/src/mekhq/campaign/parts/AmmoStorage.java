@@ -37,8 +37,8 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.equipment.AmmoType;
@@ -317,15 +317,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getDesc() {
         String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
         toReturn += ">";
         toReturn += "<b>Reload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeftText();
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -349,6 +344,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays, double valueMultiplier) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
+        newPart.setOrderedAheadForUnitId(getOrderedAheadForUnitId());
         // Deliver to the warehouse kept with the unit the ammunition is for, which may be a base's
         if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, deliveryWarehouse())) {
             return "<font color='" + ReportingUtilities.getPositiveColor()

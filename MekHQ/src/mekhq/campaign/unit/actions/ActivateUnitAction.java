@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -84,7 +84,9 @@ public record ActivateUnitAction(Person tech, boolean isGM) implements IUnitActi
                     return;
                 }
 
-                unit.addVesselCrew(tech, true);
+                if (!unit.takeAboardVesselTech(tech)) {
+                    return;
+                }
             }
 
             unit.startActivating(tech);

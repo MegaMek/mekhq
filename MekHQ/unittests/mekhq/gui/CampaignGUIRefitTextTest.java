@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,7 +52,7 @@ class CampaignGUIRefitTextTest {
     @ValueSource(strings = { "refitSelectTech.title", "refitSelectTech.prompt", "refitSelectTech.noTechs.title",
                              "refitSelectTech.noTechs.text", "refitSelectTech.wrongType.title",
                              "refitSelectTech.wrongType.text", "refitNoEngineer.title", "refitNoEngineer.text",
-                             "refitConfirm.title", "refitLoadFailed.title", "refitLoadFailed.text",
+                             "refitConfirm.button.cancel", "refitConfirm.button.begin", "refitLoadFailed.title", "refitLoadFailed.text",
                              "refitIOException.title", "refitEngineerCannotWork.title" })
     void plainRefitTextExists(String key) {
         String text = getFormattedTextAt(BUNDLE, key);
@@ -59,30 +60,23 @@ class CampaignGUIRefitTextTest {
         assertFalse(text.startsWith("!"), key + " is missing from the bundle");
     }
 
+    /** The refit briefing reads this warning from the default GUI bundle */
     @Test
     void cannotBuyWarningNamesThePartsAndKeepsItsApostrophe() {
-        String text = getFormattedTextAt(BUNDLE, "refitConfirm.cannotBuy.text", "ER Medium Laser");
+        String text = getFormattedText("refitConfirm.cannotBuy.text", "ER Medium Laser");
 
         assertFalse(text.contains("{"), text);
         assertEquals(true, text.contains("ER Medium Laser") && text.contains("campaign's"), text);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "refitConfirm.refit.text", "refitConfirm.refurbish.text" })
-    void refitConfirmationNamesTheClassAndTheUnit(String key) {
-        String text = getFormattedTextAt(BUNDLE, key, "Class C", "Locust LCT-1V");
-
-        assertFalse(text.contains("{"), text);
-        assertEquals(true, text.contains("Class C") && text.contains("Locust LCT-1V"), text);
-    }
-
-    @ParameterizedTest
     @ValueSource(strings = { "refitSelectTech.techLabel" })
     void techLabelFillsEveryField(String key) {
-        String estimate = "TN 7 (58%), 1480 min, done in 3 more day(s)";
-        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", estimate);
+        String estimate = "This job: 24 h 40 min of work, needs 7+ (58%). Finishes 3151-01-05, in 3 days";
+        String techDay = "Free today: 8 h of 8 h";
+        String text = getFormattedTextAt(BUNDLE, key, "Jane Doe", "Regular", "Mek Tech", estimate, techDay);
 
         assertFalse(text.contains("{"), text);
-        assertEquals(true, text.contains(estimate), text);
+        assertEquals(true, text.contains(estimate) && text.contains(techDay), text);
     }
 }

@@ -45,18 +45,23 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.JOptionPane;
 
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IPartWork;
 
 /**
  * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
@@ -74,7 +79,7 @@ public final class LocationNewDayUtil {
      * hangar nor a warehouse return immediately.
      */
     public static void processNewDayUnits(IPlace place, Campaign campaign) {
-        mekhq.campaign.LocalHangar hangar = place.getHangar();
+        LocalHangar hangar = place.getHangar();
         LocalWarehouse warehouse = place.getWarehouse();
 
         if (hangar != null) {
@@ -140,47 +145,15 @@ public final class LocationNewDayUtil {
             for (Part part : arrivedParts) {
                 campaign.getQuartermaster().arrivePart(part);
             }
+            RefitPartOrders.announceRefitsReadyToBegin(campaign, arrivedParts);
 
             // finish up any overnight assigned tasks
             for (Part part : assignedParts) {
-                Person tech;
-                if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
-                    tech = part.getUnit().getEngineer();
-                } else {
-                    tech = part.getTech();
-                }
+                Person tech = getOvernightTech(part);
 
                 if (tech != null) {
                     ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
-                    // If the tech has moved to a different location since the assignment was made,
-                    // cancel it and notify the player rather than silently failing.
-                    if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                        campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CampaignNewDayManager.techAtDifferentLocation",
-                              tech.getHyperlinkedFullTitle(),
-                              part.getName()));
-                        part.cancelAssignment(true);
-                        continue;
-                    }
-                    if (tech.getSkillForWorkingOn(part) != null) {
-                        try {
-                            campaign.fixPart(part, tech);
-                        } catch (Exception ex) {
-                            LOGGER.error(ex,
-                                  "Could not perform overnight maintenance on {} ({}) due to an error",
-                                  part.getName(),
-                                  part.getId());
-                            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                                  "CampaignNewDayManager.maintenanceError.report",
-                                  part.getName()));
-                        }
-                    } else {
-                        campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CampaignNewDayManager.techAbort.report",
-                              tech.getHyperlinkedFullTitle(),
-                              part.getName()));
-                        part.cancelAssignment(false);
-                    }
+                    continueOvernightWork(campaign, part, repairTarget, tech);
                 } else {
                     JOptionPane.showMessageDialog(null,
                           getFormattedTextAt(RESOURCE_BUNDLE, "LocationNewDayUtil.noTechForPart.message",
@@ -201,7 +174,9 @@ public final class LocationNewDayUtil {
             // ok now we can check for other stuff we might need to do to units
             int defaultRepairSite = ContractRepairLocation.getBestRepairLocation(campaign.getActiveContracts());
             List<UUID> unitsToRemove = new ArrayList<>();
+            int podSwapsCarriedOver = 0;
             for (Unit unit : hangar.getUnits()) {
+                podSwapsCarriedOver += continueOvernightPodSwaps(unit, campaign);
                 if (unit.isRefitting()) {
                     campaign.refit(unit.getRefit());
                 }
@@ -225,6 +200,9 @@ public final class LocationNewDayUtil {
                     unitsToRemove.add(unit.getId());
                 }
             }
+            if (podSwapsCarriedOver > 0) {
+                LOGGER.debug("[PodSpace] {} pod swaps carried over to the new day", podSwapsCarriedOver);
+            }
             // Remove any unrepairable, unsalvageable units
             unitsToRemove.forEach(campaign::removeUnit);
         }
@@ -237,6 +215,76 @@ public final class LocationNewDayUtil {
                     processNewDayUnits(campus, campaign);
                 }
             }
+        }
+    }
+
+    /**
+     * Pod swaps are not parts, so the warehouse pass above never sees them. Any on this unit that ran out of time
+     * yesterday are carried on here, after the parts, in the same way.
+     *
+     * @return how many pod swaps were carried over
+     */
+    private static int continueOvernightPodSwaps(Unit unit, Campaign campaign) {
+        List<PodSpace> assignedPodSpaces = new ArrayList<>();
+        for (PodSpace podSpace : unit.getPodSpace()) {
+            if (podSpace.isBeingWorkedOn()) {
+                assignedPodSpaces.add(podSpace);
+            }
+        }
+        for (PodSpace podSpace : assignedPodSpaces) {
+            Person tech = getOvernightTech(podSpace);
+            if (tech != null) {
+                continueOvernightWork(campaign, podSpace, unit, tech);
+            }
+        }
+        return assignedPodSpaces.size();
+    }
+
+    /**
+     * @return who carries on an overnight job: the unit's own engineer for a self-crewed unit, otherwise the tech who
+     *       started it
+     */
+    private static @Nullable Person getOvernightTech(IPartWork partWork) {
+        Unit unit = partWork.getUnit();
+        if ((unit != null) && (unit.getEngineer() != null)) {
+            return unit.getEngineer();
+        }
+        return partWork.getTech();
+    }
+
+    /**
+     * Carries on a job that ran out of time yesterday. The job is dropped, with a report, if the tech has moved away
+     * from it or can no longer work on it.
+     */
+    private static void continueOvernightWork(Campaign campaign, IPartWork partWork, ILocation repairTarget,
+          Person tech) {
+        // If the tech has moved to a different location since the assignment was made,
+        // cancel it and notify the player rather than silently failing.
+        if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CampaignNewDayManager.techAtDifferentLocation",
+                  tech.getHyperlinkedFullTitle(),
+                  partWork.getPartName()));
+            partWork.cancelAssignment(true);
+            return;
+        }
+        if (tech.getSkillForWorkingOn(partWork) != null) {
+            try {
+                campaign.fixPart(partWork, tech);
+            } catch (Exception exception) {
+                LOGGER.error(exception,
+                      "Could not perform overnight maintenance on {} due to an error",
+                      partWork.getPartName());
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "CampaignNewDayManager.maintenanceError.report",
+                      partWork.getPartName()));
+            }
+        } else {
+            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CampaignNewDayManager.techAbort.report",
+                  tech.getHyperlinkedFullTitle(),
+                  partWork.getPartName()));
+            partWork.cancelAssignment(false);
         }
     }
 

@@ -50,6 +50,8 @@ class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
+    boolean personnelMarketDisableShowOfInterest;
+    boolean personnelMarketDisableCombatManeuversRestriction;
     UnitMarketMethod unitMarketMethod;
     boolean unitMarketRegionalMekVariations;
     int unitMarketArtilleryUnitChance;
@@ -65,6 +67,7 @@ class MarketsOptionsModel {
     boolean useRiskySalvage;
     boolean keepEnemyCamouflageOnSalvage;
     boolean enableSalvageFlagByDefault;
+    boolean useClanSalvageClause;
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
@@ -81,6 +84,7 @@ class MarketsOptionsModel {
     boolean contractMarketReportRefresh;
     int contractMaxSalvagePercentage;
     int dropShipBonusPercentage;
+    boolean useDropShipBonusInSpace;
     int pityContracts;
     double contractBasePayMultiplier;
     double contractStraightSupportMultiplier;
@@ -92,6 +96,7 @@ class MarketsOptionsModel {
     boolean basePayOnlyConsidersScale;
     boolean capContractScaleByHiringHall;
     boolean taperCombatPayAndSalvageByScale;
+    boolean useFractionalScale;
     boolean useLegacyContractPay;
     boolean equipmentContractBase;
     double equipmentContractPercent;
@@ -109,6 +114,9 @@ class MarketsOptionsModel {
         personnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
         personnelMarketReportRefresh = options.get(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH);
         usePersonnelHireHiringHallOnly = options.get(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY);
+        personnelMarketDisableShowOfInterest = options.get(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST);
+        personnelMarketDisableCombatManeuversRestriction = options.get(
+              CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION);
         unitMarketMethod = options.get(CampaignOption.UNIT_MARKET_METHOD);
         unitMarketRegionalMekVariations = options.get(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS);
         unitMarketArtilleryUnitChance = options.get(CampaignOption.UNIT_MARKET_ARTILLERY_UNIT_CHANCE);
@@ -124,6 +132,7 @@ class MarketsOptionsModel {
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
         keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
+        useClanSalvageClause = options.get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
@@ -140,6 +149,7 @@ class MarketsOptionsModel {
         contractMarketReportRefresh = options.get(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH);
         contractMaxSalvagePercentage = options.get(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE);
         dropShipBonusPercentage = options.get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE);
+        useDropShipBonusInSpace = options.get(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE);
         pityContracts = options.get(CampaignOption.PITY_CONTRACTS);
         contractBasePayMultiplier = options.get(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER);
         contractStraightSupportMultiplier = options.get(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER);
@@ -151,6 +161,7 @@ class MarketsOptionsModel {
         basePayOnlyConsidersScale = options.get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
         capContractScaleByHiringHall = options.get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL);
         taperCombatPayAndSalvageByScale = options.get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE);
+        useFractionalScale = options.get(CampaignOption.USE_FRACTIONAL_SCALE);
         useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
         equipmentContractPercent = options.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT);
@@ -185,6 +196,9 @@ class MarketsOptionsModel {
         }
 
         options.set(CampaignOption.USE_PERSONNEL_HIRE_HIRING_HALL_ONLY, usePersonnelHireHiringHallOnly);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST, personnelMarketDisableShowOfInterest);
+        options.set(CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION,
+              personnelMarketDisableCombatManeuversRestriction);
         options.set(CampaignOption.PERSONNEL_MARKET_REPORT_REFRESH, personnelMarketReportRefresh);
         options.set(CampaignOption.UNIT_MARKET_METHOD, unitMarketMethod);
         options.set(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS, unitMarketRegionalMekVariations);
@@ -201,6 +215,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
         options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
+        options.set(CampaignOption.USE_CLAN_SALVAGE_CLAUSE, useClanSalvageClause);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
@@ -217,6 +232,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_MARKET_REPORT_REFRESH, contractMarketReportRefresh);
         options.set(CampaignOption.CONTRACT_MAX_SALVAGE_PERCENTAGE, contractMaxSalvagePercentage);
         options.set(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE, dropShipBonusPercentage);
+        options.set(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE, useDropShipBonusInSpace);
         options.set(CampaignOption.PITY_CONTRACTS, pityContracts);
         options.set(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER, contractBasePayMultiplier);
         options.set(CampaignOption.CONTRACT_STRAIGHT_SUPPORT_MULTIPLIER, contractStraightSupportMultiplier);
@@ -228,6 +244,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, basePayOnlyConsidersScale);
         options.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, capContractScaleByHiringHall);
         options.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, taperCombatPayAndSalvageByScale);
+        options.set(CampaignOption.USE_FRACTIONAL_SCALE, useFractionalScale);
         options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);
         options.setEquipmentContractPercent(equipmentContractPercent);

@@ -58,8 +58,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -88,7 +89,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Manages the resolution and effects of random events during a campaign.
@@ -141,7 +141,7 @@ public class RandomEventEffectsManager {
         eventReport = report.toString();
     }
 
-    private @NonNull StringBuilder buildMechanicalEffectsReport(RandomEventData eventData,
+    private @Nonnull StringBuilder buildMechanicalEffectsReport(RandomEventData eventData,
           List<RandomEventResult> results) {
         StringBuilder report = new StringBuilder();
         for (RandomEventResult result : results) {
@@ -332,8 +332,8 @@ public class RandomEventEffectsManager {
 
         int priorHits = target.getTotalInjurySeverity();
 
-        wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target,
-              campaign.getCampaignOptions().get(CampaignOption.USE_INJURY_FATIGUE),
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaign.getCampaignOptions());
+        wounds = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(target, isUseInjuryFatigue,
               campaign.getCampaignOptions().get(CampaignOption.FATIGUE_RATE), wounds);
 
         if (priorHits + wounds > 5) {
@@ -345,6 +345,11 @@ public class RandomEventEffectsManager {
 
         if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
             target.diagnose(campaign, wounds);
+        }
+
+        // Process after the wounds are applied, so the injured target isn't sent on leave
+        if (isUseInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, target);
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -383,7 +388,7 @@ public class RandomEventEffectsManager {
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        boolean isUseInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
@@ -403,6 +408,11 @@ public class RandomEventEffectsManager {
 
             if (isUseAdvancedMedical) {
                 target.diagnose(campaign, wounds);
+            }
+
+            // Process after the wounds are applied, so the injured target isn't sent on leave
+            if (isUseInjuryFatigue) {
+                Fatigue.processFatigueActions(campaign, target);
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -891,11 +901,14 @@ public class RandomEventEffectsManager {
         }
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              magnitude > 0 ? SINGULAR_CHARACTER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
+              target.getPrisonerStatus().isCurrentPrisoner() ?
+                    SINGULAR_PRISONER_RESOURCE_KEY :
+                    SINGULAR_CHARACTER_RESOURCE_KEY);
 
+        // Gaining fatigue is bad for the campaign, losing it is good
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -905,7 +918,7 @@ public class RandomEventEffectsManager {
               colorOpen,
               direction,
               CLOSING_SPAN_TAG,
-              magnitude);
+              Math.abs(magnitude * fatigueRate));
     }
 
     /**
@@ -958,9 +971,10 @@ public class RandomEventEffectsManager {
                   targets.size() != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
+        // Gaining fatigue is bad for the campaign, losing it is good
         String colorOpen = magnitude > 0 ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String direction = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0 ? "change.increased" : "change.decreased");
 
@@ -970,7 +984,7 @@ public class RandomEventEffectsManager {
               colorOpen,
               direction,
               CLOSING_SPAN_TAG,
-              magnitude);
+              Math.abs(magnitude * fatigueRate));
     }
 
     /**

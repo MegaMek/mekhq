@@ -59,19 +59,21 @@ public final class ContractSettlement {
      * The value of salvage the player kept beyond their salvage rights, which the employer is owed at contract end.
      * Under normal (non-exchange) salvage rights the player physically keeps the salvage they recover during the
      * contract; if the value they kept exceeds the fraction their salvage rights allow of the total salvage recovered,
-     * the excess is owed. Salvage-exchange contracts are already paid out as cash during the contract, so there is
-     * nothing owed. Whether this is actually repaid is the caller's decision (the
-     * {@code OverageRepaymentInFinalPayment} option), which folds it into the final contract payment.
+     * the excess is owed. Salvage-exchange contracts (including those under the special Clan salvage clause) are
+     * already paid out as cash during the contract, so there is nothing owed. Whether this is actually repaid is the
+     * caller's decision (the {@code OverageRepaymentInFinalPayment} option), which folds it into the final contract
+     * payment.
      *
      * @param contract the contract being completed
+     * @param campaign the current campaign
      *
      * @return the salvage overage owed, or {@link Money#zero()} when none is owed
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static Money salvageOverage(AbstractContract contract) {
-        if (contract.isSalvageExchange()) {
+    public static Money salvageOverage(AbstractContract contract, Campaign campaign) {
+        if (contract.isSalvageTreatedAsExchange(campaign)) {
             return Money.zero();
         }
 
@@ -87,6 +89,30 @@ public final class ContractSettlement {
     }
 
     /**
+     * Calculates the shareholders' cut of the end-of-contract lump payout.
+     *
+     * @param campaign the paying campaign
+     * @param contract the contract being completed (supplies the shares percentage)
+     * @param payout   the gross final payout
+     *
+     * @return the shareholders' cut, or {@link Money#zero()} when the share system is disabled or there is no positive
+     *       payout to draw it from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money calculateShares(Campaign campaign, AbstractContract contract, Money payout) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
+            return Money.zero();
+        }
+        if ((payout == null) || !payout.isPositive()) {
+            return Money.zero();
+        }
+
+        return payout.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+    }
+
+    /**
      * Pays shareholding personnel their cut of the end-of-contract lump payout, mirroring the monthly share payout.
      * Runs only when the share system is enabled and there is a positive payout to draw the share from.
      *
@@ -98,14 +124,7 @@ public final class ContractSettlement {
      * @since 0.51.01
      */
     public static void settleShares(Campaign campaign, AbstractContract contract, Money payout) {
-        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
-            return;
-        }
-        if ((payout == null) || !payout.isPositive()) {
-            return;
-        }
-
-        Money shares = payout.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+        Money shares = calculateShares(campaign, contract, payout);
         if (!shares.isPositive()) {
             return;
         }

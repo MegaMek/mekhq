@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import mekhq.campaign.finances.enums.UnitCostModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -119,17 +120,19 @@ class HotSpotsUpkeepExclusionTest {
               CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT,
               CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE,
               CampaignOption.INCREASE_CLAN_REPAIR_COSTS,
-              CampaignOption.USE_ALTERNATE_UNIT_COST,
               CampaignOption.USE_SPA_TRAINING_COSTS,
               CampaignOption.CAP_TOTAL_SPAS,
               CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS,
               CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL,
               CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE,
+              CampaignOption.USE_FRACTIONAL_SCALE,
               CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
 
         for (CampaignOption<Boolean> option : newOptions) {
             assertFalse(campaignOptions.get(option), option + " should default to off");
         }
+        assertEquals(UnitCostModel.TOTAL_WARFARE, campaignOptions.get(CampaignOption.UNIT_COST_MODEL),
+              "UNIT_COST_MODEL should default to Total Warfare");
     }
 
     /** A fresh campaign with default options must charge exactly what it charged before these changes. */

@@ -62,6 +62,7 @@ import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
@@ -387,7 +388,8 @@ public class ShoppingListPriorityDialog extends JDialog {
                 case COL_COST -> item.getBuyCost().toAmountAndSymbolString();
                 case COL_TOTAL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
                 case COL_TARGET -> {
-                    TargetRoll target = campaign.checkGenericAcquisition(item).getTargetNumber();
+                    TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, item,
+                          campaign.checkGenericAcquisition(item)).getTargetNumber();
                     String value = target.getValueAsString();
                     if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
                         value += "+";

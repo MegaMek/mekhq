@@ -37,13 +37,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.work.IAcquisitionWork;
 
 /**
  * Which parts the campaign may buy, judged by their tech base. The "allow purchasing of Clan parts" and "allow
@@ -72,6 +73,23 @@ public final class RefitPurchaseCheck {
             case IS -> campaignOptions.get(CampaignOption.ALLOW_IS_PURCHASES);
             case null, default -> true;
         };
+    }
+
+    /**
+     * A refit kit arrives with every part it needs, so it may only be bought when each of those parts could be bought
+     * on its own. Otherwise a kit would bring in Clan parts for a force that may not buy them.
+     *
+     * @param campaign    the campaign
+     * @param acquisition the item being acquired
+     *
+     * @return {@code true} if the item is a refit kit holding a part the campaign may not buy
+     */
+    public static boolean isKitWithPartsThatCannotBeBought(Campaign campaign, IAcquisitionWork acquisition) {
+        if (!(acquisition instanceof Refit refit)) {
+            return false;
+        }
+        // Names the parts in the log when there are any
+        return !findPartsThatCannotBeBought(campaign, refit).isEmpty();
     }
 
     /**

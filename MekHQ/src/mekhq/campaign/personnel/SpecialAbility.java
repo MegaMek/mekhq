@@ -45,10 +45,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Faction;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
@@ -91,6 +91,8 @@ public class SpecialAbility {
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static final Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
+
+    private static final Version REMOVE_ABILITIES_REPAIR_VERSION = new Version("0.51.02");
 
     private String displayName;
     private String lookupName;
@@ -325,6 +327,28 @@ public class SpecialAbility {
         return true;
     }
 
+    /**
+     * Restores an ability's {@code removeAbilities} from its default for files written before
+     * {@link #REMOVE_ABILITIES_REPAIR_VERSION}. Those versions read the list into the wrong field, so it was dropped
+     * on load and written back out empty, letting a person hold both abilities of a pair such as Slow Learner and Fast
+     * Learner.
+     *
+     * @param specialAbility the ability just read from the file
+     * @param defaultAbility the matching default ability, or {@code null} if there is none
+     * @param version        the version the file was written by
+     *
+     * @author Illiani
+     * @since 0.51.02
+     */
+    private static void repairRemovedAbilities(SpecialAbility specialAbility, @Nullable SpecialAbility defaultAbility,
+          Version version) {
+        if ((defaultAbility != null)
+                  && specialAbility.removeAbilities.isEmpty()
+                  && version.isLowerThan(REMOVE_ABILITIES_REPAIR_VERSION)) {
+            specialAbility.removeAbilities = new Vector<>(defaultAbility.removeAbilities);
+        }
+    }
+
     public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
@@ -410,7 +434,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
                     specialAbility.invalidAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
-                    specialAbility.choiceValues = Utilities.splitString(textContent, "::");
+                    specialAbility.removeAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
@@ -450,6 +474,8 @@ public class SpecialAbility {
                 return;
             }
 
+            repairRemovedAbilities(specialAbility, defaultAbility, v);
+
             specialAbilities.put(specialAbility.lookupName, specialAbility);
         } catch (Exception ex) {
             LOGGER.error("", ex);
@@ -457,7 +483,7 @@ public class SpecialAbility {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Map<String, SpecialAbility> spHash,
-          PersonnelOptions options) {
+          PersonnelOptions options, Version version) {
         try {
             SpecialAbility specialAbility = new SpecialAbility();
             NodeList nl = wn.getChildNodes();
@@ -480,7 +506,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
                     specialAbility.invalidAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
-                    specialAbility.choiceValues = Utilities.splitString(textContent, "::");
+                    specialAbility.removeAbilities = Utilities.splitString(textContent, "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrerequisite skill = SkillPrerequisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
@@ -515,6 +541,9 @@ public class SpecialAbility {
                     specialAbility.desc = option.getDescription();
                 }
             }
+
+            repairRemovedAbilities(specialAbility, defaultAbility, version);
+
             spHash.put(specialAbility.lookupName, specialAbility);
         } catch (Exception ex) {
             LOGGER.error("", ex);

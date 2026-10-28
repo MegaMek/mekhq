@@ -32,9 +32,7 @@
  */
 package mekhq.campaign.universe;
 
-import static java.awt.Color.BLACK;
-import static megamek.utilities.ImageUtilities.addTintToImageIcon;
-
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.ImageObserver;
 import java.time.LocalDate;
@@ -47,13 +45,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
 
 public class Factions {
     private static final MMLogger LOGGER = MMLogger.create(Factions.class);
@@ -285,35 +282,24 @@ public class Factions {
     }
 
     /**
-     * @deprecated use {@link #getFactionLogo(int, String)} instead
+     * Returns the faction's legacy logo for the given year. Older faction files (e.g. custom factions in a user dir)
+     * may still set {@code logo} or {@code logoChanges} instead of an icon; these are kept working for the formation
+     * origin icon and the map emblem.
+     *
+     * @param gameYear    the in-game year
+     * @param factionCode the faction identifier
+     *
+     * @return the legacy logo path relative to the formation icon logo directory
+     *       ({@link mekhq.MHQConstants#LAYERED_FORCE_ICON_LOGO_PATH}), or {@code null} if the faction has none for
+     *       the year
+     *
+     * @see Faction2#getLegacyLogo(int)
      */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public static ImageIcon getFactionLogo(Campaign campaign, String factionCode,
-          boolean fallbackDateDependent) {
-        return getFactionLogo(campaign.getGameYear(), factionCode);
-    }
-
-    /**
-     * Returns a faction logo as a black-tinted {@link ImageIcon}, resolved for the given game year.
-     *
-     * <p>The logo file is selected based on {@code factionCode}, with some factions returning different logos
-     * depending on {@code gameYear} to reflect historical changes. Unknown or unsupported faction codes fall back to a
-     * generic clan logo or the mercenary logo.</p>
-     *
-     * @param gameYear    the in-game year, used to resolve era-appropriate logos for applicable factions
-     * @param factionCode the faction identifier (e.g., {@code "FS"} for Federated Suns)
-     *
-     * @return a black-tinted {@link ImageIcon} representing the faction's logo
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static ImageIcon getFactionLogo(int gameYear, String factionCode) {
-        String address = getFactionLogoAddress(gameYear, factionCode);
-        ImageIcon icon = new ImageIcon(address);
-        icon = addTintToImageIcon(icon.getImage(), BLACK);
-
-        return icon;
+    public static @Nullable String getLegacyFactionLogo(int gameYear, String factionCode) {
+        return Factions2.getInstance().getFaction(factionCode)
+                     .map(faction -> faction.getLegacyLogo(gameYear))
+                     .filter(logo -> !logo.isBlank())
+                     .orElse(null);
     }
 
     /**
@@ -333,7 +319,10 @@ public class Factions {
      * @since 0.51.0
      */
     public static ImageIcon getFactionLogoWithScaling(int gameYear, String factionCode, int targetPixelWidth) {
-        ImageIcon icon = getFactionLogo(gameYear, factionCode);
+        ImageIcon icon = RATGenerator.getFactionLogo(gameYear, factionCode, Color.BLACK);
+        if (icon == null) {
+            return new ImageIcon();
+        }
 
         Image baseImage = icon.getImage();
 
@@ -347,138 +336,5 @@ public class Factions {
         int height = (int) Math.ceil((double) targetWidth * baseImageHeight / baseImageWidth);
 
         return new ImageIcon(baseImage.getScaledInstance(targetWidth, height, Image.SCALE_SMOOTH));
-    }
-
-    /**
-     * Resolves the file path for a faction's logo image, accounting for era-based logo changes.
-     *
-     * <p>Most factions map to a fixed logo file. A small number of factions — such as Clan Ghost
-     * Bear and Clan Diamond Shark/Sea Fox — return different logos depending on {@code gameYear} to reflect historical
-     * transitions. Unrecognized faction codes fall back to a generic clan logo for clan factions, or the mercenary logo
-     * otherwise.</p>
-     *
-     * @param gameYear    the in-game year, used to select the correct logo for era-sensitive factions
-     * @param factionCode the faction identifier (e.g., {@code "DC"} for Draconis Combine)
-     *
-     * @return the relative file path to the faction's logo PNG, rooted at {@code data/images/universe/factions/}
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    public static String getFactionLogoAddress(int gameYear, String factionCode) {
-        String canonicalAddress = getCanonicalFactionLogoAddress(gameYear, factionCode);
-        if (canonicalAddress != null) {
-            return canonicalAddress;
-        }
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-        String key = faction.isClan() ? "logo_clan_generic" : "logo_mercenaries";
-        return "data/images/universe/factions/" + key + ".png";
-    }
-
-    /**
-     * Returns the era-appropriate built-in logo path, or {@code null} when the faction has no dedicated map artwork.
-     * Callers can use this to distinguish a dedicated logo from the generic fallback without duplicating the mapping.
-     *
-     * @param gameYear    the in-game year
-     * @param factionCode the faction identifier
-     *
-     * @return the built-in logo path, or {@code null} if the faction is not mapped
-     */
-    public static @Nullable String getCanonicalFactionLogoAddress(int gameYear, String factionCode) {
-        final String IMAGE_DIRECTORY = "data/images/universe/factions/";
-        final String FILE_TYPE = ".png";
-
-        String key = switch (factionCode) {
-            case "ARC", "ARD" -> "logo_aurigan_coalition";
-            case "CDP" -> "logo_calderon_protectorate";
-            case "CC" -> "logo_capellan_confederation";
-            case "CIR" -> "logo_circinus_federation";
-            case "CBS" -> "logo_clan_blood_spirit";
-            case "CB" -> "logo_clan_burrock";
-            case "CCC" -> "logo_clan_cloud_cobra";
-            case "CCO" -> "logo_clan_coyote";
-            case "CFM" -> "logo_clan_fire_mandrills";
-            case "CGB" -> {
-                if (gameYear >= 3060) {
-                    yield "logo_rasalhague_dominion";
-                } else {
-                    yield "logo_clan_ghost_bear";
-                }
-            }
-            case "CGS", "SE" -> "logo_clan_goliath_scorpion";
-            case "CHH" -> "logo_clan_hells_horses";
-            case "CIH" -> "logo_clan_ice_hellion";
-            case "CJF" -> "logo_clan_jade_falcon";
-            case "CMG" -> "logo_clan_mongoose";
-            case "CNC" -> "logo_clan_nova_cat";
-            case "CDS" -> {
-                if (gameYear <= 2984 || gameYear >= 3100) {
-                    yield "logo_clan_sea_fox";
-                } else {
-                    yield "logo_clan_diamond_sharks";
-                }
-            }
-            case "MBA" -> "logo_clan_sea_fox";
-            case "CSJ" -> "logo_clan_smoke_jaguar";
-            case "CSR" -> "logo_clan_snow_raven";
-            case "CSA" -> "logo_clan_star_adder";
-            case "CSV" -> "logo_clan_steel_viper";
-            case "CSL" -> "logo_clan_stone_lion";
-            case "CW", "CWE", "CWIE" -> "logo_clan_wolf";
-            case "CWOV" -> "logo_clan_wolverine";
-            case "CS", "MRB" -> "logo_comstar";
-            case "DC" -> "logo_draconis_combine";
-            case "DA" -> "logo_duchy_of_andurien";
-            case "DTA" -> "logo_duchy_of_tamarind_abbey";
-            case "CEI" -> "logo_escorpion_imperio";
-            case "FC" -> "logo_federated_commonwealth";
-            case "FS" -> "logo_federated_suns";
-            case "FOR" -> "logo_fiefdom_of_randis";
-            case "FVC" -> "logo_filtvelt_coalition";
-            case "FRR" -> "logo_free_rasalhague_republic";
-            case "FWL" -> "logo_free_worlds_league";
-            case "FR" -> "logo_fronc_reaches";
-            case "HL" -> "logo_hanseatic_league";
-            case "IP" -> "logo_illyrian_palatinate";
-            case "LL" -> "logo_lothian_league";
-            case "LA" -> "logo_lyran_alliance";
-            case "MOC" -> "logo_magistracy_of_canopus";
-            case "MH" -> "logo_marian_hegemony";
-            case "MERC" -> "logo_mercenaries";
-            case "MV" -> "logo_morgrains_valkyrate";
-            case "NC" -> "logo_nueva_castile";
-            case "OC" -> "logo_oberon_confederation";
-            case "OA" -> "logo_outworld_alliance";
-            case "PIR", "PSI" -> "logo_pirates";
-            case "RD" -> "logo_rasalhague_dominion";
-            case "RF" -> "logo_regulan_fiefs";
-            case "ROS" -> "logo_republic_of_the_sphere";
-            case "RWR" -> "logo_rim_worlds_republic";
-            case "IND" -> "logo_security_forces";
-            case "SIC" -> "logo_st_ives_compact";
-            case "SL", "SLIE" -> "logo_star_league";
-            case "TC" -> "logo_taurian_concordat";
-            case "TD" -> "logo_tortuga_dominions";
-            case "UC" -> "logo_umayyad_caliphate";
-            case "WOB" -> "logo_word_of_blake";
-            case "TH" -> "logo_terran_hegemony";
-            case "CI" -> "logo_chainelane_isles";
-            case "SOC" -> "logo_the_society";
-            case "CWI" -> "logo_clan_widowmaker";
-            case "EF" -> "logo_elysian_fields";
-            case "GV" -> "logo_greater_valkyrate";
-            case "JF" -> "logo_jarnfolk";
-            case "MSC" -> "logo_marik_stewart_commonwealth";
-            case "OP" -> "logo_oriente_protectorate";
-            case "RA" -> "logo_raven_alliance";
-            case "RCM" -> "logo_rim_commonality";
-            case "NIOPS" -> "logo_niops_association";
-            case "AXP" -> "logo_axumite_providence";
-            case "NDC" -> "logo_new_delphi_compact";
-            case "REB" -> "logo_rebels";
-            default -> null;
-        };
-
-        return key == null ? null : IMAGE_DIRECTORY + key + FILE_TYPE;
     }
 }

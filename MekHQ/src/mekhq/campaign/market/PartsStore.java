@@ -103,6 +103,8 @@ public class PartsStore {
     private static final int MIN_MEK_TONNAGE = 20;
     private static final int MAX_MEK_TONNAGE = 100;
     private static final int MEK_TONNAGE_STEP = 5;
+    /** The damage divisor of the heavy custom infantry armor the unit editor offers, which the store stocks. */
+    private static final double HEAVY_INFANTRY_ARMOR_DAMAGE_DIVISOR = 2.0;
 
     private final ArrayList<Part> parts;
     private final Map<String, Part> nameAndDetailMap;
@@ -136,6 +138,7 @@ public class PartsStore {
         stockProtomekLocations(c);
         stockProtomekComponents(c);
         stockBattleArmorSuits(c);
+        stockHeavySneakSuits(c);
 
         StringBuilder sb = new StringBuilder();
         for (Part p : parts) {
@@ -444,7 +447,7 @@ public class PartsStore {
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, false));
                         }
-                        if (engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
+                        if (engine.getTechLevel(year) != TechConstants.T_ALLOWED_ALL) {
                             engine = new Engine(rating, i, Engine.CLAN_ENGINE);
                             if (engine.engineValid) {
                                 parts.add(new EnginePart(ton, engine, c, false));
@@ -462,7 +465,7 @@ public class PartsStore {
                         }
                     }
                     engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
-                    if (engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
+                    if (engine.getTechLevel(year) != TechConstants.T_ALLOWED_ALL) {
                         if (engine.engineValid) {
                             parts.add(new EnginePart(ton, engine, c, false));
                         }
@@ -552,6 +555,30 @@ public class PartsStore {
         for (int ton = 5; ton <= 100; ton = ton + 5) {
             parts.add(new Rotor(ton, c));
             parts.add(new Turret(ton, ton, c));
+        }
+    }
+
+    /**
+     * Stocks the heavy sneak suits. These are custom infantry armor built in the unit editor, not armor kits: damage
+     * divisor 2 with camouflage, infrared baffling, ECM or any mix of the three, encumbering or not. A refit to such a
+     * platoon orders this armor, so the player must be able to buy it by hand as well.
+     *
+     * @param campaign the campaign the parts belong to
+     */
+    protected void stockHeavySneakSuits(Campaign campaign) {
+        boolean[] bothChoices = { false, true };
+        for (boolean isEncumbering : bothChoices) {
+            for (boolean hasCamo : bothChoices) {
+                for (boolean hasInfraredBaffling : bothChoices) {
+                    for (boolean hasECM : bothChoices) {
+                        boolean isSneakSuit = hasCamo || hasInfraredBaffling || hasECM;
+                        if (isSneakSuit) {
+                            parts.add(new InfantryArmorPart(0, campaign, HEAVY_INFANTRY_ARMOR_DAMAGE_DIVISOR,
+                                  isEncumbering, false, hasCamo, hasInfraredBaffling, hasECM, false));
+                        }
+                    }
+                }
+            }
         }
     }
 

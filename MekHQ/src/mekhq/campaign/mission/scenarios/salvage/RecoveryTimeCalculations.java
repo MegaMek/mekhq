@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import static java.lang.Math.round;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Light;
@@ -229,7 +229,7 @@ public class RecoveryTimeCalculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static double getAtmosphereMultiplier(@Nullable Atmosphere scenarioAtmosphere,
+    public static double getAtmosphereMultiplier(@Nullable Atmosphere scenarioAtmosphere,
           @Nullable AtmosphericTaint planetaryAtmosphere) {
         double atmosphereMultiplier = DEFAULT_MULTIPLIER;
 
@@ -267,7 +267,7 @@ public class RecoveryTimeCalculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static double getGravityMultiplier(float gravity) {
+    public static double getGravityMultiplier(float gravity) {
         if (gravity <= 0.0f) {
             return ZERO_G;
         } else if (gravity < 0.8f) {
@@ -296,7 +296,7 @@ public class RecoveryTimeCalculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static double getTemperatureMultiplier(int temperature) {
+    public static double getTemperatureMultiplier(int temperature) {
         if (temperature > 50 || temperature < -30) {
             return ABOVE_50_C_OR_BELOW_30_C;
         }

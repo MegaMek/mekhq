@@ -36,13 +36,13 @@ import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
 
 import java.util.ResourceBundle;
 
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 
 public class BackgroundsController {

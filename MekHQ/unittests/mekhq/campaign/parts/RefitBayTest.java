@@ -81,6 +81,17 @@ class RefitBayTest {
         return PartsScenario.unitParts(leopard, TransportBayPart.class).size();
     }
 
+    /** The bays that get a part: every bay except quarters of size 0. */
+    private int baysWithSpace() {
+        int count = 0;
+        for (Bay bay : leopard.getEntity().getTransportBays()) {
+            if (TransportBayPart.isWorthAPart(bay)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /**
      * @return the Leopard design with its 34-ton cargo bay replaced by one of the given size and doors
      */
@@ -107,7 +118,7 @@ class RefitBayTest {
         complete(refit);
 
         assertEquals(baysBefore, bayParts(), "The crew quarters keep their bay parts");
-        assertEquals(leopard.getEntity().getTransportBays().size(), bayParts());
+        assertEquals(baysWithSpace(), bayParts());
     }
 
     @Test
@@ -123,7 +134,7 @@ class RefitBayTest {
 
         complete(refit);
 
-        assertEquals(leopard.getEntity().getTransportBays().size(), bayParts(), "Every bay has its part");
+        assertEquals(baysWithSpace(), bayParts(), "Every bay with space has its part");
         assertEquals(Map.of("Mek Cubicle", 4), PartsCensus.ofWarehouseStock(scenario.getWarehouse()));
     }
 

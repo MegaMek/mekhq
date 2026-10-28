@@ -42,10 +42,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -90,9 +91,9 @@ import mekhq.gui.baseComponents.tables.MHQTableColumn;
 import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
+import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
-import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn implements MHQTableColumn {
 
@@ -832,7 +833,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         return "";
     }
 
-    private static @NonNull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
+    private static @Nonnull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SkillModifierData skillModifierData = person.getSkillModifierData(
               campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
@@ -840,7 +841,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                                   person.getSkill(skillName).getFinalSkillValue(skillModifierData);
     }
 
-    private static @NonNull Function<String, String> getStringSkillValue(Person person, Campaign campaign) {
+    private static @Nonnull Function<String, String> getStringSkillValue(Person person, Campaign campaign) {
         return skillName -> skillToText(getSkillValue(person, campaign).apply(skillName));
     }
 
@@ -951,21 +952,21 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
-     * @param personalStateFlags list of i18n keys for color reasons, or null/empty if no special coloring
+     * @param personalStateFlags the reasons the row is colored, or empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
-    public @Nullable String getToolTipText(Person person, java.util.List<String> personalStateFlags) {
+    public @Nullable String getToolTipText(Person person, List<ColorReason> personalStateFlags) {
         String baseTooltip = getBaseToolTipText(person);
 
         // For name, rank, and status columns, append color reasons if present
         if (!personalStateFlags.isEmpty() && isNameRankOrStatusColumn()) {
             StringBuilder colorReasons = new StringBuilder();
-            for (String key : personalStateFlags) {
+            for (ColorReason reason : personalStateFlags) {
                 if (!colorReasons.isEmpty()) {
                     colorReasons.append("<br>");
                 }
-                colorReasons.append(MHQInternationalization.getText(key));
+                colorReasons.append(reason.text());
             }
 
             if (baseTooltip != null) {
@@ -1108,7 +1109,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
               Comparator.comparing(SkillAttributeCell::value).thenComparing(SkillAttributeCell::cap);
 
         @Override
-        @NonNull
+        @Nonnull
         public String toString() {
             StringBuilder result = new StringBuilder();
             result.append(value).append(" / ").append(cap);
@@ -1141,7 +1142,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         }
 
         @Override
-        @NonNull
+        @Nonnull
         public String toString() {
             String primaryString = primaryValue == null ? "-" : primaryValue.toString();
             String secondaryString = secondaryValue == null ? "-" : secondaryValue.toString();

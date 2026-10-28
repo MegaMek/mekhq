@@ -36,6 +36,7 @@ import static java.lang.Math.round;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -48,7 +49,6 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for the contract pay schemes: given a generated contract, each scheme decides how much the employer pays
@@ -86,7 +86,7 @@ public abstract class AbstractContractDeterminationPay {
      * Returns the pay scheme the campaign has opted into: the CamOps force-value scheme when
      * {@link CampaignOption#USE_LEGACY_CONTRACT_PAY} is set, otherwise the default Chaos scheme.
      */
-    public static @NonNull AbstractContractDeterminationPay forCampaign(Campaign campaign) {
+    public static @Nonnull AbstractContractDeterminationPay forCampaign(Campaign campaign) {
         if (campaign.getCampaignOptions().get(CampaignOption.USE_LEGACY_CONTRACT_PAY)) {
             return new CamOpsContractDeterminationPay();
         }
@@ -99,17 +99,9 @@ public abstract class AbstractContractDeterminationPay {
      */
     public void determineContractPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
-        Money monthlyPay = getMonthlyPay(campaign, contract);
+        Money monthlyPay = getContractMonthlyPay(campaign, contract);
         Money combatPay = getContractCombatPay(campaign, contract);
         Money transportPay = getTransportPay(campaign, currentDate, contract, currentLocation);
-
-        // A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too
-        // generous for this job" tell an attentive player can learn to notice. Transport is cost reimbursement, so it
-        // is left alone. Applies to whichever pay scheme is in effect, since both route through here.
-        if (contract.isFalseFlag()) {
-            monthlyPay = monthlyPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
-            combatPay = combatPay.multipliedBy(FALSE_FLAG_PAY_PREMIUM);
-        }
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
         contract.setContractFinanceData(contractFinanceData);
@@ -133,23 +125,35 @@ public abstract class AbstractContractDeterminationPay {
     }
 
     /** The monthly retainer the employer pays. */
-    public abstract @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract);
+    public abstract @Nonnull Money getMonthlyPay(Campaign campaign, AbstractContract contract);
 
     /** The per-battle combat bonus the employer pays; some schemes fold this into the monthly retainer and return zero. */
-    public abstract @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract);
+    public abstract @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract);
+
+    /**
+     * The monthly retainer actually owed for this contract: the active scheme's {@link #getMonthlyPay monthly pay}, plus
+     * the false flag deniability premium. Prefer this over {@link #getMonthlyPay} wherever a contract's real retainer is
+     * computed, so the premium holds on every path (generation, the GM editor, and negotiation).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nonnull Money getContractMonthlyPay(Campaign campaign, AbstractContract contract) {
+        return applyFalseFlagPremium(contract, getMonthlyPay(campaign, contract));
+    }
 
     /**
      * The per-battle combat bonus actually owed for this contract: the active scheme's {@link #getCombatPay combat pay},
      * except an opportunistic (non-covert) pirate raid always earns zero - the band loots for itself, and only a
      * secretly-bankrolled (covert) pirate raid is paid a combat bonus, by its hidden sponsor. A contract carrying the
-     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule instead has its combat pay quartered. Prefer
-     * this over {@link #getCombatPay} wherever a contract's real combat bonus is computed, so the rule holds on every
-     * path (generation, the GM editor, and negotiation).
+     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule instead has its combat pay quartered, and a
+     * false flag operation adds its deniability premium. Prefer this over {@link #getCombatPay} wherever a contract's
+     * real combat bonus is computed, so the rules hold on every path (generation, the GM editor, and negotiation).
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public @NonNull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
+    public @Nonnull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
         ContractObjectiveType objectiveType = contract.getObjectiveType();
         ChaosObjectiveType chaosObjectiveType = objectiveType == null ? null : objectiveType.getChaosObjectiveType();
         if ((chaosObjectiveType == ChaosObjectiveType.PIRATE_RAID) && !contract.isCovertOperation()) {
@@ -160,14 +164,30 @@ public abstract class AbstractContractDeterminationPay {
         if (contract.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY)) {
             combatPay = combatPay.multipliedBy(REDUCED_COMBAT_PAY_FRACTION);
         }
-        return combatPay;
+        return applyFalseFlagPremium(contract, combatPay);
+    }
+
+    /**
+     * A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too generous
+     * for this job" tell an attentive player can learn to notice. Transport is cost reimbursement, so it is left alone.
+     *
+     * @param contract the contract being paid
+     * @param pay      the retainer or combat bonus before the premium
+     *
+     * @return {@code pay} with the premium applied for a false flag operation, otherwise {@code pay} unchanged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money applyFalseFlagPremium(AbstractContract contract, Money pay) {
+        return contract.isFalseFlag() ? pay.multipliedBy(FALSE_FLAG_PAY_PREMIUM) : pay;
     }
 
     /**
      * Up-front transport compensation for the journey from the player's current location to the contract's target,
      * derived from the contract's scale, transport terms, and jump count. Shared by every pay scheme.
      */
-    public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+    public @Nonnull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
 
@@ -178,8 +198,9 @@ public abstract class AbstractContractDeterminationPay {
             return Money.zero();
         }
 
-        int transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * contract.getScale();
-        transportCostInSupportPoints *= jumpCount;
+        double economicScale = contract.getEconomicScale(campaign.getCampaignOptions()
+                                                               .get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double transportCostInSupportPoints = DEFAULT_TRANSPORT_COST_MULTIPLIER * economicScale * jumpCount;
 
         // Two-way pay for hiring halls: when the player sets out from a hiring hall, the employer covers the return
         // journey too, doubling transport pay. Only applied when the campaign opts into it.
@@ -189,8 +210,9 @@ public abstract class AbstractContractDeterminationPay {
             transportCostInSupportPoints *= HIRING_HALL_RETURN_MULTIPLIER;
         }
 
-        transportCostInSupportPoints = (int) round(transportCostInSupportPoints * contract.getTransportMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(transportCostInSupportPoints,
+        int roundedTransportCostInSupportPoints = (int) round(transportCostInSupportPoints
+                                                                    * contract.getTransportMultiplier());
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedTransportCostInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }
 

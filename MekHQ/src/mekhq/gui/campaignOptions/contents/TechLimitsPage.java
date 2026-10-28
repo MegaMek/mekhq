@@ -46,11 +46,12 @@ import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -120,7 +121,8 @@ class TechLimitsPage {
         allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonRefitOnlyBox"));
 
         // Clan Tech Refits Pre 3052
-        limitClanTechBox = new CampaignOptionsCheckBox("LimitClanTechBox");
+        limitClanTechBox = new CampaignOptionsCheckBox("LimitClanTechBox",
+              getMetadata(new Version(0, 51, 1)));
         limitClanTechBox.addMouseListener(createTipPanelUpdater("LimitClanTechBox"));
 
         // Maximum Tech Level

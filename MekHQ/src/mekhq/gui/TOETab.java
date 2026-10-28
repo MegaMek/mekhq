@@ -338,6 +338,13 @@ public final class TOETab extends CampaignGuiTab {
 
     public void refreshOrganization() {
         SwingUtilities.invokeLater(() -> {
+            // While a bulk generation builds formations off the EDT, skip this refresh: rebuilding the tree iterates
+            // formation and unit lists the worker is appending to, which throws ConcurrentModificationException. The
+            // OrganizationChangedEvent fired when the generation completes reschedules this refresh.
+            if (getCampaign().isBulkGenerationInProgress()) {
+                return;
+            }
+
             // Preserve the tree's expansion and selection across the refresh so adding units (for
             // example committing a generated command) updates the tree in place rather than
             // collapsing it back to the root. orgTree.updateUI() re-reads the model but resets the
@@ -353,15 +360,16 @@ public final class TOETab extends CampaignGuiTab {
                     }
                 }
             }
-            TreePath selectionPath = orgTree.getSelectionPath();
+            // Keep every selected path, not just the first, so a refresh doesn't collapse a multi-selection
+            TreePath[] selectionPaths = orgTree.getSelectionPaths();
 
             orgTree.updateUI();
 
             for (TreePath path : expandedPaths) {
                 orgTree.expandPath(path);
             }
-            if (selectionPath != null) {
-                orgTree.setSelectionPath(selectionPath);
+            if (selectionPaths != null) {
+                orgTree.setSelectionPaths(selectionPaths);
             }
             refreshForceView();
         });

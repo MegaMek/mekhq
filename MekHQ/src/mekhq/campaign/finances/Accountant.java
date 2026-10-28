@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -165,9 +166,33 @@ public record Accountant(Campaign campaign) {
      */
     public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
           AbstractLocation location) {
+        return getMonthlyFoodAndHousingExpenses(campaign,
+              personnel,
+              location.isOnPlanet(),
+              location.getCurrentSystem(),
+              campaign.getActiveContracts());
+    }
+
+    /**
+     * As {@link #getMonthlyFoodAndHousingExpenses(Campaign, List, AbstractLocation)}, for a given situation rather than
+     * the force's current one, so the expenses somewhere the force is going can be projected.
+     *
+     * @param campaign        the campaign, used to resolve options, faction standings, and the current date
+     * @param personnel       the personnel to evaluate
+     * @param isOnPlanet      whether the force is on a planet; housing is only charged on a planet
+     * @param currentSystem   the system the force is in, used for the faction-standing barrack cost multiplier
+     * @param activeContracts the contracts active in that situation, used for the faction-standing barrack cost
+     *                        multiplier
+     *
+     * @return a {@link Money} object representing the total monthly food and housing expenses
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
+          boolean isOnPlanet, @Nullable PlanetarySystem currentSystem, List<AbstractContract> activeContracts) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean payForFood = campaignOptions.get(CampaignOption.PAY_FOR_FOOD);
-        boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = campaignOptions.get(CampaignOption.PAY_FOR_HOUSING) && isOnPlanet;
 
         if (!payForFood && !payForHousing) {
@@ -175,10 +200,10 @@ public record Accountant(Campaign campaign) {
         }
 
         double barrackCostMultiplier = 1.0;
-        if (isOnPlanet && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
+        if (isOnPlanet && (currentSystem != null) && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
             barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(campaign.getPlayerForce()
                                                                                   .getFactionStandings(),
-                  location.getCurrentSystem(), campaign.getActiveContracts(), campaign.getLocalDate());
+                  currentSystem, activeContracts, campaign.getLocalDate());
         }
 
         return getFoodAndHousingTotal(personnel, payForFood, payForHousing, barrackCostMultiplier);
@@ -323,6 +348,9 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getWeeklyMaintenanceCosts()}.
      *
+     * <p>Units that do not require maintenance (e.g. mothballed, deployed, or self-maintained infantry) are skipped,
+     * as they are never charged.</p>
+     *
      * @param units the units to total weekly maintenance costs for
      *
      * @return the total {@link Money} weekly cost of maintenance
@@ -330,7 +358,9 @@ public record Accountant(Campaign campaign) {
     public static Money getWeeklyMaintenanceTotal(Collection<Unit> units) {
         Money total = Money.zero();
         for (Unit unit : units) {
-            total = total.plus(unit.getWeeklyMaintenanceCost());
+            if (unit.requiresMaintenance()) {
+                total = total.plus(unit.getWeeklyMaintenanceCost());
+            }
         }
 
         return total;
@@ -395,14 +425,55 @@ public record Accountant(Campaign campaign) {
             return Money.zero();
         }
 
-        int scale = ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign());
-        int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
-        if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
-            upkeepInSupportPoints = (int) Math.round(upkeepInSupportPoints
-                                                           * ChaosScaleLimits.getUpkeepEscalationMultiplier(scale));
+        return getHotSpotsUpkeepCostsForScale(campaignOptions,
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign()));
+    }
+
+    /**
+     * As {@link #getHotSpotsUpkeepCosts()}, but as if the given units had left the TO&amp;E. Used to project the upkeep
+     * charged while travelling with those units mothballed.
+     *
+     * @param excludedUnits the units to leave out of the TO&amp;E Scale
+     *
+     * @return the monthly upkeep cost without those units, or zero if Hot Spots upkeep is disabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getHotSpotsUpkeepCostsExcluding(Collection<Unit> excludedUnits) {
+        CampaignOptions campaignOptions = getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+            return Money.zero();
         }
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(upkeepInSupportPoints,
+        if (excludedUnits.isEmpty()) {
+            return getHotSpotsUpkeepCosts();
+        }
+
+        List<Unit> remainingUnits = new ArrayList<>(campaign().getPlayerForce().getHangar().getUnits());
+        remainingUnits.removeAll(excludedUnits);
+        double exactScale = ChaosContractDeterminationScale.generateScaleForTableOfOrganization(
+              campaign().getPlayerForce(),
+              remainingUnits,
+              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+        return getHotSpotsUpkeepCostsForScale(campaignOptions, exactScale);
+    }
+
+    /**
+     * @param campaignOptions the campaign options
+     * @param exactScale      the exact (unrounded) Scale of the TO&amp;E
+     *
+     * @return the monthly Hot Spots upkeep for a TO&amp;E of that Scale
+     */
+    private static Money getHotSpotsUpkeepCostsForScale(CampaignOptions campaignOptions, double exactScale) {
+        double scale = ChaosContractDeterminationScale.getEconomicScale(exactScale,
+              campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE));
+        double upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
+        if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
+            upkeepInSupportPoints *= ChaosScaleLimits.getUpkeepEscalationMultiplier(scale);
+        }
+
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints((int) Math.round(upkeepInSupportPoints),
               campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION));
     }
 
@@ -633,6 +704,19 @@ public record Accountant(Campaign campaign) {
               getTemporaryMedicPool(),
               getTempCrewMap(),
               includeSalaries);
+    }
+
+    /**
+     * The units that {@link #getPeacetimeCost(boolean)} charges for: every unit assigned to the player force's
+     * formations. Units outside the TO&amp;E are not included.
+     *
+     * @return every unit assigned to the player force's formations and their sub-formations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Collection<Unit> getUnitsInFormations() {
+        return getUnitsInFormations(this.campaign().getPlayerForce().getFormations().getSubFormations(), getHangar());
     }
 
     /**

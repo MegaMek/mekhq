@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.CrewArmorKitRules;
 import megamek.common.units.Entity;

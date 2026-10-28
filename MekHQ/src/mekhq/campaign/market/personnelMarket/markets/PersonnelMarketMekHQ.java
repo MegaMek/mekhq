@@ -261,6 +261,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                   closingBrace);
         }
 
+        if (getCampaign().getCampaignOptions()
+                  .get(CampaignOption.PERSONNEL_MARKET_DISABLE_COMBAT_MANEUVERS_RESTRICTION)) {
+            return "";
+        }
+
         for (AbstractContract contract : getCampaign().getActiveContracts()) {
             if (!contract.getObjectiveType().isGarrisonType()) {
                 color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
@@ -285,6 +290,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public void generateApplicants() {
+        boolean isShowOfInterestDisabled = getCampaign().getCampaignOptions()
+                                                 .get(CampaignOption.PERSONNEL_MARKET_DISABLE_SHOW_OF_INTEREST);
         int averageSkillLevel = getCampaign().getPlayerForce()
                                       .getAverageSkillLevel(getCampaign().getCampaignOptions(),
                                             getCampaign().getLocalDate())
@@ -310,7 +317,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
             int applicantSkill = applicant.getSkillLevel(getCampaign(), false).getExperienceLevel();
 
-            if (applicantSkill > averageSkillLevel) {
+            if (!isShowOfInterestDisabled && applicantSkill > averageSkillLevel) {
                 boolean notInterested = false;
 
                 int difference = applicantSkill - averageSkillLevel;

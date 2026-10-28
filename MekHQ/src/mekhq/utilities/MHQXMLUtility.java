@@ -40,8 +40,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.loaders.MULParser;
@@ -213,7 +213,11 @@ public class MHQXMLUtility extends MMXMLUtility {
                   .append("<" + MULParser.ELE_FUEL + " " + MULParser.ATTR_LEFT + "=\"").append(a.getFuel())
                   .append("\"/>\n");
 
-            // TODO: dropship docking collars, bays
+            // DropShip docking collar and K-F boom damage, written the way MegaMek writes it. Bays and their doors
+            // are kept by their parts.
+            if (a instanceof Dropship dropship) {
+                retVal.append(EntityListFile.getDropshipCritString(dropship));
+            }
 
             // Large craft stuff
             if (a instanceof Jumpship j) {
@@ -227,6 +231,9 @@ public class MHQXMLUtility extends MMXMLUtility {
                 retVal.append(MHQXMLUtility.indentStr(indentLvl + 1))
                       .append("<" + MULParser.ELE_SAIL + " " + MULParser.ATTR_INTEGRITY + "=\"")
                       .append(j.getSailIntegrity()).append("\"/>\n");
+
+                // Drive component, grav deck and docking collar damage, written the way MegaMek writes it
+                retVal.append(EntityListFile.getJumpshipCritString(j));
             }
 
             // Crits

@@ -52,10 +52,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -1344,7 +1344,8 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     /**
-     * Ported batchall-breach warning. Loops until the player confirms a decision.
+     * Ported batchall-breach warning. Choosing to breach the batchall loops until the player confirms it; backing out
+     * returns immediately.
      *
      * @return {@code true} if the player backed out of reinforcing rather than breaching the batchall
      */
@@ -1368,7 +1369,7 @@ public class StratConDeploymentWizard extends JDialog {
                   List.of(cancelButton, continueButton), outOfCharacter, null, true);
             backedOut = dialog.getDialogChoice() != continueOption;
 
-            if (MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
+            if (backedOut || MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
                 dialogAccepted = true;
             } else {
                 dialogAccepted = new ImmersiveDialogConfirmation(campaign,

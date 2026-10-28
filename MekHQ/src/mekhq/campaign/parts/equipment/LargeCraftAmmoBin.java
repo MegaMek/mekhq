@@ -34,8 +34,8 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
@@ -386,9 +386,16 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
     }
 
+    /**
+     * Bay ammunition is the same part only for the same rack size: a bay of LRM-20 launchers cannot fire LRM-10
+     * ammunition, so an LRM-10 bin is never an LRM-20 bin moved to another arc.
+     */
     @Override
     public boolean isSamePartType(Part part) {
-        return (getClass() == part.getClass()) && getType().isCompatibleWith(((AmmoBin) part).getType());
+        if ((getClass() != part.getClass()) || !getType().isCompatibleWith(((AmmoBin) part).getType())) {
+            return false;
+        }
+        return getType().getRackSize() == ((AmmoBin) part).getType().getRackSize();
     }
 
     @Override
@@ -426,15 +433,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return super.getDesc();
         }
         String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
         toReturn += ">";
         toReturn += "<b>Unload " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
-        toReturn += getTimeLeft() + " minutes" + scheduled;
+        toReturn += getTimeLeftText();
         toReturn += "</font></html>";
         return toReturn;
     }

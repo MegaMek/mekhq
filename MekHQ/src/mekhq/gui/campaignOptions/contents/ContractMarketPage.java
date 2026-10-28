@@ -103,6 +103,7 @@ class ContractMarketPage {
     private JCheckBox chkUseRiskySalvage;
     private JCheckBox chkKeepEnemyCamouflageOnSalvage;
     private JCheckBox chkEnableSalvageFlagByDefault;
+    private JCheckBox chkUseClanSalvageClause;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
@@ -118,6 +119,7 @@ class ContractMarketPage {
     private JCheckBox chkHideContractType;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
+    private JCheckBox chkUseDropShipBonusInSpace;
     private JLabel lblPityContracts;
     private JSpinner spnPityContracts;
     private JLabel lblContractBasePayMultiplier;
@@ -140,6 +142,7 @@ class ContractMarketPage {
     private JCheckBox chkBasePayOnlyConsidersScale;
     private JCheckBox chkCapContractScaleByHiringHall;
     private JCheckBox chkTaperCombatPayAndSalvageByScale;
+    private JCheckBox chkUseFractionalScale;
     private JCheckBox chkUseLegacyOptions;
     private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
@@ -264,6 +267,10 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
 
+        chkUseClanSalvageClause = new CampaignOptionsCheckBox("UseClanSalvageClause",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseClanSalvageClause.addMouseListener(createTipPanelUpdater("UseClanSalvageClause"));
+
         comboSalvageSystem.addActionListener(event -> updateSalvageTeamOptionsEnabledState());
 
         // General options that apply regardless of the contract-pay scheme (Chaos or legacy).
@@ -333,6 +340,10 @@ class ContractMarketPage {
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
         spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
 
+        chkUseDropShipBonusInSpace = new CampaignOptionsCheckBox("UseDropShipBonusInSpace",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseDropShipBonusInSpace.addMouseListener(createTipPanelUpdater("UseDropShipBonusInSpace"));
+
         lblPityContracts = new CampaignOptionsLabel("PityContracts", getMetadata(new Version(0, 51, 0)));
         lblPityContracts.addMouseListener(createTipPanelUpdater("PityContracts"));
         spnPityContracts = new CampaignOptionsSpinner("PityContracts", 4, 0, 20, 1);
@@ -355,6 +366,7 @@ class ContractMarketPage {
               chkUseRiskySalvage,
               chkKeepEnemyCamouflageOnSalvage,
               chkEnableSalvageFlagByDefault,
+              chkUseClanSalvageClause,
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
@@ -371,6 +383,7 @@ class ContractMarketPage {
               chkBLCSaleValue,
               chkOverageRepaymentInFinalPayment);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
+        panel.addCheckBox(chkUseDropShipBonusInSpace);
         panel.addRow(lblPityContracts, spnPityContracts);
 
         return panel;
@@ -463,6 +476,8 @@ class ContractMarketPage {
         chkTaperCombatPayAndSalvageByScale = new CampaignOptionsCheckBox("TaperCombatPayAndSalvageByScale",
               getMetadata(new Version(0, 51, 1)));
         chkTaperCombatPayAndSalvageByScale.addMouseListener(createTipPanelUpdater("TaperCombatPayAndSalvageByScale"));
+        chkUseFractionalScale = new CampaignOptionsCheckBox("UseFractionalScale", getMetadata(new Version(0, 51, 1)));
+        chkUseFractionalScale.addMouseListener(createTipPanelUpdater("UseFractionalScale"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
@@ -605,6 +620,9 @@ class ContractMarketPage {
         panel.add(chkTaperCombatPayAndSalvageByScale, layout);
 
         layout.gridy++;
+        panel.add(chkUseFractionalScale, layout);
+
+        layout.gridy++;
         panel.add(chkUseLegacyOptions, layout);
 
         layout.gridy++;
@@ -722,6 +740,7 @@ class ContractMarketPage {
         chkUseRiskySalvage.setSelected(model.useRiskySalvage);
         chkKeepEnemyCamouflageOnSalvage.setSelected(model.keepEnemyCamouflageOnSalvage);
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
+        chkUseClanSalvageClause.setSelected(model.useClanSalvageClause);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
@@ -736,6 +755,7 @@ class ContractMarketPage {
         chkUseOperationCodenames.setSelected(model.useOperationCodenames);
         chkHideContractType.setSelected(model.hideContractType);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
+        chkUseDropShipBonusInSpace.setSelected(model.useDropShipBonusInSpace);
         spnPityContracts.setValue(model.pityContracts);
         spnContractBasePayMultiplier.setValue(model.contractBasePayMultiplier);
         spnContractStraightSupportMultiplier.setValue(model.contractStraightSupportMultiplier);
@@ -747,6 +767,7 @@ class ContractMarketPage {
         chkBasePayOnlyConsidersScale.setSelected(model.basePayOnlyConsidersScale);
         chkCapContractScaleByHiringHall.setSelected(model.capContractScaleByHiringHall);
         chkTaperCombatPayAndSalvageByScale.setSelected(model.taperCombatPayAndSalvageByScale);
+        chkUseFractionalScale.setSelected(model.useFractionalScale);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
@@ -786,6 +807,7 @@ class ContractMarketPage {
         model.useRiskySalvage = chkUseRiskySalvage.isSelected();
         model.keepEnemyCamouflageOnSalvage = chkKeepEnemyCamouflageOnSalvage.isSelected();
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
+        model.useClanSalvageClause = chkUseClanSalvageClause.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
@@ -800,6 +822,7 @@ class ContractMarketPage {
         model.useOperationCodenames = chkUseOperationCodenames.isSelected();
         model.hideContractType = chkHideContractType.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
+        model.useDropShipBonusInSpace = chkUseDropShipBonusInSpace.isSelected();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.contractBasePayMultiplier = (double) spnContractBasePayMultiplier.getValue();
         model.contractStraightSupportMultiplier = (double) spnContractStraightSupportMultiplier.getValue();
@@ -811,6 +834,7 @@ class ContractMarketPage {
         model.basePayOnlyConsidersScale = chkBasePayOnlyConsidersScale.isSelected();
         model.capContractScaleByHiringHall = chkCapContractScaleByHiringHall.isSelected();
         model.taperCombatPayAndSalvageByScale = chkTaperCombatPayAndSalvageByScale.isSelected();
+        model.useFractionalScale = chkUseFractionalScale.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();

@@ -48,10 +48,10 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Era;
 import megamek.common.enums.Faction;
@@ -75,6 +75,7 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -93,7 +94,9 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.campaign.work.WorkTime;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.StringUtils;
@@ -184,6 +187,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
     /** This tracks the unit which reserved the part for a refit */
     private Unit refitUnit;
+    /**
+     * The unit whose refit this part was ordered ahead for with Order Parts (issue #7848), or {@code null}. The part
+     * stays an ordinary spare; the label only says what it was bought for. It is an id rather than the unit, because
+     * an order read back from a save keeps an unresolved reference to its unit.
+     */
+    private @Nullable UUID orderedAheadForUnitId;
     /**
      * The unique identifier of the tech who is reserving this part for overnight work
      */
@@ -333,10 +342,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         switch (getTechBase()) {
             case IS:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER));
                 break;
             case CLAN:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
+                cost = cost.multipliedBy(campaign.getCampaignOptions().get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER));
                 break;
             case ALL:
             default:
@@ -401,6 +410,13 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public boolean isUnitTonnageMatters() {
         return unitTonnageMatters;
+    }
+
+    /**
+     * @return {@code true} when the part's details name the weight of the unit it is for
+     */
+    protected boolean showsUnitTonnageInDetails() {
+        return isUnitTonnageMatters();
     }
 
     public abstract double getTonnage();
@@ -570,15 +586,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
 
         if (!isDamagedBeyondRepair()) {
-            toReturn.append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled)" : "")
-                  .append(" <b>TN:</b> ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
+            toReturn.append(getTimeAndTargetText());
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                   MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
@@ -588,14 +596,19 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return toReturn.toString();
     }
 
+    /**
+     * Describes the repair the part needs for the warehouse's Repair Details column. A part with nothing to repair
+     * says what it is for instead, so the column is not blank: for example, a Small Laser on its way for a refit is
+     * {@code Held for the refit of Locust LCT-1V}, one ordered ahead of a refit names the unit, and an ordinary spare
+     * on its way needs no repairs.
+     *
+     * @return the repair the part needs, what it is held for, or an empty string for an undamaged part in stock
+     */
     public String getRepairDesc() {
         StringBuilder toReturn = new StringBuilder();
 
         if (needsFixing()) {
-            toReturn.append("<html>")
-                  .append(getTimeLeft())
-                  .append(" minutes")
-                  .append(null != getTech() ? " (scheduled) " : "");
+            toReturn.append("<html>").append(getTimeLeftText());
 
             if (!getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
                 toReturn.append(" - <b>")
@@ -604,15 +617,30 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                       .append("</b>");
             }
 
-            toReturn.append(", TN: ")
-                  .append(getAllMods(null).getValue() > -1 ? "+" : "")
-                  .append(getAllMods(null).getValueAsString());
-            if (getMode() != WorkTime.NORMAL) {
-                toReturn.append(" <i>").append(getCurrentModeName()).append("</i>");
-            }
-            toReturn.append("</html>");
+            toReturn.append(", ")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumberPlain",
+                        formatTargetModifier(getAllMods(null))))
+                  .append(getWorkModeText())
+                  .append("</html>");
+        } else {
+            toReturn.append(describeWhatTheUndamagedPartIsFor());
         }
         return toReturn.toString();
+    }
+
+    private String describeWhatTheUndamagedPartIsFor() {
+        Unit unitRefitted = getRefitUnit();
+        if (unitRefitted != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairDesc.heldForRefit", unitRefitted.getName());
+        }
+        Unit unitOrderedFor = (orderedAheadForUnitId == null) ? null : getCampaign().getUnit(orderedAheadForUnitId);
+        if (unitOrderedFor != null) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairDesc.orderedAhead", unitOrderedFor.getName());
+        }
+        if (!isPresent()) {
+            return getTextAt(RESOURCE_BUNDLE, "Part.repairDesc.noRepairsNeeded");
+        }
+        return "";
     }
 
     public String getTechBaseName() {
@@ -674,7 +702,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @param part The part to be compared with the current part
      */
     public boolean isSamePartTypeAndStatus(Part part) {
-        return isSamePartType(part) && isSameStatus(part);
+        // A part ordered ahead for a refit stays in its own stack, so it keeps saying which refit it is for
+        boolean isOrderedAheadForTheSameRefit = Objects.equals(orderedAheadForUnitId, part.orderedAheadForUnitId);
+        return isSamePartType(part) && isSameStatus(part) && isOrderedAheadForTheSameRefit;
     }
 
     public abstract boolean isSamePartType(Part part);
@@ -739,6 +769,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (refitUnit != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
+        }
+
+        if (orderedAheadForUnitId != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "orderedAheadForUnitId", orderedAheadForUnitId);
         }
 
         if (daysToArrival > 0) {
@@ -885,6 +919,26 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         };
     }
 
+    /**
+     * Fixes the saved name of a part whose name has since changed. Part names are written to the save file and read
+     * back over the name the constructor sets, so without this a renamed part keeps its old name in existing saves.
+     *
+     * @param partName the part name read from the save file
+     *
+     * @return the current part name, or the passed name if it hasn't changed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String fixForRenamedParts(String partName) {
+        return switch (partName) {
+            // CHECKSTYLE IGNORE ForbiddenWords FOR 2 LINES
+            case "Mech Life Support System" -> "Mek Life Support System";
+            case "ProtoMech Arm Actuator" -> "ProtoMek Arm Actuator";
+            default -> partName;
+        };
+    }
+
     public static Part generateInstanceFromXML(Node wn, Version version) {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -909,7 +963,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     // a save from before parts had an identity has none, and the part keeps the one it was made with
                     readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.name = fixForRenamedParts(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
                     retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
@@ -940,6 +994,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.refitUnit = new PartUnitRef(UUID.fromString(wn2.getTextContent()));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("orderedAheadForUnitId")) {
+                    retVal.orderedAheadForUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
@@ -1000,6 +1056,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         if ((getUnit() != null) && (getUnit().hasPrototypeTSM())) {
             time *= 2;
         }
+        time *= PlanetaryWorkConditions.getTimeMultiplier(getCampaign(), getUnit());
         return (int) Math.ceil(time);
     }
 
@@ -1089,9 +1146,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             mods.append(getUnit().getSiteMod());
             if (getUnit().getEntity() != null) {
                 if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                    mods.addModifier(-1, "easy to maintain");
+                    mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
                 } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                    mods.addModifier(1, "difficult to maintain");
+                    mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
                 }
 
                 // Apply obsolete quirk modifier
@@ -1107,20 +1164,25 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (this instanceof MissingMekLocation) ||
                              (this instanceof MekActuator) ||
                              (this instanceof MissingMekActuator))) {
-                mods.addModifier(2, "prototype TSM");
+                mods.addModifier(2, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
             }
+        } else {
+            // Parts repaired in the warehouse work under the same conditions a unit would be assigned on arrival,
+            // otherwise pulling a component out of a unit would dodge the contract's repair site penalty.
+            int warehouseSite = ContractRepairLocation.getBestRepairLocation(getCampaign().getActiveContracts());
+            mods.append(Unit.getSiteMod(warehouseSite));
         }
 
         if (tech != null) {
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1130,11 +1192,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(1, "Maintainer");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
@@ -1156,9 +1218,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         mods.append(getUnit().getSiteMod());
         if (getUnit().getEntity() != null) {
             if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-                mods.addModifier(-1, "easy to maintain");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.easyToMaintain"));
             } else if (getUnit().getEntity().hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-                mods.addModifier(1, "difficult to maintain");
+                mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.difficultToMaintain"));
             }
 
             // Apply obsolete quirk modifier
@@ -1173,12 +1235,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
                       ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
-                mods.addModifier(-1, "Weapon specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
                       IPartWork.findCorrectRepairType(this).isArmour()) {
-                mods.addModifier(-1, "Armor specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
@@ -1188,16 +1250,16 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
                              (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
-                mods.addModifier(-1, "Internal specialist");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
-                mods.addModifier(-1, "Maintainer");
+                mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.maintainer"));
             }
         }
 
         if (getUnit().hasPrototypeTSM()) {
-            mods.addModifier(1, "prototype TSM");
+            mods.addModifier(1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.prototypeTsm"));
         }
 
         return getCampaign().getCampaignOptions().get(CampaignOption.USE_QUALITY_MAINTENANCE) ?
@@ -1219,13 +1281,63 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                   (null != tech) &&
                   tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             // fixers can ignore the first point of penalty for poor quality
-            mods.addModifier(-1, "Mr/Ms Fix-it");
+            mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.fixer"));
         }
         return mods;
     }
 
     public String getCurrentModeName() {
         return mode.name;
+    }
+
+    /**
+     * @return the time left on this job, as the player's chosen work time display shows it, for example
+     *       {@code 3 days (2 days with overtime)}
+     */
+    protected String getTimeLeftText() {
+        return WorkTimeEstimate.describeTimeLeft(getCampaign(), this);
+    }
+
+    /**
+     * @return the target number modifier for this job, for example {@code <b>TN:</b> +2}
+     */
+    protected String getTargetNumberText() {
+        return formatTargetNumberText(getAllMods(null));
+    }
+
+    /**
+     * @return the work mode in italics with a leading space, or an empty string in normal mode
+     */
+    protected String getWorkModeText() {
+        return (getMode() == WorkTime.NORMAL) ? "" : (" <i>" + getCurrentModeName() + "</i>");
+    }
+
+    /**
+     * @return the time left, the target number modifier and the work mode, as one line of the task list
+     */
+    protected String getTimeAndTargetText() {
+        String timeLeft = getTimeLeftText();
+        // A job with no time to show, such as armor with none in stock, starts with its target number
+        String timePrefix = timeLeft.isEmpty() ? "" : (timeLeft + ' ');
+        return timePrefix + getTargetNumberText() + getWorkModeText();
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the modifiers as the task list labels them, for example {@code <b>TN:</b> +2}
+     */
+    public static String formatTargetNumberText(TargetRoll targetRoll) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.task.targetNumber", formatTargetModifier(targetRoll));
+    }
+
+    /**
+     * @param targetRoll the modifiers for a job
+     *
+     * @return the total modifier with its sign, for example {@code +2} or {@code -1}
+     */
+    public static String formatTargetModifier(TargetRoll targetRoll) {
+        return ((targetRoll.getValue() > -1) ? "+" : "") + targetRoll.getValueAsString();
     }
 
     @Override
@@ -1338,7 +1450,65 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         timeSpent = 0;
         shorthandedMod = 0;
         return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
-              "<b> failed</b>") + ".";
+              "<b> failed</b>") + "." + getBeyondRepairReport();
+    }
+
+    /**
+     * Tells the player when a failed repair has left this part beyond repair, which no tech can then work on. Without
+     * it the report only said the repair failed, and the part just dropped out of the repair lists.
+     *
+     * @return the sentence to add to the failure report, or an empty string while the part can still be repaired
+     */
+    private String getBeyondRepairReport() {
+        if (!isDamagedBeyondRepair()) {
+            return "";
+        }
+        boolean isReplaceable = isReplaceable();
+        LOGGER.info("[BeyondRepair] {} on {} is now damaged beyond repair; replaceable: {}", getName(),
+              (unit == null) ? "no unit" : unit.getName(), isReplaceable);
+        String reportKey = isReplaceable ? "Part.fail.beyondRepair" : "Part.fail.beyondRepairNotReplaceable";
+        return " " + getTextAt(RESOURCE_BUNDLE, reportKey);
+    }
+
+    /**
+     * @return {@code true} if this part can be scrapped and a replacement fitted, which is how a part beyond repair is
+     *       dealt with. A part that can never be scrapped, such as a vehicle location, cannot be replaced either.
+     */
+    public boolean isReplaceable() {
+        return !canNeverScrap();
+    }
+
+    /**
+     * Whether this part's current task can fail its own check. A task that cannot, such as a routine reload that
+     * succeeds automatically, can only have been left impossible in error.
+     *
+     * @return {@code true} if the current task can genuinely fail
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean canFailItsOwnCheck() {
+        return true;
+    }
+
+    /**
+     * Clears a difficulty raised above Legendary on a task that can never genuinely fail. Before impossible tasks were
+     * held, a task carried over while its unit was deployed was rolled anyway and failed, which left such a task
+     * impossible for good. A task that can genuinely fail keeps its difficulty, since a failure at Legendary is
+     * permanent.
+     *
+     * @return {@code true} if the difficulty was cleared
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean clearImpossibleDifficulty() {
+        if ((getSkillMin() <= SkillType.EXP_LEGENDARY) || canFailItsOwnCheck()) {
+            return false;
+        }
+
+        resetRepairSettings();
+        return true;
     }
 
     @Override
@@ -1386,7 +1556,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             details.add("OmniPod");
         }
 
-        if (isUnitTonnageMatters()) {
+        if (showsUnitTonnageInDetails()) {
             details.add(getUnitTonnage() + " tons");
         }
 
@@ -1515,6 +1685,22 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public boolean isReservedForRefit() {
         return refitUnit != null;
+    }
+
+    /**
+     * @return the id of the unit whose refit this part was ordered ahead for, or {@code null} for an ordinary spare
+     */
+    public @Nullable UUID getOrderedAheadForUnitId() {
+        return orderedAheadForUnitId;
+    }
+
+    /**
+     * Labels the part, or its order, with the unit whose refit it was ordered ahead for.
+     *
+     * @param unitId the unit's id, or {@code null} to clear the label
+     */
+    public void setOrderedAheadForUnitId(@Nullable UUID unitId) {
+        orderedAheadForUnitId = unitId;
     }
 
     /**
@@ -1752,19 +1938,28 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public String getShoppingListReport(int quan) {
-        return getQuantityName(quan) + ((quan > 1) ? " have " : " has ") + "been added to the procurement list.";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.shoppingListReport", getQuantityName(quan), quan);
     }
 
     public String getArrivalReport() {
-        return getQuantityName(quantity) + ((quantity > 1) ? " have " : " has ") + "arrived";
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.arrivalReport", getQuantityName(quantity), quantity);
     }
 
     public String getQuantityName(int quantity) {
-        String answer = String.valueOf(quantity) + ' ' + getName();
-        if (quantity > 1) {
-            answer += "s";
-        }
-        return answer;
+        return formatQuantityName(quantity, getName());
+    }
+
+    /**
+     * Names a quantity of an item without guessing at an English plural, which turned "Vehicle Sensors" into
+     * "Vehicle Sensorss": one item reads "1 Medium Laser", more read "2 x Medium Laser".
+     *
+     * @param quantity how many there are
+     * @param name     the item's name
+     *
+     * @return the quantity and name for a report
+     */
+    public static String formatQuantityName(int quantity, String name) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Part.quantityName", quantity, name);
     }
 
     /**
@@ -1781,6 +1976,35 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         setHits(getHits() + d);
         updateConditionFromPart();
         updateConditionFromEntity(false);
+    }
+
+    /**
+     * Whether a failed maintenance check can still damage this part. A location or hull that is already destroyed has
+     * nothing left to damage.
+     *
+     * @return {@code true} if maintenance damage would change this part
+     */
+    public boolean canTakeMaintenanceDamage() {
+        return true;
+    }
+
+    /**
+     * The structure a location or hull keeps after maintenance damage. Maintenance damage never destroys it, so it stops
+     * at 1 point. One that is already destroyed stays destroyed: raising it back to 1 point would make a wreck
+     * repairable again.
+     *
+     * @param structure the structure points before the damage
+     * @param damage    the maintenance damage
+     *
+     * @return the structure points after the damage
+     */
+    protected int getStructureAfterMaintenanceDamage(int structure, int damage) {
+        if (structure < 1) {
+            LOGGER.debug("[MaintenanceDamage] {} on {}: already destroyed, so maintenance damage leaves it as it is",
+                  getName(), (unit == null) ? "no unit" : unit.getName());
+            return structure;
+        }
+        return Math.max(structure - damage, 1);
     }
 
     public PartQuality getQuality() {

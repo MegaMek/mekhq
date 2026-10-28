@@ -159,6 +159,8 @@ public class MASC extends EquipmentPart {
                     equipTonnage = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
                     engineRating = Integer.parseInt(wn2.getTextContent());
+                } else {
+                    loadArmoringFromXmlNode(wn2);
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);

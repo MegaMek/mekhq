@@ -57,7 +57,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -68,6 +68,7 @@ import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -376,6 +377,11 @@ public class Finances {
         // Handle contract payments
         if (isNewMonth) {
             for (AbstractContract contract : campaign.getActiveContracts()) {
+                // A breached contract pays nothing more, even if it is still running out its last day
+                if (contract.getMandatedCompletionStatus() == MissionStatus.BREACH) {
+                    continue;
+                }
+
                 credit(TransactionType.CONTRACT_PAYMENT,
                       today,
                       contract.getMonthlyPayOut(),

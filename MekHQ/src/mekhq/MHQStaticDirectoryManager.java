@@ -36,8 +36,9 @@ import static mekhq.MHQConstants.AWARDS_IMAGE_DIRECTORY_PATH;
 
 import java.io.File;
 
+import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.tileset.MMStaticDirectoryManager;
-import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
@@ -106,11 +107,63 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     DirectoryItems userDirFormationIcon = new DirectoryItems(formationIconUserDir, new ImageFileFactory());
                     formationIconDirectory.merge(userDirFormationIcon);
                 }
+                addFactionLogos(formationIconDirectory);
 
             } catch (Exception e) {
                 LOGGER.error("Could not parse the formation icon directory!", e);
             }
         }
+    }
+
+    /**
+     * Adds the faction icons from {@link RATGenerator#FACTION_LOGO_DIRECTORY} to the formation icon logos, under the
+     * {@link MHQConstants#LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY} category, so they can be used as a formation
+     * icon's logo layer. Faction icons in the user directory take precedence over the installed ones.
+     *
+     * @param formationIcons the parsed formation icon directory
+     */
+    private static void addFactionLogos(AbstractDirectory formationIcons) {
+        AbstractDirectory logos = formationIcons.getCategory(MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH);
+        AbstractDirectory factionLogos = null;
+        File factionLogoDirectory = new File(RATGenerator.FACTION_LOGO_DIRECTORY);
+        if (factionLogoDirectory.isDirectory()) {
+            factionLogos = new DirectoryItems(factionLogoDirectory, new ImageFileFactory());
+        }
+
+        String userDir = PreferenceManager.getClientPreferences().getUserDir();
+        File factionLogoUserDir = new File(userDir, RATGenerator.FACTION_LOGO_DIRECTORY);
+        if (!userDir.isBlank() && factionLogoUserDir.isDirectory()) {
+            DirectoryItems userFactionLogos = new DirectoryItems(factionLogoUserDir, new ImageFileFactory());
+            if (factionLogos == null) {
+                factionLogos = userFactionLogos;
+            } else {
+                factionLogos.merge(userFactionLogos);
+            }
+        }
+
+        if ((factionLogos == null) || (logos == null)) {
+            LOGGER.warn("Could not add the faction icons to the formation icon logos");
+            return;
+        }
+
+        factionLogos.setRootName(MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY);
+        setRootPaths(factionLogos, MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH
+                                         + MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY + '/');
+        AbstractDirectory existing = logos.getCategories()
+                                           .putIfAbsent(MHQConstants.LAYERED_FORCE_ICON_FACTION_LOGO_CATEGORY,
+                                                 factionLogos);
+        if (existing != null) {
+            existing.merge(factionLogos);
+        }
+    }
+
+    /**
+     * Sets the root path of the directory and of all its subdirectories, which {@link AbstractDirectory#setRootPath}
+     * leaves unchanged. The formation icon chooser uses these paths to find the images of a subdirectory.
+     */
+    private static void setRootPaths(AbstractDirectory directory, String rootPath) {
+        directory.setRootPath(rootPath);
+        directory.getCategories().forEach((name, category) -> setRootPaths(category, rootPath + name + '/'));
     }
 
     /**

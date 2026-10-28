@@ -379,6 +379,17 @@ public final class InjuryTypes {
             InjuryType.register(246, "alt:MEDICAL_COMPLICATION", AlternateInjuries.MEDICAL_COMPLICATION);
             InjuryType.register(247, "alt:FRACTURE_REPAIR", AlternateInjuries.FRACTURE_REPAIR);
             InjuryType.register(248, "alt:FRACTURE_REPAIR_RECOVERY", AlternateInjuries.FRACTURE_REPAIR_RECOVERY);
+            InjuryType.register(249, "alt:TOXIN_EFFUSER", AlternateInjuries.TOXIN_EFFUSER);
+            InjuryType.register(250, "alt:EXPLOSIVE_SUICIDE_IMPLANT", AlternateInjuries.EXPLOSIVE_SUICIDE_IMPLANT);
+            InjuryType.register(251, "alt:ENHANCED_PROSTHETIC_LIMB", AlternateInjuries.ENHANCED_PROSTHETIC_LIMB);
+            InjuryType.register(252,
+                  "alt:IMPROVED_ENHANCED_PROSTHETIC_LIMB",
+                  AlternateInjuries.IMPROVED_ENHANCED_PROSTHETIC_LIMB);
+            InjuryType.register(253, "alt:PROSTHETIC_LEG_MASC", AlternateInjuries.PROSTHETIC_LEG_MASC);
+            InjuryType.register(254, "alt:ENHANCED_TAIL_PROSTHETIC", AlternateInjuries.ENHANCED_TAIL_PROSTHETIC);
+            InjuryType.register(255, "alt:EXTRANEOUS_PROSTHETIC_LIMBS", AlternateInjuries.EXTRANEOUS_PROSTHETIC_LIMBS);
+            InjuryType.register(256, "alt:GLIDER_WINGS", AlternateInjuries.GLIDER_WINGS);
+            InjuryType.register(257, "alt:POWERED_FLIGHT_WINGS", AlternateInjuries.POWERED_FLIGHT_WINGS);
 
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);

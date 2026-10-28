@@ -59,7 +59,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.swing.*;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.roleplay.JournalEntry;

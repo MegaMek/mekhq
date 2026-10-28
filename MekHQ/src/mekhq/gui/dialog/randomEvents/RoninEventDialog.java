@@ -37,7 +37,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.List;
 import javax.swing.JPanel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;

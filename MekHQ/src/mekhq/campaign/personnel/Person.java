@@ -98,13 +98,13 @@ import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -143,6 +143,7 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
@@ -388,6 +389,7 @@ public class Person implements ILocatable {
     private int eduDaysOfTravel;
     private transient String legacyEduAcademySystem;
     private List<UUID> eduTagAlongs;
+    private UUID eduOriginBaseId;
     private List<String> eduFailedApplications;
     private double trainingForceEducationTime;
     // endregion Education
@@ -443,6 +445,7 @@ public class Person implements ILocatable {
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
+    private boolean leadNegotiator;
     // Senior appointments. Booleans in the same mould as secondInCommand and salvageSupervisor, so a
     // caller can ask "who is the CMO?" as a predicate rather than matching a string. A post is a
     // position within a command, distinct from rank (what someone is) and role (what they do).
@@ -652,6 +655,7 @@ public class Person implements ILocatable {
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduTagAlongs = new ArrayList<>();
+        eduOriginBaseId = null;
         eduFailedApplications = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
@@ -1212,21 +1216,6 @@ public class Person implements ILocatable {
         return targetPixelWidth == null ?
                      portrait.getImageIcon(DEFAULT_IMAGE_WIDTH) :
                      portrait.getImageIcon(targetPixelWidth);
-    }
-
-    /**
-     * Retrieves a fallback portrait image when no specific portrait is available.
-     *
-     * <p>This method generates a fallback image by using the faction logo corresponding to the person's origin
-     * faction and birth year. The logo is scaled to the default image width while maintaining aspect ratio.</p>
-     *
-     * @return A scaled {@link ImageIcon} containing the faction logo as a fallback portrait
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private ImageIcon getFallbackPortrait() {
-        return Factions.getFactionLogo(birthday.getYear(), originFaction.getShortName());
     }
 
     private ImageIcon getFallbackPortrait(int targetPixelWidth) {
@@ -1898,7 +1887,9 @@ public class Person implements ILocatable {
                 returnToLastAssignedUnit(campaign);
             }
         } else {
-            setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
+            if (!status.isInfirmaryEligible()) {
+                setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
+            }
 
             // If we're assigned to a unit, remove us from it, remembering where we were so we can return later
             Unit currentUnit = getUnit();
@@ -1945,6 +1936,12 @@ public class Person implements ILocatable {
                   getHyperlinkedFullTitle()));
         }
 
+        if (isLeadNegotiator() && status.isDepartedUnit()) {
+            setLeadNegotiator(false);
+            campaign.addReport(PERSONNEL, getFormattedText("removedLeadNegotiator.format",
+                  getHyperlinkedFullTitle()));
+        }
+
         // clean up the save entry
         this.setEduAcademyName(null);
         this.setEduAcademyFaction(null);
@@ -1956,11 +1953,13 @@ public class Person implements ILocatable {
         this.setEduJourneyTime(0);
         this.setEduEducationTime(0);
         this.setEduDaysOfTravel(0);
+        this.setEduOriginBaseId(null);
 
         for (UUID tagAlongId : eduTagAlongs) {
             Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
-            if (tagAlong != null) {
+            // camp followers were never placed on leave, so they must not be made active (employed)
+            if (tagAlong != null && tagAlong.getStatus().isOnLeave()) {
                 tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
@@ -2799,19 +2798,36 @@ public class Person implements ILocatable {
      *
      * <p>This method modifies the fatigue level based on the given {@code delta} value. Positive values, which
      * indicate an increase in fatigue, are scaled by the result of {@link #getFatigueMultiplier()} and rounded down
-     * using {@link Math#floor(double)} to ensure consistent results. Negative values, which indicate a reduction in
-     * fatigue, are applied directly without modification.</p>
+     * using {@link Math#floor(double)}, to a minimum of 1. Negative values, which indicate a reduction in fatigue, are
+     * applied directly without modification.</p>
      *
      * @param delta The amount to adjust the fatigue by. Positive values represent fatigue gain and are scaled by the
      *              fatigue multiplier, while negative values represent fatigue reduction and are applied as-is.
      */
     public void changeFatigue(int delta) {
-        if (delta > 0) {
+        changeFatigue(delta, true);
+    }
+
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>If {@code isApplyMultiplier} is {@code true}, positive values are scaled by the result of
+     * {@link #getFatigueMultiplier()} and rounded down, to a minimum of 1. Otherwise, and for all negative values, the
+     * change is applied as-is.</p>
+     *
+     * @param delta             The amount to adjust the fatigue by.
+     * @param isApplyMultiplier {@code true} if fatigue gain should be scaled by the character's fatigue multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeFatigue(int delta, boolean isApplyMultiplier) {
+        if ((delta > 0) && isApplyMultiplier) {
             // Only fatigue gain is modified by SPAs, not reduction.
-            delta = (int) floor(delta * getFatigueMultiplier());
+            delta = max(1, (int) floor(delta * getFatigueMultiplier()));
         }
 
-        fatigue += MathUtility.roundAwayFromZero(delta);
+        fatigue += delta;
 
         fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
@@ -3210,6 +3226,18 @@ public class Person implements ILocatable {
 
     public void addEduTagAlong(final UUID tagAlong) {
         this.eduTagAlongs.add(tagAlong);
+    }
+
+    /**
+     * Returns the id of the {@link mekhq.campaign.base.PlayerBase} this person left from to attend an academy, or
+     * {@code null} if they left from the main force. Students return here once their education ends.
+     */
+    public @Nullable UUID getEduOriginBaseId() {
+        return eduOriginBaseId;
+    }
+
+    public void setEduOriginBaseId(final @Nullable UUID eduOriginBaseId) {
+        this.eduOriginBaseId = eduOriginBaseId;
     }
 
     public List<String> getEduFailedApplications() {
@@ -3631,6 +3659,15 @@ public class Person implements ILocatable {
 
     public void setSalvageSupervisor(final boolean salvageSupervisor) {
         this.salvageSupervisor = salvageSupervisor;
+    }
+
+    /** @return whether this person is the command's lead negotiator, put forward by default at contract negotiations */
+    public boolean isLeadNegotiator() {
+        return leadNegotiator;
+    }
+
+    public void setLeadNegotiator(final boolean leadNegotiator) {
+        this.leadNegotiator = leadNegotiator;
     }
 
     /** @return whether this person is the command's chief medical officer */
@@ -4184,6 +4221,10 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
             }
 
+            if (eduOriginBaseId != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduOriginBaseId", eduOriginBaseId);
+            }
+
             if (!eduTagAlongs.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduFailedApplications");
 
@@ -4372,6 +4413,9 @@ public class Person implements ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
+            if (leadNegotiator) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "leadNegotiator", true);
+            }
             if (chiefMedicalOfficer) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chiefMedicalOfficer", true);
             }
@@ -4945,6 +4989,14 @@ public class Person implements ILocatable {
                             }
                         }
                     }
+                } else if (nodeName.equalsIgnoreCase("eduOriginBaseId")) {
+                    try {
+                        person.eduOriginBaseId = UUID.fromString(wn2.getTextContent().trim());
+                    } catch (IllegalArgumentException ex) {
+                        // the student will fall back to returning to the main force
+                        LOGGER.warn("Invalid eduOriginBaseId '{}' for {}; ignoring", wn2.getTextContent().trim(),
+                              person.getFullName());
+                    }
                 } else if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                     if (nodeName.equalsIgnoreCase("eduFailedApplications")) {
                         NodeList nodes = wn2.getChildNodes();
@@ -5073,6 +5125,8 @@ public class Person implements ILocatable {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("leadNegotiator")) {
+                    person.setLeadNegotiator(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("chiefMedicalOfficer")) {
                     person.setChiefMedicalOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("headTechnician")) {
@@ -5928,8 +5982,8 @@ public class Person implements ILocatable {
      * <p>The calculation varies depending on the person's role and campaign options:</p>
      * <ul>
      *     <li>
-     *         <b>Vehicle Gunners:</b> If artillery usage is enabled in the campaign, calculates the maximum
-     *         experience level between Gunnery (Vee) and Artillery skills. Otherwise, uses the profession's
+     *         <b>MekWarriors and Vehicle Crews:</b> If artillery usage is enabled in the campaign, the better of their
+     *         gunnery skill and Artillery is used in place of their gunnery skill. Otherwise, uses the profession's
      *         associated skills and campaign averaging option.
      *     </li>
      *     <li>
@@ -6058,7 +6112,8 @@ public class Person implements ILocatable {
     /**
      * Retrieves the skills associated with the character's profession. The skills returned depend on whether the
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
-     * settings, such as whether artillery skills are enabled.
+     * settings, such as whether artillery skills are enabled. When artillery is enabled, the better of the
+     * profession's gunnery skill and Artillery is used in place of the gunnery skill.
      *
      * @param campaignOptions  the current {@link CampaignOptions}
      * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
@@ -6088,7 +6143,57 @@ public class Person implements ILocatable {
             professionSkills = List.of(bestSkill == null ? S_SMALL_ARMS : bestSkill);
         }
 
+        if (professionSkills.contains(S_ARTILLERY)) {
+            professionSkills = getProfessionSkillsWithBestGunnery(professionSkills);
+        }
+
         return professionSkills;
+    }
+
+    /**
+     * Replaces the gunnery and Artillery skills in a profession's skill list with whichever of the two is better.
+     *
+     * <p>Artillery is an alternative to a profession's normal gunnery skill, not an additional requirement. So only
+     * the higher of the two counts towards the profession, and a character without Artillery simply uses their normal
+     * gunnery skill.</p>
+     *
+     * @param professionSkills the profession's skills, including {@link SkillType#S_ARTILLERY}
+     *
+     * @return a new list where the gunnery skill is replaced by Artillery if Artillery is better, and Artillery is
+     *       otherwise removed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private List<String> getProfessionSkillsWithBestGunnery(List<String> professionSkills) {
+        List<String> skillsWithBestGunnery = new ArrayList<>(professionSkills);
+        skillsWithBestGunnery.remove(S_ARTILLERY);
+
+        Skill artillerySkill = getSkill(S_ARTILLERY);
+        if (artillerySkill == null) {
+            return skillsWithBestGunnery;
+        }
+
+        int gunneryIndex = -1;
+        for (String gunnerySkillName : List.of(S_GUN_MEK, S_GUN_VEE)) {
+            gunneryIndex = skillsWithBestGunnery.indexOf(gunnerySkillName);
+            if (gunneryIndex != -1) {
+                break;
+            }
+        }
+
+        if (gunneryIndex == -1) {
+            return skillsWithBestGunnery;
+        }
+
+        Skill gunnerySkill = getSkill(skillsWithBestGunnery.get(gunneryIndex));
+        SkillModifierData skillModifierData = getSkillModifierData();
+        if ((gunnerySkill == null) || (artillerySkill.getTotalSkillLevel(skillModifierData) >
+                                             gunnerySkill.getTotalSkillLevel(skillModifierData))) {
+            skillsWithBestGunnery.set(gunneryIndex, S_ARTILLERY);
+        }
+
+        return skillsWithBestGunnery;
     }
 
     /**
@@ -7175,6 +7280,8 @@ public class Person implements ILocatable {
     public int getMaintenanceTimeUsing() {
         return getTechUnits().stream()
                      .filter(unit -> !(unit.isRefitting() && unit.getRefit().getTech() == this))
+                     // Units in salvage mode are not maintained, so they take none of the tech's time
+                     .filter(unit -> !unit.isSalvage())
                      .mapToInt(Unit::getMaintenanceTime)
                      .sum();
     }
@@ -7514,6 +7621,12 @@ public class Person implements ILocatable {
 
             if ((u.getRefit() != null) && equals(u.getRefit().getTech())) {
                 u.getRefit().setTech(null);
+            }
+
+            for (PodSpace podSpace : u.getPodSpace()) {
+                if (equals(podSpace.getTech())) {
+                    podSpace.cancelAssignment(true);
+                }
             }
         });
 

@@ -41,12 +41,14 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nullable;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
+import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.campaign.roleplay.CheckTarget;
 
 /**
  * Base abstract class for configuring character skill, attribute, and other action checks.
@@ -66,6 +68,9 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
     private static final int MARGIN_OF_SUCCESS_MAX = 10;
     private static final int MARGIN_OF_SUCCESS_MIN = -10;
+
+    /** The dice result that always fails a check made with {@link #withRollOfTwoAlwaysFailing()}. */
+    public static final int ALWAYS_FAILING_ROLL = 2;
 
     protected final Person person;
     protected final TargetRoll targetNumber;
@@ -96,6 +101,11 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * introduced the person in their own running report suppress the repeated name via {@link #withoutSubject()}.
      */
     private boolean includeSubject = true;
+
+    /**
+     * Whether a roll of 2 fails however low the target number is. See {@link #withRollOfTwoAlwaysFailing()}.
+     */
+    private boolean isRollOfTwoAlwaysFailing = false;
 
     /**
      * Initializes a new action check for the specified person and target number.
@@ -205,6 +215,25 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
+     * @return the dice this check rolls: the type forced with {@link #withRollType(RollType)} if any, otherwise
+     *       {@link RollType#ADVANTAGE} for natural aptitude or {@link RollType#NORMAL}
+     */
+    public RollType getRollType() {
+        return (rollTypeOverride != null)
+                     ? rollTypeOverride
+                     : (hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL);
+    }
+
+    /**
+     * @return the target this check rolls against, exactly as {@link #resolve(boolean, String)} rolls it, so its odds
+     *       can be worked out before rolling
+     */
+    public CheckTarget getCheckTarget() {
+        return new CheckTarget(targetNumber.getValue(), isCountUp(), targetNumber.cannotSucceed(), getRollType(),
+              hasAlwaysFailingRoll());
+    }
+
+    /**
      * Adds a results-line log performed by {@link #resolve(boolean, String)}.
      *
      * @return updated action check
@@ -246,6 +275,17 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
+     * Makes a roll of 2 fail however low the target number is, as Campaign Operations (Extra Time, p. 208) requires
+     * for a Technician Skill Check. The results line and the default edge gate both treat that roll as a failure.
+     *
+     * @return updated action check
+     */
+    public T withRollOfTwoAlwaysFailing() {
+        this.isRollOfTwoAlwaysFailing = true;
+        return getThis();
+    }
+
+    /**
      * Executes action check for the specified person.
      *
      * <p>Performs a roll and determines margin of success as <code>Roll - TN</code> if <code>isCountUp ==
@@ -256,9 +296,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * @param reason  the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
-        RollType rollType = (rollTypeOverride != null)
-                                  ? rollTypeOverride
-                                  : (hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL);
+        RollType rollType = getRollType();
 
         ActionCheckRoll roll = ActionCheckRoll.perform(rollType);
         boolean usedEdge = false;
@@ -273,7 +311,8 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         if (edgeRerollCondition != null) {
             shouldReroll = canSpendEdge && canSucceed && edgeRerollCondition.test(roll);
         } else {
-            boolean failed = isCountUp() ? roll.result() > target : roll.result() < target;
+            boolean failed = (isCountUp() ? roll.result() > target : roll.result() < target)
+                                   || isAlwaysFailingRoll(roll.result());
             shouldReroll = failed && canSucceed && canSpendEdge;
         }
 
@@ -287,6 +326,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         long difference = (long) targetNumber.getValue() - roll.result();
         int marginOfSuccess = Math.clamp(isCountUp() ? difference : -difference,
               MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
+        if (isAlwaysFailingRoll(roll.result()) && ActionCheckResult.isSuccess(marginOfSuccess)) {
+            // the roll met the target, so it reports as the narrowest possible failure
+            marginOfSuccess = MarginOfSuccess.ALMOST.getUpperBound();
+        }
         String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason, rollType);
 
         if (logResult) {
@@ -294,6 +337,21 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         }
 
         return new ActionCheckResult(roll, marginOfSuccess, usedEdge, resultsText);
+    }
+
+    /**
+     * @return {@code true} if this check fails on the given roll whatever the target number. A target that needs no
+     *       roll, such as an automatic success, is never failed this way.
+     */
+    private boolean isAlwaysFailingRoll(int rollResult) {
+        return hasAlwaysFailingRoll() && (rollResult <= ALWAYS_FAILING_ROLL);
+    }
+
+    /**
+     * @return {@code true} if a roll of {@link #ALWAYS_FAILING_ROLL} fails this check whatever the target number
+     */
+    private boolean hasAlwaysFailingRoll() {
+        return isRollOfTwoAlwaysFailing && !isCountUp() && targetNumber.needsRoll();
     }
 
     /**

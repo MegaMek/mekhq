@@ -54,6 +54,7 @@ import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.settings.SettingsFormPanel;
@@ -253,9 +254,12 @@ public class GeneralPage {
         }
 
         // Starting location
-        lblStartingLocation = new CampaignOptionsLabel("StartingLocation");
-        lblStartingLocationFaction = new CampaignOptionsLabel("StartingLocationFaction");
-        lblStartingWorld = new CampaignOptionsLabel("StartingWorld");
+        lblStartingLocation = new CampaignOptionsLabel("StartingLocation",
+              getMetadata(new Version(0, 51, 1)));
+        lblStartingLocationFaction = new CampaignOptionsLabel("StartingLocationFaction",
+              getMetadata(new Version(0, 51, 1)));
+        lblStartingWorld = new CampaignOptionsLabel("StartingWorld",
+              getMetadata(new Version(0, 51, 1)));
         comboStartingLocation.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -430,7 +434,8 @@ public class GeneralPage {
         comboStartingWorld = new MMComboBox<>("comboStartingWorld",
               new String[] { getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.factionCapital"),
                              getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.randomHiringHall") });
-        chkIncludeDeepPeriphery = new CampaignOptionsCheckBox("IncludeDeepPeriphery");
+        chkIncludeDeepPeriphery = new CampaignOptionsCheckBox("IncludeDeepPeriphery",
+              getMetadata(new Version(0, 51, 1)));
     }
 
     /**

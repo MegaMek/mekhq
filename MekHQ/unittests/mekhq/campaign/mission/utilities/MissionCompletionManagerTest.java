@@ -40,10 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -65,6 +67,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -93,6 +96,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.roleplay.ContractJournalPrompt;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
@@ -315,7 +319,7 @@ public class MissionCompletionManagerTest {
     @Nested
     public class UndeployFormations {
         @Test
-        void cadreDutyRevertsCadreRoleAndReportsCadreForces() {
+        void leavesFormationRolesUnchanged() {
             AbstractContract mission = mock(AbstractContract.class);
             when(mission.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
 
@@ -324,30 +328,10 @@ public class MissionCompletionManagerTest {
             Formation formation = mock(Formation.class);
             when(campaign.getPlayerForce()).thenReturn(playerForce);
             when(playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.CADRE);
             when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
 
-            boolean hadCadreForces = MissionCompletionManager.undeployFormations(campaign, mission);
+            MissionCompletionManager.undeployFormations(campaign, mission);
 
-            assertTrue(hadCadreForces);
-            verify(formation).setCombatRoleInMemory(CombatRole.FRONTLINE);
-        }
-
-        @Test
-        void nonCadreDutyLeavesRolesAndReportsNoCadreForces() {
-            AbstractContract mission = mock(AbstractContract.class);
-            when(mission.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
-
-            Campaign campaign = mock(Campaign.class);
-            PlayerForce playerForce = mock(PlayerForce.class);
-            Formation formation = mock(Formation.class);
-            when(campaign.getPlayerForce()).thenReturn(playerForce);
-            when(playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
-
-            boolean hadCadreForces = MissionCompletionManager.undeployFormations(campaign, mission);
-
-            assertFalse(hadCadreForces);
             verify(formation, never()).setCombatRoleInMemory(any());
         }
 
@@ -586,6 +570,36 @@ public class MissionCompletionManagerTest {
             verify(factionStandings).processContractCompletion(campaignFaction, employerFaction, TODAY,
                   MissionStatus.SUCCESS, 6.0, 12);
         }
+
+        @Test
+        void trackingEnabledPostsStandingReportsToPolitics() {
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)).thenReturn(true);
+            when(campaignOptions.get(CampaignOption.REGARD_MULTIPLIER)).thenReturn(1.0);
+
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            FactionStandings factionStandings = mock(FactionStandings.class);
+            AbstractContract mission = mock(AbstractContract.class);
+
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getFactionStandings()).thenReturn(factionStandings);
+            when(factionStandings.processContractCompletion(any(), any(), any(), any(), anyDouble(), anyInt()))
+                  .thenReturn(new ArrayList<>(List.of("employer report", "", "ally report")));
+
+            try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                  ContractCharacteristics.class)) {
+                contractCharacteristics.when(() -> ContractCharacteristics.getEmployerRegardMultiplier(mission))
+                      .thenReturn(1.0);
+
+                MissionCompletionManager.updateFactionStandings(campaign, campaignOptions, mission,
+                      MissionStatus.SUCCESS);
+            }
+
+            verify(campaign).addReport(DailyReportType.POLITICS, "employer report");
+            verify(campaign).addReport(DailyReportType.POLITICS, "ally report");
+            verify(campaign, never()).addReport(DailyReportType.POLITICS, "");
+        }
     }
     // endregion updateFactionStandings
 
@@ -640,7 +654,7 @@ public class MissionCompletionManagerTest {
 
                 chaosReputation.verify(() -> ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS,
                       personnel, 1.5));
-                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyInt(),
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyDouble(),
                       any(), any(), anyBoolean(), any()), never());
             }
         }
@@ -662,7 +676,8 @@ public class MissionCompletionManagerTest {
             List<Scenario> scenarios = List.of(mock(Scenario.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
             when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(true);
-            when(mission.getScale()).thenReturn(4);
+            when(campaignOptions.get(CampaignOption.USE_FRACTIONAL_SCALE)).thenReturn(false);
+            when(mission.getEconomicScale(false)).thenReturn(4.0);
             when(mission.getScenarios()).thenReturn(scenarios);
             when(mission.getName()).thenReturn("Raid");
 
@@ -676,12 +691,98 @@ public class MissionCompletionManagerTest {
 
                 MissionCompletionManager.payCompletionBonusAndReputation(campaign, mission, MissionStatus.SUCCESS);
 
-                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4, scenarios,
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4.0, scenarios,
                       null, true, "Raid"));
             }
         }
     }
     // endregion payCompletionBonusAndReputation
+
+    // region releaseCompletedContractDeployments
+    @Nested
+    public class ReleaseCompletedContractDeployments {
+        @Test
+        void releasesForcesOnCompletedContractAndDrawsItsCurrentScenarios() {
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+            UUID completedId = UUID.randomUUID();
+            AbstractContract completedContract = mock(AbstractContract.class);
+            when(completedContract.getStatus()).thenReturn(MissionStatus.SUCCESS);
+            when(campaign.getContract(completedId)).thenReturn(completedContract);
+            when(campaign.getCompletedContracts()).thenReturn(List.of(completedContract));
+
+            Scenario strandedScenario = mock(Scenario.class);
+            when(strandedScenario.getMissionId()).thenReturn(completedId);
+            when(campaign.getScenario(58)).thenReturn(strandedScenario);
+            when(completedContract.getCurrentScenarios()).thenReturn(List.of(strandedScenario));
+
+            Formation formation = mock(Formation.class);
+            when(formation.getScenarioId()).thenReturn(58);
+            when(playerForce.getAllFormations()).thenReturn(List.of(formation));
+            Unit unit = mock(Unit.class);
+            when(unit.getScenarioId()).thenReturn(58);
+            when(campaign.getUnits()).thenReturn(List.of(unit));
+
+            MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+
+            verify(strandedScenario).setStatus(ScenarioStatus.DRAW);
+            verify(formation).setScenarioId(NO_ASSIGNED_SCENARIO, campaign);
+            verify(unit).setScenarioId(NO_ASSIGNED_SCENARIO);
+        }
+
+        @Test
+        void keepsForcesOnActiveContract() {
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(campaign.getCompletedContracts()).thenReturn(new ArrayList<>());
+
+            UUID activeId = UUID.randomUUID();
+            AbstractContract activeContract = mock(AbstractContract.class);
+            when(activeContract.getStatus()).thenReturn(MissionStatus.ACTIVE);
+            when(campaign.getContract(activeId)).thenReturn(activeContract);
+
+            Scenario scenario = mock(Scenario.class);
+            when(scenario.getMissionId()).thenReturn(activeId);
+            when(campaign.getScenario(92)).thenReturn(scenario);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getScenarioId()).thenReturn(92);
+            when(playerForce.getAllFormations()).thenReturn(List.of(formation));
+            Unit unit = mock(Unit.class);
+            when(unit.getScenarioId()).thenReturn(92);
+            when(campaign.getUnits()).thenReturn(List.of(unit));
+
+            MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+
+            verify(formation, never()).setScenarioId(anyInt(), any());
+            verify(unit, never()).setScenarioId(anyInt());
+        }
+
+        @Test
+        void releasesForcesOnMissingScenario() {
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(campaign.getCompletedContracts()).thenReturn(new ArrayList<>());
+            when(campaign.getScenario(13)).thenReturn(null);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getScenarioId()).thenReturn(13);
+            Formation undeployedFormation = mock(Formation.class);
+            when(undeployedFormation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
+            when(playerForce.getAllFormations()).thenReturn(List.of(formation, undeployedFormation));
+            when(campaign.getUnits()).thenReturn(new ArrayList<>());
+
+            MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+
+            verify(formation).setScenarioId(NO_ASSIGNED_SCENARIO, campaign);
+            verify(undeployedFormation, never()).setScenarioId(anyInt(), any());
+        }
+    }
+    // endregion releaseCompletedContractDeployments
 
     // region completeMission
     @Nested
@@ -775,23 +876,13 @@ public class MissionCompletionManagerTest {
         }
 
         @Test
-        void abortedTurnoverWithNoOutstandingPayoutsStops() {
+        void cancelledTurnoverStopsBeforeCompletion() {
             Fixture fixture = new Fixture();
-            when(fixture.campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
-            when(fixture.campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(
-                  true);
+            fixture.enableTurnover(Money.of(1000));
+            when(fixture.mission.getStatus()).thenReturn(MissionStatus.ACTIVE);
 
-            UUID missionId = UUID.randomUUID();
-            when(fixture.mission.getId()).thenReturn(missionId);
-            RetirementDefectionTracker tracker = mock(RetirementDefectionTracker.class);
-            when(fixture.humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
-            when(tracker.isOutstanding(missionId)).thenReturn(false);
-
-            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
-                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
-                        ContractCharacteristics.class);
-                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
-                        MissionStatus.SUCCESS);
+            try (MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                  MissionStatus.SUCCESS);
                   MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
                         PrisonerMissionEndEvent.class);
                   MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
@@ -800,27 +891,107 @@ public class MissionCompletionManagerTest {
                 boolean completed = fixture.manager.completeMission();
 
                 assertFalse(completed);
-                // Completion itself happens before turnover, so it must already have been applied.
-                verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+                verify(fixture.campaign, never()).completeMission(any(), any());
+                verify(fixture.campaign, never()).applyRetirement(any(), any());
+                // The status applied for the turnover rolls is restored, leaving the contract active.
+                verify(fixture.mission).setStatus(MissionStatus.SUCCESS);
+                verify(fixture.mission).setStatus(MissionStatus.ACTIVE);
+            }
+        }
+
+        @Test
+        void unaffordableTurnoverStopsBeforeCompletion() {
+            Fixture fixture = new Fixture();
+            fixture.enableTurnover(Money.of(500));
+            when(fixture.campaign.getProjectedCompletionIncome(fixture.mission, MissionStatus.SUCCESS)).thenReturn(
+                  Money.of(1000));
+            when(fixture.mission.getStatus()).thenReturn(MissionStatus.ACTIVE);
+
+            try (MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                  MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<ImmersiveDialogNotification> notifications = mockConstruction(
+                        ImmersiveDialogNotification.class);
+                  MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
+                        RetirementDefectionDialog.class,
+                        (dialog, context) -> {
+                            when(dialog.wasAborted()).thenReturn(false);
+                            when(dialog.totalPayout()).thenReturn(Money.of(2000));
+                        })) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertFalse(completed);
+                assertEquals(1, notifications.constructed().size());
+                verify(fixture.campaign, never()).completeMission(any(), any());
+                verify(fixture.campaign, never()).applyRetirement(any(), any());
+                verify(fixture.mission).setStatus(MissionStatus.ACTIVE);
+            }
+        }
+
+        @Test
+        void pendingFinalPaymentCoversTurnoverAppliedAfterContractCloses() {
+            Fixture fixture = new Fixture();
+            fixture.enableTurnover(Money.of(500));
+            when(fixture.campaign.getProjectedCompletionIncome(fixture.mission, MissionStatus.SUCCESS)).thenReturn(
+                  Money.of(1000));
+            when(fixture.campaign.applyRetirement(any(), any())).thenReturn(true);
+            Money totalPayout = Money.of(1200);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
+                        RetirementDefectionDialog.class,
+                        (dialog, context) -> {
+                            when(dialog.wasAborted()).thenReturn(false);
+                            when(dialog.totalPayout()).thenReturn(totalPayout);
+                        })) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                InOrder inOrder = inOrder(fixture.campaign);
+                inOrder.verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+                inOrder.verify(fixture.campaign).applyRetirement(eq(totalPayout), any());
+            }
+        }
+
+        @Test
+        void alreadyRolledTurnoverShowsExistingResults() {
+            Fixture fixture = new Fixture();
+            fixture.enableTurnover(Money.of(1000));
+            UUID missionId = UUID.randomUUID();
+            when(fixture.mission.getId()).thenReturn(missionId);
+            when(fixture.tracker.isOutstanding(missionId)).thenReturn(true);
+            List<Object> constructorArguments = new ArrayList<>();
+
+            try (MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                  MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
+                        RetirementDefectionDialog.class,
+                        (dialog, context) -> {
+                            constructorArguments.addAll(context.arguments());
+                            when(dialog.wasAborted()).thenReturn(true);
+                        })) {
+                fixture.manager.completeMission();
+
+                // The third argument is doRetirement: false shows the earlier results instead of rolling again.
+                assertEquals(false, constructorArguments.get(2));
             }
         }
 
         @Test
         void appliedTurnoverAwardsAdministratorExperienceAndContinues() {
             Fixture fixture = new Fixture();
-            when(fixture.campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
-            when(fixture.campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(
-                  true);
-
-            RetirementDefectionTracker tracker = mock(RetirementDefectionTracker.class);
-            when(fixture.humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
-            when(tracker.getRetirees(fixture.mission)).thenReturn(Set.of(UUID.randomUUID()));
-
-            Finances finances = mock(Finances.class);
-            Money balance = mock(Money.class);
-            when(fixture.playerForce.getFinances()).thenReturn(finances);
-            when(finances.getBalance()).thenReturn(balance);
-            when(balance.isGreaterOrEqualThan(any(Money.class))).thenReturn(true);
+            fixture.enableTurnover(Money.of(1000));
+            when(fixture.tracker.getRetirees(fixture.mission)).thenReturn(Set.of(UUID.randomUUID()));
 
             Person administrator = mock(Person.class);
             when(fixture.humanResources.findBestInRole(any(), any(), any(), anyBoolean(), any())).thenReturn(
@@ -849,19 +1020,15 @@ public class MissionCompletionManagerTest {
         }
 
         @Test
-        void turnoverApplyRetirementFailureAborts() {
+        void turnoverApplyRetirementFailureStillCompletes() {
             Fixture fixture = new Fixture();
-            when(fixture.campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
-            when(fixture.campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(
-                  true);
-
-            RetirementDefectionTracker tracker = mock(RetirementDefectionTracker.class);
-            when(fixture.humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
-            // A null retiree set skips the administrator-experience block, isolating the applyRetirement abort.
-            when(tracker.getRetirees(fixture.mission)).thenReturn(null);
+            fixture.enableTurnover(Money.of(1000));
+            // A null retiree set skips the administrator-experience block, isolating the applyRetirement failure.
+            when(fixture.tracker.getRetirees(fixture.mission)).thenReturn(null);
             when(fixture.campaign.applyRetirement(any(), any())).thenReturn(false);
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
@@ -876,7 +1043,8 @@ public class MissionCompletionManagerTest {
                         })) {
                 boolean completed = fixture.manager.completeMission();
 
-                assertFalse(completed);
+                // Once the contract is closed every remaining step must run, so a late failure cannot strand forces.
+                assertTrue(completed);
                 verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
             }
         }
@@ -924,34 +1092,6 @@ public class MissionCompletionManagerTest {
                 verify(fixture.humanResources).refreshApplicants(fixture.campaign, true);
                 campaignNewDayManager.verify(
                       () -> CampaignNewDayManager.showRarePersonnelDialog(fixture.campaign, false));
-            }
-        }
-
-        @Test
-        void cadreForcesReassignmentShowsNotification() {
-            Fixture fixture = new Fixture();
-            when(fixture.mission.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
-
-            Formation formation = mock(Formation.class);
-            when(fixture.playerForce.getAllFormations()).thenReturn(List.of(formation));
-            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.CADRE);
-            when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
-
-            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
-                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
-                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
-                        ContractCharacteristics.class);
-                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
-                        MissionStatus.SUCCESS);
-                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
-                        PrisonerMissionEndEvent.class);
-                  MockedConstruction<ImmersiveDialogNotification> notifications = mockConstruction(
-                        ImmersiveDialogNotification.class)) {
-                boolean completed = fixture.manager.completeMission();
-
-                assertTrue(completed);
-                verify(formation).setCombatRoleInMemory(CombatRole.FRONTLINE);
-                assertEquals(1, notifications.constructed().size());
             }
         }
 
@@ -1017,6 +1157,8 @@ public class MissionCompletionManagerTest {
         private final ForceHumanResources humanResources;
         private final NewPersonnelMarket newPersonnelMarket;
         private final AbstractContract mission;
+        private final RetirementDefectionTracker tracker;
+        private final Finances finances;
         private final MissionCompletionManager manager;
 
         private Fixture() {
@@ -1028,6 +1170,8 @@ public class MissionCompletionManagerTest {
             humanResources = mock(ForceHumanResources.class);
             newPersonnelMarket = mock(NewPersonnelMarket.class);
             mission = mock(AbstractContract.class);
+            tracker = mock(RetirementDefectionTracker.class);
+            finances = mock(Finances.class);
 
             when(campaignGui.getCampaign()).thenReturn(campaign);
             when(campaignGui.getFrame()).thenReturn(null);
@@ -1056,6 +1200,23 @@ public class MissionCompletionManagerTest {
             when(campaignOptions.get(CampaignOption.MISSION_XP_SUCCESS)).thenReturn(0);
 
             manager = new MissionCompletionManager(app, campaignGui, mission);
+        }
+
+        /**
+         * Enables contract-completion turnover, with no projected completion income.
+         *
+         * @param balance the campaign's current balance
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        private void enableTurnover(Money balance) {
+            when(campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
+            when(campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(true);
+            when(humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
+            when(playerForce.getFinances()).thenReturn(finances);
+            when(finances.getBalance()).thenReturn(balance);
+            when(campaign.getProjectedCompletionIncome(any(), any())).thenReturn(Money.zero());
         }
     }
 }

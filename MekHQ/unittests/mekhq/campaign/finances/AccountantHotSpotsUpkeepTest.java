@@ -165,6 +165,29 @@ class AccountantHotSpotsUpkeepTest {
         }
 
         @Test
+        void fractionalScaleChargesThePartScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            tableOfOrganizationWithBattleValue(BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2));
+
+            assertEquals(supportPoints(750), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void fractionalScaleChargesAtLeastTheMinimum() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            tableOfOrganizationWithBattleValue(1);
+
+            assertEquals(supportPoints(50), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void fractionalScaleStillChargesNothingForAnEmptyTableOfOrganization() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+
+            assertEquals(Money.zero(), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
         void upkeepStaysInSupportPointsWithoutTheConversion() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
             tableOfOrganizationOfScale(3);
@@ -191,6 +214,33 @@ class AccountantHotSpotsUpkeepTest {
             when(campaign.hasActiveContract()).thenReturn(true);
 
             assertEquals(offContract, accountant.getHotSpotsUpkeepCosts());
+        }
+
+        /** Units about to be mothballed for a journey are left out of the Scale the upkeep is projected from. */
+        @Test
+        void excludedUnitsAddNoUpkeep() {
+            tableOfOrganizationOfScale(2);
+            tableOfOrganizationOfScale(3);
+            Unit mothballedUnit = units.get(1);
+
+            assertEquals(supportPoints(1_000), accountant.getHotSpotsUpkeepCostsExcluding(List.of(mothballedUnit)));
+            assertEquals(supportPoints(2_500), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void excludingNothingIsTheWholeUpkeep() {
+            tableOfOrganizationOfScale(4);
+
+            assertEquals(accountant.getHotSpotsUpkeepCosts(), accountant.getHotSpotsUpkeepCostsExcluding(List.of()));
+        }
+
+        @Test
+        void excludingUnitsCostsNothingWhenTheOptionIsOff() {
+            campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
+            tableOfOrganizationOfScale(2);
+            tableOfOrganizationOfScale(3);
+
+            assertEquals(Money.zero(), accountant.getHotSpotsUpkeepCostsExcluding(List.of(units.getFirst())));
         }
     }
 

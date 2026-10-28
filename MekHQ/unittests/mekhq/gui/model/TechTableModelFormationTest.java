@@ -30,41 +30,40 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.universe;
+package mekhq.gui.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
-class FactionsLogoAddressTest {
-    @ParameterizedTest
-    @CsvSource({
-          "3025, FS, logo_federated_suns",
-          "3059, CGB, logo_clan_ghost_bear",
-          "3060, CGB, logo_rasalhague_dominion",
-          "2984, CDS, logo_clan_sea_fox",
-          "2985, CDS, logo_clan_diamond_sharks",
-          "3099, CDS, logo_clan_diamond_sharks",
-          "3100, CDS, logo_clan_sea_fox",
-          "3025, CGS, logo_clan_goliath_scorpion",
-          "3150, SE, logo_clan_goliath_scorpion",
-          "3080, CEI, logo_escorpion_imperio",
-          "3025, MERC, logo_mercenaries",
-          "3025, IND, logo_security_forces",
-          "3025, PIR, logo_pirates"
-    })
-    void builtInLogoMappingsAndHistoricalTransitionsRemainUnchanged(int year, String code, String image) {
-        String expected = "data/images/universe/factions/" + image + ".png";
+/**
+ * The formation shown after a tech's name in the Repair Bay, so techs kept on a sub-contract stand apart from the main
+ * force (issue #10601).
+ */
+class TechTableModelFormationTest {
+    @Test
+    void aTechsFormationFollowsTheirName() {
+        Campaign campaign = mockCampaign();
+        Person tech = mock(Person.class);
+        Formation formation = mock(Formation.class);
+        when(formation.getFullName()).thenReturn("Alpha Lance, 1st Company");
+        when(campaign.getPlayerForce().getFormationFor(tech)).thenReturn(formation);
 
-        assertEquals(expected, Factions.getCanonicalFactionLogoAddress(year, code));
-        assertEquals(expected, Factions.getFactionLogoAddress(year, code));
+        assertEquals(" (Alpha Lance, 1st Company)", TechTableModel.describeFormation(campaign, tech));
     }
 
     @Test
-    void unmappedFactionHasNoDedicatedArtwork() {
-        assertNull(Factions.getCanonicalFactionLogoAddress(3025, "CUSTOM"));
+    void aTechWithNoFormationShowsNothing() {
+        Campaign campaign = mockCampaign();
+        Person tech = mock(Person.class);
+        when(campaign.getPlayerForce().getFormationFor(tech)).thenReturn(null);
+
+        assertEquals("", TechTableModel.describeFormation(campaign, tech));
     }
 }

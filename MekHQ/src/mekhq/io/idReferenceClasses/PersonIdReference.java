@@ -33,6 +33,7 @@
 package mekhq.io.idReferenceClasses;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,29 @@ public class PersonIdReference extends Person {
 
     public static void fixPersonIdReferences(final Campaign campaign) {
         for (final Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            fixGenealogyReferences(campaign, person);
+        }
+    }
+
+    /**
+     * Resolves the Genealogy PersonIdReferences of personnel imported into an existing campaign. This must be called
+     * after all imported personnel have been added to the campaign, so that relatives imported together can find each
+     * other. Relatives that are not present in the campaign are dropped, and an imported person whose spouse is
+     * missing reverts to their maiden name.
+     *
+     * @param campaign          the campaign the personnel were imported into
+     * @param importedPersonnel the personnel that were imported
+     */
+    public static void fixImportedPersonnelReferences(final Campaign campaign,
+          final Collection<Person> importedPersonnel) {
+        for (final Person person : importedPersonnel) {
+            final Person spouse = person.getGenealogy().getSpouse();
+            if ((spouse != null)
+                      && (campaign.getPlayerForce().getHumanResources().getPerson(spouse.getId()) == null)
+                      && (person.getMaidenName() != null)) {
+                person.setSurname(person.getMaidenName());
+            }
+
             fixGenealogyReferences(campaign, person);
         }
     }

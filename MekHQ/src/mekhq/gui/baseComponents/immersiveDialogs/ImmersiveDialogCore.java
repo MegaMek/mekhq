@@ -62,10 +62,12 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
+import megamek.common.ui.AppIcons;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -76,7 +78,6 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
@@ -277,6 +278,12 @@ public class ImmersiveDialogCore extends JDialog {
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
           @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
+        super(resolveOwner(campaign));
+        if (getOwner() == null) {
+            // Unowned dialogs get their own taskbar entry, so give it the MekHQ icon instead of the Java default
+            AppIcons.applyToWindow(this, "mekhq");
+        }
+
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -379,6 +386,30 @@ public class ImmersiveDialogCore extends JDialog {
         setModal(isModal);
         setLocationRelativeTo(locationReference); // Needs to be after pack
         setVisible(true);
+    }
+
+    /**
+     * Picks the owner window for this dialog.
+     *
+     * <p>When the campaign window is visible, the dialog is owned by it so it stays on top of it and shares its
+     * taskbar entry. Otherwise (for example during startup, before the campaign window exists), the dialog has no
+     * owner. Without an explicit {@code null} owner, Swing would attach the dialog to a hidden shared frame, which
+     * leaves it out of the Windows taskbar and Alt+Tab.</p>
+     *
+     * @param campaign the campaign the dialog belongs to; may be {@code null}
+     *
+     * @return the visible campaign window, or {@code null} if there is none
+     */
+    private static @Nullable Window resolveOwner(@Nullable Campaign campaign) {
+        if (campaign == null) {
+            return null;
+        }
+        CampaignGUI campaignGUI = campaign.getGUI();
+        if (campaignGUI == null) {
+            return null;
+        }
+        JFrame frame = campaignGUI.getFrame();
+        return ((frame != null) && frame.isShowing()) ? frame : null;
     }
 
     /**
@@ -767,15 +798,16 @@ public class ImmersiveDialogCore extends JDialog {
 
     static void configureHtmlEditorPane(JEditorPane editorPane) {
         HTMLEditorKit editorKit = new HTMLEditorKit();
-        StyleSheet styleSheet = new StyleSheet();
-        styleSheet.addStyleSheet(editorKit.getStyleSheet());
+        editorPane.setEditorKit(editorKit);
+        // Add rules to this document's own style sheet; HTMLEditorKit.setStyleSheet would replace the shared
+        // default style sheet used by every HTML pane in the application.
+        HTMLDocument document = (HTMLDocument) editorKit.createDefaultDocument();
+        StyleSheet styleSheet = document.getStyleSheet();
         styleSheet.addRule("body, div, p, span { background-color: transparent; }");
         styleSheet.addRule("body { margin: 0; padding: 0; }");
         styleSheet.addRule("p { margin: " + scaleForGUI(6) + "px 0 0 0; }");
 
-        editorKit.setStyleSheet(styleSheet);
-        editorPane.setEditorKit(editorKit);
-        editorPane.setDocument(new HTMLDocument(styleSheet));
+        editorPane.setDocument(document);
         editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         editorPane.setOpaque(false);
     }
@@ -1138,7 +1170,9 @@ public class ImmersiveDialogCore extends JDialog {
 
     /**
      * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon for the campaign is
-     * returned instead.
+     * returned instead. A speaker with a non-default portrait always shows that portrait, whether or not they belong
+     * to the campaign. A speaker with the default portrait shows the campaign faction icon if they belong to the
+     * campaign, or their origin faction's logo otherwise.
      *
      * @param campaign the {@link Campaign} instance containing the faction icon; can be {@code null} to use a default
      *                 image.
@@ -1156,19 +1190,21 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         Image baseImage;
-        if (campaign.getPlayerForce().getHumanResources().getPersonnel().contains(speaker)) {
-            Portrait portrait = speaker.getPortrait();
-
-            if (portrait == null ||
-                      portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                      portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME)) {
+        Portrait portrait = speaker.getPortrait();
+        boolean hasDefaultPortrait = portrait == null ||
+                                           portrait.getFilename().equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
+                                           portrait.getFilename().equalsIgnoreCase(NO_PORTRAIT_NAME);
+        if (!hasDefaultPortrait) {
+            baseImage = portrait.getBaseImage();
+        } else if (campaign.getPlayerForce().getHumanResources().getPersonnel().contains(speaker)) {
+            return campaign.getCampaignFactionIcon();
+        } else {
+            ImageIcon factionLogo = RATGenerator.getFactionLogo(campaign.getGameYear(),
+                  speaker.getOriginFaction().getShortName(), Color.BLACK);
+            if (factionLogo == null) {
                 return campaign.getCampaignFactionIcon();
             }
-
-            baseImage = portrait.getBaseImage();
-        } else {
-            baseImage = Factions.getFactionLogo(campaign.getGameYear(), speaker.getOriginFaction().getShortName())
-                              .getImage();
+            baseImage = factionLogo.getImage();
         }
 
         // The following sorcery is due to the compressed manner in which personnel portraits are stored.

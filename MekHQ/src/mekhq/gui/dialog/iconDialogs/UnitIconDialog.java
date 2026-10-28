@@ -40,10 +40,10 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.dialogs.iconChooser.AbstractIconChooserDialog;
 import megamek.client.ui.enums.DialogResult;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.gui.dialog.AbstractMHQIconChooserDialog;

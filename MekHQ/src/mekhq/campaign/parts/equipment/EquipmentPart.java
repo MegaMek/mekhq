@@ -33,14 +33,15 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
@@ -48,6 +49,7 @@ import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.equipment.enums.MiscTypeFlag;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
@@ -95,6 +97,18 @@ public class EquipmentPart extends Part {
      * Whether an autocannon has absorbed its first critical hit (Core rules only).
      */
     protected boolean autocannonHit = false;
+
+    /**
+     * Whether this spare is an armored component. While the part is on a unit, the unit's equipment says so instead;
+     * this is what the part remembers once it comes off.
+     */
+    private boolean armored = false;
+
+    /**
+     * What armoring adds to this spare's price, remembered with {@link #armored} because a spare has no unit to work
+     * it out from.
+     */
+    private Money armoringCost = Money.zero();
 
     @Override
     public boolean isRightTechType(String skillType) {
@@ -150,9 +164,97 @@ public class EquipmentPart extends Part {
 
     @Override
     public void setUnit(Unit u) {
+        if ((u == null) && (unit != null)) {
+            rememberArmoring();
+        }
         super.setUnit(u);
         if ((u != null) && (type != null)) {
             equipTonnage = type.getTonnage(u.getEntity(), size);
+        }
+    }
+
+    /**
+     * Keeps the armoring of the equipment this part fills as the part comes off its unit, so a salvaged armored
+     * component stays an armored spare.
+     */
+    private void rememberArmoring() {
+        Mounted<?> mounted = getMountedOnUnit();
+        if (mounted == null) {
+            return;
+        }
+        armored = mounted.isArmored();
+        armoringCost = getArmoringCost();
+        if (armored) {
+            LOGGER.debug("[ArmoredSpare] {} came off {} as an armored spare worth {} more", getName(), unit.getName(),
+                  armoringCost);
+        }
+    }
+
+    /**
+     * @return the equipment this part fills on its unit, or {@code null} when the part is not on a unit
+     */
+    private @Nullable Mounted<?> getMountedOnUnit() {
+        if ((unit == null) || (unit.getEntity() == null) || (equipmentNum < 0)) {
+            return null;
+        }
+        return unit.getEntity().getEquipment(equipmentNum);
+    }
+
+    /**
+     * @return what armoring adds to this part's price: worked out from the unit's equipment while the part is on a
+     *       unit, and remembered for a spare
+     */
+    private Money getArmoringCost() {
+        Mounted<?> mounted = getMountedOnUnit();
+        if (mounted == null) {
+            return armored ? armoringCost : Money.zero();
+        }
+        return mounted.isArmored()
+                     ? armoringCostOf(type, unit.getEntity(), mounted.getLocation(), size)
+                     : Money.zero();
+    }
+
+    /**
+     * Works out what armoring adds to the price of a piece of equipment, using MegaMek's prices.
+     *
+     * @param type     the equipment
+     * @param entity   the unit it is or will be on
+     * @param location its location on the unit
+     * @param size     its size, for equipment of variable size
+     *
+     * @return the extra cost of the armored version
+     */
+    public static Money armoringCostOf(EquipmentType type, Entity entity, int location, double size) {
+        double armoredCost = type.getCost(entity, true, location, size);
+        double plainCost = type.getCost(entity, false, location, size);
+        return Money.of(Math.max(0, armoredCost - plainCost));
+    }
+
+    /**
+     * @return {@code true} when this part is an armored component: on a unit, when the equipment it fills is armored,
+     *       and as a spare, when it was armored when it came off or was bought armored
+     */
+    public boolean isArmored() {
+        Mounted<?> mounted = getMountedOnUnit();
+        return (mounted != null) ? mounted.isArmored() : armored;
+    }
+
+    /**
+     * Makes this spare an armored component, for a spare bought to fill an armored slot.
+     *
+     * @param armoringCost what armoring adds to the spare's price
+     */
+    public void setArmored(Money armoringCost) {
+        armored = true;
+        this.armoringCost = armoringCost;
+    }
+
+    @Override
+    protected void copyBaseData(Part part) {
+        super.copyBaseData(part);
+        if (part instanceof EquipmentPart equipmentPart) {
+            armored = equipmentPart.isArmored();
+            armoringCost = equipmentPart.getArmoringCost();
         }
     }
 
@@ -206,7 +308,8 @@ public class EquipmentPart extends Part {
                      getTonnage() == part.getTonnage() &&
                      getStickerPrice().equals(part.getStickerPrice()) &&
                      getSize() == ((EquipmentPart) part).getSize() &&
-                     isOmniPodded() == part.isOmniPodded()
+                     isOmniPodded() == part.isOmniPodded() &&
+                     (isArmored() == ((EquipmentPart) part).isArmored())
                      && (!isUnitTonnageMatters() || getUnitTonnage() == part.getUnitTonnage());
     }
 
@@ -244,9 +347,35 @@ public class EquipmentPart extends Part {
                 directionalMountLocked = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("autocannonHit")) {
                 autocannonHit = Boolean.parseBoolean(wn2.getTextContent());
+            } else {
+                loadArmoringFromXmlNode(wn2);
             }
         }
         restore();
+    }
+
+    @Override
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        // Only a spare needs this; a part on a unit takes its armoring from the unit's equipment
+        if ((unit == null) && armored) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armored", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armoringCost", armoringCost);
+        }
+        super.writeToXMLEnd(pw, indent);
+    }
+
+    /**
+     * Reads a spare's armoring from its saved part. Saves made before armored spares existed have none, so their
+     * spares load as plain components.
+     *
+     * @param node one child node of the saved part
+     */
+    protected void loadArmoringFromXmlNode(Node node) {
+        if (node.getNodeName().equalsIgnoreCase("armored")) {
+            armored = Boolean.parseBoolean(node.getTextContent());
+        } else if (node.getNodeName().equalsIgnoreCase("armoringCost")) {
+            armoringCost = Money.fromXmlString(node.getTextContent());
+        }
     }
 
     @Override
@@ -339,6 +468,13 @@ public class EquipmentPart extends Part {
             return;
         }
 
+        // Field guns have no critical slots, so MegaMek can only report their loss through the destroyed flag. A field
+        // gun left uncrewed in combat is lost and must be replaced, rather than repaired.
+        if (isDestroyedFieldGun(unit.getEntity(), mounted)) {
+            remove(false);
+            return;
+        }
+
         int priorHits = getHits();
 
         int newHits = unit.getEntity()
@@ -366,6 +502,17 @@ public class EquipmentPart extends Part {
                   (campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET))) {
             remove(false);
         }
+    }
+
+    /**
+     * @return {@code true} if the given mount is a conventional infantry field gun or field artillery piece that has
+     *       been destroyed
+     */
+    static boolean isDestroyedFieldGun(@Nullable Entity entity, Mounted<?> mounted) {
+        return (entity instanceof ConvInfantry) &&
+                     (mounted.getType() instanceof WeaponType) &&
+                     (mounted.getLocation() == ConvInfantry.LOC_FIELD_GUNS) &&
+                     mounted.isDestroyed();
     }
 
     @Override
@@ -464,6 +611,15 @@ public class EquipmentPart extends Part {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder details = new StringBuilder(super.getDetails(includeRepairDetails));
 
+        if (hasVariableTonnage(type)) {
+            appendDetail(details, getFormattedTextAt("mekhq.resources.Parts", "EquipmentPart.tonnage", getTonnage()));
+        }
+        if (isBattleArmorOnly(type)) {
+            appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.battleArmor"));
+        }
+        if (isArmored()) {
+            appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.armored"));
+        }
         if (autocannonHit) {
             appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.autocannonHit"));
         }
@@ -471,6 +627,30 @@ public class EquipmentPart extends Part {
             appendDetail(details, getTextAt("mekhq.resources.Parts", "EquipmentPart.directionalMountLocked"));
         }
         return details.toString();
+    }
+
+    /**
+     * A targeting computer, club, talon or shield comes in many weights, and its price follows its own weight, so its
+     * details show that weight rather than the weight of the unit it is for. Store stock has no unit, so it showed
+     * "0 tons" for every weight.
+     */
+    @Override
+    protected boolean showsUnitTonnageInDetails() {
+        return super.showsUnitTonnageInDetails() && !hasVariableTonnage(type);
+    }
+
+    /**
+     * @return {@code true} for equipment only battle armor can mount. Some of it shares its name with the equipment
+     *       other units mount, such as the battle armor Small VSP Laser, which weighs 0.5 tons to the Mek version's 2.
+     */
+    private static boolean isBattleArmorOnly(@Nullable EquipmentType equipmentType) {
+        if (equipmentType instanceof WeaponType) {
+            return equipmentType.hasFlag(WeaponType.F_BA_WEAPON) && !equipmentType.hasFlag(WeaponType.F_MEK_WEAPON);
+        }
+        if (equipmentType instanceof MiscType) {
+            return equipmentType.hasFlag(MiscType.F_BA_EQUIPMENT) && !equipmentType.hasFlag(MiscType.F_MEK_EQUIPMENT);
+        }
+        return false;
     }
 
     private static void appendDetail(StringBuilder details, String note) {
@@ -600,6 +780,8 @@ public class EquipmentPart extends Part {
                 isArmored = mounted.isArmored();
             }
             itemCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
+        } else if (armored) {
+            itemCost = itemCost.plus(armoringCost);
         }
 
         if (isOmniPodded()) {
@@ -678,7 +860,9 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasFlag(MiscTypeFlag.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
             } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
-                varCost = Money.of(getUnitTonnage() * 100000);
+                // Matches MegaMek: the system weighs 1% of the unit and costs 100,000 per ton. Long math since warship
+                // tonnages overflow an int.
+                varCost = Money.of(getUnitTonnage() * 1000L);
             }
         }
         if (varCost.isZero()) {

@@ -123,6 +123,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
@@ -852,9 +853,9 @@ public class CampaignNewDayManager {
      * Updates the status of whether field kitchens are operating within their required capacity.
      *
      * <p>If fatigue is enabled in the campaign options, campaign method calculates the total available
-     * field kitchen capacity and the required field kitchen usage, then updates the {@code fieldKitchenWithinCapacity}
-     * flag to reflect whether the capacity meets the demand. If fatigue is disabled, the capacity is automatically set
-     * to {@code false}.</p>
+     * field kitchen capacity (including any kitchens rented for active contracts) and the required field kitchen
+     * usage, then updates the {@code fieldKitchenWithinCapacity} flag to reflect whether the capacity meets the demand.
+     * If fatigue is disabled, the capacity is automatically set to {@code false}.</p>
      */
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
@@ -862,6 +863,8 @@ public class CampaignNewDayManager {
                   checkFieldKitchenCapacity(campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
                                                   .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(),
                                                         false), campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
+            fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
+                  ContractRentalType.KITCHENS);
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
                                                                  .getHumanResources()
                                                                  .getActivePersonnel(false, false),
@@ -1251,6 +1254,9 @@ public class CampaignNewDayManager {
         // active scenarios and may end or regenerate the contract.
         EmployerLostPlanet.processNewDay(campaign);
 
+        // Combat teams whose contract has ended move to an active one before anything reads their assignments
+        CombatTeam.assignInactiveTeamsToActiveContract(campaign);
+
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             processTrainingCombatTeams(campaign);
         }
@@ -1348,7 +1354,7 @@ public class CampaignNewDayManager {
                                                            campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
                         for (String report : reports) {
-                            campaign.addReport(GENERAL, report);
+                            campaign.addReport(POLITICS, report);
                         }
                     }
                 }
@@ -1587,7 +1593,7 @@ public class CampaignNewDayManager {
             campaign.addReport(POLITICS, report);
         }
 
-        List<AbstractContract> activeMissions = campaign.getContractHistoryData().getCompleted();
+        List<AbstractContract> activeMissions = campaign.getContractHistoryData().getActiveAndStarted(today);
         boolean isInTransit = !updatedLocation.isOnPlanet();
         Factions factions = Factions.getInstance();
 
@@ -2029,7 +2035,7 @@ public class CampaignNewDayManager {
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"));
         campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
-        boolean failedWillpowerCheck = attributeCheckResult.isSuccess();
+        boolean failedWillpowerCheck = !attributeCheckResult.isSuccess();
         person.processDiscontinuationSyndrome(campaign,
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
@@ -2037,6 +2043,10 @@ public class CampaignNewDayManager {
               fatigueRate,
               true,
               failedWillpowerCheck);
+
+        if (isUseFatigue && failedWillpowerCheck) {
+            Fatigue.processFatigueActions(campaign, person);
+        }
     }
 
     /**

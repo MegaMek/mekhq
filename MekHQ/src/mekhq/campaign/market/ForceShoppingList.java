@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -111,7 +111,7 @@ public class ForceShoppingList {
 
     public @Nullable IAcquisitionWork getShoppingItem(final Object newEquipment) {
         return getShoppingList().stream()
-                     .filter(shoppingItem -> isSameEquipment(shoppingItem.getNewEquipment(), newEquipment))
+                     .filter(shoppingItem -> holdsSameEquipment(shoppingItem, newEquipment))
                      .findFirst()
                      .orElse(null);
     }
@@ -120,7 +120,7 @@ public class ForceShoppingList {
         int idx = -1;
         int row = 0;
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), equipment)) {
+            if (holdsSameEquipment(shoppingItem, equipment)) {
                 idx = row;
                 break;
             }
@@ -204,6 +204,13 @@ public class ForceShoppingList {
         return ordersRemoved;
     }
 
+    /**
+     * @return the unit whose refit an order was placed ahead for, or {@code null} for an ordinary order
+     */
+    private static @Nullable UUID orderedAheadForId(IAcquisitionWork shoppingItem) {
+        return (shoppingItem instanceof Part part) ? part.getOrderedAheadForUnitId() : null;
+    }
+
     /** The place an existing order resolves to (a base for a base order), or {@code null} for the main force. */
     private static @Nullable IPlace orderPlace(IAcquisitionWork shoppingItem) {
         return (shoppingItem instanceof Part part) ? part.getPlace() : null;
@@ -227,11 +234,13 @@ public class ForceShoppingList {
         }
 
         // If the same equipment is already ordered for the same destination and the same refit (or neither is for a
-        // refit), add the quantity to that order and return
+        // refit), and ordered ahead for the same unit or for none, add the quantity to that order and return
+        Object newEquipment = newWork.getNewEquipment();
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())
+            if (holdsSameEquipment(shoppingItem, newEquipment)
                       && orderPlace(shoppingItem) == destination
-                      && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))) {
+                      && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))
+                      && Objects.equals(orderedAheadForId(shoppingItem), orderedAheadForId(newWork))) {
                 campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
                 while (quantity > 0) {
                     shoppingItem.incrementQuantity();
@@ -371,6 +380,14 @@ public class ForceShoppingList {
             }
         }
         return unitList;
+    }
+
+    private boolean holdsSameEquipment(IAcquisitionWork shoppingItem, Object equipment) {
+        // A unit order can only match a unit, and building its equipment reads the unit file from disk.
+        if ((shoppingItem instanceof UnitOrder) && !(equipment instanceof Entity)) {
+            return false;
+        }
+        return isSameEquipment(shoppingItem.getNewEquipment(), equipment);
     }
 
     private boolean isSameEquipment(Object equipment, Object newEquipment) {

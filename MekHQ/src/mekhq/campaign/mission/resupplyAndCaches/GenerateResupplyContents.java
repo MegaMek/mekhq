@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

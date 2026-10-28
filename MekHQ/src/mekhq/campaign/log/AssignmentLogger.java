@@ -36,13 +36,13 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This class is responsible to control the logging of unit assignment Log Entries.

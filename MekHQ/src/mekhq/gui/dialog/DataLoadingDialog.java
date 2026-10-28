@@ -64,14 +64,15 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.RawImagePanel;
-import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.OptionsConstants;
+import megamek.common.ui.AppIcons;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
@@ -86,6 +87,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.campaign.io.CustomUnitFileUUIDRepair;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
@@ -137,7 +139,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
           final boolean isInAppNewCampaign, Consumer<Campaign> completionHandler) {
-        super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
+        // Every caller hides its frame before loading, and Windows leaves windows owned by a hidden frame out of the
+        // taskbar and Alt+Tab, so the loading screen has no owner and carries the MekHQ icon itself.
+        super((JDialog) null, frame, false, "DataLoadingDialog", "DataLoadingDialog.title");
+        AppIcons.applyToWindow(this, "mekhq");
         this.application = application;
         this.campaignFile = campaignFile;
         this.isInAppNewCampaign = isInAppNewCampaign;
@@ -338,6 +343,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 }
             }
+            CustomUnitFileUUIDRepair.repairCustomUnitFiles();
             // endregion Progress 5
 
             setProgress(6);
@@ -560,7 +566,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         private boolean showStartupCampaignOptionsDialog(final Campaign campaign, final @Nullable CampaignPreset preset,
               final CampaignOptionsDialogMode mode) {
-            final CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+            final CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(getFrame(), campaign, preset, mode);
             setVisible(false); // cede visibility to `optionsDialog`
             optionsDialog.setVisible(true);
             if (optionsDialog.wasCanceled()) {
@@ -645,7 +651,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     final File rescued = JournalRescue.rescue(save,
                           date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
                     if (rescued != null) {
-                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
+                        SwingUtilities.invokeLater(() -> showStartupMessage(
                               getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
                                     rescued.getAbsolutePath()),
                               getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
@@ -660,11 +666,28 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         }
 
         /**
+         * Shows a message about loading a campaign. The dialog has no owner window and carries the MekHQ icon so it
+         * appears in the Windows taskbar and Alt+Tab even while the MekHQ window is hidden. A {@code null} parent would
+         * instead attach it to Swing's hidden shared frame, which leaves it out of both.
+         *
+         * @param message     the message to show
+         * @param title       the dialog title
+         * @param messageType the {@link JOptionPane} message type
+         */
+        private static void showStartupMessage(String message, String title, int messageType) {
+            final JDialog dialog = new JOptionPane(message, messageType).createDialog(title);
+            AppIcons.applyToWindow(dialog, "mekhq");
+            dialog.setVisible(true);
+            dialog.dispose();
+        }
+
+        /**
          * Executed in event dispatching thread
          */
         @Override
         public void done() {
-            setVisible(false);
+            // The loader has no owner window to clean it up, so release it rather than just hiding it
+            dispose();
             try {
                 Campaign campaign = get();
                 completionHandler.accept(campaign);
@@ -673,24 +696,24 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
                                 ex.getCause().getMessage()),
                           resources.getString("DataLoadingDialog.NullEntityException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof NullPointerException) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           String.format(resources.getString("DataLoadingDialog.NullPointerException.text"),
                                 ex.getCause().getMessage()),
                           resources.getString("DataLoadingDialog.NullPointerException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof OutOfMemoryError) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           resources.getString("DataLoadingDialog.OutOfMemoryError.text"),
                           resources.getString("DataLoadingDialog.OutOfMemoryError.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           resources.getString("DataLoadingDialog.ExecutionException.text"),
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);

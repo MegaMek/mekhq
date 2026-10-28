@@ -46,6 +46,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.iconChooser.EntityImagePanel;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityViewPane;
 import megamek.client.ui.models.XTableColumnModel;
@@ -54,7 +55,6 @@ import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
 import megamek.common.ui.FastJScrollPane;
@@ -68,6 +68,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
@@ -410,6 +411,10 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     @Override
     protected Component createRightComponent() {
         setEntityViewPane(new EntityViewPane(getFrame(), null));
+        // The preview's Cost line shows what the campaign values the unit at, before the offer's market percentage
+        getEntityViewPane().setCostProvider(entity -> Unit.estimateBuyCost(entity, getCampaign().getCampaignOptions())
+                                                            .getAmount()
+                                                            .doubleValue());
         return getEntityViewPane();
     }
 

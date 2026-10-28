@@ -36,7 +36,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffective
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -44,6 +44,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.work.TechJobs;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -66,17 +67,47 @@ public class PersonnelStateColors {
      */
     public static final String INJURED_REASON_KEY = "colorReason.personnel.injured";
 
+    /**
+     * The resource key added to the color reasons of a tech in the middle of a job; its text names the job.
+     */
+    public static final String WORKING_REASON_KEY = "colorReason.personnel.working";
+
     private PersonnelStateColors() {}
+
+    /**
+     * Why a person's row is highlighted: a resource key in the default GUI bundle, with any values its text needs.
+     *
+     * @param key       the reason's resource key
+     * @param arguments the values for the reason's text, such as the job a tech is doing; empty for most reasons
+     */
+    public record ColorReason(String key, List<Object> arguments) {
+        /**
+         * @param key the reason's resource key, for a reason whose text needs no values
+         */
+        public ColorReason(String key) {
+            this(key, List.of());
+        }
+
+        /**
+         * @return the reason, in words the player can read
+         */
+        public String text() {
+            return arguments.isEmpty() ? MHQInternationalization.getText(key)
+                         : MHQInternationalization.getFormattedText(key, arguments.toArray());
+        }
+    }
 
     /**
      * Determines the colors for a person's row, and collects the reasons they are highlighted.
      *
      * <p>A person may be in several highlighted states at once. The color comes from the most important state, while
-     * every applicable state is added to {@code colorReasonKeys}.</p>
+     * every applicable state is added to {@code colorReasons}.</p>
      *
-     * @param campaign        the current campaign
-     * @param person          the person to check
-     * @param colorReasonKeys receives a resource key (in the default GUI bundle) for every state that applies
+     * @param campaign     the current campaign
+     * @param person       the person to check
+     * @param colorReasons receives a reason for every state that applies
+     * @param jobs         the jobs the person is in the middle of, from {@link TechJobs}; empty for anyone not working
+     *                     on one
      *
      * @return the colors for the most important state, or {@code null} if no highlighted state applies
      *
@@ -84,7 +115,7 @@ public class PersonnelStateColors {
      * @since 0.51.01
      */
     public static @Nullable ComponentColors getStateColors(Campaign campaign, Person person,
-          List<String> colorReasonKeys) {
+          List<ColorReason> colorReasons, List<String> jobs) {
         // Set color based on priority (first match wins for display color)
         // But collect ALL applicable reasons for tooltip
         MHQOptions mhqOptions = MekHQ.getMHQOptions();
@@ -92,65 +123,70 @@ public class PersonnelStateColors {
 
         ComponentColors cellColors = null;
         if (person.getStatus().isAbsent()) {
-            colorReasonKeys.add("colorReason.personnel.absent");
+            colorReasons.add(new ColorReason("colorReason.personnel.absent"));
             cellColors = mhqOptions.getAbsentColors();
         }
         if (person.getStatus().isDepartedUnit()) {
-            colorReasonKeys.add("colorReason.personnel.departed");
+            colorReasons.add(new ColorReason("colorReason.personnel.departed"));
             cellColors = (cellColors == null) ? mhqOptions.getGoneColors() : cellColors;
         }
         if (person.isDeployed()) {
-            colorReasonKeys.add("colorReason.personnel.deployed");
+            colorReasons.add(new ColorReason("colorReason.personnel.deployed"));
             cellColors = (cellColors == null) ? mhqOptions.getDeployedColors() : cellColors;
         }
         if (person.isQueuedForTravel(campaign.getCampaignLocationManager())) {
-            colorReasonKeys.add("colorReason.personnel.queuedForTravel");
+            colorReasons.add(new ColorReason("colorReason.personnel.queuedForTravel"));
             cellColors = (cellColors == null) ? mhqOptions.getQueuedForTravelColors() : cellColors;
         }
         if (PersonnelStatus.computeIsAwayFromMainForce(campaign, person)) {
-            colorReasonKeys.add("colorReason.personnel.awayFromMainForce");
+            colorReasons.add(new ColorReason("colorReason.personnel.awayFromMainForce"));
             cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
         }
         if (campaignOptions.isUseAdvancedMedical() ? person.hasInjuries(true) : (person.getHits() > 0)) {
-            colorReasonKeys.add(INJURED_REASON_KEY);
+            colorReasons.add(new ColorReason(INJURED_REASON_KEY));
             cellColors = (cellColors == null) ? mhqOptions.getInjuredColors() : cellColors;
         }
         if (person.isPregnant()) {
-            colorReasonKeys.add("colorReason.personnel.pregnant");
+            colorReasons.add(new ColorReason("colorReason.personnel.pregnant"));
             cellColors = (cellColors == null) ? mhqOptions.getPregnantColors() : cellColors;
         }
         if (campaignOptions.get(CampaignOption.USE_FATIGUE) &&
                   (getEffectiveFatigue(person, campaign) >= FATIGUE_HIGHLIGHT_THRESHOLD)) {
-            colorReasonKeys.add("colorReason.personnel.fatigued");
+            colorReasons.add(new ColorReason("colorReason.personnel.fatigued"));
             cellColors = (cellColors == null) ? mhqOptions.getFatiguedColors() : cellColors;
+        }
+        // A tech in the middle of a job keeps spending time on it every day until it is done
+        for (String job : jobs) {
+            colorReasons.add(new ColorReason(WORKING_REASON_KEY, List.of(job)));
+            cellColors = (cellColors == null) ? mhqOptions.getWorkingColors() : cellColors;
         }
         boolean isUseAlternativeAdvancedMedical = campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
         if (person.hasNonProstheticPermanentInjuries(isUseAlternativeAdvancedMedical)) {
-            colorReasonKeys.add("colorReason.personnel.healedInjuries");
+            colorReasons.add(new ColorReason("colorReason.personnel.healedInjuries"));
             cellColors = (cellColors == null) ? mhqOptions.getHealedInjuriesColors() : cellColors;
         }
         return cellColors;
     }
 
     /**
-     * Converts the reason keys collected by {@link #getStateColors(Campaign, Person, List)} into tooltip text, one
+     * Converts the reasons collected by {@link #getStateColors(Campaign, Person, List, List)} into tooltip text, one
      * reason per line.
      *
-     * @param colorReasonKeys the collected reason keys
+     * @param colorReasons the collected reasons
      *
      * @return the reasons as HTML-ready text (without {@code <html>} tags), or an empty string if there are none
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static String getColorReasonsText(List<String> colorReasonKeys) {
-        StringBuilder colorReasons = new StringBuilder();
-        for (String key : colorReasonKeys) {
-            if (!colorReasons.isEmpty()) {
-                colorReasons.append("<br>");
+    public static String getColorReasonsText(List<ColorReason> colorReasons) {
+        StringBuilder reasonsText = new StringBuilder();
+        for (ColorReason reason : colorReasons) {
+            if (!reasonsText.isEmpty()) {
+                reasonsText.append("<br>");
             }
-            colorReasons.append(MHQInternationalization.getText(key));
+            reasonsText.append(reason.text());
         }
-        return colorReasons.toString();
+        return reasonsText.toString();
     }
 }

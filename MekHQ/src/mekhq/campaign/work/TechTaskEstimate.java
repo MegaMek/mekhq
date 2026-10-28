@@ -35,7 +35,6 @@ package mekhq.campaign.work;
 import megamek.common.compute.Compute;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 
@@ -100,7 +99,8 @@ public record TechTaskEstimate(int targetNumber, String targetDetails, boolean i
 
     /**
      * @return {@code 0} if the work fits in the tech's time today (overtime included when it can be used), otherwise
-     *       how many more working days it runs into, counting a part day as a day
+     *       how many more working days it runs into, counting a part day as a day. Work carried over to later days
+     *       uses overtime too, when it can be used.
      */
     private static int findDaysToFinish(Campaign campaign, Person tech, int minutesNeeded, boolean canUseOvertime) {
         int overtimeToday = canUseOvertime ? tech.getOvertimeLeft() : 0;
@@ -108,8 +108,7 @@ public record TechTaskEstimate(int targetNumber, String targetDetails, boolean i
         if (minutesNeeded <= minutesToday) {
             return 0;
         }
-        boolean techsUseAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
-        int minutesPerDay = Math.max(1, tech.getDailyAvailableTechTime(techsUseAdministration));
+        int minutesPerDay = Math.max(1, WorkTimeEstimate.getMinutesPerDay(campaign, tech, canUseOvertime));
         int minutesAfterToday = minutesNeeded - Math.max(0, minutesToday);
         return (int) Math.ceil((double) minutesAfterToday / minutesPerDay);
     }

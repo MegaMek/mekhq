@@ -44,11 +44,11 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.WeatherRestriction;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.BoardDimensions;
 import megamek.common.compute.Compute;
@@ -760,7 +760,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardScenarioForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (combatRole.isPatrol() || combatRole.isTraining() || combatRole.isCadre()) {
+        if (combatRole.isPatrol() || combatRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;

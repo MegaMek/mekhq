@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -54,8 +54,11 @@ import mekhq.campaign.mission.contract.contractData.ContractCharacteristic.Categ
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
+import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.EmployerNegotiator;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonUtility;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Rolls and applies a contract's random {@link ContractCharacteristic}s. This is the single home for characteristic
@@ -191,34 +194,33 @@ public final class ContractCharacteristics {
                 case LENGTH -> applyLengthMultiplier(contract, characteristic.getMagnitude());
                 case OBJECTIVES -> applyObjectiveStep(contract, (int) Math.round(characteristic.getMagnitude()));
                 case INTENSITY -> applyTrackStep(contract, (int) Math.round(characteristic.getMagnitude()));
-                case NEGOTIATOR -> applyNegotiatorTier(contract, campaign);
+                case NEGOTIATOR -> syncNegotiatorTier(contract, campaign);
                 default -> {
                     // COMPLETION_PAYMENT, UNIT_REPUTATION, EMPLOYER_STANDING and ENEMY_STANDING are applied at their
                     // own lifecycle points (accept / completion), not at generation.
                 }
             }
         }
+
+        if (contract.getCharacteristic(Category.INTENSITY) != null) {
+            refreshCombatPayForTrackCount(contract, campaign);
+        }
     }
 
     /**
-     * Re-tiers the already-generated employer negotiator to Elite or Regular. The negotiator was created (as a Veteran)
-     * back at the employer step, before characteristics were rolled, so the tier is overridden here.
+     * Combat pay was worked out from the track count before the intensity characteristic stepped it, and under the
+     * minimum-track and weekly-rolling options combat pay depends on the track count. So it is recomputed from the
+     * final track count, with the combat-pay characteristic baked back on top.
+     *
+     * @param contract the contract whose track count has changed
+     * @param campaign the campaign, for the pay scheme and its options
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private static void applyNegotiatorTier(final AbstractContract contract, final Campaign campaign) {
-        final SkillLevel tier = getNegotiatorSkillOverride(contract);
-        if (tier == null) {
-            return;
-        }
-        final EmployerData employerData = contract.getEmployerData();
-        if (employerData == null) {
-            return;
-        }
-        final Person negotiator = employerData.negotiator();
-        if (negotiator == null) {
-            return;
-        }
-
-        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, true);
+    static void refreshCombatPayForTrackCount(final AbstractContract contract, final Campaign campaign) {
+        contract.updateCombatPay(bakeCombatPay(AbstractContractGeneration.determineCombatPay(campaign, contract),
+              contract));
     }
 
     private static void applyPayMultiplier(final AbstractContract contract, final double multiplier) {
@@ -349,19 +351,24 @@ public final class ContractCharacteristics {
     }
 
     /**
-     * The enemy negotiator's skill-tier override.
+     * The employer negotiator's tier step: how many tiers the negotiator characteristic moves the negotiator from the
+     * tier the employer normally fields.
      *
-     * @return {@link SkillLevel#ELITE} for {@link ContractCharacteristic#ELITE_NEGOTIATOR}, {@link SkillLevel#REGULAR}
-     *       for {@link ContractCharacteristic#NOVICE_NEGOTIATOR}, or {@code null} to keep the default tier
+     * @return {@code +1} for {@link ContractCharacteristic#ELITE_NEGOTIATOR}, {@code -1} for
+     *       {@link ContractCharacteristic#NOVICE_NEGOTIATOR}, or {@code 0} when neither is present
      */
-    public static @Nullable SkillLevel getNegotiatorSkillOverride(final AbstractContract contract) {
-        if (contract.hasCharacteristic(ContractCharacteristic.ELITE_NEGOTIATOR)) {
-            return SkillLevel.ELITE;
-        }
-        if (contract.hasCharacteristic(ContractCharacteristic.NOVICE_NEGOTIATOR)) {
-            return SkillLevel.REGULAR;
-        }
-        return null;
+    public static int getNegotiatorTierStep(final AbstractContract contract) {
+        final ContractCharacteristic characteristic = contract.getCharacteristic(Category.NEGOTIATOR);
+        return (characteristic == null) ? 0 : (int) Math.round(characteristic.getMagnitude());
+    }
+
+    /**
+     * Moves a skill tier up or down by {@code step} tiers, staying between Ultra-Green and Legendary.
+     */
+    static SkillLevel stepSkillLevel(final SkillLevel skillLevel, final int step) {
+        final int index = Math.max(SkillLevel.ULTRA_GREEN.ordinal(),
+              Math.min(SkillLevel.LEGENDARY.ordinal(), skillLevel.ordinal() + step));
+        return SkillLevel.values()[index];
     }
 
     // endregion Lifecycle-hook helpers
@@ -425,10 +432,11 @@ public final class ContractCharacteristics {
     }
 
     /**
-     * Sets the employer negotiator's tier to match the contract's negotiator characteristic: Elite for
-     * {@link ContractCharacteristic#ELITE_NEGOTIATOR}, Regular for {@link ContractCharacteristic#NOVICE_NEGOTIATOR}, or
-     * Veteran (the baseline) when neither is present. Used by the GM editor so a change of selection is reflected on
-     * the negotiator; safe to call repeatedly.
+     * Sets the employer negotiator's tier to the tier the employer normally fields
+     * ({@link EmployerNegotiator#getEmployerSkillLevel(Faction, ChaosEmployerType)}), stepped one tier up for
+     * {@link ContractCharacteristic#ELITE_NEGOTIATOR} or one tier down for
+     * {@link ContractCharacteristic#NOVICE_NEGOTIATOR}. Used at generation, once characteristics are rolled, and by the
+     * GM editor so a change of selection is reflected on the negotiator; safe to call repeatedly.
      */
     public static void syncNegotiatorTier(final AbstractContract contract, final Campaign campaign) {
         final EmployerData employerData = contract.getEmployerData();
@@ -436,12 +444,14 @@ public final class ContractCharacteristics {
             return;
         }
         final Person negotiator = employerData.negotiator();
-        if (negotiator == null) {
+        final Faction employerFaction = employerData.getFaction();
+        final ChaosEmployerType employerType = employerData.type();
+        if (negotiator == null || employerFaction == null || employerType == null) {
             return;
         }
-        final SkillLevel override = getNegotiatorSkillOverride(contract);
-        final SkillLevel tier = (override != null) ? override : SkillLevel.VETERAN;
-        PersonUtility.overrideSkills(campaign, negotiator, negotiator.getPrimaryRole(), tier, true);
+        final SkillLevel employerTier = EmployerNegotiator.getEmployerSkillLevel(employerFaction, employerType);
+        final SkillLevel tier = stepSkillLevel(employerTier, getNegotiatorTierStep(contract));
+        EmployerNegotiator.applySkillLevel(campaign, negotiator, tier);
     }
 
     // endregion GM editor helpers

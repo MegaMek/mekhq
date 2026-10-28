@@ -34,7 +34,7 @@ package mekhq.campaign.unit;
 
 import java.util.Optional;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.bays.Bay;
 import megamek.common.equipment.Transporter;
 import megamek.logging.MMLogger;

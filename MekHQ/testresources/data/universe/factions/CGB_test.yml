@@ -1,4 +1,4 @@
-# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
 # To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
 #
 # NOTICE: The MegaMek organization is a non-profit group of volunteers
@@ -35,7 +35,6 @@ color:
   red: 191
   green: 232
   blue: 255
-logo: Clan/Clan Ghost Bear.png
 background: Clan/Clan Ghost Bear.png
 camos: Clans/Ghost Bear
 nameGenerator: Clan

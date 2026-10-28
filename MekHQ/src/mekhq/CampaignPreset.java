@@ -52,9 +52,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
+import jakarta.annotation.Nullable;
 import megamek.SuiteConstants;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -732,7 +732,10 @@ public class CampaignPreset {
                                 continue;
                             }
 
-                            SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
+                            SpecialAbility.generateSeparateInstanceFromXML(wn2,
+                                  preset.getSpecialAbilities(),
+                                  options,
+                                  version);
                         }
                         break;
                     }

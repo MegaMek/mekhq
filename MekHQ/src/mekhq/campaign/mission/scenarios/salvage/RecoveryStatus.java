@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Whether the units assigned to a wreck can recover it, and if not, why not.

@@ -36,7 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
@@ -232,6 +232,17 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
             mount.setFired(false);
         }
         spent = false;
+    }
+
+    /**
+     * A reload succeeds automatically, so only a removal while salvaging can genuinely fail.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean canFailItsOwnCheck() {
+        return isSalvaging();
     }
 
     @Override

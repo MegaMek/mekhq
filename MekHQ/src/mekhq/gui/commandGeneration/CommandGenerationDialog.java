@@ -47,7 +47,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -63,6 +65,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.client.ui.buttons.MMButton;
@@ -71,7 +74,6 @@ import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -733,23 +735,14 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
           CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Medical reserve: a generation-only option (independent of the campaign-wide Alternative
-        // Advanced Medical rule). Creates spare unassigned MekWarriors as injury replacements, sized
-        // as a percentage of the generated combatants.
+        // Advanced Medical rule). Creates spare unassigned personnel as injury replacements for every
+        // combat role, each role's reserve sized as a percentage of the people generated in it.
         if (options.isGenerateMedicalReserve()) {
-            int combatants = 0;
-            for (Person person : generatedPersons) {
-                if (person.isCombat()) {
-                    combatants++;
-                }
-            }
-
-            int spares = (int) Math.ceil(combatants * options.getMedicalReservePercent() / 100.0);
-            if (spares > 0) {
-                new ImmersiveDialogNotification(campaign,
-                      resources.getString("CommandGenerationDialog.campaignOptions.altAdvancedMedical"),
-                      true);
-                for (int i = 0; i < spares; i++) {
-                    generateSparePersonnel(options);
+            Map<PersonnelRole, Integer> sparesByRole = getMedicalReserveSparesByRole(generatedPersons,
+                  options.getMedicalReservePercent());
+            for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    generateSparePersonnel(options, entry.getKey());
                 }
             }
         }
@@ -763,10 +756,50 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
     }
 
-    private void generateSparePersonnel(CommandGenerationOptions options) {
-        Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, PersonnelRole.MEKWARRIOR);
+    /**
+     * Works out how many medical reserve spares to generate for each combat role. Each generated person is counted
+     * under their primary role if it is a combat role, otherwise under their secondary role if that is; anyone with
+     * no combat role is ignored. Each role's spares are the given percentage of its headcount, rounded up, so every
+     * combat role present gets at least one spare whenever the percentage is above zero.
+     *
+     * @param generatedPersons       the personnel produced by the generator
+     * @param medicalReservePercent  the reserve size as a percentage of each role's headcount
+     *
+     * @return the number of spares to generate for each combat role, omitting roles that need none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Map<PersonnelRole, Integer> getMedicalReserveSparesByRole(List<Person> generatedPersons,
+          int medicalReservePercent) {
+        Map<PersonnelRole, Integer> combatantsByRole = new EnumMap<>(PersonnelRole.class);
+        for (Person person : generatedPersons) {
+            PersonnelRole combatRole = null;
+            if (person.getPrimaryRole().isCombat()) {
+                combatRole = person.getPrimaryRole();
+            } else if (person.getSecondaryRole().isCombat()) {
+                combatRole = person.getSecondaryRole();
+            }
 
-        overrideSkills(campaign, person, PersonnelRole.MEKWARRIOR, SkillLevel.GREEN, true);
+            if (combatRole != null) {
+                combatantsByRole.merge(combatRole, 1, Integer::sum);
+            }
+        }
+
+        Map<PersonnelRole, Integer> sparesByRole = new EnumMap<>(PersonnelRole.class);
+        for (Map.Entry<PersonnelRole, Integer> entry : combatantsByRole.entrySet()) {
+            int spares = (int) Math.ceil(entry.getValue() * medicalReservePercent / 100.0);
+            if (spares > 0) {
+                sparesByRole.put(entry.getKey(), spares);
+            }
+        }
+        return sparesByRole;
+    }
+
+    private void generateSparePersonnel(CommandGenerationOptions options, PersonnelRole role) {
+        Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
+
+        overrideSkills(campaign, person, role, SkillLevel.GREEN, true);
 
         SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
         reRollLoyalty(person, actualSkillLevel);

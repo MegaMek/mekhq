@@ -44,9 +44,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -409,8 +409,8 @@ public class SetupTab {
         constraints.gridx = 1;
         section.add(cmbMedicSkillLevel, constraints);
 
-        // Medical reserve: generation-only spare MekWarriors as injury replacements, sized by a
-        // percentage of the generated combatants. The spinner is live only when the box is checked.
+        // Medical reserve: generation-only spare combat personnel as injury replacements, sized by a
+        // percentage of each combat role. The spinner is live only when the box is checked.
         chkGenerateMedicalReserve = new CommandGenerationCheckBox("GenerateMedicalReserve");
         spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
         spnMedicalReservePercent.setToolTipText(chkGenerateMedicalReserve.getToolTipText());

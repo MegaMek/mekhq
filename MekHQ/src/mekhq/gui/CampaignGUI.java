@@ -62,16 +62,19 @@ import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MekFileParser;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.ui.AppIcons;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -106,19 +109,24 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.RefitPurchaseCheck;
+import mekhq.campaign.parts.RefitBriefing;
+import mekhq.campaign.parts.RefitFacility;
+import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitSiteChange;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.campaign.work.TechTaskEstimate;
+import mekhq.campaign.work.WorkTimeEstimate;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
@@ -128,12 +136,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.EasyBugReportDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MekHQUnitSelectorDialog;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.RefitPartsArrivedNotice;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
@@ -142,7 +152,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.model.TechTableModel;
 import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -154,6 +163,9 @@ import mekhq.gui.view.CurrentLocationPanel;
 public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
     private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    /** The buttons of the refit site question, in the order they are shown */
+    private static final int REFIT_SITE_CANCEL = 0;
+    private static final int REFIT_SITE_MOVE = 2;
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -194,6 +206,8 @@ public class CampaignGUI extends JPanel {
     private final InfirmaryTab infirmaryTab;
     private final MekLabTab mekLabTab;
     private final FinancesTab financesTab;
+
+    private boolean isDayAdvanceBatchInProgress;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -335,6 +349,7 @@ public class CampaignGUI extends JPanel {
     private void initComponents() {
         frame = new JFrame("MekHQ");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        AppIcons.apply(frame, "mekhq");
 
         tabMain = new EnhancedTabbedPane(true, true);
         tabMain.setToolTipText("");
@@ -1128,12 +1143,15 @@ public class CampaignGUI extends JPanel {
                 continue;
             }
 
-            // The same estimate the Repair tab shows: target number, odds, minutes needed and finish day
+            // The same estimate the Repair tab's tech card shows: the tech's day, the job and its finish date.
+            // Refits never use overtime, so none is shown.
             String techLabel = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.techLabel",
                   tech.getFullName(),
                   SkillType.getColoredExperienceLevelName(tech.getSkillLevel(campaign, false, true)),
                   tech.getPrimaryRoleDesc(),
-                  TechTableModel.describeEstimate(TechTaskEstimate.estimate(campaign, refit, tech)));
+                  WorkTimeEstimate.describeTechJobAndFinish(campaign, TechTaskEstimate.estimate(campaign, refit,
+                        tech)),
+                  WorkTimeEstimate.describeTechDay(campaign, tech, false));
             techsByLabel.put(techLabel, tech);
             if (tech.isRightTechTypeFor(refit)) {
                 techLabels.add(lastRightTechIndex++, techLabel);
@@ -1163,7 +1181,7 @@ public class CampaignGUI extends JPanel {
 
         Person selectedTech = techsByLabel.get(chosenLabel);
         if (!selectedTech.isRightTechTypeFor(refit)) {
-            int response = JOptionPane.showConfirmDialog(null,
+            int response = JOptionPane.showConfirmDialog(frame,
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.text"),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.title"),
                   JOptionPane.YES_NO_OPTION);
@@ -1192,6 +1210,10 @@ public class CampaignGUI extends JPanel {
 
     public void refitUnit(Refit refit, boolean selectModelName) {
         Campaign campaign = getCampaign();
+        // Settled before the tech is chosen, so the tech list shows the target number at the site the work is done
+        if (!isRefitSiteSettled(refit)) {
+            return;
+        }
         if (refit.getOriginalEntity() instanceof Infantry && !(refit.getOriginalEntity() instanceof BattleArmor)) {
             refit.setTech(null);
         } else if (refit.getOriginalEntity() instanceof Dropship || refit.getOriginalEntity() instanceof Jumpship) {
@@ -1220,6 +1242,8 @@ public class CampaignGUI extends JPanel {
             }
             refit.setTech(selectedTech);
         }
+        logger.debug("[RefitStart] {}: tech chosen, {}", refit.getUnit().getName(),
+              (refit.getTech() == null) ? "none needed" : refit.getTech().getFullName());
         if (selectModelName) {
             // select a model name
             RefitNameDialog refitNameDialog = new RefitNameDialog(frame, true, refit);
@@ -1227,56 +1251,189 @@ public class CampaignGUI extends JPanel {
             if (refitNameDialog.wasCancelled()) {
                 // Set the tech team to null since we may want to change it when we re-do the
                 // refit
+                logger.debug("[RefitStart] {}: naming the new model was cancelled", refit.getUnit().getName());
                 refit.setTech(null);
                 return;
             }
+            logger.debug("[RefitStart] {}: new model named", refit.getUnit().getName());
         }
         // TODO: allow overtime work?
-        // check to see if user really wants to do it - give some info on what
-        // will be done
-        // TODO: better information
-        int response = JOptionPane.showConfirmDialog(null,
-              getRefitConfirmation(campaign, refit),
-              getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.title"),
-              JOptionPane.YES_NO_OPTION);
-        if (response != JOptionPane.YES_OPTION) {
+        // The chosen tech briefs the commander on the refit class and why. Every dialog here has the main window as
+        // its parent: a dialog without one can open behind MekHQ, which then looks frozen while it waits for an answer
+        // the player cannot see (issues #4072 and #4554); the immersive dialog opens over the main window.
+        logger.debug("[RefitStart] {}: asking the player to confirm the refit", refit.getUnit().getName());
+        if (!isRefitConfirmed(refit)) {
+            logger.debug("[RefitStart] {}: the refit was not confirmed", refit.getUnit().getName());
             return;
         }
         try {
             if (!refit.begin()) {
                 // Refused before it started: the unit already has a refit, or the refurbishment cannot be paid for
+                logger.debug("[RefitStart] {}: the refit was refused as it began", refit.getUnit().getName());
                 return;
             }
         } catch (EntityLoadingException exception) {
-            JOptionPane.showMessageDialog(null,
+            logger.error(exception, "[RefitStart] %s: the new design could not be loaded", refit.getUnit().getName());
+            JOptionPane.showMessageDialog(frame,
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.text"),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException exception) {
-            JOptionPane.showMessageDialog(null, exception.getMessage(),
+            logger.error(exception, "[RefitStart] %s: the new design could not be saved", refit.getUnit().getName());
+            JOptionPane.showMessageDialog(frame, exception.getMessage(),
                   getTextAt(REFIT_RESOURCE_BUNDLE, "refitIOException.title"), JOptionPane.ERROR_MESSAGE);
             return;
         }
+        logger.debug("[RefitStart] {}: refit begun, doing the first work", refit.getUnit().getName());
         campaign.refit(refit);
         getMekLabTab().clearUnit();
+        logger.debug("[RefitStart] {}: refit started", refit.getUnit().getName());
     }
 
     /**
-     * @return the question asked before a refit or refurbishment starts, naming its refit class and the unit, and
-     *       warning about parts the refit needs but the campaign may not buy
+     * Offers to move the unit to the repair site its refit needs when its site is too low for the refit's class, by
+     * Campaign Operations p.211 (issue #3437). For example, a Class C refit of a unit in an improvised site needs a
+     * field workshop or better. The player may move the unit, keep it where it is, or cancel the refit.
+     *
+     * @return {@code false} if the player cancelled the refit
      */
-    private static String getRefitConfirmation(Campaign campaign, Refit refit) {
-        String key = refit.isBeingRefurbished() ? "refitConfirm.refurbish.text" : "refitConfirm.refit.text";
-        String question = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, key, refit.getRefitClassName(),
-              refit.getUnit().getName());
-        List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
-        if (partsThatCannotBeBought.isEmpty()) {
-            return question;
+    private boolean isRefitSiteSettled(Refit refit) {
+        Campaign campaign = getCampaign();
+        Unit unit = refit.getOriginalUnit();
+        if (RefitFacility.isSiteGoodEnough(refit, unit.getSite())) {
+            return true;
         }
-        String warning = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.cannotBuy.text",
-              String.join(", ", partsThatCannotBeBought));
-        return warning + "\n\n" + question;
+        int requiredSite = RefitFacility.getRequiredSite(refit);
+        String currentSiteName = Unit.getSiteName(unit.getSite());
+        String requiredSiteName = Unit.getSiteName(requiredSite);
+        logger.debug("[RefitFacility] {}: {} work needs {}, the unit is at {}; asking whether to move it",
+              unit.getName(), refit.getRefitClassName(), requiredSiteName, currentSiteName);
+
+        Person speaker = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .getSeniorAdminPerson(campaign.getCampaignOptions(),
+                                     campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        String inCharacter = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.text",
+              campaign.getCommanderAddress(), unit.getName(), refit.getNewEntity().getModel(),
+              refit.getRefitClassName(), RefitFacility.describeRequiredSite(refit), currentSiteName);
+        List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.cancel"),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.stay", currentSiteName),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.move", requiredSiteName));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false);
+
+        return switch (dialog.getDialogChoice()) {
+            case REFIT_SITE_CANCEL -> {
+                logger.debug("[RefitFacility] {}: the refit was cancelled at the site question", unit.getName());
+                yield false;
+            }
+            case REFIT_SITE_MOVE -> {
+                boolean isMoved = UnitSiteChange.moveToSite(campaign, new Unit[] { unit }, requiredSite);
+                logger.debug("[RefitFacility] {}: {} to {}", unit.getName(), isMoved ? "moved" : "could not move",
+                      requiredSiteName);
+                yield true;
+            }
+            default -> {
+                logger.debug("[RefitFacility] {}: stays at {} for the refit", unit.getName(), currentSiteName);
+                yield true;
+            }
+        };
+    }
+
+    /**
+     * Opens Choose Refit Kit for the units, all of one model, and begins the refit the player chooses on each of them.
+     * Used by the Hangar's Refit/Customize, by the notice that a refit's parts have arrived, and by the warehouse.
+     *
+     * @param units            the units to refit; the first one is shown in the window
+     * @param preselectedModel the model to select in the list, such as the one parts were ordered ahead for, or
+     *                         {@code null} to select nothing
+     */
+    public void chooseRefit(Unit[] units, @Nullable String preselectedModel) {
+        ChooseRefitDialog chooseRefitDialog = new ChooseRefitDialog(getFrame(), true, getCampaign(), units[0]);
+        chooseRefitDialog.selectRefitModel(preselectedModel);
+        chooseRefitDialog.setVisible(true);
+        if (!chooseRefitDialog.isConfirmed()) {
+            return;
+        }
+        MekSummary summary = MekSummaryCache.getInstance()
+                                   .getMek(chooseRefitDialog.getSelectedRefit().getNewEntity().getShortNameRaw());
+        if (summary == null) {
+            return;
+        }
+        for (Unit unit : units) {
+            try {
+                Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (refitEntity != null) {
+                    Refit refit = new Refit(unit, refitEntity, chooseRefitDialog.isCustomize(), false, false);
+                    if (refit.checkFixable() == null) {
+                        refitUnit(refit, false);
+                    }
+                }
+            } catch (EntityLoadingException exception) {
+                logger.error("", exception);
+            }
+        }
+    }
+
+    /**
+     * Tells the player that everything ordered ahead for a unit's refit has arrived, and opens Choose Refit Kit with
+     * that refit selected if they choose to begin it.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param refitPartsArrivedEvent the event naming the unit whose parts have arrived
+     */
+    @Subscribe
+    public void handleRefitPartsArrived(RefitPartsArrivedEvent refitPartsArrivedEvent) {
+        Unit unit = refitPartsArrivedEvent.getUnit();
+        Refit plannedRefit = RefitPartOrders.planPendingRefit(unit);
+        List<String> stillToBuy = (plannedRefit == null) ? List.of() : RefitPartOrders.describeStillToBuy(plannedRefit);
+        if (!RefitPartsArrivedNotice.askToBegin(getCampaign(), unit, stillToBuy)) {
+            logger.debug("[RefitParts] {}: parts arrived, the refit is left for later", unit.getName());
+            return;
+        }
+        beginPendingRefit(unit, plannedRefit);
+    }
+
+    /**
+     * Begins the refit a unit's parts were ordered ahead for, as a kit refit, going straight to the repair site
+     * question, the choice of tech and the tech's briefing. The player already chose the design when ordering.
+     *
+     * @param unit the unit with a pending refit
+     */
+    public void beginPendingRefit(Unit unit) {
+        beginPendingRefit(unit, RefitPartOrders.planPendingRefit(unit));
+    }
+
+    private void beginPendingRefit(Unit unit, @Nullable Refit plannedRefit) {
+        String fixableProblem = (plannedRefit == null) ? null : plannedRefit.checkFixable();
+        if ((plannedRefit == null) || (fixableProblem != null)) {
+            // Fall back to choosing the refit by hand, with the ordered design selected
+            logger.debug("[RefitParts] {}: the pending refit cannot begin directly ({}); opening Choose Refit Kit",
+                  unit.getName(), (plannedRefit == null) ? "design not loaded" : fixableProblem);
+            chooseRefit(new Unit[] { unit }, unit.getPendingRefitModel());
+            return;
+        }
+        logger.debug("[RefitParts] {}: beginning the pending refit to {} as a kit refit", unit.getName(),
+              unit.getPendingRefitModel());
+        refitUnit(plannedRefit, false);
+    }
+
+    /**
+     * Has the tech chosen for the refit brief the commander on its class and why, with any rules the player should
+     * know, such as a loss of quality, and asks whether to begin.
+     *
+     * @return {@code true} if the player chose to begin the refit
+     */
+    private boolean isRefitConfirmed(Refit refit) {
+        List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.cancel"),
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.begin"));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
+              RefitBriefing.describeInCharacter(getCampaign(), refit), buttons,
+              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false);
+        return dialog.getDialogChoice() == 1;
     }
 
     /**
@@ -1308,8 +1465,9 @@ public class CampaignGUI extends JPanel {
 
                 if (unit.getEntity().isLargeCraft()) {
                     Unit techUnit = tech.getUnit();
-                    // This stops vessel crew from other vessels appearing in the list
-                    if (techUnit != null && !techUnit.equals(unit)) {
+                    // This stops vessel crew from other vessels appearing in the list. A support carrier seat is a
+                    // holding assignment, not a vessel, so its crew remain available.
+                    if (techUnit != null && !techUnit.equals(unit) && !techUnit.isCarrier()) {
                         continue;
                     }
                 }
@@ -1972,28 +2130,18 @@ public class CampaignGUI extends JPanel {
 
         // Optional New Day Blocker
         if (getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT)) {
-            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+            TurnoverPromptOutcome turnoverPrompt = getCampaign().checkTurnoverPrompt();
 
             switch (turnoverPrompt) {
-                case -1:
-                    // the user wasn't presented with the dialog
-                    break;
-                case 0:
-                    // the user launched the turnover dialog
+                case NOT_PROMPTED, ADVANCE_DAY_REGARDLESS -> {
+                    // Nothing blocks the new day
+                }
+                case EMPLOYEE_TURNOVER -> {
                     if (!showRetirementDefectionDialog()) {
                         dayEndingEvent.cancel();
-                        return;
                     }
-                case 1:
-                    // the user picked 'Advance Day Regardless'
-                    break;
-                case 2:
-                    // the user canceled
-                    dayEndingEvent.cancel();
-                    return;
-                default:
-                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " +
-                                                          turnoverPrompt);
+                }
+                case CANCEL_ADVANCE_DAY -> dayEndingEvent.cancel();
             }
         }
     }
@@ -2011,6 +2159,23 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleMissionChanged(MissionEvent missionEvent) {
         refreshPartsAvailability();
+    }
+
+    /**
+     * The tech on a refit whose check failed tells the commander what went wrong and how much longer it will take.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param refitCheckFailedEvent the event naming the refit whose check failed
+     */
+    @Subscribe
+    public void handleRefitCheckFailed(RefitCheckFailedEvent refitCheckFailedEvent) {
+        Refit refit = refitCheckFailedEvent.getRefit();
+        logger.debug("[RefitCheck] {}: check failed, telling the player", refit.getUnit().getName());
+        new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
+              RefitBriefing.describeFailedCheck(getCampaign(), refit), null,
+              RefitBriefing.describeFailedCheckRules(refit), null, false);
     }
 
     /**
@@ -2189,7 +2354,31 @@ public class CampaignGUI extends JPanel {
         refreshPartsAvailability();
         refreshMarketButtonLabels();
 
+        if (isDayAdvanceBatchInProgress) {
+            // The Command Center still refreshes every day: it collects the report lines added after its own new
+            // day handler ran, and the advance days dialog would otherwise show those lines twice.
+            commandCenterTab.refreshAll();
+            return;
+        }
         refreshAllTabs();
+    }
+
+    /**
+     * Starts a run of days advanced together, such as from the advance days dialog. Until
+     * {@link #endDayAdvanceBatch()} is called, each new day refreshes only the Command Center tab rather than every
+     * tab, because the days in between are never shown. The caller must refresh every tab once the run ends.
+     */
+    public void beginDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Deferring tab refreshes until the advance ends");
+        isDayAdvanceBatchInProgress = true;
+    }
+
+    /**
+     * Ends a run started with {@link #beginDayAdvanceBatch()}, so each new day refreshes every tab again.
+     */
+    public void endDayAdvanceBatch() {
+        logger.debug("[AdvanceDays] Advance ended, tab refreshes resume");
+        isDayAdvanceBatchInProgress = false;
     }
 
     /**

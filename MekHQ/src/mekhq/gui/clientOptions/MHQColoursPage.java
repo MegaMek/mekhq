@@ -106,6 +106,7 @@ class MHQColoursPage extends MHQOptionsPage {
               "optionDeployedForeground", "optionDeployedBackground",
               "optionInTransitForeground", "optionInTransitBackground",
               "optionQueuedForTravelForeground", "optionQueuedForTravelBackground",
+              "optionPendingRefitForeground", "optionPendingRefitBackground",
               "optionRefittingForeground", "optionRefittingBackground",
               "optionMothballingForeground", "optionMothballingBackground",
               "optionMothballedForeground", "optionMothballedBackground",
@@ -125,6 +126,7 @@ class MHQColoursPage extends MHQOptionsPage {
               "optionInjuredForeground", "optionInjuredBackground",
               "optionPregnantForeground", "optionPregnantBackground",
               "optionFatiguedForeground", "optionFatiguedBackground",
+              "optionWorkingForeground", "optionWorkingBackground",
               "optionHealedInjuriesForeground", "optionHealedInjuriesBackground");
     }
 

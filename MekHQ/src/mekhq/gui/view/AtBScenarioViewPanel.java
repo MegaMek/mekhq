@@ -63,9 +63,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.interfaces.IStartingPositions;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.PlanetaryConditions;

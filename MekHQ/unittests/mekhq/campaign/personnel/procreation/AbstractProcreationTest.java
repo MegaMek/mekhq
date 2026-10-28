@@ -58,13 +58,17 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -831,6 +835,7 @@ public class AbstractProcreationTest {
     @Test
     public void testProcessNewWeek_ForNonPregnantMale() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
         when(mockPerson.getGender()).thenReturn(Gender.MALE);
@@ -842,6 +847,7 @@ public class AbstractProcreationTest {
     @Test
     public void testProcessNewWeek_ForPregnantFemale() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
 
@@ -851,14 +857,15 @@ public class AbstractProcreationTest {
 
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
 
-        verify(mockProcreation, never()).birth(any(), any(), any());
+        verify(mockProcreation, never()).birth(any(), any(), any(), anyBoolean());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
     }
 
     @Test
     public void testProcessNewWeek_ForPregnantFemaleWithDueDate() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
-        doNothing().when(mockProcreation).birth(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
+        doNothing().when(mockProcreation).birth(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
 
@@ -868,8 +875,56 @@ public class AbstractProcreationTest {
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
 
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(1)).birth(any(), any(), any());
+        verify(mockProcreation, times(1)).birth(any(), any(), any(), anyBoolean());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testProcessNewWeek_PregnantActivePersonGoesOnMaternityLeave() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
+        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
+
+        final LocalDate today = LocalDate.ofYearDay(3025, 1);
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(today.plusWeeks(10));
+        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        mockProcreation.processNewWeek(mockCampaign, today, mockPerson);
+
+        verify(mockPerson, times(1)).changeStatus(mockCampaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
+    }
+
+    /**
+     * Regression test: only {@link PersonnelStatus#ACTIVE} personnel should be moved onto maternity leave. Anyone in
+     * another status (e.g. {@link PersonnelStatus#STUDENT}) must keep that status.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @ParameterizedTest
+    @EnumSource(value = PersonnelStatus.class, names = { "ACTIVE" }, mode = EnumSource.Mode.EXCLUDE)
+    public void testProcessNewWeek_PregnantNonActivePersonDoesNotGoOnMaternityLeave(PersonnelStatus status) {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
+        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
+
+        final LocalDate today = LocalDate.ofYearDay(3025, 1);
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(today.plusWeeks(10));
+        when(mockPerson.getStatus()).thenReturn(status);
+
+        mockProcreation.processNewWeek(mockCampaign, today, mockPerson);
+
+        verify(mockPerson, never()).changeStatus(any(), any(), any());
     }
 
     //region Random Procreation
@@ -940,5 +995,70 @@ public class AbstractProcreationTest {
             assertEquals("", baby.getPreNominal());
             assertEquals("", baby.getPostNominal());
         }
+    }
+
+    /**
+     * A normal birth leaves the mother in postpartum recovery and shows the birth announcement.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirth_appliesPostpartumAndAnnouncesOutsideStartingSimulation() {
+        final Person mother = prepareBirth();
+
+        try (MockedConstruction<BirthAnnouncement> announcements = mockConstruction(BirthAnnouncement.class)) {
+            new DisabledRandomProcreation(mockCampaignOptions).birth(mockCampaign, LocalDate.of(3025, 6, 1), mother,
+                  false);
+
+            assertEquals(1, mother.getHits());
+            assertEquals(1, announcements.constructed().size());
+        }
+    }
+
+    /**
+     * A birth during a new command's starting simulation spares the mother postpartum recovery and shows no birth
+     * announcement.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirth_skipsPostpartumAndAnnouncementDuringStartingSimulation() {
+        final Person mother = prepareBirth();
+
+        try (MockedConstruction<BirthAnnouncement> announcements = mockConstruction(BirthAnnouncement.class)) {
+            new DisabledRandomProcreation(mockCampaignOptions).birth(mockCampaign, LocalDate.of(3025, 6, 1), mother,
+                  true);
+
+            assertEquals(0, mother.getHits());
+            assertTrue(announcements.constructed().isEmpty());
+        }
+    }
+
+    /**
+     * Stubs the options a single, fatherless birth reads, with birth announcements enabled.
+     *
+     * @return the mother, uninjured
+     */
+    private Person prepareBirth() {
+        when(mockCampaignOptions.get(CampaignOption.DETERMINE_FATHER_AT_BIRTH)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)).thenReturn(BabySurnameStyle.MOTHERS);
+        when(mockCampaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ASSIGN_NON_PRISONER_BABIES_FOUNDER_TAG)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.ASSIGN_CHILDREN_OF_FOUNDERS_FOUNDER_TAG)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS)).thenReturn(true);
+        // Only read if the random loyalty change actually moves someone's loyalty
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_LOYALTY_MODIFIERS)).thenReturn(false);
+
+        when(mockCampaign.getPlayerForce().getHumanResources().newDependent(any(), any(), any(), any()))
+              .thenAnswer(invocation -> new Person(mockCampaign));
+
+        final Person mother = new Person(mockCampaign);
+        mother.setGender(Gender.FEMALE);
+        assertEquals(0, mother.getHits());
+        return mother;
     }
 }

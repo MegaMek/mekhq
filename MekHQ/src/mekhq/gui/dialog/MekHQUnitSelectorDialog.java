@@ -53,11 +53,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.AbstractUnitSelectorDialog;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.MekSummary;
 import megamek.common.rolls.TargetRoll;
@@ -66,13 +66,15 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitAcquisitionType;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     private final Campaign campaign;
@@ -108,6 +110,10 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         updateOptionValues();
         initialize();
+        // The preview's Cost line shows what the campaign would charge, matching the table's price column
+        panePreview.setCostProvider(entity -> Unit.estimateBuyCost(entity, campaign.getCampaignOptions())
+                                                    .getAmount()
+                                                    .doubleValue());
         if (!addToCampaign) {
             setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             getRootPane().getActionMap().put(CLOSE_ACTION, new AbstractAction() {
@@ -320,7 +326,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             if (addToCampaign) {
                 buttonBuy.setEnabled(true);
                 buttonAddGM.setEnabled(true);
-                TargetRoll target = campaign.checkAcquisition(selectedUnit).getTargetNumber();
+                TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, selectedUnit,
+                      campaign.checkAcquisition(selectedUnit)).getTargetNumber();
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonBuy.setToolTipText(target.getDesc());
             }
@@ -343,6 +350,22 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         }
 
         return selectedEntity;
+    }
+
+    /**
+     * Shows each unit at the price the campaign would charge for it, rather than MegaMek's construction cost, so the
+     * unit price multipliers and the {@link CampaignOption#UNIT_COST_MODEL} are reflected.
+     *
+     * @param summary the unit to price
+     *
+     * @return the campaign's purchase price for the unit, in C-bills
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected long getDisplayedPrice(MekSummary summary) {
+        return Unit.estimateBuyCost(summary, campaign.getCampaignOptions()).round().getAmount().longValue();
     }
 
     static boolean isPersistentCampaignUnitSummary(@Nullable MekSummary unitSummary) {

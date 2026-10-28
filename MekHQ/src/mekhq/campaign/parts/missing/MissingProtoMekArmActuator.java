@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,9 +35,9 @@ package mekhq.campaign.parts.missing;
 
 import java.io.PrintWriter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.units.ProtoMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -69,8 +69,7 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     public MissingProtoMekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
-        this.name = "ProtoMech Arm Actuator";
+        this.name = "ProtoMek Arm Actuator";
         this.location = loc;
     }
 

@@ -34,9 +34,9 @@ package mekhq.gui.panels;
 
 import javax.swing.JFrame;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.panels.abstractPanels.abstractIconChooserPanel;
 import megamek.client.ui.trees.AbstractIconChooserTree;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MekHQ;
 

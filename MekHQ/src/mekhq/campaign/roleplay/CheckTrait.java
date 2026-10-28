@@ -34,7 +34,7 @@ package mekhq.campaign.roleplay;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**

@@ -37,7 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
 
 import java.util.Locale;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Shared helpers for the Command Generation dialog's styled components.

@@ -39,7 +39,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.TreeMap;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.util.fileUtils.MegaMekFile;
 import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;

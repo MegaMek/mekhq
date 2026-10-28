@@ -35,7 +35,7 @@ package mekhq.campaign.personnel.familyTree;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;

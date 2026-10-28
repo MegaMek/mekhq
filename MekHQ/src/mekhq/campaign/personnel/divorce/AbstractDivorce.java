@@ -39,12 +39,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
@@ -230,7 +230,7 @@ public abstract class AbstractDivorce {
             campaign.addReport(PERSONNEL, String.format(resources.getString("divorce.report"),
                   origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         } else {
-            reasonOrigin = FormerSpouseReason.DIVORCE;
+            reasonOrigin = FormerSpouseReason.WIDOWED;
             reasonSpouse = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
@@ -238,9 +238,6 @@ public abstract class AbstractDivorce {
             } else {
                 PersonalLogger.widowedBy(spouse, origin, today);
             }
-
-            PersonalLogger.divorcedFrom(origin, spouse, today);
-
 
             campaign.addReport(PERSONNEL, String.format(resources.getString("widowed.report"),
                   origin.getHyperlinkedName(), spouse.getHyperlinkedName()));

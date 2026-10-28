@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -54,7 +56,6 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -109,12 +110,12 @@ class AbstractContractDeterminationPayTest {
         }
 
         @Override
-        public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
+        public @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract) {
             return COMBAT;
         }
 
         @Override
-        public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+        public @Nonnull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
               AbstractLocation currentLocation) {
             return TRANSPORT;
         }
@@ -225,6 +226,49 @@ class AbstractContractDeterminationPayTest {
 
     // endregion combat pay (reduced combat pay)
 
+    // region false flag premium
+
+    private static AbstractContract falseFlagContract() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+        when(contract.isFalseFlag()).thenReturn(true);
+        return contract;
+    }
+
+    @Test
+    void getContractMonthlyPayAddsTheFalseFlagPremium() {
+        // FixedPay.MONTHLY (500) * 1.25 = 625
+        assertEquals(Money.of(625), new FixedPay().getContractMonthlyPay(mock(Campaign.class), falseFlagContract()));
+    }
+
+    @Test
+    void getContractCombatPayAddsTheFalseFlagPremium() {
+        // FixedPay.COMBAT (250) * 1.25 = 312.5
+        assertEquals(Money.of(312.5), new FixedPay().getContractCombatPay(mock(Campaign.class), falseFlagContract()));
+    }
+
+    @Test
+    void getContractMonthlyPayHasNoPremiumWithoutAFalseFlag() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+
+        assertEquals(FixedPay.MONTHLY, new FixedPay().getContractMonthlyPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void determineContractPayAppliesTheFalseFlagPremiumOnce() {
+        AbstractContract contract = falseFlagContract();
+
+        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+
+        ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
+        verify(contract).setContractFinanceData(captor.capture());
+        assertEquals(Money.of(625), captor.getValue().monthlyPay());
+        assertEquals(Money.of(312.5), captor.getValue().combatPay());
+        // Transport is cost reimbursement, so it carries no premium
+        assertEquals(FixedPay.TRANSPORT, captor.getValue().transport());
+    }
+
+    // endregion false flag premium
+
     // region transport pay
 
     /**
@@ -233,7 +277,13 @@ class AbstractContractDeterminationPayTest {
      */
     private static Money transportPay(int scale, int jumps, double transportMultiplier, boolean atHiringHall,
           boolean twoWayPay, boolean convertSupportPoints) {
+        return transportPay(scale, false, jumps, transportMultiplier, atHiringHall, twoWayPay, convertSupportPoints);
+    }
+
+    private static Money transportPay(double scale, boolean useFractionalScale, int jumps, double transportMultiplier,
+          boolean atHiringHall, boolean twoWayPay, boolean convertSupportPoints) {
         CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.USE_FRACTIONAL_SCALE)).thenReturn(useFractionalScale);
         when(options.get(CampaignOption.IS_USE_TWO_WAY_PAY)).thenReturn(twoWayPay);
         when(options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)).thenReturn(convertSupportPoints);
         Campaign campaign = mock(Campaign.class);
@@ -245,7 +295,9 @@ class AbstractContractDeterminationPayTest {
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
 
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(scale);
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(scale));
+        when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
+              ChaosContractDeterminationScale.getEconomicScale(scale, invocation.getArgument(0)));
         when(contract.getTransportMultiplier()).thenReturn(transportMultiplier);
 
         JumpPath jumpPath = jumps == 0 ? null : mock(JumpPath.class);
@@ -271,6 +323,18 @@ class AbstractContractDeterminationPayTest {
     void transportPayScalesWithScaleAndJumpCount() {
         // 50 * scale(3) * jumps(2) = 300 support points, unconverted.
         assertEquals(Money.of(300), transportPay(3, 2, 1.0, false, false, false));
+    }
+
+    @Test
+    void transportPayRoundsScaleUpWithoutFractionalScale() {
+        // 50 * scale(2.4 -> 3) * jumps(2) = 300 support points
+        assertEquals(Money.of(300), transportPay(2.4, false, 2, 1.0, false, false, false));
+    }
+
+    @Test
+    void transportPayFollowsTheExactScaleWithFractionalScale() {
+        // 50 * scale(2.4) * jumps(2) = 240 support points
+        assertEquals(Money.of(240), transportPay(2.4, true, 2, 1.0, false, false, false));
     }
 
     @Test

@@ -35,7 +35,7 @@ package mekhq.campaign.digitalGM.stratCon;
 import java.util.EnumMap;
 import java.util.Map;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.*;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;

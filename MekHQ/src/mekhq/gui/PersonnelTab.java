@@ -72,6 +72,7 @@ import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -87,6 +88,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.tables.MHQTable;
 import mekhq.gui.dialog.BatchXPDialog;
+import mekhq.gui.dialog.FamilyTreeDialog;
 import mekhq.gui.dialog.QuickTrainDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
@@ -113,6 +115,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     private JTextField searchField;
     private JScrollPane scrollPersonnelView;
     private JCheckBox chkGroupByUnit;
+    private RoundedJButton btnFamilyTree;
 
     /**
      * A person shown in the detail panel while not present in the grid, e.g. when a link targets someone outside the
@@ -312,11 +315,33 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(btnQuickTrain, gridBagConstraints);
 
+        btnFamilyTree = new RoundedJButton(resourceMap.getString("btnFamilyTree.text"));
+        btnFamilyTree.setToolTipText(resourceMap.getString("btnFamilyTree.toolTipText"));
+        btnFamilyTree.setEnabled(false);
+        btnFamilyTree.addActionListener(e -> {
+            List<Person> selectedPersons = getSelectedPersons();
+            if (selectedPersons.size() == 1) {
+                new FamilyTreeDialog(getFrame(),
+                      selectedPersons.get(0).getGenealogy(),
+                      getCampaign().getPlayerForce().getPersonnel().values(),
+                      getCampaignGui()::focusOnPerson);
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        add(btnFamilyTree, gridBagConstraints);
+
         RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
         btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
         btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridx = 9;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
@@ -327,7 +352,11 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         personnelTable = new MHQTable<>(new PersonnelTableModel(getCampaign()));
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
+        personnelTable.getSelectionModel().addListSelectionListener(ev -> {
+            refreshPersonnelView();
+            // The family tree is drawn around a single person, so it needs exactly one selection
+            btnFamilyTree.setEnabled(getSelectedPersons().size() == 1);
+        });
 
         scrollPersonnelView = new FastJScrollPane();
         scrollPersonnelView.setBorder(RoundedLineBorder.createRoundedLineBorder());
@@ -344,7 +373,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.gridwidth = 10;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -353,7 +382,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab.keyText");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.gridwidth = 10;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0;
@@ -545,6 +574,13 @@ public final class PersonnelTab extends CampaignGuiTab {
      * Refreshes the personnel table model, applying the currently-selected location filter.
      */
     public void refreshPersonnelList() {
+        // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
+        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // generation completes reschedules this refresh against the finished campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
         if (selectedRow >= 0 && selectedRow < personnelTable.getRowCount()) {
@@ -637,6 +673,20 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(PersonNewEvent ev) {
+        personnelListScheduler.schedule();
+    }
+
+    /**
+     * A force generation recruits its personnel while {@link mekhq.campaign.Campaign#isBulkGenerationInProgress()} is
+     * true, so the refreshes its {@link PersonNewEvent}s trigger are dropped by the guard in
+     * {@link #refreshPersonnelList()}. Generation ends by firing this event, which runs the refresh against the
+     * finished campaign.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
         personnelListScheduler.schedule();
     }
 

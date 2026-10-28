@@ -36,8 +36,6 @@ package mekhq.campaign.unit;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
-import static mekhq.campaign.personnel.skills.SkillType.S_ZERO_G_OPERATIONS;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -54,10 +52,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryConditions.Atmosphere;
-import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -69,7 +65,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
-import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -79,8 +76,8 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.PlanetaryWorkConditions;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -99,7 +96,18 @@ public class Maintenance {
 
     public static void doMaintenance(Campaign campaign, Unit unit) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!unit.requiresMaintenance() || !campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+        if (!campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+            return;
+        }
+        if (!unit.requiresMaintenance()) {
+            LOGGER.debug("[Maintenance] {}: no maintenance today (present={}, deployed={}, refitting={}, "
+                               + "mothballing={}, mothballed={}, salvage={})",
+                  unit.getName(), unit.isPresent(), unit.isDeployed(), unit.isRefitting(), unit.isMothballing(),
+                  unit.isMothballed(), unit.isSalvage());
+            return;
+        }
+        // Maintenance is paused, rather than skipped: the cycle does not advance, so nothing is charged or checked
+        if (!isMaintenanceEnabledForSituation(campaign, unit)) {
             return;
         }
         // let's start by checking times
@@ -108,6 +116,7 @@ public class Maintenance {
         boolean maintained;
         boolean paidMaintenance = true;
 
+        double daysBeforeIncrement = unit.getDaysSinceMaintenance();
         unit.incrementDaysSinceMaintenance(campaign, false, asTechsUsed);
 
         int ruggedMultiplier = 1;
@@ -119,8 +128,22 @@ public class Maintenance {
             ruggedMultiplier = 3;
         }
 
-        if (unit.getDaysSinceMaintenance() >= (campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier)) {
+        int cycleDays = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS) * ruggedMultiplier;
+        boolean isCheckDue = unit.getDaysSinceMaintenance() >= cycleDays;
+        LOGGER.debug("[Maintenance] {}: {} of {} days since last check (clock +{} today, rugged x{}), check {}",
+              unit.getName(), unit.getDaysSinceMaintenance(), cycleDays,
+              unit.getDaysSinceMaintenance() - daysBeforeIncrement, ruggedMultiplier,
+              isCheckDue ? "due" : "not due");
+
+        if (isCheckDue) {
             Person tech = unit.getTech();
+            if (tech == null) {
+                LOGGER.debug("[Maintenance] {}: no tech or engineer, checked as unmaintained", unit.getName());
+            } else {
+                LOGGER.debug("[Maintenance] {}: {} has {} minutes, needs {} (multiplier x{})",
+                      unit.getName(), tech.getFullName(), tech.getMinutesLeft(), minutesUsed,
+                      unit.getMaintenanceMultiplier());
+            }
             if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
                 // Tech is at a different location; maintenance cannot be performed this cycle.
                 campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -131,12 +154,12 @@ public class Maintenance {
                 int availableMinutes = tech.getMinutesLeft();
                 maintained = (availableMinutes >= minutesUsed);
 
+                // A tech mothballing another unit still maintains this one: maintenance comes first each day, and
+                // the mothballing only uses the minutes left over, as a refit does
                 if (!maintained) {
                     // At this point, insufficient minutes is the only reason why maintenance would fail.
                     campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
                           unit.getName()));
-                } else {
-                    maintained = !tech.isMothballing();
                 }
 
                 if (maintained) {
@@ -157,10 +180,12 @@ public class Maintenance {
                 }
             }
 
-            // maybe use the money
+            // maybe use the money. Straight support covers repairs, not maintenance (Hot Spots: Draconis Reach pg 27),
+            // so none of this is reimbursed.
             if (campaignOptions.isChargingMaintenance()) {
                 Money maintenanceCost = unit.getMaintenanceCost()
-                                              .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign));
+                                              .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign))
+                                              .multipliedBy(getSituationalMaintenanceCostMultiplier(campaign, unit));
                 if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,
                       campaign.getLocalDate(),
                       maintenanceCost,
@@ -171,8 +196,6 @@ public class Maintenance {
                                                         unit.getHyperlinkedName() +
                                                         "!</b></font>");
                     paidMaintenance = false;
-                } else {
-                    ContractSupportPayments.reimburseStraightSupport(campaign, maintenanceCost, unit.getName());
                 }
             }
             // it is time for a maintenance check
@@ -215,18 +238,7 @@ public class Maintenance {
                 }
             }
 
-            int nDamage = 0;
-            int nDestroy = 0;
-            for (Map.Entry<Part, Integer> p : partsToDamage.entrySet()) {
-                int damage = p.getValue();
-                if (damage > 3) {
-                    nDestroy++;
-                    p.getKey().remove(false);
-                } else {
-                    p.getKey().doMaintenanceDamage(damage);
-                    nDamage++;
-                }
-            }
+            MaintenanceDamage damageDone = applyMaintenanceDamage(partsToDamage);
 
             unit.setLastMaintenanceReport(maintenanceReport.toString());
 
@@ -254,7 +266,7 @@ public class Maintenance {
             } else {
                 qualityString = "Overall quality remains " + quality.toName(reverse);
             }
-            String damageString = getDamageString(unit, nDamage, nDestroy);
+            String damageString = getDamageString(unit, damageDone.damagedParts(), damageDone.destroyedParts());
             String paidString = "";
             if (!paidMaintenance) {
                 paidString = "<font color='" +
@@ -277,24 +289,251 @@ public class Maintenance {
         }
     }
 
-    private static String getDamageString(Unit unit, int nDamage, int nDestroy) {
-        String damageString = "";
-        if (nDamage > 0) {
-            damageString += nDamage + " parts were damaged. ";
+    /**
+     * How far each unit's maintenance cycle advances in one day: a full day on a combat contract, otherwise a quarter.
+     * The daily maintenance and the schedule check both use this, so the schedule predicts the day a check falls due.
+     *
+     * @param campaign the campaign to check
+     *
+     * @return {@code 1} on a combat contract, otherwise {@code 0.25}
+     */
+    public static double getDailyMaintenanceProgress(Campaign campaign) {
+        return isOnCombatContract(campaign) ? 1 : 0.25;
+    }
+
+    /**
+     * Checks whether the campaign is on a contract that runs maintenance at the full, weekly pace. Only active
+     * contracts other than Garrison Duty and Retainer count; otherwise maintenance progresses at x0.25 speed.
+     *
+     * @param campaign the campaign to check
+     *
+     * @return {@code true} if any active contract is neither Garrison Duty nor a Retainer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isOnCombatContract(Campaign campaign) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            ContractObjectiveType objectiveType = contract.getObjectiveType();
+            if (!objectiveType.isGarrisonDuty() && !objectiveType.isRetainer()) {
+                return true;
+            }
         }
-        if (nDestroy > 0) {
-            damageString += nDestroy + " parts were destroyed.";
+        return false;
+    }
+
+    /**
+     * Checks whether a unit is travelling: away from a planet (including waiting at a jump point), or moving overland
+     * in a ground convoy.
+     *
+     * @param unit the unit to check
+     *
+     * @return {@code true} if the unit is in transit; a unit with no location is never in transit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isUnitInTransit(Unit unit) {
+        if (!unit.hasLocation()) {
+            return false;
         }
-        if (!damageString.isEmpty()) {
-            damageString = "<b><font color='" +
-                                 getNegativeColor() +
-                                 "'>" +
-                                 damageString +
-                                 "</b></font> [<a href='REPAIR|" +
-                                 unit.getId() +
-                                 "'>Repair bay</a>]";
+        return !unit.isOnPlanet() || unit.isInTransit();
+    }
+
+    /**
+     * Checks whether the campaign options allow maintenance on a unit in its current situation. Being on or off
+     * contract always applies, and being in transit applies on top of that; maintenance only runs if every situation
+     * that applies is enabled.
+     *
+     * @param campaign the campaign providing options and active contracts
+     * @param unit     the unit to check
+     *
+     * @return {@code true} if maintenance may run on the unit today
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isMaintenanceEnabledForSituation(Campaign campaign, Unit unit) {
+        return isMaintenanceEnabledForSituation(campaign.getCampaignOptions(),
+              !campaign.getActiveContracts().isEmpty(),
+              isUnitInTransit(unit));
+    }
+
+    /**
+     * As {@link #isMaintenanceEnabledForSituation(Campaign, Unit)}, for a given situation rather than the current one.
+     *
+     * @param campaignOptions the campaign options
+     * @param isOnContract    whether any contract is active
+     * @param isUnitInTransit whether the unit is travelling
+     *
+     * @return {@code true} if maintenance may run on a unit in that situation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isMaintenanceEnabledForSituation(CampaignOptions campaignOptions, boolean isOnContract,
+          boolean isUnitInTransit) {
+        CampaignOption<Boolean> contractOption = isOnContract
+                                                       ? CampaignOption.MAINTENANCE_ON_CONTRACT
+                                                       : CampaignOption.MAINTENANCE_OFF_CONTRACT;
+        if (!campaignOptions.get(contractOption)) {
+            return false;
         }
-        return damageString;
+        return campaignOptions.get(CampaignOption.MAINTENANCE_IN_TRANSIT) || !isUnitInTransit;
+    }
+
+    /**
+     * Returns the multiplier applied to a unit's maintenance cost for its current situation. On a combat contract
+     * maintenance runs weekly rather than monthly, so the combat contract multiplier offsets the more frequent
+     * charges. Units other than large craft that are in transit are stowed, so the in-transit multiplier applies to
+     * them as well. Both multipliers stack.
+     *
+     * @param campaign the campaign providing options and active contracts
+     * @param unit     the unit being maintained
+     *
+     * @return the combined situational cost multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getSituationalMaintenanceCostMultiplier(Campaign campaign, Unit unit) {
+        return getSituationalMaintenanceCostMultiplier(campaign.getCampaignOptions(),
+              unit,
+              isOnCombatContract(campaign),
+              isUnitInTransit(unit));
+    }
+
+    /**
+     * As {@link #getSituationalMaintenanceCostMultiplier(Campaign, Unit)}, for a given situation rather than the
+     * current one.
+     *
+     * @param campaignOptions    the campaign options
+     * @param unit               the unit being maintained
+     * @param isOnCombatContract whether a contract other than Garrison Duty or a Retainer is active
+     * @param isUnitInTransit    whether the unit is travelling
+     *
+     * @return the combined situational cost multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getSituationalMaintenanceCostMultiplier(CampaignOptions campaignOptions, Unit unit,
+          boolean isOnCombatContract, boolean isUnitInTransit) {
+        double multiplier = 1.0;
+        if (isOnCombatContract) {
+            multiplier *= campaignOptions.get(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER);
+        }
+
+        Entity entity = unit.getEntity();
+        boolean isVessel = entity != null && entity.isLargeCraft();
+        if (!isVessel && isUnitInTransit) {
+            multiplier *= campaignOptions.get(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER);
+        }
+        return multiplier;
+    }
+
+    /**
+     * Projects the maintenance a unit will be charged per day, on average, in a given situation. This mirrors
+     * {@link #doMaintenance(Campaign, Unit)}: a cycle is charged every {@link CampaignOption#MAINTENANCE_CYCLE_DAYS}
+     * (stretched by Rugged quirks), and away from a combat contract the cycle advances at x0.25 speed (see
+     * {@link Unit#incrementDaysSinceMaintenance}). The situational toggles and cost multipliers apply as they would on
+     * the day. Planetary cost reductions are not applied: they never apply on contract, and a unit in transit is not on
+     * a planet.
+     *
+     * @param campaign           the campaign providing options
+     * @param unit               the unit to project
+     * @param isOnContract       whether a contract will be active
+     * @param isOnCombatContract whether that contract is neither Garrison Duty nor a Retainer
+     * @param isTravelling       whether the force will be travelling; a unit with no location never travels
+     *
+     * @return the average daily maintenance cost, or zero if the unit will not be charged maintenance
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getProjectedDailyMaintenanceCost(Campaign campaign, Unit unit, boolean isOnContract,
+          boolean isOnCombatContract, boolean isTravelling) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isChargingMaintenance()
+                  || !campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)
+                  || !unit.requiresMaintenance()) {
+            return Money.zero();
+        }
+
+        boolean isUnitInTransit = isTravelling && unit.hasLocation();
+        if (!isMaintenanceEnabledForSituation(campaignOptions, isOnContract, isUnitInTransit)) {
+            return Money.zero();
+        }
+
+        int cycleDays = unit.getMaintenanceCycleDuration(campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS));
+        if (cycleDays <= 0) {
+            return Money.zero();
+        }
+
+        double cyclesPerDay = (isOnCombatContract ? 1.0 : 0.25) / cycleDays;
+        double multiplier = getSituationalMaintenanceCostMultiplier(campaignOptions,
+              unit,
+              isOnCombatContract,
+              isUnitInTransit);
+        return unit.getMaintenanceCost().multipliedBy(cyclesPerDay * multiplier);
+    }
+
+    /**
+     * How many parts a failed maintenance check damaged and destroyed, for the maintenance report.
+     *
+     * @param damagedParts   the parts that took damage
+     * @param destroyedParts the parts that were destroyed
+     */
+    record MaintenanceDamage(int damagedParts, int destroyedParts) {}
+
+    /**
+     * Applies the damage from failed maintenance checks: more than 3 points destroys the part, less damages it. A
+     * location or hull that is already destroyed has nothing left to damage, so it is left alone and not counted;
+     * otherwise the report would say a part was damaged when nothing changed.
+     *
+     * @param partsToDamage each part with the damage its failed check did
+     *
+     * @return how many parts were damaged and destroyed
+     */
+    static MaintenanceDamage applyMaintenanceDamage(Map<Part, Integer> partsToDamage) {
+        int damagedParts = 0;
+        int destroyedParts = 0;
+        for (Map.Entry<Part, Integer> partAndDamage : partsToDamage.entrySet()) {
+            Part part = partAndDamage.getKey();
+            int damage = partAndDamage.getValue();
+            if (!part.canTakeMaintenanceDamage()) {
+                LOGGER.debug("[MaintenanceDamage] {}: already destroyed, so the failed check changes nothing",
+                      part.getName());
+            } else if (damage > 3) {
+                destroyedParts++;
+                part.remove(false);
+            } else {
+                part.doMaintenanceDamage(damage);
+                damagedParts++;
+            }
+        }
+        return new MaintenanceDamage(damagedParts, destroyedParts);
+    }
+
+    /**
+     * The maintenance report's line on what a failed check damaged and destroyed, with a link to the Repair bay, such
+     * as "1 part was damaged."
+     *
+     * @return the line, or an empty string when nothing was damaged or destroyed
+     */
+    static String getDamageString(Unit unit, int damagedParts, int destroyedParts) {
+        List<String> damageSentences = new ArrayList<>();
+        if (damagedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.damaged", damagedParts));
+        }
+        if (destroyedParts > 0) {
+            damageSentences.add(getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.destroyed", destroyedParts));
+        }
+        if (damageSentences.isEmpty()) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.damage.report", getNegativeColor(),
+              String.join(" ", damageSentences), unit.getId().toString());
     }
 
     /**
@@ -494,53 +733,7 @@ public class Maintenance {
             target.addModifier(campaign.getPlayerForce().getFaction().getEraMod(campaign.getGameYear()), "era");
         }
 
-        if (partUnit != null && partUnit.getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
-                      campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-                AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-                Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
-                int temperature = planet.getTemperature(campaign.getLocalDate());
-
-                Skill zeroGSkill = tech == null ? null : tech.getSkill(S_ZERO_G_OPERATIONS);
-                int zeroGSkillLevel = 0;
-                if (zeroGSkill != null) {
-                    zeroGSkillLevel = zeroGSkill.getTotalSkillLevel(skillModifierData);
-                }
-
-                // getGravity() is nullable (a planet may record no gravity); default to standard Terran gravity so
-                // an unrecorded value contributes no modifier rather than throwing on the unboxing below.
-                Double recordedGravity = planet.getGravity();
-                double gravity = (recordedGravity != null) ? recordedGravity : 1.0;
-                if (gravity < 0.8) {
-                    int modifier = 2;
-                    target.addModifier(modifier, "Low Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity >= 2.0) {
-                    int modifier = 4;
-                    target.addModifier(modifier, "Very High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                } else if (gravity > 1.2) {
-                    int modifier = 1;
-                    target.addModifier(modifier, "High Gravity");
-                    addZeroGOperationsModifier(zeroGSkillLevel, modifier, target);
-                }
-
-                if (atmosphere.isTainted() || atmosphere.isToxic()) {
-                    target.addModifier(2, "Tainted or Toxic Atmosphere");
-                } else if (planetaryConditions.isVacuum()) {
-                    target.addModifier(2, "Vacuum");
-                }
-
-                if (planetaryConditions.isTrace() || planetaryConditions.isVeryHigh()) {
-                    target.addModifier(1, "Trace or Very High Pressure Atmosphere");
-                }
-
-                if (temperature < -30 || temperature > 50) {
-                    target.addModifier(1, "Extreme Temperature");
-                }
-            }
-        }
+        PlanetaryWorkConditions.addRollModifiers(campaign, partUnit, tech, target);
 
         if (tech != null && partUnit != null) {
             // the AsTech issue is crazy, because you can actually be better off
@@ -568,30 +761,6 @@ public class Maintenance {
         }
 
         return target;
-    }
-
-    /**
-     * Applies a Zero-G Operations skill gravityModifier to the specified {@link TargetRoll}, offsetting a penalty
-     * gravityModifier.
-     *
-     * <ul>
-     *   <li>If {@code zeroGSkillLevel} >= {@code gravityModifier}, does nothing.</li>
-     *   <li>If {@code zeroGSkillLevel} < {@code gravityModifier}, applies {@code -zeroGSkillLevel}.</li>
-     * </ul>
-     *
-     * @param zeroGSkillLevel the Zero-G Operations skill level, which negates up to that much penalty from the
-     *                        gravityModifier
-     * @param gravityModifier the penalty modifier value to offset
-     * @param target          the {@link TargetRoll} instance to modify
-     */
-    private static void addZeroGOperationsModifier(int zeroGSkillLevel, int gravityModifier, TargetRoll target) {
-        if (zeroGSkillLevel > 0) {
-            int effectiveModifier = zeroGSkillLevel >= gravityModifier ? 0 : -zeroGSkillLevel;
-
-            if (effectiveModifier < 0) {
-                target.addModifier(effectiveModifier, "Zero-G Operations");
-            }
-        }
     }
 
     /**
@@ -631,7 +800,7 @@ public class Maintenance {
         final int maintenanceCycleDuration = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
         final boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
-        final boolean hasActiveMission = !campaign.getActiveContracts().isEmpty();
+        final double dailyProgress = getDailyMaintenanceProgress(campaign);
         final LocalDate today = campaign.getLocalDate();
 
         List<Person> allTechs = campaign.getPlayerForce()
@@ -653,7 +822,13 @@ public class Maintenance {
                 continue;
             }
 
-            List<Unit> techUnits = tech.getTechUnits();
+            // Units whose maintenance is paused in their current situation are not due, so they are not scheduled
+            List<Unit> techUnits = new ArrayList<>();
+            for (Unit techUnit : tech.getTechUnits()) {
+                if (isMaintenanceEnabledForSituation(campaign, techUnit)) {
+                    techUnits.add(techUnit);
+                }
+            }
             if (techUnits.isEmpty()) {
                 continue;
             }
@@ -662,7 +837,7 @@ public class Maintenance {
             LinkedHashMap<LocalDate, List<Unit>> correctedSchedule = new LinkedHashMap<>();
             LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = buildSchedule(techUnits,
                   maintenanceCycleDuration,
-                  hasActiveMission,
+                  dailyProgress,
                   today,
                   correctedSchedule);
 
@@ -709,8 +884,8 @@ public class Maintenance {
      *   <li>Calculates the number of days until each unit's next maintenance is due using
      *   {@link Unit#getDaysUntilNextMaintenance(int)}.</li>
      *   <li>Any negative or zero values are treated as due today to ensure overdue units are handled promptly.</li>
-     *   <li>If the campaign has no active mission, multiplies the computed days by four to account for slower
-     *   maintenance progress when idle. This only affects scheduling, not technician work time.</li>
+     *   <li>Divides the days by the cycle's daily progress, as the clock advances by that much each day. The clock
+     *   advances before the check, so the check falls on the day of the last advance needed, not the day after.</li>
      *   <li>Populates {@code maintenanceSchedule} with each unit keyed by its scheduled maintenance date.</li>
      *   <li>Determines the final day represented in the schedule and populates {@code correctedSchedule} with all
      *   dates from today through that day, initializing each with an empty list to ensure coverage for all days in
@@ -721,8 +896,8 @@ public class Maintenance {
      *
      * @param techUnits                the list of units assigned to the technician
      * @param maintenanceCycleDuration the duration of a full maintenance cycle in days
-     * @param hasActiveMission         {@code true} if the campaign currently has an active mission, affecting
-     *                                 scheduling
+     * @param dailyProgress            how far the maintenance cycle advances each day, from
+     *                                 {@link #getDailyMaintenanceProgress(Campaign)}
      * @param today                    the current in-game date
      * @param correctedSchedule        the map to populate with empty lists for all days between today and the last
      *                                 scheduled maintenance date
@@ -730,9 +905,10 @@ public class Maintenance {
      * @return a {@link LinkedHashMap} of maintenance jobs sorted by maintenance date (soonest -> latest)
      */
     private static LinkedHashMap<LocalDate, List<Unit>> buildSchedule(List<Unit> techUnits,
-          int maintenanceCycleDuration, boolean hasActiveMission, LocalDate today,
+          int maintenanceCycleDuration, double dailyProgress, LocalDate today,
           LinkedHashMap<LocalDate, List<Unit>> correctedSchedule) {
         LinkedHashMap<LocalDate, List<Unit>> maintenanceSchedule = new LinkedHashMap<>();
+        List<String> scheduledDays = new ArrayList<>();
 
         for (Unit maintainedUnit : techUnits) {
             if (!maintainedUnit.requiresMaintenance()) {
@@ -743,15 +919,15 @@ public class Maintenance {
             double daysUntilNextMaintenance =
                   max(0.0, maintainedUnit.getDaysUntilNextMaintenance(maintenanceCycleDuration));
 
-            // Adjust when not under contract: maintenance progress is x0.25 normal
-            if (!hasActiveMission) {
-                daysUntilNextMaintenance *= 4;
-            }
-
-            LocalDate scheduleMaintenance = today.plusDays((int) Math.ceil(daysUntilNextMaintenance));
+            // The clock advances before the check each day, so a unit one advance short is due today, not tomorrow
+            int advancesNeeded = (int) Math.ceil(daysUntilNextMaintenance / dailyProgress);
+            LocalDate scheduleMaintenance = today.plusDays(max(0, advancesNeeded - 1));
+            scheduledDays.add(maintainedUnit.getName() + " due " + scheduleMaintenance);
             maintenanceSchedule.computeIfAbsent(scheduleMaintenance, k -> new ArrayList<>())
                   .add(maintainedUnit);
         }
+
+        LOGGER.debug("[Maintenance] Schedule at {} cycle days a day: {}", dailyProgress, scheduledDays);
 
         LocalDate lastDay = maintenanceSchedule.keySet().stream()
                                   .max(Comparator.naturalOrder())
@@ -864,6 +1040,11 @@ public class Maintenance {
      */
     private static String performEngineerCheck(Person tech, int dailyWorkMinutes) {
         Unit techUnit = tech.getUnit();
+        if (techUnit == null) {
+            LOGGER.warn("[Maintenance] {} is flagged as an engineer but serves on no unit; skipping the engineer check",
+                  tech.getFullName());
+            return "";
+        }
         int maintenanceTime = techUnit.getMaintenanceTime();
         if (techUnit.requiresMaintenance() && maintenanceTime > dailyWorkMinutes) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.largeVessel",
@@ -891,6 +1072,12 @@ public class Maintenance {
         }
         if (!unit.requiresMaintenance()) {
             LOGGER.debug("[Maintenance] {}: no immediate maintenance, the unit does not need it", unit.getName());
+            return;
+        }
+        // doMaintenance does nothing while maintenance is paused, so the loop below would never end
+        if (!isMaintenanceEnabledForSituation(campaign, unit)) {
+            campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.pausedForSituation",
+                  unit.getHyperlinkedName()));
             return;
         }
         Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate

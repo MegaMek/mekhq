@@ -37,9 +37,9 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.preference.PreferenceManager;
-import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.Factions;
@@ -51,44 +51,59 @@ final class FactionMapLogo {
     private FactionMapLogo() {
     }
 
-    static boolean hasCustomLogo(int gameYear, String factionCode) {
-        return Factions.getCanonicalFactionLogoAddress(gameYear, factionCode) == null
-                     && getConfiguredLogo(gameYear, factionCode) != null;
+    /**
+     * @return {@code true} if the faction (or, for a command, one of its parents) has an icon for the given year, or,
+     *       for older faction files, a legacy logo
+     */
+    static boolean hasIcon(int gameYear, String factionCode) {
+        return (RATGenerator.getCanonicalFactionLogoAddress(gameYear, factionCode) != null)
+                     || (Factions.getLegacyFactionLogo(gameYear, factionCode) != null);
     }
 
+    /**
+     * Loads the faction's icon for the given year or, for older faction files without an icon, its legacy logo. When
+     * neither exists or the image cannot be read, the generic Clan or mercenary logo is loaded instead.
+     *
+     * @return the emblem image, or {@code null} if not even the generic logo can be read
+     */
     static @Nullable BufferedImage load(int gameYear, String factionCode) {
-        String canonicalAddress = Factions.getCanonicalFactionLogoAddress(gameYear, factionCode);
-        if (canonicalAddress != null) {
-            return readImage(new File(canonicalAddress));
-        }
-
-        String configuredLogo = getConfiguredLogo(gameYear, factionCode);
-        if (configuredLogo != null) {
-            File logoDirectory = new File(MHQConstants.FORCE_ICON_PATH, MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH);
-            File logoFile = new File(logoDirectory, configuredLogo);
-            String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
-            if (!userDirectory.isBlank()) {
-                File userLogo = new File(userDirectory, logoFile.toString());
-                if (userLogo.isFile()) {
-                    logoFile = userLogo;
-                }
-            }
-            BufferedImage image = readImage(logoFile);
+        File dedicatedLogo = (RATGenerator.getCanonicalFactionLogoAddress(gameYear, factionCode) != null)
+              ? RATGenerator.getFactionLogoFile(gameYear, factionCode)
+              : getLegacyLogoFile(gameYear, factionCode);
+        if (dedicatedLogo != null) {
+            BufferedImage image = readImage(dedicatedLogo);
             if (image != null) {
                 return image;
             }
         }
-        return readImage(new File(Factions.getFactionLogoAddress(gameYear, factionCode)));
+        return readImage(RATGenerator.getGenericFactionLogoFile(factionCode));
     }
 
-    private static @Nullable String getConfiguredLogo(int gameYear, String factionCode) {
-        return Factions2.getInstance().getFaction(factionCode)
-                     .map(faction -> faction.getLogo(gameYear))
-                     .filter(logo -> !logo.isBlank())
-                     .orElse(null);
+    /**
+     * @return the legacy logo file from the formation icon logos, preferring the user directory over the installed
+     *       one, or {@code null} if the faction has no legacy logo for the year
+     */
+    private static @Nullable File getLegacyLogoFile(int gameYear, String factionCode) {
+        String legacyLogo = Factions.getLegacyFactionLogo(gameYear, factionCode);
+        if (legacyLogo == null) {
+            return null;
+        }
+        File logoDirectory = new File(MHQConstants.FORCE_ICON_PATH, MHQConstants.LAYERED_FORCE_ICON_LOGO_PATH);
+        File logoFile = new File(logoDirectory, legacyLogo);
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if (!userDirectory.isBlank()) {
+            File userLogo = new File(userDirectory, logoFile.toString());
+            if (userLogo.isFile()) {
+                return userLogo;
+            }
+        }
+        return logoFile;
     }
 
-    private static @Nullable BufferedImage readImage(File file) {
+    private static @Nullable BufferedImage readImage(@Nullable File file) {
+        if (file == null) {
+            return null;
+        }
         try {
             BufferedImage image = ImageIO.read(file);
             if (image == null) {

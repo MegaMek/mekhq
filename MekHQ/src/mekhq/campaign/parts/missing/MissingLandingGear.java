@@ -36,9 +36,9 @@ package mekhq.campaign.parts.missing;
 import java.util.StringJoiner;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
@@ -47,10 +47,10 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.Part;
 import org.w3c.dom.Node;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)

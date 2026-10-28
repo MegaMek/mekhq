@@ -55,11 +55,11 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
@@ -366,7 +366,19 @@ public class ForceHumanResources {
     }
 
     public List<Person> getPatients() {
-        return getPatients(getActivePersonnel(true, true));
+        return getPatients(getInfirmaryEligiblePersonnel());
+    }
+
+    /**
+     * Retrieves all personnel who can be treated in the infirmary, as determined by
+     * {@link PersonnelStatus#isInfirmaryEligible()}. This includes prisoners and camp followers.
+     *
+     * @return a {@link List} of {@link Person} objects who can be treated in the infirmary
+     */
+    public List<Person> getInfirmaryEligiblePersonnel() {
+        return new ArrayList<>(getPersonnel()).stream()
+                     .filter(person -> person.getStatus().isInfirmaryEligible())
+                     .collect(Collectors.toList());
     }
 
     public List<Person> getPatientsAssignedToDoctors() {
@@ -386,7 +398,7 @@ public class ForceHumanResources {
     public int getPatientsFor(Person doctor) {
         int patients = 0;
         UUID doctorId = doctor.getId();
-        for (Person person : getActivePersonnel(true, true)) {
+        for (Person person : getInfirmaryEligiblePersonnel()) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctorId)) {
                 patients++;
             }
@@ -2544,7 +2556,7 @@ public class ForceHumanResources {
         LocalDate currentDay = campaign.getLocalDate();
         Finances finances = campaign.getPlayerForce().getFinances();
 
-        if (employ && !person.isEmployed()) {
+        if (employ && !person.isEmployed() && prisonerStatus.isFree()) {
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd
                       && !isRecruitmentPrepaid) {
                 if (!finances.debit(TransactionType.RECRUITMENT,

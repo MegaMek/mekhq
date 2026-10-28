@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -54,15 +55,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
-import megamek.common.units.Aero;
 import megamek.common.units.Entity;
+import megamek.common.units.IAero;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
@@ -81,6 +82,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -88,6 +90,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.unit.AerospaceRefueling;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -244,7 +248,7 @@ public class CamOpsSalvageUtilities {
      *   <li>Adding claimed salvage units to the campaign</li>
      *   <li>Processing sold salvage units and crediting the account</li>
      *   <li>Charging the player for any salvage they must buy, and paying them any cash share of the employer's
-     *   salvage, as the settlement dictates (see {@link SalvageSettlement})</li>
+     *   salvage, as the settlement dictates (see {@link SalvageSettlement}), unless the salvage was stolen</li>
      *   <li>Updating contract salvage tracking</li>
      *   <li>Setting repair locations for salvaged units</li>
      * </ul>
@@ -256,13 +260,15 @@ public class CamOpsSalvageUtilities {
      * @param keptSalvage     The list of units claimed (or, under salvage purchases, bought) by the player.
      * @param soldSalvage     The list of units that were sold instead of claimed.
      * @param employerSalvage The list of units going to the employer or unclaimed.
+     * @param isStolen        {@code true} if the player stole the salvage they kept: they pay nothing for it, and
+     *                        receive no cash share of the employer's salvage.
      *
      * @author Illiani
      * @since 0.50.10
      */
     public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
           SalvageSettlement settlement, List<TestUnit> keptSalvage, List<TestUnit> soldSalvage,
-          List<TestUnit> employerSalvage) {
+          List<TestUnit> employerSalvage, boolean isStolen) {
         int deliveryTime = getSalvageDeliveryTime(campaign, scenario, mission);
         Money keptSalvageValue = Money.zero();
         boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
@@ -273,13 +279,11 @@ public class CamOpsSalvageUtilities {
             // Adding the unit to the campaign resets its camouflage to our own, so grab it first
             Camouflage fieldedCamouflage = salvageUnit.getEntity().getCamouflage().clone();
 
-            if (salvageUnit.getEntity() instanceof Aero aero) {
-                // Refuel from a fresh copy of the unit. This is only needed for aerospace units, and building the
-                // status parses the unit's file, so it isn't done for anything else.
+            if (salvageUnit.getEntity() instanceof IAero) {
+                // Refuel from a fresh copy of the unit. This is only needed for aerospace units and LAMs, and building
+                // the status parses the unit's file, so it isn't done for anything else.
                 ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
-                if (salvageStatus.getBaseEntity() instanceof Aero baseAero) {
-                    aero.setFuelTonnage(baseAero.getFuelTonnage());
-                }
+                AerospaceRefueling.refuel(salvageUnit.getEntity(), salvageStatus.getBaseEntity());
             }
 
             campaign.clearGameData(salvageUnit.getEntity());
@@ -293,20 +297,23 @@ public class CamOpsSalvageUtilities {
                 salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
             }
 
-            keptSalvageValue = keptSalvageValue.plus(salvageUnit.getSellValue());
+            keptSalvageValue = keptSalvageValue.plus(settlement.getSalvageValue(salvageUnit));
         }
 
         // Bought salvage is split: the price paid is the employer's share of it, and only the rest counts as the
         // player's. Recording the full value as the player's would put them over their salvage rights, and the
-        // overage would be charged again at the end of the contract.
-        Money purchaseCost = settlement.chargePurchases(campaign, scenario, keptSalvageValue);
+        // overage would be charged again at the end of the contract. Stolen salvage is recorded the same way, as though
+        // the player's share had been taken and the rest bought, but nothing is charged.
+        Money purchaseCost = isStolen ?
+                                   keptSalvageValue.minus(keptSalvageValue.multipliedBy(settlement.getPlayerShare())) :
+                                   settlement.chargePurchases(campaign, scenario, keptSalvageValue);
         mission.changeSalvagedByUnitValue(keptSalvageValue.minus(purchaseCost));
 
         // And any ransomed salvaged units
         if (!soldSalvage.isEmpty()) {
             Money unitRansoms = Money.zero();
             for (TestUnit ransomedUnit : soldSalvage) {
-                unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
+                unitRansoms = unitRansoms.plus(settlement.getSalvageValue(ransomedUnit));
             }
 
             if (unitRansoms.isPositive()) {
@@ -326,15 +333,38 @@ public class CamOpsSalvageUtilities {
 
         Money employerTakeHome = Money.zero();
         for (TestUnit salvageUnit : employerSalvage) {
-            employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
+            employerTakeHome = employerTakeHome.plus(settlement.getSalvageValue(salvageUnit));
         }
 
-        // Depending on the settlement, the player may be paid a share of the employer's salvage
-        Money playerTakeHome = settlement.payCashShare(campaign, scenario, employerTakeHome);
+        // Depending on the settlement, the player may be paid a share of the employer's salvage. An employer pays
+        // nothing to a unit that has just stolen from them.
+        Money playerTakeHome = isStolen ? Money.zero() : settlement.payCashShare(campaign, scenario, employerTakeHome);
         employerTakeHome = employerTakeHome.minus(playerTakeHome).plus(purchaseCost);
         mission.changeSalvagedByUnitValue(playerTakeHome);
 
         mission.changeSalvagedByEmployerValue(employerTakeHome);
+    }
+
+    /**
+     * Ends a contract the player has breached by stealing salvage.
+     *
+     * <p>As with a routed OpFor, the contract ends the next day. It is to be recorded as a breach, and pays nothing
+     * more.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the contract the salvage was stolen under
+     * @param scenario the scenario the salvage was stolen from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void breachContractForSalvageTheft(Campaign campaign, AbstractContract contract, Scenario scenario) {
+        contract.endContractEarly(campaign.getLocalDate().plusDays(1), Money.zero());
+        contract.setMandatedCompletionStatus(MissionStatus.BREACH);
+
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.theft.report",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, scenario.getHyperlinkedName(),
+              contract.getHyperlinkedName()));
     }
 
     /**
@@ -428,7 +458,7 @@ public class CamOpsSalvageUtilities {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         final int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
-        final boolean useInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
+        final boolean useInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
 
         int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits);
 
@@ -520,6 +550,11 @@ public class CamOpsSalvageUtilities {
         } else {
             int priorHits = victim.getHits();
             victim.setHits(priorHits + newHits);
+        }
+
+        // Process after the injuries are applied, so the injured victim isn't sent on leave
+        if (useInjuryFatigue) {
+            Fatigue.processFatigueActions(campaign, victim);
         }
 
         return newHits;

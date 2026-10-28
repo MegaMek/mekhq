@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.annotation.Nonnull;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
@@ -437,6 +437,18 @@ public class LocalWarehouse implements ILocation {
     public static List<Part> getSpareParts(Collection<Part> parts) {
         return parts.stream()
                      .filter(Part::isSpare)
+                     .collect(Collectors.toList());
+    }
+
+    /**
+     * The parts this warehouse holds: its spares, and parts set aside for a refit or a repair, such as a refit kit on
+     * its way. Parts fitted to a unit or to another part are left out.
+     *
+     * @return a fresh list of the held parts
+     */
+    public List<Part> getHeldParts() {
+        return new ArrayList<>(getParts()).stream()
+                     .filter(part -> (part.getUnit() == null) && !part.hasParentPart())
                      .collect(Collectors.toList());
     }
 

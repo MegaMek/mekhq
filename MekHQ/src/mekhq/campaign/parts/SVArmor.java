@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.parts;
 
-import static megamek.common.equipment.EquipmentType.T_ARMOR_SV_BAR_2;
-
 import java.io.PrintWriter;
 import java.util.Objects;
 
@@ -42,6 +40,7 @@ import megamek.common.TechAdvancement;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -80,6 +79,38 @@ public class SVArmor extends Armor {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
         this.bar = bar;
         this.techRating = techRating;
+    }
+
+    /**
+     * Tells whether a location of a unit carries support vehicle armor, which is weighed and priced by its BAR and
+     * armor tech rating rather than by points per ton. Unit files give BAR armor its own armor type for each BAR.
+     * Standard armor is BAR 10 military armor, which a support vehicle mounts on an armored chassis; it is weighed by
+     * points per ton as on any other vehicle, so it is not support vehicle armor.
+     *
+     * @param entity   the unit
+     * @param location the location on the unit
+     *
+     * @return {@code true} when the location carries support vehicle BAR armor
+     */
+    public static boolean usesBarArmor(Entity entity, int location) {
+        if (!entity.isSupportVehicle()) {
+            return false;
+        }
+        ArmorType armor = ArmorType.of(entity.getArmorType(location), false);
+        return armor.hasFlag(MiscType.F_SUPPORT_VEE_BAR_ARMOR);
+    }
+
+    /**
+     * Tells whether this part is the armor a support vehicle location carries: the same BAR and the same armor tech
+     * rating.
+     *
+     * @param entity   the unit
+     * @param location the location on the unit
+     *
+     * @return {@code true} when this part matches the location's armor
+     */
+    public boolean matchesArmorOf(Entity entity, int location) {
+        return (bar == entity.getBARRating(location)) && (techRating == entity.getArmorTechRating());
     }
 
     @Override
@@ -127,14 +158,13 @@ public class SVArmor extends Armor {
 
     @Override
     public Money getStickerPrice() {
-        // The value of '< T_ARMOR_SV_BAR_2' means that the armor does not exist at that tech level
-        // (or it is not SV BAR armor).
-        if (bar < T_ARMOR_SV_BAR_2) {
+        // A weight of zero means that the armor does not exist at that tech rating
+        double weightPerPoint = ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        if (weightPerPoint <= 0) {
             return Money.zero();
         }
 
         // always in 5-ton increments
-        double weightPerPoint = ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
         double calculatedAmount = 5.0 / weightPerPoint * ArmorType.svArmor(bar).getCost();
         return Money.of(calculatedAmount);
     }
@@ -153,12 +183,14 @@ public class SVArmor extends Armor {
 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new SVArmor(bar, techRating, (int) Math.round(5.0 / getArmorPointsPerTon()), -1, campaign);
+        return new SVArmor(bar, techRating, (int) Math.round(5 * getArmorPointsPerTon()), -1, campaign);
     }
 
     @Override
     public double getArmorPointsPerTon() {
-        return 1.0 / ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        // A weight of zero means that the armor does not exist at that tech rating
+        double weightPerPoint = ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        return (weightPerPoint > 0) ? 1.0 / weightPerPoint : 0.0;
     }
 
     @Override

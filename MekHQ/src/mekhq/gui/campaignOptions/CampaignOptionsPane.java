@@ -88,6 +88,7 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.quartermaster.DefaultKitChanges;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -861,7 +862,7 @@ public class CampaignOptionsPane extends JPanel {
         // Human Resources
         if (personnelPages != null) {
             personnelPages.applyCampaignOptionsToCampaign(campaign, options);
-            biographyPages.applyCampaignOptionsToCampaign(options);
+            biographyPages.applyCampaignOptionsToCampaign(options, isSaveAction);
             relationshipsPages.applyCampaignOptionsToCampaign(options);
             salariesPages.applyCampaignOptionsToCampaign(options);
             turnoverAndRetentionPages.applyCampaignOptionsToCampaign(options);
@@ -1050,6 +1051,7 @@ public class CampaignOptionsPane extends JPanel {
 
         boolean newIsUseAltAdvancedMedical = newOptions.useAltAdvancedMedical();
         if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
+            recordDerivedImplantProsthetics(campaign);
             new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
@@ -1103,6 +1105,14 @@ public class CampaignOptionsPane extends JPanel {
         boolean newTechsNeedToolKit = newOptions.techsNeedToolKit();
         if (!isStartUp && newTechsNeedToolKit && !oldOptions.techsNeedToolKit()) { // Has tracking changed?
             new TechsNeedToolKitCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+    }
+
+    private static void recordDerivedImplantProsthetics(Campaign campaign) {
+        // Advanced Alternate Medical works some implants out each day from the prosthetics present. Anyone already
+        // holding one of those implants needs the prosthetics recorded, or the first daily check takes it away.
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
         }
     }
 

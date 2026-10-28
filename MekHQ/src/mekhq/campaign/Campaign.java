@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static megamek.client.ratgenerator.RATGenerator.getFactionLogo;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.campaignOptions.CampaignOptions.TRANSIT_UNIT_MONTH;
@@ -65,10 +66,10 @@ import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -86,6 +87,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomUnitGenerator;
@@ -94,14 +96,11 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
-import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
@@ -116,14 +115,11 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.units.Aero;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
@@ -207,6 +203,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -248,12 +245,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
 import mekhq.campaign.utilities.LithiumFusionBatteries;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IFabricatable;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.RepairAsTechTime;
-import mekhq.campaign.work.RepairLocationCheck;
-import mekhq.campaign.work.RepairTaskHold;
+import mekhq.campaign.work.*;
+import mekhq.campaign.work.RepairTechEligibility.Refusal;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -756,7 +749,8 @@ public class Campaign implements ITechManager {
 
         if ((totalPayout.isPositive()) ||
                   (null != getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees())) {
-            if (getPlayerForce().getFinances()
+            // A zero payout needs no debit; attempting one would fail whenever the campaign is in debt.
+            if (!totalPayout.isPositive() || getPlayerForce().getFinances()
                       .debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees()) {
                     Person person = getPlayerForce().getHumanResources().getPerson(pid);
@@ -889,7 +883,7 @@ public class Campaign implements ITechManager {
                 getPlayerForce().getHumanResources().getRetirementDefectionTracker().resolveAllContracts();
                 return true;
             }
-        } else {
+
             addReport(FINANCES, "<font color='" +
                                       ReportingUtilities.getNegativeColor() +
                                       "'>You cannot afford to make the final payments.</font>");
@@ -1433,6 +1427,17 @@ public class Campaign implements ITechManager {
             unit.getEntity().setId(game.getNextEntityId());
         }
         game.addEntity(unit.getEntity());
+
+        // The constructor set up transport space against the entity's old game (or none); redo it against ours
+        unit.initializeAllTransportSpace();
+
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
+            }
+        }
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -2374,9 +2379,7 @@ public class Campaign implements ITechManager {
           PlanetarySystem system) {
         SkillCheck skillCheck = checkAcquisition(acquisition, person);
         boolean inherentFailure = skillCheck.getTargetNumber().isImpossible();
-        List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
-              getLocalDate(), getCampaignOptions(), getPlayerForce().getFaction(), acquisition.getTechBase() == TechBase.CLAN);
-        skillCheck.withExternalModifiers(acquisitionMods);
+        skillCheck.withExternalModifiers(PlanetaryAcquisitionModifiers.forSystem(this, acquisition, system));
 
         // if it's already impossible, don't bother with the rest
         if (skillCheck.getTargetNumber().isImpossible()) {
@@ -2456,10 +2459,7 @@ public class Campaign implements ITechManager {
             extraModifiers.add(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase"));
         }
 
-        if (system != null) {
-            extraModifiers.addAll(system.getPrimaryPlanet().getAcquisitionMods(
-                  getLocalDate(), getCampaignOptions(), getPlayerForce().getFaction(), acquisition.getTechBase() == TechBase.CLAN));
-        }
+        extraModifiers.addAll(PlanetaryAcquisitionModifiers.forSystem(this, acquisition, system));
         report += "attempts to find " + acquisition.getAcquisitionName();
 
         SkillCheck skillCheck = checkAcquisition(acquisition, person).withExternalModifiers(extraModifiers);
@@ -2782,14 +2782,7 @@ public class Campaign implements ITechManager {
         if (minutes > tech.getMinutesLeft()) {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
-            report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() /
-                                                 (double) tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)));
-            if (daysLeft == 1) {
-                report += " tomorrow.</b>";
-            } else {
-                report += " in " + daysLeft + " days.</b>";
-            }
+            report = report + ", " + WorkTimeEstimate.describeWorkCarriedOver(this, theRefit, tech) + "</b>";
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
             theRefit.addTimeSpent(minutes);
@@ -2815,8 +2808,9 @@ public class Campaign implements ITechManager {
                                                      (tech.getCurrentEdge() > 0);
                     SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
                                                   .withoutSubject()
-                                                  .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
-                                                                                              target.getValue());
+                                                  .withRollOfTwoAlwaysFailing()
+                                                  .withEdgeRerollCondition(firstRoll -> !TechnicianCheck.isSuccess(
+                                                        firstRoll.result(), target));
                     if (!rightTechType) {
                         // Working out of type always rolls at a disadvantage, overriding any natural aptitude.
                         refitCheck.withRollType(RollType.DISADVANTAGE);
@@ -2827,10 +2821,11 @@ public class Campaign implements ITechManager {
                           target.getValueAsString(), refitResult.getReport()) + " ";
                 }
 
-                if (roll >= target.getValue()) {
+                if (TechnicianCheck.isSuccess(roll, target)) {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -2998,20 +2993,11 @@ public class Campaign implements ITechManager {
                 partWork.setTech(tech);
                 partWork.reservePart();
                 report += " - <b>";
-                report += partWork.getTimeLeft();
-                report += " minutes left. Work";
                 if ((minutesUsed > 0) &&
                           (tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)) > 0)) {
-                    report += " will be finished ";
-                    int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() /
-                                                         (double) tech.getDailyAvailableTechTime(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)));
-                    if (daysLeft == 1) {
-                        report += " tomorrow.</b>";
-                    } else {
-                        report += " in " + daysLeft + " days.</b>";
-                    }
+                    report += WorkTimeEstimate.describeWorkCarriedOver(this, partWork, tech) + "</b>";
                 } else {
-                    report += " cannot be finished because there was no time left after maintenance tasks.</b>";
+                    report += getTextAt(RESOURCE_BUNDLE, "fixPart.noTimeAfterMaintenance") + "</b>";
                     partWork.cancelAssignment(true);
                 }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
@@ -3044,6 +3030,7 @@ public class Campaign implements ITechManager {
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
             SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
                                            .withoutSubject()
+                                           .withRollOfTwoAlwaysFailing()
                                            .withEdgeRerollCondition(firstRoll -> {
                                                int rolled = firstRoll.result();
                                                if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
@@ -3061,7 +3048,8 @@ public class Campaign implements ITechManager {
                                                      true) == SkillType.EXP_LEGENDARY) ||
                                                                                      tech.getPrimaryRole()
                                                                                            .isVesselCrew();
-                                               return legendaryOrVesselCrew && (rolled < target.getValue());
+                                               return legendaryOrVesselCrew && !TechnicianCheck.isSuccess(rolled,
+                                                     target);
                                            });
             if (!rightTechType) {
                 // Working out of type always rolls at a disadvantage, overriding any natural aptitude the tech has.
@@ -3073,7 +3061,7 @@ public class Campaign implements ITechManager {
                   target.getValueAsString(), repairResult.getReport());
         }
 
-        final boolean taskSucceeded = roll >= target.getValue();
+        final boolean taskSucceeded = TechnicianCheck.isSuccess(roll, target);
         if (taskSucceeded) {
             // capture the repair target before succeeding: replacing a MissingPart removes the placeholder from the
             // unit, which clears its unit reference and its part name along with it
@@ -4350,7 +4338,7 @@ public class Campaign implements ITechManager {
                 if (!RouteAlternativesPlanner.isValidRequest(origin, requestedStops)) {
             return List.of();
         }
-        List<AbstractContract> activeContracts = getActiveContracts();
+        List<AbstractContract> activeContracts = getActiveContracts(true);
         FactionHints factionHints = FactionHints.getInstance();
           NavigationRouteAnalysis.Policy policy = createNavigationPolicy(false, false, activeContracts,
               factionHints);
@@ -4431,7 +4419,7 @@ public class Campaign implements ITechManager {
             return jumpPath;
         }
 
-        List<AbstractContract> activeAtBContracts = getActiveContracts();
+        List<AbstractContract> activeAtBContracts = getActiveContracts(true);
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -4452,7 +4440,8 @@ public class Campaign implements ITechManager {
 
     private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
           boolean skipEmptySystemCheck) {
-        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(),
+        // Accepted contracts that haven't started yet still grant access, otherwise the player can't travel to them
+        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(true),
               FactionHints.getInstance());
     }
 
@@ -4511,24 +4500,26 @@ public class Campaign implements ITechManager {
      * @return the simplified travel time in days
      */
     public int getSimplifiedTravelTime(PlanetarySystem destination) {
-        if (Objects.equals(getCurrentSystem(), destination)) {
+        return getSimplifiedTravelTime(getCurrentSystem(), destination);
+    }
+
+    /**
+     * Calculates simplified travel time between two systems. Travel time is calculated by dividing distance (in LY) by
+     * 20 and multiplying the result by 7.
+     *
+     * @param origin      the planetary system being traveled from
+     * @param destination the planetary system being traveled to
+     *
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem origin, PlanetarySystem destination) {
+        if (Objects.equals(origin, destination)) {
             return 0;
         } else {
             // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
             // It looked to be around 15-20LY, so 20LY seemed a good gauge
-            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+            return (int) ((origin.getDistanceTo(destination) / 20) * 7);
         }
-    }
-
-    /**
-     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
-     * so they take no other work. Maintenance of units they already look after is separate and carries on.
-     *
-     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
-     */
-    private boolean isBusyWithAnotherRefit(IPartWork partWork, Person tech) {
-        Unit refittingUnit = getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech);
-        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
     }
 
     /**
@@ -4541,12 +4532,36 @@ public class Campaign implements ITechManager {
      * <p>The result will reflect all applicable modifiers (such as overtime or era-based penalties) and communicates
      * if a task is impossible, or has automatic success (e.g., for infantry refits).</p>
      *
+     * <p>Before anything else, a repair or salvage task checks the rules about who may work on it, the same ones the
+     * Repair tab's tech list follows: the tech must be where the task is, be the right type of tech, and not be
+     * another unit's crew.</p>
+     *
      * @param partWork the part work task to be performed
      * @param tech     the technician assigned to the task
      *
      * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
      */
     public TargetRoll getTargetFor(final IPartWork partWork, final Person tech) {
+        if (!(partWork instanceof Refit)) {
+            Refusal refusal = RepairTechEligibility.findAssignmentRefusal(this, partWork, tech);
+            if (refusal != null) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE, refusal.getDescription());
+            }
+        }
+        return getSkillTargetFor(partWork, tech);
+    }
+
+    /**
+     * Calculates the {@link TargetRoll} for a task from the tech's skill, without the rules about who may work on it.
+     * Mass Repair uses this with a stand-in elite tech, who belongs to no unit and no place, to judge whether anyone
+     * could do the task at all. Everything else uses {@link #getTargetFor(IPartWork, Person)}.
+     *
+     * @param partWork the part work task to be performed
+     * @param tech     the technician, real or stand-in
+     *
+     * @return a {@link TargetRoll} capturing the total target value and reason for success or impossibility
+     */
+    public TargetRoll getSkillTargetFor(final IPartWork partWork, final Person tech) {
         final Skill skill = tech.getSkillForWorkingOn(partWork);
         int modePenalty = partWork.getMode().expReduction;
         SkillModifierData skillModifierData = tech.getSkillModifierData();
@@ -4561,7 +4576,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
-        } else if (isBusyWithAnotherRefit(partWork, tech)) {
+        } else if (RepairTechEligibility.isBusyWithAnotherRefit(this, partWork, tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, getFormattedTextAt(RESOURCE_BUNDLE, "refit.techBusy",
                   getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
@@ -4597,9 +4612,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, unaffordableReason);
         }
 
-        final int techTime = isOvertimeAllowed() ?
-                                   tech.getMinutesLeft() + tech.getOvertimeLeft() :
-                                   tech.getMinutesLeft();
+        final int techTime = RepairTechEligibility.getTimeLeftToday(this, tech);
         if (!(partWork instanceof Refit) && (techTime <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no time left.");
         }
@@ -4666,6 +4679,10 @@ public class Campaign implements ITechManager {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }
             }
+        }
+
+        if (!(partWork instanceof Refit)) {
+            PlanetaryWorkConditions.addRollModifiers(this, partUnit, tech, target);
         }
 
         final boolean isOvertime;
@@ -4830,6 +4847,9 @@ public class Campaign implements ITechManager {
                                      : "acquisition.modifier.ISTech";
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, reasonKey));
+        } else if (RefitPurchaseCheck.isKitWithPartsThatCannotBeBought(this, acquisition)) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.refitKitParts"));
         } else if (getCampaignOptions().get(CampaignOption.TECH_LEVEL) < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.techLevel"));
@@ -5371,49 +5391,8 @@ public class Campaign implements ITechManager {
      * @param entity the entity to clear the game data for
      */
     public void clearGameData(Entity entity) {
-        // First, lets remove any improvised clubs picked up during the combat
-        entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.GIRDER_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.TREE_CLUB);
-
-        // Then reset mounted equipment
-        for (Mounted<?> m : entity.getEquipment()) {
-            m.setUsedThisRound(false);
-            m.resetJam();
-        }
-
-        // And clear out all the flags
-        entity.setDeployed(false);
-        entity.setElevation(0);
-        entity.setPassedThrough(new Vector<>());
-        entity.resetFiringArcs();
-        entity.resetBays();
-        entity.setEvading(false);
-        entity.setFacing(0);
-        entity.setPosition(null);
-        entity.setProne(false);
-        entity.setHullDown(false);
-        entity.heat = 0;
-        entity.heatBuildup = 0;
-        entity.underwaterRounds = 0;
-        entity.setTransportId(Entity.NONE);
-        entity.resetTransporter();
-        entity.setDeployRound(0);
-        entity.setSwarmAttackerId(Entity.NONE);
-        entity.setSwarmTargetId(Entity.NONE);
-        entity.setUnloaded(false);
-        entity.setDone(false);
-        entity.setLastTarget(Entity.NONE);
-        entity.setNeverDeployed(true);
-        entity.setStuck(false);
-        entity.resetCoolantFailureAmount();
-        entity.setConversionMode(0);
-        entity.setDoomed(false);
-        entity.setDestroyed(false);
-        entity.setHidden(false);
-        entity.clearNarcAndiNarcPods();
-        entity.setShutDown(false);
-        entity.setSearchlightState(false);
+        // The battle state MegaMek tracks on the unit, from position and heat to artillery fire adjustment
+        entity.clearGameState();
 
         resetSensorChoice(entity);
 
@@ -5438,24 +5417,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof Mek m) {
-            m.setCoolingFlawActive(false);
-        } else if (entity instanceof Aero a) {
-
-            if (a.isSpheroid()) {
-                entity.setMovementMode(EntityMovementMode.SPHEROID);
-            } else {
-                entity.setMovementMode(EntityMovementMode.AERODYNE);
-            }
-            a.setAltitude(5);
-            a.setCurrentVelocity(0);
-            a.setNextVelocity(0);
-        } else if (entity instanceof Tank t) {
-            t.unjamTurret(t.getLocTurret());
-            t.unjamTurret(t.getLocTurret2());
-            t.resetJammedWeapons();
-        }
-        entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
@@ -5500,30 +5461,87 @@ public class Campaign implements ITechManager {
         });
     }
 
+    /**
+     * Calculates the gross final payment a contract pays out on completion, before any salvage overage is repaid or
+     * shareholders take their cut.
+     *
+     * @param mission the contract being completed
+     * @param status  the status the contract is being completed with
+     *
+     * @return the gross final payment, or {@link Money#zero()} if the status earns none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Money getGrossFinalContractPayment(AbstractContract mission, MissionStatus status) {
+        // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
+        // payment even though this seems foolish
+        if (!status.isSuccess()) {
+            return Money.zero();
+        }
+
+        Money routedPayout = mission.getRoutPayout();
+        if (routedPayout != null) {
+            return routedPayout;
+        }
+
+        return mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
+    }
+
+    /**
+     * Calculates the final payment credited on completion: the gross final payment less any salvage overage the
+     * {@code OverageRepaymentInFinalPayment} option has repaid out of it. This can be negative.
+     *
+     * @param mission      the contract being completed
+     * @param grossPayment the contract's gross final payment
+     *
+     * @return the net final payment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Money getNetFinalContractPayment(AbstractContract mission, Money grossPayment) {
+        if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
+            return grossPayment.minus(ContractSettlement.salvageOverage(mission, this));
+        }
+
+        return grossPayment;
+    }
+
+    /**
+     * Calculates how much the campaign's balance will change when {@link #completeMission(AbstractContract,
+     * MissionStatus)} runs: the net final payment less the shareholders' cut. Used to judge, before the contract is
+     * closed, whether payments due on completion (such as turnover payouts) will be affordable.
+     *
+     * <p>The shareholders' cut is always deducted, even though it is skipped when the campaign cannot afford it, so
+     * the projection never overstates the funds available.</p>
+     *
+     * @param mission the contract being completed
+     * @param status  the status the contract is being completed with
+     *
+     * @return the projected change in balance, which may be negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getProjectedCompletionIncome(AbstractContract mission, MissionStatus status) {
+        Money grossPayment = getGrossFinalContractPayment(mission, status);
+        Money netPayment = getNetFinalContractPayment(mission, grossPayment);
+        return netPayment.minus(ContractSettlement.calculateShares(this, mission, grossPayment));
+    }
+
     public void completeMission(@Nullable AbstractContract mission, MissionStatus status) {
         if (mission == null) {
             return;
         }
         mission.setStatus(status);
-        Money remainingMoney = Money.zero();
-        // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
-        // payment even though this seems foolish
-        if (mission.getStatus().isSuccess()) {
-            remainingMoney = mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
-
-            Money routedPayout = mission.getRoutPayout();
-
-            remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
-        }
 
         // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
-        final Money grossPayout = remainingMoney;
+        final Money grossPayout = getGrossFinalContractPayment(mission, status);
 
         // With OverageRepaymentInFinalPayment enabled, salvage the player kept beyond their rights is repaid as part of
         // the final payment, which can push it into a debit (the negative branch below).
-        if (getCampaignOptions().get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT)) {
-            remainingMoney = remainingMoney.minus(ContractSettlement.salvageOverage(mission));
-        }
+        Money remainingMoney = getNetFinalContractPayment(mission, grossPayout);
 
         if (remainingMoney.isPositive()) {
             getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT,
@@ -5890,16 +5908,16 @@ public class Campaign implements ITechManager {
      *
      * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
      *
-     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
-     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
+     * @return the {@link TurnoverPromptOutcome}, which is {@link TurnoverPromptOutcome#NOT_PROMPTED} if the turnover
+     *       prompt was not displayed
      */
-    public int checkTurnoverPrompt() {
+    public TurnoverPromptOutcome checkTurnoverPrompt() {
         if (!getPlayerForce().getForceDetachment().isOnPlanet()) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         boolean triggerTurnoverPrompt;
@@ -5919,11 +5937,11 @@ public class Campaign implements ITechManager {
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
             default:
-                return -1;
+                return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (!triggerTurnoverPrompt) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         String dialogTitle;
@@ -5941,7 +5959,7 @@ public class Campaign implements ITechManager {
                              resources.getString("turnoverAdvanceRegardless"),
                              resources.getString("turnoverCancel.text") };
 
-        return JOptionPane.showOptionDialog(null,
+        int dialogResult = JOptionPane.showOptionDialog(null,
               dialogBody,
               dialogTitle,
               JOptionPane.YES_NO_CANCEL_OPTION,
@@ -5949,6 +5967,8 @@ public class Campaign implements ITechManager {
               null,
               options,
               options[0]);
+
+        return TurnoverPromptOutcome.fromDialogResult(dialogResult);
     }
 
     /**
@@ -6149,7 +6169,7 @@ public class Campaign implements ITechManager {
         StandardFormationIcon campaignIcon = getPlayerForce().getUnitIcon();
 
         if (campaignIcon.getFilename() == null) {
-            icon = getFactionLogo(currentDay.getYear(), getPlayerForce().getFaction().getShortName());
+            icon = getFactionLogo(currentDay.getYear(), getPlayerForce().getFaction().getShortName(), Color.BLACK);
         } else {
             icon = campaignIcon.getImageIcon();
         }

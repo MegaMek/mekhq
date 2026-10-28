@@ -66,20 +66,24 @@ import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.EntityUtilities.hasActiveProbe;
+import static mekhq.utilities.EntityUtilities.hasImprovedCommunications;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
 import static mekhq.utilities.EntityUtilities.hasReconCamera;
+import static mekhq.utilities.EntityUtilities.hasSatelliteImager;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
@@ -100,6 +104,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
@@ -147,11 +152,12 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
-import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains "rules" logic for the AtB-StratCon state
@@ -166,6 +172,8 @@ public class StratConRulesManager {
 
     private static final int NO_FACILITY_MODIFIER = 0;
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
+    // a facility your employer holds answers a fight's draw for support only 1 time in this many
+    public static final int EMPLOYER_LEND_DIE_SIZE = 2;
     public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
@@ -897,7 +905,7 @@ public class StratConRulesManager {
         }
     }
 
-    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+    private static @Nonnull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
           ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
         List<Unit> vettedUnits = new ArrayList<>();
         MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
@@ -2008,13 +2016,16 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        int scanRangeIncrease = track.getScanRangeIncrease();
+        int trackScanRangeIncrease = track.getScanRangeIncrease();
+        int scanRangeIncrease = trackScanRangeIncrease;
+        boolean isTraining = false;
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
         if (combatTeam != null) {
-            boolean isPatrol = combatTeam.getRole().isPatrol();
-            if (isPatrol) {
+            CombatRole combatRole = combatTeam.getRole();
+            if (combatRole.isPatrol()) {
                 scanRangeIncrease++; // Determine scan range (this is the furthest a hex can be revealed)
             }
+            isTraining = combatRole.isTraining();
         }
 
         // Process starting point
@@ -2049,6 +2060,11 @@ public class StratConRulesManager {
             }
         }
 
+        // A training force is busy drilling, not scouting, so it reveals only the hex it deploys to
+        if (isTraining) {
+            return;
+        }
+
         if ((scenario != null) || (targetFacility != null && !targetFacility.isOwnerAlliedToPlayer())) {
             return;
         }
@@ -2062,12 +2078,23 @@ public class StratConRulesManager {
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = useAdvancedScouting && scoutData.unitWeight() <= 35 ?
-                                            scanRangeIncrease + 1 :
-                                            scanRangeIncrease;
+            int individualScanRange = getIndividualScanRange(scoutData.unitWeight(), scanRangeIncrease,
+                  useAdvancedScouting);
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
+
+            // A scout whose reach the track's jamming has cut to nothing never rolls, so say why
+            if (useAdvancedScouting
+                      && isScoutJammed(scoutData.unitWeight(), scanRangeIncrease, trackScanRangeIncrease)) {
+                campaign.addReport(SKILL_CHECKS, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "StratConRulesManager.scoutingJammed",
+                      getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
+                      scout.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG));
+                continue;
+            }
 
             // Per-scout BFS structures
             Queue<Pair<StratConCoords, Integer>> scoutQueue = new LinkedList<>();
@@ -2087,7 +2114,9 @@ public class StratConRulesManager {
                 }
 
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
-                for (int direction = 0; direction < 6; direction++) {
+                // Directions are shuffled so scouts don't sweep each ring in a fixed clockwise order. The BFS still
+                // finishes each ring before moving outward, so the closest hexes are always scouted first.
+                for (int direction : getShuffledDirections()) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
                     //ensure we are scouting on the StratCon track
@@ -2167,6 +2196,22 @@ public class StratConRulesManager {
     }
 
     /**
+     * Returns the six hex directions (0-5) in a random order.
+     *
+     * @return an array containing each hex direction exactly once, shuffled
+     */
+    private static int[] getShuffledDirections() {
+        int[] directions = { 0, 1, 2, 3, 4, 5 };
+        for (int i = directions.length - 1; i > 0; i--) {
+            int swapIndex = randomInt(i + 1);
+            int temp = directions[i];
+            directions[i] = directions[swapIndex];
+            directions[swapIndex] = temp;
+        }
+        return directions;
+    }
+
+    /**
      * Returns a TargetRollModifier based on the provided unit weight. Lighter units gain bonuses, heavier units gain
      * penalties.
      *
@@ -2227,8 +2272,8 @@ public class StratConRulesManager {
     /**
      * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
      *
-     * <p>Improved Sensors, Active Probes, and Recon Cameras (mounted or carried as a pod) all count as sensor
-     * equipment. They do not stack.</p>
+     * <p>Improved Sensors, Active Probes, Recon Cameras (mounted or carried as a pod), Satellite Imagers, and the
+     * Improved Communications quirk all count as sensor equipment. They do not stack.</p>
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
@@ -2325,7 +2370,11 @@ public class StratConRulesManager {
             if (entity != null) {
                 unitWeight = entity.getWeight();
                 unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
-                hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity) || hasReconCamera(entity);
+                hasSensorEquipment = hasImprovedSensors(entity)
+                                           || hasActiveProbe(entity)
+                                           || hasReconCamera(entity)
+                                           || hasSatelliteImager(entity)
+                                           || hasImprovedCommunications(entity);
 
                 if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
                     Person commander = unit.getCommander();
@@ -2372,22 +2421,22 @@ public class StratConRulesManager {
     }
 
     /**
-     * Increases the fatigue for all crew members per Unit in a force.
+     * Increases the fatigue for all crew members per Unit in a force. Does nothing if Fatigue is disabled.
      *
      * @param forceID  the ID of the force
      * @param campaign the campaign
      */
     public static void increaseFatigue(int forceID, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
+        if (!campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            return;
+        }
+
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         for (UUID unit : campaign.getPlayerForce().getFormation(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.changeFatigue(fatigueRate);
-
-                if (isUseFatigue) {
-                    Fatigue.processFatigueActions(campaign, person);
-                }
+                Fatigue.processFatigueActions(campaign, person);
             }
         }
     }
@@ -2476,17 +2525,18 @@ public class StratConRulesManager {
 
         if (isGMReinforcement) {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
-                  scenario.getHyperlinkedName()));
+                  scenario.getName()));
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         } else {
             reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
-                  scenario.getHyperlinkedName(),
+                  scenario.getName(),
                   roll,
                   maneuverRoleReport,
                   reinforcementTargetNumber));
@@ -2498,7 +2548,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2508,9 +2558,10 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
 
-            return isInstantlyDeployed ? INSTANT : SUCCESS;
+            ReinforcementResultsType result = isInstantlyDeployed ? INSTANT : SUCCESS;
+            showReinforcementResultsDialog(campaign, formation, result, reportStatus.toString());
+            return result;
         }
 
         // Reinforcement roll failed, make interception check
@@ -2523,7 +2574,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
@@ -2542,7 +2593,7 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
 
@@ -2555,11 +2606,9 @@ public class StratConRulesManager {
             reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
                   CLOSING_SPAN_TAG));
-            campaign.addReport(BATTLE, reportStatus.toString());
+            showReinforcementResultsDialog(campaign, formation, FAILED, reportStatus.toString());
             return FAILED;
         }
-
-        campaign.addReport(BATTLE, reportStatus.toString());
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_TACTICS, campaign)
@@ -2569,7 +2618,8 @@ public class StratConRulesManager {
             String reportString = commander.getSkill(S_TACTICS) != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
-            campaign.addReport(BATTLE, String.format(reportString,
+            reportStatus.append("<p>");
+            reportStatus.append(String.format(reportString,
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
                   CLOSING_SPAN_TAG));
 
@@ -2577,10 +2627,12 @@ public class StratConRulesManager {
                 increaseFatigue(formation.getId(), campaign);
             }
 
+            showReinforcementResultsDialog(campaign, formation, DELAYED, reportStatus.toString());
             return DELAYED;
         }
 
-        campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+        reportStatus.append("<p>");
+        reportStatus.append(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               actionCheckResult.getRollResult(),
@@ -2588,12 +2640,42 @@ public class StratConRulesManager {
 
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
+        showReinforcementResultsDialog(campaign, formation, INTERCEPTED, reportStatus.toString());
+
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
               campaign.getPlayerForce().getHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
 
         return INTERCEPTED;
+    }
+
+    /**
+     * Presents the outcome of a reinforcement check in an immersive dialog, rather than the daily report, so the player
+     * can't miss it.
+     *
+     * @param campaign  the current campaign
+     * @param formation the reinforcing formation; its commander, if any, delivers the message
+     * @param result    the outcome of the reinforcement check
+     * @param report    the breakdown of the check, shown as the out-of-character message
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void showReinforcementResultsDialog(Campaign campaign, Formation formation,
+          ReinforcementResultsType result, String report) {
+        UUID commanderId = formation.getFormationCommanderID();
+        Person speaker = (commanderId == null) ?
+                               null :
+                               campaign.getPlayerForce().getHumanResources().getPerson(commanderId);
+
+        String inCharacter = getFormattedTextAt(RESOURCE_BUNDLE,
+              "StratConRulesManager.reinforcements.inCharacter." + result.name(),
+              campaign.getCommanderAddress(),
+              formation.getName());
+
+        new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, null, report, null, false,
+              ImmersiveDialogWidth.SMALL);
     }
 
     /**
@@ -3297,10 +3379,11 @@ public class StratConRulesManager {
     /**
      * Applies scenario modifiers provided by facilities on the track.
      *
-     * <p>If the scenario is located directly on a facility, that facility's local or shared modifiers are applied and
-     * no additional modifier is rolled for facilities with the same ownership alignment. The method may then roll once
-     * for an available allied facility and once for an available enemy facility, allowing remote facilities to
-     * contribute shared modifiers to the scenario.</p>
+     * <p>If the scenario is located directly on a facility, that facility's local modifiers and its synergy partners'
+     * shared modifiers are applied. Either way, the method then rolls once for an available allied facility and once
+     * for an available enemy facility, allowing remote facilities to contribute shared modifiers to the scenario. The
+     * facility the scenario is on, and its partners, have already been marked unavailable by then, so they are never
+     * drawn a second time.</p>
      *
      * <p>Facilities that provide modifiers are marked unavailable by
      * {@link #getFacilityModifiers(StratConScenario, StratConFacility, boolean, boolean, boolean)} and will not be
@@ -3316,13 +3399,15 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers       {@code true} if facility modifiers which add forces that benefit the enemy
      *                                     should be blocked
      */
-    private static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
+    static void applyFacilityModifiers(StratConScenario scenario, StratConTrackState track,
           StratConCoords coords, int alliedFacilityModifierChance, int enemyFacilityModifierChance,
           boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         Map<StratConCoords, StratConFacility> allFacilities = track.getFacilities();
 
-        boolean rollForAllied = true;
-        boolean rollForEnemy = true;
+        // Recorded so the player can see which facilities lent support to the fight, and why none did.
+        scenario.setFacilitySupportRecorded(true);
+        scenario.getAlliedFacilitySupport().clear();
+        scenario.getHostileFacilitySupport().clear();
 
         StratConFacility localFacility = allFacilities.get(coords);
         boolean scenarioAtFacility = localFacility != null;
@@ -3340,30 +3425,32 @@ public class StratConRulesManager {
                 if (partner.getSharedModifiers().isEmpty()) {
                     continue;
                 }
-                getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers);
-            }
-
-            if (localFacility.isOwnerAlliedToPlayer()) {
-                rollForAllied = false;
-            } else {
-                rollForEnemy = false;
+                if (getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers)) {
+                    recordFacilitySupport(scenario, track, partner);
+                }
             }
         }
 
         Map<StratConCoords, StratConFacility> availableAlliedFacilities = new HashMap<>();
         Map<StratConCoords, StratConFacility> availableEnemyFacilities = new HashMap<>();
-        filterAvailableFacilities(allFacilities, availableAlliedFacilities, availableEnemyFacilities);
+        filterAvailableFacilities(allFacilities,
+              availableAlliedFacilities,
+              availableEnemyFacilities,
+              restrictAlliedModifiers,
+              restrictEnemyModifiers);
 
-        if (rollForAllied && !availableAlliedFacilities.isEmpty()) {
+        if (!availableAlliedFacilities.isEmpty()) {
             rollForFacilityModifier(scenario,
+                  track,
                   alliedFacilityModifierChance,
                   availableAlliedFacilities,
                   restrictAlliedModifiers,
                   restrictEnemyModifiers);
         }
 
-        if (rollForEnemy && !availableEnemyFacilities.isEmpty()) {
+        if (!availableEnemyFacilities.isEmpty()) {
             rollForFacilityModifier(scenario,
+                  track,
                   enemyFacilityModifierChance,
                   availableEnemyFacilities,
                   restrictAlliedModifiers,
@@ -3376,9 +3463,12 @@ public class StratConRulesManager {
      *
      * <p>A chance value of {@code 0} always fails, a value of {@code 1} always succeeds, and any higher value gives a
      * {@code 1 / facilityModifierChance} chance of success. On success, one facility is selected at random from
-     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects.</p>
+     * {@code availableFacilities} and its shared modifiers are applied as remote facility effects. A facility your
+     * employer holds answers only 1 time in {@link #EMPLOYER_LEND_DIE_SIZE}; when it does not, the fight gets no support
+     * and the facility stays ready.</p>
      *
      * @param scenario                the scenario receiving the facility modifiers
+     * @param track                   the scenario's sector
      * @param facilityModifierChance  the roll chance denominator; {@code 0} disables the roll, {@code 1} guarantees
      *                                success, and values greater than {@code 1} succeed when a random roll returns
      *                                {@code 0}
@@ -3388,7 +3478,8 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
      *                                be blocked
      */
-    private static void rollForFacilityModifier(StratConScenario scenario, int facilityModifierChance,
+    private static void rollForFacilityModifier(StratConScenario scenario, StratConTrackState track,
+          int facilityModifierChance,
           Map<StratConCoords, StratConFacility> availableFacilities, boolean restrictAlliedModifiers,
           boolean restrictEnemyModifiers) {
         boolean autoFailRoll = facilityModifierChance == NO_FACILITY_MODIFIER;
@@ -3405,12 +3496,49 @@ public class StratConRulesManager {
                 return;
             }
 
+            // Your employer decides where its own support goes: a facility it holds answers only half the time, so
+            // a facility you hold is the more dependable lender.
+            boolean isEmployerHeld = randomFacility.getOwner() == ForceAlignment.Allied;
+            if (isEmployerHeld && (randomInt(EMPLOYER_LEND_DIE_SIZE) != 0)) {
+                return;
+            }
+
             final boolean isLocalFacility = false;
-            getFacilityModifiers(scenario,
+            if (getFacilityModifiers(scenario,
                   randomFacility,
                   isLocalFacility,
                   restrictAlliedModifiers,
-                  restrictEnemyModifiers);
+                  restrictEnemyModifiers)) {
+                recordFacilitySupport(scenario, track, randomFacility);
+            }
+        }
+    }
+
+    /**
+     * Notes on the scenario that a facility elsewhere in the sector lent it support: your side's by name, the enemy's
+     * by hex, so one the player hasn't found can be shown without naming it.
+     *
+     * @param scenario the scenario that received the support
+     * @param track    the sector
+     * @param facility the facility that lent it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void recordFacilitySupport(StratConScenario scenario, StratConTrackState track,
+          StratConFacility facility) {
+        if (facility.isOwnerAlliedToPlayer()) {
+            if (!scenario.getAlliedFacilitySupport().contains(facility.getDisplayableName())) {
+                scenario.getAlliedFacilitySupport().add(facility.getDisplayableName());
+            }
+            return;
+        }
+
+        for (Entry<StratConCoords, StratConFacility> facilityEntry : track.getFacilities().entrySet()) {
+            if ((facilityEntry.getValue() == facility)
+                      && !scenario.getHostileFacilitySupport().contains(facilityEntry.getKey())) {
+                scenario.getHostileFacilitySupport().add(facilityEntry.getKey());
+            }
         }
     }
 
@@ -3431,10 +3559,12 @@ public class StratConRulesManager {
      * @param restrictEnemyModifiers  {@code true} if facility modifiers which add forces that benefit the enemy should
      *                                be blocked
      *
+     * @return {@code true} if at least one modifier was applied
+     *
      * @author Illiani
      * @since 0.51.0
      */
-    private static void getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
+    private static boolean getFacilityModifiers(StratConScenario scenario, StratConFacility facility,
           boolean isLocal, boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         List<String> relevantModifiers = new ArrayList<>();
         List<String> localModifiers = facility.getLocalModifiers();
@@ -3446,6 +3576,7 @@ public class StratConRulesManager {
             relevantModifiers.addAll(globalModifiers);
         }
 
+        boolean isAnyApplied = false;
         for (String modifierID : relevantModifiers) {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
             if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
@@ -3453,9 +3584,11 @@ public class StratConRulesManager {
             }
 
             applyModifierToScenario(scenario, facility, modifierID);
+            isAnyApplied = true;
         }
 
         facility.setIsAvailable(false);
+        return isAnyApplied;
     }
 
     /**
@@ -3491,24 +3624,35 @@ public class StratConRulesManager {
     }
 
     /**
-     * Creates a map containing only facilities that are currently available for use.
+     * Creates a map containing only facilities that are currently available to lend support.
      *
-     * <p>Facilities marked as unavailable are excluded from the returned maps. The filtered maps preserve the
-     * original coordinate-to-facility associations.</p>
+     * <p>Facilities marked as unavailable, and those with nothing they could lend (see
+     * {@link StratConFacilityEffectStatus#getLendableModifiers}), are excluded from the returned maps. The filtered
+     * maps preserve the original coordinate-to-facility associations.</p>
      *
      * @param allFacilities             the complete map of facilities indexed by their coordinates
      * @param availableAlliedFacilities an array of all allied facilities that are available
      * @param availableEnemyFacilities  an array of all enemy facilities that are available
+     * @param restrictAlliedModifiers   {@code true} if facility modifiers which add forces that benefit the player
+     *                                  should be blocked
+     * @param restrictEnemyModifiers    {@code true} if facility modifiers which add forces that benefit the enemy
+     *                                  should be blocked
      */
     private static void filterAvailableFacilities(
           Map<StratConCoords, StratConFacility> allFacilities,
           Map<StratConCoords, StratConFacility> availableAlliedFacilities,
-          Map<StratConCoords, StratConFacility> availableEnemyFacilities) {
+          Map<StratConCoords, StratConFacility> availableEnemyFacilities,
+          boolean restrictAlliedModifiers, boolean restrictEnemyModifiers) {
         for (Entry<StratConCoords, StratConFacility> facilityEntry : allFacilities.entrySet()) {
             StratConFacility facility = facilityEntry.getValue();
             StratConCoords facilityCoords = facilityEntry.getKey();
 
-            if (facility.isAvailable()) {
+            // A facility with nothing to lend, such as a Sensor Post or a damaged Air Base, must not use up a
+            // fight's draw: the draw would land on it and the fight would get nothing.
+            boolean hasSupportToLend = !StratConFacilityEffectStatus.getLendableModifiers(facility,
+                  restrictAlliedModifiers,
+                  restrictEnemyModifiers).isEmpty();
+            if (facility.isAvailable() && hasSupportToLend) {
                 if (facility.isOwnerAlliedToPlayer()) {
                     availableAlliedFacilities.put(facilityCoords, facility);
                 } else {
@@ -4155,21 +4299,29 @@ public class StratConRulesManager {
     }
 
     /**
-     * Check if the unit's force (if one exists) has been deployed to a StratCon track
+     * Check if the unit's force (if one exists), or any formation above it, has been deployed to a StratCon track. A
+     * formation deployed as a whole takes the units of its sub-formations with it.
      */
     public static boolean isUnitDeployedToStratCon(Unit unit) {
-        if (!unit.getCampaign().getCampaignOptions().isUseStratCon()) {
+        Campaign campaign = unit.getCampaign();
+        if (!campaign.getCampaignOptions().isUseStratCon()) {
             return false;
+        }
+
+        List<Integer> formationIds = new ArrayList<>();
+        formationIds.add(unit.getFormationId());
+
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        if (formation != null) {
+            for (Formation parent : formation.getAllParents()) {
+                formationIds.add(parent.getId());
+            }
         }
 
         // this is a little inefficient, but probably there aren't too many active AtB
         // contracts at a time
-        return unit.getCampaign()
-                     .getActiveContracts()
-                     .stream()
-                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
-                                                 contract.getStratConCampaignState()
-                                                       .isForceDeployedHere(unit.getFormationId()));
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        return formationIds.stream().anyMatch(formationId -> isForceDeployedToStratCon(activeContracts, formationId));
     }
 
     public static boolean isForceDeployedToStratCon(List<AbstractContract> activeAtBContracts, int forceId) {
@@ -4733,6 +4885,7 @@ public class StratConRulesManager {
               MekHQ.getMHQOptions().getLocale());
 
         List<Integer> forcesToUndeploy = new ArrayList<>();
+        List<Integer> patrolsToScout = new ArrayList<>();
         LocalDate date = campaign.getLocalDate();
 
         // for each force on the track, if the return date is today or in the past,
@@ -4744,8 +4897,16 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId()) ||
-                      track.getStickyForces().contains(forceID)) {
+            if (track.getBackingScenariosMap().containsKey(formation.getScenarioId())) {
+                continue;
+            }
+
+            if (track.getStickyForces().contains(forceID)) {
+                // A patrol told to remain deployed scouts again instead of returning
+                boolean isDueToReturn = !track.getAssignedForceReturnDates().get(forceID).isAfter(date);
+                if (isDueToReturn && isPatrolScoutingUntilDone(forceID, track, campaign)) {
+                    patrolsToScout.add(forceID);
+                }
                 continue;
             }
 
@@ -4775,9 +4936,205 @@ public class StratConRulesManager {
             }
         }
 
+        for (int forceID : patrolsToScout) {
+            String formationName = campaign.getPlayerForce().getFormation(forceID).getName();
+            if (scoutRemainingPatrolArea(forceID, track, campaign)) {
+                forcesToUndeploy.add(forceID);
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.scoutingComplete"), formationName));
+            } else {
+                campaign.addReport(BATTLE,
+                      String.format(resources.getString("patrol.stillScouting"), formationName));
+            }
+        }
+
         for (int forceID : forcesToUndeploy) {
             track.unassignFormation(forceID);
         }
+    }
+
+    /**
+     * Whether a formation told to Remain Deployed is a patrol that keeps scouting until its area is fully scouted,
+     * instead of staying in place until recalled.
+     *
+     * <p>This only applies under Advanced Scouting, where a patrol may need several attempts to scout its whole area,
+     * and never to a formation held in place by a facility order - that order decides when it may leave.</p>
+     *
+     * @param forceID  the deployed formation's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the formation should scout again, rather than return, whenever it would normally return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isPatrolScoutingUntilDone(int forceID, StratConTrackState track, Campaign campaign) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING)) {
+            return false;
+        }
+
+        if (track.getFacilityOrder(forceID) != null) {
+            return false;
+        }
+
+        // Matches the role scanNeighboringCoords uses to grant the patrol its extra scan range
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
+        return (combatTeam != null) && combatTeam.getRole().isPatrol();
+    }
+
+    /**
+     * Has a patrol told to Remain Deployed make another round of Advanced Scouting checks around its hex, as it would
+     * when first deploying. Once every hex within its scouts' reach has been scouted the patrol is done; otherwise it
+     * stays out until it would next return, when it tries again.
+     *
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the patrol's whole area is now scouted, and it should return
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean scoutRemainingPatrolArea(int forceID, StratConTrackState track, Campaign campaign) {
+        StratConCoords coords = track.getAssignedForceCoords().get(forceID);
+        if (coords == null) {
+            return true;
+        }
+
+        int radius = getPatrolScoutingRadius(coords, forceID, track, campaign);
+        if (!isAreaFullyScouted(coords, radius, track)) {
+            scanNeighboringCoords(coords, forceID, campaign, track);
+            StratConReconnaissance.updateObjectives(track);
+        }
+
+        if (isAreaFullyScouted(coords, radius, track)) {
+            return true;
+        }
+
+        track.setReturnDate(forceID, campaign.getLocalDate().plusDays(track.getDeploymentTime()));
+        return false;
+    }
+
+    /**
+     * The furthest, in hexes, a deployed patrol can scout from its hex under Advanced Scouting: the patrol's scan
+     * range, plus one for any scout in a unit of 35 tons or less. A patrol with no scouts, or sitting on a scenario
+     * or a hostile facility, can't scout past its own hex.
+     *
+     * @param coords   the hex the patrol is deployed to
+     * @param forceID  the deployed patrol's ID
+     * @param track    the track it is deployed to
+     * @param campaign the current campaign
+     *
+     * @return the patrol's scouting radius
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getPatrolScoutingRadius(StratConCoords coords, int forceID, StratConTrackState track,
+          Campaign campaign) {
+        // scanNeighboringCoords scouts nothing past a hex holding a scenario or a hostile facility
+        StratConFacility facility = track.getFacility(coords);
+        if ((track.getScenario(coords) != null) || ((facility != null) && !facility.isOwnerAlliedToPlayer())) {
+            return 0;
+        }
+
+        // Patrols increase their scan range by 1
+        int scanRangeIncrease = track.getScanRangeIncrease() + 1;
+        int radius = 0;
+        for (ScoutRecord scout : buildScoutMap(campaign.getPlayerForce().getFormation(forceID),
+              campaign.getPlayerForce().getHangar(), campaign)) {
+            radius = max(radius, getIndividualScanRange(scout.unitWeight(), scanRangeIncrease, true));
+        }
+        return radius;
+    }
+
+    /**
+     * How far, in hexes, a single scout can reveal from where its formation deploys. Under Advanced Scouting, a scout
+     * in a unit of 35 tons or less reaches one hex further.
+     *
+     * @param unitWeight          the weight of the scout's unit, in tons
+     * @param scanRangeIncrease   the formation's scan range
+     * @param useAdvancedScouting whether Advanced Scouting is enabled
+     *
+     * @return the scout's scan range
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getIndividualScanRange(double unitWeight, int scanRangeIncrease, boolean useAdvancedScouting) {
+        return useAdvancedScouting && unitWeight <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+    }
+
+    /**
+     * Whether a scout has been jammed out of scouting entirely under Advanced Scouting: the track's scan range
+     * penalties, such as a hostile Jamming Station, leave it unable to reach any hex past its formation's own, when it
+     * could have reached at least one without them.
+     *
+     * @param unitWeight             the weight of the scout's unit, in tons
+     * @param scanRangeIncrease      the formation's scan range, including the track's penalties
+     * @param trackScanRangeIncrease the track's own change to scan range, included in {@code scanRangeIncrease}
+     *
+     * @return {@code true} if the scout can't scout any hex because of the track's scan range penalties
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isScoutJammed(double unitWeight, int scanRangeIncrease, int trackScanRangeIncrease) {
+        if (trackScanRangeIncrease >= 0 || getIndividualScanRange(unitWeight, scanRangeIncrease, true) > 0) {
+            return false;
+        }
+
+        int unjammedScanRangeIncrease = scanRangeIncrease - trackScanRangeIncrease;
+        return getIndividualScanRange(unitWeight, unjammedScanRangeIncrease, true) > 0;
+    }
+
+    /**
+     * Whether every hex on the track within the given radius of a hex has been scouted. Like scouting itself, this
+     * never looks past the edge of the track.
+     *
+     * @param center the hex at the center of the area
+     * @param radius how far from the center, in hexes, the area reaches
+     * @param track  the track to check
+     *
+     * @return {@code true} if every on-track hex in the area has been revealed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAreaFullyScouted(StratConCoords center, int radius, StratConTrackState track) {
+        Set<StratConCoords> revealedCoords = track.getRevealedCoords();
+        if (!revealedCoords.contains(center)) {
+            return false;
+        }
+
+        Queue<Pair<StratConCoords, Integer>> queue = new LinkedList<>();
+        Set<StratConCoords> visited = new HashSet<>();
+        queue.add(new Pair<>(center, 0));
+        visited.add(center);
+
+        while (!queue.isEmpty()) {
+            Pair<StratConCoords, Integer> current = queue.poll();
+            int distance = current.getValue();
+            if (distance >= radius) {
+                continue;
+            }
+
+            for (int direction = 0; direction < 6; direction++) {
+                StratConCoords checkCoords = current.getKey().translate(direction);
+                if (track.isOffTrack(checkCoords) || !visited.add(checkCoords)) {
+                    continue;
+                }
+
+                if (!revealedCoords.contains(checkCoords)) {
+                    return false;
+                }
+                queue.add(new Pair<>(checkCoords, distance + 1));
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -4800,6 +5157,68 @@ public class StratConRulesManager {
                 processIgnoredStratConScenario(stratConScenario, track, campaignState, campaign);
                 break;
             }
+        }
+    }
+
+    /**
+     * Moves a dynamic scenario to a new battle date, keeping its StratCon deployment, battle and return dates in step.
+     *
+     * <p>Used when the GM changes a scenario's date from the briefing room. Changing only the backing scenario's date
+     * would leave the StratCon deployment date behind, so the scenario would be treated as ignored - and removed from
+     * its sector - while still pending in the briefing room.</p>
+     *
+     * <p>The deployment and battle dates move to the new date, and the return date (as well as that of any formation
+     * already deployed to the scenario) moves with it, so formations stay deployed for the same length of time.</p>
+     *
+     * @param scenarioId    the ID of the dynamic scenario being rescheduled
+     * @param campaignState the contract's StratCon campaign state
+     * @param newDate       the scenario's new battle date
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void rescheduleDynamicScenario(int scenarioId, StratConCampaignState campaignState,
+          LocalDate newDate) {
+        for (StratConTrackState track : campaignState.getTracks()) {
+            StratConScenario scenario = track.getBackingScenariosMap().get(scenarioId);
+            if (scenario == null) {
+                continue;
+            }
+
+            LocalDate oldActionDate = scenario.getActionDate();
+            long shiftDays = (oldActionDate == null) ? 0 : ChronoUnit.DAYS.between(oldActionDate, newDate);
+
+            // A missing deployment date marks a scenario not yet placed, so we leave it to be set when it is
+            if (scenario.getDeploymentDate() != null) {
+                scenario.setDeploymentDate(newDate);
+            }
+            scenario.setActionDate(newDate);
+
+            LocalDate oldReturnDate = scenario.getReturnDate();
+            if (oldReturnDate == null) {
+                return;
+            }
+
+            LocalDate newReturnDate = oldReturnDate.plusDays(shiftDays);
+            if (newReturnDate.isBefore(newDate)) {
+                newReturnDate = newDate;
+            }
+            scenario.setReturnDate(newReturnDate);
+
+            // Formations deployed for this scenario return with it; any due back sooner stay until it is over
+            Set<Integer> deployedForceIDs = track.getAssignedCoordForces().get(scenario.getCoords());
+            if (deployedForceIDs != null) {
+                for (int forceID : deployedForceIDs) {
+                    LocalDate forceReturnDate = track.getAssignedForceReturnDates().get(forceID);
+                    if ((forceReturnDate == null) ||
+                              forceReturnDate.equals(oldReturnDate) ||
+                              forceReturnDate.isBefore(newReturnDate)) {
+                        track.getAssignedForceReturnDates().put(forceID, newReturnDate);
+                        track.getAssignedForceReturnDatesForStorage().put(forceID, newReturnDate.toString());
+                    }
+                }
+            }
+            return;
         }
     }
 

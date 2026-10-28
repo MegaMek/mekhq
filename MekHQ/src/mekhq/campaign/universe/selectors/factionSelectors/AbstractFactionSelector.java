@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.universe.selectors.factionSelectors;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;

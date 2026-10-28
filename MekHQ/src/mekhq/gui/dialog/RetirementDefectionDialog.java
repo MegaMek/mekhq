@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -54,6 +55,7 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
@@ -76,7 +78,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
@@ -100,6 +101,8 @@ public class RetirementDefectionDialog extends JDialog {
     final private CampaignGUI hqView;
     final private AbstractContract contract;
     final private RetirementDefectionTracker rdTracker;
+    /** Money not yet credited that will be available for payouts, such as a contract's final payment. */
+    final private Money pendingIncome;
 
     private Map<UUID, TargetRoll> targetRolls;
     final private Map<UUID, UUID> unitAssignments;
@@ -188,10 +191,29 @@ public class RetirementDefectionDialog extends JDialog {
     };
 
     public RetirementDefectionDialog(CampaignGUI gui, AbstractContract mission, boolean doRetirement) {
+        this(gui, mission, doRetirement, Money.zero());
+    }
+
+    /**
+     * Creates the turnover dialog.
+     *
+     * @param gui           the campaign GUI
+     * @param mission       the contract whose completion triggered turnover, or {@code null} if it is not contract
+     *                      related
+     * @param doRetirement  {@code true} to roll for turnover, {@code false} to show existing results
+     * @param pendingIncome money not yet credited that will be available for payouts, such as the final payment of a
+     *                      contract that is still being completed; it counts towards affording the payouts
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public RetirementDefectionDialog(CampaignGUI gui, AbstractContract mission, boolean doRetirement,
+          Money pendingIncome) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
         this.contract = mission;
+        this.pendingIncome = pendingIncome;
         rdTracker = hqView.getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker();
         if (doRetirement) {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
@@ -842,7 +864,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
         }
 
-        return assignmentComplete && (totalPayout.isLessThan(hqView.getCampaign().getPlayerForce().getFunds()));
+        Money availableFunds = hqView.getCampaign().getPlayerForce().getFunds().plus(pendingIncome);
+        return assignmentComplete && (totalPayout.isLessThan(availableFunds));
     }
 
     private void enableAddRemoveButtons() {
@@ -949,14 +972,17 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setLayout(new BorderLayout());
 
         // Creating and scaling the image label
-        ImageIcon originalIcon = Factions.getFactionLogo(campaign.getGameYear(), campaign.getPlayerForce().getFaction().getShortName());
-        ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage()
-                                                   .getScaledInstance(originalIcon.getIconWidth() / 2,
-                                                         originalIcon.getIconHeight() / 2,
-                                                         Image.SCALE_FAST));
-        JLabel imageLabel = new JLabel(scaledIcon);
+        ImageIcon originalIcon = RATGenerator.getFactionLogo(campaign.getGameYear(),
+              campaign.getPlayerForce().getFaction().getShortName(), Color.BLACK);
+        if (originalIcon != null) {
+            ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage()
+                                                       .getScaledInstance(originalIcon.getIconWidth() / 2,
+                                                             originalIcon.getIconHeight() / 2,
+                                                             Image.SCALE_FAST));
+            JLabel imageLabel = new JLabel(scaledIcon);
 
-        dialog.add(imageLabel, BorderLayout.NORTH);
+            dialog.add(imageLabel, BorderLayout.NORTH);
+        }
 
         // Dialog body
         JLabel text = new JLabel(resourceMap.getString("nobodyEligibleDialog.text"), JLabel.CENTER);
@@ -974,4 +1000,3 @@ public class RetirementDefectionDialog extends JDialog {
         dialog.setVisible(true);
     }
 }
-
