@@ -46,6 +46,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.IntFunction;
 
@@ -72,6 +74,7 @@ import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.EntitySavingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
@@ -86,6 +89,7 @@ import megamek.common.verifier.TestSmallCraft;
 import megamek.common.verifier.TestTank;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.logging.MMLogger;
+import megameklab.ui.util.MegaMekLabFileSaver;
 import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -1766,8 +1770,10 @@ public class Refit extends Part implements IAcquisitionWork {
         } else if (newPart instanceof MissingMekCockpit) {
             classGrader.gradeCockpitChange();
             locationHasNewStuff[Mek.LOC_HEAD] = true;
-        } else if (newPart instanceof MissingTurret) {
-            classGrader.gradeTurret(getLocationName(newEntity, location), hasVehicleTurretAt(location));
+        } else if (newPart instanceof MissingTurret missingTurret) {
+            // A missing turret has no location of its own; it remembers the turret location it fills
+            int turretLocation = missingTurret.getTurretLocation();
+            classGrader.gradeTurret(getLocationName(newEntity, turretLocation), hasVehicleTurretAt(turretLocation));
         } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
             // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
             locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
@@ -2605,60 +2611,62 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * Writes the configuration for the new side of the refit to a .mtf or .blk file in the customs directory.
      *
+     * @throws IOException            if the file cannot be written, such as when a file with that name already exists;
+     *                                its message is shown to the player
+     * @throws EntityLoadingException if the written file cannot be read back
      */
-    public void saveCustomization() throws EntityLoadingException {
+    public void saveCustomization() throws EntityLoadingException, IOException {
         UnitUtil.compactCriticalSlots(newEntity);
 
         String unitName = newEntity.getShortNameRaw();
-        // MHQXMLUtility.escape() doesn't include `/` or `\` so we need to include them explicitly.
-        String fileName = MHQXMLUtility.escape(unitName).replace("/", "_").replace("\\", "_");
+        // A refit can be given any name, but the file needs one that is legal on every platform
+        String fileName = MegaMekLabFileSaver.sanitizeFilename(unitName);
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
         // path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
-        if (!customsDir.exists()) {
-            if (!customsDir.mkdir()) {
-                LOGGER.error("Failed to create directory customs folder {}, and therefore cannot save the unit.",
-                      sCustomsDir);
-                return;
-            }
+        if (!customsDir.exists() && !customsDir.mkdir()) {
+            throw new IOException("Failed to create the customs folder " + sCustomsDir +
+                                        ", and therefore cannot save the unit.");
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
-        if (!customsDirCampaign.exists()) {
-            if (!customsDirCampaign.mkdir()) {
-                LOGGER.error("Failed to create directory custom campaigns folder {}, and therefore cannot save the " +
-                                   "unit.", sCustomsDirCampaign);
-                return;
-            }
+        if (!customsDirCampaign.exists() && !customsDirCampaign.mkdir()) {
+            throw new IOException("Failed to create the campaign customs folder " + sCustomsDirCampaign +
+                                        ", and therefore cannot save the unit.");
         }
 
-        String fileNameCampaign;
+        String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
+        String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
+        String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
+
+        // if this file already exists then don't overwrite it, or we might break another unit
+        if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+            throw new IOException("A file already exists with the custom name " +
+                                        fileNameCampaign +
+                                        ". Please choose a different name. (Unit name and/or model)");
+        }
+
+        assignCustomUnitFileIdentity(newEntity);
+
         try {
-            String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
-            String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
-            fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
-
-            // if this file already exists then don't overwrite it, or we might break another unit
-            if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                throw new IOException("A file already exists with the custom name " +
-                                            fileNameCampaign +
-                                            ". Please choose a different name. (Unit name and/or model)");
-            }
-
-            assignCustomUnitFileIdentity(newEntity);
-
             if (newEntity instanceof Mek) {
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                       PrintStream p = new PrintStream(out)) {
                     p.println(((Mek) newEntity).getMtf());
+
+                    if (p.checkError()) {
+                        throw new IOException("Could not write " + fileNameCampaign);
+                    }
                 }
 
             } else {
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-            fileNameCampaign = null;
+        } catch (IOException | EntitySavingException | RuntimeException ex) {
+            LOGGER.error(ex, "Could not save refit entity {} to {}", unitName, fileNameCampaign);
+            deleteBadRefitFile(fileNameCampaign);
+            throw new IOException("Could not save " + unitName + " to " + fileNameCampaign + ": " + ex.getMessage(),
+                  ex);
         }
 
         getCampaign().addCustom(unitName);
@@ -2669,22 +2677,31 @@ public class Refit extends Part implements IAcquisitionWork {
 
             newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             LOGGER.info("Saved {} to {}", unitName, summary.getSourceFile());
-        } catch (EntityLoadingException ex) {
+        } catch (EntityLoadingException | RuntimeException ex) {
             LOGGER.error(ex, "Could not read back refit entity {}", unitName);
-
-            if (fileNameCampaign != null) {
-                LOGGER.warn("Deleting invalid refit file {}", fileNameCampaign);
-                try {
-                    new File(fileNameCampaign).delete();
-                } catch (SecurityException ex2) {
-                    LOGGER.warn(ex2, "Could not clean up bad refit file {}", fileNameCampaign);
-                }
-
-                // Reload the mek cache if we had to delete the file
-                MekSummaryCache.refreshUnitData(false);
+            deleteBadRefitFile(fileNameCampaign);
+            // Reload the mek cache since we had to delete the file
+            MekSummaryCache.refreshUnitData(false);
+            if (ex instanceof EntityLoadingException entityLoadingException) {
+                throw entityLoadingException;
             }
+            throw new EntityLoadingException("Could not read back " + unitName + ": " + ex.getMessage(), ex);
+        }
+    }
 
-            throw ex;
+    /**
+     * Removes a refit file that could not be written or read back, so it does not block the name or break the unit
+     * cache.
+     *
+     * @param fileName the path of the bad file
+     */
+    private static void deleteBadRefitFile(String fileName) {
+        try {
+            if (Files.deleteIfExists(Path.of(fileName))) {
+                LOGGER.warn("Deleted invalid refit file {}", fileName);
+            }
+        } catch (IOException | SecurityException ex) {
+            LOGGER.warn(ex, "Could not clean up bad refit file {}", fileName);
         }
     }
 

@@ -139,6 +139,24 @@ class UnitMarketOfferAlternateCostTest {
     }
 
     /**
+     * Infantry offers are priced from their equipment-only alternate cost, matching purchase, procurement, and sale
+     * values, as MekHQ infantry arrives without trained soldiers.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @ParameterizedTest
+    @CsvSource({ "Infantry", "BattleArmor" })
+    void infantryIsPricedFromAlternateCost(String unitTypeName) {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
+        when(summary.getUnitType()).thenReturn(unitTypeName);
+        when(summary.getAlternateCost()).thenReturn(30_000L);
+
+        assertEquals(Money.of(30_000), offer(100).getPrice());
+        verify(summary, never()).getCost();
+    }
+
+    /**
      * MekHQ prices large craft offers from their construction cost.
      *
      * @author Illiani

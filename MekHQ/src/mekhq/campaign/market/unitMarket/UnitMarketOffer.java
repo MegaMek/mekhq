@@ -178,15 +178,16 @@ public class UnitMarketOffer {
 
     /**
      * @return the offered unit's list price before the market percentage and unit price multipliers: its construction
-     *       cost, or, when the {@link CampaignOption#UNIT_COST_MODEL} values it by Battle Value, one support point per
-     *       point of Battle Value
+     *       cost (equipment-only for infantry, see {@link Unit#getConstructionCost(MekSummary)}), or, when the
+     *       {@link CampaignOption#UNIT_COST_MODEL} values it by Battle Value, one support point per point of Battle
+     *       Value
      *
      * @author Illiani
      * @since 0.51.01
      */
     private Money getBaseCost() {
         if (!isBattleValueCost()) {
-            return Money.of((double) getUnit().getCost());
+            return Unit.getConstructionCost(getUnit());
         }
 
         // The summary's Battle Value is the unit's own, with no pilot, C3, or TAG adjustments
