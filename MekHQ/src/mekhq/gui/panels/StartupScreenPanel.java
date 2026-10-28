@@ -47,9 +47,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import jakarta.annotation.Nullable;
@@ -82,7 +84,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     // region Variable Declarations
     private final MekHQ app;
-    private final File lastSaveFile;
+    private @Nullable File lastSaveFile;
     private final File newPlayerQuickstartFile;
     private BufferedImage backgroundIcon;
 
@@ -103,7 +105,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         AppIcons.apply(getFrame(), "mekhq");
         this.app = app;
-        lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(), saveFilter);
         newPlayerQuickstartFile = new File(LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);
 
         initialize();
@@ -180,11 +181,13 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
               UIComponents.MainMenuButton.getComp(),
               true);
-        btnLoadLastCampaign.setEnabled(lastSaveFile != null);
+        // Stays disabled until the background search for the last save finishes
+        btnLoadLastCampaign.setEnabled(false);
         btnLoadLastCampaign.addActionListener(evt -> {
             btnLoadLastCampaign.setEnabled(false);
             startCampaign(lastSaveFile);
         });
+        findLastSaveFile(btnLoadLastCampaign);
 
         MegaMekButton btnNewPlayerQuickstart = new MegaMekButton(resources.getString("btnNewPlayerQuickstart.text"),
               UIComponents.MainMenuButton.getComp(),
@@ -316,6 +319,35 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         getFrame().pack();
         // center window in screen
         getFrame().setLocationRelativeTo(null);
+    }
+
+    /**
+     * Searches the campaigns directory for the most recent save off the Event Dispatch Thread, so a large campaigns
+     * directory cannot keep the startup screen from appearing, then enables the load last campaign button if a save
+     * was found.
+     *
+     * @param btnLoadLastCampaign the button to enable once the last save is found
+     */
+    private void findLastSaveFile(final MegaMekButton btnLoadLastCampaign) {
+        final String campaignsDirectory = MekHQ.getCampaignsDirectory().getValue();
+        new SwingWorker<File, Void>() {
+            @Override
+            protected File doInBackground() {
+                return Utilities.lastFileModified(campaignsDirectory, saveFilter);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    lastSaveFile = get();
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException ex) {
+                    LOGGER.error(ex, "Unable to find the last campaign save in {}", campaignsDirectory);
+                }
+                btnLoadLastCampaign.setEnabled(lastSaveFile != null);
+            }
+        }.execute();
     }
     // endregion Initialization
 
