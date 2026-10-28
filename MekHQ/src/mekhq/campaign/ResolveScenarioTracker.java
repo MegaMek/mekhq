@@ -485,11 +485,16 @@ public class ResolveScenarioTracker {
                     // Under SIMULATED_DAMAGE the enemy took no lasting damage either, so nothing is left behind to
                     // salvage.
                     if (!voidsCombatDamage()) {
-                        TestUnit newUnit = generateNewTestUnit(entity);
-                        UnitStatus unitStatus = new UnitStatus(newUnit);
-                        unitStatus.setTotalLoss(false);
-                        salvageStatus.put(newUnit.getId(), unitStatus);
-                        potentialSalvage.add(newUnit);
+                        if (entity.isDropShip() && scenario.getBoardType() == T_SPACE &&
+                                  campaign.getCampaignOptions().get(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE)) {
+                            addDropShipBonus(entity);
+                        } else {
+                            TestUnit newUnit = generateNewTestUnit(entity);
+                            UnitStatus unitStatus = new UnitStatus(newUnit);
+                            unitStatus.setTotalLoss(false);
+                            salvageStatus.put(newUnit.getId(), unitStatus);
+                            potentialSalvage.add(newUnit);
+                        }
                     }
                 }
             }
@@ -651,14 +656,10 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
-                    double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
-                                                                    .get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE) / 100;
-
-                    if (dropShipBonusPercentage > 0) {
-                        dropShipBonus = dropShipBonus.plus(generateNewTestUnit(wreck).getSellValue()
-                                                                 .multipliedBy(dropShipBonusPercentage));
-                    }
+                boolean useDropShipBonusInSpace = campaign.getCampaignOptions()
+                                                        .get(CampaignOption.USE_DROP_SHIP_BONUS_IN_SPACE);
+                if (wreck.isDropShip() && (scenario.getBoardType() != T_SPACE || useDropShipBonusInSpace)) {
+                    addDropShipBonus(wreck);
                     appendKillCredit(wreck);
                     continue;
                 }
@@ -700,6 +701,22 @@ public class ResolveScenarioTracker {
         recoverUnfoundDeployedUnits();
 
         checkStatusOfPersonnel();
+    }
+
+    /**
+     * Pays the DropShip Bonus Percent of the given DropShip's sell value into the scenario's DropShip bonus, in place
+     * of offering the DropShip as salvage. Does nothing if the bonus percent is 0.
+     *
+     * @param dropShip the enemy DropShip being converted into a bounty
+     */
+    private void addDropShipBonus(Entity dropShip) {
+        double dropShipBonusPercentage = (double) campaign.getCampaignOptions()
+                                                        .get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE) / 100;
+
+        if (dropShipBonusPercentage > 0) {
+            dropShipBonus = dropShipBonus.plus(generateNewTestUnit(dropShip).getSellValue()
+                                                     .multipliedBy(dropShipBonusPercentage));
+        }
     }
 
     /**
