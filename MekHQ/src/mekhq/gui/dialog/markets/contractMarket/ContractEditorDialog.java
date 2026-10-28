@@ -133,8 +133,9 @@ import mekhq.gui.utilities.WrapLayout;
  * <p>The generated NPC personnel attached to a contract (the employer's negotiator and liaison, and the opposing
  * commander) can have their name, rank, and portrait edited. On confirmation the contract is mutated in place; query
  * {@link #wasConfirmed()} afterward and rebuild any view showing it. The player's chosen negotiator is preserved
- * as-is. The StratCon campaign state is not edited here, but when its contract's scale, track count, or dates change,
- * its pre-rolled schedule is rolled again to match (see {@link StratConScenarioTempo#regenerateSchedules}).</p>
+ * as-is. The StratCon campaign state is not edited here, but when its contract's scale, track count, dates, command
+ * rights, or employer change, its pre-rolled schedule is rolled again to match (see
+ * {@link StratConScenarioTempo#regenerateSchedules}).</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -1665,8 +1666,8 @@ public class ContractEditorDialog extends JDialog {
 
     /**
      * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
-     * untouched. If the contract's scale, track count, or dates changed, its StratCon schedule is rolled again (see
-     * {@link StratConScenarioTempo#regenerateSchedules}).
+     * untouched. If the contract's scale, track count, dates, command rights, or employer changed, its StratCon schedule
+     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}).
      *
      * @author Illiani
      * @since 0.51.01
@@ -1678,6 +1679,9 @@ public class ContractEditorDialog extends JDialog {
         LocalDate previousStartDate = contract.getStartDate();
         LocalDate previousEndDate = contract.getEndingDate();
         int previousLengthInMonths = contract.getLengthInMonths();
+        // Deployment Orders are rolled from these.
+        ContractCommandRights previousCommandRights = contract.getCommandRights();
+        String previousEmployerCode = contract.getEmployerFactionCode();
 
         // Identity
         String name = nameField.getText().trim();
@@ -1874,7 +1878,9 @@ public class ContractEditorDialog extends JDialog {
                                           || (contract.getTrackCount() != previousTrackCount)
                                           || !Objects.equals(contract.getStartDate(), previousStartDate)
                                           || !Objects.equals(contract.getEndingDate(), previousEndDate)
-                                          || (contract.getLengthInMonths() != previousLengthInMonths);
+                                          || (contract.getLengthInMonths() != previousLengthInMonths)
+                                          || (contract.getCommandRights() != previousCommandRights)
+                                          || !Objects.equals(contract.getEmployerFactionCode(), previousEmployerCode);
         if ((campaignState != null) && isScheduleChanged) {
             StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
         }

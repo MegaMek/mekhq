@@ -174,7 +174,6 @@ public class StratConRulesManager {
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
     // a facility your employer holds answers a fight's draw for support only 1 time in this many
     public static final int EMPLOYER_LEND_DIE_SIZE = 2;
-    public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
           "Hold Until Relief.json");
@@ -693,8 +692,10 @@ public class StratConRulesManager {
     /**
      * Determines if a given StratCon scenario should be marked as critical within the context of a contract.
      * <p>
-     * This method evaluates the scenario's template, type, and the contract's command rights to decide if the scenario
-     * should be flagged as a "turning point." Turning Point scenarios can cause CVP to be increased or decreased.
+     * Special scenarios, strategic objectives, and combat challenges are never Turning Points. Any other scenario has a
+     * one-in-three chance of being one, whatever the contract's command rights: command rights are felt through
+     * Deployment Orders instead (see {@link StratConDeploymentOrders}). Under House command rights, a Turning Point also
+     * brings the House commander's attached units. Turning Point scenarios can cause CVP to be increased or decreased.
      * </p>
      *
      * @param contract          The {@link AbstractContract} representing the current contract.
@@ -713,28 +714,10 @@ public class StratConRulesManager {
             return;
         }
 
-        ContractCommandRights commandRights = contract.getCommandRights();
-        switch (commandRights) {
-            case INTEGRATED -> scenario.setTurningPoint(true);
-            case HOUSE -> {
-                if (randomInt(3) == 0) {
-                    scenario.setTurningPoint(true);
-                    setAttachedUnitsModifier(scenario, contract);
-                }
-            }
-            case LIAISON -> {
-                if (randomInt(3) == 0) {
-                    scenario.setTurningPoint(true);
-                }
-            }
-            case INDEPENDENT -> {
-                // Victory points only exist on a StratCon campaign state; treat a non-StratCon contract as having
-                // none, so it still qualifies as a turning point.
-                StratConCampaignState campaignState = contract.getStratConCampaignState();
-                int victoryPoints = (campaignState == null) ? 0 : campaignState.getVictoryPoints();
-                if (victoryPoints < INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
-                    scenario.setTurningPoint(true);
-                }
+        if (randomInt(3) == 0) {
+            scenario.setTurningPoint(true);
+            if (contract.getCommandRights().isHouse()) {
+                setAttachedUnitsModifier(scenario, contract);
             }
         }
     }

@@ -428,6 +428,12 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
         String body;
         if (selectedStatus == MissionStatus.BREACH) {
             body = getText("completeMission.reason.breach");
+        } else if ((selectedStatus == MissionStatus.PARTIAL) && statistics.hasVictoryPointTarget()
+                         && statistics.isVictoryPointTargetMet() && (statistics.getObjectivesFailed() > 0)) {
+            // The target was met, but a failed strategic objective cost the contract its Complete Success.
+            body = getFormattedText("completeMission.reason.victoryPoints.partial.objectivesFailed",
+                  statistics.getContractScore(), statistics.getRequiredVictoryPoints(),
+                  statistics.getObjectivesFailed());
         } else if (statistics.hasVictoryPointTarget()) {
             body = getFormattedText("completeMission.reason.victoryPoints." + statusKey(selectedStatus),
                   statistics.getContractScore(), statistics.getRequiredVictoryPoints());
