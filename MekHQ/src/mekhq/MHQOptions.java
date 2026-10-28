@@ -470,6 +470,27 @@ public final class MHQOptions extends SuiteOptions {
         return new ComponentColors(getQueuedForTravelForeground(), getQueuedForTravelBackground());
     }
 
+    public Color getPendingRefitForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.PENDING_REFIT_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setPendingRefitForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PENDING_REFIT_FOREGROUND, value.getRGB());
+    }
+
+    /**
+     * @return the background of a unit waiting for refit parts, a paler shade of the refitting cyan by default
+     */
+    public Color getPendingRefitBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.PENDING_REFIT_BACKGROUND, new Color(0xB0F0F0).getRGB()));
+    }
+
+    public void setPendingRefitBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PENDING_REFIT_BACKGROUND, value.getRGB());
+    }
+
     public Color getRefittingForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.REFITTING_FOREGROUND, Color.BLACK.getRGB()));

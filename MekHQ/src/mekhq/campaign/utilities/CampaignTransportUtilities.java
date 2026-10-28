@@ -221,7 +221,7 @@ public class CampaignTransportUtilities {
                       transporters.add(HEAVY_VEHICLE_BAY);
                   }
 
-                  if (entity.getWeight() <= 150) {
+                  if (entity.getWeight() <= 200) {
                       transporters.add(SUPER_HEAVY_VEHICLE_BAY);
                   }
                   return transporters;

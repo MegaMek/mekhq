@@ -16,14 +16,17 @@
 # affiliated with Microsoft.
 
 {
-  "ultimatumFileNames": [
-    "AMARIS_COUP.json",
-    "EXODUS.json",
-    "ESPINOSA_COUP.json",
-    "ST_IVES_SPLIT.json",
-    "RASALHAGUE_INDEPENDENCE.json",
-    "COMSTAR_SCHISM.json",
-    "FED_COM_CIVIL_WAR.json",
-    "CLAN_WOLF_SPLIT.json"
-  ]
+  "name" : "RONIN_EXIT",
+  "date" : "3034-10-01",
+  "notes" : "While no exact date was given (as this was more of a resistence movement than a war), Brush Wars states that \"By and large, the last major resistance by the ronin ended in October of 3034\".",
+  "affectedFactionCodes" : [ "RON" ],
+  "sides" : [ {
+    "id" : "DC",
+    "name" : "Gunji-no-Kanrei Theodore Kurita",
+    "role" : "NOBLE",
+    "factionCode" : "DC"
+  } ],
+  "dissenterPreference" : "DC",
+  "isViolentTransition" : false,
+  "divisiveness" : -2
 }

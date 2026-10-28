@@ -37,8 +37,12 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.units.Jumpship.DRIVE_CORE_NONE;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.mission.utilities.TransportCostCalculations.*;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.unit.enums.TransporterType.HEAVY_VEHICLE_BAY;
+import static mekhq.campaign.unit.enums.TransporterType.LIGHT_VEHICLE_BAY;
+import static mekhq.campaign.unit.enums.TransporterType.SUPER_HEAVY_VEHICLE_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -57,6 +61,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,6 +70,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
+import megamek.common.units.Tank;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -75,7 +81,9 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1505,6 +1513,38 @@ public class TransportCostCalculationsTest {
         int countedLightVehicles = local.getLightVehicleCount();
         assertEquals(unitCount, countedLightVehicles,
               "Expected " + unitCount + " units but was " + countedLightVehicles);
+    }
+
+    /**
+     * Jump costs charge for a vehicle bay based on the vehicle's weight, so the vehicle must actually be loadable into
+     * that bay type when assigning ship transport.
+     */
+    @ParameterizedTest
+    @ValueSource(doubles = { 25.0, 50.0, 75.0, 100.0, 125.0, 150.0, 175.0, 200.0 })
+    public void testCountUnitsByType_vehicleBucketMatchesShipTransportBays(double weight) {
+        Unit mockUnit = mock(Unit.class);
+        Tank mockTank = mock(Tank.class);
+        when(mockUnit.getEntity()).thenReturn(mockTank);
+        when(mockTank.isVehicle()).thenReturn(true);
+        when(mockTank.getWeight()).thenReturn(weight);
+
+        TransportCostCalculations local = new TransportCostCalculations(List.of(mockUnit), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
+        local.countUnitsByType();
+
+        TransporterType expectedBay;
+        if (local.getSuperHeavyVehicleCount() == 1) {
+            expectedBay = SUPER_HEAVY_VEHICLE_BAY;
+        } else if (local.getHeavyVehicleCount() == 1) {
+            expectedBay = HEAVY_VEHICLE_BAY;
+        } else {
+            expectedBay = LIGHT_VEHICLE_BAY;
+        }
+
+        EnumSet<TransporterType> shipTransporters = CampaignTransportUtilities.mapICarryableToTransporters(
+              SHIP_TRANSPORT, mockTank);
+        assertTrue(shipTransporters.contains(expectedBay),
+              "A " + weight + "t vehicle is charged for a " + expectedBay + " but can't be loaded into one");
     }
 
     @ParameterizedTest

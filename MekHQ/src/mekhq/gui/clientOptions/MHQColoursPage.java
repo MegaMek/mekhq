@@ -106,6 +106,7 @@ class MHQColoursPage extends MHQOptionsPage {
               "optionDeployedForeground", "optionDeployedBackground",
               "optionInTransitForeground", "optionInTransitBackground",
               "optionQueuedForTravelForeground", "optionQueuedForTravelBackground",
+              "optionPendingRefitForeground", "optionPendingRefitBackground",
               "optionRefittingForeground", "optionRefittingBackground",
               "optionMothballingForeground", "optionMothballingBackground",
               "optionMothballedForeground", "optionMothballedBackground",

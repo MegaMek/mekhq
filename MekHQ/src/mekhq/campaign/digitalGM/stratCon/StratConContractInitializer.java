@@ -347,6 +347,7 @@ public class StratConContractInitializer {
             FacilityTier facilityTier = adjustTier(facilityProfile,
                   getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false));
             double density = getFacilityDensity(campaignOptions, facilityProfile);
+            boolean isOpForPresent = !contract.isPeaceful();
 
             if ((facilityProfile == null) || (facilityProfile.getAlliedShare() == null)) {
                 ForceAlignment facilityOwner = contract.isPlayerAttacker() ?
@@ -357,6 +358,9 @@ public class StratConContractInitializer {
                       isFactorSupportPointsIntoScale,
                       objectiveFacilityCount,
                       density);
+                if ((facilityOwner == ForceAlignment.Opposing) && !isOpForPresent) {
+                    facilityCount = 0;
+                }
                 placeNonObjectiveFacilities(campaignState, facilityCount, facilityOwner, facilityTier,
                       facilityProfile);
             } else {
@@ -368,10 +372,13 @@ public class StratConContractInitializer {
                       objectiveFacilityCount,
                       density);
                 int alliedCount = (int) Math.round(facilityCount * facilityProfile.getAlliedShare());
-                int hostileCount = facilityCount - alliedCount;
+                int hostileCount = isOpForPresent ? facilityCount - alliedCount : 0;
 
                 FacilityType anchorType = facilityProfile.getAnchorType();
-                if ((anchorType != null) && placeAnchorFacility(campaignState, facilityProfile, facilityTier)) {
+                boolean isAnchorAllowed = isOpForPresent
+                                                || (facilityProfile.getAnchorOwner() != ForceAlignment.Opposing);
+                if ((anchorType != null) && isAnchorAllowed
+                          && placeAnchorFacility(campaignState, facilityProfile, facilityTier)) {
                     if (facilityProfile.getAnchorOwner() == ForceAlignment.Opposing) {
                         hostileCount = max(0, hostileCount - 1);
                     } else {
