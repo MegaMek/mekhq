@@ -352,7 +352,8 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
-     * Drops every part of a salvaged unit by one quality level, clamped at the lowest quality.
+     * Drops every part of a salvaged unit by one quality level using {@link Part#reduceQuality()}, which leaves parts
+     * already at the worst quality where they are.
      *
      * <p>Missing parts have no quality and are left untouched.</p>
      *
@@ -361,7 +362,7 @@ public class CamOpsSalvageUtilities {
      * @author Illiani
      * @since 0.51.01
      */
-    static void reduceSalvageQuality(Unit salvagedUnit) {
+    private static void reduceSalvageQuality(Unit salvagedUnit) {
         for (Part part : salvagedUnit.getParts()) {
             if (!(part instanceof MissingPart)) {
                 part.reduceQuality();
