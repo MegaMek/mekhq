@@ -623,12 +623,14 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Brings the current sector's supply routes up to date after a GM edit to its facilities, so one added is joined
-     * to its side's routes and one removed or captured stops carrying them. The roads are left as they are.
+     * Checks the current sector's supply at once after a GM edit to its facilities, rather than waiting for the next
+     * day: one added is joined to its side's routes, one removed or captured stops carrying them, the cut-off marks
+     * are brought up to date, and the player is told if their side is left with no source of supply. The roads are
+     * left as they are. It is not the start of a month, so nothing starves.
      */
-    private void reconcileSupplyNetworks() {
-        if ((currentTrack != null) && StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            StratConFacilitySupply.reconcileNetworks(currentTrack);
+    private void refreshSupply() {
+        if (currentTrack != null) {
+            StratConFacilitySupply.processSupply(currentTrack, campaign, false);
         }
     }
 
@@ -3041,7 +3043,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);
-                reconcileSupplyNetworks();
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConGMs.facility(campaign.getCampaignOptions())
@@ -3050,7 +3052,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 // neither lays new road nor tears up the old. Recalculating would also rebuild the whole network from
                 // scratch, so a single capture could redraw roads across the sector. Capturing the same facility by
                 // winning a scenario leaves the network alone for the same reason.
-                reconcileSupplyNetworks();
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_SET_FACILITY_STATE:
                 @SuppressWarnings("unchecked")
@@ -3071,7 +3073,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility newFacility = new StratConFacility(facilityDefinition, owner);
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
-                reconcileSupplyNetworks();
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);
