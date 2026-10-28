@@ -144,6 +144,35 @@ class ContractDebriefStatisticsTest {
     }
 
     @Test
+    void recommendsPartialWhenTargetMetButAStrategicObjectiveFailed() {
+        // A lapsed Deployment Order, say: the contract's terms were met, but not every objective was.
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        objectives.add(objective(false, true));
+        StratConCampaignState state = stratConWith(5, objectives);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        ContractDebriefStatistics statistics = from(contract);
+
+        assertEquals(1, statistics.getObjectivesFailed());
+        assertEquals(MissionStatus.PARTIAL, statistics.getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsSuccessWhenTargetMetAndEveryObjectiveSecured() {
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        StratConCampaignState state = stratConWith(5, objectives);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        assertEquals(MissionStatus.SUCCESS, from(contract).getRecommendedStatus());
+    }
+
+    @Test
     void recommendsSuccessWhenTargetMetEvenEndingEarly() {
         StratConCampaignState state = stratConWith(3, new ArrayList<>());
         AbstractContract contract = baseContract(new ArrayList<>());

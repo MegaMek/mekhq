@@ -174,7 +174,6 @@ public class StratConRulesManager {
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
     // a facility your employer holds answers a fight's draw for support only 1 time in this many
     public static final int EMPLOYER_LEND_DIE_SIZE = 2;
-    public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
           "Hold Until Relief.json");

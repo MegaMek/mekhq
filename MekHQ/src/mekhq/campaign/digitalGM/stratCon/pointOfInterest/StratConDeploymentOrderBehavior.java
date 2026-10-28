@@ -38,13 +38,12 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.StratConDeploymentOrders;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 
 /**
  * A Deployment Order: a position the employer has ordered the player to move a formation to, issued more or less often
  * depending on the contract's command rights and how controlling the employer is (see
- * {@link StratConDeploymentOrders}). Each is a strategic objective, so letting one lapse costs the player a Complete
+ * {@link mekhq.campaign.digitalGM.stratCon.StratConDeploymentOrders}). Each is a strategic objective, so letting one lapse costs the player a Complete
  * Success.
  *
  * <p>Any formation deploying onto its hex carries out the order. Unlike most points of interest, the order does not
