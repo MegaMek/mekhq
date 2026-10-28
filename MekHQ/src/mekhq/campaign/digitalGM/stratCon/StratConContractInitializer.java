@@ -603,7 +603,10 @@ public class StratConContractInitializer {
      * ones instead (see {@link #scheduleSpecialPointsOfInterest}), and a Recon Raid schedules none at all (see
      * {@link StratConReconnaissance}). With it off, every contract schedules its definition's points of interest.</p>
      *
-     * <p>Does nothing if the contract asks for no points of interest, or has no settled start date.</p>
+     * <p>Whatever else it schedules, every contract also schedules the Deployment Orders its command rights call for
+     * (see {@link StratConDeploymentOrders}).</p>
+     *
+     * <p>Does nothing more if the contract asks for no points of interest, or has no settled start date.</p>
      *
      * @param contract                        the contract being accepted
      * @param contractDefinition              its StratCon contract definition
@@ -651,7 +654,12 @@ public class StratConContractInitializer {
           StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
           boolean isContractsUseSpecialMechanics, @Nullable LocalDate fromDate, int committedCount,
           Map<String, Integer> alreadyMarkedCounts) {
-        // A Recon Raid using special mechanics has no points of interest at all: its sectors are scouted instead.
+        // Deployment Orders come from the contract's command rights rather than its type, so every contract gets them,
+        // whatever else it schedules.
+        StratConDeploymentOrders.scheduleDeploymentOrders(contract, campaignState, isMultiplyTrackIntensityByScale,
+              fromDate);
+
+        // A Recon Raid using special mechanics has no other points of interest: its sectors are scouted instead.
         if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
             return;
         }
