@@ -1766,8 +1766,10 @@ public class Refit extends Part implements IAcquisitionWork {
         } else if (newPart instanceof MissingMekCockpit) {
             classGrader.gradeCockpitChange();
             locationHasNewStuff[Mek.LOC_HEAD] = true;
-        } else if (newPart instanceof MissingTurret) {
-            classGrader.gradeTurret(getLocationName(newEntity, location), hasVehicleTurretAt(location));
+        } else if (newPart instanceof MissingTurret missingTurret) {
+            // A missing turret has no location of its own; it remembers the turret location it fills
+            int turretLocation = missingTurret.getTurretLocation();
+            classGrader.gradeTurret(getLocationName(newEntity, turretLocation), hasVehicleTurretAt(turretLocation));
         } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
             // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
             locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
