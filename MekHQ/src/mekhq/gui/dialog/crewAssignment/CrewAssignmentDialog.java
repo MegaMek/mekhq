@@ -73,6 +73,7 @@ import mekhq.campaign.unit.crewAssignment.CrewAssignmentService;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudChip;
@@ -109,6 +110,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private static final MMLogger LOGGER = MMLogger.create(CrewAssignmentDialog.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CrewAssignmentDialog";
 
+    /** Wide enough for most formation names and their counts; longer names are shortened, with a tooltip. */
+    private static final int RAIL_WIDTH = 300;
     private static final int UNIT_ROW_HEIGHT = 52;
     private static final int PERSON_ROW_HEIGHT = 46;
     private static final int REVIEW_ROW_HEIGHT = 46;
@@ -376,7 +379,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         railHolder.add(railScroll(unitRail), CrewAssignmentPage.UNITS.name());
         railHolder.add(railScroll(peopleRail), CrewAssignmentPage.PERSONNEL.name());
         railHolder.add(railScroll(column()), CrewAssignmentPage.REVIEW.name());
-        railHolder.setPreferredSize(scaleForGUI(230, 0));
+        railHolder.setPreferredSize(scaleForGUI(RAIL_WIDTH, 0));
         railHolder.setBorder(BorderFactory.createMatteBorder(0, 0, 0, scaleForGUI(1), BORDER));
         return railHolder;
     }
@@ -384,11 +387,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private static JScrollPane railScroll(JPanel rail) {
         rail.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(12),
               scaleForGUI(12)));
-        JPanel holder = new JPanel(new BorderLayout());
+        // The holder follows the rail's width, so long formation names are shortened rather than pushing the counts
+        // out of sight, and keeps the filters at their natural height at the top
+        JScrollablePanel holder = new JScrollablePanel();
+        holder.setLayout(new BorderLayout());
         holder.setOpaque(true);
         holder.setBackground(GROUND);
         holder.add(rail, BorderLayout.NORTH);
-        JScrollPane scroll = new JScrollPane(holder);
+        JScrollPane scroll = new JScrollPane(holder, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         Hud.styleScroll(scroll, GROUND, false);
         return scroll;
     }

@@ -61,6 +61,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
 
 import jakarta.annotation.Nullable;
 
@@ -221,6 +222,9 @@ public class HudFilterList<T> extends JPanel {
             count.setForeground(TEXT_FAINT);
             add(label, BorderLayout.CENTER);
             add(count, BorderLayout.EAST);
+            // A label too long for the rail is shortened with an ellipsis, so the whole name is kept in a tooltip
+            setToolTipText(item.label());
+            getAccessibleContext().setAccessibleName(item.label());
 
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -283,6 +287,11 @@ public class HudFilterList<T> extends JPanel {
         private void refreshRow() {
             label.setForeground((isSelected || hovered || isFocusOwner()) ? TEXT : TEXT_MUTED);
             repaint();
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return new HudToolTip(this);
         }
 
         @Override
