@@ -159,4 +159,15 @@ public class PersonnelStatusTest {
             assertEquals(status.isDeadOrMIA(), isDeadOrMIA);
         }
     }
+
+    @Test
+    public void testIsInfirmaryEligible() {
+        List<PersonnelStatus> validStatuses = List.of(ACTIVE, CAMP_FOLLOWER, ON_LEAVE, ON_MATERNITY_LEAVE);
+
+        for (PersonnelStatus status : PersonnelStatus.values()) {
+            boolean isInfirmaryEligible = validStatuses.contains(status);
+
+            assertEquals(status.isInfirmaryEligible(), isInfirmaryEligible);
+        }
+    }
 }
