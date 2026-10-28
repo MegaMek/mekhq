@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.unit.enums;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
