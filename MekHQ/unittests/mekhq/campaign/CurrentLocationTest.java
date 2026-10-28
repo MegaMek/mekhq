@@ -547,6 +547,31 @@ public class CurrentLocationTest {
         }
     }
 
+    /** Tests for in-system transfers between two worlds of the current system. */
+    @Nested
+    class InSystemTransfer {
+        @Test
+        void setJumpPathPlacesTheWholeTransferAhead() {
+            Planet origin = mock(Planet.class);
+            Planet destination = mock(Planet.class);
+            when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(4.0);
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.setOriginPlanet(origin);
+            jumpPath.setTargetPlanet(destination);
+
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+            }
+
+            assertEquals(4.0, loc.getTransitTime(), 1e-9);
+            assertFalse(loc.isAtJumpPoint(), "A transfer between worlds never passes through the jump point");
+            assertTrue(loc.isInTransit());
+            assertEquals(0.0, loc.getPercentageTransit(), 1e-9);
+        }
+    }
+
     @Nested
     class PersonChildSerialization {
 

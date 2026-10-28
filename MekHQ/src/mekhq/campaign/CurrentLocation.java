@@ -98,7 +98,15 @@ public class CurrentLocation extends AbstractMobileLocation {
 
     @Override
     public boolean isAtJumpPoint() {
+        // An in-system transfer flies directly between two worlds and never passes through the jump point
+        if (isInSystemTransfer()) {
+            return false;
+        }
         return transitTime >= destinationTransitTime();
+    }
+
+    private boolean isInSystemTransfer() {
+        return (jumpPath != null) && jumpPath.isInSystemTransfer();
     }
 
     @Override
@@ -115,9 +123,15 @@ public class CurrentLocation extends AbstractMobileLocation {
      * instead the transit to that planet &mdash; so a journey to an outer or inner world takes correspondingly longer
      * or shorter, and "arrival" means reaching that planet rather than the primary world.</p>
      *
+     * <p>During an {@link JumpPath#isInSystemTransfer() in-system transfer} it is the direct transit between the
+     * departure and destination worlds.</p>
+     *
      * @return the effective in-system transit time to the current destination
      */
     private double destinationTransitTime() {
+        if (isInSystemTransfer()) {
+            return jumpPath.getInSystemTransferTime();
+        }
         if ((jumpPath != null) && (jumpPath.size() == 1) && (jumpPath.getTargetPlanet() != null)) {
             return jumpPath.getTargetPlanet().getTimeToJumpPoint(1.0);
         }
@@ -173,7 +187,21 @@ public class CurrentLocation extends AbstractMobileLocation {
 
     @Override
     public void setJumpPath(JumpPath path) {
+        boolean isInSystemCourse = (currentSystem != null) && (path != null) && (path.size() == 1)
+                                         && (path.getTargetPlanet() != null)
+                                         && Objects.equals(currentSystem, path.getFirstSystem());
+        double previousDestinationTransitTime = isInSystemCourse ? destinationTransitTime() : 0.0;
         jumpPath = path;
+        if (isInSystemCourse) {
+            if (isInSystemTransfer()) {
+                // An in-system transfer departs from a world, so the whole leg lies ahead of the DropShips
+                transitTime = path.getInSystemTransferTime();
+            } else if ((transitTime > 0) && (previousDestinationTransitTime > 0)) {
+                // Heading for a different world from the jump point side of the system: keep the DropShips the same
+                // share of the way in, measured against the new destination
+                transitTime = destinationTransitTime() * Math.min(1.0, transitTime / previousDestinationTransitTime);
+            }
+        }
         // Underway: the force is no longer at a world until the path completes.
         currentPlanet = null;
         MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
@@ -343,17 +371,26 @@ public class CurrentLocation extends AbstractMobileLocation {
         }
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
+            final boolean isInSystemTransfer = isInSystemTransfer();
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
             if (!isSilentProcessing) {
-                campaign.addReport(GENERAL, "DropShips spent " +
-                                                  (Math.round(100.0 * usedTransitTime) / 100.0) +
-                                                  " hours transiting into system");
+                if (isInSystemTransfer) {
+                    campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.transfer.hours",
+                          Math.round(100.0 * usedTransitTime) / 100.0,
+                          jumpPath.getTargetPlanet().getPrintableName(today)));
+                } else {
+                    campaign.addReport(GENERAL, "DropShips spent " +
+                                                      (Math.round(100.0 * usedTransitTime) / 100.0) +
+                                                      " hours transiting into system");
+                }
             }
             transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
                 if (!isSilentProcessing) {
-                    campaign.addReport(GENERAL,
-                          jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                    String destinationName = isInSystemTransfer
+                                                   ? jumpPath.getTargetPlanet().getPrintableName(today)
+                                                   : jumpPath.getLastSystem().getPrintableName(today);
+                    campaign.addReport(GENERAL, destinationName + " reached.");
                 }
                 // we are here! Capture the world the path aimed at before discarding it - this is the only point
                 // where the destination is still known. A path with no target world leaves this null, so getPlanet()

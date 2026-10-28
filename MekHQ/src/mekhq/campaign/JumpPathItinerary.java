@@ -156,6 +156,11 @@ public final class JumpPathItinerary {
         double endingTransit = (path.getTargetPlanet() == null)
               ? lastSystem.getTimeToJumpPoint(accelerationG)
               : path.getTargetPlanet().getTimeToJumpPoint(accelerationG);
+        if (path.isInSystemTransfer()) {
+            // A direct flight between two worlds of one system never heads out to the jump point
+            startingTransit = 0.0;
+            endingTransit = path.getOriginPlanet().getTimeToPlanet(path.getTargetPlanet(), accelerationG);
+        }
 
         int[] rechargeHours = new int[systems.size()];
         int totalRechargeHours = 0;
