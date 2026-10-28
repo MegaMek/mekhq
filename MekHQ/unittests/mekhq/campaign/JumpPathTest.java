@@ -222,6 +222,18 @@ class JumpPathTest {
     }
 
     @Test
+    void getTotalTimeOfAnInSystemTransferCountsDownOnceUnderway() {
+        Planet origin = mock(Planet.class);
+        Planet destination = mock(Planet.class);
+        when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(3.5);
+        JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
+        jumpPath.setOriginPlanet(origin);
+        jumpPath.setTargetPlanet(destination);
+
+        assertEquals(1.25, jumpPath.getTotalTime(TEST_DATE, 1.25, false), 1.0e-9);
+    }
+
+    @Test
     void writeToXMLIncludesTheOriginPlanetOnlyWhenSet() {
         JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
         assertFalse(toXml(jumpPath).contains("originPlanetId"),

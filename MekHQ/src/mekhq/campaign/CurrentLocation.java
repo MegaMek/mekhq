@@ -129,11 +129,13 @@ public class CurrentLocation extends AbstractMobileLocation {
      * @return the effective in-system transit time to the current destination
      */
     private double destinationTransitTime() {
-        if (isInSystemTransfer()) {
-            return jumpPath.getInSystemTransferTime();
-        }
-        if ((jumpPath != null) && (jumpPath.size() == 1) && (jumpPath.getTargetPlanet() != null)) {
-            return jumpPath.getTargetPlanet().getTimeToJumpPoint(1.0);
+        if (jumpPath != null) {
+            if (jumpPath.isInSystemTransfer()) {
+                return jumpPath.getInSystemTransferTime();
+            }
+            if ((jumpPath.size() == 1) && (jumpPath.getTargetPlanet() != null)) {
+                return jumpPath.getTargetPlanet().getTimeToJumpPoint(1.0);
+            }
         }
         return currentSystem.getTimeToJumpPoint(1.0);
     }
@@ -185,22 +187,38 @@ public class CurrentLocation extends AbstractMobileLocation {
         return jumpPath;
     }
 
+    /**
+     * Sets the path the force is following, or clears it with {@code null}.
+     *
+     * <p>Changing course part-way through an {@link JumpPath#isInSystemTransfer() in-system transfer} (including
+     * cancelling it) is allowed. The DropShips are treated as being as many days out from the world they were flying to
+     * as they still had to go, capped at that world's jump point transit. From there they are kept the same share of
+     * the way in, measured against the new destination, exactly like a ship re-routed on its way in from the jump
+     * point.</p>
+     */
     @Override
     public void setJumpPath(JumpPath path) {
+        final JumpPath previousPath = jumpPath;
+        boolean isLeavingTransfer = (previousPath != null) && previousPath.isInSystemTransfer() && (transitTime > 0);
         boolean isInSystemCourse = (currentSystem != null) && (path != null) && (path.size() == 1)
                                          && (path.getTargetPlanet() != null)
                                          && Objects.equals(currentSystem, path.getFirstSystem());
-        double previousDestinationTransitTime = isInSystemCourse ? destinationTransitTime() : 0.0;
+        double previousDestinationTransitTime = 0.0;
+        if (isLeavingTransfer) {
+            previousDestinationTransitTime = previousPath.getTargetPlanet().getTimeToJumpPoint(1.0);
+            transitTime = Math.min(transitTime, previousDestinationTransitTime);
+        } else if (isInSystemCourse) {
+            previousDestinationTransitTime = destinationTransitTime();
+        }
         jumpPath = path;
-        if (isInSystemCourse) {
-            if (isInSystemTransfer()) {
-                // An in-system transfer departs from a world, so the whole leg lies ahead of the DropShips
-                transitTime = path.getInSystemTransferTime();
-            } else if ((transitTime > 0) && (previousDestinationTransitTime > 0)) {
-                // Heading for a different world from the jump point side of the system: keep the DropShips the same
-                // share of the way in, measured against the new destination
-                transitTime = destinationTransitTime() * Math.min(1.0, transitTime / previousDestinationTransitTime);
-            }
+        if (isInSystemCourse && path.isInSystemTransfer()) {
+            // An in-system transfer departs from a world, so the whole leg lies ahead of the DropShips
+            transitTime = path.getInSystemTransferTime();
+        } else if ((isLeavingTransfer || isInSystemCourse) && (transitTime > 0)
+                         && (previousDestinationTransitTime > 0)) {
+            // Heading somewhere new from part-way in (or abandoning a transfer): keep the DropShips the same share of
+            // the way in, measured against the new destination
+            transitTime = destinationTransitTime() * Math.min(1.0, transitTime / previousDestinationTransitTime);
         }
         // Underway: the force is no longer at a world until the path completes.
         currentPlanet = null;

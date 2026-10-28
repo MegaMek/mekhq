@@ -617,6 +617,8 @@ public class TransportCostCalculations {
         calculateAdditionalBayRequirementsFromPassengers(getTotalLargeCraftPassengerCapacity());
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
+        // The crew multiplier has always scaled the DropShip charges as well as the JumpShip ones, so a DropShip-only
+        // trip keeps it
         inSystemCost = applyCostModifiers(totalCost);
 
         calculateAdditionalJumpCollarsRequirements();

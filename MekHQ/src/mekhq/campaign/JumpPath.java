@@ -308,6 +308,9 @@ public class JumpPath {
      * Calculates the total journey time for the path, including recharge, start, and end times, taking the fleet's
      * {@link JumpDriveProfile} into account.
      *
+     * <p>For an {@link #isInSystemTransfer() in-system transfer} this is the flight time still to go: the whole flight
+     * while {@code currentTransit} is {@code 0} (not yet departed), otherwise {@code currentTransit} itself.</p>
+     *
      * @param when                the date to use for all time calculations in the journey
      * @param currentTransit      the remaining fraction of the current transit
      * @param isUseCommandCircuit {@code true} if command circuits are used for the journey
@@ -322,7 +325,10 @@ public class JumpPath {
     public double getTotalTime(LocalDate when, double currentTransit, boolean isUseCommandCircuit,
           @Nullable JumpDriveProfile jumpDriveProfile) {
         if (isInSystemTransfer()) {
-            return getInSystemTransferTime();
+            // Underway, currentTransit is the time still to go; before departure the fleet sits at its world with
+            // nothing travelled, so the whole flight lies ahead
+            double transferTime = getInSystemTransferTime();
+            return (currentTransit > 0) ? Math.min(currentTransit, transferTime) : transferTime;
         }
         return getTotalRechargeTime(when, isUseCommandCircuit, jumpDriveProfile)
                      + getStartTime(currentTransit)
