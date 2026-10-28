@@ -102,8 +102,11 @@ public final class StratConFacilitySupply {
 
     static final String RESOURCE_BUNDLE = StratConEnemyFacilityActivity.RESOURCE_BUNDLE;
 
-    /** How many hexes a Supply Depot reaches without a road. */
-    static final int DEPOT_RANGE = 3;
+    /**
+     * How many hexes a Supply Depot reaches without a road. Public so the map can tell which hexes a depot's straight
+     * link to a facility may cross.
+     */
+    public static final int DEPOT_RANGE = 3;
 
     /** How many days a won convoy interdiction cuts the enemy's supply through its hex. */
     static final int ROAD_CUT_DAYS = 28;
