@@ -463,7 +463,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                updateArmorKits(scenario, escapee);
+                updateArmorKits(scenario, escapee, campaign.getCampaignOptions());
             }
 
             generatedEntities.add(escapee);
@@ -496,7 +496,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-            updateArmorKits(scenario, vip);
+            updateArmorKits(scenario, vip, campaign.getCampaignOptions());
         }
 
         Vector<Entity> generatedEntities = new Vector<>();
@@ -510,13 +510,29 @@ public class AtBDynamicScenarioFactory {
         return (int) floor(generatedEntities.size() / 4.0);
     }
 
-    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity) {
+    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
         if (entity instanceof ConvInfantry infantry) {
             boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
             boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
-            int temperature = scenario.getTemperature();
+            int temperature = getBattleTemperature(scenario, campaignOptions);
             changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
         }
+    }
+
+    /**
+     * The temperature the battle will actually be fought at. When weather is in use, weather such as snow overrides
+     * the planet's base temperature, and that weather-modified value is what is handed to MegaMek; otherwise the base
+     * temperature stands.
+     *
+     * @param scenario        the scenario being generated
+     * @param campaignOptions the campaign options, to check whether weather conditions are in use
+     *
+     * @return the battle temperature, in degrees C
+     */
+    private static int getBattleTemperature(AtBScenario scenario, CampaignOptions campaignOptions) {
+        return campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS) ?
+                     scenario.getModifiedTemperature() :
+                     scenario.getTemperature();
     }
 
     /**
@@ -965,7 +981,7 @@ public class AtBDynamicScenarioFactory {
                                 changeInfantryKit(infantryPlatoon,
                                       isLowPressure,
                                       isTainted,
-                                      scenario.getTemperature());
+                                      getBattleTemperature(scenario, campaign.getCampaignOptions()));
                             }
                         }
                     }
@@ -1247,7 +1263,10 @@ public class AtBDynamicScenarioFactory {
         if (!transportedEntities.isEmpty()) {
             // Transported units need to filter out battle armor before applying armor changes
             for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == INFANTRY).toList()) {
-                changeInfantryKit((ConvInfantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                changeInfantryKit((ConvInfantry) curPlatoon,
+                      isLowPressure,
+                      isTainted,
+                      getBattleTemperature(scenario, campaign.getCampaignOptions()));
             }
         }
 
