@@ -366,10 +366,10 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
             return "";
         }
         TransportCostCalculations calculation = campaign.getTransportCostCalculation(EXP_REGULAR);
-        if (jumpPath.getJumps() > 0) {
+        if ((jumpPath.getJumps() > 0) || jumpPath.isInSystemTransfer()) {
             int duration = (int) Math.ceil(jumpPath.getTotalTime(campaign.getLocalDate(), location.getTransitTime(),
                   campaign.isUseCommandCircuit(), campaign.getJumpDriveProfile(location)));
-            Money jumpCost = calculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+            Money jumpCost = calculation.calculateCostForEntireJourney(duration, jumpPath);
             return getFormattedTextAt("info.jumpCost.remaining", jumpCost.toAmountString());
         } else {
             Money jumpCost = calculation.calculateJumpCostForEntireJourney(7, 0);

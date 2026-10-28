@@ -148,6 +148,31 @@ final class RoutePlanningIntent {
         return replace(proposedOrigin, List.of(destination.getParentSystem()), destination, planner);
     }
 
+    /**
+     * Plots a course to another world of the system the fleet is already in. No jump is involved, so the route is the
+     * single system itself.
+     *
+     * @param departure   the world the fleet is leaving, or {@code null} when it is not at a world (at the jump point,
+     *                    or stopped part-way through an in-system leg)
+     * @param destination the world to travel to
+     */
+    ChangeResult plotInSystem(@Nullable Planet departure, @Nullable Planet destination) {
+        if ((destination == null) || (destination.getParentSystem() == null)
+              || Objects.equals(departure, destination)
+              || ((departure != null) && !Objects.equals(departure.getParentSystem(), destination.getParentSystem()))) {
+            return ChangeResult.NO_CHANGE;
+        }
+        PlanetarySystem system = destination.getParentSystem();
+        JumpPath inSystemPath = new JumpPath();
+        inSystemPath.addSystem(system);
+        inSystemPath.setOriginPlanet(departure);
+        inSystemPath.setTargetPlanet(destination);
+        origin = system;
+        requestedStops = List.of(system);
+        jumpPath = inSystemPath;
+        return ChangeResult.CHANGED;
+    }
+
     ChangeResult append(@Nullable PlanetarySystem destination, SegmentPlanner planner) {
         if ((origin == null) || (destination == null)) {
             return ChangeResult.NO_CHANGE;
@@ -283,6 +308,7 @@ final class RoutePlanningIntent {
         JumpPath copy = new JumpPath();
         copy.addSystems(source.getSystems());
         copy.setTargetPlanet(source.getTargetPlanet());
+        copy.setOriginPlanet(source.getOriginPlanet());
         return copy;
     }
 }
