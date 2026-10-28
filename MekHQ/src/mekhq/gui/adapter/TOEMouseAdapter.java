@@ -87,6 +87,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
@@ -160,6 +161,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COPY_ICON = "COPY_ICON";
     private static final String PASTE_ICON = "PASTE_ICON";
     private static final String SUB_FORCES_PASTE_ICON = "SUB_FORCES_PASTE_ICON";
+    private static final String AUTO_FORMATION_ICONS = "AUTO_FORMATION_ICONS";
+    private static final String REGENERATE_FORMATION_ICONS = "REGENERATE_FORMATION_ICONS";
     private static final String CHANGE_NAME = "CHANGE_NAME";
 
     private static final String COMMAND_CHANGE_FORCE_TYPE_STANDARD = "COMMAND_CHANGE_FORCE_TYPE_STANDARD|FORCE|empty|";
@@ -176,6 +179,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_COPY_FORCE_ICON = "COPY_ICON|FORCE|empty|";
     private static final String COMMAND_PASTE_FORCE_ICON = "PASTE_ICON|FORCE|empty|";
     private static final String COMMAND_SUB_FORCES_PASTE_FORCE_ICON = "SUB_FORCES_PASTE_ICON|FORCE|empty|";
+    private static final String COMMAND_AUTO_FORMATION_ICONS = "AUTO_FORMATION_ICONS|FORCE|empty|";
+    private static final String COMMAND_REGENERATE_FORMATION_ICONS = "REGENERATE_FORMATION_ICONS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
@@ -434,6 +439,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 formation.setFormationIcon(gui.getCopyFormationIcon().clone(), subForces);
             }
             gui.getTOETab().refreshForceView();
+        } else if (command.contains(AUTO_FORMATION_ICONS)) {
+            // Blank icons are drawn and the ones MekHQ drew are brought up to date; the player's own are left alone
+            Campaign campaign = gui.getCampaign();
+            for (Formation formation : formations) {
+                FormationIconBuilder.refreshIcons(formation, campaign.getPlayerForce().getFaction(),
+                      campaign::getUnit, campaign.getPlayerForce().getSupportCommandFormation());
+                // The tree only redraws its icons on an organization change
+                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, formation));
+            }
+        } else if (command.contains(REGENERATE_FORMATION_ICONS)) {
+            if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
+                  "This replaces every icon in the selected formations and the formations under them, including "
+                        + "icons you designed yourself. Continue?",
+                  "Regenerate Formation Icons?",
+                  JOptionPane.YES_NO_OPTION)) {
+                return;
+            }
+            Campaign campaign = gui.getCampaign();
+            FormationIconBuilder.applyIconsToFormations(formations, campaign.getPlayerForce().getFaction(),
+                  campaign::getUnit, campaign.getPlayerForce().getSupportCommandFormation());
+            for (Formation formation : formations) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, formation));
+            }
         } else if (command.contains(CHANGE_CAMO)) {
             if (singleFormation != null) {
                 CamoChooserDialog ccd = new CamoChooserDialog(gui.getFrame(),
@@ -1233,6 +1261,23 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
+
+            menuItem = new JMenuItem("Auto-Generate Formation Icons");
+            menuItem.setName("miAutoFormationIcons");
+            menuItem.setToolTipText("Draws icons for blank formations here and below, and updates the icons MekHQ "
+                                          + "drew to match their formations' size and units. Icons you designed are "
+                                          + "left alone.");
+            menuItem.setActionCommand(COMMAND_AUTO_FORMATION_ICONS + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
+
+            menuItem = new JMenuItem("Regenerate All Formation Icons...");
+            menuItem.setName("miRegenerateFormationIcons");
+            menuItem.setToolTipText("Replaces every icon here and below with a freshly generated one, including "
+                                          + "icons you designed.");
+            menuItem.setActionCommand(COMMAND_REGENERATE_FORMATION_ICONS + forceIds);
+            menuItem.addActionListener(this);
+            menu.add(menuItem);
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
             if (!multipleSelection) {

@@ -249,7 +249,8 @@ public final class SupportUnitGenerator {
         int decorated = 0;
         for (SupportCapability capability : SupportCapability.values()) {
             decorated += FormationIconBuilder.decorateUndecorated(AddSupportUnitsToTOE.findCapabilityFormation(campaign,
-                  capability.formationType()), campaign);
+                  capability.formationType()), campaign.getPlayerForce().getFaction(), campaign::getUnit,
+                  campaign.getPlayerForce().getSupportCommandFormation());
         }
         return decorated;
     }
@@ -1096,7 +1097,8 @@ public final class SupportUnitGenerator {
             // Only command generation and the Support Teams conversion drew support icons, so a convoy or canteens
             // granted mid-campaign were filed blank. Generation redraws the whole TOE afterwards anyway.
             FormationIconBuilder.decorateUndecorated(AddSupportUnitsToTOE.findCapabilityFormation(campaign,
-                  formationType), campaign);
+                  formationType), campaign.getPlayerForce().getFaction(), campaign::getUnit,
+                  campaign.getPlayerForce().getSupportCommandFormation());
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {
