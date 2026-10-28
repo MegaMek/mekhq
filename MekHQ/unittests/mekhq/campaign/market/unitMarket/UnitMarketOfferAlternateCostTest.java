@@ -152,7 +152,7 @@ class UnitMarketOfferAlternateCostTest {
         when(summary.getUnitType()).thenReturn(unitTypeName);
         when(summary.getAlternateCost()).thenReturn(30_000L);
 
-        assertEquals(Money.of(30_000), offer(100).getPrice());
+        assertEquals(Money.of(30_000), offer(100).getPrice(null, GAME_YEAR));
         verify(summary, never()).getCost();
     }
 
