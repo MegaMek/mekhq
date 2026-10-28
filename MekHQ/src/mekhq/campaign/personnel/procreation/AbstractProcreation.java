@@ -676,6 +676,22 @@ public abstract class AbstractProcreation {
     }
 
     /**
+     * Resolves the pregnancy of a background character, with the babies born on the mother's due date. See
+     * {@link #birthHistoric(Campaign, LocalDate, Person, Person)}.
+     *
+     * @param campaign the campaign object
+     * @param mother   the mother giving birth
+     *
+     * @return the babies, which have not yet been added to the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Person> birthBackground(final Campaign campaign, final Person mother) {
+        return birthHistoric(campaign, mother.getDueDate(), mother, determineFather(campaign, mother));
+    }
+
+    /**
      * This is used to process procreation when a person dies with the Pregnancy Complications status
      *
      * @param campaign the campaign to add the baby to

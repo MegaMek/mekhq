@@ -2333,6 +2333,10 @@ public class ForceHumanResources {
 
         Person currentSpouse = null;
         List<Person> allSpouses = new ArrayList<>();
+        // Ex-spouses who were pregnant at the time of the divorce, mapped to the father of the pregnancy (if known).
+        // Any still pregnant once the simulation ends become background characters, so their birth is resolved by
+        // processBackgroundCharacterPregnancy instead.
+        Map<Person, Person> pregnantExSpouses = new LinkedHashMap<>();
 
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
             LocalDate currentDate = localDate.minusWeeks(weeksRemaining);
@@ -2353,6 +2357,13 @@ public class ForceHumanResources {
 
                     currentChildren.removeAll(toRemove);
                     priorChildren.addAll(toRemove);
+
+                    // The pregnancy outlives the marriage, so we need to keep tracking it until the birth
+                    if (currentSpouse.isPregnant()) {
+                        pregnantExSpouses.put(currentSpouse, spousesBabysFather);
+                        spousesBabysFather = null;
+                    }
+
                     currentSpouse = null;
                 }
             } else {
@@ -2403,6 +2414,30 @@ public class ForceHumanResources {
                       currentSpouse,
                       spousesBabysFather));
                 spousesBabysFather = null;
+            }
+
+            Iterator<Map.Entry<Person, Person>> exSpouseIterator = pregnantExSpouses.entrySet().iterator();
+            while (exSpouseIterator.hasNext()) {
+                Map.Entry<Person, Person> pregnantExSpouse = exSpouseIterator.next();
+                Person exSpouse = pregnantExSpouse.getKey();
+
+                if (!exSpouse.isPregnant()) {
+                    exSpouseIterator.remove();
+                } else if (currentDate.isAfter(exSpouse.getDueDate())) {
+                    // As with children born before the divorce, there is an even chance the child stays with the
+                    // campaign
+                    for (Person child : procreation.birthHistoric(campaign,
+                          currentDate,
+                          exSpouse,
+                          pregnantExSpouse.getValue())) {
+                        if (randomInt(2) == 0) {
+                            priorChildren.add(child);
+                        } else {
+                            currentChildren.add(child);
+                        }
+                    }
+                    exSpouseIterator.remove();
+                }
             }
         }
 
@@ -2485,6 +2520,38 @@ public class ForceHumanResources {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
+    /**
+     * Resolves the pregnancy of a background character once their due date has arrived.
+     *
+     * <p>Background characters count as having departed the campaign, so they are skipped by the regular weekly
+     * procreation processing. Without this, a pregnant background character (such as a spouse divorced during a new
+     * recruit's simulated relationship history) would remain pregnant indefinitely.</p>
+     *
+     * <p>The babies are born on the mother's due date and, like their mother, are background characters.</p>
+     *
+     * @param campaign the current campaign
+     * @param today    the current date
+     * @param mother   the background character to process
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processBackgroundCharacterPregnancy(Campaign campaign, LocalDate today, Person mother) {
+        if (!mother.getStatus().isBackground() || !mother.isPregnant() || today.isBefore(mother.getDueDate())) {
+            return;
+        }
+
+        for (Person baby : procreation.birthBackground(campaign, mother)) {
+            // The due date may be long past (e.g., a pregnancy left unresolved in an older save), so the child's
+            // education needs to reflect their real age
+            rerollBackgroundChildEducation(campaign, baby);
+            recruitPerson(campaign, baby, PrisonerStatus.FREE, true, false, false, true);
+            baby.setStatus(PersonnelStatus.BACKGROUND_CHARACTER);
+            MekHQ.triggerEvent(new PersonChangedEvent(baby));
+        }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(mother));
+    }
 
     /**
      * Re-rolls the education of a child generated as part of a new recruit's background family.

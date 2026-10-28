@@ -1204,7 +1204,11 @@ public class CampaignNewDayManager {
                                                .toList();
         for (Person person : departedPersonnel) {
             if (isNewWeek) {
-                randomDeath.processNewWeek(campaign, today, person);
+                if (!randomDeath.processNewWeek(campaign, today, person)) {
+                    campaign.getPlayerForce()
+                          .getHumanResources()
+                          .processBackgroundCharacterPregnancy(campaign, today, person);
+                }
             }
         }
     }
