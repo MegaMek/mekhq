@@ -135,17 +135,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
-import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.EasyBugReportDialog;
-import mekhq.gui.dialog.HireBulkPersonnelDialog;
-import mekhq.gui.dialog.MekHQUnitSelectorDialog;
-import mekhq.gui.dialog.NewsDialog;
-import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.RefitNameDialog;
-import mekhq.gui.dialog.RefitPartsArrivedNotice;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.UnitMarketDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -355,6 +345,22 @@ public class CampaignGUI extends JPanel {
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
+        applyTabLockOptions();
+
+        // While the tab order is locked, a tab dropped back onto the tab strip returns to its usual place rather than
+        // wherever it was dropped
+        tabMain.addTabStateListener(new EnhancedTabbedPane.TabStateListener() {
+            @Override
+            public void onTabReattached(int tabIndex, Component component) {
+                if (MekHQ.getMHQOptions().getLockMainTabOrder() && (component instanceof CampaignGuiTab tab)) {
+                    tabMain.remove(tab);
+                    int index = tabInsertIndex(tab);
+                    tabMain.insertTab(tab.getTabName(), null, tab, null, index);
+                    tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
+                    tabMain.setSelectedIndex(index);
+                }
+            }
+        });
 
         boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
         int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
@@ -754,15 +760,31 @@ public class CampaignGUI extends JPanel {
         if (tabMain.indexOfComponent(tab) >= 0) {
             return;
         }
-        int index =
-              IntStream.range(0, tabMain.getTabCount()).filter(
-                          i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
-                                     tab.tabType().ordinal())
-                    .findFirst()
-                    .orElse(tabMain.getTabCount());
+        int index = tabInsertIndex(tab);
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
         SwingUtilities.invokeLater(tab::refreshAll);
+    }
+
+    /**
+     * @param tab a tab that is not currently in the tab panel
+     *
+     * @return the index the tab belongs at in the tab panel, before the first tab that comes after it
+     */
+    private int tabInsertIndex(CampaignGuiTab tab) {
+        return IntStream.range(0, tabMain.getTabCount()).filter(
+                    i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
+                               tab.tabType().ordinal())
+                     .findFirst()
+                     .orElse(tabMain.getTabCount());
+    }
+
+    /**
+     * Applies the client options that lock the main tabs against being reordered or detached.
+     */
+    private void applyTabLockOptions() {
+        tabMain.setTabReorderingEnabled(!MekHQ.getMHQOptions().getLockMainTabOrder());
+        tabMain.setTabDetachingEnabled(!MekHQ.getMHQOptions().getLockMainTabDetaching());
     }
 
     /**
@@ -2618,6 +2640,7 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
         refreshGuiScale();
+        applyTabLockOptions();
     }
     // endregion Subscriptions
 }

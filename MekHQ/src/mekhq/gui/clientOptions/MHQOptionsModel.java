@@ -120,6 +120,8 @@ class MHQOptionsModel {
     boolean showCommandGenerator;
     boolean showUnitPicturesOnTOE;
     boolean showWarriorsAlmanac;
+    boolean lockMainTabOrder;
+    boolean lockMainTabDetaching;
     // endregion Display - General
 
     // region Display - Record Logs
@@ -239,6 +241,8 @@ class MHQOptionsModel {
         showCommandGenerator = options.getShowCommandGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
         showWarriorsAlmanac = options.getShowWarriorsAlmanac();
+        lockMainTabOrder = options.getLockMainTabOrder();
+        lockMainTabDetaching = options.getLockMainTabDetaching();
 
         // Display - Record Logs
         displayPersonnelLog = options.getDisplayPersonnelLog();
@@ -437,6 +441,8 @@ class MHQOptionsModel {
         options.setShowCommandGenerator(showCommandGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
         options.setShowWarriorsAlmanac(showWarriorsAlmanac);
+        options.setLockMainTabOrder(lockMainTabOrder);
+        options.setLockMainTabDetaching(lockMainTabDetaching);
 
         options.setDisplayPersonnelLog(displayPersonnelLog);
         options.setDisplayScenarioLog(displayScenarioLog);

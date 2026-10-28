@@ -79,6 +79,8 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkShowCommandGenerator;
     private SettingsCheckBox chkShowUnitPicturesOnTOE;
     private SettingsCheckBox chkShowWarriorsAlmanac;
+    private SettingsCheckBox chkLockMainTabOrder;
+    private SettingsCheckBox chkLockMainTabDetaching;
 
     // Display - Record Logs (start expanded)
     private SettingsCheckBox chkDisplayPersonnelLog;
@@ -191,6 +193,10 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac,
               getMetadata(new Version(0, 51, 1)));
         chkExpandOptionSections = checkBox("chkExpandOptionSections", model.expandOptionSections);
+        chkLockMainTabOrder = checkBox("chkLockMainTabOrder", model.lockMainTabOrder,
+              getMetadata(new Version(0, 51, 1)));
+        chkLockMainTabDetaching = checkBox("chkLockMainTabDetaching", model.lockMainTabDetaching,
+              getMetadata(new Version(0, 51, 1)));
         panel.addCheckBoxGrid(2,
               chkHideUnitFluff,
               chkUseAlternateStratConFogOfWar,
@@ -198,7 +204,9 @@ class MHQDisplayPage extends MHQOptionsPage {
               chkShowCommandGenerator,
               chkShowUnitPicturesOnTOE,
               chkShowWarriorsAlmanac,
-              chkExpandOptionSections);
+              chkExpandOptionSections,
+              chkLockMainTabOrder,
+              chkLockMainTabDetaching);
 
         return panel;
     }
@@ -449,6 +457,8 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.showCommandGenerator = chkShowCommandGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
         model.showWarriorsAlmanac = chkShowWarriorsAlmanac.isSelected();
+        model.lockMainTabOrder = chkLockMainTabOrder.isSelected();
+        model.lockMainTabDetaching = chkLockMainTabDetaching.isSelected();
 
         model.displayPersonnelLog = chkDisplayPersonnelLog.isSelected();
         model.displayScenarioLog = chkDisplayScenarioLog.isSelected();
