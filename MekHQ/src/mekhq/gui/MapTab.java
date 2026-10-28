@@ -1092,7 +1092,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         String costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  " + unavailable;
         if (isCostVisible) {
             TransportCostCalculations calculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
-            Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, displayedPath.getJumps());
+            Money journeyCost = calculations.calculateCostForEntireJourney(duration, displayedPath);
             costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  "
                 + journeyCost.toAmountAndSymbolString();
         }
@@ -1500,7 +1500,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               getCampaign().getJumpDriveProfile()));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
-        Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+        Money journeyCost = transportCostCalculations.calculateCostForEntireJourney(duration, jumpPath);
 
         String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getPlayerForce()
                                                                                    .getFinances(), jumpPath,

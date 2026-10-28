@@ -234,6 +234,7 @@ public class TransportCostCalculations {
     private int otherUnitCount;
 
     private Money totalCost = null;
+    private Money inSystemCost = null;
 
     public @Nullable Money getTotalCost() {
         return totalCost;
@@ -568,6 +569,36 @@ public class TransportCostCalculations {
     }
 
     /**
+     * Calculates the cost of a journey that makes no jump, such as a flight between two worlds of one system. No
+     * JumpShip is involved, so neither docking collars nor per-jump fees are charged.
+     *
+     * @param days the total number of days in the journey
+     *
+     * @return the total {@link Money} cost for the journey of the specified duration
+     */
+    public Money calculateInSystemCostForEntireJourney(final int days) {
+        if (inSystemCost == null) { // inSystemCost will be null if calculateJumpCostForEachDay hasn't yet been run
+            calculateJumpCostForEachDay();
+        }
+
+        return inSystemCost.multipliedBy(days).round();
+    }
+
+    /**
+     * Calculates the cost of travelling {@code path}, charging for JumpShips only when the path makes a jump.
+     *
+     * @param days the total number of days in the journey
+     * @param path the route being travelled
+     *
+     * @return the total {@link Money} cost for the journey
+     */
+    public Money calculateCostForEntireJourney(final int days, final JumpPath path) {
+        return (path.getJumps() > 0)
+                     ? calculateJumpCostForEntireJourney(days, path.getJumps())
+                     : calculateInSystemCostForEntireJourney(days);
+    }
+
+    /**
      * Calculates the cost of transporting the current hangar for a single day. This includes bay, collar, and
      * per-bay/per-collar costs, scaled for crew experience. The result is stored in {@link #totalCost} and also
      * returned.
@@ -586,19 +617,32 @@ public class TransportCostCalculations {
         calculateAdditionalBayRequirementsFromPassengers(getTotalLargeCraftPassengerCapacity());
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
+        inSystemCost = applyCostModifiers(totalCost);
+
         calculateAdditionalJumpCollarsRequirements();
 
-        adjustForCrewExperienceLevel();
-
-        if (hasTransportNegotiatorSPA) {
-            totalCost = totalCost.multipliedBy(1.05);
-        }
-
-        totalCost = totalCost.round();
+        totalCost = applyCostModifiers(totalCost);
     }
 
     /**
-     * Adjusts the total transport cost by applying a multiplier determined by the crew's experience level.
+     * Applies the crew experience multiplier and, if present, the Transport Negotiator bonus to a daily cost.
+     *
+     * @param cost the unmodified daily cost
+     *
+     * @return the modified daily cost, rounded
+     */
+    private Money applyCostModifiers(Money cost) {
+        Money modifiedCost = cost.multipliedBy(getCrewExperienceLevelMultiplier());
+
+        if (hasTransportNegotiatorSPA) {
+            modifiedCost = modifiedCost.multipliedBy(1.05);
+        }
+
+        return modifiedCost.round();
+    }
+
+    /**
+     * Determines the transport cost multiplier for the crew's experience level.
      *
      * <p>The method selects a specific multiplier based on {@link #jumpShipCrewExperienceLevel}:</p>
      *
@@ -610,22 +654,19 @@ public class TransportCostCalculations {
      *   <li>Any other value: uses {@code OTHER_CREW_MULTIPLIER}</li>
      * </ul>
      *
-     * <p>This multiplier is applied to the {@code totalCost} field, updating it to reflect the adjusted cost after
-     * considering crew quality.</p>
+     * @return the multiplier reflecting crew quality
      *
      * @author Illiani
      * @since 50.10
      */
-    private void adjustForCrewExperienceLevel() {
-        double crewExperienceLevelMultiplier = switch (jumpShipCrewExperienceLevel) {
+    private double getCrewExperienceLevelMultiplier() {
+        return switch (jumpShipCrewExperienceLevel) {
             case EXP_LEGENDARY -> LEGENDARY_CREW_MULTIPLIER;
             case EXP_HEROIC -> HEROIC_CREW_MULTIPLIER;
             case EXP_ELITE -> ELITE_CREW_MULTIPLIER;
             case EXP_VETERAN -> VETERAN_CREW_MULTIPLIER;
             default -> OTHER_CREW_MULTIPLIER;
         };
-
-        totalCost = totalCost.multipliedBy(crewExperienceLevelMultiplier);
     }
 
     /**
