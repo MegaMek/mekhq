@@ -41,6 +41,8 @@ import static mekhq.campaign.force.FormationType.SALVAGE;
 import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.force.FormationType.SUPPORT;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
@@ -100,6 +102,7 @@ import mekhq.gui.utilities.StaticChecks;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger LOGGER = MMLogger.create(TOEMouseAdapter.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.TOEMouseAdapter";
 
     private final CampaignGUI gui;
     private final JTree tree;
@@ -194,9 +197,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String REMOVE_NETWORK = "REMOVE_NETWORK";
     private static final String SET_MM = "SET_MM";
     private static final String SET_IND_M = "SET_IND_M";
+    private static final String UNLINK_C3_NODES = "UNLINK_C3_NODES";
 
     private static final String COMMAND_ADD_SLAVE = "ADD_SLAVES|UNIT|";
     private static final String COMMAND_REMOVE_C3 = "REMOVE_C3|UNIT|empty|";
+    private static final String COMMAND_UNLINK_C3_NODES = "UNLINK_C3_NODES|UNIT|empty|";
     private static final String COMMAND_SET_CO_MASTER = "SET_MM|UNIT|empty|";
     private static final String COMMAND_SET_IND_MASTER = "SET_IND_M|UNIT|empty|";
     private static final String COMMAND_CREATE_C3I = "C3I|UNIT|empty|";
@@ -209,24 +214,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     // Other
     private static final String GOTO_PILOT = "GOTO_PILOT";
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
-
-    // String tokens for dialog boxes used for transport loading
-    private static final String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" +
-                                                               "Would you also like to deploy these units?";
-    private static final String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
-
-    private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
-    private static final String MEK_CARRIERS = "Mek Transports";
-    private static final String PROTOMEK_CARRIERS = "ProtoMek Transports";
-    private static final String LIGHT_VEHICLE_CARRIERS = "Light Vehicle Transports";
-    private static final String HEAVY_VEHICLE_CARRIERS = "Heavy Vehicle Transports";
-    private static final String SUPER_HEAVY_VEHICLE_CARRIERS = "SuperHeavy Vehicle Transports";
-    private static final String BA_CARRIERS = "Battle Armor Transports";
-    private static final String INFANTRY_CARRIERS = "Infantry Transports";
-    private static final String ASF_CARRIERS = "Aerospace Fighter Transports";
-    private static final String SC_CARRIERS = "Small Craft Transports";
-    private static final String DS_CARRIERS = "DropShip Transports";
-    private static final String VARIABLE_TRANSPORT = "%s Transports";
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -285,12 +272,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         if (command.contains(TOEMouseAdapter.ADD_FORCE)) {
             if (null != singleFormation) {
                 String name = (String) JOptionPane.showInputDialog(null,
-                      "Enter the force name",
-                      "Force Name",
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceName.text"),
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceName.title"),
                       JOptionPane.PLAIN_MESSAGE,
                       null,
                       null,
-                      "My Lance");
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceName.default"));
                 if (null != name) {
                     Formation f = new Formation(name);
                     Campaign campaign = gui.getCampaign();
@@ -326,19 +313,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                                     u.setTech(tech);
                                 } else {
-                                    cantTech.append(tech.getFullName())
-                                          .append(" cannot maintain ")
-                                          .append(u.getName())
+                                    cantTech.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                                                "TOEMouseAdapter.cantMaintain.text",
+                                                tech.getFullName(),
+                                                u.getName()))
                                           .append('\n');
                                 }
                             }
                         }
 
                         if (!cantTech.toString().isBlank()) {
-                            cantTech.append("You will need to assign a tech manually.");
+                            cantTech.append(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.assignTechManually.text"));
                             JOptionPane.showMessageDialog(null,
                                   cantTech.toString(),
-                                  "Warning",
+                                  getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.warning.title"),
                                   JOptionPane.WARNING_MESSAGE);
                         }
                     }
@@ -358,11 +346,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 StringJoiner cantLoad = new StringJoiner(", ");
                 String cantLoadReasons = StaticChecks.canTransportShipCarry(units, ship);
                 if (cantLoadReasons != null) {
-                    cantLoad.add(ship.getName() +
-                                       " cannot load selected units for the following reasons: \n" +
-                                       cantLoadReasons);
+                    cantLoad.add(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "TOEMouseAdapter.cantLoad.text",
+                          ship.getName(),
+                          cantLoadReasons));
                     // If the ship can't load the selected units, display a nag with the reasons why
-                    JOptionPane.showMessageDialog(null, cantLoad, "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                          cantLoad,
+                          getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.warning.title"),
+                          JOptionPane.WARNING_MESSAGE);
                 } else {
                     // First, remove the units from any other Transport they might be on
                     for (Unit u : units) {
@@ -448,8 +440,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(CHANGE_NAME)) {
             if (null != singleFormation) {
                 String name = (String) JOptionPane.showInputDialog(null,
-                      "Enter the force name",
-                      "Force Name",
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceName.text"),
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceName.title"),
                       JOptionPane.PLAIN_MESSAGE,
                       null,
                       null,
@@ -485,7 +477,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             if (null != singleFormation) {
                 MarkdownEditorDialog tad = new MarkdownEditorDialog(gui.getFrame(),
                       true,
-                      "Edit Force Description",
+                      getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.editForceDescription.title"),
                       singleFormation.getDescription());
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
@@ -565,8 +557,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 if (null != formation && null != formation.getParentFormation()) {
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(null,
-                                    "Are you sure you want to delete " + formation.getFullName() + '?',
-                                    "Delete Force?",
+                                    getFormattedTextAt(RESOURCE_BUNDLE,
+                                          "TOEMouseAdapter.deleteForce.text",
+                                          formation.getFullName()),
+                                    getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.deleteForce.title"),
                                     JOptionPane.YES_NO_OPTION)) {
                         continue;
                     }
@@ -652,8 +646,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (unit.hasShipTransportedUnits()) { //I don't think units are deployed through this anymore
                             // Prompt the player to also deploy any units transported by this one
                             int optionChoice = JOptionPane.showConfirmDialog(null,
-                                  TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
-                                  TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE,
+                                  getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.loadUnits.text"),
+                                  getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.loadUnits.title"),
                                   JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
                                 extraUnits.addAll(unit.getShipTransportedUnits());
@@ -768,6 +762,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
             gui.getCampaign().getPlayerForce().refreshNetworks(gui.getCampaign().getGame());
             MekHQ.triggerEvent(new NetworkChangedEvent(units));
+        } else if (command.contains(TOEMouseAdapter.UNLINK_C3_NODES)) {
+            Campaign campaign = gui.getCampaign();
+            for (Unit u : units) {
+                campaign.getPlayerForce().removeUnitsFromC3Master(u, campaign.getGame());
+            }
         } else if (command.contains(TOEMouseAdapter.REMOVE_C3)) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
@@ -840,7 +839,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (!multipleSelection) {
                 if (formation.getSubFormations().isEmpty()) {
-                    menu = new JMenu("Override Formation Level");
+                    menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.overrideFormationLevel.text"));
                     menu.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME + forceIds);
                     menu.addActionListener(this);
                     menu.setEnabled(true);
@@ -865,7 +864,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                menu = new JMenu("Change Role");
+                menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeRole.text"));
                 menu.setEnabled(true);
                 popup.add(menu);
 
@@ -886,29 +885,29 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                menuItem = new JMenuItem("Change Name...");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeName.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_NAME + forceIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
-                menuItem = new JMenuItem("Change Description...");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeDescription.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_FORCE_DESC + forceIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
-                menuItem = new JMenuItem("Add New Force...");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addNewForce.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_FORCE + forceIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
 
                 if (formation.getTechID() == null) {
-                    menu = new JMenu("Add Tech to Force");
+                    menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addTech.text"));
 
-                    JMenu mekTechs = new JMenu("Mek Techs");
-                    JMenu aeroTechs = new JMenu("Aero Techs");
-                    JMenu mechanics = new JMenu("Mechanics");
-                    JMenu baTechs = new JMenu("BA Techs");
+                    JMenu mekTechs = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.mekTechs.text"));
+                    JMenu aeroTechs = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.aeroTechs.text"));
+                    JMenu mechanics = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.mechanics.text"));
+                    JMenu baTechs = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.baTechs.text"));
 
                     PersonnelRole role;
                     PersonnelRole previousRole = PersonnelRole.MEK_TECH;
@@ -1024,7 +1023,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(menu, currentMenu);
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 } else {
-                    menuItem = new JMenuItem("Remove Tech from Force");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeTech.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH +
                                                     formation.getTechID() +
                                                     '|' +
@@ -1033,7 +1032,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     popup.add(menuItem);
                 }
 
-                menu = new JMenu("Add Unit");
+                menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addUnit.text"));
                 HashMap<String, JMenu> unitTypeMenus = new HashMap<>();
                 HashMap<String, JMenu> weightClassForUnitType = new HashMap<>();
                 final List<Integer> svTypes = Arrays.asList(UnitType.TANK,
@@ -1084,7 +1083,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 // Or don't need a crew (trailers)
                 // Or HHWs
                 // TODO: Or Robotic Systems!
-                JMenu unsorted = new JMenu("Unsorted");
+                JMenu unsorted = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.unsorted.text"));
 
                 HangarSorter.weightSorted().forEachUnit(gui.getCampaign().getPlayerForce().getHangar(), u -> {
                     String type = UnitType.getTypeName(u.getEntity().getUnitType());
@@ -1122,7 +1121,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                     if (u.getEntity() instanceof GunEmplacement) {
                         if (u.getFormationId() < 1 && u.isPresent()) {
-                            JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
+                            JMenuItem menuItem0 = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "TOEMouseAdapter.autoTurret.text",
+                                  u.getName()));
                             menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                             menuItem0.addActionListener(this);
                             menuItem0.setEnabled(u.isAvailable());
@@ -1187,7 +1188,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 // still in the multiple selection block
                 List<UUID> eligibleCommanders = formation.getEligibleCommanders(gui.getCampaign());
                 if (!eligibleCommanders.isEmpty()) {
-                    menuItem = new JScrollableMenu("setCommanderMenu", "Set Commander");
+                    menuItem = new JScrollableMenu("setCommanderMenu",
+                          getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.setCommander.text"));
 
                     for (UUID personID : eligibleCommanders) {
                         Campaign campaign = gui.getCampaign();
@@ -1206,14 +1208,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            menu = new JMenu("Formation Icon");
+            menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.formationIcon.text"));
             if (!multipleSelection) {
-                menuItem = new JMenuItem("Change Formation Icon...");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeFormationIcon.text"));
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Copy Formation Icon");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.copyFormationIcon.text"));
                 menuItem.setName("miCopyFormationIcon");
                 menuItem.setActionCommand(COMMAND_COPY_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
@@ -1221,13 +1223,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCopyFormationIcon() != null) {
-                menuItem = new JMenuItem("Paste Formation Icon");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.pasteFormationIcon.text"));
                 menuItem.setName("miPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
 
-                menuItem = new JMenuItem("Paste Formation Icon to Force and Sub forces");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      "TOEMouseAdapter.pasteFormationIconSubForces.text"));
                 menuItem.setName("miSubForcesPasteFormationIcon");
                 menuItem.setActionCommand(COMMAND_SUB_FORCES_PASTE_FORCE_ICON + forceIds);
                 menuItem.addActionListener(this);
@@ -1236,48 +1239,51 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
             if (!multipleSelection) {
-                menuItem = new JMenuItem("Force Camouflage...");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.forceCamouflage.text"));
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CAMO + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
 
-            menu = new JMenu("Change Force Type");
+            menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.changeForceType.text"));
 
-            menuItem = new JMenuItem("Make Combat Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.makeCombatForce.text"));
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_STANDARD + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            menuItem = new JMenuItem("Make Support Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.makeSupportForce.text"));
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SUPPORT + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            menuItem = new JMenuItem("Make Convoy Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.makeConvoyForce.text"));
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_CONVOY + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            menuItem = new JMenuItem("Make Salvage Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.makeSalvageForce.text"));
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SALVAGE + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
 
-            menuItem = new JMenuItem("Make Security Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.makeSecurityForce.text"));
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SECURITY + forceIds);
             menuItem.addActionListener(this);
             menu.add(menuItem);
             popup.add(menu);
 
             if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
-                JMenuItem optionStrategicForceOverride = new JMenuItem((formation.isCombatTeam() ? "Never" : "Always") +
-                                                                             " Consider Force a Combat Team");
+                JMenuItem optionStrategicForceOverride = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      formation.isCombatTeam() ?
+                            "TOEMouseAdapter.neverCombatTeam.text" :
+                            "TOEMouseAdapter.alwaysCombatTeam.text"));
                 optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionStrategicForceOverride.addActionListener(this);
                 popup.add(optionStrategicForceOverride);
 
-                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Combat Team Override");
+                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      "TOEMouseAdapter.removeCombatTeamOverride.text"));
                 optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionRemoveStrategicForceOverride.addActionListener(this);
                 optionRemoveStrategicForceOverride.setVisible(formations.stream()
@@ -1289,7 +1295,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (StaticChecks.areAllForcesUnDeployed(gui.getCampaign(), formations) &&
                       StaticChecks.areAllStandardForces(formations)) {
-                menu = new JMenu("Deploy Force");
+                menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.deployForce.text"));
 
                 JMenu missionMenu;
                 for (final AbstractContract mission : gui.getCampaign().getActiveContracts(true)) {
@@ -1317,7 +1323,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllForcesDeployed(formations)) {
-                menuItem = new JMenuItem("Undeploy Force");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.undeployForce.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
 
@@ -1335,7 +1341,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            menuItem = new JMenuItem("Remove Force");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeForce.text"));
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
             menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(formations) &&
@@ -1354,10 +1360,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (int i = 1; i < units.size(); i++) {
                 unitIds.append('|').append(units.get(i).getId().toString());
             }
-            JScrollableMenu networkMenu = new JScrollableMenu("networkMenu", "Network");
+            JScrollableMenu networkMenu = new JScrollableMenu("networkMenu",
+                  getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.network.text"));
             JMenu availMenu;
             if (StaticChecks.areAllUnitsC3Slaves(units)) {
-                availMenu = new JMenu("Slave to");
+                availMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.slaveTo.text"));
                 for (String[] network : gui.getCampaign().getPlayerForce().getAvailableC3MastersForSlaves()) {
                     final int nodesFree;
                     try {
@@ -1368,7 +1375,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     if (nodesFree >= units.size()) {
-                        menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
+                        menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "TOEMouseAdapter.nodesFree.text",
+                              network[2],
+                              network[1]));
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE + network[0] + '|' + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1379,12 +1389,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsIndependentC3Masters(units)) {
-                menuItem = new JMenuItem("Set as Company Level Master");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.setCompanyMaster.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_SET_CO_MASTER + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 networkMenu.add(menuItem);
-                availMenu = new JMenu("Slave to");
+                availMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.slaveTo.text"));
                 for (String[] network : gui.getCampaign().getPlayerForce().getAvailableC3MastersForMasters()) {
                     final int nodesFree;
                     try {
@@ -1395,7 +1405,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     if (nodesFree >= units.size()) {
-                        menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
+                        menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "TOEMouseAdapter.nodesFree.text",
+                              network[2],
+                              network[1]));
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE + network[0] + '|' + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1406,7 +1419,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsCompanyLevelMasters(units)) {
-                menuItem = new JMenuItem("Set as Independent Master");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.setIndependentMaster.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_SET_IND_MASTER + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
@@ -1414,8 +1427,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.doAllUnitsHaveC3Master(units)) {
-                menuItem = new JMenuItem("Remove from network");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeFromNetwork.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_C3 + unitIds);
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
+                networkMenu.add(menuItem);
+            }
+
+            if (units.stream().noneMatch(u -> gui.getCampaign().getPlayerForce().getC3Nodes(u).isEmpty())) {
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.unlinkAllNodes.text"));
+                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNLINK_C3_NODES + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 networkMenu.add(menuItem);
@@ -1423,7 +1444,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // Naval C3 checks
             if (StaticChecks.doAllUnitsHaveNC3(units)) {
                 if (multipleSelection && StaticChecks.areAllUnitsNotNC3Networked(units) && (units.size() < 7)) {
-                    menuItem = new JMenuItem("Create new NC3 network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.createNC3Network.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_NC3 + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1431,7 +1452,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsNotNC3Networked(units)) {
-                    availMenu = new JMenu("Add to network");
+                    availMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addToNetwork.text"));
                     for (String[] network : gui.getCampaign().getPlayerForce().getAvailableNC3Networks()) {
                         final int nodesFree;
                         try {
@@ -1442,7 +1463,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         if (nodesFree >= units.size()) {
-                            menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
+                            menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "TOEMouseAdapter.nodesFree.text",
+                                  network[0],
+                                  network[1]));
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK +
                                                             network[0] +
                                                             '|' +
@@ -1456,13 +1480,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsNC3Networked(units)) {
-                    menuItem = new JMenuItem("Remove from network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeFromNetwork.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     networkMenu.add(menuItem);
                     if (StaticChecks.areAllUnitsOnSameNC3Network(units)) {
-                        menuItem = new JMenuItem("Disband this network");
+                        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.disbandNetwork.text"));
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1473,7 +1497,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             if (StaticChecks.doAllUnitsHaveC3i(units)) {
                 if (multipleSelection && StaticChecks.areAllUnitsNotC3iNetworked(units) && (units.size() < 7)) {
-                    menuItem = new JMenuItem("Create new C3i network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.createC3iNetwork.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_C3I + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1481,7 +1505,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsNotC3iNetworked(units)) {
-                    availMenu = new JMenu("Add to network");
+                    availMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addToNetwork.text"));
                     for (String[] network : gui.getCampaign().getPlayerForce().getAvailableC3iNetworks()) {
                         final int nodesFree;
                         try {
@@ -1492,7 +1516,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         if (nodesFree >= units.size()) {
-                            menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
+                            menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "TOEMouseAdapter.nodesFree.text",
+                                  network[0],
+                                  network[1]));
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK +
                                                             network[0] +
                                                             '|' +
@@ -1506,13 +1533,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsC3iNetworked(units)) {
-                    menuItem = new JMenuItem("Remove from network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeFromNetwork.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     networkMenu.add(menuItem);
                     if (StaticChecks.areAllUnitsOnSameC3iNetwork(units)) {
-                        menuItem = new JMenuItem("Disband this network");
+                        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.disbandNetwork.text"));
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1524,7 +1551,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // Nova CEWS network checks (max 3 units per network)
             if (StaticChecks.doAllUnitsHaveNovaCEWS(units)) {
                 if (multipleSelection && StaticChecks.areAllUnitsNotNovaCEWSNetworked(units) && (units.size() < 4)) {
-                    menuItem = new JMenuItem("Create new Nova CEWS network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.createNovaCEWSNetwork.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CREATE_NOVA_CEWS + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
@@ -1532,7 +1559,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsNotNovaCEWSNetworked(units)) {
-                    availMenu = new JMenu("Add to Nova network");
+                    availMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.addToNovaNetwork.text"));
                     for (String[] network : gui.getCampaign().getPlayerForce().getAvailableNovaCEWSNetworks()) {
                         final int nodesFree;
                         try {
@@ -1543,7 +1570,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         if (nodesFree >= units.size()) {
-                            menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
+                            menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+                                  "TOEMouseAdapter.nodesFree.text",
+                                  network[0],
+                                  network[1]));
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK +
                                                             network[0] +
                                                             '|' +
@@ -1557,13 +1587,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (StaticChecks.areAllUnitsNovaCEWSNetworked(units)) {
-                    menuItem = new JMenuItem("Remove from network");
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeFromNetwork.text"));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FROM_NETWORK + unitIds);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     networkMenu.add(menuItem);
                     if (StaticChecks.areAllUnitsOnSameNovaCEWSNetwork(units)) {
-                        menuItem = new JMenuItem("Disband this network");
+                        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.disbandNetwork.text"));
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DISBAND_NETWORK + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
@@ -1575,14 +1605,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(networkMenu);
             }
 
-            menuItem = new JMenuItem("Remove Unit from TO&E");
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeUnit.text"));
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_UNIT + unitIds);
             menuItem.addActionListener(this);
             menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
             popup.add(menuItem);
             if (StaticChecks.areAllUnitsAvailable(units)) {
                 // Deploy unit to a scenario - includes submenus for scenario selection
-                menu = new JMenu("Deploy Unit");
+                menu = new JMenu(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.deployUnit.text"));
                 JMenu missionMenu;
                 for (final AbstractContract mission : gui.getCampaign().getActiveContracts(true)) {
                     missionMenu = new JMenu(mission.getName());
@@ -1608,7 +1638,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Undeploy Unit");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.undeployUnit.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
 
@@ -1632,13 +1662,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             if (!multipleSelection) {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
 
-                menuItem = new JMenuItem("Go to Unit in Hangar");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.goToUnit.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_UNIT + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
 
-                menuItem = new JMenuItem("Go to Pilot/Commander in Personnel");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.goToPilot.text"));
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_GOTO_PILOT + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
