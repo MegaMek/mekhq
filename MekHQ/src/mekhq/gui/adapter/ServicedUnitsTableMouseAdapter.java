@@ -33,6 +33,7 @@
 package mekhq.gui.adapter;
 
 import static mekhq.campaign.unit.Unit.SITE_FIELD_WORKSHOP;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
 import java.util.Optional;
@@ -144,7 +145,8 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 } else {
                     String message = MRMSService.performSingleUnitMRMS(gui.getCampaign(), unit);
 
-                    JOptionPane.showMessageDialog(gui.getFrame(), message, "Complete",
+                    JOptionPane.showMessageDialog(gui.getFrame(), message,
+                          getTextAt("mekhq.resources.MRMS", "MRMS.UnitResult.title"),
                           JOptionPane.INFORMATION_MESSAGE);
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }

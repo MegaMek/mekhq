@@ -95,6 +95,18 @@ public class ProstheticTypeTest {
     }
 
     @Test
+    @DisplayName("isClonedLimb is only true for cloned limb replacements")
+    public void isClonedLimb_onlyTrueForClones() {
+        Set<ProstheticType> clones = Set.of(ProstheticType.CLONED_ARM, ProstheticType.CLONED_HAND,
+              ProstheticType.CLONED_LEG, ProstheticType.CLONED_FOOT);
+
+        for (ProstheticType prostheticType : ProstheticType.values()) {
+            assertEquals(clones.contains(prostheticType), prostheticType.isClonedLimb(),
+                  () -> prostheticType.name() + " has an unexpected isClonedLimb value");
+        }
+    }
+
+    @Test
     @DisplayName("getProstheticFromInjury returns null for non-permanent modification injuries")
     public void getProstheticFromInjury_returnsNullForNonPermanent() {
         InjuryType nonPermanent = AlternateInjuries.FRACTURED_RIB;
@@ -220,5 +232,20 @@ public class ProstheticTypeTest {
 
         assertFalse(tooltip.contains("!ProstheticType."),
               () -> prostheticType.name() + " has a tooltip line missing from the resource bundle: " + tooltip);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ProstheticType.class, names = { "CLONED_ARM", "CLONED_FOOT", "CLONED_HAND", "CLONED_LEG" })
+    @DisplayName("Cloned limbs explain their healing penalty exemption in their tooltip")
+    public void clonedLimbTooltipsMentionHealingExemption(ProstheticType prostheticType) {
+        Faction faction = mock(Faction.class);
+        when(faction.getShortName()).thenReturn("MERC");
+
+        String tooltip = prostheticType.getTooltip(faction, 3075, 1.0, BodyLocation.GENERIC);
+
+        assertFalse(tooltip.contains("!ProstheticType."),
+              () -> prostheticType.name() + " has a tooltip line missing from the resource bundle: " + tooltip);
+        assertTrue(tooltip.contains("+" + AdvancedMedicalAlternateHealing.PROSTHETIC_PENALTY + " prosthetic penalty"),
+              () -> prostheticType.name() + " does not mention its healing penalty exemption: " + tooltip);
     }
 }
