@@ -32,29 +32,39 @@
  */
 package mekhq.gui.menus;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Stream;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import megamek.common.units.*;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.crewAssignment.CrewSeat;
+import mekhq.campaign.unit.crewAssignment.CrewSeatLayout;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.utilities.StaticChecks;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a standard menu that takes either a person or multiple people, and allows the user to assign them to a unit
  * or remove them from their unit(s), including tech assignments.
+ *
+ * <p>Which seats are offered comes from {@link CrewSeatLayout} and
+ * {@link mekhq.campaign.unit.crewAssignment.SeatEligibility}, the same rules the crew assignment dialog uses. A seat
+ * that holds one person is offered only when one person is selected; a seat that holds several takes as many of the
+ * selected people as it has room for.</p>
  */
 public class AssignPersonToUnitMenu extends JScrollableMenu {
     //region Constructors
@@ -88,13 +98,13 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
         if (assign) {
             final Profession basePrimaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
-            final Profession baseSecondaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getPrimaryRole());
+            final Profession baseSecondaryProfession = Profession.getProfessionFromPersonnelRole(people[0].getSecondaryRole());
             for (final Person person : people) {
                 final Profession primaryProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
                 if ((primaryProfession == basePrimaryProfession) || (primaryProfession == baseSecondaryProfession)) {
                     continue;
                 }
-                final Profession secondaryProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
+                final Profession secondaryProfession = Profession.getProfessionFromPersonnelRole(person.getSecondaryRole());
                 if (secondaryProfession.isCivilian() ||
                           ((secondaryProfession != basePrimaryProfession) &&
                                  (secondaryProfession != baseSecondaryProfession))) {
@@ -105,468 +115,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         }
 
         if (assign) {
-            // Person Assignment Menus
-            final JScrollableMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("asPilotMenu.text"));
-            JScrollableMenu pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu");
-            JMenu pilotEntityWeightMenu = new JMenu();
-            final JScrollableMenu driverMenu = new JScrollableMenu("driverMenu",
-                  resources.getString("asDriverMenu.text"));
-            JScrollableMenu driverUnitTypeMenu = new JScrollableMenu("driverUnitTypeMenu");
-            JMenu driverEntityWeightMenu = new JMenu();
-            final JScrollableMenu gunnerMenu = new JScrollableMenu("gunnerMenu",
-                  resources.getString("asGunnerMenu.text"));
-            JScrollableMenu gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu");
-            JMenu gunnerEntityWeightMenu = new JMenu();
-            final JScrollableMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu",
-                  resources.getString("asCrewmemberMenu.text"));
-            JScrollableMenu crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu");
-            JMenu crewmemberEntityWeightMenu = new JMenu();
-            final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
-                  resources.getString("asTechOfficerMenu.text"));
-            JScrollableMenu techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu");
-            JMenu techOfficerEntityWeightMenu = new JMenu();
-            final JScrollableMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu",
-                  resources.getString("asConsoleCommanderMenu.text"));
-            JScrollableMenu consoleCommanderUnitTypeMenu = new JScrollableMenu("consoleCommanderUnitTypeMenu");
-            JMenu consoleCommanderEntityWeightMenu = new JMenu();
-            final JScrollableMenu soldierMenu = new JScrollableMenu("soldierMenu",
-                  resources.getString("asSoldierMenu.text"));
-            JScrollableMenu soldierUnitTypeMenu = new JScrollableMenu("soldierUnitTypeMenu");
-            JMenu soldierEntityWeightMenu = new JMenu();
-            final JScrollableMenu navigatorMenu = new JScrollableMenu("navigatorMenu",
-                  resources.getString("asNavigatorMenu.text"));
-            JScrollableMenu navigatorUnitTypeMenu = new JScrollableMenu("navigatorUnitTypeMenu");
-            JMenu navigatorEntityWeightMenu = new JMenu();
-
-            // Parsing Booleans
-            final boolean singlePerson = people.length == 1;
-            final boolean areAllBattleMekPilots = Stream.of(people)
-                                                        .allMatch(person -> person.getPrimaryRole()
-                                                                                  .isMekWarriorGrouping() ||
-                                                                                  person.getSecondaryRole()
-                                                                                        .isMekWarriorGrouping());
-            final boolean areAllProtoMekPilots = Stream.of(people)
-                                                       .allMatch(person -> person.hasRole(PersonnelRole.PROTOMEK_PILOT));
-            final boolean areAllConventionalAircraftPilots = Stream.of(people)
-                                                                   .allMatch(person -> person.getPrimaryRole()
-                                                                                             .isConventionalAircraftPilot() ||
-                                                                                             person.getSecondaryRole()
-                                                                                                   .isConventionalAircraftPilot());
-            final boolean areAllAerospacePilots = Stream.of(people)
-                                                        .allMatch(person -> person.getPrimaryRole()
-                                                                                  .isAerospaceGrouping() ||
-                                                                                  person.getSecondaryRole()
-                                                                                        .isAerospaceGrouping());
-            final boolean areAllGroundCrew = Stream.of(people)
-                                                   .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_GROUND));
-            final boolean areAllVTOLCrew = Stream.of(people)
-                                                 .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_VTOL));
-            final boolean areAllVesselPilots = Stream.of(people)
-                                                     .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_PILOT));
-            final boolean areAllNavalVehicleCrew = Stream.of(people)
-                                                         .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_NAVAL));
-            final boolean areAllGroundVehicleCrew = Stream.of(people)
-                                                          .allMatch(person -> person.hasRole(PersonnelRole.VEHICLE_CREW_GROUND));
-            final boolean areAllVesselGunners = Stream.of(people)
-                                                      .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_GUNNER));
-            final boolean areAllVesselCrew = Stream.of(people)
-                                                   .allMatch(person -> person.hasRole(PersonnelRole.VESSEL_CREW));
-            final boolean areAllVehicleCrew = Stream.of(people)
-                                                    .allMatch(person -> person.getPrimaryRole()
-                                                                              .isVehicleCrewExtended() ||
-                                                                              person.getSecondaryRole()
-                                                                                    .isVehicleCrewExtended());
-            final boolean areAllSoldiers = Stream.of(people).allMatch(person -> person.hasRole(PersonnelRole.SOLDIER));
-            final boolean areAllBattleArmourPilots = Stream.of(people)
-                                                           .allMatch(person -> person.hasRole(PersonnelRole.BATTLE_ARMOUR));
-            final boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
-            final boolean isUseImplants = campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS);
-
-            // Parsing Variables
-            int unitType = -1;
-            int weightClass = -1;
-
-            // Use the hangar at the persons' effective location: base hangar when at a base,
-            // campaign hangar when in the main force. All selected persons must be co-located
-            // (enforced above via the in-transit check and the unit co-location filter below).
-            AbstractBase effectiveBase = LocationUtils.findEffectiveBase(people[0]);
-            mekhq.campaign.LocalHangar sourceHangar;
-            sourceHangar = effectiveBase != null ?
-                                 effectiveBase.getBaseHangar() :
-                                 campaign.getPlayerForce().getHangar();
-            final List<Unit> units = HangarSorter.defaultSorting()
-                                           .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable))
-                                           .toList();
-            for (final Unit unit : units) {
-                Entity entity = unit.getEntity();
-                if (entity.getUnitType() != unitType) {
-                    // Add the current menus, first the Entity Weight Class menu to the related Unit
-                    // Type menu, then the Unit Type menu to the grouping menu
-                    pilotUnitTypeMenu.add(pilotEntityWeightMenu);
-                    pilotMenu.add(pilotUnitTypeMenu);
-                    driverUnitTypeMenu.add(driverEntityWeightMenu);
-                    driverMenu.add(driverUnitTypeMenu);
-                    gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
-                    gunnerMenu.add(gunnerUnitTypeMenu);
-                    crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
-                    crewmemberMenu.add(crewmemberUnitTypeMenu);
-                    techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
-                    techOfficerMenu.add(techOfficerUnitTypeMenu);
-                    consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
-                    consoleCommanderMenu.add(consoleCommanderUnitTypeMenu);
-                    soldierUnitTypeMenu.add(soldierEntityWeightMenu);
-                    soldierMenu.add(soldierUnitTypeMenu);
-                    navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
-                    navigatorMenu.add(navigatorUnitTypeMenu);
-
-                    // Update parsing variables
-                    unitType = entity.getUnitType();
-                    weightClass = entity.getWeightClass();
-
-                    // And create the new menus
-                    final String unitTypeName = UnitType.getTypeDisplayableName(unitType);
-                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, entity);
-                    pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
-                    pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
-                    driverUnitTypeMenu = new JScrollableMenu("driverUnitTypeMenu", unitTypeName);
-                    driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
-                    gunnerUnitTypeMenu = new JScrollableMenu("gunnerUnitTypeMenu", unitTypeName);
-                    gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
-                    crewmemberUnitTypeMenu = new JScrollableMenu("crewmemberUnitTypeMenu", unitTypeName);
-                    crewmemberEntityWeightMenu = new JScrollableMenu("crewmemberEntityWeightMenu",
-                          entityWeightClassName);
-                    techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu", unitTypeName);
-                    techOfficerEntityWeightMenu = new JScrollableMenu("techOfficerEntityWeightMenu",
-                          entityWeightClassName);
-                    consoleCommanderUnitTypeMenu = new JScrollableMenu("consoleCommanderUnitTypeMenu", unitTypeName);
-                    consoleCommanderEntityWeightMenu = new JScrollableMenu("consoleCommanderEntityWeightMenu",
-                          entityWeightClassName);
-                    soldierUnitTypeMenu = new JScrollableMenu("soldierUnitTypeMenu", unitTypeName);
-                    soldierEntityWeightMenu = new JScrollableMenu("soldierEntityWeightMenu", entityWeightClassName);
-                    navigatorUnitTypeMenu = new JScrollableMenu("navigatorUnitTypeMenu", unitTypeName);
-                    navigatorEntityWeightMenu = new JScrollableMenu("navigatorEntityWeightMenu", entityWeightClassName);
-                } else if (entity.getWeightClass() != weightClass) {
-                    // Add the current Entity Weight Class menu to the Unit Type menu
-                    pilotUnitTypeMenu.add(pilotEntityWeightMenu);
-                    driverUnitTypeMenu.add(driverEntityWeightMenu);
-                    gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
-                    crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
-                    techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
-                    consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
-                    soldierUnitTypeMenu.add(soldierEntityWeightMenu);
-                    navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
-
-                    // Update parsing variable
-                    weightClass = entity.getWeightClass();
-
-                    // And create the new Entity Weight Class menus
-                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, entity);
-                    pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
-                    driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
-                    gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
-                    techOfficerUnitTypeMenu = new JScrollableMenu("techOfficerUnitTypeMenu", entityWeightClassName);
-                    crewmemberEntityWeightMenu = new JScrollableMenu("crewmemberEntityWeightMenu",
-                          entityWeightClassName);
-                    consoleCommanderEntityWeightMenu = new JScrollableMenu("consoleCommanderEntityWeightMenu",
-                          entityWeightClassName);
-                    soldierEntityWeightMenu = new JScrollableMenu("soldierEntityWeightMenu", entityWeightClassName);
-                    navigatorEntityWeightMenu = new JScrollableMenu("navigatorEntityWeightMenu", entityWeightClassName);
-                }
-
-                // Pilot Menu
-                if (unit.canTakeMoreDrivers()) {
-                    // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                    if (singlePerson &&
-                              (unit.usesSoloPilot() ||
-                                     (entity instanceof VTOL) ||
-                                     (entity instanceof Mek) ||
-                                     (entity instanceof ConvFighter) ||
-                                     entity.isSuperHeavy() ||
-                                     entity.isTripodMek() ||
-                                     entity.isQuadMek())) {
-                        final boolean valid = switch (entity) {
-                            case Mek ignored -> areAllBattleMekPilots;
-                            case ProtoMek ignored -> areAllProtoMekPilots;
-                            case ConvFighter ignored -> areAllConventionalAircraftPilots;
-                            case Aero ignored -> areAllAerospacePilots;
-                            case VTOL ignored -> areAllVTOLCrew;
-                            default -> false;
-                        };
-
-                        if (valid) {
-                            final JMenuItem miPilot = new JMenuItem(unit.getName());
-                            miPilot.setName("miPilot");
-                            miPilot.addActionListener(evt -> {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                    useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                }
-
-                                if (entity instanceof VTOL || entity instanceof ConvFighter) {
-                                    unit.addDriver(people[0], useTransfers);
-                                } else {
-                                    unit.addPilotOrSoldier(people[0], useTransfers);
-                                }
-
-                                Person person = people[0];
-                                ensureRecruitmentDate(campaign.getLocalDate(), person);
-                            });
-                            pilotEntityWeightMenu.add(miPilot);
-                        }
-                    }
-
-                    // Pilot Menu - Small Craft and JumpShip Vessel Pilot Assignment
-                    if (((entity instanceof SmallCraft) || (entity instanceof Jumpship)) && areAllVesselPilots) {
-                        final JMenuItem miVesselPilot = new JMenuItem(unit.getName());
-                        miVesselPilot.setName("miVesselPilot");
-                        miVesselPilot.addActionListener(evt -> {
-                            for (final Person person : people) {
-                                if (!unit.canTakeMoreDrivers()) {
-                                    return;
-                                } else if (!unit.equals(person.getUnit())) {
-                                    final Unit oldUnit = person.getUnit();
-                                    boolean useTransfers = false;
-                                    if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                        useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                    }
-                                    unit.addDriver(person, useTransfers);
-                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
-                                }
-                            }
-                        });
-                        pilotEntityWeightMenu.add(miVesselPilot);
-                    }
-
-                    // Driver Menu - Non-VTOL Tank Driver Assignments
-                    if (singlePerson && (entity instanceof Tank) && !(entity instanceof VTOL)) {
-                        if (entity.getMovementMode().isMarine() ?
-                                  areAllNavalVehicleCrew :
-                                  areAllGroundVehicleCrew) {
-                            final JMenuItem miDriver = new JMenuItem(unit.getName());
-                            miDriver.setName("miDriver");
-                            miDriver.addActionListener(evt -> {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                    useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                }
-                                unit.addDriver(people[0], useTransfers);
-
-                                Person person = people[0];
-                                ensureRecruitmentDate(campaign.getLocalDate(), person);
-                            });
-                            driverEntityWeightMenu.add(miDriver);
-                        }
-                    }
-                }
-
-                // Gunnery Menu
-                if (unit.canTakeMoreGunners()) {
-                    final boolean valid;
-
-                    if (entity instanceof Tank) {
-                        if (entity instanceof VTOL) {
-                            valid = areAllVTOLCrew;
-                        } else if (entity.getMovementMode().isMarine()) {
-                            valid = areAllNavalVehicleCrew;
-                        } else {
-                            valid = areAllGroundCrew;
-                        }
-                    } else if (entity instanceof ConvFighter) {
-                        valid = areAllConventionalAircraftPilots;
-                    } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-                        valid = areAllVesselGunners;
-                    } else if ((entity instanceof Mek) && !unit.usesSoloPilot()) {
-                        valid = areAllBattleMekPilots;
-                    } else {
-                        valid = false;
-                    }
-
-                    if (valid) {
-                        final JMenuItem miGunner = new JMenuItem(unit.getName());
-                        miGunner.setName("miGunner");
-                        miGunner.addActionListener(evt -> {
-                            for (final Person person : people) {
-                                if (!unit.canTakeMoreGunners()) {
-                                    return;
-                                } else if (!unit.equals(person.getUnit())) {
-                                    final Unit oldUnit = person.getUnit();
-                                    boolean useTransfers = false;
-                                    if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                        useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                    }
-                                    unit.addGunner(person, useTransfers);
-                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
-                                }
-                            }
-                        });
-                        gunnerEntityWeightMenu.add(miGunner);
-                    }
-                }
-
-                // Crewmember Menu
-                // TODO : Rename the method to canTakeMoreCrewmembers, and update the variable names to
-                // TODO : also be based on crewmembers
-                if (unit.canTakeMoreVesselCrew()) {
-                    final boolean valid;
-                    if (entity instanceof Aero && !(entity instanceof ConvFighter)) {
-                        valid = areAllVesselCrew;
-                    } else {
-                        // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
-                        valid = areAllVehicleCrew;
-                    }
-
-                    if (valid) {
-                        final JMenuItem miCrewmember = new JMenuItem(unit.getName());
-                        miCrewmember.setName("miCrewmember");
-                        miCrewmember.addActionListener(evt -> {
-                            for (final Person person : people) {
-                                if (!unit.canTakeMoreVesselCrew()) {
-                                    return;
-                                } else if (!unit.equals(person.getUnit())) {
-                                    final Unit oldUnit = person.getUnit();
-                                    boolean useTransfers = false;
-                                    if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                        useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                    }
-                                    unit.addVesselCrew(person, useTransfers);
-                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
-                                }
-                            }
-                        });
-                        crewmemberEntityWeightMenu.add(miCrewmember);
-
-                    }
-                }
-
-                // Tech Officer and Console Commander Menu, currently combined as required by the current setup
-                // TODO : Our implementation for Console Commanders in MekHQ makes this a necessity, but
-                // TODO : I find that really terrible. We should be able to separate out tech officers
-                // TODO : and Console Commanders properly. Because of this, I'm leaving the base code
-                // TODO : here as the older style for now.
-                if (singlePerson && unit.canTakeTechOfficer()) {
-                    // For a vehicle command console we will require the commander to be a driver
-                    // or a gunner, but not necessarily both
-                    if (entity instanceof Tank) {
-                        if (people[0].canDrive(entity, isUseAltAdvancedMedical, isUseImplants) ||
-                                  people[0].canGun(entity)) {
-                            final JMenuItem miConsoleCommander = new JMenuItem(unit.getName());
-                            miConsoleCommander.setName("miConsoleCommander");
-                            miConsoleCommander.addActionListener(evt -> {
-                                final Unit oldUnit = people[0].getUnit();
-                                boolean useTransfers = false;
-                                if (oldUnit != null) {
-                                    oldUnit.remove(people[0], !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                    useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                }
-                                unit.setTechOfficer(people[0], useTransfers);
-
-                                Person person = people[0];
-                                ensureRecruitmentDate(campaign.getLocalDate(), person);
-                            });
-                            consoleCommanderEntityWeightMenu.add(miConsoleCommander);
-                        }
-                    } else if (people[0].canDrive(entity, isUseAltAdvancedMedical, isUseImplants) &&
-                                     people[0].canGun(entity)) {
-                        final JMenuItem miTechOfficer = new JMenuItem(unit.getName());
-                        miTechOfficer.setName("miTechOfficer");
-                        miTechOfficer.addActionListener(evt -> {
-                            final Unit oldUnit = people[0].getUnit();
-                            boolean useTransfers = false;
-                            if (oldUnit != null) {
-                                oldUnit.remove(people[0], !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                            }
-                            unit.setTechOfficer(people[0], useTransfers);
-
-                            Person person = people[0];
-                            ensureRecruitmentDate(campaign.getLocalDate(), person);
-                        });
-                        techOfficerEntityWeightMenu.add(miTechOfficer);
-                    }
-                }
-
-                // Soldier Menu
-                if (unit.usesSoldiers() && unit.canTakeMoreGunners()) {
-                    final boolean valid = unit.isConventionalInfantry() ? areAllSoldiers : areAllBattleArmourPilots;
-
-                    if (valid) {
-                        final JMenuItem miSoldier = new JMenuItem(unit.getName());
-                        miSoldier.setName("miSoldier");
-                        miSoldier.addActionListener(evt -> {
-                            for (final Person person : people) {
-                                if (!unit.canTakeMoreGunners()) {
-                                    return;
-                                } else if (!unit.equals(person.getUnit())) {
-                                    final Unit oldUnit = person.getUnit();
-                                    boolean useTransfers = false;
-                                    if (oldUnit != null) {
-                                        oldUnit.remove(person, !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                                        useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                                    }
-                                    unit.addPilotOrSoldier(person, useTransfers);
-                                    ensureRecruitmentDate(campaign.getLocalDate(), person);
-                                }
-                            }
-                        });
-                        soldierEntityWeightMenu.add(miSoldier);
-                    }
-                }
-
-                // Navigator Menu
-                if (singlePerson && unit.canTakeNavigator() && people[0].hasRole(PersonnelRole.VESSEL_NAVIGATOR)) {
-                    final JMenuItem miNavigator = new JMenuItem(unit.getName());
-                    miNavigator.setName("miNavigator");
-                    miNavigator.addActionListener(evt -> {
-                        final Unit oldUnit = people[0].getUnit();
-                        boolean useTransfers = false;
-                        if (oldUnit != null) {
-                            oldUnit.remove(people[0], !campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS));
-                            useTransfers = campaign.getCampaignOptions().get(CampaignOption.USE_TRANSFERS);
-                        }
-                        unit.setNavigator(people[0], useTransfers);
-
-                        Person person = people[0];
-                        ensureRecruitmentDate(campaign.getLocalDate(), person);
-                    });
-                    navigatorEntityWeightMenu.add(miNavigator);
-                }
-            }
-
-            // Add the created menus to this
-            pilotUnitTypeMenu.add(pilotEntityWeightMenu);
-            pilotMenu.add(pilotUnitTypeMenu);
-            add(pilotMenu);
-            driverUnitTypeMenu.add(driverEntityWeightMenu);
-            driverMenu.add(driverUnitTypeMenu);
-            add(driverMenu);
-            gunnerUnitTypeMenu.add(gunnerEntityWeightMenu);
-            gunnerMenu.add(gunnerUnitTypeMenu);
-            add(gunnerMenu);
-            crewmemberUnitTypeMenu.add(crewmemberEntityWeightMenu);
-            crewmemberMenu.add(crewmemberUnitTypeMenu);
-            add(crewmemberMenu);
-            techOfficerUnitTypeMenu.add(techOfficerEntityWeightMenu);
-            techOfficerMenu.add(techOfficerUnitTypeMenu);
-            add(techOfficerMenu);
-            consoleCommanderUnitTypeMenu.add(consoleCommanderEntityWeightMenu);
-            consoleCommanderMenu.add(consoleCommanderUnitTypeMenu);
-            add(consoleCommanderMenu);
-            soldierUnitTypeMenu.add(soldierEntityWeightMenu);
-            soldierMenu.add(soldierUnitTypeMenu);
-            add(soldierMenu);
-            navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
-            navigatorMenu.add(navigatorUnitTypeMenu);
-            add(navigatorMenu);
+            addSeatMenus(campaign, people);
 
             // Add the tech menu if there is only a single person to assign
-            if (singlePerson) {
+            if (people.length == 1) {
                 add(new AssignTechToUnitMenu(campaign, people[0]));
             }
         }
@@ -594,20 +146,57 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
     }
 
     /**
-     * Ensures that the given person's recruitment date is set.
-     *
-     * <p>If the {@code Person} does not already have a recruitment date assigned, this method assigns the provided
-     * date as their recruitment date.</p>
-     *
-     * @param today  the {@link LocalDate} to set as the recruitment date if not already set
-     * @param person the {@link Person} whose recruitment date is to be checked and possibly updated
-     *
-     * @author Illiani
-     * @since 0.50.07
+     * Adds one menu per kind of seat, each grouping the units with that seat free by unit type and then weight class.
      */
-    private static void ensureRecruitmentDate(LocalDate today, Person person) {
-        if (person.getRecruitment() == null) {
-            person.setRecruitment(today);
+    private void addSeatMenus(final Campaign campaign, final Person... people) {
+        // Use the hangar at the persons' effective location: base hangar when at a base, campaign hangar when in the
+        // main force. A unit at a different location is refused when the assignment is applied.
+        final AbstractBase effectiveBase = LocationUtils.findEffectiveBase(people[0]);
+        final LocalHangar sourceHangar = (effectiveBase != null) ?
+                                               effectiveBase.getBaseHangar() :
+                                               campaign.getPlayerForce().getHangar();
+        final List<Unit> units = HangarSorter.defaultSorting()
+                                       .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable))
+                                       .toList();
+
+        // Seat menu -> unit type -> weight class -> one item per unit, kept in the hangar's sorted order
+        final Map<CrewSeatMenu, Map<String, Map<String, List<JMenuItem>>>> items = new EnumMap<>(CrewSeatMenu.class);
+        final boolean singlePerson = people.length == 1;
+        for (final Unit unit : units) {
+            final Entity entity = unit.getEntity();
+            for (final CrewSeat seat : CrewSeatLayout.forUnit(unit)) {
+                if (seat.isFull()
+                          || (!singlePerson && (seat.capacity() <= 1))
+                          || !CrewMenuAssignment.allQualify(campaign, unit, seat.type(), people)) {
+                    continue;
+                }
+                final JMenuItem item = new JMenuItem(unit.getName());
+                item.setName("mi" + seat.type().name());
+                item.addActionListener(evt -> CrewMenuAssignment.assign(campaign, unit, seat.type(), people));
+                items.computeIfAbsent(CrewSeatMenu.of(seat.type(), entity), key -> new LinkedHashMap<>())
+                      .computeIfAbsent(UnitType.getTypeDisplayableName(entity.getUnitType()),
+                            key -> new LinkedHashMap<>())
+                      .computeIfAbsent(EntityWeightClass.getClassName(entity.getWeightClass(), entity),
+                            key -> new ArrayList<>())
+                      .add(item);
+            }
+        }
+
+        for (final CrewSeatMenu seatMenu : CrewSeatMenu.values()) {
+            final JScrollableMenu menu = new JScrollableMenu(seatMenu.name().toLowerCase(Locale.ROOT) + "Menu",
+                  resources.getString(seatMenu.getPersonToUnitKey()));
+            for (final Map.Entry<String, Map<String, List<JMenuItem>>> unitType :
+                  items.getOrDefault(seatMenu, Map.of()).entrySet()) {
+                final JScrollableMenu unitTypeMenu = new JScrollableMenu("unitTypeMenu", unitType.getKey());
+                for (final Map.Entry<String, List<JMenuItem>> weightClass : unitType.getValue().entrySet()) {
+                    final JScrollableMenu weightClassMenu = new JScrollableMenu("entityWeightMenu",
+                          weightClass.getKey());
+                    weightClass.getValue().forEach(weightClassMenu::add);
+                    unitTypeMenu.add(weightClassMenu);
+                }
+                menu.add(unitTypeMenu);
+            }
+            add(menu);
         }
     }
     //endregion Initialization

@@ -193,6 +193,7 @@ import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
@@ -2670,6 +2671,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         JMenuHelpers.addMenuIfNonEmpty(popup, healthcareMenu);
 
+        menuItem = new JMenuItem(resources.getString("crewAssignment.text"));
+        menuItem.setToolTipText(resources.getString("crewAssignment.toolTipText"));
+        menuItem.addActionListener(evt -> CrewAssignmentDialog.showFor(getFrame(), getCampaign(), List.of(),
+              List.of(selected)));
+        popup.add(menuItem);
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
 
         if (Arrays.stream(selected)

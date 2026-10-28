@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.unit.crewAssignment;
 
-import java.util.function.Predicate;
-
 import megamek.common.units.Aero;
 import megamek.common.units.ConvFighter;
 import megamek.common.units.Entity;
@@ -102,56 +100,103 @@ public final class SeatEligibility {
         }
 
         return switch (type) {
-            case PILOT -> canPilot(person, entity);
-            case DRIVER -> canDriveSeat(person, entity);
-            case GUNNER -> canGunSeat(person, entity);
-            case CREW -> ((entity instanceof Aero) && !(entity instanceof ConvFighter)) ?
-                               person.hasRole(PersonnelRole.VESSEL_CREW) :
-                               hasAnyRole(person, PersonnelRole::isVehicleCrewExtended);
-            case SOLDIER -> person.hasRole(unit.isConventionalInfantry() ?
-                                                 PersonnelRole.SOLDIER :
-                                                 PersonnelRole.BATTLE_ARMOUR);
-            case NAVIGATOR -> person.hasRole(PersonnelRole.VESSEL_NAVIGATOR);
             // A tech officer works the whole cockpit, so they must be able to both drive and gun
             case TECH_OFFICER -> person.canDrive(entity, useAltAdvancedMedical, useImplants)
                                        && person.canGun(entity);
             // A console commander needs only one of the two
             case CONSOLE_COMMANDER -> person.canDrive(entity, useAltAdvancedMedical, useImplants)
                                             || person.canGun(entity);
+            default -> roleFits(person.getPrimaryRole(), unit, type)
+                             || roleFits(person.getSecondaryRole(), unit, type);
         };
     }
 
-    private static boolean canPilot(final Person person, final Entity entity) {
+    /**
+     * Whether a person's primary role is what qualifies them for a seat, so their primary role's experience level is
+     * the one that matters there. A person qualified only through their secondary role should be judged by that
+     * role's level instead.
+     *
+     * @param person the person
+     * @param unit   the unit
+     * @param type   the seat
+     *
+     * @return {@code true} if the primary role fits the seat, or if the seat (a tech officer or console commander) is
+     *       not filled by role at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean qualifiesByPrimaryRole(final Person person, final Unit unit, final SeatType type) {
+        if ((type == SeatType.TECH_OFFICER) || (type == SeatType.CONSOLE_COMMANDER)) {
+            return true;
+        }
+        return roleFits(person.getPrimaryRole(), unit, type);
+    }
+
+    /**
+     * Whether one role is the right one for a seat. Tech officer and console commander seats are filled by ability,
+     * not role, so no role fits them here.
+     *
+     * @param role the role
+     * @param unit the unit
+     * @param type the seat
+     *
+     * @return {@code true} if someone with this role may take the seat
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean roleFits(final PersonnelRole role, final Unit unit, final SeatType type) {
+        final Entity entity = unit.getEntity();
+        if (entity == null) {
+            return false;
+        }
+        return switch (type) {
+            case PILOT -> pilotRoleFits(role, entity);
+            case DRIVER -> driverRoleFits(role, entity);
+            case GUNNER -> gunnerRoleFits(role, entity);
+            case CREW -> ((entity instanceof Aero) && !(entity instanceof ConvFighter)) ?
+                               role.isVesselCrew() :
+                               role.isVehicleCrewExtended();
+            case SOLDIER -> role == (unit.isConventionalInfantry() ?
+                                           PersonnelRole.SOLDIER :
+                                           PersonnelRole.BATTLE_ARMOUR);
+            case NAVIGATOR -> role.isVesselNavigator();
+            case TECH_OFFICER, CONSOLE_COMMANDER -> false;
+        };
+    }
+
+    private static boolean pilotRoleFits(final PersonnelRole role, final Entity entity) {
         if (entity instanceof Mek) {
-            return hasAnyRole(person, PersonnelRole::isMekWarriorGrouping);
+            return role.isMekWarriorGrouping();
         } else if (entity instanceof ProtoMek) {
-            return person.hasRole(PersonnelRole.PROTOMEK_PILOT);
+            return role.isProtoMekPilot();
         } else if (entity instanceof Aero) {
-            return hasAnyRole(person, PersonnelRole::isAerospaceGrouping);
+            return role.isAerospaceGrouping();
         }
         return false;
     }
 
-    private static boolean canDriveSeat(final Person person, final Entity entity) {
+    private static boolean driverRoleFits(final PersonnelRole role, final Entity entity) {
         if (entity instanceof Tank) {
-            return person.hasRole(vehicleCrewRole(entity));
+            return role == vehicleCrewRole(entity);
         } else if (entity instanceof ConvFighter) {
-            return person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+            return role.isConventionalAircraftPilot();
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return person.hasRole(PersonnelRole.VESSEL_PILOT);
+            return role.isVesselPilot();
         }
         return false;
     }
 
-    private static boolean canGunSeat(final Person person, final Entity entity) {
+    private static boolean gunnerRoleFits(final PersonnelRole role, final Entity entity) {
         if (entity instanceof Tank) {
-            return person.hasRole(vehicleCrewRole(entity));
+            return role == vehicleCrewRole(entity);
         } else if (entity instanceof ConvFighter) {
-            return person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+            return role.isConventionalAircraftPilot();
         } else if ((entity instanceof SmallCraft) || (entity instanceof Jumpship)) {
-            return person.hasRole(PersonnelRole.VESSEL_GUNNER);
+            return role.isVesselGunner();
         } else if (entity instanceof Mek) {
-            return hasAnyRole(person, PersonnelRole::isMekWarriorGrouping);
+            return role.isMekWarriorGrouping();
         }
         return false;
     }
@@ -164,9 +209,5 @@ public final class SeatEligibility {
             return PersonnelRole.VEHICLE_CREW_NAVAL;
         }
         return PersonnelRole.VEHICLE_CREW_GROUND;
-    }
-
-    private static boolean hasAnyRole(final Person person, final Predicate<PersonnelRole> test) {
-        return test.test(person.getPrimaryRole()) || test.test(person.getSecondaryRole());
     }
 }

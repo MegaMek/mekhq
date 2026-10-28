@@ -40,6 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
@@ -174,5 +175,34 @@ class SeatEligibilityTest {
         assertFalse(canTake(retired, mek, SeatType.PILOT));
         assertFalse(canTake(deployed, mek, SeatType.PILOT));
         assertTrue(canTake(bondsman, mek, SeatType.PILOT));
+    }
+
+    @Test
+    void theQualifyingRoleDecidesWhichExperienceLevelCounts() {
+        Unit mek = fixture.soloPilotUnit(mock(Mek.class), "Mek").unit;
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR, PersonnelRole.DOCTOR);
+        Person doctorWhoPilots = fixture.person("Doc", PersonnelRole.DOCTOR, PersonnelRole.MEKWARRIOR);
+
+        assertTrue(SeatEligibility.qualifiesByPrimaryRole(pilot, mek, SeatType.PILOT));
+        assertFalse(SeatEligibility.qualifiesByPrimaryRole(doctorWhoPilots, mek, SeatType.PILOT));
+    }
+
+    @Test
+    void seatsFilledByAbilityAreNotJudgedByRole() {
+        Unit mek = fixture.soloPilotUnit(mock(Mek.class), "Mek").unit;
+        Person anyone = fixture.person("Anyone", PersonnelRole.DOCTOR);
+
+        assertFalse(SeatEligibility.roleFits(PersonnelRole.MEKWARRIOR, mek, SeatType.TECH_OFFICER));
+        assertTrue(SeatEligibility.qualifiesByPrimaryRole(anyone, mek, SeatType.TECH_OFFICER));
+    }
+
+    @Test
+    void lamPilotsFitBothMeksAndAerospaceFighters() {
+        Unit mek = fixture.soloPilotUnit(mock(Mek.class), "Mek").unit;
+        Unit fighter = fixture.soloPilotUnit(mock(AeroSpaceFighter.class), "Fighter").unit;
+
+        assertTrue(SeatEligibility.roleFits(PersonnelRole.LAM_PILOT, mek, SeatType.PILOT));
+        assertTrue(SeatEligibility.roleFits(PersonnelRole.LAM_PILOT, fighter, SeatType.PILOT));
+        assertFalse(SeatEligibility.roleFits(PersonnelRole.MEKWARRIOR, fighter, SeatType.PILOT));
     }
 }

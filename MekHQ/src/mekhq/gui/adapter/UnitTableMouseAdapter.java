@@ -139,6 +139,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
@@ -1130,6 +1131,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
+            menuItem = new JMenuItem(resources.getString("crewAssignment.text"));
+            menuItem.setToolTipText(resources.getString("crewAssignment.toolTipText"));
+            menuItem.addActionListener(evt -> CrewAssignmentDialog.showFor(gui.getFrame(), gui.getCampaign(),
+                  List.of(units), List.of()));
+            popup.add(menuItem);
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
