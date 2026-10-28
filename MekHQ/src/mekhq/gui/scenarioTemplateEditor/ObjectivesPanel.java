@@ -39,6 +39,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -48,17 +52,18 @@ import javax.swing.ListSelectionModel;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 
 /**
- * Editor panel for a scenario template's objectives: the objective list plus add/edit (via {@link ObjectiveEditPanel})
- * and remove.
+ * Editor panel for a list of scenario objectives: the objective list plus add/edit (via {@link ObjectiveEditPanel})
+ * and remove. Used for a scenario template's objectives and for a scenario modifier's.
  *
  * <p>Extracted from {@code ScenarioTemplateEditorDialog} (Phase 4). Objectives are edited in place on the bound
- * template (the child {@link ObjectiveEditPanel} adds them directly), so this panel exposes {@link #load} to bind a
- * template and {@link #refresh}/{@link #removeSelectedObjectives} for list management - all headless-testable. Only the
- * add/edit action opens the child {@code JDialog}, which is not.
+ * list (the child {@link ObjectiveEditPanel} adds or replaces them directly), so this panel exposes {@link #load} to
+ * bind a list and {@link #refresh}/{@link #removeSelectedObjectives} for list management - all headless-testable. Only
+ * the add/edit action opens the child {@code JDialog}, which is not.
  */
 public class ObjectivesPanel extends JPanel {
 
@@ -67,7 +72,9 @@ public class ObjectivesPanel extends JPanel {
     private final JList<ScenarioObjective> objectiveList = new JList<>();
     private final JButton btnRemoveObjective = new JButton(getTextAt(RESOURCE_BUNDLE, "ObjectivesPanel.remove"));
 
-    private ScenarioTemplate template;
+    private List<ScenarioObjective> objectives;
+    // read each time the objective editor opens, so it offers the forces as they are then
+    private Supplier<Collection<String>> forceIdSupplier = List::of;
 
     public ObjectivesPanel() {
         super(new GridBagLayout());
@@ -111,20 +118,37 @@ public class ObjectivesPanel extends JPanel {
     }
 
     /**
-     * Binds the panel to a template and refreshes the objective list.
+     * Binds the panel to a template's objectives, offering the template's forces, and refreshes the objective list.
      */
     public void load(ScenarioTemplate template) {
-        this.template = template;
+        load(template.scenarioObjectives, () -> {
+            List<String> forceIds = new ArrayList<>();
+            for (ScenarioForceTemplate force : template.getAllScenarioForces()) {
+                forceIds.add(force.getForceName());
+            }
+            return forceIds;
+        });
+    }
+
+    /**
+     * Binds the panel to an objective list and refreshes it.
+     *
+     * @param objectives      the objectives to edit in place
+     * @param forceIdSupplier supplies the force IDs an objective can be tied to
+     */
+    public void load(List<ScenarioObjective> objectives, Supplier<Collection<String>> forceIdSupplier) {
+        this.objectives = objectives;
+        this.forceIdSupplier = forceIdSupplier;
         refresh();
     }
 
     /**
-     * Rebuilds the objective list from the bound template.
+     * Rebuilds the objective list from the bound objectives.
      */
     public void refresh() {
         DefaultListModel<ScenarioObjective> model = new DefaultListModel<>();
-        if (template != null) {
-            template.scenarioObjectives.forEach(model::addElement);
+        if (objectives != null) {
+            objectives.forEach(model::addElement);
         }
         objectiveList.setModel(model);
     }
@@ -137,30 +161,32 @@ public class ObjectivesPanel extends JPanel {
     }
 
     /**
-     * Removes the selected objectives from the bound template.
+     * Removes the selected objectives from the bound list.
      */
     public void removeSelectedObjectives() {
-        if (template == null) {
+        if (objectives == null) {
             return;
         }
-        template.scenarioObjectives.removeAll(objectiveList.getSelectedValuesList());
+        objectives.removeAll(objectiveList.getSelectedValuesList());
         btnRemoveObjective.setEnabled(false);
         refresh();
     }
 
     private void openObjectiveEditor() {
-        if (template == null) {
+        if (objectives == null) {
             return;
         }
         ObjectiveEditPanel editPanel = objectiveList.getSelectedValue() != null ?
                                              createObjectiveEditPanel() :
-                                             new ObjectiveEditPanel(template, this, this::refresh);
+                                             new ObjectiveEditPanel(objectives, forceIdSupplier.get(), this,
+                                                   this::refresh);
         editPanel.setModal(true);
         editPanel.requestFocus();
         editPanel.setVisible(true);
     }
 
     private @Nonnull ObjectiveEditPanel createObjectiveEditPanel() {
-        return new ObjectiveEditPanel(template, objectiveList.getSelectedValue(), this, this::refresh);
+        return new ObjectiveEditPanel(objectives, objectiveList.getSelectedValue(), forceIdSupplier.get(), this,
+              this::refresh);
     }
 }

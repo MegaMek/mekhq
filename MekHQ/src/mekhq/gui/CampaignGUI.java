@@ -142,6 +142,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.preferences.TabOrderPreference;
 import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -181,6 +182,8 @@ public class CampaignGUI extends JPanel {
 
     /* for the main panel */
     private EnhancedTabbedPane tabMain;
+    /** The user's preferred order of the main tabs, holding every tab type, including hidden and detached tabs. */
+    private final List<MHQTabType> tabOrder = new ArrayList<>(List.of(MHQTabType.values()));
 
     private MekHQMenuBar windowMenu;
 
@@ -372,9 +375,22 @@ public class CampaignGUI extends JPanel {
         // check to see if we just selected the command center tab
         // and if so change its color to standard
         tabMain.addChangeListener(evt -> {
-            if (tabMain.getSelectedIndex() == 0) {
-                tabMain.setBackgroundAt(0, null);
+            if ((commandCenterTab != null) && (tabMain.getSelectedComponent() == commandCenterTab)) {
+                tabMain.setBackgroundAt(tabMain.getSelectedIndex(), null);
                 logNagActive = false;
+            }
+        });
+
+        // Remember the order the user drags the tabs into, so it can be restored on the next launch
+        tabMain.addTabStateListener(new EnhancedTabbedPane.TabStateListener() {
+            @Override
+            public void onTabMoved(int oldIndex, int tabIndex, Component component) {
+                recordTabOrder();
+            }
+
+            @Override
+            public void onTabReattached(int tabIndex, Component component) {
+                recordTabOrder();
             }
         });
 
@@ -448,6 +464,7 @@ public class CampaignGUI extends JPanel {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
             frame.setName("mainWindow");
             preferences.manage(new JWindowPreference(frame));
+            preferences.manage(new TabOrderPreference("mainTabOrder", tabOrder));
             UIUtil.keepOnScreen(frame);
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
@@ -752,7 +769,8 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Checks if tab is present in the tab panel. If not, adds it to the panel and activates it.
+     * Checks if tab is present in the tab panel. If not, adds it to the panel at its place in the user's preferred tab
+     * order and activates it.
      *
      * @param tab The tab to activate
      */
@@ -760,7 +778,7 @@ public class CampaignGUI extends JPanel {
         if (tabMain.indexOfComponent(tab) >= 0) {
             return;
         }
-        int index = tabInsertIndex(tab);
+        int position = tabOrder.indexOf(tab.tabType());int index = tabInsertIndex(tab);
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
         SwingUtilities.invokeLater(tab::refreshAll);
@@ -773,8 +791,7 @@ public class CampaignGUI extends JPanel {
      */
     private int tabInsertIndex(CampaignGuiTab tab) {
         return IntStream.range(0, tabMain.getTabCount()).filter(
-                    i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
-                               tab.tabType().ordinal())
+                    i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
                      .findFirst()
                      .orElse(tabMain.getTabCount());
     }
@@ -794,6 +811,18 @@ public class CampaignGUI extends JPanel {
      */
     private void deactivateTab(CampaignGuiTab tab) {
         tabMain.remove(tab);
+    }
+
+    /**
+     * Updates the preferred tab order to match the tabs currently in the tab panel. Tabs not in the panel (hidden or
+     * detached) keep their existing slots, so they return to the same place when shown again.
+     */
+    private void recordTabOrder() {
+        List<MHQTabType> attachedOrder = IntStream.range(0, tabMain.getTabCount())
+                                               .mapToObj(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType())
+                                               .toList();
+        Iterator<MHQTabType> attached = attachedOrder.iterator();
+        tabOrder.replaceAll(tabType -> attachedOrder.contains(tabType) ? attached.next() : tabType);
     }
 
     public boolean showRetirementDefectionDialog() {

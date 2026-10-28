@@ -242,6 +242,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String DO_NOT_MOTHBALL_SALVAGE = "doNotMothballSalvage";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";
+    public static final String NEW_DAY_AUTO_FORMATION_ICONS = "newDayAutoFormationIcons";
     // endregion New Day
 
     // region Campaign XML Save Options

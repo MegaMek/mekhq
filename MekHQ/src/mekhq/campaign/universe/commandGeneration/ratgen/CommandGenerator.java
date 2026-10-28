@@ -510,7 +510,9 @@ public final class CommandGenerator {
         if (listener != null) {
             listener.updateProgress(0.0, "Applying formation icons...");
         }
-        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
+        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(),
+              campaign.getPlayerForce().getFaction(), campaign::getUnit,
+              campaign.getPlayerForce().getSupportCommandFormation(), campaign.getGameYear(), options);
 
         // 7b2. The most skilled pilots take the seats in the leading lances, when asked. Before ranks,
         // so the commanders chosen next are chosen from where the pilots will actually sit.
@@ -731,7 +733,9 @@ public final class CommandGenerator {
         topUpLift(campaign, options, unitsAddedBySupport);
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
-        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
+        FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(),
+              campaign.getPlayerForce().getFaction(), campaign::getUnit,
+              campaign.getPlayerForce().getSupportCommandFormation(), campaign.getGameYear(), options);
 
         logOrphanAudit(campaign);
 

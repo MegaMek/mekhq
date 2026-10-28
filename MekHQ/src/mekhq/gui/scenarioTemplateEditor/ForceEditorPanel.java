@@ -326,6 +326,18 @@ public class ForceEditorPanel extends JPanel {
     }
 
     /**
+     * Replaces the Save button's text and tooltip, for callers whose Save does something other than commit the force
+     * to a template's roster.
+     *
+     * @param text    the button text
+     * @param tooltip the unwrapped tooltip text
+     */
+    public void configureSaveButton(String text, String tooltip) {
+        btnSave.setText(text);
+        btnSave.setToolTipText(wordWrap(tooltip));
+    }
+
+    /**
      * Resets the editor to its default "add a new force" state, so it does not retain the last-edited force's values.
      */
     public void reset() {
@@ -397,7 +409,10 @@ public class ForceEditorPanel extends JPanel {
         chkContributesToBV.setSelected(forceTemplate.getContributesToBV());
         chkContributesToUnitCount.setSelected(forceTemplate.getContributesToUnitCount());
         txtForceName.setText(forceTemplate.getForceName());
-        cboSyncDeploymentType.setSelectedIndex(forceTemplate.getSyncDeploymentType().ordinal());
+        // some data files leave the sync type out entirely, which means no synchronized deployment
+        SynchronizedDeploymentType syncDeploymentType = Objects.requireNonNullElse(
+              forceTemplate.getSyncDeploymentType(), SynchronizedDeploymentType.None);
+        cboSyncDeploymentType.setSelectedIndex(syncDeploymentType.ordinal());
         cboSyncForceName.setSelectedItem(forceTemplate.getSyncedForceName());
         listMULs.setSelectedValue(forceTemplate.getFixedMul(), true);
 

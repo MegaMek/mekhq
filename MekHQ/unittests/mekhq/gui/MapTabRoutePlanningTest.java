@@ -40,11 +40,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.NavigationRouteAnalysis.PathAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
@@ -175,6 +177,66 @@ class MapTabRoutePlanningTest {
         MapTab.dispatchRoutePlanningFeedback(RoutePlanningIntent.ChangeResult.NO_ROUTE, feedback::add);
 
         assertEquals(List.of(PlanningStatus.ACCESS_DENIED, PlanningStatus.NO_ROUTE), feedback);
+    }
+
+    @Test
+    void inSystemCourseCanBeginTransitWithoutAJump() {
+        PlanetarySystem fleetSystem = new PlanetarySystem("Fleet System");
+        JumpPath noTarget = path(fleetSystem);
+        JumpPath toAnotherWorld = path(fleetSystem);
+        toAnotherWorld.setTargetPlanet(world("outer-world", fleetSystem));
+
+        assertFalse(MapTab.canBeginTransit(noTarget, fleetSystem, null, assessment(Severity.CLEAR)),
+              "A route that neither jumps nor names a world goes nowhere");
+        assertTrue(MapTab.canBeginTransit(toAnotherWorld, fleetSystem, null, assessment(Severity.CLEAR)));
+        assertFalse(MapTab.canBeginTransit(toAnotherWorld, fleetSystem, path(fleetSystem),
+              assessment(Severity.CLEAR)));
+    }
+
+    @Test
+    void inSystemCourseNeedsAnotherWorldOfTheFleetSystem() {
+        PlanetarySystem fleetSystem = new PlanetarySystem("Fleet System");
+        Planet currentWorld = world("current-world", fleetSystem);
+        Planet otherWorld = world("other-world", fleetSystem);
+        Planet foreignWorld = world("foreign-world", new PlanetarySystem("Elsewhere"));
+        AbstractLocation onPlanet = location(fleetSystem, true, currentWorld, null);
+
+        assertTrue(MapTab.canPlotInSystemRoute(onPlanet, otherWorld));
+        assertFalse(MapTab.canPlotInSystemRoute(onPlanet, currentWorld), "The fleet is already there");
+        assertFalse(MapTab.canPlotInSystemRoute(onPlanet, foreignWorld), "That world needs a jump");
+        assertFalse(MapTab.canPlotInSystemRoute(onPlanet, null));
+        assertFalse(MapTab.canPlotInSystemRoute(null, otherWorld));
+        assertSame(currentWorld, MapTab.getInSystemDeparture(onPlanet));
+    }
+
+    @Test
+    void inSystemCourseIsAvailableFromTheJumpPointButNotWhileUnderway() {
+        PlanetarySystem fleetSystem = new PlanetarySystem("Fleet System");
+        Planet primaryWorld = world("primary-world", fleetSystem);
+        AbstractLocation atJumpPoint = location(fleetSystem, false, primaryWorld, null);
+        AbstractLocation underway = location(fleetSystem, false, primaryWorld,
+              path(fleetSystem, new PlanetarySystem("Destination")));
+
+        assertTrue(MapTab.canPlotInSystemRoute(atJumpPoint, primaryWorld),
+              "Away from every world, even the primary world is a valid destination");
+        assertNull(MapTab.getInSystemDeparture(atJumpPoint));
+        assertFalse(MapTab.canPlotInSystemRoute(underway, primaryWorld));
+    }
+
+    private static Planet world(String id, PlanetarySystem system) {
+        Planet planet = new Planet(id);
+        planet.setParentSystem(system);
+        return planet;
+    }
+
+    private static AbstractLocation location(PlanetarySystem system, boolean isOnPlanet, Planet world,
+          JumpPath activePath) {
+        AbstractLocation location = mock(AbstractLocation.class);
+        when(location.getCurrentSystem()).thenReturn(system);
+        when(location.isOnPlanet()).thenReturn(isOnPlanet);
+        when(location.getPlanet()).thenReturn(world);
+        when(location.getJumpPath()).thenReturn(activePath);
+        return location;
     }
 
     private static PathAssessment assessment(Severity severity) {
