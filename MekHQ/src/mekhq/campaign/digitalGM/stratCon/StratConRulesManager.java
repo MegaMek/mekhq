@@ -2016,7 +2016,8 @@ public class StratConRulesManager {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
-        int scanRangeIncrease = track.getScanRangeIncrease();
+        int trackScanRangeIncrease = track.getScanRangeIncrease();
+        int scanRangeIncrease = trackScanRangeIncrease;
         boolean isTraining = false;
         CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceID);
         if (combatTeam != null) {
@@ -2082,6 +2083,18 @@ public class StratConRulesManager {
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
 
             Person scout = scoutData.scout();
+
+            // A scout whose reach the track's jamming has cut to nothing never rolls, so say why
+            if (useAdvancedScouting
+                      && isScoutJammed(scoutData.unitWeight(), scanRangeIncrease, trackScanRangeIncrease)) {
+                campaign.addReport(SKILL_CHECKS, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "StratConRulesManager.scoutingJammed",
+                      getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
+                      scout.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG));
+                continue;
+            }
 
             // Per-scout BFS structures
             Queue<Pair<StratConCoords, Integer>> scoutQueue = new LinkedList<>();
@@ -4286,21 +4299,29 @@ public class StratConRulesManager {
     }
 
     /**
-     * Check if the unit's force (if one exists) has been deployed to a StratCon track
+     * Check if the unit's force (if one exists), or any formation above it, has been deployed to a StratCon track. A
+     * formation deployed as a whole takes the units of its sub-formations with it.
      */
     public static boolean isUnitDeployedToStratCon(Unit unit) {
-        if (!unit.getCampaign().getCampaignOptions().isUseStratCon()) {
+        Campaign campaign = unit.getCampaign();
+        if (!campaign.getCampaignOptions().isUseStratCon()) {
             return false;
+        }
+
+        List<Integer> formationIds = new ArrayList<>();
+        formationIds.add(unit.getFormationId());
+
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        if (formation != null) {
+            for (Formation parent : formation.getAllParents()) {
+                formationIds.add(parent.getId());
+            }
         }
 
         // this is a little inefficient, but probably there aren't too many active AtB
         // contracts at a time
-        return unit.getCampaign()
-                     .getActiveContracts()
-                     .stream()
-                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
-                                                 contract.getStratConCampaignState()
-                                                       .isForceDeployedHere(unit.getFormationId()));
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        return formationIds.stream().anyMatch(formationId -> isForceDeployedToStratCon(activeContracts, formationId));
     }
 
     public static boolean isForceDeployedToStratCon(List<AbstractContract> activeAtBContracts, int forceId) {
@@ -5044,6 +5065,29 @@ public class StratConRulesManager {
      */
     static int getIndividualScanRange(double unitWeight, int scanRangeIncrease, boolean useAdvancedScouting) {
         return useAdvancedScouting && unitWeight <= 35 ? scanRangeIncrease + 1 : scanRangeIncrease;
+    }
+
+    /**
+     * Whether a scout has been jammed out of scouting entirely under Advanced Scouting: the track's scan range
+     * penalties, such as a hostile Jamming Station, leave it unable to reach any hex past its formation's own, when it
+     * could have reached at least one without them.
+     *
+     * @param unitWeight             the weight of the scout's unit, in tons
+     * @param scanRangeIncrease      the formation's scan range, including the track's penalties
+     * @param trackScanRangeIncrease the track's own change to scan range, included in {@code scanRangeIncrease}
+     *
+     * @return {@code true} if the scout can't scout any hex because of the track's scan range penalties
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isScoutJammed(double unitWeight, int scanRangeIncrease, int trackScanRangeIncrease) {
+        if (trackScanRangeIncrease >= 0 || getIndividualScanRange(unitWeight, scanRangeIncrease, true) > 0) {
+            return false;
+        }
+
+        int unjammedScanRangeIncrease = scanRangeIncrease - trackScanRangeIncrease;
+        return getIndividualScanRange(unitWeight, unjammedScanRangeIncrease, true) > 0;
     }
 
     /**

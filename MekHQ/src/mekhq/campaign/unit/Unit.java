@@ -3297,11 +3297,25 @@ public class Unit implements ITechnology, ILocatable {
             return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
         }
 
-        // Infantry, battle armor included, is priced by its alternate cost, as getTraditionalBuyCost does
+        return getConstructionCost(summary).multipliedBy(unitPriceMultiplier);
+    }
+
+    /**
+     * Returns a unit's construction cost from its {@link MekSummary}, before any campaign price multipliers. Infantry,
+     * battle armor included, is priced by its alternate (equipment-only) cost, as {@link #getTraditionalBuyCost} does,
+     * because MekHQ infantry comes without trained soldiers.
+     *
+     * @param summary the unit to price
+     *
+     * @return the unit's construction cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getConstructionCost(MekSummary summary) {
         int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
         boolean isInfantry = (unitTypeCode == UnitType.INFANTRY) || (unitTypeCode == UnitType.BATTLE_ARMOR);
-        Money cost = Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
-        return cost.multipliedBy(unitPriceMultiplier);
+        return Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
     }
 
     /**

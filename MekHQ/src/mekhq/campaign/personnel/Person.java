@@ -1869,7 +1869,9 @@ public class Person implements ILocatable {
                 campaign.getPlayerForce().getHumanResources().getProcreation().birth(campaign, getDueDate(), this);
             }
         } else {
-            setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
+            if (!status.isInfirmaryEligible()) {
+                setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
+            }
 
             // If we're assigned to a unit, remove us from it
             if (getUnit() != null) {

@@ -39,6 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
@@ -195,6 +196,17 @@ class BabySurnameStyleTest {
             }
         }
     }
+
+    @Test
+    void testIsRandom() {
+        for (final BabySurnameStyle babySurnameStyle : styles) {
+            if (babySurnameStyle == BabySurnameStyle.RANDOM) {
+                assertTrue(babySurnameStyle.isRandom());
+            } else {
+                assertFalse(babySurnameStyle.isRandom());
+            }
+        }
+    }
     // endregion Boolean Comparison Methods
 
     @Test
@@ -344,12 +356,33 @@ class BabySurnameStyleTest {
         assertEquals("Mother", BabySurnameStyle.RUSSIAN_PATRONYMICS.generateBabySurname(mother, null, Gender.FEMALE));
     }
 
+    @Test
+    void testGenerateBabySurnameRandom() {
+        final Person mother = mock(Person.class);
+        when(mother.getSurname()).thenReturn("Mother");
+        final Person father = mock(Person.class);
+        when(father.getSurname()).thenReturn("Father");
+
+        final Set<String> expectedSurnames = Set.of("Father", "Mother", "Mother Father", "Mother-Father",
+              "Father Mother", "Father-Mother");
+        for (int i = 0; i < 100; i++) {
+            assertTrue(expectedSurnames.contains(BabySurnameStyle.RANDOM.generateBabySurname(mother, father,
+                  Gender.MALE)));
+        }
+
+        // Null Father - every eligible style falls back to the mother's surname
+        for (int i = 0; i < 100; i++) {
+            assertEquals("Mother", BabySurnameStyle.RANDOM.generateBabySurname(mother, null, Gender.MALE));
+        }
+    }
+
     // region File I/O
     @Test
     void testParseFromString() {
         // Normal Parsing
         assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("MOTHERS"));
         assertEquals(BabySurnameStyle.ICELANDIC_MATRONYMICS, BabySurnameStyle.parseFromString("ICELANDIC_MATRONYMICS"));
+        assertEquals(BabySurnameStyle.RANDOM, BabySurnameStyle.parseFromString("RANDOM"));
 
         // Error Case
         assertEquals(BabySurnameStyle.MOTHERS, BabySurnameStyle.parseFromString("2"));

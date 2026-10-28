@@ -260,18 +260,47 @@ public class AtBDynamicScenario extends AtBScenario {
      */
     @Override
     public int getStartingPos() {
-        // If we've assigned at least one force
-        // and there's a player force template associated with the first force
-        // and that template's deployment zone has been generated (the scenario has been finalized)
-        // then return the generated deployment zone associated with the first force
-        if (!getForceIDs().isEmpty()) {
-            ScenarioForceTemplate forceTemplate = playerForceTemplates.get(getForceIDs().getFirst());
-            if ((forceTemplate != null) && (forceTemplate.getActualDeploymentZone() != Board.START_NONE)) {
-                return forceTemplate.getActualDeploymentZone();
-            }
+        ScenarioForceTemplate forceTemplate = getDeployedPrimaryForceTemplate();
+        if (forceTemplate != null) {
+            return forceTemplate.getActualDeploymentZone();
         }
 
         return super.getStartingPos();
+    }
+
+    /**
+     * Sets the starting zone for the player's primary force. Once the scenario has been finalized,
+     * {@link #getStartingPos()} reports the first force's generated deployment zone, so that zone is changed as well;
+     * otherwise a deployment picked in the Customize Scenario dialog would never reach the game.
+     */
+    @Override
+    public void setStartingPos(int start) {
+        super.setStartingPos(start);
+
+        ScenarioForceTemplate forceTemplate = getDeployedPrimaryForceTemplate();
+        if (forceTemplate != null) {
+            forceTemplate.setActualDeploymentZone(start);
+        }
+    }
+
+    /**
+     * @return the player force template linked to the first assigned force, if that template's deployment zone has
+     *       been generated (the scenario has been finalized); otherwise {@code null}
+     */
+    private @Nullable ScenarioForceTemplate getDeployedPrimaryForceTemplate() {
+        // If we've assigned at least one force
+        // and there's a player force template associated with the first force
+        // and that template's deployment zone has been generated (the scenario has been finalized)
+        // then that template holds the primary force's deployment zone
+        if (getForceIDs().isEmpty()) {
+            return null;
+        }
+
+        ScenarioForceTemplate forceTemplate = playerForceTemplates.get(getForceIDs().getFirst());
+        if ((forceTemplate != null) && (forceTemplate.getActualDeploymentZone() != Board.START_NONE)) {
+            return forceTemplate;
+        }
+        return null;
     }
 
     /**
