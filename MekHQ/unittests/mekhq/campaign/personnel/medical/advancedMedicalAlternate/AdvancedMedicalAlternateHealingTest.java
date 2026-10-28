@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PATHOLOGIC_IN
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TECHNICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
+import static mekhq.campaign.personnel.medical.BodyLocation.LEFT_HAND;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_FOREARM;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_HAND;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.DISEASE_GENERIC;
@@ -167,6 +168,28 @@ class AdvancedMedicalAlternateHealingTest {
 
         Person patient = mock(Person.class);
         when(patient.getPermanentInjuries()).thenReturn(List.of(prosthetic, ignored, skipped));
+
+        Set<BodyLocation> penalties = invokePrivateStatic("getProstheticPenalties",
+              new Class<?>[] { Person.class }, patient);
+
+        assertEquals(Set.of(RIGHT_HAND), penalties);
+    }
+
+    @Test
+    @DisplayName("getProstheticPenalties ignores cloned limbs")
+    void getProstheticPenalties_ignoresClonedLimbs() throws Exception {
+        Injury clonedHand = mock(Injury.class);
+        when(clonedHand.getType()).thenReturn(AlternateInjuries.CLONED_HAND);
+        when(clonedHand.getSubType()).thenReturn(PROSTHETIC_GENERIC);
+        when(clonedHand.getLocation()).thenReturn(LEFT_HAND);
+
+        Injury prostheticHand = mock(Injury.class);
+        when(prostheticHand.getType()).thenReturn(AlternateInjuries.PROSTHETIC_HAND);
+        when(prostheticHand.getSubType()).thenReturn(PROSTHETIC_GENERIC);
+        when(prostheticHand.getLocation()).thenReturn(RIGHT_HAND);
+
+        Person patient = mock(Person.class);
+        when(patient.getPermanentInjuries()).thenReturn(List.of(clonedHand, prostheticHand));
 
         Set<BodyLocation> penalties = invokePrivateStatic("getProstheticPenalties",
               new Class<?>[] { Person.class }, patient);

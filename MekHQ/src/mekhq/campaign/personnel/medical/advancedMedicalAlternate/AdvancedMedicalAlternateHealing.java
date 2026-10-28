@@ -62,6 +62,7 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
@@ -85,7 +86,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
  */
 public class AdvancedMedicalAlternateHealing {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedMedicalAlternateHealing";
-    private static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
+    static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
 
     /**
      * Processes the start-of-day healing for a given patient.
@@ -126,6 +127,8 @@ public class AdvancedMedicalAlternateHealing {
      * <p>This method scans all permanent injuries and records the primary body locations that are associated with
      * prosthetic subtypes. These locations will later receive a flat penalty to healing attempts.</p>
      *
+     * <p>Cloned limbs are excluded, as they are biological replacements rather than artificial prosthetics.</p>
+     *
      * @param patient the person whose permanent injuries are being examined
      *
      * @return a set of body locations that suffer the prosthetic penalty
@@ -137,7 +140,7 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = new HashSet<>();
         for (Injury injury : patient.getPermanentInjuries()) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification()) {
+            if (injurySubType.isPermanentModification() && !isClonedLimb(injury)) {
                 BodyLocation location = injury.getLocation();
                 BodyLocation primaryLocation = location.getPrimaryLocation();
 
@@ -147,6 +150,16 @@ public class AdvancedMedicalAlternateHealing {
             }
         }
         return prostheticPenalties;
+    }
+
+    private static boolean isClonedLimb(Injury injury) {
+        InjuryType injuryType = injury.getType();
+        if (injuryType == null) {
+            return false;
+        }
+
+        ProstheticType prostheticType = ProstheticType.getProstheticFromInjury(injuryType);
+        return prostheticType != null && prostheticType.isClonedLimb();
     }
 
     /**
