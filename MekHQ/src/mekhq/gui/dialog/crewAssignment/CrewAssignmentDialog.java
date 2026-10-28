@@ -240,8 +240,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 requestClose();
             }
         });
-        setMinimumSize(scaleForGUI(1100, 700));
-        getContentPane().setPreferredSize(scaleForGUI(1320, 820));
+        setMinimumSize(scaleForGUI(1200, 700));
+        getContentPane().setPreferredSize(scaleForGUI(1400, 840));
         pack();
         setLocationRelativeTo(frame);
         setPreferences();

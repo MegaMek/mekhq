@@ -61,6 +61,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
+import javax.swing.ScrollPaneConstants;
 
 import megamek.client.ui.WrapLayout;
 import mekhq.campaign.personnel.Person;
@@ -69,6 +70,7 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatType;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudChip;
@@ -86,6 +88,9 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
  */
 final class CrewInspector extends JPanel {
     private static final String RESOURCE_BUNDLE = CrewAssignmentDialog.RESOURCE_BUNDLE;
+    /** Wide enough for a selection summary, its link, and a row of three action buttons. */
+    private static final int PREFERRED_WIDTH = 440;
+    private static final int MINIMUM_WIDTH = 400;
 
     /** What the inspector asks the dialog to do. */
     interface Actions {
@@ -137,10 +142,19 @@ final class CrewInspector extends JPanel {
         JPanel stack = column();
         stack.add(leftAligned(selection));
         stack.add(leftAligned(detail));
-        JScrollPane scroll = new JScrollPane(stack);
+        // The holder follows the viewport's width, so long rows wrap instead of running off the panel, and keeps the
+        // column at its natural height at the top, so the sections are never stretched apart
+        JScrollablePanel holder = new JScrollablePanel();
+        holder.setLayout(new BorderLayout());
+        holder.setOpaque(true);
+        holder.setBackground(GROUND);
+        holder.add(stack, BorderLayout.NORTH);
+        JScrollPane scroll = new JScrollPane(holder, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         Hud.styleScroll(scroll, GROUND, false);
         add(scroll, BorderLayout.CENTER);
-        setPreferredSize(scaleForGUI(360, 0));
+        setPreferredSize(scaleForGUI(PREFERRED_WIDTH, 0));
+        setMinimumSize(scaleForGUI(MINIMUM_WIDTH, 0));
     }
 
     /** Rebuilds the panel from the dialog's state. */
@@ -253,7 +267,10 @@ final class CrewInspector extends JPanel {
             text.add(leftAligned(Hud.hint(hint)));
         }
         row.add(text, BorderLayout.CENTER);
-        row.add(Hud.link(linkText, () -> actions.showPage(page)), BorderLayout.EAST);
+        // Pinned to the top, so the link sits beside the title rather than floating between the two lines
+        JPanel linkHolder = Hud.transparentPanel(new BorderLayout());
+        linkHolder.add(Hud.link(linkText, () -> actions.showPage(page)), BorderLayout.NORTH);
+        row.add(linkHolder, BorderLayout.EAST);
         return row;
     }
 
