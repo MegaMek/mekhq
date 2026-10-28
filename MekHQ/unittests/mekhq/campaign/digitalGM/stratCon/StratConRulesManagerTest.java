@@ -1827,6 +1827,25 @@ class StratConRulesManagerTest {
                   StratConRulesManager.getIndividualScanRange(unitWeight, scanRangeIncrease, useAdvancedScouting));
         }
 
+        @ParameterizedTest
+        @CsvSource({
+              // a heavy patrol scout under a -1 jammer: range 0 instead of 1
+              "50.0, 0, -1, true",
+              // a light patrol scout under the same jammer still reaches one hex
+              "35.0, 0, -1, false",
+              // a heavy scout with no jamming and no patrol never reached past its hex anyway
+              "50.0, 0, 0, false",
+              // a heavy non-patrol scout under a jammer couldn't reach past its hex without it either
+              "50.0, -1, -1, false",
+              // a light non-patrol scout under a jammer loses the one hex it would have reached
+              "35.0, -1, -1, true"
+        })
+        void isScoutJammed_onlyWhenJammingTakesAwayEveryHexTheScoutCouldReach(double unitWeight,
+              int scanRangeIncrease, int trackScanRangeIncrease, boolean expectedJammed) {
+            assertEquals(expectedJammed,
+                  StratConRulesManager.isScoutJammed(unitWeight, scanRangeIncrease, trackScanRangeIncrease));
+        }
+
         @Test
         void isAreaFullyScouted_trueWhenEveryHexInRadiusIsRevealed() {
             setUp(true, 0);
