@@ -2254,9 +2254,13 @@ public class Campaign implements ITechManager {
                             String deliveryReport = "";
                             if (getCampaignOptions().get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
                                 int deliveryMargin = contact.deliveryMarginOfSuccess();
-                                transitTime = AcquisitionDeliveryTime.applyMarginOfSuccess(transitTime,
+                                int reducedTransitTime = AcquisitionDeliveryTime.applyMarginOfSuccess(transitTime,
                                       deliveryMargin);
-                                deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                                // Rounding can leave short deliveries unchanged, so only report a real reduction
+                                if (reducedTransitTime < transitTime) {
+                                    deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                                }
+                                transitTime = reducedTransitTime;
                             }
 
                             int requestedQuantity = shoppingItem.getQuantity();
@@ -2544,8 +2548,13 @@ public class Campaign implements ITechManager {
                 if (campaignOptions.get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
                     int deliveryMargin = AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck,
                           skillCheckResult);
-                    transitDays = AcquisitionDeliveryTime.applyMarginOfSuccess(transitDays, deliveryMargin);
-                    deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                    int reducedTransitDays = AcquisitionDeliveryTime.applyMarginOfSuccess(transitDays,
+                          deliveryMargin);
+                    // Rounding can leave short deliveries unchanged, so only report a real reduction
+                    if (reducedTransitDays < transitDays) {
+                        deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                    }
+                    transitDays = reducedTransitDays;
                 }
             }
             report = report + acquisition.find(transitDays, valueChange) + ' ' + deliveryReport + ' ' +
