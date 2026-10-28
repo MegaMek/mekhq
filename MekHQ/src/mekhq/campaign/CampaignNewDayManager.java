@@ -125,6 +125,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.ForceShoppingList;
@@ -196,6 +197,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
@@ -1513,6 +1515,13 @@ public class CampaignNewDayManager {
         // update formation levels
         Formation.populateFormationLevelsFromOrigin(campaign);
         recalculateCombatTeams(campaign);
+
+        // Draw and update the generated formation icons before the status indicator goes on top of them
+        if (MekHQ.getMHQOptions().getNewDayAutoFormationIcons()) {
+            PlayerForce playerForce = campaign.getPlayerForce();
+            FormationIconBuilder.refreshIcons(playerForce.getFormations(), playerForce.getFaction(),
+                  campaign::getUnit, playerForce.getSupportCommandFormation());
+        }
 
         // Update the formation icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatus()) {

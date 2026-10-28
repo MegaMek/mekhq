@@ -205,7 +205,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
                 static boolean canBeginTransit(JumpPath proposedPath, PlanetarySystem campaignCurrentSystem,
                         JumpPath activePath, PathAssessment routeAssessment) {
-          return (proposedPath != null) && !proposedPath.isEmpty() && (proposedPath.getJumps() > 0)
+          // A route without jumps is only a journey when it heads for a specific world in the current system
+          return (proposedPath != null) && !proposedPath.isEmpty()
+              && ((proposedPath.getJumps() > 0) || (proposedPath.getTargetPlanet() != null))
               && Objects.equals(proposedPath.getFirstSystem(), campaignCurrentSystem)
                             && ((activePath == null) || activePath.isEmpty()) && (routeAssessment != null)
                             && (routeAssessment.severity() != Severity.BLOCKED);
@@ -215,6 +217,29 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                   return (selectedSystem != null) && (campaignCurrentSystem != null)
                           && !Objects.equals(selectedSystem, campaignCurrentSystem);
                 }
+
+    /**
+     * @return {@code true} if the fleet can plot a course to {@code destination}, another world of the system it is
+     *       already in. The fleet must not already be underway, and must not already be at that world.
+     */
+    static boolean canPlotInSystemRoute(@Nullable AbstractLocation currentLocation, @Nullable Planet destination) {
+        if ((currentLocation == null) || (destination == null) || (currentLocation.getCurrentSystem() == null)
+              || !Objects.equals(destination.getParentSystem(), currentLocation.getCurrentSystem())) {
+            return false;
+        }
+        JumpPath activePath = currentLocation.getJumpPath();
+        if ((activePath != null) && !activePath.isEmpty()) {
+            return false;
+        }
+        return !currentLocation.isOnPlanet() || !Objects.equals(destination, currentLocation.getPlanet());
+    }
+
+    /**
+     * @return the world an in-system course departs from, or {@code null} when the fleet is not at a world
+     */
+    static @Nullable Planet getInSystemDeparture(AbstractLocation currentLocation) {
+        return currentLocation.isOnPlanet() ? currentLocation.getPlanet() : null;
+    }
 
         static ChangeResult plotQuickRoute(RoutePlanningIntent intent, PlanetarySystem origin,
                     PlanetarySystem destination, @Nullable Planet destinationPlanet,
@@ -999,14 +1024,18 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         String unavailable = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.unavailable.text");
         boolean isCostVisible = getCampaign().getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT);
         PlanetarySystem selectedSystem = panMap.getSelectedSystem();
+        Planet selectedPlanet = isPlanetViewShowing() ? panSystem.getSelectedPlanet() : null;
         boolean isQuickPlotVisible = true;
-        boolean isQuickPlotEnabled = canQuickPlotRoute(selectedSystem, getCampaign().getCurrentSystem());
+        boolean isQuickPlotEnabled = canQuickPlotRoute(selectedSystem, getCampaign().getCurrentSystem())
+              || canPlotInSystemRoute(currentLocation, selectedPlanet);
           String quickPlotText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, quickPlotResourceKey(hasProposedPath));
 
         if (displayedPath == null) {
-            String selectedSystemName = (selectedSystem == null)
-                ? unavailable
-                : selectedSystem.getPrintableName(getCampaign().getLocalDate());
+            String selectedSystemName = (selectedPlanet != null)
+                ? selectedPlanet.getPrintableName(getCampaign().getLocalDate())
+                : (selectedSystem == null)
+                    ? unavailable
+                    : selectedSystem.getPrintableName(getCampaign().getLocalDate());
             return new RouteStripSnapshot(RouteStripState.NO_ROUTE,
                                     MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.noRoute.text"),
                   ROUTE_MUTED_COLOR,
@@ -1063,7 +1092,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         String costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  " + unavailable;
         if (isCostVisible) {
             TransportCostCalculations calculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
-            Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, displayedPath.getJumps());
+            Money journeyCost = calculations.calculateCostForEntireJourney(duration, displayedPath);
             costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  "
                 + journeyCost.toAmountAndSymbolString();
         }
@@ -1294,19 +1323,47 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private void calculateJumpPath() {
         PlanetarySystem origin = resolveRouteField(suggestRouteOrigin);
         PlanetarySystem destination = resolveRouteField(suggestRouteDestination);
-        if ((origin != null) && (destination != null)) {
-            applyRoutePlanningChange(routePlanningIntent.plot(origin, destination, this::calculateRouteSegment),
-                  destination);
+        if ((origin == null) || (destination == null)) {
+            return;
         }
+        if (Objects.equals(origin, destination)) {
+            // A system-to-itself route goes nowhere; the only journey there is to another of its worlds
+            plotInSystemToSelectedWorld();
+            return;
+        }
+        applyRoutePlanningChange(routePlanningIntent.plot(origin, destination, this::calculateRouteSegment),
+              destination);
+    }
+
+    /**
+     * Plots a course to the world selected in the planetary system view, if it is another world of the fleet's
+     * current system.
+     *
+     * @return {@code true} if an in-system course was plotted
+     */
+    private boolean plotInSystemToSelectedWorld() {
+        Planet destinationPlanet = isPlanetViewShowing() ? panSystem.getSelectedPlanet() : null;
+        AbstractLocation currentLocation = getCampaign().getPlayerForce()
+                                                 .getForceDetachment()
+                                                 .getCurrentLocation();
+        if (!canPlotInSystemRoute(currentLocation, destinationPlanet)) {
+            return false;
+        }
+        applyRoutePlanningChange(routePlanningIntent.plotInSystem(getInSystemDeparture(currentLocation),
+              destinationPlanet), destinationPlanet.getParentSystem());
+        return true;
     }
 
     private void plotRouteToSelectedDestination() {
+        if (plotInSystemToSelectedWorld()) {
+            return;
+        }
         PlanetarySystem origin = getCampaign().getCurrentSystem();
         PlanetarySystem destination = panMap.getSelectedSystem();
+        Planet destinationPlanet = isPlanetViewShowing() ? panSystem.getSelectedPlanet() : null;
         if (!canQuickPlotRoute(destination, origin)) {
             return;
         }
-        Planet destinationPlanet = mapView.getView() == panSystem ? panSystem.getSelectedPlanet() : null;
         applyRoutePlanningChange(plotQuickRoute(routePlanningIntent, origin, destination, destinationPlanet,
               this::calculateRouteSegment), destination);
     }
@@ -1419,7 +1476,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             return;
         }
 
-        if (!JumpBlockers.areAllUnitsJumpCapable(getCampaign())) {
+        // An in-system course never jumps, so JumpShips unable to jump don't hold it up
+        if ((jumpPath.getJumps() > 0) && !JumpBlockers.areAllUnitsJumpCapable(getCampaign())) {
             return;
         }
 
@@ -1442,7 +1500,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               getCampaign().getJumpDriveProfile()));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
-        Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+        Money journeyCost = transportCostCalculations.calculateCostForEntireJourney(duration, jumpPath);
 
         String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getPlayerForce()
                                                                                    .getFinances(), jumpPath,
@@ -1480,6 +1538,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private void refreshPlanetView() {
+        panSystem.setPlannedRoute(routePlanningIntent.getJumpPath());
+        panSystem.repaint();
         updateRouteStrip();
         refreshRouteView();
         int pos = panSystem.getSelectedPlanetPosition();
@@ -1645,7 +1705,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         PlanetarySystem s = p.getParentSystem();
         selectMapSystem(s);
         panSystem.updatePlanetarySystem(p);
-        mapView.setView(panSystem);
+        showInMapView(panSystem);
         refreshPlanetView();
     }
 
@@ -1657,7 +1717,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     public void switchPlanetaryMap(PlanetarySystem s) {
         selectMapSystem(s);
         panSystem.updatePlanetarySystem(s);
-        mapView.setView(panSystem);
+        showInMapView(panSystem);
         refreshPlanetView();
     }
 
@@ -1673,12 +1733,33 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     public void switchSystemsMap() {
-        boolean returningFromSystem = mapView.getView() == panSystem;
-        mapView.setView(panMapView);
+        boolean returningFromSystem = isPlanetViewShowing();
+        showInMapView(panMap);
         refreshSystemView();
         if (returningFromSystem) {
             panMap.startSystemReturn();
         }
+    }
+
+    /**
+     * Shows either the interstellar map or the planetary system view between the navigation HUD and the route strip,
+     * so course plotting and transit controls stay available in both views.
+     */
+    private void showInMapView(Component view) {
+        Component currentView = ((BorderLayout) panMapView.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (currentView == view) {
+            return;
+        }
+        if (currentView != null) {
+            panMapView.remove(currentView);
+        }
+        panMapView.add(view, BorderLayout.CENTER);
+        panMapView.revalidate();
+        panMapView.repaint();
+    }
+
+    private boolean isPlanetViewShowing() {
+        return (panSystem != null) && (panSystem.getParent() == panMapView);
     }
 
     @Override

@@ -34,10 +34,12 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.RATGenerator;
@@ -48,7 +50,6 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
@@ -102,6 +103,24 @@ public final class FormationIconBuilder {
     /** StratOps type icon for a logistics convoy. */
     private static final String SUPPLY_TYPE_FILENAME = "Supply.png";
 
+    private static final String AEROSPACE_TYPE_FILENAME = "Aerospace (Left).png";
+    private static final String PROTOMEK_TYPE_FILENAME = "ProtoMek.png";
+    private static final String BATTLE_ARMOR_TYPE_FILENAME = "Battle Armor.png";
+    private static final String INFANTRY_TYPE_FILENAME = "Infantry (Xenoplanetary).png";
+    private static final String DROPSHIP_TYPE_FILENAME = "DropShip.png";
+    private static final String JUMPSHIP_TYPE_FILENAME = "JumpShip.png";
+    private static final String WARSHIP_TYPE_FILENAME = "WarShip.png";
+    private static final String SPACE_STATION_TYPE_FILENAME = "Space Station.png";
+    private static final String VTOL_TYPE_FILENAME = "Airship.png";
+    private static final String GUN_EMPLACEMENT_TYPE_FILENAME = "Headquarters.png";
+
+    /**
+     * Every StratOps type file this builder draws. A TYPE layer made only of these was drawn here, or by a player who
+     * picked exactly what the builder would have, so redrawing it to match the formation's units takes nothing from
+     * anyone.
+     */
+    private static final Set<String> BUILDER_TYPE_FILENAMES = builderTypeFilenames();
+
     private FormationIconBuilder() {
         // utility class
     }
@@ -111,12 +130,16 @@ public final class FormationIconBuilder {
      * non-leaf Formation. Honors the icon-related toggles on {@link CommandGenerationOptions}: if
      * {@code isGenerateFormationIcons()} is off, returns immediately.
      *
-     * @param root     the campaign's top-level Formation (typically {@code campaign.getPlayerForce().getFormations()})
-     * @param campaign the campaign whose units feed the weight-class math
-     * @param options  the options driving icon-generation toggles
+     * @param root           the force's top-level Formation (typically {@code force.getFormations()})
+     * @param forceFaction   the faction the force is organised as, used unless the options name another
+     * @param unitLookup     resolves the unit ids in the formations, whose units feed the weight-class math
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
+     * @param gameYear       the current year, which picks the faction logo for the origin node
+     * @param options        the options driving icon-generation toggles
      */
-    public static void applyIcons(Formation root, Campaign campaign, CommandGenerationOptions options) {
-        if (root == null || campaign == null || options == null) {
+    public static void applyIcons(Formation root, Faction forceFaction, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand, int gameYear, CommandGenerationOptions options) {
+        if (root == null || forceFaction == null || unitLookup == null || options == null) {
             return;
         }
         if (!options.isGenerateFormationIcons()) {
@@ -130,9 +153,9 @@ public final class FormationIconBuilder {
 
         Faction iconFaction = options.isUseSpecifiedFactionToGenerateFormationIcons()
               ? options.getSpecifiedFaction()
-              : campaign.getPlayerForce().getFaction();
+              : forceFaction;
         if (iconFaction == null) {
-            iconFaction = campaign.getPlayerForce().getFaction();
+            iconFaction = forceFaction;
         }
 
         FormationPieceIcon background = buildBackgroundPiece(iconFaction);
@@ -141,52 +164,54 @@ public final class FormationIconBuilder {
 
         // Root gets a logo-or-default-type icon if the toggle is on.
         if (options.isGenerateOriginNodeFormationIcon()) {
-            LayeredFormationIcon rootIcon = buildOriginIcon(iconFaction, campaign.getGameYear(),
+            LayeredFormationIcon rootIcon = buildOriginIcon(iconFaction, gameYear,
                   options.isUseOriginNodeFormationIconLogo(), background);
             root.setFormationIcon(rootIcon);
             LOGGER.info("[CompanyGen]   root '{}' -> origin icon applied", root.getName());
         }
 
         // Recurse into the rest of the tree.
-        int applied = applyToSubtree(root, campaign, iconFaction, background);
+        int applied = applyToSubtree(root, unitLookup, supportCommand, iconFaction, background);
         LOGGER.info("[CompanyGen] FormationIconBuilder.applyIcons DONE; {} non-root formations decorated", applied);
     }
 
     /**
-     * Walks every sub-Formation under {@code parent} and applies a layered icon. The {@code parent}
-     * itself is NOT decorated by this method — the caller already handled the root in
-     * {@link #applyIcons}. Returns the count of decorated Formations.
-     */
-    /**
-     * Decorates one existing formation and everything under it, using the campaign's own faction.
+     * Decorates one existing formation and everything under it, using the force's own faction.
      *
      * <p>The generation pass above needs {@link CommandGenerationOptions} because it also decides the origin node's
      * icon. Support teams organized after generation - a campaign that switched the option on - have no generation
      * options to consult, but their formations should look like the generated ones, so this is the same builder
      * without the origin-node question.</p>
      *
-     * @param root     the formation to decorate, along with its subtree
-     * @param campaign the campaign the formation belongs to
+     * @param root           the formation to decorate, along with its subtree
+     * @param iconFaction    the faction the force is organised as, which sets the shape set and background
+     * @param unitLookup     resolves the unit ids in the formations
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
      *
      * @return the number of formations decorated
      */
-    public static int applyIconsToSubtree(@Nullable Formation root, @Nullable Campaign campaign) {
-        return applyIconsToFormations(root == null ? List.of() : List.of(root), campaign);
+    public static int applyIconsToSubtree(@Nullable Formation root, @Nullable Faction iconFaction,
+          @Nullable Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
+        return applyIconsToFormations(root == null ? List.of() : List.of(root), iconFaction, unitLookup,
+              supportCommand);
     }
 
     /**
-     * Decorates the named formations and everything under them, using the campaign's own faction.
+     * Decorates the named formations and everything under them, using the force's own faction.
      *
      * <p>Used by the support-team conversion, which knows exactly which formations it created and must not touch the
      * player's own - their icons are their business.</p>
      *
-     * @param formations the formations to decorate, each along with its subtree
-     * @param campaign   the campaign the formations belong to
+     * @param formations     the formations to decorate, each along with its subtree
+     * @param iconFaction    the faction the force is organised as, which sets the shape set and background
+     * @param unitLookup     resolves the unit ids in the formations
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
      *
      * @return the number of formations decorated
      */
-    public static int applyIconsToFormations(List<Formation> formations, @Nullable Campaign campaign) {
-        if ((campaign == null) || formations.isEmpty()) {
+    public static int applyIconsToFormations(List<Formation> formations, @Nullable Faction iconFaction,
+          @Nullable Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
+        if ((iconFaction == null) || (unitLookup == null) || formations.isEmpty()) {
             return 0;
         }
         if (MHQStaticDirectoryManager.getFormationIcons() == null) {
@@ -194,10 +219,6 @@ public final class FormationIconBuilder {
             return 0;
         }
 
-        Faction iconFaction = campaign.getPlayerForce().getFaction();
-        if (iconFaction == null) {
-            return 0;
-        }
         FormationPieceIcon background = buildBackgroundPiece(iconFaction);
 
         int applied = 0;
@@ -205,12 +226,13 @@ public final class FormationIconBuilder {
             if (formation == null) {
                 continue;
             }
-            LayeredFormationIcon icon = buildFormationIcon(formation, campaign, iconFaction, background);
+            LayeredFormationIcon icon = buildFormationIcon(formation, unitLookup, supportCommand, iconFaction,
+                  background);
             if (icon != null) {
                 formation.setFormationIcon(icon);
                 applied++;
             }
-            applied += applyToSubtree(formation, campaign, iconFaction, background);
+            applied += applyToSubtree(formation, unitLookup, supportCommand, iconFaction, background);
         }
 
         LOGGER.info("[SupportTOE] applyIconsToFormations DONE; {} formation(s) decorated", applied);
@@ -225,31 +247,24 @@ public final class FormationIconBuilder {
      * Only an icon whose formation layer is a single echelon shape from this builder's folder is touched, so an icon
      * the player designed is never overwritten.</p>
      *
-     * @param formation the formation whose icon may be stale
-     * @param campaign  the campaign, for the faction family that decides the shape set
+     * @param formation   the formation whose icon may be stale
+     * @param iconFaction the faction the force is organised as, whose family decides the shape set
      *
      * @return {@code true} if the symbol was changed
      */
-    public static boolean refreshEchelonPiece(@Nullable Formation formation, @Nullable Campaign campaign) {
-        if ((formation == null) || (campaign == null)
-                  || !(formation.getFormationIcon() instanceof LayeredFormationIcon icon)) {
+    public static boolean refreshEchelonPiece(@Nullable Formation formation, @Nullable Faction iconFaction) {
+        if ((formation == null) || (iconFaction == null)
+                  || !(formation.getFormationIcon() instanceof LayeredFormationIcon icon)
+                  || !hasBuilderEchelonPiece(icon, iconFaction)) {
             return false;
         }
-        Faction iconFaction = campaign.getPlayerForce().getFaction();
         List<FormationPieceIcon> pieces = icon.getPieces().get(LayeredFormationIconLayer.FORMATION);
-        if ((iconFaction == null) || (pieces == null) || (pieces.size() != 1)) {
-            return false;
-        }
-        String folder = formationFolderFor(iconFaction);
         FormationPieceIcon piece = pieces.get(0);
-        if (!folder.equals(piece.getCategory()) || !isEchelonShape(piece.getFilename(), iconFaction)) {
-            return false;
-        }
         String wanted = formationFilenameFor(formation.getFormationLevel(), iconFaction);
         if ((wanted == null) || wanted.equals(piece.getFilename())) {
             return false;
         }
-        pieces.set(0, new FormationPieceIcon(LayeredFormationIconLayer.FORMATION, folder, wanted));
+        pieces.set(0, new FormationPieceIcon(LayeredFormationIconLayer.FORMATION, piece.getCategory(), wanted));
         LOGGER.info("[SupportTOE] formation '{}' re-sized to {}: echelon symbol '{}' -> '{}'", formation.getName(),
               formation.getFormationLevel(), piece.getFilename(), wanted);
         return true;
@@ -263,40 +278,151 @@ public final class FormationIconBuilder {
      * security detail - were filed with no icon at all, because only command generation and the Support Teams
      * conversion drew them. A formation already decorated, by this builder or by the player, is never redrawn.</p>
      *
-     * @param root     the formation to decorate, along with its subtree
-     * @param campaign the campaign the formation belongs to
+     * @param root           the formation to decorate, along with its subtree
+     * @param iconFaction    the faction the force is organised as, which sets the shape set and background
+     * @param unitLookup     resolves the unit ids in the formations
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
      *
      * @return the number of formations decorated
      */
-    public static int decorateUndecorated(@Nullable Formation root, @Nullable Campaign campaign) {
-        if ((root == null) || (campaign == null) || (MHQStaticDirectoryManager.getFormationIcons() == null)) {
+    public static int decorateUndecorated(@Nullable Formation root, @Nullable Faction iconFaction,
+          @Nullable Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
+        if ((root == null) || (iconFaction == null) || (unitLookup == null)
+                  || (MHQStaticDirectoryManager.getFormationIcons() == null)) {
             return 0;
         }
-        Faction iconFaction = campaign.getPlayerForce().getFaction();
-        if (iconFaction == null) {
-            return 0;
-        }
-        int decorated = decorateUndecoratedSubtree(root, campaign, iconFaction, buildBackgroundPiece(iconFaction));
+        int decorated = decorateUndecoratedSubtree(root, unitLookup, supportCommand, iconFaction,
+              buildBackgroundPiece(iconFaction));
         if (decorated > 0) {
             LOGGER.info("[SupportTOE] '{}': drew {} missing formation icon(s)", root.getName(), decorated);
         }
         return decorated;
     }
 
-    private static int decorateUndecoratedSubtree(Formation formation, Campaign campaign, Faction iconFaction,
-          @Nullable FormationPieceIcon background) {
+    private static int decorateUndecoratedSubtree(Formation formation, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand, Faction iconFaction, @Nullable FormationPieceIcon background) {
         int decorated = 0;
+        if (isUndecorated(formation)
+                  && decorate(formation, unitLookup, supportCommand, iconFaction, background)) {
+            decorated++;
+        }
+        for (Formation child : formation.getSubFormations()) {
+            decorated += decorateUndecoratedSubtree(child, unitLookup, supportCommand, iconFaction, background);
+        }
+        return decorated;
+    }
+
+    /**
+     * Brings every icon this builder drew under {@code root} into line with its formation, and draws the ones still
+     * blank.
+     *
+     * <p>This is the on-demand version of what command generation does, for a TOE that has grown since: new
+     * formations get their icon, a lance that became a company gets the company symbol, and a lance whose 'Meks were
+     * traded for tanks loses the 'Mek silhouette. Icons the player designed are left alone.</p>
+     *
+     * @param root           the formation to refresh, along with its subtree
+     * @param iconFaction    the faction the force is organised as, which sets the shape set and background
+     * @param unitLookup     resolves the unit ids in the formations
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
+     *
+     * @return the number of formations whose icon was drawn or changed
+     */
+    public static int refreshIcons(@Nullable Formation root, @Nullable Faction iconFaction,
+          @Nullable Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
+        if ((root == null) || (iconFaction == null) || (unitLookup == null)
+                  || (MHQStaticDirectoryManager.getFormationIcons() == null)) {
+            return 0;
+        }
+        int changed = refreshSubtree(root, unitLookup, supportCommand, iconFaction, buildBackgroundPiece(iconFaction));
+        if (changed > 0) {
+            LOGGER.info("[FormationIcons] '{}': drew or updated {} formation icon(s)", root.getName(), changed);
+        }
+        return changed;
+    }
+
+    private static int refreshSubtree(Formation formation, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand, Faction iconFaction, @Nullable FormationPieceIcon background) {
+        int changed = 0;
         if (isUndecorated(formation)) {
-            LayeredFormationIcon icon = buildFormationIcon(formation, campaign, iconFaction, background);
-            if (icon != null) {
-                formation.setFormationIcon(icon);
-                decorated++;
+            if (decorate(formation, unitLookup, supportCommand, iconFaction, background)) {
+                changed++;
+            }
+        } else {
+            // Both run: the echelon first, as the type refresh asks whether the echelon is still the builder's.
+            boolean echelonChanged = refreshEchelonPiece(formation, iconFaction);
+            boolean typeChanged = refreshTypePiece(formation, iconFaction, unitLookup, supportCommand);
+            if (echelonChanged || typeChanged) {
+                changed++;
             }
         }
         for (Formation child : formation.getSubFormations()) {
-            decorated += decorateUndecoratedSubtree(child, campaign, iconFaction, background);
+            changed += refreshSubtree(child, unitLookup, supportCommand, iconFaction, background);
         }
-        return decorated;
+        return changed;
+    }
+
+    /**
+     * Redraws the unit-type silhouette on a formation's icon to match the units it holds now, and leaves the rest of
+     * the icon alone.
+     *
+     * <p>A Mek lance whose 'Meks were sold for tanks, or a medium company that bought heavies, kept the silhouette it
+     * was drawn with. Only an icon this builder drew is touched: its formation layer must be the builder's echelon
+     * shape and every type piece one the builder draws, so an icon the player designed is never overwritten.</p>
+     *
+     * @param formation      the formation whose icon may be stale
+     * @param iconFaction    the faction the force is organised as, whose family decides the shape set
+     * @param unitLookup     resolves the unit ids in the formation
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
+     *
+     * @return {@code true} if the silhouette was changed
+     */
+    public static boolean refreshTypePiece(@Nullable Formation formation, @Nullable Faction iconFaction,
+          @Nullable Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
+        // Without the images every type resolves to the generic fallback, which would overwrite a good silhouette
+        if ((formation == null) || (iconFaction == null) || (unitLookup == null)
+                  || (MHQStaticDirectoryManager.getFormationIcons() == null)
+                  || !(formation.getFormationIcon() instanceof LayeredFormationIcon icon)
+                  || !hasBuilderEchelonPiece(icon, iconFaction)) {
+            return false;
+        }
+        List<FormationPieceIcon> pieces = icon.getPieces().get(LayeredFormationIconLayer.TYPE);
+        if ((pieces == null) || pieces.isEmpty()
+                  || !pieces.stream().allMatch(FormationIconBuilder::isBuilderTypePiece)) {
+            return false;
+        }
+        LayeredFormationIcon redrawn = new LayeredFormationIcon();
+        appendTypePieces(redrawn, formation, unitLookup, supportCommand);
+        List<FormationPieceIcon> wanted = redrawn.getPieces().get(LayeredFormationIconLayer.TYPE);
+        if (wanted.equals(pieces)) {
+            return false;
+        }
+        LOGGER.info("[FormationIcons] formation '{}': type pieces {} -> {}", formation.getName(),
+              pieces.stream().map(FormationPieceIcon::getFilename).toList(),
+              wanted.stream().map(FormationPieceIcon::getFilename).toList());
+        pieces.clear();
+        pieces.addAll(wanted);
+        return true;
+    }
+
+    /**
+     * Gives a blank formation its icon, keeping the operational status indicator if the new day has already put one
+     * on it, so drawing an icon mid-day does not wipe the status until tomorrow.
+     */
+    private static boolean decorate(Formation formation, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand, Faction iconFaction, @Nullable FormationPieceIcon background) {
+        LayeredFormationIcon icon = buildFormationIcon(formation, unitLookup, supportCommand, iconFaction,
+              background);
+        if (icon == null) {
+            return false;
+        }
+        if (formation.getFormationIcon() instanceof LayeredFormationIcon blank) {
+            List<FormationPieceIcon> status = blank.getPieces().get(LayeredFormationIconLayer.SPECIAL_MODIFIER);
+            if ((status != null) && !status.isEmpty()) {
+                icon.getPieces().put(LayeredFormationIconLayer.SPECIAL_MODIFIER, new ArrayList<>(status));
+            }
+        }
+        formation.setFormationIcon(icon);
+        return true;
     }
 
     /** Whether the formation still has the blank layered icon every new formation starts with. */
@@ -305,13 +431,48 @@ public final class FormationIconBuilder {
             // A single image the player picked.
             return false;
         }
-        // Blank means the frame and nothing else; any other piece was put there by someone.
+        // Blank means the frame and nothing else; any other piece was put there by someone. The operational status
+        // indicator is the exception: the new day puts it on every layered icon, blank ones included, so counting it
+        // would make every blank formation look decorated the day after it was created.
         for (Map.Entry<LayeredFormationIconLayer, List<FormationPieceIcon>> layer : icon.getPieces().entrySet()) {
-            if ((layer.getKey() != LayeredFormationIconLayer.FRAME) && !layer.getValue().isEmpty()) {
+            if ((layer.getKey() != LayeredFormationIconLayer.FRAME)
+                      && (layer.getKey() != LayeredFormationIconLayer.SPECIAL_MODIFIER)
+                      && !layer.getValue().isEmpty()) {
                 return false;
             }
         }
         return true;
+    }
+
+    /** Whether the icon's formation layer is a single echelon shape from this builder's folder for the faction. */
+    private static boolean hasBuilderEchelonPiece(LayeredFormationIcon icon, Faction iconFaction) {
+        List<FormationPieceIcon> pieces = icon.getPieces().get(LayeredFormationIconLayer.FORMATION);
+        if ((pieces == null) || (pieces.size() != 1)) {
+            return false;
+        }
+        FormationPieceIcon piece = pieces.get(0);
+        return formationFolderFor(iconFaction).equals(piece.getCategory())
+                     && isEchelonShape(piece.getFilename(), iconFaction);
+    }
+
+    /** Whether the piece is one of the StratOps type files this builder draws. */
+    private static boolean isBuilderTypePiece(FormationPieceIcon piece) {
+        return MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH.equals(piece.getCategory())
+                     && BUILDER_TYPE_FILENAMES.contains(piece.getFilename());
+    }
+
+    private static Set<String> builderTypeFilenames() {
+        Set<String> filenames = new HashSet<>(List.of(MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME,
+              MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME, AEROSPACE_TYPE_FILENAME,
+              PROTOMEK_TYPE_FILENAME, BATTLE_ARMOR_TYPE_FILENAME, INFANTRY_TYPE_FILENAME, DROPSHIP_TYPE_FILENAME,
+              JUMPSHIP_TYPE_FILENAME, WARSHIP_TYPE_FILENAME, SPACE_STATION_TYPE_FILENAME, VTOL_TYPE_FILENAME,
+              GUN_EMPLACEMENT_TYPE_FILENAME, MEDICAL_TYPE_FILENAME, MAINTENANCE_TYPE_FILENAME,
+              HEADQUARTERS_TYPE_FILENAME, SUPPLY_TYPE_FILENAME));
+        // The weight-class letters, drawn beside a silhouette or alone for vehicles.
+        for (int weightClass = 0; weightClass < EntityWeightClass.SIZE; weightClass++) {
+            filenames.add(EntityWeightClass.getClassName(weightClass) + ".png");
+        }
+        return Set.copyOf(filenames);
     }
 
     /** Whether the file is one of the echelon shapes this builder draws for the faction family. */
@@ -327,18 +488,24 @@ public final class FormationIconBuilder {
         return false;
     }
 
-    private static int applyToSubtree(Formation parent, Campaign campaign, Faction iconFaction,
-          FormationPieceIcon background) {
+    /**
+     * Walks every sub-Formation under {@code parent} and applies a layered icon. The {@code parent}
+     * itself is NOT decorated by this method — the caller already handled the root in
+     * {@link #applyIcons}. Returns the count of decorated Formations.
+     */
+    private static int applyToSubtree(Formation parent, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand, Faction iconFaction, FormationPieceIcon background) {
         int count = 0;
         for (Formation child : parent.getSubFormations()) {
-            LayeredFormationIcon icon = buildFormationIcon(child, campaign, iconFaction, background);
+            LayeredFormationIcon icon = buildFormationIcon(child, unitLookup, supportCommand, iconFaction,
+                  background);
             if (icon != null) {
                 child.setFormationIcon(icon);
                 count++;
                 LOGGER.info("[CompanyGen]   formation '{}' (level={}) -> icon applied",
                       child.getName(), child.getFormationLevel());
             }
-            count += applyToSubtree(child, campaign, iconFaction, background);
+            count += applyToSubtree(child, unitLookup, supportCommand, iconFaction, background);
         }
         return count;
     }
@@ -408,8 +575,9 @@ public final class FormationIconBuilder {
      * Builds the TYPE / FORMATION / BACKGROUND icon for a single Formation node. Returns {@code null}
      * if the formation's level is unknown (in which case the caller leaves the formation icon-less).
      */
-    private static @Nullable LayeredFormationIcon buildFormationIcon(Formation formation, Campaign campaign,
-          Faction iconFaction, FormationPieceIcon background) {
+    private static @Nullable LayeredFormationIcon buildFormationIcon(Formation formation,
+          Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand, Faction iconFaction,
+          FormationPieceIcon background) {
         String formationFilename = formationFilenameFor(formation.getFormationLevel(), iconFaction);
         if (formationFilename == null) {
             // Unknown level (e.g. INVALID, NONE) — skip; the formation gets no auto-icon.
@@ -420,7 +588,7 @@ public final class FormationIconBuilder {
 
         // TYPE: dominant-unit-type silhouette (Mek by default, Aero / BA / ProtoMek / Infantry /
         // vehicle / vessel when those dominate the formation's subtree).
-        appendTypePieces(icon, formation, campaign);
+        appendTypePieces(icon, formation, unitLookup, supportCommand);
 
         // FORMATION: shape file per level + faction family.
         String formationFolder = formationFolderFor(iconFaction);
@@ -450,13 +618,14 @@ public final class FormationIconBuilder {
      * Gun Emplacement uses Headquarters.png. Mixed / empty formations fall back to the generic
      * BattleMek (Center) silhouette.
      */
-    private static void appendTypePieces(LayeredFormationIcon icon, Formation formation, Campaign campaign) {
+    private static void appendTypePieces(LayeredFormationIcon icon, Formation formation,
+          Function<UUID, Unit> unitLookup, @Nullable Formation supportCommand) {
         icon.getPieces().putIfAbsent(LayeredFormationIconLayer.TYPE, new ArrayList<>());
 
         // A field hospital or a recovery detachment is a formation of vehicles, and vehicles have no StratOps
         // silhouette, so the generic path below would give them nothing but a weight-class letter. StratOps ships an
         // icon for both jobs, so use it: what the formation is for reads better than how heavy it is.
-        String purposeIcon = purposeIconFor(formation, campaign);
+        String purposeIcon = purposeIconFor(formation, unitLookup, supportCommand);
         if (purposeIcon != null) {
             try {
                 appendSingle(icon, MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, purposeIcon);
@@ -469,8 +638,8 @@ public final class FormationIconBuilder {
             }
         }
 
-        int dominantType = determineDominantUnitType(formation, campaign);
-        int weightClass = determineWeightClass(formation, campaign);
+        int dominantType = determineDominantUnitType(formation, unitLookup);
+        int weightClass = determineWeightClass(formation, unitLookup);
         String weightFilename = EntityWeightClass.getClassName(weightClass) + ".png";
         String stratOps = MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH;
         LOGGER.info("[CompanyGen][Icons] formation '{}' dominantType={} ({}) weightClass={} ({})",
@@ -482,16 +651,16 @@ public final class FormationIconBuilder {
                       MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME,
                       stratOps, weightFilename);
                 case UnitType.AEROSPACE_FIGHTER, UnitType.AERO, UnitType.CONV_FIGHTER ->
-                      appendPairOrCenter(icon, stratOps, "Aerospace (Left).png", stratOps, weightFilename);
-                case UnitType.PROTOMEK -> appendSingle(icon, stratOps, "ProtoMek.png");
-                case UnitType.BATTLE_ARMOR -> appendSingle(icon, stratOps, "Battle Armor.png");
-                case UnitType.INFANTRY -> appendSingle(icon, stratOps, "Infantry (Xenoplanetary).png");
-                case UnitType.DROPSHIP, UnitType.SMALL_CRAFT -> appendSingle(icon, stratOps, "DropShip.png");
-                case UnitType.JUMPSHIP -> appendSingle(icon, stratOps, "JumpShip.png");
-                case UnitType.WARSHIP -> appendSingle(icon, stratOps, "WarShip.png");
-                case UnitType.SPACE_STATION -> appendSingle(icon, stratOps, "Space Station.png");
-                case UnitType.VTOL -> appendSingle(icon, stratOps, "Airship.png");
-                case UnitType.GUN_EMPLACEMENT -> appendSingle(icon, stratOps, "Headquarters.png");
+                      appendPairOrCenter(icon, stratOps, AEROSPACE_TYPE_FILENAME, stratOps, weightFilename);
+                case UnitType.PROTOMEK -> appendSingle(icon, stratOps, PROTOMEK_TYPE_FILENAME);
+                case UnitType.BATTLE_ARMOR -> appendSingle(icon, stratOps, BATTLE_ARMOR_TYPE_FILENAME);
+                case UnitType.INFANTRY -> appendSingle(icon, stratOps, INFANTRY_TYPE_FILENAME);
+                case UnitType.DROPSHIP, UnitType.SMALL_CRAFT -> appendSingle(icon, stratOps, DROPSHIP_TYPE_FILENAME);
+                case UnitType.JUMPSHIP -> appendSingle(icon, stratOps, JUMPSHIP_TYPE_FILENAME);
+                case UnitType.WARSHIP -> appendSingle(icon, stratOps, WARSHIP_TYPE_FILENAME);
+                case UnitType.SPACE_STATION -> appendSingle(icon, stratOps, SPACE_STATION_TYPE_FILENAME);
+                case UnitType.VTOL -> appendSingle(icon, stratOps, VTOL_TYPE_FILENAME);
+                case UnitType.GUN_EMPLACEMENT -> appendSingle(icon, stratOps, GUN_EMPLACEMENT_TYPE_FILENAME);
                 // Tank / Naval have no generic chassis silhouette under StratOps. Fall back to
                 // weight-class file alone — matches the "H"/"A"/etc. letter the existing vehicle
                 // formations already render, distinct from Mek formations' chassis-plus-letter
@@ -569,13 +738,15 @@ public final class FormationIconBuilder {
      * <p>Every unit has to agree, so a company of MASH trucks is a field hospital while a mixed formation that merely
      * contains one is not.</p>
      *
-     * @param formation the formation
-     * @param campaign  the campaign, to resolve the unit ids
+     * @param formation      the formation
+     * @param unitLookup     resolves the unit ids in the formation
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
      *
      * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
      */
-    static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
-        if (isHeadquarters(formation, campaign)) {
+    static @Nullable String purposeIconFor(Formation formation, Function<UUID, Unit> unitLookup,
+          @Nullable Formation supportCommand) {
+        if (isHeadquarters(formation, supportCommand)) {
             return HEADQUARTERS_TYPE_FILENAME;
         }
 
@@ -594,7 +765,7 @@ public final class FormationIconBuilder {
         // A formation whose vehicles all do one support job carries that job's icon, judged by the same rule that
         // counts them. Recovery vehicles need carry no recovery gear and canteens carry nothing the equipment check
         // below looks for, so without this a Recovery Company or the Commissary fell back to a 'Mek silhouette.
-        String capabilityIcon = capabilityIconFor(formation, campaign);
+        String capabilityIcon = capabilityIconFor(formation, unitLookup);
         if (capabilityIcon != null) {
             return capabilityIcon;
         }
@@ -604,7 +775,7 @@ public final class FormationIconBuilder {
         int recovery = 0;
         Set<SupportSection> sections = EnumSet.noneOf(SupportSection.class);
         for (UUID unitId : formation.getAllUnits(false)) {
-            Unit unit = campaign.getUnit(unitId);
+            Unit unit = unitLookup.apply(unitId);
             if ((unit == null) || (unit.getEntity() == null)) {
                 continue;
             }
@@ -647,10 +818,10 @@ public final class FormationIconBuilder {
      * The icon for the one support job every vehicle in the formation does, or {@code null} when they do different jobs,
      * any of them does none, or there are none. Support carriers are the staff's squads and take no part.
      */
-    private static @Nullable String capabilityIconFor(Formation formation, Campaign campaign) {
+    private static @Nullable String capabilityIconFor(Formation formation, Function<UUID, Unit> unitLookup) {
         SupportCapability shared = null;
         for (UUID unitId : formation.getAllUnits(false)) {
-            Unit unit = campaign.getUnit(unitId);
+            Unit unit = unitLookup.apply(unitId);
             if ((unit == null) || unit.isCarrier()) {
                 continue;
             }
@@ -672,48 +843,17 @@ public final class FormationIconBuilder {
     }
 
     /**
-     * Swaps the generic 'Mek silhouette on a formation's icon for its support job's icon, once its vehicles show what
-     * that job is. Only the fallback silhouette this builder draws is replaced, so an icon the player chose is left
-     * alone.
-     *
-     * @param formation the formation whose icon may predate its vehicles
-     * @param campaign  the campaign
-     *
-     * @return {@code true} if the icon was changed
-     */
-    public static boolean refreshPurposePiece(@Nullable Formation formation, @Nullable Campaign campaign) {
-        if ((formation == null) || (campaign == null)
-                  || !(formation.getFormationIcon() instanceof LayeredFormationIcon icon)) {
-            return false;
-        }
-        List<FormationPieceIcon> pieces = icon.getPieces().get(LayeredFormationIconLayer.TYPE);
-        if ((pieces == null) || (pieces.size() != 1)
-                  || !MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME.equals(pieces.get(0).getFilename())) {
-            return false;
-        }
-        String purpose = purposeIconFor(formation, campaign);
-        if (purpose == null) {
-            return false;
-        }
-        pieces.set(0, new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
-              MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, purpose));
-        LOGGER.info("[SupportTOE] formation '{}': purpose icon '{}'", formation.getName(), purpose);
-        return true;
-    }
-
-    /**
      * Whether this formation is the command's headquarters.
      *
      * <p>Asked of the structure rather than the name: the support tree hangs off the headquarters, so whatever the
      * player has renamed it to, it is the formation the Support Command sits under.</p>
      *
-     * @param formation the formation
-     * @param campaign  the campaign
+     * @param formation      the formation
+     * @param supportCommand the force's Support Command formation, or {@code null} if it has none
      *
      * @return {@code true} if the Support Command formation is a direct child of this formation
      */
-    private static boolean isHeadquarters(Formation formation, Campaign campaign) {
-        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+    private static boolean isHeadquarters(Formation formation, @Nullable Formation supportCommand) {
         if (supportCommand == null) {
             return false;
         }
@@ -738,10 +878,10 @@ public final class FormationIconBuilder {
         return null;
     }
 
-    private static int determineDominantUnitType(Formation formation, Campaign campaign) {
+    private static int determineDominantUnitType(Formation formation, Function<UUID, Unit> unitLookup) {
         Map<Integer, Integer> counts = new java.util.HashMap<>();
         for (UUID unitId : formation.getAllUnits(false)) {
-            Unit unit = campaign.getUnit(unitId);
+            Unit unit = unitLookup.apply(unitId);
             if (unit == null) {
                 continue;
             }
@@ -774,11 +914,11 @@ public final class FormationIconBuilder {
      * <p>Logs per-unit weight + class plus the formation total at {@code [CompanyGen][Icons][Weight]}
      * so the rendered icon can be traced back to specific units.</p>
      */
-    private static int determineWeightClass(Formation formation, Campaign campaign) {
+    private static int determineWeightClass(Formation formation, Function<UUID, Unit> unitLookup) {
         int totalClass = 0;
         int unitCount = 0;
         for (UUID unitId : formation.getAllUnits(false)) {
-            Unit unit = campaign.getUnit(unitId);
+            Unit unit = unitLookup.apply(unitId);
             if (unit == null || unit.getEntity() == null) {
                 continue;
             }

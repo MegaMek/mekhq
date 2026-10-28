@@ -33,13 +33,14 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static java.lang.Math.ceil;
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
 
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 
 public class ChaosContractDeterminationRequiredVictoryPoints {
+    // the share of scenarios that are Turning Points, whatever the contract's command rights
+    private static final double TURNING_POINT_CHANCE = 0.33;
+
     /**
      * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
      * contract.
@@ -58,10 +59,6 @@ public class ChaosContractDeterminationRequiredVictoryPoints {
             return 0;
         }
 
-        if (contract.getCommandRights().isIndependent()) {
-            return INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
-        }
-
         double baseRequirement = contract.getScale();
 
         int duration = contract.getLengthInMonths();
@@ -78,9 +75,8 @@ public class ChaosContractDeterminationRequiredVictoryPoints {
 
         double meanScenarioOdds = totalScenarioOdds / trackCount;
         double scenarioOdds = meanScenarioOdds / 100.0;
-        double turningPointChance = (contract.getCommandRights() == ContractCommandRights.INTEGRATED ? 1.0 : 0.33);
 
         // This result gives us the average number of Turning Points expected for the contract
-        return (int) ceil(baseRequirement * duration * scenarioOdds * turningPointChance);
+        return (int) ceil(baseRequirement * duration * scenarioOdds * TURNING_POINT_CHANCE);
     }
 }

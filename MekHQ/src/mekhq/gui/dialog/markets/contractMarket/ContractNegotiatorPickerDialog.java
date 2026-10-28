@@ -691,7 +691,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                      role, skill.getTotalSkillLevel(person.getSkillModifierData()));
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(MarketHud.escape(person.getFullTitle())).append("</b><br>")
-                                       .append("<span style='font-size:smaller; color:").append(hex(TEXT_FAINT))
+                                       .append("<span style='color:").append(hex(TEXT_FAINT))
                                        .append("'>").append(MarketHud.escape(sub)).append("</span>");
             List<String> tags = new ArrayList<>();
             if (person.equals(currentSelection)) {
@@ -704,7 +704,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                 tags.add(tag(traitName(person, trait), NegotiatorProfile.isHelpfulTrait(trait) ? READY : DANGER));
             }
             if (!tags.isEmpty()) {
-                html.append("<br><span style='font-size:smaller'><b>")
+                html.append("<br><span><b>")
                       .append(String.join(getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator"), tags))
                       .append("</b></span>");
             }

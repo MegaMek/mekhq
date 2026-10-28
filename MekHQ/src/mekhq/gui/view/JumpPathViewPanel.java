@@ -317,7 +317,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT)) {
             TransportCostCalculations calculations = campaign.getTransportCostCalculation(EXP_REGULAR);
             int duration = (int) ceil(itineraryPlan.totalDays());
-            Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
+            Money journeyCost = calculations.calculateCostForEntireJourney(duration, path);
             addMetric(summary, metricIndex++, "metric.cost.text", journeyCost.toAmountAndSymbolString());
         }
         if (jumpFeeSummaryHandler != null) {

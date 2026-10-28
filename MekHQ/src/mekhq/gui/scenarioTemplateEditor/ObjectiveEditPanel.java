@@ -40,24 +40,25 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
+import jakarta.annotation.Nullable;
 import megamek.common.OffBoardDirection;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectConditionType;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.scenarios.ScenarioObjective.TimeLimitType;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 
 /**
- * UI for creating or editing a single scenario objective
+ * UI for creating or editing a single scenario objective. It works on a plain objective list and a set of force IDs
+ * rather than a scenario template, so both the scenario template editor and the scenario modifier editor use it.
  */
 public class ObjectiveEditPanel extends JDialog {
 
@@ -89,12 +90,28 @@ public class ObjectiveEditPanel extends JDialog {
 
     private JList<String> lstDetails;
 
-    private final ScenarioTemplate currentScenarioTemplate;
+    // the list the objective belongs to (a template's or a scenario modifier's), and the force IDs to offer
+    private final List<ScenarioObjective> objectives;
+    private final Collection<String> forceIds;
+    // the objective being replaced on save, or null when adding a new one
+    private final ScenarioObjective originalObjective;
+    // the working copy every control edits, so Cancel leaves the original untouched
     private final ScenarioObjective objective;
     private final Runnable onSaved;
 
-    public ObjectiveEditPanel(ScenarioTemplate template, Component owner, Runnable onSaved) {
-        currentScenarioTemplate = template;
+    /**
+     * Opens the editor for a new objective, which is added to {@code objectives} on save.
+     *
+     * @param objectives the list the new objective is added to
+     * @param forceIds   the force IDs the objective can be tied to
+     * @param owner      the component to center on
+     * @param onSaved    run after the objective is saved
+     */
+    public ObjectiveEditPanel(List<ScenarioObjective> objectives, Collection<String> forceIds, Component owner,
+          Runnable onSaved) {
+        this.objectives = objectives;
+        this.forceIds = forceIds;
+        originalObjective = null;
         objective = new ScenarioObjective();
         this.onSaved = onSaved;
 
@@ -105,10 +122,22 @@ public class ObjectiveEditPanel extends JDialog {
         setLocationRelativeTo(owner);
     }
 
-    public ObjectiveEditPanel(ScenarioTemplate template, ScenarioObjective objective, Component owner,
-          Runnable onSaved) {
-        currentScenarioTemplate = template;
-        this.objective = objective;
+    /**
+     * Opens the editor for an existing objective. Edits are made to a copy, which replaces the original in
+     * {@code objectives} on save.
+     *
+     * @param objectives the list holding the objective
+     * @param objective  the objective to edit
+     * @param forceIds   the force IDs the objective can be tied to
+     * @param owner      the component to center on
+     * @param onSaved    run after the objective is saved
+     */
+    public ObjectiveEditPanel(List<ScenarioObjective> objectives, ScenarioObjective objective,
+          Collection<String> forceIds, Component owner, Runnable onSaved) {
+        this.objectives = objectives;
+        this.forceIds = forceIds;
+        originalObjective = objective;
+        this.objective = new ScenarioObjective(objective);
         this.onSaved = onSaved;
 
         initGUI();
@@ -361,9 +390,7 @@ public class ObjectiveEditPanel extends JDialog {
         JLabel forcesLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "ObjectiveEditPanel.forceNames.label"));
 
         cboForceName = new JComboBox<>();
-        for (ScenarioForceTemplate forceTemplate : currentScenarioTemplate.getAllScenarioForces()) {
-            cboForceName.addItem(forceTemplate.getForceName());
-        }
+        forceIds.forEach(cboForceName::addItem);
 
         forceNames = new JList<>();
         forceNames.setVisibleRowCount(5);
@@ -675,11 +702,30 @@ public class ObjectiveEditPanel extends JDialog {
             objective.setTimeLimitAtMost(cboTimeLimitDirection.getSelectedIndex() == 0);
         }
 
-        if (!currentScenarioTemplate.scenarioObjectives.contains(objective)) {
-            currentScenarioTemplate.scenarioObjectives.add(objective);
-        }
+        saveInto(objectives, originalObjective, objective);
 
         onSaved.run();
         setVisible(false);
+    }
+
+    /**
+     * Puts a saved objective into its list: in place of the original when editing (matched by identity, since
+     * objectives have no equality of their own), or at the end when adding.
+     *
+     * @param objectives the list to update
+     * @param original   the objective that was edited, or {@code null} when adding a new one
+     * @param saved      the saved objective
+     */
+    static void saveInto(List<ScenarioObjective> objectives, @Nullable ScenarioObjective original,
+          ScenarioObjective saved) {
+        if (original != null) {
+            for (int index = 0; index < objectives.size(); index++) {
+                if (objectives.get(index) == original) {
+                    objectives.set(index, saved);
+                    return;
+                }
+            }
+        }
+        objectives.add(saved);
     }
 }

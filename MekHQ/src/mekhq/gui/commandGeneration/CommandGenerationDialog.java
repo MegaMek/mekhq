@@ -78,10 +78,12 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -727,6 +729,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
         LOGGER.info("[CompanyGen][PostGen] running processBonusUnitsBasedOnCampaignOptions");
         processBonusUnitsBasedOnCampaignOptions(generatedPersons, options);
+
+        AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        if ((currentLocation != null) && currentLocation.isOnPlanet()) {
+            LOGGER.info("[CompanyGen][PostGen] generating initial contract market offers");
+            ChaosContractMarketAvailability.processNewMonth(campaign);
+        }
+
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);
     }

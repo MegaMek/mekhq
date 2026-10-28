@@ -73,12 +73,14 @@ public final class HudStyle {
     public static final Color CAUTION = new Color(235, 166, 66);
     public static final Color DANGER = new Color(215, 87, 79);
     public static final Color INELIGIBLE = new Color(132, 153, 161);
+    private static final float SHRINK_KEPT = 0.3f;
 
     private HudStyle() {}
 
     /**
      * @param style      a {@link Font} style constant
-     * @param sizeFactor multiplier on the base label font size
+     * @param sizeFactor multiplier on the base label font size; factors below 1 are softened by
+     *                   {@link #readableSizeFactor(float)}
      * @param tracking   letter spacing (0 for none)
      *
      * @return a HUD font derived from the label font
@@ -91,13 +93,32 @@ public final class HudStyle {
         if (base == null) {
             base = new JLabel().getFont();
         }
-        Font sized = base.deriveFont(style, base.getSize2D() * sizeFactor);
+        Font sized = base.deriveFont(style, base.getSize2D() * readableSizeFactor(sizeFactor));
         if (tracking == 0.0f) {
             return sized;
         }
         Map<TextAttribute, Object> attributes = new HashMap<>();
         attributes.put(TextAttribute.TRACKING, tracking);
         return sized.deriveFont(attributes);
+    }
+
+    /**
+     * Softens a requested size factor so small HUD text stays legible: only {@link #SHRINK_KEPT} of any shrink below
+     * the base size is applied (0.7 becomes 0.91), while factors of 1 or more are left alone. The base label font
+     * already follows the player's GUI scale, so this works the same at every scale.
+     *
+     * @param sizeFactor the requested multiplier on the base label font size
+     *
+     * @return the multiplier to apply
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static float readableSizeFactor(float sizeFactor) {
+        if (sizeFactor >= 1.0f) {
+            return sizeFactor;
+        }
+        return 1.0f - (1.0f - sizeFactor) * SHRINK_KEPT;
     }
 
     /**
