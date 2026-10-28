@@ -778,7 +778,7 @@ public class CampaignGUI extends JPanel {
         if (tabMain.indexOfComponent(tab) >= 0) {
             return;
         }
-        int position = tabOrder.indexOf(tab.tabType());int index = tabInsertIndex(tab);
+        int index = tabInsertIndex(tab);
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
         SwingUtilities.invokeLater(tab::refreshAll);
@@ -790,8 +790,9 @@ public class CampaignGUI extends JPanel {
      * @return the index the tab belongs at in the tab panel, before the first tab that comes after it
      */
     private int tabInsertIndex(CampaignGuiTab tab) {
-        return IntStream.range(0, tabMain.getTabCount()).filter(
-                    i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
+        int position = tabOrder.indexOf(tab.tabType());
+        return IntStream.range(0, tabMain.getTabCount())
+                     .filter(i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
                      .findFirst()
                      .orElse(tabMain.getTabCount());
     }
