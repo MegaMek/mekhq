@@ -570,6 +570,39 @@ public class CurrentLocationTest {
             assertTrue(loc.isInTransit());
             assertEquals(0.0, loc.getPercentageTransit(), 1e-9);
         }
+
+        @Test
+        void newDayArrivesAtTheTransferDestination() {
+            LocalDate today = LocalDate.of(2474, 11, 1);
+            Campaign campaign = mockCampaign();
+            when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            when(campaign.getLocalDate()).thenReturn(today);
+            when(campaign.getFutureContracts()).thenReturn(Collections.emptyList());
+            when(system.getRechargeTime(today, false)).thenReturn(176.0);
+            Planet origin = mock(Planet.class);
+            Planet destination = mock(Planet.class);
+            when(destination.getPrintableName(today)).thenReturn("Outer World");
+            when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(0.5);
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.setOriginPlanet(origin);
+            jumpPath.setTargetPlanet(destination);
+
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+
+                loc.newDay(campaign, false);
+
+                assertTrue(loc.isOnPlanet());
+                assertNull(loc.getJumpPath());
+                assertSame(destination, loc.getPlanet());
+                assertEquals(system, loc.getCurrentSystem(), "A transfer never leaves the system");
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("in transit to Outer World"));
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("Outer World reached."));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), never());
+            }
+        }
     }
 
     @Nested
