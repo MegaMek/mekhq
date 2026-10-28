@@ -42,7 +42,9 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -137,6 +139,48 @@ class RoleplayTest {
         assertEquals(ana, roleplay.addCharacter("Ana"));
         assertTrue(ana.isActive());
         assertEquals(List.of("Bo", "Ana"), names(roleplay.getActiveCharacters()));
+    }
+
+    @Test
+    void deletedCharactersAreGoneAndUntaggedButTheirEntriesStay() {
+        Roleplay roleplay = new Roleplay();
+        OracleCharacter ana = roleplay.addCharacter("Ana");
+        OracleCharacter bo = roleplay.addCharacter("Bo");
+        JournalEntry note = JournalEntry.newNote(LocalDate.of(3025, 1, 1)).tagCharacter(ana).tagCharacter(bo);
+        roleplay.getJournal().add(note);
+        JournalEntry record = roleplay.logOracle(LocalDate.of(3025, 1, 2), JournalEntryType.DICE, "2d6: 7", 100)
+                                    .tagCharacter(ana);
+        roleplay.removeCharacter(ana);
+
+        assertTrue(roleplay.deleteCharacter(ana));
+        assertNull(roleplay.getCharacter(ana.getId()));
+        assertEquals(List.of("Bo"), names(roleplay.getCharacters()));
+        assertEquals(List.of(bo.getId()), List.copyOf(note.getCharacters()));
+        assertTrue(record.getCharacters().isEmpty());
+        assertEquals(2, roleplay.getTimeline(new JournalFilter(null, null, null, Set.of(), null, null)).size());
+        assertFalse(roleplay.deleteCharacter(ana), "a character can only be deleted once");
+
+        // The name is free again, so typing it adds someone new.
+        OracleCharacter newAna = roleplay.addCharacter("Ana");
+        assertNotNull(newAna);
+        assertFalse(newAna.getId().equals(ana.getId()));
+    }
+
+    @Test
+    void anyEntryCanBeDeleted() {
+        Roleplay roleplay = new Roleplay();
+        JournalEntry note = JournalEntry.newNote(LocalDate.of(3025, 1, 1));
+        roleplay.getJournal().add(note);
+        JournalEntry dice = roleplay.logOracle(LocalDate.of(3025, 1, 1), JournalEntryType.DICE, "2d6: 7", 100);
+        JournalEntry chronicle = roleplay.logOracle(LocalDate.of(3025, 1, 1), JournalEntryType.CHRONICLE,
+              "Arrived at Helm.", 100);
+
+        assertTrue(roleplay.deleteEntry(note));
+        assertTrue(roleplay.deleteEntry(dice));
+        assertTrue(roleplay.deleteEntry(chronicle));
+        assertFalse(roleplay.deleteEntry(note), "an entry can only be deleted once");
+        assertTrue(roleplay.getJournal().isEmpty());
+        assertTrue(roleplay.getOracleLog().isEmpty());
     }
 
     @Test

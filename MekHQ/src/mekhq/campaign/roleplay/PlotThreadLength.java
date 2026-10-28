@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * How many steps a {@link PlotThread}'s progress track has.
  */
 public enum PlotThreadLength {
+    BRIEF("BRIEF", 5),
     SHORT("SHORT", 10),
     MEDIUM("MEDIUM", 15),
     LONG("LONG", 20);

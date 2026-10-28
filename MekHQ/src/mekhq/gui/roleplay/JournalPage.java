@@ -99,8 +99,9 @@ import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 
 /**
  * The console's Journal page: every note and Oracle record in one list, grouped by month, narrowed by the filter column
- * (search, type, thread, cast member and dates). The right side reads the selected entry; a note opens straight into
- * the rich-text editor. The filtered journal can be exported as Markdown or plain text.
+ * (search, type, thread, cast member and dates). The right side reads the selected entry and edits it in place: a note
+ * in the rich-text editor, an Oracle or campaign record as plain text. Any entry can be deleted. The filtered journal
+ * can be exported as Markdown or plain text.
  */
 class JournalPage implements ConsoleSection {
     private static final int SAVE_DELAY_MILLISECONDS = 400;
@@ -634,9 +635,8 @@ class JournalPage implements ConsoleSection {
         readerTags.setText(tagLine(entry));
         editor.setHtml(entry.isNote() ? JournalText.sanitizeHtml(entry.getText())
                              : JournalText.plainToHtml(entry.getText()));
-        editor.setEditable(entry.isNote());
+        editor.setEditable(true);
         editor.setToolbarVisible(entry.isNote());
-        delete.setVisible(entry.isNote());
         reader.revalidate();
         reader.repaint();
     }
@@ -671,8 +671,8 @@ class JournalPage implements ConsoleSection {
     }
 
     private void saveEditor() {
-        if (shown != null && shown.isNote()) {
-            shown.setText(editor.getHtml());
+        if (shown != null) {
+            shown.setText(shown.isNote() ? editor.getHtml() : JournalText.htmlToPlain(editor.getHtml()));
             status.setText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.saved"));
             list.repaint();
         }
@@ -836,8 +836,8 @@ class JournalPage implements ConsoleSection {
 
     private void deleteShown() {
         saveTimer.stop();
-        if (shown != null && shown.isNote()) {
-            console.roleplay().getJournal().remove(shown);
+        if (shown != null) {
+            console.roleplay().deleteEntry(shown);
             shown = null;
             refreshList(null);
             console.changed();
