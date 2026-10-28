@@ -658,6 +658,20 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Determines whether a person can be treated in the campaign's infirmary.
+     *
+     * <p>Characters on leave are excused from duty, but remain under the care of the campaign's medical staff.</p>
+     *
+     * @return {@code true} if the person can be treated in the infirmary; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isInfirmaryEligible() {
+        return isActiveFlexible() || isOnLeave() || isOnMaternityLeave();
+    }
+
+    /**
      * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {
