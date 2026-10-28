@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -136,7 +137,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     private final CardLayout railCards = new CardLayout();
     private final JPanel railHolder = new JPanel(railCards);
-    private final HudFilterList<LocationFilterItem> locationFilter = new HudFilterList<>(this::chooseLocation);
+    /** A combo box rather than a list, so a campaign with many bases does not fill the rail with them. */
+    private final JComboBox<LocationFilterItem> locationPicker = new JComboBox<>();
     private final HudFilterList<String> typeFilter = new HudFilterList<>(value -> {
         state.unitType = value;
         refresh();
@@ -202,6 +204,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                                  !people.isEmpty() ? people.iterator().next() : null;
         location = locationOf(anchor);
         data = new CrewAssignmentData(campaign, location);
+        buildLocationPicker();
 
         modeSelector = new HudModeSelector<>(CrewAssignmentPage.class, CrewAssignmentPage::getLabel, this::showPage);
         unassignedTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "tile.unassigned"),
@@ -248,6 +251,21 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         pack();
         setLocationRelativeTo(frame);
         setPreferences();
+    }
+
+    private void buildLocationPicker() {
+        for (LocationFilterItem item : locations) {
+            locationPicker.addItem(item);
+        }
+        locationPicker.setSelectedItem(location);
+        Hud.styleComboBox(locationPicker);
+        locationPicker.getAccessibleContext().setAccessibleName(getTextAt(RESOURCE_BUNDLE, "rail.location"));
+        locationPicker.setMaximumSize(new Dimension(Integer.MAX_VALUE, locationPicker.getPreferredSize().height));
+        locationPicker.addActionListener(event -> {
+            if (locationPicker.getSelectedItem() instanceof LocationFilterItem item) {
+                chooseLocation(item);
+            }
+        });
     }
 
     /** Finds the location filter entry for the base something is at, or the main force. */
@@ -360,7 +378,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private JComponent buildRail() {
         JPanel unitRail = column();
         unitRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.location"))));
-        unitRail.add(leftAligned(locationFilter));
+        unitRail.add(leftAligned(locationPicker));
         unitRail.add(Box.createVerticalStrut(scaleForGUI(12)));
         unitRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.unitType"))));
         unitRail.add(leftAligned(typeFilter));
@@ -487,8 +505,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         unitsPage.setCount(getFormattedTextAt(RESOURCE_BUNDLE, "units.count", shown.size(),
               state.selectedUnits.size()));
 
-        locationFilter.setItems(locations.stream().map(item -> new Item<>(item, item.toString(), -1)).toList());
-        locationFilter.setSelected(location);
         typeFilter.setItems(withAll("rail.allTypes", statusMatches, byType));
         typeFilter.setSelected(state.unitType);
         formationFilter.setItems(withAll("rail.allFormations", statusMatches, byFormation));
@@ -851,6 +867,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         }
         if (!data.plan().isEmpty()) {
             setMessage(getTextAt(RESOURCE_BUNDLE, "message.locationLocked"), true);
+            // Put the picker back; the change it fires is for the current location, which is ignored above
+            locationPicker.setSelectedItem(location);
             refresh();
             return;
         }
