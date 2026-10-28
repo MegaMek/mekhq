@@ -192,8 +192,8 @@ class AcademyTests {
     }
 
     /**
-     * Regression test for #10664: a Capellan-origin person in a Federated Suns campaign must not be offered a
-     * Federated Suns academy while FS and CC are at war, as {@link Academy#isFactionConflict} would expel them.
+     * Regression test for #10664: a Capellan-origin person must not be offered a Federated Suns academy while FS and
+     * CC are at war, as {@link Academy#isFactionConflict} would expel them.
      */
     @Test
     void testGetFilteredFactionExcludesFactionAtWarWithOriginOnly() {
