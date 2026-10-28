@@ -277,6 +277,9 @@ public class AtBScenarioModifierApplicator {
      * The force keeps the deployment zone from its own definition. No other force in the scenario is affected.
      * <p>
      * Forces with a destination edge are left alone, as they need to keep moving toward that edge.
+     * <p>
+     * The force is found by object identity, as the modifier's own template object is the one generated into the
+     * scenario. Another force that happens to share its name is not affected.
      *
      * @param scenario    The scenario to process.
      * @param campaign    The current campaign.
@@ -285,23 +288,28 @@ public class AtBScenarioModifierApplicator {
     public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ScenarioForceTemplate ambushForce) {
         // Prevent Hidden Units from Causing Issues if Disabled
         if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+            LOGGER.debug("Skipping ambush for {}: hidden units are disabled", ambushForce.getForceName());
             return;
         }
 
         if (ambushForce.getArrivalTurn() != 0) {
+            LOGGER.debug("Skipping ambush for {}: it arrives on turn {}, not at the start", ambushForce.getForceName(),
+                  ambushForce.getArrivalTurn());
             return;
         }
 
         // Forces with a destination edge (such as convoys) are meant to cross the map. Hidden units never move, so leave
         // these forces out of the ambush.
         if (ambushForce.getDestinationZone() != CardinalEdge.NONE.getIndex()) {
+            LOGGER.debug("Skipping ambush for {}: it has destination edge {}", ambushForce.getForceName(),
+                  ambushForce.getDestinationZone());
             return;
         }
 
-        for (BotForce botForce : scenario.getBotForces()) {
-            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+        int totalHiddenUnits = 0;
 
-            if ((forceTemplate == null) || !forceTemplate.getForceName().equals(ambushForce.getForceName())) {
+        for (BotForce botForce : scenario.getBotForces()) {
+            if (scenario.getBotForceTemplates().get(botForce) != ambushForce) {
                 continue;
             }
 
@@ -320,7 +328,11 @@ public class AtBScenarioModifierApplicator {
                     numHiddenUnits++;
                 }
             }
+
+            totalHiddenUnits += numHiddenUnits;
         }
+
+        LOGGER.debug("Ambush for {}: hid {} unit(s)", ambushForce.getForceName(), totalHiddenUnits);
     }
 
     /**

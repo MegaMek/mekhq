@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -120,8 +121,13 @@ public class ObjectivesPanel extends JPanel {
      * Binds the panel to a template's objectives, offering the template's forces, and refreshes the objective list.
      */
     public void load(ScenarioTemplate template) {
-        load(template.scenarioObjectives,
-              () -> template.getAllScenarioForces().stream().map(ScenarioForceTemplate::getForceName).toList());
+        load(template.scenarioObjectives, () -> {
+            List<String> forceIds = new ArrayList<>();
+            for (ScenarioForceTemplate force : template.getAllScenarioForces()) {
+                forceIds.add(force.getForceName());
+            }
+            return forceIds;
+        });
     }
 
     /**
