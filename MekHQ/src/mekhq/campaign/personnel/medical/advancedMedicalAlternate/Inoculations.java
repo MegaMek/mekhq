@@ -248,7 +248,7 @@ public class Inoculations {
         inoculatePersonnel(today, personnel, currentPlanet);
     }
 
-    private static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
+    static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
           Collection<Person> allPersonnel,
           Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation,
           Map<String, Set<Person>> militaryPersonnelInNeedOfCanonInoculation) {
@@ -294,7 +294,7 @@ public class Inoculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
+    static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
           Set<Person> civilianPersonnel, Set<Person> militaryPersonnel) {
         for (Person person : allPersonnel) {
             if (person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
