@@ -36,24 +36,37 @@ import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
+import megamek.common.compute.Compute;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConSupplyInterdictionBehavior;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Pathing;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.StepCost;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
@@ -69,10 +82,14 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * <p>Routes are laid once and kept. A facility that turns up, or changes sides, is joined to its side's network by the
  * cheapest way there. A facility taken by the other side, or a source that is lost, sends every route that ran through
  * it the long way round, since that loss lasts. A cut does not: no route is laid around a hex where the player has cut
- * the enemy's supply (see {@link StratConRoadCut}), so a cut anywhere on a route blocks everything beyond it.</p>
+ * the enemy's supply (see {@link StratConRoadCut}), or where an enemy Supply Interdiction sits across the player's
+ * (see {@link StratConSupplyInterdictionBehavior}), so either blocks everything beyond it on the route.</p>
  *
  * <p>A facility whose route reaches a source unblocked is Connected. One whose route is blocked, or that has no route
  * at all, is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month.</p>
+ *
+ * <p>The enemy also sends Supply Interdictions against the player's routes, as often as it sends engineers to build
+ * outposts (see {@link #processSupplyInterdictions}).</p>
  *
  * <p>Supply lines apply only with the improved sector generator, and only while the "Supply Lines" option is on. A
  * sector with no roads has none either.</p>
@@ -81,6 +98,8 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * @since 0.51.01
  */
 public final class StratConFacilitySupply {
+    private static final MMLogger LOGGER = MMLogger.create(StratConFacilitySupply.class);
+
     static final String RESOURCE_BUNDLE = StratConEnemyFacilityActivity.RESOURCE_BUNDLE;
 
     /** How many hexes a Supply Depot reaches without a road. */
@@ -325,7 +344,8 @@ public final class StratConFacilitySupply {
      * @param isPlayerSide {@code true} if the facility is on the player's side, {@code false} if on the enemy's
      *
      * @return {@code true} if the facility's route reaches one of its side's roots with nothing blocking it: no hex the
-     *       other side holds and, for the enemy, no hex where the player has cut its supply
+     *       other side holds and, for the enemy, no hex where the player has cut its supply, or for the player, no hex
+     *       held by an enemy Supply Interdiction
      */
     static boolean isSupplied(StratConTrackState track, StratConCoords coords, boolean isPlayerSide) {
         StratConSupplyNetwork network = track.getSupplyNetwork(isPlayerSide);
@@ -335,7 +355,10 @@ public final class StratConFacilitySupply {
         }
 
         for (StratConCoords hex : route) {
-            if (isHeldByOtherSide(track, hex, isPlayerSide) || (!isPlayerSide && track.isRoadCut(hex))) {
+            boolean isCut = isPlayerSide ?
+                                  StratConSupplyInterdictionBehavior.isInterdicted(track, hex) :
+                                  track.isRoadCut(hex);
+            if (isCut || isHeldByOtherSide(track, hex, isPlayerSide)) {
                 return false;
             }
         }
@@ -421,6 +444,143 @@ public final class StratConFacilitySupply {
                 reportFacility(campaign, track, coords, "report.starved");
             }
         }
+    }
+
+    /**
+     * The contract-level daily step for enemy Supply Interdictions: schedules the next month's once the last month's
+     * schedule runs out - as many as the enemy sends engineers (see
+     * {@link StratConEnemyFacilityActivity#getMonthlyEngineerCount}) - and places those due today across the player's
+     * supply routes in a random sector. One that finds no route to sit on is dropped. None are sent while supply lines
+     * are out of use or the enemy is idle, and none are placed against a routed enemy.
+     *
+     * @param campaign      the current campaign
+     * @param contract      the contract
+     * @param campaignState the contract's StratCon campaign state
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processSupplyInterdictions(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState) {
+        List<LocalDate> interdictionDates = campaignState.getSupplyInterdictionDates();
+        // Anything scheduled before supply lines were turned off, or the enemy turned idle, is called off.
+        if (!isSupplyLinesActive(campaign) || (StratConEnemyFacilityActivity.getActivity(campaign) <= 0)) {
+            interdictionDates.clear();
+            return;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+        LocalDate scheduledUntil = campaignState.getSupplyInterdictionsScheduledUntil();
+        if ((scheduledUntil == null) || !today.isBefore(scheduledUntil)) {
+            scheduleSupplyInterdictions(campaign, contract, campaignState, today);
+        }
+
+        int dueCount = 0;
+        for (LocalDate interdictionDate : interdictionDates) {
+            if (!interdictionDate.isAfter(today)) {
+                dueCount++;
+            }
+        }
+        if (dueCount == 0) {
+            return;
+        }
+        interdictionDates.removeIf(interdictionDate -> !interdictionDate.isAfter(today));
+
+        // The enemy is in no state to raid while routed.
+        if (contract.getMoraleLevel().isRouted()) {
+            return;
+        }
+
+        List<StratConPointOfInterest> placed = new ArrayList<>();
+        for (int interdiction = 0; interdiction < dueCount; interdiction++) {
+            StratConPointOfInterest pointOfInterest = placeSupplyInterdiction(campaignState, today);
+            if (pointOfInterest == null) {
+                LOGGER.info("No sector of contract {} had a supply route to interdict.", contract.getName());
+            } else {
+                placed.add(pointOfInterest);
+            }
+        }
+        StratConPointOfInterestRules.announceNewPointsOfInterest(campaign, contract, placed);
+    }
+
+    private static void scheduleSupplyInterdictions(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, LocalDate today) {
+        LocalDate monthEnd = today.plusMonths(1);
+        campaignState.setSupplyInterdictionsScheduledUntil(monthEnd);
+
+        LocalDate contractEnd = contract.getEndingDate();
+        if ((contractEnd != null) && contractEnd.isBefore(monthEnd)) {
+            monthEnd = contractEnd;
+        }
+        int dayCount = (int) ChronoUnit.DAYS.between(today, monthEnd);
+        if (dayCount <= 0) {
+            return;
+        }
+
+        int interdictionCount = StratConEnemyFacilityActivity.getMonthlyEngineerCount(contract.getScale(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+              StratConEnemyFacilityActivity.getActivity(campaign));
+        for (int interdiction = 0; interdiction < interdictionCount; interdiction++) {
+            campaignState.getSupplyInterdictionDates().add(today.plusDays(Compute.randomInt(dayCount)));
+        }
+    }
+
+    private static @Nullable StratConPointOfInterest placeSupplyInterdiction(StratConCampaignState campaignState,
+          LocalDate today) {
+        StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(
+              StratConSupplyInterdictionBehavior.TYPE_ID);
+        if (definition == null) {
+            return null;
+        }
+
+        List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
+        while (!tracks.isEmpty()) {
+            StratConTrackState track = tracks.remove(Compute.randomInt(tracks.size()));
+            List<StratConCoords> candidates = getInterdictionCandidates(track, definition);
+            if (candidates.isEmpty()) {
+                continue;
+            }
+
+            StratConPointOfInterest pointOfInterest = StratConPointOfInterestPlacer.place(track,
+                  StratConSupplyInterdictionBehavior.TYPE_ID,
+                  candidates.get(Compute.randomInt(candidates.size())),
+                  today);
+            if (pointOfInterest != null) {
+                return pointOfInterest;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param track      a sector
+     * @param definition the Supply Interdiction definition
+     *
+     * @return the hexes of the sector a Supply Interdiction could sit on: those along the player's side's supply routes
+     *       that hold no facility, that its definition allows, and where no player formation stands. A root no route
+     *       runs from carries no supply, so it doesn't count.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<StratConCoords> getInterdictionCandidates(StratConTrackState track,
+          StratConPointOfInterestDefinition definition) {
+        Set<StratConCoords> routeHexes = new LinkedHashSet<>();
+        for (StratConSupplyLink link : track.getPlayerSupplyNetwork().getLinks()) {
+            routeHexes.add(link.getFrom());
+            routeHexes.add(link.getTo());
+        }
+
+        Collection<StratConCoords> forceCoords = track.getAssignedForceCoords().values();
+        List<StratConCoords> candidates = new ArrayList<>();
+        for (StratConCoords coords : routeHexes) {
+            if ((track.getFacility(coords) == null)
+                      && !forceCoords.contains(coords)
+                      && StratConPointOfInterestPlacer.canPlace(track, definition, coords)) {
+                candidates.add(coords);
+            }
+        }
+        return candidates;
     }
 
     /**

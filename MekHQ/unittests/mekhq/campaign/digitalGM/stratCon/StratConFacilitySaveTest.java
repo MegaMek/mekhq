@@ -179,6 +179,8 @@ class StratConFacilitySaveTest {
         campaignState.addTrack(track);
         campaignState.setLastCounterattackDate(TODAY);
         campaignState.getEnemyEngineerDates().add(TODAY.plusDays(5));
+        campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(20));
+        campaignState.getSupplyInterdictionDates().add(TODAY.plusDays(6));
 
         StratConCampaignState reloadedState = saveAndLoad(campaignState);
         StratConTrackState reloadedTrack = reloadedState.getTrack(0);
@@ -206,6 +208,8 @@ class StratConFacilitySaveTest {
 
         assertEquals(TODAY, reloadedState.getLastCounterattackDate());
         assertEquals(List.of(TODAY.plusDays(5)), reloadedState.getEnemyEngineerDates());
+        assertEquals(TODAY.plusDays(20), reloadedState.getSupplyInterdictionsScheduledUntil());
+        assertEquals(List.of(TODAY.plusDays(6)), reloadedState.getSupplyInterdictionDates());
     }
 
     @Test

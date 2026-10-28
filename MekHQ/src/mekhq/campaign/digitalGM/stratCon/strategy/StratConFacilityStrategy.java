@@ -85,6 +85,7 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     public void processEnemyActivity(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
         StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
+        StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
     }
 
     @Override

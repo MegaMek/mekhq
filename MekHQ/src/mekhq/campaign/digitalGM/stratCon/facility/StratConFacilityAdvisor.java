@@ -53,6 +53,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConEnemyEngineersBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConSupplyInterdictionBehavior;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
@@ -450,7 +451,7 @@ public final class StratConFacilityAdvisor {
         for (StratConTrackState track : campaignState.getTracks()) {
             addScenarioEvents(track, events);
             addOrderEvents(campaign, track, events);
-            addEngineerEvents(track, events);
+            addEnemyPointOfInterestEvents(track, events);
 
             for (StratConRoadCut roadCut : track.getRoadCuts()) {
                 events.add(new UpcomingEvent(roadCut.getEndDate(),
@@ -507,17 +508,25 @@ public final class StratConFacilityAdvisor {
         }
     }
 
-    private static void addEngineerEvents(StratConTrackState track, List<UpcomingEvent> events) {
+    private static void addEnemyPointOfInterestEvents(StratConTrackState track, List<UpcomingEvent> events) {
         for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
-            boolean isEngineers = StratConEnemyEngineersBehavior.TYPE_ID.equals(pointOfInterest.getTypeId());
-            if (!isEngineers || !pointOfInterest.isActive() || (pointOfInterest.getExpiryDate() == null)
+            String eventKey;
+            if (StratConEnemyEngineersBehavior.TYPE_ID.equals(pointOfInterest.getTypeId())) {
+                eventKey = "event.engineers";
+            } else if (StratConSupplyInterdictionBehavior.TYPE_ID.equals(pointOfInterest.getTypeId())) {
+                eventKey = "event.supplyInterdiction";
+            } else {
+                continue;
+            }
+
+            if (!pointOfInterest.isActive() || (pointOfInterest.getExpiryDate() == null)
                       || !pointOfInterest.isVisibleToPlayer(track)) {
                 continue;
             }
             events.add(new UpcomingEvent(pointOfInterest.getExpiryDate(),
                   track,
                   pointOfInterest.getCoords(),
-                  getTextAt(RESOURCE_BUNDLE, "event.engineers")));
+                  getTextAt(RESOURCE_BUNDLE, eventKey)));
         }
     }
 

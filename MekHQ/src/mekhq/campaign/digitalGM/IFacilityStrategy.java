@@ -111,7 +111,8 @@ public interface IFacilityStrategy {
     void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth);
 
     /**
-     * Runs the enemy's contract-wide facility activity for the day, such as sending engineers to build outposts.
+     * Runs the enemy's contract-wide facility activity for the day, such as sending engineers to build outposts or
+     * raiders to interdict the player's supply routes.
      *
      * @param campaign      the current campaign
      * @param contract      the contract

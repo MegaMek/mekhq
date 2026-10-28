@@ -62,9 +62,15 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConSupplyInterdictionBehavior;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -484,6 +490,191 @@ class StratConFacilitySupplyTest {
             when(options.get(CampaignOption.USE_SUPPLY_LINES)).thenReturn(false);
             assertEquals("reason.supplyLinesOff", StratConFacilityOperations.getUnavailableReasonKey(campaign,
                   contract, track, road[2], FacilityOperation.INTERDICT));
+        }
+    }
+
+    private void interdict(StratConCoords coords) {
+        track.addPointOfInterest(new StratConPointOfInterest(StratConSupplyInterdictionBehavior.TYPE_ID, coords));
+    }
+
+    private int countInterdictions() {
+        int count = 0;
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
+            if (StratConSupplyInterdictionBehavior.TYPE_ID.equals(pointOfInterest.getTypeId())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static StratConPointOfInterestDefinition interdictionDefinition() {
+        StratConPointOfInterestDefinition definition = new StratConPointOfInterestDefinition();
+        definition.setTypeId(StratConSupplyInterdictionBehavior.TYPE_ID);
+        definition.setDisplayableName("Supply Interdiction");
+        definition.setOccupiesHex(true);
+        definition.setLandOnly(true);
+        definition.setDefaultOwner(ForceAlignment.Opposing);
+        definition.setLifespanDays(7);
+        definition.setRemoveOnExpiry(true);
+        definition.setBehaviorId(StratConSupplyInterdictionBehavior.BEHAVIOR_ID);
+        return definition;
+    }
+
+    @Nested
+    class Interdictions {
+        @Test
+        void anInterdictionCutsOffThePlayersFacilitiesBeyondIt() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            StratConCoords beyond = roadEnd.translate(ROAD_DIRECTION);
+            place(beyond, ForceAlignment.Player, FacilityType.TankBase);
+            checkSupply();
+
+            interdict(road[1]);
+
+            assertEquals(Set.of(roadEnd, beyond), checkSupply());
+        }
+
+        @Test
+        void noRouteIsLaidAroundAnInterdiction() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            checkSupply();
+
+            interdict(road[1]);
+            checkSupply();
+
+            assertTrue(track.getPlayerSupplyNetwork().routeFrom(roadEnd).contains(road[1]));
+        }
+
+        @Test
+        void anInterdictionDoesNotBlockTheEnemy() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            interdict(road[1]);
+
+            assertTrue(checkSupply().isEmpty());
+        }
+
+        @Test
+        void onceTheInterdictionIsGoneTheRouteIsOpenAgain() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            checkSupply();
+            StratConPointOfInterest interdiction = new StratConPointOfInterest(
+                  StratConSupplyInterdictionBehavior.TYPE_ID, road[1]);
+            track.addPointOfInterest(interdiction);
+            assertTrue(checkSupply().contains(roadEnd));
+
+            track.removePointOfInterest(interdiction.getId());
+
+            assertTrue(checkSupply().isEmpty());
+        }
+
+        @Test
+        void anInterdictionCanSitOnlyOnThePlayersRoutesAwayFromFacilitiesAndFormations() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            checkSupply();
+            track.assignForce(1, road[2], TODAY, false);
+
+            List<StratConCoords> candidates = StratConFacilitySupply.getInterdictionCandidates(track,
+                  interdictionDefinition());
+
+            assertEquals(Set.of(road[0], road[1]), new HashSet<>(candidates));
+        }
+
+        @Test
+        void theEnemysOwnRoutesAreNoPlaceForAnInterdiction() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            assertTrue(StratConFacilitySupply.getInterdictionCandidates(track, interdictionDefinition()).isEmpty());
+        }
+    }
+
+    @Nested
+    class InterdictionSchedule {
+        private StratConCampaignState campaignState;
+        private AbstractContract contract;
+
+        @BeforeEach
+        void setUpSchedule() {
+            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
+            when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+
+            campaignState = new StratConCampaignState();
+            campaignState.addTrack(track);
+            contract = mock(AbstractContract.class);
+            when(contract.getStratConCampaignState()).thenReturn(campaignState);
+            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
+            when(contract.getScale()).thenReturn(6);
+            when(contract.getEndingDate()).thenReturn(TODAY.plusYears(1));
+            when(contract.getName()).thenReturn("Test Contract");
+
+            StratConPointOfInterestDefinitions.registerDefinition(interdictionDefinition());
+
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            checkSupply();
+        }
+
+        @AfterEach
+        void forgetDefinition() {
+            StratConPointOfInterestDefinitions.unregisterDefinition(StratConSupplyInterdictionBehavior.TYPE_ID);
+        }
+
+        @Test
+        void oneDueTodaySitsAcrossAPlayerSupplyRoute() {
+            campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(10));
+            campaignState.getSupplyInterdictionDates().add(TODAY);
+
+            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+
+            assertEquals(1, countInterdictions());
+            StratConPointOfInterest interdiction = track.getPointsOfInterest().getFirst();
+            assertTrue(track.getPlayerSupplyNetwork().contains(interdiction.getCoords()));
+            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
+        }
+
+        @Test
+        void theyComeAsOftenAsEngineers() {
+            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+
+            int expected = StratConEnemyFacilityActivity.getMonthlyEngineerCount(6, false, 1.0);
+            assertEquals(expected, campaignState.getSupplyInterdictionDates().size() + countInterdictions());
+            assertEquals(TODAY.plusMonths(1), campaignState.getSupplyInterdictionsScheduledUntil());
+        }
+
+        @Test
+        void noneAreSentWhileSupplyLinesAreOff() {
+            when(options.get(CampaignOption.USE_SUPPLY_LINES)).thenReturn(false);
+            campaignState.getSupplyInterdictionDates().add(TODAY);
+
+            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+
+            assertEquals(0, countInterdictions());
+            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
+        }
+
+        @Test
+        void noneAreSentByAnIdleEnemy() {
+            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
+            campaignState.getSupplyInterdictionDates().add(TODAY);
+
+            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+
+            assertEquals(0, countInterdictions());
+            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
+        }
+
+        @Test
+        void noneArePlacedByARoutedEnemy() {
+            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+            campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(10));
+            campaignState.getSupplyInterdictionDates().add(TODAY);
+
+            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+
+            assertEquals(0, countInterdictions());
+            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
         }
     }
 
