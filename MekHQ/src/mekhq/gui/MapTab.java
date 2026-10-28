@@ -1323,24 +1323,44 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private void calculateJumpPath() {
         PlanetarySystem origin = resolveRouteField(suggestRouteOrigin);
         PlanetarySystem destination = resolveRouteField(suggestRouteDestination);
-        if ((origin != null) && (destination != null)) {
-            applyRoutePlanningChange(routePlanningIntent.plot(origin, destination, this::calculateRouteSegment),
-                  destination);
+        if ((origin == null) || (destination == null)) {
+            return;
         }
+        if (Objects.equals(origin, destination)) {
+            // A system-to-itself route goes nowhere; the only journey there is to another of its worlds
+            plotInSystemToSelectedWorld();
+            return;
+        }
+        applyRoutePlanningChange(routePlanningIntent.plot(origin, destination, this::calculateRouteSegment),
+              destination);
     }
 
-    private void plotRouteToSelectedDestination() {
-        PlanetarySystem origin = getCampaign().getCurrentSystem();
-        PlanetarySystem destination = panMap.getSelectedSystem();
+    /**
+     * Plots a course to the world selected in the planetary system view, if it is another world of the fleet's
+     * current system.
+     *
+     * @return {@code true} if an in-system course was plotted
+     */
+    private boolean plotInSystemToSelectedWorld() {
         Planet destinationPlanet = isPlanetViewShowing() ? panSystem.getSelectedPlanet() : null;
         AbstractLocation currentLocation = getCampaign().getPlayerForce()
                                                  .getForceDetachment()
                                                  .getCurrentLocation();
-        if (canPlotInSystemRoute(currentLocation, destinationPlanet)) {
-            applyRoutePlanningChange(routePlanningIntent.plotInSystem(getInSystemDeparture(currentLocation),
-                  destinationPlanet), destination);
+        if (!canPlotInSystemRoute(currentLocation, destinationPlanet)) {
+            return false;
+        }
+        applyRoutePlanningChange(routePlanningIntent.plotInSystem(getInSystemDeparture(currentLocation),
+              destinationPlanet), destinationPlanet.getParentSystem());
+        return true;
+    }
+
+    private void plotRouteToSelectedDestination() {
+        if (plotInSystemToSelectedWorld()) {
             return;
         }
+        PlanetarySystem origin = getCampaign().getCurrentSystem();
+        PlanetarySystem destination = panMap.getSelectedSystem();
+        Planet destinationPlanet = isPlanetViewShowing() ? panSystem.getSelectedPlanet() : null;
         if (!canQuickPlotRoute(destination, origin)) {
             return;
         }
