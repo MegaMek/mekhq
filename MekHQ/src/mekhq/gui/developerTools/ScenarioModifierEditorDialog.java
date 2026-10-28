@@ -36,36 +36,50 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifierJson;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.scenarioTemplateEditor.ObjectivesPanel;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * A developer tool for editing scenario modifier files (JSON). The complex nested pieces of a modifier - its force
- * definition, objectives and linked modifiers - are edited in place, so loading a modifier, changing the scalar fields
- * and saving preserves them untouched.
+ * A developer tool for editing scenario modifier files (JSON). The force definition and objectives are edited with the
+ * scenario template editor's own force and objective panels, so both tools share one implementation. Linked modifiers
+ * can't be edited here, so they are carried on the loaded modifier and saved back untouched.
  */
 public class ScenarioModifierEditorDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(ScenarioModifierEditorDialog.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DeveloperTools";
     private static final String MODIFIER_MANIFEST_FILE_NAME = "modifiermanifest.json";
@@ -76,6 +90,19 @@ public class ScenarioModifierEditorDialog extends JDialog {
     // needs a concrete file name, so the button stays disabled until this is set.
     private File currentFile;
     private final JButton btnAddToManifest = new JButton(getTextAt(RESOURCE_BUNDLE, "button.addToManifest"));
+    // serialized snapshot of the last new/loaded/saved editor state, for unsaved-changes detection
+    private String capturedState = "";
+
+    // The force definition being edited. It is only written to the modifier on save, like the other fields.
+    private ScenarioForceTemplate forceDefinition;
+    private final JLabel lblForceDefinition = new JLabel();
+    private final JButton btnEditForceDefinition = new JButton();
+    private final JButton btnRemoveForceDefinition = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
+
+    // The objectives being edited, a copy of the modifier's list. Edited objectives replace their originals in this
+    // list rather than changing them, so the modifier itself only changes on save.
+    private List<ScenarioObjective> objectives = new ArrayList<>();
+    private final ObjectivesPanel objectivesPanel = new ObjectivesPanel();
 
     private final JTextField txtModifierName = new JTextField(30);
     private final JTextArea txtAdditionalBriefingText = new JTextArea(3, 40);
@@ -107,6 +134,17 @@ public class ScenarioModifierEditorDialog extends JDialog {
         load(modifier);
         pack();
         setLocationRelativeTo(parent);
+
+        captureBaseline();
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (confirmDiscardChanges()) {
+                    dispose();
+                }
+            }
+        });
     }
 
     private JPanel buildForm() {
@@ -127,6 +165,7 @@ public class ScenarioModifierEditorDialog extends JDialog {
         addRow(panel, gbc, "modifierEditor.additionalBriefingText", new FastJScrollPane(txtAdditionalBriefingText));
         addRow(panel, gbc, "modifierEditor.eventTiming", cboEventTiming);
         addRow(panel, gbc, "modifierEditor.eventRecipient", cboEventRecipient);
+        addRow(panel, gbc, "modifierEditor.forceDefinition", buildForceDefinitionField());
         addRow(panel, gbc, "modifierEditor.benefitsPlayer", chkBenefitsPlayer);
         addRow(panel, gbc, "modifierEditor.blockFurtherEvents", chkBlockFurtherEvents);
         addRow(panel, gbc, "modifierEditor.skillAdjustment", txtSkillAdjustment);
@@ -160,12 +199,93 @@ public class ScenarioModifierEditorDialog extends JDialog {
         specificGroundTerrainCheck.addActionListener(e -> updateTerrainListEnabled());
         addRow(panel, gbc, "modifierEditor.allowedTerrainTypes", new FastJScrollPane(lstTerrainTypes));
 
+        // the shared objectives panel carries its own "Objectives:" label, so it spans both columns
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        panel.add(objectivesPanel, gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         panel.add(new JLabel("<html><i>" + getTextAt(RESOURCE_BUNDLE, "modifierEditor.advancedNote") + "</i></html>"),
               gbc);
         return panel;
+    }
+
+    /**
+     * Builds the force definition row: a summary of the current force, with buttons to add or edit it in the shared
+     * force editor and to remove it.
+     */
+    private JPanel buildForceDefinitionField() {
+        btnEditForceDefinition.addActionListener(e -> editForceDefinition());
+        btnRemoveForceDefinition.addActionListener(e -> {
+            forceDefinition = null;
+            updateForceDefinitionControls();
+        });
+
+        JPanel field = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        field.add(lblForceDefinition);
+        field.add(btnEditForceDefinition);
+        field.add(btnRemoveForceDefinition);
+        return field;
+    }
+
+    private void editForceDefinition() {
+        new ModifierForceDefinitionDialog(this, forceDefinition, StratConScenarioFactory.getAllScenarioForceIds())
+              .showDialog()
+              .ifPresent(editedForce -> {
+                  forceDefinition = editedForce;
+                  updateForceDefinitionControls();
+              });
+    }
+
+    /**
+     * Refreshes the force definition summary and buttons. Ambush logic only acts on the modifier's own force, so it
+     * can only be set while there is one; without a force it is cleared, as it would do nothing.
+     */
+    private void updateForceDefinitionControls() {
+        boolean hasForce = forceDefinition != null;
+        lblForceDefinition.setText(describeForce(forceDefinition));
+        btnEditForceDefinition.setText(getTextAt(RESOURCE_BUNDLE, hasForce ? "button.edit" : "button.add"));
+        btnRemoveForceDefinition.setEnabled(hasForce);
+
+        chkUseAmbushLogic.setEnabled(hasForce);
+        if (!hasForce) {
+            chkUseAmbushLogic.setSelected(false);
+        }
+    }
+
+    /**
+     * Builds the force IDs an objective can be tied to: the force IDs the scenario templates define, the primary
+     * player force, and this modifier's own force. A modifier's objectives apply to whichever scenario it lands in, so
+     * they can name any of these.
+     *
+     * @param knownForceIds   the force IDs the scenario templates define
+     * @param forceDefinition the modifier's force, or {@code null} if it has none
+     *
+     * @return the distinct force IDs, sorted
+     */
+    static List<String> objectiveForceIds(Collection<String> knownForceIds,
+          @Nullable ScenarioForceTemplate forceDefinition) {
+        Set<String> forceIds = new TreeSet<>(knownForceIds);
+        forceIds.add(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID);
+        if ((forceDefinition != null) && (forceDefinition.getForceName() != null)
+                  && !forceDefinition.getForceName().isBlank()) {
+            forceIds.add(forceDefinition.getForceName());
+        }
+        return new ArrayList<>(forceIds);
+    }
+
+    private static String describeForce(@Nullable ScenarioForceTemplate force) {
+        if (force == null) {
+            return getTextAt(RESOURCE_BUNDLE, "modifierEditor.forceDefinition.none");
+        }
+        int alignment = force.getForceAlignment();
+        String alignmentName = ((alignment >= 0) && (alignment < ScenarioForceTemplate.FORCE_ALIGNMENTS.length))
+                                     ? ScenarioForceTemplate.FORCE_ALIGNMENTS[alignment] : String.valueOf(alignment);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "modifierEditor.forceDefinition.summary",
+              force.getForceName(), alignmentName);
     }
 
     /** @return every declared StratCon terrain type name, sorted, for the terrain-targeting list. */
@@ -199,10 +319,14 @@ public class ScenarioModifierEditorDialog extends JDialog {
         JPanel bar = new JPanel();
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
         btnNew.addActionListener(e -> {
+            if (!confirmDiscardChanges()) {
+                return;
+            }
             modifier = new AtBScenarioModifier();
             currentFile = null;
             load(modifier);
             updateManifestButtonState();
+            captureBaseline();
         });
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
         btnLoad.addActionListener(e -> loadFromFile());
@@ -211,7 +335,11 @@ public class ScenarioModifierEditorDialog extends JDialog {
         btnAddToManifest.addActionListener(e -> addToManifest());
         btnAddToManifest.setToolTipText(getTextAt(RESOURCE_BUNDLE, "modifierEditor.addToManifest.tooltip"));
         JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "button.close"));
-        btnClose.addActionListener(e -> dispose());
+        btnClose.addActionListener(e -> {
+            if (confirmDiscardChanges()) {
+                dispose();
+            }
+        });
         bar.add(btnNew);
         bar.add(btnLoad);
         bar.add(btnSave);
@@ -223,6 +351,52 @@ public class ScenarioModifierEditorDialog extends JDialog {
 
     private void updateManifestButtonState() {
         btnAddToManifest.setEnabled(currentFile != null);
+    }
+
+    /**
+     * Asks whether to throw away unsaved changes, if there are any.
+     *
+     * @return {@code true} if there are no unsaved changes or the user agreed to discard them
+     */
+    private boolean confirmDiscardChanges() {
+        if (!isDirty()) {
+            return true;
+        }
+        int choice = JOptionPane.showConfirmDialog(this,
+              getTextAt(RESOURCE_BUNDLE, "unsavedChanges.message"),
+              getTextAt(RESOURCE_BUNDLE, "unsavedChanges.title"),
+              JOptionPane.YES_NO_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+        return choice == JOptionPane.YES_OPTION;
+    }
+
+    /** Records the current editor state as the "clean" baseline. Called after a new, load or save. */
+    private void captureBaseline() {
+        capturedState = currentSerializedState();
+    }
+
+    /** @return whether the editor state differs from the last captured baseline */
+    private boolean isDirty() {
+        String currentState = currentSerializedState();
+        // if the state can't be rendered, assume there are changes rather than risk losing them
+        return (currentState == null) || !currentState.equals(capturedState);
+    }
+
+    /**
+     * Serializes a snapshot of the current editor state - the loaded modifier plus the values in the form - so it can
+     * be compared against the baseline. Uses a clone so the working modifier is not changed.
+     *
+     * @return the snapshot's JSON, or {@code null} if it could not be rendered
+     */
+    private @Nullable String currentSerializedState() {
+        AtBScenarioModifier snapshot = modifier.clone();
+        writeInto(snapshot);
+        try {
+            return AtBScenarioModifierJson.toJsonString(snapshot);
+        } catch (IOException ex) {
+            LOGGER.error("Could not serialize the scenario modifier for unsaved-changes detection", ex);
+            return null;
+        }
     }
 
     private void load(AtBScenarioModifier source) {
@@ -240,8 +414,15 @@ public class ScenarioModifierEditorDialog extends JDialog {
         txtNumExtraEvents.setText(numToText(source.getNumExtraEvents()));
         txtBvBudgetAdditiveMultiplier.setText(numToText(source.getBVBudgetAdditiveMultiplier()));
         txtReinforcementDelayReduction.setText(numToText(source.getReinforcementDelayReduction()));
+        forceDefinition = source.getForceDefinition();
         chkUseAmbushLogic.setSelected(Boolean.TRUE.equals(source.getUseAmbushLogic()));
         chkSwitchSides.setSelected(Boolean.TRUE.equals(source.getSwitchSides()));
+        // after the ambush checkbox is loaded, so a modifier without a force clears it
+        updateForceDefinitionControls();
+        objectives = (source.getObjectives() == null) ? new ArrayList<>() : new ArrayList<>(source.getObjectives());
+        // read the force IDs when the objective editor opens, so a force definition added since is offered
+        objectivesPanel.load(objectives,
+              () -> objectiveForceIds(StratConScenarioFactory.getAllScenarioForceIds(), forceDefinition));
         List<MapLocation> allowed = source.getAllowedMapLocations();
         for (Map.Entry<MapLocation, JCheckBox> entry : mapLocationChecks.entrySet()) {
             entry.getValue().setSelected((allowed != null) && allowed.contains(entry.getKey()));
@@ -261,10 +442,13 @@ public class ScenarioModifierEditorDialog extends JDialog {
     private void writeInto(AtBScenarioModifier target) {
         target.setModifierName(emptyToNull(txtModifierName.getText()));
         target.setAdditionalBriefingText(emptyToNull(txtAdditionalBriefingText.getText()));
+        // these two default to false and are read as plain booleans, so they are always written out explicitly
         target.setBenefitsPlayer(chkBenefitsPlayer.isSelected());
         target.setBlockFurtherEvents(chkBlockFurtherEvents.isSelected());
         target.setEventTiming((EventTiming) cboEventTiming.getSelectedItem());
         target.setEventRecipient((ForceAlignment) cboEventRecipient.getSelectedItem());
+        target.setForceDefinition(forceDefinition);
+        target.setObjectives(new ArrayList<>(objectives));
         target.setSkillAdjustment(textToInt(txtSkillAdjustment.getText()));
         target.setQualityAdjustment(textToInt(txtQualityAdjustment.getText()));
         target.setBattleDamageIntensity(textToInt(txtBattleDamageIntensity.getText()));
@@ -273,8 +457,9 @@ public class ScenarioModifierEditorDialog extends JDialog {
         target.setNumExtraEvents(textToInt(txtNumExtraEvents.getText()));
         target.setBVBudgetAdditiveMultiplier(textToDouble(txtBvBudgetAdditiveMultiplier.getText()));
         target.setReinforcementDelayReduction(textToInt(txtReinforcementDelayReduction.getText()));
-        target.setUseAmbushLogic(chkUseAmbushLogic.isSelected());
-        target.setSwitchSides(chkSwitchSides.isSelected());
+        // these two are optional effects whose "off" state is null, matching the data files
+        target.setUseAmbushLogic(checkboxToOptionalFlag(chkUseAmbushLogic));
+        target.setSwitchSides(checkboxToOptionalFlag(chkSwitchSides));
         List<MapLocation> allowed = new ArrayList<>();
         for (Map.Entry<MapLocation, JCheckBox> entry : mapLocationChecks.entrySet()) {
             if (entry.getValue().isSelected()) {
@@ -290,7 +475,47 @@ public class ScenarioModifierEditorDialog extends JDialog {
                                             : new ArrayList<>(allowedTerrain));
     }
 
+    /**
+     * Checks that every filled-in number field holds a valid number, so a typo is reported rather than silently saved
+     * as blank.
+     *
+     * @return an empty string if the input is valid, or a message listing the fields to fix
+     */
+    private String validateInput() {
+        List<String> invalidFields = new ArrayList<>();
+        checkInteger(invalidFields, "modifierEditor.skillAdjustment", txtSkillAdjustment);
+        checkInteger(invalidFields, "modifierEditor.qualityAdjustment", txtQualityAdjustment);
+        checkInteger(invalidFields, "modifierEditor.battleDamageIntensity", txtBattleDamageIntensity);
+        checkInteger(invalidFields, "modifierEditor.ammoExpenditureIntensity", txtAmmoExpenditureIntensity);
+        checkInteger(invalidFields, "modifierEditor.unitRemovalCount", txtUnitRemovalCount);
+        checkInteger(invalidFields, "modifierEditor.numExtraEvents", txtNumExtraEvents);
+        checkInteger(invalidFields, "modifierEditor.reinforcementDelayReduction", txtReinforcementDelayReduction);
+        if (!isValidDecimal(txtBvBudgetAdditiveMultiplier.getText())) {
+            invalidFields.add(fieldName("modifierEditor.bvBudgetAdditiveMultiplier"));
+        }
+
+        if (invalidFields.isEmpty()) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "modifierEditor.invalidNumbers.message",
+              String.join("\n", invalidFields));
+    }
+
+    private static void checkInteger(List<String> invalidFields, String labelKey, JTextField field) {
+        if (!isValidInteger(field.getText())) {
+            invalidFields.add(fieldName(labelKey));
+        }
+    }
+
+    /** @return the field's label without its trailing colon, for listing it in a message */
+    private static String fieldName(String labelKey) {
+        return getTextAt(RESOURCE_BUNDLE, labelKey).replaceFirst(":\\s*$", "");
+    }
+
     private void loadFromFile() {
+        if (!confirmDiscardChanges()) {
+            return;
+        }
         File file = FileDialogs.openScenarioModifier(frame).orElse(null);
         if (file == null) {
             return;
@@ -305,14 +530,24 @@ public class ScenarioModifierEditorDialog extends JDialog {
         currentFile = file;
         load(modifier);
         updateManifestButtonState();
+        captureBaseline();
     }
 
     private void saveToFile() {
+        // validate before changing anything, so invalid input aborts the save cleanly
+        String validationErrors = validateInput();
+        if (!validationErrors.isEmpty()) {
+            JOptionPane.showMessageDialog(this, validationErrors,
+                  getTextAt(RESOURCE_BUNDLE, "modifierEditor.invalidNumbers.title"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         writeInto(modifier);
         FileDialogs.saveScenarioModifier(frame, modifier).ifPresent(file -> {
             modifier.Serialize(file);
             currentFile = file;
             updateManifestButtonState();
+            captureBaseline();
         });
     }
 
@@ -422,6 +657,36 @@ public class ScenarioModifierEditorDialog extends JDialog {
 
     private static String numToText(Number value) {
         return (value == null) ? "" : value.toString();
+    }
+
+    /** @return {@code Boolean.TRUE} if the box is checked, otherwise {@code null} (the effect is left off) */
+    private static @Nullable Boolean checkboxToOptionalFlag(JCheckBox checkBox) {
+        return checkBox.isSelected() ? Boolean.TRUE : null;
+    }
+
+    /** @return whether the text is blank (no value) or a whole number */
+    static boolean isValidInteger(String text) {
+        if (text.isBlank()) {
+            return true;
+        }
+        try {
+            Integer.parseInt(text.trim());
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
+    }
+
+    /** @return whether the text is blank (no value) or a finite decimal number */
+    static boolean isValidDecimal(String text) {
+        if (text.isBlank()) {
+            return true;
+        }
+        try {
+            return Double.isFinite(Double.parseDouble(text.trim()));
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
     }
 
     private static Integer textToInt(String text) {
