@@ -32,6 +32,7 @@
  */
 package mekhq.gui.roleplay;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
@@ -89,6 +90,7 @@ class ChecksPage implements ConsoleSection {
     private static final int PREVIEW_PEOPLE = 6;
     private static final int MAXIMUM_OTHER = 6;
     private static final int FLAVOUR_LINES = 50;
+    private static final int HINT_WRAP_CHARACTERS = 50;
 
     /** What the page is set up to check. */
     enum Mode {
@@ -570,8 +572,8 @@ class ChecksPage implements ConsoleSection {
             picked.add(listed.get(0).getId());
         }
         showPeople();
-        peopleHint.setText(listed.isEmpty() ? text(wholeCompany ? "ChecksPage.who.noneCompany"
-                                                           : "ChecksPage.who.noneCast")
+        peopleHint.setText(listed.isEmpty() ? wordWrap(text(wholeCompany ? "ChecksPage.who.noneCompany"
+                                                                    : "ChecksPage.who.noneCast"), HINT_WRAP_CHARACTERS)
                                  : getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.who.count", picked.size()));
     }
 

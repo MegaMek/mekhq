@@ -390,11 +390,11 @@ public class AtBScenarioModifier implements Cloneable {
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if (eventTiming == getEventTiming()) {
-            if (!appliesToScenarioTerrain(scenario)) {
-                return;
-            }
+        if (!appliesToScenarioTerrain(scenario)) {
+            return;
+        }
 
+        if (eventTiming == getEventTiming()) {
             if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario,
                       getAdditionalBriefingText());
@@ -429,11 +429,7 @@ public class AtBScenarioModifier implements Cloneable {
                       getUnitRemovalCount());
             }
 
-            if ((getUseAmbushLogic() != null) && (getEventRecipient() != null)) {
-                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
-            }
-
-            if ((getSwitchSides() != null) && (getEventRecipient() != null)) {
+            if (Boolean.TRUE.equals(getSwitchSides()) && (getEventRecipient() != null)) {
                 AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
             }
 
@@ -458,6 +454,13 @@ public class AtBScenarioModifier implements Cloneable {
                 AtBScenarioModifierApplicator.applyReinforcementDelayReduction(scenario, eventRecipient,
                       getReinforcementDelayReduction());
             }
+        }
+
+        // Ambush logic only acts on this modifier's own force, so it has to wait until that force has been generated,
+        // even when the force itself was added before force generation.
+        if (Boolean.TRUE.equals(getUseAmbushLogic()) && (getForceDefinition() != null) &&
+                  (eventTiming == EventTiming.PostForceGeneration)) {
+            AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getForceDefinition());
         }
     }
 
@@ -537,7 +540,6 @@ public class AtBScenarioModifier implements Cloneable {
         return forceDefinition;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setForceDefinition(ScenarioForceTemplate forceDefinition) {
         this.forceDefinition = forceDefinition;
     }
@@ -632,6 +634,10 @@ public class AtBScenarioModifier implements Cloneable {
     @XmlElement(name = "objective")
     public List<ScenarioObjective> getObjectives() {
         return objectives;
+    }
+
+    public void setObjectives(List<ScenarioObjective> objectives) {
+        this.objectives = objectives;
     }
 
     public Integer getNumExtraEvents() {

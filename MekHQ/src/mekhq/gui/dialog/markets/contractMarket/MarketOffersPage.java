@@ -373,7 +373,7 @@ final class MarketOffersPage {
 
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(MarketHud.escape(marketName(contract))).append("</b><br>")
-                                       .append("<span style='font-size:smaller; color:").append(hex(TEXT_MUTED))
+                                       .append("<span style='color:").append(hex(TEXT_MUTED))
                                        .append("'>").append(MarketHud.escape(String.join(separator, parts)))
                                        .append("</span>");
             List<String> badges = new ArrayList<>();
@@ -382,7 +382,7 @@ final class MarketOffersPage {
                                  + MarketHud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
             }
             if (!badges.isEmpty()) {
-                html.append("<br><span style='font-size:smaller'><b>").append(String.join(separator, badges))
+                html.append("<br><span><b>").append(String.join(separator, badges))
                       .append("</b></span>");
             }
             text.setText(html.append("</html>").toString());

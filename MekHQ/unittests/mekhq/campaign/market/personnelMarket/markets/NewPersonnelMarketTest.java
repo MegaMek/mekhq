@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.market.personnelMarket.markets;
 
+import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.removeCivilianEntries;
 import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.CLOWN;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT;
@@ -45,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -56,6 +59,8 @@ import java.util.Map;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -74,6 +79,17 @@ class NewPersonnelMarketTest {
 
     private static PersonnelMarketEntry entry(PersonnelRole role, int weight, int count) {
         return new PersonnelMarketEntry(weight, role, count, 3050, 3100, DEPENDENT);
+    }
+
+    private static CampaignOptions mockCampaignOptions(Campaign mockCampaign, boolean isCivilianApplicantsDisabled) {
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS))
+              .thenReturn(isCivilianApplicantsDisabled);
+        // Read by the Person constructor
+        when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        return mockCampaignOptions;
     }
 
     @Test
@@ -491,6 +507,7 @@ class NewPersonnelMarketTest {
     void generateSingleApplicant_returnNullIfApplicantIsNull() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        mockCampaignOptions(mockCampaign, false);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -526,6 +543,7 @@ class NewPersonnelMarketTest {
     void generateSingleApplicant_returnApplicantIfApplicantIsNotNull() {
         // Setup
         Campaign mockCampaign = mockCampaign();
+        mockCampaignOptions(mockCampaign, false);
 
         NewPersonnelMarket market = new NewPersonnelMarket();
         market.setCampaign(mockCampaign);
@@ -557,5 +575,151 @@ class NewPersonnelMarketTest {
             // Assert
             assertNotNull(applicant);
         }
+    }
+
+    @Test
+    void removeCivilianEntries_removesOnlyCivilians() {
+        // Setup
+        PersonnelMarketEntry clown = entry(CLOWN, 1, 1);
+        PersonnelMarketEntry dependent = entry(DEPENDENT, 1, 1);
+        List<PersonnelMarketEntry> entries = List.of(marketEntryAdmin, clown, marketEntryMekWarrior, dependent);
+
+        // Act
+        List<PersonnelMarketEntry> filteredEntries = removeCivilianEntries(entries);
+
+        // Assert
+        assertEquals(List.of(marketEntryAdmin, marketEntryMekWarrior), filteredEntries);
+    }
+
+    @Test
+    void isCivilianApplicantsDisabled_falseWithoutCampaign() {
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        assertFalse(market.isCivilianApplicantsDisabled());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void isCivilianApplicantsDisabled_matchesCampaignOption(boolean isCivilianApplicantsDisabled) {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        mockCampaignOptions(mockCampaign, isCivilianApplicantsDisabled);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+
+        // Act & Assert
+        assertEquals(isCivilianApplicantsDisabled, market.isCivilianApplicantsDisabled());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
+    void generateSingleApplicant_neverPicksCivilianWhenCiviliansDisabled(int randomValue) {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        mockCampaignOptions(mockCampaign, true);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+        market.setGameYear(3050);
+
+        Faction faction = new Faction();
+        market.setApplicantOriginFactions(List.of(faction));
+
+        Person person = new Person(mockCampaign);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.eq(SOLDIER),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(person);
+
+        // The clown would almost always be picked if civilians were permitted
+        PersonnelMarketEntry clown = new PersonnelMarketEntry(1000, CLOWN, 1, 3000, 3100, CLOWN);
+        PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3000, 3100, SOLDIER);
+
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = Map.of(SOLDIER, soldier, CLOWN, clown);
+        List<PersonnelMarketEntry> orderedMarketEntries = market.getMarketEntriesAsList(unorderedMarketEntries);
+
+        // Act
+        try (MockedStatic<Compute> mockedRandom = mockStatic(Compute.class)) {
+            mockedRandom.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+            mockedRandom.when(() -> Compute.randomInt(1001)).thenReturn(randomValue * 100);
+
+            Person applicant = market.generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+
+            // Assert
+            assertEquals(person, applicant);
+        }
+    }
+
+    @Test
+    void generateSingleApplicant_returnNullForCivilianFallbackWhenCiviliansDisabled() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        mockCampaignOptions(mockCampaign, true);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+        market.setGameYear(3050);
+
+        Faction faction = new Faction();
+        market.setApplicantOriginFactions(List.of(faction));
+
+        // Ensure an applicant would be generated if the civilian check didn't block it
+        Person person = new Person(mockCampaign);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .newPerson(ArgumentMatchers.eq(mockCampaign),
+                         ArgumentMatchers.any(PersonnelRole.class),
+                         ArgumentMatchers.eq(faction.getShortName()),
+                         ArgumentMatchers.eq(megamek.common.enums.Gender.RANDOMIZE))).thenReturn(person);
+
+        // Soldiers aren't available until 3060, so fall back to a civilian profession
+        PersonnelMarketEntry soldier = new PersonnelMarketEntry(1, SOLDIER, 1, 3060, 3100, CLOWN);
+        PersonnelMarketEntry clown = new PersonnelMarketEntry(1, CLOWN, 1, 3000, 3100, CLOWN);
+
+        Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries = Map.of(SOLDIER, soldier, CLOWN, clown);
+        List<PersonnelMarketEntry> orderedMarketEntries = market.getMarketEntriesAsList(unorderedMarketEntries);
+
+        // Act
+        Person applicant = market.generateSingleApplicant(unorderedMarketEntries, orderedMarketEntries);
+
+        // Assert
+        assertNull(applicant);
+    }
+
+    @Test
+    void applyApplicantMultiplier_unchangedWithoutCampaign() {
+        NewPersonnelMarket market = new NewPersonnelMarket();
+
+        assertEquals(30, market.applyApplicantMultiplier(30));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+          "30, 1.0, 30",
+          "30, 2.0, 60",
+          "30, 0.5, 15",
+          "31, 0.5, 16",
+          "30, 0.1, 3",
+          "30, 0.0, 3", // Clamped to the minimum multiplier
+          "30, -1.0, 3", // Clamped to the minimum multiplier
+          "0, 2.0, 0"
+    })
+    void applyApplicantMultiplier_scalesRolls(int rolls, double multiplier, int expectedRolls) {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions mockCampaignOptions = mockCampaignOptions(mockCampaign, false);
+        when(mockCampaignOptions.get(CampaignOption.PERSONNEL_MARKET_APPLICANT_MULTIPLIER)).thenReturn(multiplier);
+
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setCampaign(mockCampaign);
+
+        // Act
+        int actualRolls = market.applyApplicantMultiplier(rolls);
+
+        // Assert
+        assertEquals(expectedRolls, actualRolls);
     }
 }

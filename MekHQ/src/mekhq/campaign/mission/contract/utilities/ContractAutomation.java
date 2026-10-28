@@ -138,7 +138,7 @@ public class ContractAutomation {
               playerForce.getWarehouse().getSpareParts(),
               detachment.getPersonnel().values(),
               EXP_REGULAR);
-        Money cost = costCalculations.calculateJumpCostForEntireJourney(travelDays, jumpPath.getJumps());
+        Money cost = costCalculations.calculateCostForEntireJourney(travelDays, jumpPath);
 
         // Hyperlinked so the player can jump straight to the destination on the interstellar map.
         PlanetarySystem targetPlanetarySystem = contract.getTargetSystem();

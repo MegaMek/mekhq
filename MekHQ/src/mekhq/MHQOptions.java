@@ -1483,6 +1483,20 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .put(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
     }
+
+    /**
+     * @return whether each new day draws icons for blank formations and updates the icons MekHQ drew to match their
+     *       formations' size and units
+     */
+    public boolean getNewDayAutoFormationIcons() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_AUTO_FORMATION_ICONS, false);
+    }
+
+    public void setNewDayAutoFormationIcons(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_AUTO_FORMATION_ICONS, value);
+    }
     // endregion New Day
 
     // region Campaign XML Save Options

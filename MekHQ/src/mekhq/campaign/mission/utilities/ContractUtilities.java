@@ -196,27 +196,35 @@ public class ContractUtilities {
         PlanetarySystem targetSystem = abstractContract.getTargetSystem();
         PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
         if (targetSystem == null) {
-            return refreshJumpPath(campaign, abstractContract, currentSystem, null, null);
+            return refreshJumpPath(campaign, abstractContract, currentSystem, null, null, null);
         }
 
         Planet targetPlanet = abstractContract.getTargetPlanet();
+        // A contract on another world of the system the force is sitting in is an in-system transfer from that world
+        Planet originPlanet = (Objects.equals(currentSystem, targetSystem) && currentLocation.isOnPlanet())
+                                    ? currentLocation.getPlanet()
+                                    : null;
 
         if (cachedJumpPath == null ||
                   cachedJumpPath.isEmpty() ||
                   !Objects.equals(cachedJumpPath.getFirstSystem(), currentSystem) ||
-                  !Objects.equals(cachedJumpPath.getTargetPlanet(), targetPlanet)) {
-            return refreshJumpPath(campaign, abstractContract, currentSystem, targetSystem, targetPlanet);
+                  !Objects.equals(cachedJumpPath.getTargetPlanet(), targetPlanet) ||
+                  !Objects.equals(cachedJumpPath.getOriginPlanet(), originPlanet)) {
+            return refreshJumpPath(campaign, abstractContract, currentSystem, targetSystem, targetPlanet,
+                  originPlanet);
         }
 
         return cachedJumpPath;
     }
 
     private static JumpPath refreshJumpPath(Campaign campaign, AbstractContract abstractContract,
-          PlanetarySystem currentSystem, PlanetarySystem targetSystem, @Nullable Planet targetPlanet) {
+          PlanetarySystem currentSystem, PlanetarySystem targetSystem, @Nullable Planet targetPlanet,
+          @Nullable Planet originPlanet) {
         JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
 
         if (jumpPath != null) {
             jumpPath.setTargetPlanet(targetPlanet);
+            jumpPath.setOriginPlanet(originPlanet);
         }
 
         abstractContract.setCachedJumpPath(jumpPath);

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
 import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.DEMANDING;
 import static mekhq.campaign.mission.contract.contractData.ContractCharacteristic.LENIENT;
 import static mekhq.campaign.mission.contract.utilities.ContractCharacteristics.bakeRequiredVictoryPoints;
@@ -50,12 +49,14 @@ import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
- * Tests {@link ChaosContractDeterminationRequiredVictoryPoints#getRequiredVictoryPoints(AbstractContract)}: the two
- * short-circuits (no StratCon state, and independent command rights), and the expected-turning-points formula
- * {@code ceil(scale * duration * meanScenarioOdds/100 * turningPointChance)} - where garrisons shorten the effective
- * duration to 75% and only integrated command earns the full turning-point chance.
+ * Tests {@link ChaosContractDeterminationRequiredVictoryPoints#getRequiredVictoryPoints(AbstractContract)}: the
+ * short-circuit for a contract with no StratCon state, and the expected-turning-points formula
+ * {@code ceil(scale * duration * meanScenarioOdds/100 * 0.33)} - where garrisons shorten the effective duration to 75%,
+ * and every command right has the same one-in-three turning-point chance.
  *
  * <p>The final block also covers the composition {@code StratConContractInitializer.initializeCampaignState} performs
  * at contract acceptance - {@code bakeRequiredVictoryPoints(getRequiredVictoryPoints(contract), contract)} - which is
@@ -86,32 +87,23 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
         assertEquals(0, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
     }
 
-    @Test
-    void independentCommandUsesTheFixedRequirement() {
-        AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getStratConCampaignState()).thenReturn(mock(StratConCampaignState.class));
-        when(contract.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
-
-        assertEquals(INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS,
-              ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
-    }
-
-    @Test
-    void integratedCommandTakesTheFullTurningPointChance() {
-        StratConCampaignState state = stateWithTracks(track(50));
+    @ParameterizedTest
+    @EnumSource(ContractCommandRights.class)
+    void everyCommandRightTakesTheSameTurningPointChance(ContractCommandRights commandRights) {
+        StratConCampaignState state = stateWithTracks(track(100));
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getStratConCampaignState()).thenReturn(state);
-        when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
+        when(contract.getCommandRights()).thenReturn(commandRights);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.OBJECTIVE_RAID);
-        when(contract.getScale()).thenReturn(2);
+        when(contract.getScale()).thenReturn(3);
         when(contract.getLengthInMonths()).thenReturn(3);
 
-        // ceil(2 * 3 * (50/100) * 1.0) = ceil(3.0) = 3
+        // ceil(3 * 3 * (100/100) * 0.33) = ceil(2.97) = 3
         assertEquals(3, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
     }
 
     @Test
-    void nonIntegratedCommandOnlyTakesAThirdOfTheTurningPoints() {
+    void aThirdOfTheExpectedScenariosAreTurningPoints() {
         StratConCampaignState state = stateWithTracks(track(100), track(50));
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getStratConCampaignState()).thenReturn(state);
@@ -131,26 +123,27 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
         when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
-        when(contract.getScale()).thenReturn(2);
+        when(contract.getScale()).thenReturn(4);
         when(contract.getLengthInMonths()).thenReturn(4);
 
-        // duration -> ceil(4 * 0.75) = 3; ceil(2 * 3 * 1.0 * 1.0) = 6
-        assertEquals(6, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
+        // duration -> ceil(4 * 0.75) = 3; ceil(4 * 3 * 1.0 * 0.33) = ceil(3.96) = 4, where the full 4 months would
+        // give ceil(5.28) = 6
+        assertEquals(4, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
     }
 
     /**
-     * A contract sized so the determined requirement is a clean 3: scale 2, length 3, integrated command, a single
-     * 50%-odds track -> {@code ceil(2 * 3 * 0.5 * 1.0) = 3}. The OBJECTIVES characteristic (if any) is applied on top
-     * by {@code bakeRequiredVictoryPoints}.
+     * A contract sized so the determined requirement is a clean 3: scale 3, length 3, a single 100%-odds track ->
+     * {@code ceil(3 * 3 * 1.0 * 0.33) = 3}. The OBJECTIVES characteristic (if any) is applied on top by
+     * {@code bakeRequiredVictoryPoints}.
      */
     private static AbstractContract contractWithDeterminedRequirementOfThree(
           final ContractCharacteristic objectivesCharacteristic) {
-        StratConCampaignState state = stateWithTracks(track(50));
+        StratConCampaignState state = stateWithTracks(track(100));
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.OBJECTIVE_RAID);
-        when(contract.getScale()).thenReturn(2);
+        when(contract.getScale()).thenReturn(3);
         when(contract.getLengthInMonths()).thenReturn(3);
         when(contract.getCharacteristic(ContractCharacteristic.Category.OBJECTIVES)).thenReturn(objectivesCharacteristic);
         return contract;

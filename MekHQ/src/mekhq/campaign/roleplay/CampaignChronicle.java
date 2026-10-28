@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,8 +51,9 @@ import jakarta.annotation.Nullable;
 
 /**
  * Writes what happens in the campaign into the Oracle log, so the journal records the story MekHQ plays out as well as
- * the player's own: contracts, battles, arrivals, and people joining, dying or leaving. People events on the same day
- * are gathered into one entry, such as "Killed: Ana, Ben", so a hard battle does not bury the journal.
+ * the player's own: contracts, ultimatums, and cast members joining, dying or leaving. Everything else, such as
+ * battles, is left out, and travel has its own {@link TravelLog}. People events on the same day are gathered into one
+ * entry, such as "Killed: Ana, Ben", so a hard battle does not bury the journal.
  *
  * <p>This class holds the rules; {@link CampaignChronicleListener} feeds it MekHQ's events.</p>
  */
@@ -61,6 +63,11 @@ public class CampaignChronicle {
     /** The kinds of people event gathered into one entry per day. */
     public enum PersonChange {
         JOINED, BORN, KILLED, MISSING, CAPTURED, DEPARTED
+    }
+
+    /** The answers a Faction Standing ultimatum can be given. */
+    public enum UltimatumChoice {
+        SIDE, MERCENARY, PIRATE
     }
 
     private record Group(LocalDate date, JournalEntry entry, List<String> names) {}
@@ -131,30 +138,62 @@ public class CampaignChronicle {
               outcome));
     }
 
-    /** @return the entry for a resolved battle */
-    public @Nullable JournalEntry battleResolved(final int id, final String name, final String outcome) {
-        return record("battle:" + id, getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.battle", name, outcome));
-    }
-
-    /** @return the entry for arriving in a system */
-    public @Nullable JournalEntry arrived(final String system) {
-        return record("arrived:" + system, getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.arrived", system));
+    /**
+     * Records the player's answer to a Faction Standing ultimatum and how many people refused to follow it. Cast
+     * members among them are tagged.
+     *
+     * @param ultimatumName     the ultimatum's unique name
+     * @param choice            what the player chose
+     * @param sideName          the name of the faction sided with, or {@code null} when going rogue
+     * @param departedPersonIds the ids of everyone who left or died because of the decision
+     *
+     * @return the entry written, or {@code null} if the chronicle is off or this was already recorded today
+     */
+    public @Nullable JournalEntry ultimatumResolved(final String ultimatumName, final UltimatumChoice choice,
+          final @Nullable String sideName, final Collection<UUID> departedPersonIds) {
+        String text = getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.ultimatum." + choice.name(), sideName) + ' '
+                            + getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.ultimatum.departed",
+                                  departedPersonIds.size());
+        JournalEntry entry = record("ultimatum:" + ultimatumName, text);
+        if (entry != null) {
+            castMembersFor(departedPersonIds).forEach(entry::tagCharacter);
+        }
+        return entry;
     }
 
     /**
-     * Records a person joining, being born, dying, going missing, being captured or leaving. The day's people with the
-     * same change share one entry, and anyone in the cast is tagged on it.
+     * Records a person in the cast joining, being born, dying, going missing, being captured or leaving. See
+     * {@link #personChanged(PersonChange, UUID, String, String, Collection)}.
      *
-     * @param change   what happened
-     * @param personId the person's id
-     * @param name     the person's name
-     * @param detail   what exactly happened, such as "Killed in Action", or {@code null}
-     *
-     * @return the entry written or added to, or {@code null} if the chronicle is off or this was already recorded
+     * @return the entry written or added to, or {@code null} if nothing was recorded
      */
     public @Nullable JournalEntry personChanged(final PersonChange change, final UUID personId, final String name,
           final @Nullable String detail) {
-        if (!enabled.getAsBoolean() || isRepeat("person:" + change + ":" + personId)) {
+        return personChanged(change, personId, name, detail, List.of());
+    }
+
+    /**
+     * Records a person joining, being born, dying, going missing, being captured or leaving, if it concerns the
+     * current cast: the person, or one of their relatives, must be linked to someone in the cast. Everyone else's
+     * comings and goings would bury the story. The day's people with the same change share one entry, and the cast
+     * members involved are tagged on it.
+     *
+     * @param change    what happened
+     * @param personId  the person's id
+     * @param name      the person's name
+     * @param detail    what exactly happened, such as "Killed in Action", or {@code null}
+     * @param relatives the ids of people whose being in the cast also makes this worth recording, such as a newborn's
+     *                  parents
+     *
+     * @return the entry written or added to, or {@code null} if the chronicle is off, nobody involved is in the cast,
+     *       or this was already recorded
+     */
+    public @Nullable JournalEntry personChanged(final PersonChange change, final UUID personId, final String name,
+          final @Nullable String detail, final Collection<UUID> relatives) {
+        Set<UUID> involved = new HashSet<>(relatives);
+        involved.add(personId);
+        List<OracleCharacter> castMembers = castMembersFor(involved);
+        if (!enabled.getAsBoolean() || castMembers.isEmpty() || isRepeat("person:" + change + ":" + personId)) {
             return null;
         }
         LocalDate date = today.get();
@@ -170,11 +209,18 @@ public class CampaignChronicle {
         group.names().add(shown);
         group.entry().setText(getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.person." + change.name(),
               String.join(", ", group.names())));
-        for (OracleCharacter character : roleplay.getCharacters()) {
-            if (personId.equals(character.getPersonId())) {
-                group.entry().tagCharacter(character);
-            }
-        }
+        castMembers.forEach(group.entry()::tagCharacter);
         return group.entry();
+    }
+
+    /**
+     * @param personIds the ids of people in the campaign
+     *
+     * @return the active cast members linked to any of them, in cast order
+     */
+    private List<OracleCharacter> castMembersFor(final Collection<UUID> personIds) {
+        return roleplay.getActiveCharacters().stream()
+                     .filter(character -> character.isLinked() && personIds.contains(character.getPersonId()))
+                     .toList();
     }
 }

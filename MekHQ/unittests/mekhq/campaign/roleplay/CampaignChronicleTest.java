@@ -56,17 +56,18 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.UltimatumResolvedEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
-import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
+import mekhq.campaign.roleplay.CampaignChronicle.UltimatumChoice;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,19 +89,15 @@ class CampaignChronicleTest {
     }
 
     @Test
-    void contractsBattlesAndArrivalsAreRecorded() {
+    void contractsAreRecorded() {
         UUID contract = UUID.randomUUID();
         chronicle.contractStarted(contract, "Operation Hammer", "Lyran Commonwealth", "Helm");
-        chronicle.battleResolved(7, "Ridge Assault", "Victory");
-        chronicle.arrived("Tharkad");
         chronicle.contractEnded(contract, "Operation Hammer", "Success");
 
-        assertEquals(4, roleplay.getOracleLog().size());
+        assertEquals(2, roleplay.getOracleLog().size());
         assertEquals("Contract accepted: Operation Hammer, for Lyran Commonwealth, at Helm.",
               roleplay.getOracleLog().get(0).getText());
-        assertEquals("Battle fought: Ridge Assault (Victory).", roleplay.getOracleLog().get(1).getText());
-        assertEquals("Arrived at Tharkad.", roleplay.getOracleLog().get(2).getText());
-        assertEquals("Contract ended: Operation Hammer (Success).", roleplay.getOracleLog().get(3).getText());
+        assertEquals("Contract ended: Operation Hammer (Success).", roleplay.getOracleLog().get(1).getText());
         assertTrue(roleplay.getOracleLog().stream().allMatch(entry -> entry.getType() == JournalEntryType.CHRONICLE));
     }
 
@@ -115,24 +112,31 @@ class CampaignChronicleTest {
         UUID contract = UUID.randomUUID();
         assertNotNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null));
         assertNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null));
-        assertNotNull(chronicle.arrived("Helm"));
-        assertNull(chronicle.arrived("Helm"), "a second arrival the same day");
         today[0] = today[0].plusDays(1);
-        assertNotNull(chronicle.arrived("Helm"), "a new day is a new arrival");
+        assertNotNull(chronicle.contractStarted(contract, "Hammer", "Lyrans", null), "a new day starts afresh");
     }
 
     @Test
     void nothingIsRecordedWhenTheChronicleIsOff() {
         enabled[0] = false;
-        assertNull(chronicle.arrived("Helm"));
-        assertNull(chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", "KIA"));
+        assertNull(chronicle.contractStarted(UUID.randomUUID(), "Hammer", "Lyrans", null));
+        assertNull(chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", "KIA"));
         assertTrue(roleplay.getOracleLog().isEmpty());
+    }
+
+    /**
+     * @return the id of a new person linked to someone in the cast
+     */
+    private UUID castMember(final String name) {
+        UUID personId = UUID.randomUUID();
+        roleplay.addLinkedCharacter(personId, name);
+        return personId;
     }
 
     @Test
     void theDaysLossesShareOneEntry() {
-        JournalEntry first = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", "Killed in Action");
-        JournalEntry second = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ben", null);
+        JournalEntry first = chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", "Killed in Action");
+        JournalEntry second = chronicle.personChanged(PersonChange.KILLED, castMember("Ben"), "Ben", null);
 
         assertSame(first, second);
         assertEquals(1, roleplay.getOracleLog().size());
@@ -142,10 +146,10 @@ class CampaignChronicleTest {
 
     @Test
     void differentChangesAndDaysGetTheirOwnEntries() {
-        chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", null);
-        chronicle.personChanged(PersonChange.JOINED, UUID.randomUUID(), "Cal", "MekWarrior");
+        chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", null);
+        chronicle.personChanged(PersonChange.JOINED, castMember("Cal"), "Cal", "MekWarrior");
         today[0] = today[0].plusDays(1);
-        chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Dee", null);
+        chronicle.personChanged(PersonChange.KILLED, castMember("Dee"), "Dee", null);
 
         assertEquals(3, roleplay.getOracleLog().size());
         assertEquals("Joined the company: Cal (MekWarrior).", roleplay.getOracleLog().get(1).getText());
@@ -154,7 +158,7 @@ class CampaignChronicleTest {
 
     @Test
     void theSamePersonIsListedOnce() {
-        UUID ana = UUID.randomUUID();
+        UUID ana = castMember("Ana");
         chronicle.personChanged(PersonChange.KILLED, ana, "Ana", null);
         assertNull(chronicle.personChanged(PersonChange.KILLED, ana, "Ana", null));
         assertEquals("Killed: Ana.", roleplay.getOracleLog().get(0).getText());
@@ -165,16 +169,46 @@ class CampaignChronicleTest {
         UUID natashaId = UUID.randomUUID();
         OracleCharacter natasha = roleplay.addLinkedCharacter(natashaId, "Natasha");
         JournalEntry entry = chronicle.personChanged(PersonChange.MISSING, natashaId, "Natasha", null);
-        chronicle.personChanged(PersonChange.MISSING, UUID.randomUUID(), "Stranger", null);
 
         assertEquals(Set.of(natasha.getId()), entry.getCharacters());
     }
 
     @Test
+    void onlyPeopleInTheCurrentCastAreChronicled() {
+        assertNull(chronicle.personChanged(PersonChange.JOINED, UUID.randomUUID(), "Stranger", "MekWarrior"));
+        assertNull(chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Stranger", null));
+
+        UUID formerId = UUID.randomUUID();
+        roleplay.removeCharacter(roleplay.addLinkedCharacter(formerId, "Former"));
+        assertNull(chronicle.personChanged(PersonChange.KILLED, formerId, "Former", null),
+              "someone removed from the cast is no longer followed");
+
+        // Typed-in characters have no person behind them, so they never match a random id.
+        roleplay.addCharacter("Typed");
+        assertNull(chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Typed", null));
+        assertTrue(roleplay.getOracleLog().isEmpty());
+    }
+
+    @Test
+    void aCastMembersChildIsChronicled() {
+        UUID motherId = UUID.randomUUID();
+        OracleCharacter mother = roleplay.addLinkedCharacter(motherId, "Mother");
+
+        assertNull(chronicle.personChanged(PersonChange.BORN, UUID.randomUUID(), "Stranger", null,
+              List.of(UUID.randomUUID())));
+        JournalEntry entry = chronicle.personChanged(PersonChange.BORN, UUID.randomUUID(), "Baby", null,
+              List.of(motherId));
+
+        assertNotNull(entry);
+        assertEquals("Born: Baby.", entry.getText());
+        assertEquals(Set.of(mother.getId()), entry.getCharacters());
+    }
+
+    @Test
     void aGroupDeletedFromTheLogStartsAgain() {
-        JournalEntry first = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", null);
-        roleplay.getOracleLog().remove(first);
-        JournalEntry again = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ben", null);
+        JournalEntry first = chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", null);
+        roleplay.deleteEntry(first);
+        JournalEntry again = chronicle.personChanged(PersonChange.KILLED, castMember("Ben"), "Ben", null);
 
         assertTrue(first != again, "the deleted entry is not reused");
         assertEquals("Killed: Ben.", again.getText());
@@ -184,9 +218,33 @@ class CampaignChronicleTest {
     @Test
     void campaignEventsOutliveTheOracleLogLimit() {
         maximum[0] = 1;
-        chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", null);
-        chronicle.arrived("Helm");
+        chronicle.personChanged(PersonChange.KILLED, castMember("Ana"), "Ana", null);
+        chronicle.contractStarted(UUID.randomUUID(), "Hammer", "Lyrans", null);
         assertEquals(2, roleplay.getOracleLog().size());
+    }
+
+    @Test
+    void ultimatumAnswersAreChronicledWithTheCastWhoLeft() {
+        UUID anaId = castMember("Ana");
+        JournalEntry side = chronicle.ultimatumResolved("FED_COM_CIVIL_WAR", UltimatumChoice.SIDE,
+              "Lyran Alliance", List.of(anaId, UUID.randomUUID()));
+
+        assertNotNull(side);
+        assertEquals(JournalEntryType.CHRONICLE, side.getType());
+        assertEquals("Ultimatum answered: the company sided with Lyran Alliance. 2 people refused to follow the "
+                           + "decision.", side.getText());
+        assertEquals(Set.of(roleplay.findByName("Ana").getId()), side.getCharacters());
+        assertNull(chronicle.ultimatumResolved("FED_COM_CIVIL_WAR", UltimatumChoice.SIDE, "Lyran Alliance",
+              List.of()), "an ultimatum is recorded once");
+
+        JournalEntry pirate = chronicle.ultimatumResolved("COMSTAR_SCHISM", UltimatumChoice.PIRATE, null, List.of());
+        assertEquals("Ultimatum answered: the company broke with every side and turned pirate. Everyone followed the "
+                           + "decision.", pirate.getText());
+        JournalEntry mercenary = chronicle.ultimatumResolved("EXODUS", UltimatumChoice.MERCENARY, null,
+              List.of(UUID.randomUUID()));
+        assertEquals("Ultimatum answered: the company broke with every side and went mercenary. One person refused "
+                           + "to follow the decision.", mercenary.getText());
+        assertTrue(mercenary.getCharacters().isEmpty());
     }
 
     @Test
@@ -201,7 +259,7 @@ class CampaignChronicleTest {
     }
 
     @Test
-    void onlyTheMainForceArrivingIsChronicled() {
+    void arrivalsAreLeftToTheTravelLog() {
         Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         Roleplay roleplay = new Roleplay();
         CurrentLocation force = mock(CurrentLocation.class);
@@ -215,13 +273,9 @@ class CampaignChronicleTest {
         when(campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES)).thenReturn(100);
         CampaignChronicleListener listener = new CampaignChronicleListener(campaign);
 
-        // A convoy between bases finishing its journey is not the company arriving.
         listener.handle(new TransitCompleteEvent(mock(GroundTransitLocation.class)));
-        assertTrue(roleplay.getOracleLog().stream().noneMatch(entry -> entry.getType() == JournalEntryType.CHRONICLE));
-
         listener.handle(new TransitCompleteEvent(force));
-        assertEquals(1, roleplay.getOracleLog().stream()
-                              .filter(entry -> entry.getType() == JournalEntryType.CHRONICLE).count());
+        assertTrue(roleplay.getOracleLog().stream().noneMatch(entry -> entry.getType() == JournalEntryType.CHRONICLE));
     }
 
     // region Listener
@@ -311,44 +365,54 @@ class CampaignChronicleTest {
     }
 
     @Test
-    void onlyThisCampaignsBattlesAreChronicled() {
+    void newPeopleAreChronicledOnlyWhenTheyConcernTheCast() {
         CampaignChronicleListener listener = listener();
-        Scenario ours = mock(Scenario.class, RETURNS_DEEP_STUBS);
-        when(ours.getId()).thenReturn(7);
-        when(ours.getName()).thenReturn("Ridge Assault");
-        Scenario copy = mock(Scenario.class, RETURNS_DEEP_STUBS);
-        when(copy.getId()).thenReturn(7);
-        when(campaign.getScenario(7)).thenReturn(ours);
-
-        listener.handle(new ScenarioResolvedEvent(copy));
-        assertTrue(chronicled().isEmpty());
-        listener.handle(new ScenarioResolvedEvent(ours));
-        assertEquals(1, chronicled().size());
-        assertTrue(chronicled().get(0).startsWith("Battle fought: Ridge Assault"), chronicled().get(0));
-    }
-
-    @Test
-    void newPeopleAreChronicledButPrisonersAreNot() {
-        CampaignChronicleListener listener = listener();
+        Person mother = person("Dana", false, TODAY.minusYears(30));
+        journal.addLinkedCharacter(mother.getId(), "Dana");
         Person recruit = person("Ana", false, TODAY.minusYears(20));
         Person baby = person("Ben", false, TODAY);
+        when(baby.getGenealogy().getParents()).thenReturn(List.of(mother));
+        Person strangersBaby = person("Eve", false, TODAY);
+        when(strangersBaby.getGenealogy().getParents()).thenReturn(List.of(recruit));
         Person prisoner = person("Cole", true, TODAY.minusYears(30));
-        for (Person person : List.of(recruit, baby, prisoner)) {
+        journal.addLinkedCharacter(prisoner.getId(), "Cole");
+        for (Person person : List.of(recruit, baby, strangersBaby, prisoner)) {
             personnel.put(person.getId(), person);
             listener.handle(new PersonNewEvent(person));
         }
 
-        assertEquals(2, chronicled().size());
-        assertTrue(chronicled().stream().anyMatch(text -> text.contains("Ana (MekWarrior)")), chronicled().toString());
-        assertTrue(chronicled().stream().anyMatch(text -> text.contains("Ben") && !text.contains("Ana")),
-              chronicled().toString());
-        assertTrue(chronicled().stream().noneMatch(text -> text.contains("Cole")), chronicled().toString());
+        assertEquals(List.of("Born: Ben."), chronicled());
+    }
+
+    @Test
+    void ultimatumAnswersInThisCampaignAreChronicled() {
+        CampaignChronicleListener listener = listener();
+        when(campaign.getGameYear()).thenReturn(3057);
+        Person ana = person("Ana", false, TODAY.minusYears(20));
+        journal.addLinkedCharacter(ana.getId(), "Ana");
+        Faction lyrans = mock(Faction.class);
+        when(lyrans.getShortName()).thenReturn("LA");
+        when(lyrans.getFullName(3057)).thenReturn("Lyran Alliance");
+        Faction pirates = mock(Faction.class);
+        when(pirates.getShortName()).thenReturn(Faction.PIRATE_FACTION_CODE);
+
+        listener.handle(new UltimatumResolvedEvent(mock(Campaign.class), "OTHER", lyrans, false, List.of()));
+        assertTrue(chronicled().isEmpty(), "another campaign's ultimatum");
+
+        listener.handle(new UltimatumResolvedEvent(campaign, "FED_COM_CIVIL_WAR", lyrans, false, List.of(ana)));
+        listener.handle(new UltimatumResolvedEvent(campaign, "COMSTAR_SCHISM", pirates, true, List.of()));
+        assertEquals(List.of("Ultimatum answered: the company sided with Lyran Alliance. One person refused to "
+                                   + "follow the decision.",
+              "Ultimatum answered: the company broke with every side and turned pirate. Everyone followed the "
+                    + "decision."), chronicled());
+        assertEquals(Set.of(journal.findByName("Ana").getId()), journal.getOracleLog().get(0).getCharacters());
     }
 
     @Test
     void statusChangesForPeopleFromAnotherCampaignAreIgnored() {
         CampaignChronicleListener listener = listener();
         Person ours = person("Ana", false, TODAY.minusYears(20));
+        journal.addLinkedCharacter(ours.getId(), "Ana");
         personnel.put(ours.getId(), ours);
         UUID id = ours.getId();
         Person copy = person("Ana", false, TODAY.minusYears(20));

@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -682,12 +684,13 @@ public class StratConCampaignState {
      * <p>A contract can be ended early only if:</p>
      * <ul>
      *   <li>The base contract allows early termination</li>
-     *   <li>There is at least one strategic objective defined</li>
+     *   <li>There is at least one strategic objective defined, other than a Deployment Order</li>
      *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
      *   <li>No strategic-objective point of interest is still waiting to appear</li>
      * </ul>
      *
-     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open.</p>
+     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open, nor do Deployment Orders:
+     * the employer simply stops issuing them once the contract ends. One already issued must still be resolved.</p>
      *
      * @return {@code true} if the contract can be ended early, {@code false} otherwise
      *
@@ -708,10 +711,13 @@ public class StratConCampaignState {
         for (StratConTrackState track : tracks) {
             List<StratConStrategicObjective> objectives = track.getStrategicObjectives();
             for (StratConStrategicObjective objective : objectives) {
-
-                hasObjectives = true;
                 if (!objective.isObjectiveResolved(track)) {
                     return false;
+                }
+
+                // A Deployment Order is the employer's, not the contract's: it cannot be the one objective met.
+                if (!isDeploymentOrder(objective.getPointOfInterestTypeId())) {
+                    hasObjectives = true;
                 }
             }
         }
@@ -720,14 +726,16 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return {@code true} if a point of interest that will be a strategic objective is still scheduled to appear
+     * @return {@code true} if a point of interest that will be a strategic objective, other than a Deployment Order, is
+     *       still scheduled to appear
      *
      * @author Illiani
      * @since 0.51.01
      */
     boolean hasScheduledStrategicObjectivePointsOfInterest() {
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
-            if (scheduledPointOfInterest.isStrategicObjective()) {
+            if (scheduledPointOfInterest.isStrategicObjective()
+                      && !isDeploymentOrder(scheduledPointOfInterest.getTypeId())) {
                 return true;
             }
         }

@@ -146,6 +146,7 @@ public final class StratConPointOfInterestPlacer {
         StratConStrategicObjective objective = new StratConStrategicObjective();
         objective.setObjectiveType(StrategicObjectiveType.PointOfInterest);
         objective.setPointOfInterestId(pointOfInterest.getId());
+        objective.setPointOfInterestTypeId(pointOfInterest.getTypeId());
         objective.setDesiredObjectiveCount(1);
         track.addStrategicObjective(objective);
         return objective;

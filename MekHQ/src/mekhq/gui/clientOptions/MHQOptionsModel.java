@@ -199,6 +199,7 @@ class MHQOptionsModel {
     // region New Day - Formation Icons
     boolean newDayFormationIconOperationalStatus;
     FormationIconOperationalStatusStyle newDayFormationIconOperationalStatusStyle;
+    boolean newDayAutoFormationIcons;
     // endregion New Day - Formation Icons
 
     // region Campaign Save
@@ -382,6 +383,7 @@ class MHQOptionsModel {
         // New Day - Formation Icons
         newDayFormationIconOperationalStatus = options.getNewDayFormationIconOperationalStatus();
         newDayFormationIconOperationalStatusStyle = options.getNewDayFormationIconOperationalStatusStyle();
+        newDayAutoFormationIcons = options.getNewDayAutoFormationIcons();
 
         // Campaign Save
         preferGzippedOutput = options.getPreferGzippedOutput();
@@ -579,6 +581,7 @@ class MHQOptionsModel {
         // New Day - Formation Icons
         options.setNewDayFormationIconOperationalStatus(newDayFormationIconOperationalStatus);
         options.setNewDayFormationIconOperationalStatusStyle(newDayFormationIconOperationalStatusStyle);
+        options.setNewDayAutoFormationIcons(newDayAutoFormationIcons);
 
         // Campaign Save
         options.setPreferGzippedOutput(preferGzippedOutput);

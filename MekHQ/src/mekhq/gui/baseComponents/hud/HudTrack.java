@@ -155,6 +155,18 @@ public class HudTrack extends JComponent {
         return flashpoint ? AMBER : TEXT_FAINT;
     }
 
+    /**
+     * @return {@code font}, shrunk just enough that {@code text} fits within {@code maxWidth}, so a cell's caption
+     *       never spills into its neighbour when the track is narrow
+     */
+    private static Font fitToWidth(Graphics2D canvas, Font font, String text, int maxWidth) {
+        int textWidth = canvas.getFontMetrics(font).stringWidth(text);
+        if (textWidth <= maxWidth || maxWidth <= 0) {
+            return font;
+        }
+        return font.deriveFont(font.getSize2D() * maxWidth / textWidth);
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
         Graphics2D canvas = (Graphics2D) graphics.create();
@@ -201,9 +213,9 @@ public class HudTrack extends JComponent {
                                          : height / 2);
                 canvas.drawString(label, x + (width - numberMetrics.stringWidth(label)) / 2, numberY);
                 if (!caption.isEmpty()) {
-                    canvas.setFont(captionFont);
-                    FontMetrics captionMetrics = canvas.getFontMetrics();
                     String text = caption.toUpperCase(Locale.ROOT);
+                    canvas.setFont(fitToWidth(canvas, captionFont, text, width - scaleForGUI(6)));
+                    FontMetrics captionMetrics = canvas.getFontMetrics();
                     canvas.drawString(text, x + (width - captionMetrics.stringWidth(text)) / 2,
                           y + height - scaleForGUI(6));
                 }
