@@ -625,9 +625,12 @@ public class SalvageRecoveryConsole extends JDialog {
 
         if (settlement.isKeptSalvageBought()) {
             firstMoneyTile.setValue(session.getCashShare().toAmountString(), READY);
+            // Any purchase is money out, so it reads amber like the Buy claims that add to it, and red once the player
+            // can't afford it.
             Money purchaseCost = session.getPurchaseCost();
-            boolean isAffordable = purchaseCost.compareTo(session.getAvailableFunds()) <= 0;
-            secondMoneyTile.setValue(purchaseCost.toAmountString(), isAffordable ? TEXT : DANGER);
+            Color purchaseColor = !isPurchaseAffordable(session) ? DANGER :
+                                        (purchaseCost.isPositive() ? CAUTION : TEXT);
+            secondMoneyTile.setValue(purchaseCost.toAmountString(), purchaseColor);
             secondMoneyTile.setSub(formatted("tile.purchaseCost.sub", session.getAvailableFunds().toAmountString()));
         } else if (!settlement.canKeepSalvage()) {
             firstMoneyTile.setValue(session.getExchangeUnitTotal().toAmountString(), TEXT);
@@ -856,18 +859,30 @@ public class SalvageRecoveryConsole extends JDialog {
         for (SalvageClaim claim : session.getAvailableClaims()) {
             String title;
             String sub;
+            // Money the claim earns reads green and money it costs amber, so a Buy is never mistaken for a free pick;
+            // a Buy the player couldn't pay for, on top of their other purchases, reads red.
+            Color subColor = null;
             switch (claim) {
                 case EMPLOYER -> {
                     title = text("claim.EMPLOYER");
                     Money cashShare = settlement.getCashShare(value);
-                    sub = cashShare.isPositive() ?
-                                formatted("claim.EMPLOYER.share.sub", compactMoney(cashShare)) :
-                                text("claim.EMPLOYER.sub");
+                    if (cashShare.isPositive()) {
+                        sub = formatted("claim.EMPLOYER.share.sub", compactMoney(cashShare));
+                        subColor = READY;
+                    } else {
+                        sub = text("claim.EMPLOYER.sub");
+                    }
                 }
                 case KEEP -> {
                     if (settlement.isKeptSalvageBought()) {
                         title = text("claim.BUY");
                         sub = formatted("claim.BUY.sub", compactMoney(settlement.getPurchaseCost(value)));
+                        Money keptValueIfBought = (session.getClaim(recovery) == SalvageClaim.KEEP) ?
+                                                        session.getKeptValue() :
+                                                        session.getKeptValue().plus(value);
+                        subColor = settlement.canAfford(keptValueIfBought, session.getAvailableFunds()) ?
+                                         CAUTION :
+                                         DANGER;
                     } else if (session.isKeptSalvageStealOnly()) {
                         title = text("claim.KEEP");
                         sub = text("claim.KEEP.steal.sub");
@@ -879,10 +894,11 @@ public class SalvageRecoveryConsole extends JDialog {
                 case SELL -> {
                     title = text("claim.SELL");
                     sub = formatted("claim.SELL.sub", compactMoney(value));
+                    subColor = READY;
                 }
                 default -> throw new IllegalStateException("Unexpected claim: " + claim);
             }
-            segments.add(new Segment<>(claim, title, sub, isRecovered));
+            segments.add(new Segment<>(claim, title, sub, isRecovered, subColor));
         }
         claimControl.setSegments(segments);
         claimControl.setSelected(session.getClaim(recovery));
@@ -1044,6 +1060,11 @@ public class SalvageRecoveryConsole extends JDialog {
         return (entity == null) ? 0.0 : entity.getWeight();
     }
 
+    /** @return {@code true} if the player can pay for every wreck they are buying */
+    private static boolean isPurchaseAffordable(SalvageRecoverySession session) {
+        return session.getSettlement().canAfford(session.getKeptValue(), session.getAvailableFunds());
+    }
+
     /** Shortens a money amount for cards and segments: 6.4M, 950K, or the plain amount below a thousand. */
     private static String compactMoney(Money money) {
         double amount = money.getAmount().doubleValue();
@@ -1147,9 +1168,24 @@ public class SalvageRecoveryConsole extends JDialog {
                       ownedUnitCounts.getChassisCount(entity)));
             }
 
+            // A recovered wreck the player is buying or selling shows what that does to their funds; any other shows
+            // its salvage value.
+            SalvageSettlement settlement = session.getSettlement();
+            Money value = settlement.getSalvageValue(wreck);
+            String figure = compactMoney(value);
+            Color figureColor = TEXT;
+            if (recovery.isRecovered()) {
+                SalvageClaim claim = session.getClaim(recovery);
+                if ((claim == SalvageClaim.KEEP) && settlement.isKeptSalvageBought()) {
+                    figure = formatted("money.cost", compactMoney(settlement.getPurchaseCost(value)));
+                    figureColor = isPurchaseAffordable(session) ? CAUTION : DANGER;
+                } else if (claim == SalvageClaim.SELL) {
+                    figure = formatted("money.gain", figure);
+                    figureColor = READY;
+                }
+            }
             return card.show(statusColor(recovery), recovery.isRecovered(), wreck.getName(), null, tags,
-                  sub.toString(), compactMoney(session.getSettlement().getSalvageValue(wreck)), text("money.unit"),
-                  isSelected);
+                  sub.toString(), figure, figureColor, text("money.unit"), isSelected);
         }
 
         private Tag claimTag(SalvageClaim claim) {

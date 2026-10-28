@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ratgenerator.RATGenerator.getFactionLogo;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -42,7 +43,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -665,20 +665,6 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
         Dimension preferred = component.getPreferredSize();
         component.setMaximumSize(new Dimension(Integer.MAX_VALUE, preferred.height));
         return component;
-    }
-
-    private static Font hudFont(int style, float sizeFactor, float tracking) {
-        Font base = UIManager.getFont("Label.font");
-        if (base == null) {
-            base = new JLabel().getFont();
-        }
-        Font sized = base.deriveFont(style, base.getSize2D() * sizeFactor);
-        if (tracking == 0.0f) {
-            return sized;
-        }
-        Map<TextAttribute, Object> attributes = new HashMap<>();
-        attributes.put(TextAttribute.TRACKING, tracking);
-        return sized.deriveFont(attributes);
     }
 
     private static Color outcomeColor(MissionStatus status) {
