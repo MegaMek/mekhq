@@ -84,6 +84,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConPirateCaptainBehavior.BEHAVIOR_ID, new StratConPirateCaptainBehavior());
         behaviors.put(StratConEnemyEngineersBehavior.BEHAVIOR_ID, new StratConEnemyEngineersBehavior());
         behaviors.put(StratConDeploymentOrderBehavior.BEHAVIOR_ID, new StratConDeploymentOrderBehavior());
+        behaviors.put(StratConSupplyInterdictionBehavior.BEHAVIOR_ID, new StratConSupplyInterdictionBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {

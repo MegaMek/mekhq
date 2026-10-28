@@ -165,10 +165,6 @@ public class StratConEnemyEngineersBehavior extends StratConContestedPointOfInte
         facility.raiseIntel(FacilityIntel.LOCATED);
         track.addFacility(coords, facility);
 
-        if (contract != null) {
-            StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
-        }
-
         addReport(BATTLE, "built.report", pointOfInterest, track, campaign);
         return facility;
     }

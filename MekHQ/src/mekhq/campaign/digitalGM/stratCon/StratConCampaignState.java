@@ -119,6 +119,9 @@ public class StratConCampaignState {
     private LocalDate lastCounterattackDate;
     private LocalDate enemyEngineersScheduledUntil;
     private final List<LocalDate> enemyEngineerDates;
+    // enemy supply interdictions; see StratConFacilitySupply
+    private LocalDate supplyInterdictionsScheduledUntil;
+    private final List<LocalDate> supplyInterdictionDates;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -135,6 +138,7 @@ public class StratConCampaignState {
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
+        supplyInterdictionDates = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
@@ -143,6 +147,7 @@ public class StratConCampaignState {
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
+        supplyInterdictionDates = new ArrayList<>();
         setContract(contract);
     }
 
@@ -260,6 +265,36 @@ public class StratConCampaignState {
     }
 
     /**
+     * @return the day up to which enemy supply interdictions have been scheduled, exclusive, or {@code null} if none
+     *       have been
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    public @Nullable LocalDate getSupplyInterdictionsScheduledUntil() {
+        return supplyInterdictionsScheduledUntil;
+    }
+
+    public void setSupplyInterdictionsScheduledUntil(@Nullable LocalDate supplyInterdictionsScheduledUntil) {
+        this.supplyInterdictionsScheduledUntil = supplyInterdictionsScheduledUntil;
+    }
+
+    /**
+     * @return the still-to-come days on which enemy supply interdictions appear, one entry each (mutable; drained as
+     *       they appear)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    @XmlElementWrapper(name = "supplyInterdictionDates")
+    @XmlElement(name = "supplyInterdictionDate")
+    public List<LocalDate> getSupplyInterdictionDates() {
+        return supplyInterdictionDates;
+    }
+
+    /**
      * Moves every date still to come in the contract's pre-rolled schedule - its ordinary scenarios, its
      * strategic-objective scenarios, and its points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
      * keeps its place within the contract.
@@ -277,6 +312,7 @@ public class StratConCampaignState {
         scheduledScenarioDates.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
         strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
         enemyEngineerDates.replaceAll(engineerDate -> engineerDate.plusDays(days));
+        supplyInterdictionDates.replaceAll(interdictionDate -> interdictionDate.plusDays(days));
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
             if (spawnDate != null) {

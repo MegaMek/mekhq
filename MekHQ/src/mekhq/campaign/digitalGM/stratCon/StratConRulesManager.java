@@ -1570,9 +1570,6 @@ public class StratConRulesManager {
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
-                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
-                    // contract start.
-                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
                 }
             }
         }
@@ -4654,9 +4651,15 @@ public class StratConRulesManager {
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
-                // afterwards only when a GM edits the map - adding or removing a city or a facility. Resolving a
-                // scenario is playing on the map, not editing it: taking a base, or losing one, changes who holds
-                // the ground at the end of a road, not whether the road was ever built.
+                // afterwards only when a GM edits the map - its terrain or its cities. Resolving a scenario is playing
+                // on the map, not editing it: taking a base, or losing one, changes who holds the ground at the end of
+                // a road, not whether the road was ever built. Who holds it does decide where supply can go, though,
+                // so the supply routes, and which facilities they leave cut off, are brought up to date at once rather
+                // than the next day.
+                if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+                    StratConFacilitySupply.reconcileNetworks(track);
+                    StratConFacilitySupply.refreshCutOffFacilities(track, campaign);
+                }
 
                 processTrackForceReturnDates(track, campaign);
 
