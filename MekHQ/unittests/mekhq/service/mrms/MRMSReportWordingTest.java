@@ -69,6 +69,19 @@ class MRMSReportWordingTest {
     }
 
     @Test
+    void stoppingBeforeAnyWorkSaysItDidNotRun() {
+        assertEquals("Mass Repair/Salvage did not run. The service is disabled for Salvage.",
+              getFormattedTextAt(MRMS_BUNDLE, "MRMS.CompleteTypeDisabled.report",
+                    getTextAt(MRMS_BUNDLE, "Salvage")));
+        assertEquals("Mass Repair/Salvage did not run. The service is disabled.",
+              getTextAt(MRMS_BUNDLE, "MRMS.CompleteDisabled.report"));
+        assertEquals("Mass Repair/Salvage did not run. There are insufficient Astechs to run the service. "
+                           + "Please hire more before running it again.",
+              getTextAt(MRMS_BUNDLE, "MRMS.InsufficientAstechs.report"));
+        assertEquals("Mass Repair/Salvage", getTextAt(MRMS_BUNDLE, "MRMS.UnitResult.title"));
+    }
+
+    @Test
     void singleUnitReportCountsItsActions() {
         assertEquals("There was 1 action performed.",
               getFormattedTextAt(MRMS_BUNDLE, "MRMS.UnitActionsPerformed.report", 1));
