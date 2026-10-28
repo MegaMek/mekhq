@@ -463,7 +463,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                updateArmorKits(scenario, escapee);
+                updateArmorKits(scenario, escapee, campaign.getCampaignOptions());
             }
 
             generatedEntities.add(escapee);
