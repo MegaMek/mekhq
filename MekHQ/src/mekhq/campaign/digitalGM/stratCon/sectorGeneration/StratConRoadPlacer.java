@@ -32,13 +32,24 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Pathing;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.StepCost;
 
 /**
  * Builds the road network for a StratCon track: connects the sector's cities with roads and branches each network off
@@ -54,6 +65,9 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
  * <p>Space ports act as hubs: they root their network and cheapen travel around themselves, so the trunk roads
  * converge on them. Once the trunk is laid, each block of farmland that isn't already on it gets a single lane in by
  * the cheapest route, so farming districts are served without paving every field.</p>
+ *
+ * <p>The search itself is {@link StratConPathfinder}. Supply routes use it too, at the costs given by
+ * {@link #supplyRouteCost}, so they read the ground as the roads do and keep to them where they serve.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -82,10 +96,11 @@ public final class StratConRoadPlacer {
     /** How many hexes a hub's pull reaches. */
     private static final int HUB_ATTRACTION_RADIUS = 4;
 
-    /** The result of a Dijkstra sweep: least cost to each hex, and the hex each was reached from. */
-    private record Pathing(Map<StratConCoords, Integer> distance, Map<StratConCoords, StratConCoords> previous) {}
-
-    private record Node(StratConCoords coords, int distance) {}
+    /**
+     * Movement cost for a supply route to enter a road hex: a fifth of {@link #NORMAL_COST}, so supply keeps to the
+     * roads where they go and only strikes out across country where they don't. See {@link #supplyRouteCost}.
+     */
+    static final int SUPPLY_ROAD_COST = 2;
 
     /**
      * Clears and rebuilds the track's road network from its current cities. Safe to call whenever the cities change
@@ -142,19 +157,10 @@ public final class StratConRoadPlacer {
             while (grew) {
                 grew = false;
                 Pathing pathing = pathfind(track, network, hubProximity);
-
-                StratConCoords nearest = null;
-                int nearestCost = Integer.MAX_VALUE;
-                for (StratConCoords city : unconnected) {
-                    Integer cost = pathing.distance().get(city);
-                    if ((cost != null) && (cost < nearestCost)) {
-                        nearestCost = cost;
-                        nearest = city;
-                    }
-                }
+                StratConCoords nearest = pathing.nearest(unconnected);
 
                 if (nearest != null) {
-                    List<StratConCoords> path = reconstruct(pathing, nearest);
+                    List<StratConCoords> path = pathing.pathTo(nearest);
                     roads.addAll(path);
                     network.addAll(path);
                     unconnected.remove(nearest);
@@ -211,19 +217,10 @@ public final class StratConRoadPlacer {
             }
 
             Pathing pathing = pathfind(track, roads, hubProximity);
-
-            StratConCoords nearest = null;
-            int nearestCost = Integer.MAX_VALUE;
-            for (StratConCoords farm : cluster) {
-                Integer cost = pathing.distance().get(farm);
-                if ((cost != null) && (cost < nearestCost)) {
-                    nearestCost = cost;
-                    nearest = farm;
-                }
-            }
+            StratConCoords nearest = pathing.nearest(cluster);
 
             if (nearest != null) {
-                roads.addAll(reconstruct(pathing, nearest));
+                roads.addAll(pathing.pathTo(nearest));
             }
         }
     }
@@ -306,83 +303,33 @@ public final class StratConRoadPlacer {
     private static void addOffMapBranch(StratConTrackState track, Set<StratConCoords> network,
           Set<StratConCoords> roads, Set<StratConCoords> roadExits, Map<StratConCoords, Integer> hubProximity) {
         Pathing pathing = pathfind(track, network, hubProximity);
-
-        StratConCoords nearestBorder = null;
-        int nearestCost = Integer.MAX_VALUE;
-        for (StratConCoords border : borderLandHexes(track)) {
-            Integer cost = pathing.distance().get(border);
-            if ((cost != null) && (cost < nearestCost)) {
-                nearestCost = cost;
-                nearestBorder = border;
-            }
-        }
+        StratConCoords nearestBorder = pathing.nearest(borderLandHexes(track));
 
         if (nearestBorder != null) {
-            roads.addAll(reconstruct(pathing, nearestBorder));
+            roads.addAll(pathing.pathTo(nearestBorder));
             roadExits.add(nearestBorder);
         }
     }
 
     /**
-     * Multi-source Dijkstra over the passable land of the track, from every hex in {@code sources}.
+     * Multi-source Dijkstra over the passable land of the track, from every passable hex in {@code sources}, at road
+     * building costs (see {@link #terrainCost}).
      */
     private static Pathing pathfind(StratConTrackState track, Set<StratConCoords> sources,
           Map<StratConCoords, Integer> hubProximity) {
-        Map<StratConCoords, Integer> distance = new HashMap<>();
-        Map<StratConCoords, StratConCoords> previous = new HashMap<>();
-        Set<StratConCoords> settled = new HashSet<>();
-        PriorityQueue<Node> frontier = new PriorityQueue<>(Comparator.comparingInt(Node::distance));
-
+        List<StratConCoords> passableSources = new ArrayList<>();
         for (StratConCoords source : sources) {
             if (!isImpassable(track, source)) {
-                distance.put(source, 0);
-                frontier.add(new Node(source, 0));
+                passableSources.add(source);
             }
         }
 
-        while (!frontier.isEmpty()) {
-            Node node = frontier.poll();
-            if (!settled.add(node.coords())) {
-                continue;
+        return StratConPathfinder.pathfind(track, passableSources, (from, to) -> {
+            if (isImpassable(track, to) && isImpassable(track, from)) {
+                return StratConPathfinder.IMPASSABLE;
             }
-
-            boolean currentIsOcean = isImpassable(track, node.coords());
-
-            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, node.coords())) {
-                // Roads may bridge a single ocean hex, but never two in a row, so an ocean neighbor is only reachable
-                // from land.
-                if (isImpassable(track, neighbor) && currentIsOcean) {
-                    continue;
-                }
-
-                int candidate = node.distance() + terrainCost(track, neighbor, hubProximity);
-                if (candidate < distance.getOrDefault(neighbor, Integer.MAX_VALUE)) {
-                    distance.put(neighbor, candidate);
-                    previous.put(neighbor, node.coords());
-                    frontier.add(new Node(neighbor, candidate));
-                }
-            }
-        }
-
-        return new Pathing(distance, previous);
-    }
-
-    /**
-     * Rebuilds the hex path between {@code target} and the search's source by following the previous-hex links;
-     * includes both endpoints.
-     *
-     * <p>The list runs <em>from {@code target} back to the source</em>, because that is the direction the links point.
-     * Every caller only drains it into a set of road hexes, so the order has never mattered - but it will to the first
-     * caller that walks the path.</p>
-     */
-    private static List<StratConCoords> reconstruct(Pathing pathing, StratConCoords target) {
-        List<StratConCoords> path = new ArrayList<>();
-        StratConCoords current = target;
-        while (current != null) {
-            path.add(current);
-            current = pathing.previous().get(current);
-        }
-        return path;
+            return terrainCost(track, to, hubProximity);
+        });
     }
 
     private static List<StratConCoords> borderLandHexes(StratConTrackState track) {
@@ -417,9 +364,43 @@ public final class StratConRoadPlacer {
             // Bridges are costly wherever they are; a nearby hub is no reason to build one.
             return BRIDGE_COST;
         }
-        boolean relief = StratConBiomeManifest.isMountainTerrain(terrain) ||
-                               StratConBiomeManifest.isVolcanicTerrain(terrain);
-        return hubDiscountedCost(relief ? RELIEF_COST : NORMAL_COST, coords, hubProximity);
+        return hubDiscountedCost(isRelief(terrain) ? RELIEF_COST : NORMAL_COST, coords, hubProximity);
+    }
+
+    private static boolean isRelief(String terrain) {
+        return StratConBiomeManifest.isMountainTerrain(terrain) || StratConBiomeManifest.isVolcanicTerrain(terrain);
+    }
+
+    /**
+     * The cost of each step a supply route takes, for {@link StratConPathfinder#pathfind}. Supply reads the ground as
+     * the roads were laid on it - mountains and volcanoes are dear - but runs far more cheaply along a road, so a route
+     * keeps to the road network where it serves and strikes out across country where it doesn't. Open water is
+     * impassable except where a road bridges it, and so is any hex the caller rules out, such as one holding the
+     * other side's facility.
+     *
+     * @param track     the sector
+     * @param isBlocked the hexes the route may not enter
+     *
+     * @return the step cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static StepCost supplyRouteCost(StratConTrackState track, Predicate<StratConCoords> isBlocked) {
+        return (from, to) -> {
+            if (isBlocked.test(to)) {
+                return StratConPathfinder.IMPASSABLE;
+            }
+            if (track.isRoad(to)) {
+                return SUPPLY_ROAD_COST;
+            }
+
+            String terrain = track.getTerrainTile(to);
+            if (StratConBiomeManifest.isOceanTerrain(terrain)) {
+                return StratConPathfinder.IMPASSABLE;
+            }
+            return isRelief(terrain) ? RELIEF_COST : NORMAL_COST;
+        };
     }
 
     /**

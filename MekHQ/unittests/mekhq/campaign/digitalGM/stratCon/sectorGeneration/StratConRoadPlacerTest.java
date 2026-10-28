@@ -48,13 +48,16 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Pathing;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.StepCost;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link StratConRoadPlacer}: connecting cities, bridging a single ocean hex (but never two in a row),
- * avoiding mountains where cheaper, keeping widely-separated landmasses independent, and branching off the map.
+ * avoiding mountains where cheaper, keeping widely-separated landmasses independent, and branching off the map; and
+ * the supply route costs that read the same ground, keeping to roads where they serve.
  */
 class StratConRoadPlacerTest {
 
@@ -313,6 +316,105 @@ class StratConRoadPlacerTest {
      * Lays roads between four corner cities with a facility of the given type in the middle, and counts how many road
      * hexes end up close to that facility.
      */
+    @Test
+    void supplyRunsCheapestOnARoadAndDearestOverRelief() {
+        StratConTrackState track = landTrack(4, 3);
+        StratConCoords from = new StratConCoords(1, 1);
+        StratConCoords road = new StratConCoords(0, 1);
+        StratConCoords plains = new StratConCoords(2, 1);
+        StratConCoords mountain = new StratConCoords(3, 1);
+        track.setTerrainTile(mountain, "Mountain");
+        track.setRoads(new HashSet<>(Set.of(road)));
+
+        StepCost cost = StratConRoadPlacer.supplyRouteCost(track, coords -> false);
+
+        assertEquals(StratConRoadPlacer.SUPPLY_ROAD_COST, cost.cost(from, road));
+        assertTrue(cost.cost(from, road) < cost.cost(from, plains), "a road should be cheaper than open country");
+        assertTrue(cost.cost(from, plains) < cost.cost(from, mountain), "relief should be dearer than open country");
+    }
+
+    @Test
+    void supplyCrossesWaterOnlyByABridge() {
+        StratConTrackState track = landTrack(3, 3);
+        StratConCoords from = new StratConCoords(1, 1);
+        StratConCoords sea = new StratConCoords(0, 1);
+        StratConCoords bridge = new StratConCoords(2, 1);
+        track.setTerrainTile(sea, "Sea");
+        track.setTerrainTile(bridge, "Sea");
+        track.setRoads(new HashSet<>(Set.of(bridge)));
+
+        StepCost cost = StratConRoadPlacer.supplyRouteCost(track, coords -> false);
+
+        assertEquals(StratConPathfinder.IMPASSABLE, cost.cost(from, sea));
+        assertEquals(StratConRoadPlacer.SUPPLY_ROAD_COST, cost.cost(from, bridge));
+    }
+
+    @Test
+    void supplyNeverEntersABlockedHexEvenOnARoad() {
+        StratConTrackState track = landTrack(3, 3);
+        StratConCoords from = new StratConCoords(1, 1);
+        StratConCoords road = new StratConCoords(0, 1);
+        track.setRoads(new HashSet<>(Set.of(road)));
+
+        StepCost cost = StratConRoadPlacer.supplyRouteCost(track, road::equals);
+
+        assertEquals(StratConPathfinder.IMPASSABLE, cost.cost(from, road));
+    }
+
+    @Test
+    void supplyKeepsToTheRoadBetweenTwoCities() {
+        StratConTrackState track = landTrack(10, 10);
+        StratConCoords a = new StratConCoords(1, 1);
+        StratConCoords b = new StratConCoords(8, 8);
+        track.addCity(a);
+        track.addCity(b);
+        StratConRoadPlacer.recalculateRoads(track);
+
+        Pathing pathing = StratConPathfinder.pathfind(track,
+              List.of(a),
+              StratConRoadPlacer.supplyRouteCost(track, coords -> false));
+
+        // On open plains the road is as short as any way across, so leaving it can only cost more.
+        List<StratConCoords> route = pathing.pathTo(b);
+        assertFalse(route.isEmpty(), "the second city should be supplied");
+        assertTrue(track.getRoads().containsAll(route), "the route should keep to the road: " + route);
+    }
+
+    @Test
+    void supplyStrikesOutAcrossCountryWhereNoRoadGoes() {
+        StratConTrackState track = landTrack(6, 6);
+        StratConCoords source = new StratConCoords(0, 0);
+        StratConCoords facility = new StratConCoords(5, 5);
+
+        Pathing pathing = StratConPathfinder.pathfind(track,
+              List.of(source),
+              StratConRoadPlacer.supplyRouteCost(track, coords -> false));
+
+        assertTrue(pathing.reaches(facility), "supply should not need a road");
+    }
+
+    @Test
+    void supplyGoesAroundABlockedHex() {
+        StratConTrackState track = landTrack(10, 10);
+        StratConCoords a = new StratConCoords(1, 1);
+        StratConCoords b = new StratConCoords(8, 8);
+        track.addCity(a);
+        track.addCity(b);
+        StratConRoadPlacer.recalculateRoads(track);
+
+        List<StratConCoords> openRoute = StratConPathfinder.pathfind(track,
+              List.of(a),
+              StratConRoadPlacer.supplyRouteCost(track, coords -> false)).pathTo(b);
+        StratConCoords blocked = openRoute.get(openRoute.size() / 2);
+
+        List<StratConCoords> route = StratConPathfinder.pathfind(track,
+              List.of(a),
+              StratConRoadPlacer.supplyRouteCost(track, blocked::equals)).pathTo(b);
+
+        assertFalse(route.isEmpty(), "there is room to go around");
+        assertFalse(route.contains(blocked), "the route should avoid the blocked hex");
+    }
+
     private static int roadsNearFacility(FacilityType facilityType) {
         StratConTrackState track = landTrack(16, 12);
         track.addCity(new StratConCoords(1, 1));
