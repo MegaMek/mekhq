@@ -971,8 +971,7 @@ public class StratConContractInitializer {
         objective.setObjectiveType(StrategicObjectiveType.FacilityDestruction);
         track.addStrategicObjective(objective);
 
-        // A new base belongs on the road grid if the planet's owner holds it, as any other placed base does.
-        connectFacilitiesToRoads(track, contract, campaign);
+        // The roads are left as they are: a base that turns up mid-contract lays no new road.
         return coords;
     }
 
@@ -2067,15 +2066,14 @@ public class StratConContractInitializer {
 
     /**
      * Folds the planet-owner's facilities on the given track into its road network, via the GM's sector-generation
-     * strategy (a road-less generator ignores this). Call whenever a GM edits what sits on the map - adding or removing
-     * a city, adding or removing a facility - so the network matches the sites that are actually there. Sector
-     * generation and regeneration lay the roads the same way.
+     * strategy (a road-less generator ignores this). Call when the sector itself is laid out: at contract start, when
+     * the GM regenerates the sector or edits its terrain, and when the GM adds or removes a city.
      *
-     * <p>Deliberately <em>not</em> called for anything that happens in play: a facility changing hands, or being
-     * destroyed, during scenario resolution. The line is between editing the map and playing on it. A road is built
-     * ground, so who holds the base at the end of it does not decide whether the road was ever laid - and because this
-     * rebuilds the entire network from scratch, calling it mid-campaign could redraw roads far from the facility that
-     * changed.</p>
+     * <p>Deliberately <em>not</em> called when a facility comes or goes after the contract is generated - whether a GM
+     * adds or removes one, enemy engineers raise an outpost, the player builds one, or one changes hands or is
+     * destroyed in play. A road is built ground, so a base turning up at the end of one does not lay it, and one taken
+     * or razed does not tear it up - and because this rebuilds the entire network from scratch, calling it
+     * mid-campaign could redraw roads far from the facility that changed.</p>
      *
      * @param track    the track whose road network to refresh
      * @param contract the contract (source of the planet and the employer/enemy factions)

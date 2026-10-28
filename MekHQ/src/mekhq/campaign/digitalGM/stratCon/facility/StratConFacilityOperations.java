@@ -812,8 +812,7 @@ public final class StratConFacilityOperations {
         facility.setGarrison(facility.getGarrisonMaximum());
         track.addFacility(order.getTargetCoords(), facility);
         track.getRevealedCoords().add(order.getTargetCoords());
-        // A new base belongs on the road grid, as one placed by any other means does.
-        StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
+        // The roads are left as they are: building a base lays no new road.
         report(campaign, "report.built", facility.getDisplayableName());
     }
 

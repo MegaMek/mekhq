@@ -1587,9 +1587,6 @@ public class StratConRulesManager {
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
-                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
-                    // contract start.
-                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
                 }
             }
         }

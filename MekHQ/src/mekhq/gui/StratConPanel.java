@@ -594,9 +594,9 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Rebuilds the current sector's road network after a GM edit to its cities or facilities, so the roads keep serving
-     * the settlements that are actually there. Facilities are folded in only when the planet's owner holds them, and a
-     * road-less sector generator ignores the request entirely.
+     * Rebuilds the current sector's road network after a GM edit to its cities, so the roads keep serving the
+     * settlements that are actually there. Facilities are folded in only when the planet's owner holds them, and a
+     * road-less sector generator ignores the request entirely. Adding or removing a facility does not call this.
      */
     private void recalculateRoads() {
         if ((currentTrack == null) || (campaignState == null)) {
@@ -2883,7 +2883,6 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);
-                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConGMs.facility(campaign.getCampaignOptions())
@@ -2912,7 +2911,6 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility newFacility = new StratConFacility(facilityDefinition, owner);
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
-                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);
