@@ -41,7 +41,7 @@ package mekhq.campaign.digitalGM.stratCon.facility;
  *     <li>{@link #FORTIFY} raises the tier of a facility the player's side holds, and {@link #REINFORCE} tops up its
  *     garrison, both from its hex.</li>
  *     <li>{@link #BUILD} raises a new player-held Outpost on an empty hex.</li>
- *     <li>{@link #INTERDICT} ambushes the enemy's supply convoys on a road hex.</li>
+ *     <li>{@link #INTERDICT} ambushes the enemy's supply convoys on one of its supply routes.</li>
  *     <li>{@link #SIEGE} surrounds an enemy facility from a hex next to it, wearing its garrison down week by
  *     week.</li>
  * </ul>
@@ -57,7 +57,7 @@ public enum FacilityOperation {
     FORTIFY(false, false),
     REINFORCE(false, false),
     BUILD(false, false),
-    /** Ambush the enemy's supply convoys on a road hex, cutting their supply line through it if won. */
+    /** Ambush the enemy's supply convoys on one of its supply routes, cutting the route through the hex if won. */
     INTERDICT(true, false),
     /** Besiege an enemy facility from a hex next to it, until it surrenders or the siege is broken or lifted. */
     SIEGE(false, true);

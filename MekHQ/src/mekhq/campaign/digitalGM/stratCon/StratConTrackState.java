@@ -50,6 +50,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConSupplyNetwork;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.utilities.MHQXMLUtility;
@@ -106,6 +107,8 @@ public class StratConTrackState {
     // supply lines; see StratConFacilitySupply
     private List<StratConRoadCut> roadCuts;
     private Set<StratConCoords> cutOffFacilities;
+    private StratConSupplyNetwork playerSupplyNetwork;
+    private StratConSupplyNetwork enemySupplyNetwork;
 
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
@@ -148,6 +151,8 @@ public class StratConTrackState {
         facilityOrders = new ArrayList<>();
         roadCuts = new ArrayList<>();
         cutOffFacilities = new HashSet<>();
+        playerSupplyNetwork = new StratConSupplyNetwork();
+        enemySupplyNetwork = new StratConSupplyNetwork();
     }
 
     public String getDisplayableName() {
@@ -810,8 +815,8 @@ public class StratConTrackState {
 
     /**
      * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
-     * Scenarios, facilities, points of interest, and assigned forces are left untouched; road cuts and the cut-off
-     * record are cleared, since they belong to the old road network.
+     * Scenarios, facilities, points of interest, and assigned forces are left untouched; road cuts, the cut-off record,
+     * and both sides' supply routes are cleared, since they belong to the old road network.
      */
     public void clearForRegeneration() {
         terrainTypes.clear();
@@ -819,9 +824,11 @@ public class StratConTrackState {
         roads.clear();
         roadExits.clear();
         revealedCoords.clear();
-        // Both are keyed to the old road network and supply picture, which no longer exist
+        // All are keyed to the old road network and supply picture, which no longer exist
         roadCuts.clear();
         cutOffFacilities.clear();
+        playerSupplyNetwork.clear();
+        enemySupplyNetwork.clear();
     }
 
     /**
@@ -840,6 +847,9 @@ public class StratConTrackState {
         revealedCoords.removeIf(this::isOutOfBounds);
         roadCuts.removeIf(roadCut -> isOutOfBounds(roadCut.getCoords()));
         cutOffFacilities.removeIf(this::isOutOfBounds);
+        // Routes that ran off the edge are laid again the next time supply is checked.
+        playerSupplyNetwork.removeHexes(this::isOutOfBounds);
+        enemySupplyNetwork.removeHexes(this::isOutOfBounds);
     }
 
     /**
@@ -942,6 +952,49 @@ public class StratConTrackState {
 
     public void setCutOffFacilities(Set<StratConCoords> cutOffFacilities) {
         this.cutOffFacilities = (cutOffFacilities == null) ? new HashSet<>() : cutOffFacilities;
+    }
+
+    /**
+     * @return the supply routes of the player's side, which the employer's facilities share (mutable); see
+     *       {@code StratConFacilitySupply}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElement(name = "playerSupplyNetwork")
+    public StratConSupplyNetwork getPlayerSupplyNetwork() {
+        return playerSupplyNetwork;
+    }
+
+    public void setPlayerSupplyNetwork(StratConSupplyNetwork playerSupplyNetwork) {
+        this.playerSupplyNetwork = (playerSupplyNetwork == null) ? new StratConSupplyNetwork() : playerSupplyNetwork;
+    }
+
+    /**
+     * @return the supply routes of the enemy's side (mutable); see {@code StratConFacilitySupply}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElement(name = "enemySupplyNetwork")
+    public StratConSupplyNetwork getEnemySupplyNetwork() {
+        return enemySupplyNetwork;
+    }
+
+    public void setEnemySupplyNetwork(StratConSupplyNetwork enemySupplyNetwork) {
+        this.enemySupplyNetwork = (enemySupplyNetwork == null) ? new StratConSupplyNetwork() : enemySupplyNetwork;
+    }
+
+    /**
+     * @param isPlayerSide {@code true} for the player's side, {@code false} for the enemy's
+     *
+     * @return that side's supply routes (mutable)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConSupplyNetwork getSupplyNetwork(boolean isPlayerSide) {
+        return isPlayerSide ? playerSupplyNetwork : enemySupplyNetwork;
     }
 
     /**

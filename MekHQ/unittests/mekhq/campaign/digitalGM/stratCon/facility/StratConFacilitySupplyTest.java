@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon.facility;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,17 +48,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,8 +71,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests supply lines: which facilities a side's supply reaches, when a facility is cut off, what being cut off costs,
- * cutting a road, and the Interdict Supply order that does it.
+ * Tests supply lines: how each side's supply routes are laid and kept, when a facility is cut off, what being cut off
+ * costs, cutting a route, and the Interdict Supply order that does it.
  *
  * @author Illiani
  * @since 0.51.01
@@ -123,103 +128,235 @@ class StratConFacilitySupplyTest {
         return facility;
     }
 
+    /** Brings the routes up to date and checks supply, as the daily step does. */
+    private Set<StratConCoords> checkSupply() {
+        StratConFacilitySupply.reconcileNetworks(track);
+        return StratConFacilitySupply.updateCutOffFacilities(track);
+    }
+
+    /** Floods every hex but the road and its far end, so nothing can go around the road. */
+    private void floodAllButTheRoad() {
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (!track.isRoad(coords) && !coords.equals(roadEnd)) {
+                    track.setTerrainTile(coords, "Sea");
+                }
+            }
+        }
+    }
+
     @Nested
-    class Reach {
+    class Routes {
         @Test
         void aFacilityAtTheEndOfARoadLeavingTheSectorIsOnTheSupplyLines() {
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
 
-            assertTrue(StratConFacilitySupply.updateCutOffFacilities(track).isEmpty());
+            assertTrue(checkSupply().isEmpty());
             assertTrue(facility.isNetworked());
         }
 
         @Test
-        void cuttingTheRoadCutsOffAnEnemyFacilityThatWasOnIt() {
-            StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
-            StratConFacilitySupply.updateCutOffFacilities(track);
-
-            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
-
-            assertEquals(java.util.Set.of(roadEnd), StratConFacilitySupply.updateCutOffFacilities(track));
-            assertTrue(facility.isNetworked());
-        }
-
-        @Test
-        void aRoadCutDoesNotBlockThePlayersSide() {
-            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
-            StratConFacilitySupply.updateCutOffFacilities(track);
-
-            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
-
-            assertTrue(StratConFacilitySupply.updateCutOffFacilities(track).isEmpty());
-        }
-
-        @Test
-        void theOtherSidesFacilityOnTheRoadBlocksIt() {
+        void aRouteKeepsToTheRoad() {
             place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
-            StratConFacilitySupply.updateCutOffFacilities(track);
 
-            track.getRoads().remove(road[1]);
-            place(road[1], ForceAlignment.Player, FacilityType.TankBase);
+            checkSupply();
 
-            assertTrue(StratConFacilitySupply.updateCutOffFacilities(track).contains(roadEnd));
+            assertEquals(List.of(roadEnd, road[2], road[1], road[0]),
+                  track.getEnemySupplyNetwork().routeFrom(roadEnd));
         }
 
         @Test
-        void aFacilityNeverOnTheSupplyLinesSuppliesItself() {
+        void aFacilityOffTheRoadsIsStillJoinedToTheSupplyLines() {
             StratConCoords faraway = new StratConCoords(2, 2);
             StratConFacility facility = place(faraway, ForceAlignment.Opposing, FacilityType.MekBase);
 
-            assertTrue(StratConFacilitySupply.updateCutOffFacilities(track).isEmpty());
+            assertTrue(checkSupply().isEmpty());
+            assertTrue(facility.isNetworked());
+            assertTrue(track.getEnemySupplyNetwork().isRouted(faraway));
+        }
+
+        @Test
+        void aFacilityNoRouteCanReachIsCutOff() {
+            StratConCoords island = new StratConCoords(2, 2);
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, island)) {
+                track.setTerrainTile(neighbor, "Sea");
+            }
+            StratConFacility facility = place(island, ForceAlignment.Opposing, FacilityType.MekBase);
+
+            assertEquals(Set.of(island), checkSupply());
             assertFalse(facility.isNetworked());
         }
 
         @Test
-        void aSupplyDepotReachesItsSidesFacilitiesWithinThreeHexes() {
+        void aSupplyDepotLinksItsSidesFacilitiesWithinThreeHexesStraightToItself() {
             place(roadEnd, ForceAlignment.Opposing, FacilityType.SupplyDepot);
             StratConCoords nearby = roadEnd.translate(ROAD_DIRECTION).translate(ROAD_DIRECTION)
                                           .translate(ROAD_DIRECTION);
-            // Four hexes out the other way, so no supplied facility stands next to it to pass supply on.
             int otherWay = ROAD_DIRECTION + 2;
             StratConCoords tooFar = roadEnd.translate(otherWay).translate(otherWay).translate(otherWay)
                                           .translate(otherWay);
-            StratConFacility reached = place(nearby, ForceAlignment.Opposing, FacilityType.MekBase);
-            StratConFacility unreached = place(tooFar, ForceAlignment.Opposing, FacilityType.TankBase);
+            place(nearby, ForceAlignment.Opposing, FacilityType.MekBase);
+            place(tooFar, ForceAlignment.Opposing, FacilityType.TankBase);
 
-            StratConFacilitySupply.updateCutOffFacilities(track);
+            checkSupply();
 
-            assertTrue(reached.isNetworked());
-            assertFalse(unreached.isNetworked());
+            StratConSupplyNetwork network = track.getEnemySupplyNetwork();
+            assertEquals(roadEnd, network.nextHex(nearby));
+            assertNotEquals(roadEnd, network.nextHex(tooFar));
+            assertTrue(network.isRouted(tooFar), "beyond the depot's reach, a route is laid as for any facility");
+        }
+
+        @Test
+        void aDepotOfTheOtherSideSuppliesNothingOfYours() {
+            place(roadEnd, ForceAlignment.Player, FacilityType.SupplyDepot);
+            StratConCoords nearby = roadEnd.translate(ROAD_DIRECTION + 1).translate(ROAD_DIRECTION + 1);
+            place(nearby, ForceAlignment.Opposing, FacilityType.MekBase);
+
+            checkSupply();
+
+            assertFalse(track.getEnemySupplyNetwork().routeFrom(nearby).contains(roadEnd));
         }
 
         @Test
         void aCommandCenterIsASourceOfItsOwnSupply() {
             track.getRoadExits().clear();
-            place(road[0].translate(ROAD_DIRECTION + 3), ForceAlignment.Opposing, FacilityType.CommandCenter);
+            StratConCoords commandCenter = road[0].translate(ROAD_DIRECTION + 3);
+            place(commandCenter, ForceAlignment.Opposing, FacilityType.CommandCenter);
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
 
-            StratConFacilitySupply.updateCutOffFacilities(track);
-
+            assertTrue(checkSupply().isEmpty());
             assertTrue(facility.isNetworked());
+            assertTrue(track.getEnemySupplyNetwork().isRoot(commandCenter));
         }
 
         @Test
-        void changingSidesTakesAFacilityOffTheSupplyLines() {
-            StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
-            StratConFacilitySupply.updateCutOffFacilities(track);
+        void theEmployersAndThePlayersFacilitiesShareSupplyLines() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            StratConCoords beyond = roadEnd.translate(ROAD_DIRECTION);
+            StratConFacility playerFacility = place(beyond, ForceAlignment.Player, FacilityType.TankBase);
 
-            facility.setOwner(ForceAlignment.Player);
+            checkSupply();
 
-            assertFalse(facility.isNetworked());
+            assertTrue(playerFacility.isNetworked());
+            assertEquals(roadEnd, track.getPlayerSupplyNetwork().nextHex(beyond));
         }
 
         @Test
-        void aSectorWithoutRoadsCutsNothingOff() {
+        void aSectorWithoutRoadsKeepsNoRoutesAndCutsNothingOff() {
             track.getRoads().clear();
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
             facility.setNetworked(true);
 
-            assertTrue(StratConFacilitySupply.updateCutOffFacilities(track).isEmpty());
+            assertTrue(checkSupply().isEmpty());
+            assertTrue(track.getEnemySupplyNetwork().getLinks().isEmpty());
+        }
+
+        @Test
+        void aFacilityThatTurnsUpLaterIsJoinedWithoutTouchingTheRoads() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+            Set<StratConCoords> roadsBefore = new HashSet<>(track.getRoads());
+
+            StratConCoords later = new StratConCoords(3, 15);
+            place(later, ForceAlignment.Opposing, FacilityType.TankBase);
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            assertTrue(track.getEnemySupplyNetwork().isRouted(later));
+            assertEquals(roadsBefore, track.getRoads());
+        }
+
+        @Test
+        void anOldSaveWithNoRoutesHasThemLaidOnItsFirstCheck() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            assertTrue(track.getEnemySupplyNetwork().getLinks().isEmpty());
+
+            StratConFacilitySupply.processSupply(track, campaign, false);
+
+            assertTrue(track.getEnemySupplyNetwork().isRouted(roadEnd));
+        }
+
+        @Test
+        void rebuildingLaysTheRoutesAfresh() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            track.getEnemySupplyNetwork().addLink(new StratConCoords(1, 1), new StratConCoords(1, 2));
+
+            StratConFacilitySupply.rebuildNetworks(track);
+
+            assertFalse(track.getEnemySupplyNetwork().contains(new StratConCoords(1, 1)));
+            assertTrue(track.getEnemySupplyNetwork().isRouted(roadEnd));
+        }
+    }
+
+    @Nested
+    class Blocking {
+        @Test
+        void aCutAnywhereOnTheRouteCutsOffEverythingBeyondIt() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            StratConCoords beyond = roadEnd.translate(ROAD_DIRECTION);
+            place(beyond, ForceAlignment.Opposing, FacilityType.TankBase);
+            checkSupply();
+
+            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
+
+            assertEquals(Set.of(roadEnd, beyond), checkSupply());
+        }
+
+        @Test
+        void noRouteIsLaidAroundACut() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
+            checkSupply();
+
+            assertTrue(track.getEnemySupplyNetwork().routeFrom(roadEnd).contains(road[1]));
+        }
+
+        @Test
+        void aRoadCutDoesNotBlockThePlayersSide() {
+            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
+            checkSupply();
+
+            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
+
+            assertTrue(checkSupply().isEmpty());
+        }
+
+        @Test
+        void aRouteGoesAroundAFacilityTheOtherSideTakesOnIt() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            place(road[1], ForceAlignment.Player, FacilityType.TankBase);
+
+            assertFalse(checkSupply().contains(roadEnd));
+            assertFalse(track.getEnemySupplyNetwork().routeFrom(roadEnd).contains(road[1]));
+        }
+
+        @Test
+        void aFacilityTheOtherSideTakesWithNoWayAroundCutsOffEverythingBeyondIt() {
+            floodAllButTheRoad();
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            place(road[1], ForceAlignment.Player, FacilityType.TankBase);
+
+            assertTrue(checkSupply().contains(roadEnd));
+        }
+
+        @Test
+        void aFacilityThatChangesSidesLeavesItsOldSidesRoutesForItsNewSidesOnes() {
+            StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            facility.setOwner(ForceAlignment.Player);
+            assertFalse(facility.isNetworked());
+            checkSupply();
+
+            assertFalse(track.getEnemySupplyNetwork().contains(roadEnd));
+            assertTrue(track.getPlayerSupplyNetwork().isRouted(roadEnd));
+            assertTrue(facility.isNetworked());
         }
     }
 
@@ -294,24 +431,49 @@ class StratConFacilitySupplyTest {
 
         @BeforeEach
         void setUpContract() {
-            mekhq.campaign.digitalGM.stratCon.StratConCampaignState campaignState =
-                  new mekhq.campaign.digitalGM.stratCon.StratConCampaignState();
+            StratConCampaignState campaignState = new StratConCampaignState();
             campaignState.addTrack(track);
             campaignState.setSupportPoints(5);
             contract = mock(AbstractContract.class);
             when(contract.getStratConCampaignState()).thenReturn(campaignState);
+
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+            track.getRevealedCoords().add(road[1]);
+            track.getRevealedCoords().add(road[2]);
         }
 
         @Test
-        void aRoadHexOffersInterdictSupplyAndAnOpenHexDoesNot() {
+        void aScoutedHexOnAnEnemyRouteOffersInterdictSupplyAndAnOpenHexDoesNot() {
             assertTrue(StratConFacilityOperations.getOperationsFor(track, road[1])
                              .contains(FacilityOperation.INTERDICT));
-            assertFalse(StratConFacilityOperations.getOperationsFor(track, new StratConCoords(1, 1))
+
+            StratConCoords openHex = new StratConCoords(1, 1);
+            track.getRevealedCoords().add(openHex);
+            assertFalse(StratConFacilityOperations.getOperationsFor(track, openHex)
                               .contains(FacilityOperation.INTERDICT));
         }
 
         @Test
-        void itCanBeGivenOnARoadOnlyWhileSupplyLinesAreInUseAndTheRoadIsNotCut() {
+        void anUnscoutedHexOnAnEnemyRouteGivesNothingAway() {
+            track.getRevealedCoords().remove(road[1]);
+
+            assertFalse(StratConFacilityOperations.getOperationsFor(track, road[1])
+                              .contains(FacilityOperation.INTERDICT));
+            assertEquals("reason.notSupplyRoute", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract, track, road[1], FacilityOperation.INTERDICT));
+        }
+
+        @Test
+        void aRoadNoEnemyRouteUsesIsNotAnEnemySupplyRoute() {
+            track.getEnemySupplyNetwork().clear();
+
+            assertEquals("reason.notSupplyRoute", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract, track, road[1], FacilityOperation.INTERDICT));
+        }
+
+        @Test
+        void itCanBeGivenOnlyWhileSupplyLinesAreInUseAndTheRouteIsNotCut() {
             assertNull(StratConFacilityOperations.getUnavailableReasonKey(campaign, contract, track, road[1],
                   FacilityOperation.INTERDICT));
 
@@ -338,19 +500,19 @@ class StratConFacilitySupplyTest {
     class AwkwardCases {
         @Test
         void aCutOffFacilityThatChangesSidesIsNotReportedAsBackOnItsSupplyLines() {
-            StratConCoords offRoad = roadEnd.translate(ROAD_DIRECTION).translate(ROAD_DIRECTION);
-            StratConFacility facility = place(offRoad, ForceAlignment.Opposing, FacilityType.MekBase);
-            facility.setNetworked(true);
+            StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
             facility.setIntel(StratConFacility.FacilityIntel.LOCATED);
             StratConFacilitySupply.processSupply(track, campaign, false);
-            assertTrue(StratConFacilitySupply.isCutOff(track, offRoad));
+            track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
+            StratConFacilitySupply.processSupply(track, campaign, false);
+            assertTrue(StratConFacilitySupply.isCutOff(track, roadEnd));
 
             facility.setOwner(ForceAlignment.Player);
             clearInvocations(campaign);
             StratConFacilitySupply.processSupply(track, campaign, false);
 
-            assertFalse(StratConFacilitySupply.isCutOff(track, offRoad));
-            verify(campaign, never()).addReport(any(), eq(reconnectedReport(facility, offRoad)));
+            assertFalse(StratConFacilitySupply.isCutOff(track, roadEnd));
+            verify(campaign, never()).addReport(any(), eq(reconnectedReport(facility, roadEnd)));
         }
 
         @Test
@@ -385,12 +547,12 @@ class StratConFacilitySupplyTest {
         @Test
         void starvingNeverDestroysAFacility() {
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
-            facility.setNetworked(true);
             facility.setCondition(FacilityCondition.CRIPPLED);
             track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(5)));
 
             StratConFacilitySupply.processSupply(track, campaign, true);
 
+            assertTrue(StratConFacilitySupply.isCutOff(track, roadEnd));
             assertEquals(FacilityCondition.CRIPPLED, facility.getCondition());
             assertEquals(facility, track.getFacility(roadEnd));
         }
@@ -402,28 +564,6 @@ class StratConFacilitySupplyTest {
             StratConFacilitySupply.processSupply(track, campaign, true);
 
             assertEquals(FacilityCondition.INTACT, supplied.getCondition());
-        }
-
-        @Test
-        void theEmployersAndThePlayersFacilitiesShareSupplyLines() {
-            place(roadEnd, ForceAlignment.Allied, FacilityType.MekBase);
-            StratConCoords beyond = roadEnd.translate(ROAD_DIRECTION);
-            StratConFacility playerFacility = place(beyond, ForceAlignment.Player, FacilityType.TankBase);
-
-            StratConFacilitySupply.updateCutOffFacilities(track);
-
-            assertTrue(playerFacility.isNetworked());
-        }
-
-        @Test
-        void aDepotOfTheOtherSideSuppliesNothingOfYours() {
-            place(roadEnd, ForceAlignment.Player, FacilityType.SupplyDepot);
-            StratConCoords nearby = roadEnd.translate(ROAD_DIRECTION + 1).translate(ROAD_DIRECTION + 1);
-            StratConFacility enemy = place(nearby, ForceAlignment.Opposing, FacilityType.MekBase);
-
-            StratConFacilitySupply.updateCutOffFacilities(track);
-
-            assertFalse(enemy.isNetworked());
         }
     }
 }

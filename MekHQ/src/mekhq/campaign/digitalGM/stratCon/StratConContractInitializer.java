@@ -66,6 +66,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
@@ -2075,6 +2076,10 @@ public class StratConContractInitializer {
      * or razed does not tear it up - and because this rebuilds the entire network from scratch, calling it
      * mid-campaign could redraw roads far from the facility that changed.</p>
      *
+     * <p>Both sides' supply routes follow the roads, so they are laid afresh here too (see
+     * {@link StratConFacilitySupply#rebuildNetworks}). A facility that comes or goes later is joined to, or dropped
+     * from, the routes as they stand instead.</p>
+     *
      * @param track    the track whose road network to refresh
      * @param contract the contract (source of the planet and the employer/enemy factions)
      * @param campaign the campaign, for the current date and options
@@ -2084,6 +2089,7 @@ public class StratConContractInitializer {
         StratConGMs.sectorGeneration(campaign.getCampaignOptions())
               .connectFacilitiesToRoads(track,
                     planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
+        StratConFacilitySupply.rebuildNetworks(track);
     }
 
     /**

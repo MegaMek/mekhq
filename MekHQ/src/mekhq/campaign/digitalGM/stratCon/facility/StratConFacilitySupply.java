@@ -36,9 +36,10 @@ import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,23 +50,32 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Pathing;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.StepCost;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
- * Supply lines: the road network, read as the routes that keep each side's facilities supplied.
+ * Supply lines: the routes that keep each side's facilities supplied.
  *
- * <p>Each side's supply starts from its sources: its Comms Centers, Bases of Operations and Space Ports, and every
- * road that leaves the sector. It runs along road hexes and through that side's own facilities, and jumps from each of
- * that side's Supply Depots to that side's facilities within {@value #DEPOT_RANGE} hexes. The other side's facilities
- * block it, and so does a road hex where the player has cut the enemy's supply (see {@link StratConRoadCut}), for the
- * enemy only.</p>
+ * <p>Each side has a supply network on each sector (see {@link StratConSupplyNetwork}): a route from every one of its
+ * facilities back to a source of its supply. Its sources are its Comms Centers, Bases of Operations and Space Ports,
+ * and every road that leaves the sector. Routes are laid by the same search that lays the roads, at the costs of
+ * {@link StratConRoadPlacer#supplyRouteCost}: they keep to the roads where those serve and strike out across country
+ * where they don't, but never pass through a facility the other side holds. Each of a side's Supply Depots on its
+ * network also links that side's facilities within {@value #DEPOT_RANGE} hexes straight to itself, without a road.</p>
  *
- * <p>A facility its side's supply reaches is Connected, and is marked as on the supply lines. One that was on them but
- * is no longer reached is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month. A
- * facility never on the supply lines supplies itself, so there is nothing to cut.</p>
+ * <p>Routes are laid once and kept. A facility that turns up, or changes sides, is joined to its side's network by the
+ * cheapest way there. A facility taken by the other side, or a source that is lost, sends every route that ran through
+ * it the long way round, since that loss lasts. A cut does not: no route is laid around a hex where the player has cut
+ * the enemy's supply (see {@link StratConRoadCut}), so a cut anywhere on a route blocks everything beyond it.</p>
  *
- * <p>Supply lines apply only with the improved sector generator, which lays roads, and only while the "Supply Lines"
- * option is on. A sector with no roads has none either.</p>
+ * <p>A facility whose route reaches a source unblocked is Connected. One whose route is blocked, or that has no route
+ * at all, is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month.</p>
+ *
+ * <p>Supply lines apply only with the improved sector generator, and only while the "Supply Lines" option is on. A
+ * sector with no roads has none either.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -113,8 +123,167 @@ public final class StratConFacilitySupply {
     }
 
     /**
-     * Works out which facilities in a sector are cut off, marking every facility its side's supply reaches as on the
-     * supply lines.
+     * Lays both sides' supply routes in a sector afresh, from nothing. Call when the sector itself is laid out - when
+     * its roads are laid or relaid - since the routes follow the roads; anything else only needs
+     * {@link #reconcileNetworks}.
+     *
+     * @param track the sector
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void rebuildNetworks(StratConTrackState track) {
+        track.getPlayerSupplyNetwork().clear();
+        track.getEnemySupplyNetwork().clear();
+        reconcileNetworks(track);
+    }
+
+    /**
+     * Brings both sides' supply routes in a sector up to date with the facilities now on it, changing only what has to
+     * change:
+     *
+     * <ul>
+     *     <li>the roots become the side's sources as they now stand;</li>
+     *     <li>routes through a hex the other side now holds are dropped, as are routes that no longer lead from one of
+     *     the side's facilities to a root;</li>
+     *     <li>every facility of the side left without a route is joined to the network, if a way can be found.</li>
+     * </ul>
+     *
+     * <p>Cuts are left alone: they block a route without changing it. A sector with no roads keeps no routes.</p>
+     *
+     * @param track the sector
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void reconcileNetworks(StratConTrackState track) {
+        reconcileNetwork(track, true);
+        reconcileNetwork(track, false);
+    }
+
+    private static void reconcileNetwork(StratConTrackState track, boolean isPlayerSide) {
+        StratConSupplyNetwork network = track.getSupplyNetwork(isPlayerSide);
+        if (track.getRoads().isEmpty()) {
+            network.clear();
+            return;
+        }
+
+        network.replaceRoots(getSourceHexes(track, isPlayerSide));
+        // What the other side now holds is lost to this one for good, so the routes through it are laid again.
+        network.removeHexes(coords -> isHeldByOtherSide(track, coords, isPlayerSide));
+
+        List<StratConCoords> facilityHexes = getFacilityHexes(track, isPlayerSide);
+        network.retainRoutesFrom(facilityHexes);
+        connectUnroutedFacilities(track, network, facilityHexes, isPlayerSide);
+    }
+
+    /**
+     * @return the hexes a side's supply starts from: its sources, and every road exit the other side doesn't hold
+     */
+    private static Set<StratConCoords> getSourceHexes(StratConTrackState track, boolean isPlayerSide) {
+        Set<StratConCoords> sources = new HashSet<>();
+        for (StratConCoords roadExit : track.getRoadExits()) {
+            if (!isHeldByOtherSide(track, roadExit, isPlayerSide)) {
+                sources.add(roadExit);
+            }
+        }
+        for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
+            StratConFacility facility = entry.getValue();
+            if (isOnSide(facility, isPlayerSide)
+                      && !facility.isDefinitionMissing()
+                      && isSupplySource(facility.getFacilityType())) {
+                sources.add(entry.getKey());
+            }
+        }
+        return sources;
+    }
+
+    private static List<StratConCoords> getFacilityHexes(StratConTrackState track, boolean isPlayerSide) {
+        List<StratConCoords> facilityHexes = new ArrayList<>();
+        for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
+            if (isOnSide(entry.getValue(), isPlayerSide)) {
+                facilityHexes.add(entry.getKey());
+            }
+        }
+        return facilityHexes;
+    }
+
+    /**
+     * Joins each of a side's facilities that has no route to the network, nearest first, as the roads join cities
+     * (Prim's): Supply Depot links first, since they cost nothing, then the cheapest way from the network as it stands
+     * to the nearest facility still without a route, again and again. A facility no way reaches is left without one.
+     */
+    private static void connectUnroutedFacilities(StratConTrackState track, StratConSupplyNetwork network,
+          List<StratConCoords> facilityHexes, boolean isPlayerSide) {
+        Set<StratConCoords> unrouted = new LinkedHashSet<>();
+        for (StratConCoords facilityHex : facilityHexes) {
+            if (!network.isRouted(facilityHex)) {
+                unrouted.add(facilityHex);
+            }
+        }
+
+        StepCost stepCost = StratConRoadPlacer.supplyRouteCost(track,
+              coords -> isHeldByOtherSide(track, coords, isPlayerSide));
+        while (!unrouted.isEmpty()) {
+            linkToSupplyDepots(track, network, unrouted, isPlayerSide);
+            if (unrouted.isEmpty()) {
+                break;
+            }
+
+            List<StratConCoords> networkHexes = new ArrayList<>(network.hexes());
+            if (networkHexes.isEmpty()) {
+                break;
+            }
+
+            Pathing pathing = StratConPathfinder.pathfind(track, networkHexes, stepCost);
+            StratConCoords nearest = pathing.nearest(unrouted);
+            if (nearest == null) {
+                break;
+            }
+
+            // The path runs from the facility back to the network, the way its supply links point.
+            List<StratConCoords> path = pathing.pathTo(nearest);
+            for (int step = 0; step < (path.size() - 1); step++) {
+                network.addLink(path.get(step), path.get(step + 1));
+            }
+            // The new route may have passed through others of the side's facilities on its way.
+            unrouted.removeIf(network::isRouted);
+        }
+    }
+
+    /**
+     * Links every facility still without a route that lies within {@value #DEPOT_RANGE} hexes of one of its side's
+     * Supply Depots on the network straight to that depot, until no more can be linked.
+     */
+    private static void linkToSupplyDepots(StratConTrackState track, StratConSupplyNetwork network,
+          Set<StratConCoords> unrouted, boolean isPlayerSide) {
+        boolean isLinked = true;
+        while (isLinked && !unrouted.isEmpty()) {
+            isLinked = false;
+            for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
+                StratConFacility depot = entry.getValue();
+                StratConCoords depotCoords = entry.getKey();
+                if (!isOnSide(depot, isPlayerSide)
+                          || depot.isDefinitionMissing()
+                          || (depot.getFacilityType() != FacilityType.SupplyDepot)
+                          || !network.isRouted(depotCoords)) {
+                    continue;
+                }
+
+                for (StratConCoords nearby : StratConHexGeometry.withinRadius(track, depotCoords, DEPOT_RANGE)) {
+                    if (unrouted.remove(nearby)) {
+                        network.addLink(nearby, depotCoords);
+                        isLinked = true;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Works out which facilities in a sector are cut off, marking every facility with a route to one of its side's
+     * roots as on the supply lines. Reads the routes as they stand; {@link #processSupply} brings them up to date
+     * first.
      *
      * @param track the sector
      *
@@ -129,22 +298,21 @@ public final class StratConFacilitySupply {
             return cutOff;
         }
 
-        Set<StratConCoords> playerSupplied = getSuppliedHexes(track, true);
-        Set<StratConCoords> enemySupplied = getSuppliedHexes(track, false);
         for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
             StratConFacility facility = entry.getValue();
-            Set<StratConCoords> supplied;
+            boolean isPlayerSide;
             if (facility.isOwnerAlliedToPlayer()) {
-                supplied = playerSupplied;
+                isPlayerSide = true;
             } else if (facility.getOwner() == ForceAlignment.Opposing) {
-                supplied = enemySupplied;
+                isPlayerSide = false;
             } else {
                 continue;
             }
 
-            if (supplied.contains(entry.getKey())) {
+            if (track.getSupplyNetwork(isPlayerSide).isRouted(entry.getKey())) {
                 facility.setNetworked(true);
-            } else if (facility.isNetworked()) {
+            }
+            if (!isSupplied(track, entry.getKey(), isPlayerSide)) {
                 cutOff.add(entry.getKey());
             }
         }
@@ -153,66 +321,44 @@ public final class StratConFacilitySupply {
 
     /**
      * @param track        the sector
-     * @param isPlayerSide {@code true} for the player's side, {@code false} for the enemy's
+     * @param coords       a facility's hex
+     * @param isPlayerSide {@code true} if the facility is on the player's side, {@code false} if on the enemy's
      *
-     * @return every hex that side's supply reaches: road hexes, and that side's facilities
+     * @return {@code true} if the facility's route reaches one of its side's roots with nothing blocking it: no hex the
+     *       other side holds and, for the enemy, no hex where the player has cut its supply
+     */
+    static boolean isSupplied(StratConTrackState track, StratConCoords coords, boolean isPlayerSide) {
+        StratConSupplyNetwork network = track.getSupplyNetwork(isPlayerSide);
+        List<StratConCoords> route = network.routeFrom(coords);
+        if (!network.isRoot(route.get(route.size() - 1))) {
+            return false;
+        }
+
+        for (StratConCoords hex : route) {
+            if (isHeldByOtherSide(track, hex, isPlayerSide) || (!isPlayerSide && track.isRoadCut(hex))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param track        the sector
+     * @param coords       a hex
+     * @param isPlayerSide {@code true} for the player's side's routes, {@code false} for the enemy's
+     *
+     * @return {@code true} if one of that side's supply routes runs through the hex, or its supply starts there
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static Set<StratConCoords> getSuppliedHexes(StratConTrackState track, boolean isPlayerSide) {
-        Set<StratConCoords> supplied = new HashSet<>();
-        Deque<StratConCoords> frontier = new ArrayDeque<>();
-
-        for (StratConCoords roadExit : track.getRoadExits()) {
-            if (isPassable(track, roadExit, isPlayerSide) && supplied.add(roadExit)) {
-                frontier.add(roadExit);
-            }
-        }
-        for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
-            StratConFacility facility = entry.getValue();
-            if (isOnSide(facility, isPlayerSide)
-                      && !facility.isDefinitionMissing()
-                      && isSupplySource(facility.getFacilityType())
-                      && supplied.add(entry.getKey())) {
-                frontier.add(entry.getKey());
-            }
-        }
-
-        while (!frontier.isEmpty()) {
-            StratConCoords current = frontier.poll();
-            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, current)) {
-                if (!supplied.contains(neighbor) && isPassable(track, neighbor, isPlayerSide)) {
-                    supplied.add(neighbor);
-                    frontier.add(neighbor);
-                }
-            }
-
-            StratConFacility facility = track.getFacility(current);
-            if ((facility != null)
-                      && isOnSide(facility, isPlayerSide)
-                      && !facility.isDefinitionMissing()
-                      && (facility.getFacilityType() == FacilityType.SupplyDepot)) {
-                for (StratConCoords nearby : StratConHexGeometry.withinRadius(track, current, DEPOT_RANGE)) {
-                    StratConFacility nearbyFacility = track.getFacility(nearby);
-                    if ((nearbyFacility != null) && isOnSide(nearbyFacility, isPlayerSide) && supplied.add(nearby)) {
-                        frontier.add(nearby);
-                    }
-                }
-            }
-        }
-        return supplied;
+    public static boolean isOnSupplyNetwork(StratConTrackState track, StratConCoords coords, boolean isPlayerSide) {
+        return track.getSupplyNetwork(isPlayerSide).contains(coords);
     }
 
-    private static boolean isPassable(StratConTrackState track, StratConCoords coords, boolean isPlayerSide) {
+    private static boolean isHeldByOtherSide(StratConTrackState track, StratConCoords coords, boolean isPlayerSide) {
         StratConFacility facility = track.getFacility(coords);
-        if (facility != null) {
-            return isOnSide(facility, isPlayerSide);
-        }
-        if (!track.isRoad(coords)) {
-            return false;
-        }
-        return isPlayerSide || !track.isRoadCut(coords);
+        return (facility != null) && !isOnSide(facility, isPlayerSide);
     }
 
     private static boolean isOnSide(StratConFacility facility, boolean isPlayerSide) {
@@ -220,9 +366,10 @@ public final class StratConFacilitySupply {
     }
 
     /**
-     * The daily supply step for a sector: ends road cuts whose time is up, works out which facilities are cut off,
-     * reports those newly cut off or reconnected that the player can see, and at the start of a month costs every cut
-     * off facility a condition step. With supply lines out of use, no facility is cut off.
+     * The daily supply step for a sector: ends road cuts whose time is up, brings the supply routes up to date, works
+     * out which facilities are cut off, reports those newly cut off or reconnected that the player can see, and at the
+     * start of a month costs every cut off facility a condition step. With supply lines out of use, no facility is cut
+     * off.
      *
      * @param track          the sector
      * @param campaign       the current campaign
@@ -240,17 +387,27 @@ public final class StratConFacilitySupply {
             return;
         }
 
-        Set<StratConCoords> cutOff = updateCutOffFacilities(track);
+        reconcileNetworks(track);
+
+        // Only a facility still with the side it was cut off on can be back on its supply lines: changing sides clears
+        // its mark, so it must be read before the check below sets the mark afresh.
         Set<StratConCoords> previouslyCutOff = track.getCutOffFacilities();
+        Set<StratConCoords> stillOnSameSide = new HashSet<>();
+        for (StratConCoords coords : previouslyCutOff) {
+            StratConFacility facility = track.getFacility(coords);
+            if ((facility != null) && facility.isNetworked()) {
+                stillOnSameSide.add(coords);
+            }
+        }
+
+        Set<StratConCoords> cutOff = updateCutOffFacilities(track);
         for (StratConCoords coords : cutOff) {
             if (!previouslyCutOff.contains(coords)) {
                 reportFacility(campaign, track, coords, "report.cutOff");
             }
         }
-        for (StratConCoords coords : previouslyCutOff) {
-            StratConFacility facility = track.getFacility(coords);
-            // One that has changed sides since is no longer on the supply lines it was cut from, so it is not back.
-            if (!cutOff.contains(coords) && (facility != null) && facility.isNetworked()) {
+        for (StratConCoords coords : stillOnSameSide) {
+            if (!cutOff.contains(coords)) {
                 reportFacility(campaign, track, coords, "report.reconnected");
             }
         }
@@ -280,12 +437,12 @@ public final class StratConFacilitySupply {
     }
 
     /**
-     * Cuts the enemy's supply through a road hex for {@value #ROAD_CUT_DAYS} days, after the player wins a fight over
-     * the enemy's convoys there. Cutting a hex already cut starts its time again.
+     * Cuts the enemy's supply through a hex on its supply routes for {@value #ROAD_CUT_DAYS} days, after the player
+     * wins a fight over the enemy's convoys there. Cutting a hex already cut starts its time again.
      *
      * @param campaign the current campaign
      * @param track    the sector
-     * @param coords   the road hex
+     * @param coords   the hex
      *
      * @author Illiani
      * @since 0.51.01

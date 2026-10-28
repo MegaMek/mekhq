@@ -53,6 +53,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConSupplyNetwork;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -205,5 +206,38 @@ class StratConFacilitySaveTest {
 
         assertEquals(TODAY, reloadedState.getLastCounterattackDate());
         assertEquals(List.of(TODAY.plusDays(5)), reloadedState.getEnemyEngineerDates());
+    }
+
+    @Test
+    void theSupplyRoutesSurviveASave() throws Exception {
+        StratConTrackState track = new StratConTrackState();
+        track.setWidth(5);
+        track.setHeight(5);
+        StratConCoords between = new StratConCoords(2, 2);
+        track.getEnemySupplyNetwork().replaceRoots(List.of(ROAD_COORDS));
+        track.getEnemySupplyNetwork().addLink(FACILITY_COORDS, between);
+        track.getEnemySupplyNetwork().addLink(between, ROAD_COORDS);
+        track.getPlayerSupplyNetwork().replaceRoots(List.of(between));
+
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addTrack(track);
+
+        StratConTrackState reloadedTrack = saveAndLoad(campaignState).getTrack(0);
+
+        StratConSupplyNetwork enemyNetwork = reloadedTrack.getEnemySupplyNetwork();
+        assertEquals(List.of(FACILITY_COORDS, between, ROAD_COORDS), enemyNetwork.routeFrom(FACILITY_COORDS));
+        assertTrue(enemyNetwork.isRoot(ROAD_COORDS));
+        assertTrue(reloadedTrack.getPlayerSupplyNetwork().isRoot(between));
+        assertTrue(reloadedTrack.getPlayerSupplyNetwork().getLinks().isEmpty());
+    }
+
+    @Test
+    void anOldSaveLoadsWithNoSupplyRoutesYet() throws Exception {
+        StratConTrackState track = load(OLD_SAVE).getTrack(0);
+
+        assertNotNull(track.getPlayerSupplyNetwork());
+        assertNotNull(track.getEnemySupplyNetwork());
+        assertTrue(track.getEnemySupplyNetwork().getLinks().isEmpty());
+        assertTrue(track.getEnemySupplyNetwork().getRoots().isEmpty());
     }
 }
