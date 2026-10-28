@@ -180,7 +180,9 @@ public class ContractDebriefStatistics {
      *
      * <p>The win condition mirrors the game's own: the contract score must reach the required victory points (for a
      * contract without a positive target, a non-negative score, or no fighting at all, stands in). When that is met the
-     * contract is a success, whether it runs to term or ends early. When it is not met:</p>
+     * contract is a {@link MissionStatus#SUCCESS} - a Complete Success - whether it runs to term or ends early, so long
+     * as no strategic objective was failed; with one failed, it is only a {@link MissionStatus#PARTIAL}. When it is not
+     * met:</p>
      *
      * <ul>
      *   <li>ending the contract <em>early</em> is a {@link MissionStatus#BREACH} - its terms were abandoned before they
@@ -206,7 +208,8 @@ public class ContractDebriefStatistics {
         }
 
         if (meetsTarget) {
-            return MissionStatus.SUCCESS;
+            // A failed strategic objective - a lapsed Deployment Order, say - costs the contract its Complete Success.
+            return (objectivesFailed > 0) ? MissionStatus.PARTIAL : MissionStatus.SUCCESS;
         }
 
         // The contract's terms were not met.

@@ -34,22 +34,34 @@
 package mekhq.campaign.mission.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -178,6 +190,77 @@ public class ContractUtilitiesTest {
             }
         }
 
+    }
+
+    /** Tests for contracts on another world of the system the force is already in. */
+    @Nested
+    public class SameSystemContract {
+        PlanetarySystem system;
+        Planet homeWorld;
+        Planet contractWorld;
+        Campaign campaign;
+        AbstractContract contract;
+        AbstractLocation location;
+
+        @BeforeEach
+        void beforeEach() {
+            system = mock(PlanetarySystem.class);
+            homeWorld = mock(Planet.class);
+            contractWorld = mock(Planet.class);
+            when(homeWorld.getTimeToPlanet(contractWorld, 1.0)).thenReturn(3.5);
+
+            campaign = mock(Campaign.class);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+            when(campaign.calculateJumpPath(system, system)).thenAnswer(invocation -> {
+                JumpPath jumpPath = new JumpPath();
+                jumpPath.addSystem(system);
+                return jumpPath;
+            });
+
+            contract = mock(AbstractContract.class);
+            when(contract.getTargetSystem()).thenReturn(system);
+            when(contract.getTargetPlanet()).thenReturn(contractWorld);
+
+            location = mock(AbstractLocation.class);
+            when(location.getCurrentSystem()).thenReturn(system);
+            when(location.getPlanet()).thenReturn(homeWorld);
+        }
+
+        @Test
+        void aForceAtAWorldTransfersFromThatWorld() {
+            when(location.isOnPlanet()).thenReturn(true);
+
+            JumpPath jumpPath = ContractUtilities.getJumpPath(campaign, contract, location);
+
+            assertSame(homeWorld, jumpPath.getOriginPlanet());
+            assertTrue(jumpPath.isInSystemTransfer());
+            assertEquals(4, ContractUtilities.getTravelDays(campaign, contract, location, false,
+                  mock(FactionStandings.class)), "Travel time should be the 3.5 day transfer, rounded up");
+        }
+
+        @Test
+        void aForceAlreadyUnderwayHasNoDepartureWorld() {
+            when(location.isOnPlanet()).thenReturn(false);
+
+            JumpPath jumpPath = ContractUtilities.getJumpPath(campaign, contract, location);
+
+            assertNull(jumpPath.getOriginPlanet());
+            assertFalse(jumpPath.isInSystemTransfer());
+        }
+
+        @Test
+        void aCachedPathFromAnotherWorldIsReplotted() {
+            JumpPath stalePath = new JumpPath();
+            stalePath.addSystem(system);
+            stalePath.setOriginPlanet(mock(Planet.class));
+            stalePath.setTargetPlanet(contractWorld);
+            when(contract.getCachedJumpPathDirect()).thenReturn(stalePath);
+            when(location.isOnPlanet()).thenReturn(true);
+
+            JumpPath jumpPath = ContractUtilities.getJumpPath(campaign, contract, location);
+
+            assertSame(homeWorld, jumpPath.getOriginPlanet());
+        }
     }
 
     void newMockCombatTeams(int numberOfCombatTeams, int size, CombatRole combatRole, FormationType formationType) {

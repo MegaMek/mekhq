@@ -186,6 +186,83 @@ class JumpPathTest {
               "A path with a target planet should write its id: " + xml);
     }
 
+    @Test
+    void inSystemTransferNeedsOneSystemAndTwoDifferentWorlds() {
+        PlanetarySystem home = system("HOME", PRIMARY_TRANSIT);
+        Planet origin = mock(Planet.class);
+        Planet destination = mock(Planet.class);
+
+        JumpPath jumpPath = pathOf(home);
+        jumpPath.setTargetPlanet(destination);
+        assertFalse(jumpPath.isInSystemTransfer(), "Without a departure world this is an inbound leg");
+
+        jumpPath.setOriginPlanet(origin);
+        assertTrue(jumpPath.isInSystemTransfer());
+
+        jumpPath.setOriginPlanet(destination);
+        assertFalse(jumpPath.isInSystemTransfer(), "Departing for the world the fleet is already at goes nowhere");
+
+        JumpPath interstellar = pathOf(system("ORIGIN", ORIGIN_TRANSIT), home);
+        interstellar.setOriginPlanet(origin);
+        interstellar.setTargetPlanet(destination);
+        assertFalse(interstellar.isInSystemTransfer(), "A route with a jump is never an in-system transfer");
+    }
+
+    @Test
+    void getTotalTimeOfAnInSystemTransferIsTheDirectFlight() {
+        Planet origin = mock(Planet.class);
+        Planet destination = mock(Planet.class);
+        when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(3.5);
+        JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
+        jumpPath.setOriginPlanet(origin);
+        jumpPath.setTargetPlanet(destination);
+
+        assertEquals(3.5, jumpPath.getInSystemTransferTime(), 1.0e-9);
+        assertEquals(3.5, jumpPath.getTotalTime(TEST_DATE, 0.0, false), 1.0e-9);
+    }
+
+    @Test
+    void getTotalTimeOfAnInSystemTransferCountsDownOnceUnderway() {
+        Planet origin = mock(Planet.class);
+        Planet destination = mock(Planet.class);
+        when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(3.5);
+        JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
+        jumpPath.setOriginPlanet(origin);
+        jumpPath.setTargetPlanet(destination);
+
+        assertEquals(1.25, jumpPath.getTotalTime(TEST_DATE, 1.25, false), 1.0e-9);
+    }
+
+    @Test
+    void writeToXMLIncludesTheOriginPlanetOnlyWhenSet() {
+        JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
+        assertFalse(toXml(jumpPath).contains("originPlanetId"),
+              "A path with no departure world should not write an originPlanetId element");
+
+        Planet origin = mock(Planet.class);
+        when(origin.getId()).thenReturn("HOME-2");
+        jumpPath.setOriginPlanet(origin);
+
+        String xml = toXml(jumpPath);
+        assertTrue(xml.contains("<originPlanetId>HOME-2</originPlanetId>"),
+              "A path with a departure world should write its id: " + xml);
+    }
+
+    @Test
+    void refreshPlanetarySystemsRebindsTheDepartureWorld() {
+        Campaign campaign = mock(Campaign.class);
+        PlanetarySystem updatedHome = system("HOME", PRIMARY_TRANSIT);
+        Planet updatedOrigin = new Planet("origin");
+        when(campaign.getSystemById("HOME")).thenReturn(updatedHome);
+        when(updatedHome.getPlanetById("origin")).thenReturn(updatedOrigin);
+        JumpPath jumpPath = pathOf(system("HOME", PRIMARY_TRANSIT));
+        jumpPath.setOriginPlanet(new Planet("origin"));
+
+        jumpPath.refreshPlanetarySystems(campaign);
+
+        assertSame(updatedOrigin, jumpPath.getOriginPlanet());
+    }
+
     private static String toXml(final JumpPath jumpPath) {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {

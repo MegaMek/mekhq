@@ -834,6 +834,29 @@ public class Planet {
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
     }
 
+    /**
+     * @return the average travel time from low orbit around this planet to low orbit around {@code destination}, at
+     *       the given acceleration, in Terran days
+     */
+    public double getTimeToPlanet(Planet destination, double acceleration) {
+        // same constant-thrust, flip-at-midpoint formula as the jump point transit
+        return Math.sqrt((getDistanceToPlanet(destination) * 1000) / (StarUtil.G * acceleration)) / 43200;
+    }
+
+    /**
+     * Average distance between two planets of the same system, in km. Mirrors {@link #getDistanceToJumpPoint()} by
+     * treating the two orbits as being a quarter-turn apart, so planets sharing an orbit (or with no orbit radius on
+     * record) are still a meaningful distance apart.
+     *
+     * @return the average distance to {@code destination} in km
+     */
+    public double getDistanceToPlanet(Planet destination) {
+        if (equals(destination)) {
+            return 0;
+        }
+        return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(destination.getOrbitRadiusKm(), 2));
+    }
+
     public double getOrbitRadiusKm() {
         if (null == orbitRadius) {
             // TODO: figure out a better way to handle missing orbit radius (really this

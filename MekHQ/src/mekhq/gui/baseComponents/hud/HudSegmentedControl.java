@@ -100,13 +100,28 @@ public class HudSegmentedControl<T> extends JPanel {
      *
      * @param value   the value the segment stands for
      * @param title   the segment's title
-     * @param sub     the segment's sub-line, or {@code null} for none
-     * @param enabled {@code true} if the player may choose the segment
+     * @param sub      the segment's sub-line, or {@code null} for none
+     * @param enabled  {@code true} if the player may choose the segment
+     * @param subColor the sub-line's colour while the segment is enabled, for example to show money gained or spent;
+     *                 {@code null} for the usual muted text
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public record Segment<T>(T value, String title, @Nullable String sub, boolean enabled) {}
+    public record Segment<T>(T value, String title, @Nullable String sub, boolean enabled,
+          @Nullable Color subColor) {
+        /**
+         * A segment whose sub-line, if any, is drawn in the usual muted text.
+         *
+         * @param value   the value the segment stands for
+         * @param title   the segment's title
+         * @param sub     the segment's sub-line, or {@code null} for none
+         * @param enabled {@code true} if the player may choose the segment
+         */
+        public Segment(T value, String title, @Nullable String sub, boolean enabled) {
+            this(value, title, sub, enabled, null);
+        }
+    }
 
     /**
      * How a family of segmented controls looks and behaves.
@@ -274,6 +289,8 @@ public class HudSegmentedControl<T> extends JPanel {
         private final JLabel title;
         /** The sub-line under the title, or {@code null} for a segment without one. */
         private final JLabel sub;
+        /** The sub-line's colour while enabled, or {@code null} for the usual muted text. */
+        private final transient Color subColor;
         private boolean isCellEnabled;
         private boolean isHovered;
 
@@ -282,6 +299,7 @@ public class HudSegmentedControl<T> extends JPanel {
             this.hasRightBorder = hasRightBorder;
             this.hasBottomBorder = hasBottomBorder;
             this.isCellEnabled = segment.enabled();
+            this.subColor = segment.subColor();
             setOpaque(false);
             setFocusable(style.isDisabledCellFocusable() || isCellEnabled);
             setLayout(new GridBagLayout());
@@ -371,7 +389,11 @@ public class HudSegmentedControl<T> extends JPanel {
                 title.setForeground(isHovered ? TEXT : TEXT_MUTED);
             }
             if (sub != null) {
-                sub.setForeground(isCellEnabled ? TEXT_MUTED : TEXT_FAINT);
+                if (!isCellEnabled) {
+                    sub.setForeground(TEXT_FAINT);
+                } else {
+                    sub.setForeground((subColor == null) ? TEXT_MUTED : subColor);
+                }
             }
             repaint();
         }

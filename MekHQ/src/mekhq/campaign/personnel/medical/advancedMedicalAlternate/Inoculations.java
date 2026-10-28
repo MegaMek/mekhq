@@ -141,8 +141,8 @@ public class Inoculations {
         Set<Person> civilianPersonnelInNeedOfGenericInoculation = new HashSet<>();
         gatherPersonnelInNeedOfInoculations(allPersonnel,
               planetId,
-              militaryPersonnelInNeedOfGenericInoculation,
-              civilianPersonnelInNeedOfGenericInoculation);
+              civilianPersonnelInNeedOfGenericInoculation,
+              militaryPersonnelInNeedOfGenericInoculation);
 
         // Canon inoculations
         Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today,
@@ -248,7 +248,7 @@ public class Inoculations {
         inoculatePersonnel(today, personnel, currentPlanet);
     }
 
-    private static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
+    static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
           Collection<Person> allPersonnel,
           Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation,
           Map<String, Set<Person>> militaryPersonnelInNeedOfCanonInoculation) {
@@ -257,8 +257,12 @@ public class Inoculations {
             Set<Person> civilianInNeedOfInoculation = new HashSet<>();
 
             for (Person person : allPersonnel) {
+                if (person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
+                    continue;
+                }
+
                 if (!person.hasCanonDiseaseInoculation(inoculationType.getKey())) {
-                    if (person.isCivilian()) {
+                    if (isCivilianForInoculation(person)) {
                         civilianInNeedOfInoculation.add(person);
                     } else {
                         combatantInNeedOfInoculation.add(person);
@@ -266,8 +270,13 @@ public class Inoculations {
                 }
             }
 
-            civilianPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), civilianInNeedOfInoculation);
-            militaryPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), combatantInNeedOfInoculation);
+            if (!civilianInNeedOfInoculation.isEmpty()) {
+                civilianPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), civilianInNeedOfInoculation);
+            }
+
+            if (!combatantInNeedOfInoculation.isEmpty()) {
+                militaryPersonnelInNeedOfCanonInoculation.put(inoculationType.getKey(), combatantInNeedOfInoculation);
+            }
         }
     }
 
@@ -285,7 +294,7 @@ public class Inoculations {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
+    static void gatherPersonnelInNeedOfInoculations(Collection<Person> allPersonnel, String planetId,
           Set<Person> civilianPersonnel, Set<Person> militaryPersonnel) {
         for (Person person : allPersonnel) {
             if (person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
@@ -296,12 +305,20 @@ public class Inoculations {
                 continue;
             }
 
-            if (person.isCivilian() && person.getUnit() == null && person.getTechUnits().isEmpty()) {
+            if (isCivilianForInoculation(person)) {
                 civilianPersonnel.add(person);
             } else {
                 militaryPersonnel.add(person);
             }
         }
+    }
+
+    /**
+     * Civilians assigned to a unit, either as crew or as a tech, are treated as military staff for inoculation
+     * purposes.
+     */
+    private static boolean isCivilianForInoculation(Person person) {
+        return person.isCivilian() && person.getUnit() == null && person.getTechUnits().isEmpty();
     }
 
     /**

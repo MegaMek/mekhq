@@ -133,8 +133,9 @@ import mekhq.gui.utilities.WrapLayout;
  * <p>The generated NPC personnel attached to a contract (the employer's negotiator and liaison, and the opposing
  * commander) can have their name, rank, and portrait edited. On confirmation the contract is mutated in place; query
  * {@link #wasConfirmed()} afterward and rebuild any view showing it. The player's chosen negotiator is preserved
- * as-is. The StratCon campaign state is not edited here, but when its contract's scale, track count, or dates change,
- * its pre-rolled schedule is rolled again to match (see {@link StratConScenarioTempo#regenerateSchedules}).</p>
+ * as-is. The StratCon campaign state is not edited here, but when its contract's scale, track count, dates, command
+ * rights, or employer change, its pre-rolled schedule is rolled again to match (see
+ * {@link StratConScenarioTempo#regenerateSchedules}).</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -1328,12 +1329,12 @@ public class ContractEditorDialog extends JDialog {
                                    .append(MarketHud.escape(nameField.getText().isBlank()
                                                                   ? contract.getName()
                                                                   : nameField.getText().trim()))
-                                   .append("</b><br><span style='font-size:smaller; color:")
+                                   .append("</b><br><span style='color:")
                                    .append(HudStyle.hex(TEXT_MUTED)).append("'>")
                                    .append(MarketHud.escape(String.join(separator, parts))).append("</span>");
         List<String> tags = previewTags();
         if (!tags.isEmpty()) {
-            html.append("<br><span style='font-size:smaller'><b>").append(String.join(separator, tags))
+            html.append("<br><span><b>").append(String.join(separator, tags))
                   .append("</b></span>");
         }
         JLabel text = new JLabel(html.append("</html>").toString());
@@ -1665,8 +1666,8 @@ public class ContractEditorDialog extends JDialog {
 
     /**
      * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
-     * untouched. If the contract's scale, track count, or dates changed, its StratCon schedule is rolled again (see
-     * {@link StratConScenarioTempo#regenerateSchedules}).
+     * untouched. If the contract's scale, track count, dates, command rights, or employer changed, its StratCon schedule
+     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}).
      *
      * @author Illiani
      * @since 0.51.01
@@ -1678,6 +1679,9 @@ public class ContractEditorDialog extends JDialog {
         LocalDate previousStartDate = contract.getStartDate();
         LocalDate previousEndDate = contract.getEndingDate();
         int previousLengthInMonths = contract.getLengthInMonths();
+        // Deployment Orders are rolled from these.
+        ContractCommandRights previousCommandRights = contract.getCommandRights();
+        String previousEmployerCode = contract.getEmployerFactionCode();
 
         // Identity
         String name = nameField.getText().trim();
@@ -1874,7 +1878,9 @@ public class ContractEditorDialog extends JDialog {
                                           || (contract.getTrackCount() != previousTrackCount)
                                           || !Objects.equals(contract.getStartDate(), previousStartDate)
                                           || !Objects.equals(contract.getEndingDate(), previousEndDate)
-                                          || (contract.getLengthInMonths() != previousLengthInMonths);
+                                          || (contract.getLengthInMonths() != previousLengthInMonths)
+                                          || (contract.getCommandRights() != previousCommandRights)
+                                          || !Objects.equals(contract.getEmployerFactionCode(), previousEmployerCode);
         if ((campaignState != null) && isScheduleChanged) {
             StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
         }
@@ -2007,7 +2013,7 @@ public class ContractEditorDialog extends JDialog {
         effectLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
         effectLabel.setForeground(TEXT);
         Runnable showEffect = () -> effectLabel.setText("<html>" + MarketHud.escape(termEffectText(effect,
-              track.getSelected())) + "<br><span style='font-weight:normal; font-size:smaller; color:"
+              track.getSelected())) + "<br><span style='font-weight:normal; color:"
                                                               + HudStyle.hex(TEXT_FAINT) + "'>"
                                                               + MarketHud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.stepLabel", track.getSelected().stepValue())) + "</span></html>");
