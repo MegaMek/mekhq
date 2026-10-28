@@ -2312,7 +2312,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function to render facility icons to the given surface.
+     * Worker function to render facility icons to the given surface. A facility's name and status label is drawn only
+     * while its hex is selected.
      */
     private void drawFacilities(Graphics2D g2D) {
         Polygon facilityMarker = new Polygon();
@@ -2345,11 +2346,15 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
-                    String attributesLabel = getFacilityAttributesLabel(facility, currentCoords);
-                    if (attributesLabel != null) {
-                        // Directly under the name, with no leader line of its own, so it reads as part of the label.
-                        drawTextEffect(g2D, facilityMarker, attributesLabel, currentCoords, false);
+                    // Labelled only while its hex is selected: a label on every facility hides too much of the map.
+                    if (currentCoords.equals(boardState.getSelectedCoords())) {
+                        drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
+                        String attributesLabel = getFacilityAttributesLabel(facility, currentCoords);
+                        if (attributesLabel != null) {
+                            // Directly under the name, with no leader line of its own, so it reads as part of the
+                            // label.
+                            drawTextEffect(g2D, facilityMarker, attributesLabel, currentCoords, false);
+                        }
                     }
                 }
 
