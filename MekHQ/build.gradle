@@ -239,8 +239,12 @@ if (suiteVersion != null) {
 }
 
 ext {
+    // The one set of JVM options for every MekHQ launch: run, the start scripts and the Windows launcher (MekHQ.l4j.ini).
+    // MekHQ runs MegaMek's client and its 3D board in this JVM, so these match MegaMek's mmJvmOptions.
     mhqJvmOptions = [
             '-Xmx4096m',
+            '-XX:+UseZGC',
+            '-XX:+ZGenerational',
             '--add-opens',
             'java.base/java.util=ALL-UNNAMED',
             '--add-opens',
@@ -306,14 +310,7 @@ dependencies {
 
 application {
     mainClass = 'mekhq.MekHQ'
-    applicationDefaultJvmArgs = [
-            '-Xmx4096m',
-            '--add-opens',
-            'java.base/java.util=ALL-UNNAMED',
-            '--add-opens',
-            'java.base/java.util.concurrent=ALL-UNNAMED',
-            '-Dsun.awt.disablegrab=true'
-    ]
+    applicationDefaultJvmArgs = mhqJvmOptions
 }
 
 // Forward mekhq.* system properties set on the Gradle daemon (e.g. via IDEA Run Config "VM options",
@@ -664,6 +661,7 @@ tasks.register('createStartScripts', CreateStartScripts) {
 
     applicationName = 'MekHQ'
     mainClass = application.mainClass
+    defaultJvmOpts = mhqJvmOptions
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
