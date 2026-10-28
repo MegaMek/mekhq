@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java-distribution: [ temurin ]
-        java-version: [ 21, 25 ]
+        java-version: [ 21 ]
       fail-fast: false
 
     steps:
@@ -140,9 +140,10 @@ jobs:
         run: |
           echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
-      - name: Test All
+      # MegaMek and MegaMekLab tests run in their own repos' CI, and the nightly still runs testAll.
+      - name: Test and Build
         working-directory: mekhq
-        run: ./gradlew testAll --no-parallel --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest
+        run: ./gradlew build --no-parallel --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest -PextraVersion="PR-${{ github.event.number }}-${{ env.COMMIT_SHORT_SHA }}"
         env:
           mm.profile: dev
 
@@ -153,10 +154,6 @@ jobs:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
           overwrite: true
-
-      - name: Build with Gradle
-        working-directory: mekhq
-        run: ./gradlew build -x test -PextraVersion="PR-${{ github.event.number }}-${{ env.COMMIT_SHORT_SHA }}"
 
       - name: CodeCov.io Coverage Report
         uses: codecov/codecov-action@v7
