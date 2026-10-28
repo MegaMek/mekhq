@@ -7126,15 +7126,37 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean canTakeNavigator() {
-        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && (navigator == null);
+        return hasNavigatorSeat() && (navigator == null);
+    }
+
+    /**
+     * @return {@code true} if this unit has a navigator seat, filled or not: a JumpShip or WarShip, but not a space
+     *       station
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasNavigatorSeat() {
+        return entity instanceof Jumpship && !(entity instanceof SpaceStation);
     }
 
     public boolean canTakeTechOfficer() {
-        return (techOfficer == null) && (entity.getCrew().getCrewType().getTechPos() >= 0
-                                               // Use techOfficer field for secondary commander
-                                               ||
-                                               (entity instanceof Tank &&
-                                                      entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
+        return (techOfficer == null) && hasTechOfficerSeat();
+    }
+
+    /**
+     * Whether this unit has a seat held in the {@code techOfficer} field, filled or not. That is a cockpit tech
+     * officer position, or, on a vehicle with a working command console, the console's secondary commander.
+     *
+     * @return {@code true} if this unit has a tech officer or console commander seat
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasTechOfficerSeat() {
+        return (entity.getCrew().getCrewType().getTechPos() >= 0)
+                     // Use techOfficer field for secondary commander
+                     || ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE));
     }
 
     public boolean canTakeTech() {
