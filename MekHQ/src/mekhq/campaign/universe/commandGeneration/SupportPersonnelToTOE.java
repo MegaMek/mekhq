@@ -358,7 +358,8 @@ public final class SupportPersonnelToTOE {
         applyEchelonLevels(campaign, supportCommand,
               useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure);
         if (!newLances.isEmpty()) {
-            FormationIconBuilder.applyIconsToFormations(newLances, campaign);
+            FormationIconBuilder.applyIconsToFormations(newLances, campaign.getPlayerForce().getFaction(),
+                  campaign::getUnit, supportCommand);
         }
         // A new size needs a new echelon symbol, or a section that grew from one MASH truck to eleven still shows a
         // Team on its icon.
@@ -395,10 +396,15 @@ public final class SupportPersonnelToTOE {
         }
     }
 
-    /** Updates the echelon symbol of {@code formation} and every formation under it to match its level. */
+    /**
+     * Updates the echelon symbol and unit-type silhouette of {@code formation} and every formation under it to match
+     * its level and units.
+     */
     private static void refreshEchelonSymbols(Campaign campaign, Formation formation) {
-        FormationIconBuilder.refreshEchelonPiece(formation, campaign);
-        FormationIconBuilder.refreshPurposePiece(formation, campaign);
+        Faction faction = campaign.getPlayerForce().getFaction();
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        FormationIconBuilder.refreshEchelonPiece(formation, faction);
+        FormationIconBuilder.refreshTypePiece(formation, faction, campaign::getUnit, supportCommand);
         for (Formation child : formation.getSubFormations()) {
             refreshEchelonSymbols(campaign, child);
         }
@@ -1014,7 +1020,8 @@ public final class SupportPersonnelToTOE {
         EchelonProfile profile = campaign.getPlayerForce().isClanForce() ? clanProfile() : innerSphereProfile();
         Formation created = createFormation(campaign, sectionLabel(section), FormationType.SUPPORT, supportCommand,
               profile.sectionLevel());
-        FormationIconBuilder.applyIconsToFormations(List.of(created), campaign);
+        FormationIconBuilder.applyIconsToFormations(List.of(created), campaign.getPlayerForce().getFaction(),
+              campaign::getUnit, supportCommand);
         LOGGER.info("[SupportTeams] created the {} section under Support Command", sectionLabel(section));
         return created;
     }
