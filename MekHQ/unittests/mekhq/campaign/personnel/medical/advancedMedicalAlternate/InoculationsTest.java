@@ -35,20 +35,32 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_SUPER_SPREADER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations.DiseaseScanResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 public class InoculationsTest {
+    private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
+    private static final String DISEASE_NAME = "Test Disease";
 
     @Test
     @DisplayName("Permanent disease carriers do not contribute their disease to the unit-wide spread set")
@@ -112,6 +124,68 @@ public class InoculationsTest {
               "Active diseases set must be empty when only permanent infections exist");
         assertTrue(result.activeCanonDiseases().isEmpty(),
               "Active canon diseases set must be empty when only permanent infections exist");
+    }
+
+    @Test
+    @DisplayName("Children are never infected and no medical log entry is recorded")
+    void applyDisease_childIsNotInfected() {
+        Campaign campaign = campaign();
+        Person child = mock(Person.class);
+        when(child.isChild(TODAY, true)).thenReturn(true);
+        InjuryType disease = mock(InjuryType.class);
+
+        try (MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class)) {
+            assertFalse(Inoculations.applyDisease(campaign, child, disease),
+                  "Children must not be reported as infected");
+
+            verify(disease, never()).newInjury(any(), any(), any(), anyInt());
+            verify(child, never()).addInjury(any());
+            medicalLogger.verify(() -> MedicalLogger.contractedDisease(any(), any(), any()), never());
+        }
+    }
+
+    @Test
+    @DisplayName("A disease that fails to generate an injury does not infect the person")
+    void applyDisease_nullInjuryIsNotInfected() {
+        Campaign campaign = campaign();
+        Person person = mock(Person.class);
+        InjuryType disease = mock(InjuryType.class);
+        when(disease.newInjury(campaign, person, BodyLocation.INTERNAL, 1)).thenReturn(null);
+
+        try (MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class)) {
+            assertFalse(Inoculations.applyDisease(campaign, person, disease),
+                  "A person must not be reported as infected when no injury was generated");
+
+            verify(person, never()).addInjury(any());
+            medicalLogger.verify(() -> MedicalLogger.contractedDisease(any(), any(), any()), never());
+        }
+    }
+
+    @Test
+    @DisplayName("A successful infection adds the injury and records a contracted-disease medical log entry")
+    void applyDisease_successfulInfectionIsLogged() {
+        Campaign campaign = campaign();
+        Person person = mock(Person.class);
+        Injury injury = mock(Injury.class);
+        when(injury.getOriginalTime()).thenReturn(10);
+        InjuryType disease = mock(InjuryType.class);
+        when(disease.newInjury(campaign, person, BodyLocation.INTERNAL, 1)).thenReturn(injury);
+        when(disease.getSimpleName()).thenReturn(DISEASE_NAME);
+
+        try (MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class)) {
+            assertTrue(Inoculations.applyDisease(campaign, person, disease),
+                  "A person given a generated disease injury must be reported as infected");
+
+            verify(person).addInjury(injury);
+            medicalLogger.verify(() -> MedicalLogger.contractedDisease(person, TODAY, DISEASE_NAME));
+            verify(person, never()).changeStatus(any(), any(), any());
+        }
+    }
+
+    private static Campaign campaign() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(TODAY);
+        return campaign;
     }
 
     private static Injury injury(InjuryType type, InjurySubType subType, boolean permanent) {

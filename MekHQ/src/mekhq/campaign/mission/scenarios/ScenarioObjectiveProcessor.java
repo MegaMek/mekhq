@@ -117,7 +117,7 @@ public class ScenarioObjectiveProcessor {
 
             for (Formation formation : tracker.getCampaign().getPlayerForce().getAllFormations()) {
                 if (formation.getName().equals(forceName)) {
-                    for (UUID unitID : formation.getUnits()) {
+                    for (UUID unitID : formation.getAllUnits(false)) {
                         objectiveUnitIDs.add(tracker.getCampaign().getUnit(unitID).getEntity().getExternalIdAsString());
                     }
                     forceFound = true;

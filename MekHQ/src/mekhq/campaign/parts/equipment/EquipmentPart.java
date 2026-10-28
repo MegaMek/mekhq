@@ -49,6 +49,7 @@ import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.equipment.enums.MiscTypeFlag;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
@@ -467,6 +468,13 @@ public class EquipmentPart extends Part {
             return;
         }
 
+        // Field guns have no critical slots, so MegaMek can only report their loss through the destroyed flag. A field
+        // gun left uncrewed in combat is lost and must be replaced, rather than repaired.
+        if (isDestroyedFieldGun(unit.getEntity(), mounted)) {
+            remove(false);
+            return;
+        }
+
         int priorHits = getHits();
 
         int newHits = unit.getEntity()
@@ -494,6 +502,17 @@ public class EquipmentPart extends Part {
                   (campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET))) {
             remove(false);
         }
+    }
+
+    /**
+     * @return {@code true} if the given mount is a conventional infantry field gun or field artillery piece that has
+     *       been destroyed
+     */
+    static boolean isDestroyedFieldGun(@Nullable Entity entity, Mounted<?> mounted) {
+        return (entity instanceof ConvInfantry) &&
+                     (mounted.getType() instanceof WeaponType) &&
+                     (mounted.getLocation() == ConvInfantry.LOC_FIELD_GUNS) &&
+                     mounted.isDestroyed();
     }
 
     @Override
@@ -841,7 +860,9 @@ public class EquipmentPart extends Part {
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasFlag(MiscTypeFlag.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
             } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
-                varCost = Money.of(getUnitTonnage() * 100000);
+                // Matches MegaMek: the system weighs 1% of the unit and costs 100,000 per ton. Long math since warship
+                // tonnages overflow an int.
+                varCost = Money.of(getUnitTonnage() * 1000L);
             }
         }
         if (varCost.isZero()) {

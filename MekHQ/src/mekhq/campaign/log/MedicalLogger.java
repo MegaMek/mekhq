@@ -82,6 +82,11 @@ public class MedicalLogger {
         person.addMedicalLogEntry(medicalLogEntry);
     }
 
+    public static void contractedDisease(Person person, LocalDate date, String diseaseName) {
+        String message = logEntriesResourceMap.getString("contractedDisease.text");
+        person.addMedicalLogEntry(new MedicalLogEntry(date, MessageFormat.format(message, diseaseName)));
+    }
+
     public static void successfulSurgery(Person person, LocalDate date, String surgeryName) {
         String message = String.format(logEntriesResourceMap.getString("surgery.text"), surgeryName);
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,

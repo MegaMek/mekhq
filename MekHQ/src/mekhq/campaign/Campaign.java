@@ -101,8 +101,6 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.BombMounted;
-import megamek.common.equipment.EquipmentTypeLookup;
-import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.BLKFile;
@@ -117,14 +115,11 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.units.Aero;
 import megamek.common.units.Crew;
 import megamek.common.units.Entity;
-import megamek.common.units.EntityMovementMode;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.IBomber;
 import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
@@ -208,6 +203,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.TurnoverPromptOutcome;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -2829,6 +2825,7 @@ public class Campaign implements ITechManager {
                     report += theRefit.succeed();
                 } else {
                     report += theRefit.fail(SkillType.EXP_GREEN);
+                    MekHQ.triggerEvent(new RefitCheckFailedEvent(theRefit));
                     // try to refit again in case the tech has any time left
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
@@ -4503,12 +4500,25 @@ public class Campaign implements ITechManager {
      * @return the simplified travel time in days
      */
     public int getSimplifiedTravelTime(PlanetarySystem destination) {
-        if (Objects.equals(getCurrentSystem(), destination)) {
+        return getSimplifiedTravelTime(getCurrentSystem(), destination);
+    }
+
+    /**
+     * Calculates simplified travel time between two systems. Travel time is calculated by dividing distance (in LY) by
+     * 20 and multiplying the result by 7.
+     *
+     * @param origin      the planetary system being traveled from
+     * @param destination the planetary system being traveled to
+     *
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem origin, PlanetarySystem destination) {
+        if (Objects.equals(origin, destination)) {
             return 0;
         } else {
             // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
             // It looked to be around 15-20LY, so 20LY seemed a good gauge
-            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+            return (int) ((origin.getDistanceTo(destination) / 20) * 7);
         }
     }
 
@@ -5381,49 +5391,8 @@ public class Campaign implements ITechManager {
      * @param entity the entity to clear the game data for
      */
     public void clearGameData(Entity entity) {
-        // First, lets remove any improvised clubs picked up during the combat
-        entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.GIRDER_CLUB);
-        entity.removeMisc(EquipmentTypeLookup.TREE_CLUB);
-
-        // Then reset mounted equipment
-        for (Mounted<?> m : entity.getEquipment()) {
-            m.setUsedThisRound(false);
-            m.resetJam();
-        }
-
-        // And clear out all the flags
-        entity.setDeployed(false);
-        entity.setElevation(0);
-        entity.setPassedThrough(new Vector<>());
-        entity.resetFiringArcs();
-        entity.resetBays();
-        entity.setEvading(false);
-        entity.setFacing(0);
-        entity.setPosition(null);
-        entity.setProne(false);
-        entity.setHullDown(false);
-        entity.heat = 0;
-        entity.heatBuildup = 0;
-        entity.underwaterRounds = 0;
-        entity.setTransportId(Entity.NONE);
-        entity.resetTransporter();
-        entity.setDeployRound(0);
-        entity.setSwarmAttackerId(Entity.NONE);
-        entity.setSwarmTargetId(Entity.NONE);
-        entity.setUnloaded(false);
-        entity.setDone(false);
-        entity.setLastTarget(Entity.NONE);
-        entity.setNeverDeployed(true);
-        entity.setStuck(false);
-        entity.resetCoolantFailureAmount();
-        entity.setConversionMode(0);
-        entity.setDoomed(false);
-        entity.setDestroyed(false);
-        entity.setHidden(false);
-        entity.clearNarcAndiNarcPods();
-        entity.setShutDown(false);
-        entity.setSearchlightState(false);
+        // The battle state MegaMek tracks on the unit, from position and heat to artillery fire adjustment
+        entity.clearGameState();
 
         resetSensorChoice(entity);
 
@@ -5448,24 +5417,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof Mek m) {
-            m.setCoolingFlawActive(false);
-        } else if (entity instanceof Aero a) {
-
-            if (a.isSpheroid()) {
-                entity.setMovementMode(EntityMovementMode.SPHEROID);
-            } else {
-                entity.setMovementMode(EntityMovementMode.AERODYNE);
-            }
-            a.setAltitude(5);
-            a.setCurrentVelocity(0);
-            a.setNextVelocity(0);
-        } else if (entity instanceof Tank t) {
-            t.unjamTurret(t.getLocTurret());
-            t.unjamTurret(t.getLocTurret2());
-            t.resetJammedWeapons();
-        }
-        entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
@@ -5957,16 +5908,16 @@ public class Campaign implements ITechManager {
      *
      * <p>The dialog will show different messages depending on whether there are pending retirees.</p>
      *
-     * @return An integer representing the outcome: -1 if turnover prompt should not be displayed, 0 if user selected
-     *       "Employee Turnover", 1 if user selected "Advance Day Regardless", 2 if user selected "Cancel Advance Day"
+     * @return the {@link TurnoverPromptOutcome}, which is {@link TurnoverPromptOutcome#NOT_PROMPTED} if the turnover
+     *       prompt was not displayed
      */
-    public int checkTurnoverPrompt() {
+    public TurnoverPromptOutcome checkTurnoverPrompt() {
         if (!getPlayerForce().getForceDetachment().isOnPlanet()) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         boolean triggerTurnoverPrompt;
@@ -5986,11 +5937,11 @@ public class Campaign implements ITechManager {
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
             default:
-                return -1;
+                return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         if (!triggerTurnoverPrompt) {
-            return -1;
+            return TurnoverPromptOutcome.NOT_PROMPTED;
         }
 
         String dialogTitle;
@@ -6008,7 +5959,7 @@ public class Campaign implements ITechManager {
                              resources.getString("turnoverAdvanceRegardless"),
                              resources.getString("turnoverCancel.text") };
 
-        return JOptionPane.showOptionDialog(null,
+        int dialogResult = JOptionPane.showOptionDialog(null,
               dialogBody,
               dialogTitle,
               JOptionPane.YES_NO_CANCEL_OPTION,
@@ -6016,6 +5967,8 @@ public class Campaign implements ITechManager {
               null,
               options,
               options[0]);
+
+        return TurnoverPromptOutcome.fromDialogResult(dialogResult);
     }
 
     /**

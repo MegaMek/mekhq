@@ -354,7 +354,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     /**
      * Shows each unit at the price the campaign would charge for it, rather than MegaMek's construction cost, so the
-     * unit price multipliers and {@link CampaignOption#USE_ALTERNATE_UNIT_COST} are reflected.
+     * unit price multipliers and the {@link CampaignOption#UNIT_COST_MODEL} are reflected.
      *
      * @param summary the unit to price
      *

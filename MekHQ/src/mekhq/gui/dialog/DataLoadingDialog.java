@@ -651,7 +651,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     final File rescued = JournalRescue.rescue(save,
                           date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
                     if (rescued != null) {
-                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
+                        SwingUtilities.invokeLater(() -> showStartupMessage(
                               getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
                                     rescued.getAbsolutePath()),
                               getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
@@ -663,6 +663,22 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             }, "Journal rescue");
             rescuer.setDaemon(true);
             rescuer.start();
+        }
+
+        /**
+         * Shows a message about loading a campaign. The dialog has no owner window and carries the MekHQ icon so it
+         * appears in the Windows taskbar and Alt+Tab even while the MekHQ window is hidden. A {@code null} parent would
+         * instead attach it to Swing's hidden shared frame, which leaves it out of both.
+         *
+         * @param message     the message to show
+         * @param title       the dialog title
+         * @param messageType the {@link JOptionPane} message type
+         */
+        private static void showStartupMessage(String message, String title, int messageType) {
+            final JDialog dialog = new JOptionPane(message, messageType).createDialog(title);
+            AppIcons.applyToWindow(dialog, "mekhq");
+            dialog.setVisible(true);
+            dialog.dispose();
         }
 
         /**
@@ -680,24 +696,24 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
                                 ex.getCause().getMessage()),
                           resources.getString("DataLoadingDialog.NullEntityException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof NullPointerException) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           String.format(resources.getString("DataLoadingDialog.NullPointerException.text"),
                                 ex.getCause().getMessage()),
                           resources.getString("DataLoadingDialog.NullPointerException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof OutOfMemoryError) {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           resources.getString("DataLoadingDialog.OutOfMemoryError.text"),
                           resources.getString("DataLoadingDialog.OutOfMemoryError.title"),
                           JOptionPane.ERROR_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    showStartupMessage(
                           resources.getString("DataLoadingDialog.ExecutionException.text"),
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);

@@ -34,13 +34,7 @@ package mekhq.campaign.universe.factionStanding;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
@@ -49,9 +43,8 @@ import mekhq.MHQConstants;
 /**
  * Manages a library of {@link FactionStandingUltimatumData} objects, each loaded from its own JSON file.
  *
- * <p>The files to load are listed in {@code data/universe/factionStandingUltimatums/ultimatummanifest.json}, and
- * live alongside it. Ultimatums are mapped by their {@link LocalDate} and then by each of their affected faction
- * codes.</p>
+ * <p>Every {@code .json} file in {@code data/universe/factionStandingUltimatums/} is loaded. Ultimatums are mapped by
+ * their {@link LocalDate} and then by each of their affected faction codes.</p>
  *
  * @author Illiani
  * @since 0.50.07
@@ -65,27 +58,26 @@ public class FactionStandingUltimatumsLibrary {
     private final Map<LocalDate, Map<String, FactionStandingUltimatumData>> ultimatumMap = new HashMap<>();
 
     /**
-     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums listed in the default
-     * manifest.
+     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums in the default directory.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingUltimatumsLibrary() {
-        this(new File(MHQConstants.FACTION_STANDING_ULTIMATUM_MANIFEST));
+        this(new File(MHQConstants.FACTION_STANDING_ULTIMATUM_PATH));
     }
 
     /**
-     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums listed in the given manifest.
+     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads every ultimatum in the given directory.
      *
-     * @param manifestFile the manifest listing the ultimatum files, which sit in the same directory
+     * @param ultimatumsDirectory the directory holding the ultimatum files
      *
-     * @throws RuntimeException if the manifest cannot be read
+     * @throws RuntimeException if the directory cannot be read
      * @author Illiani
      * @since 0.51.01
      */
-    FactionStandingUltimatumsLibrary(File manifestFile) {
-        indexUltimatums(readUltimatums(manifestFile));
+    FactionStandingUltimatumsLibrary(File ultimatumsDirectory) {
+        indexUltimatums(readUltimatums(ultimatumsDirectory));
     }
 
     /**
@@ -142,30 +134,32 @@ public class FactionStandingUltimatumsLibrary {
     }
 
     /**
-     * Reads every ultimatum listed in a manifest. A listed file that is missing or unreadable is logged and skipped,
-     * so one bad file doesn't stop the others loading.
+     * Reads every {@code .json} file in a directory, in file name order. A file that is unreadable is logged and
+     * skipped, so one bad file doesn't stop the others loading.
      *
-     * @param manifestFile the manifest to read
+     * @param ultimatumsDirectory the directory to read
      *
      * @return the ultimatums that loaded
      *
-     * @throws RuntimeException if the manifest itself cannot be read
+     * @throws RuntimeException if the directory itself cannot be read
      * @author Illiani
      * @since 0.51.01
      */
-    private static List<FactionStandingUltimatumData> readUltimatums(File manifestFile) {
-        FactionStandingUltimatumManifest manifest = FactionStandingUltimatumManifest.deserialize(manifestFile);
-        if (manifest == null) {
-            throw new RuntimeException("Could not read ultimatum manifest: " + manifestFile.getPath());
+    private static List<FactionStandingUltimatumData> readUltimatums(File ultimatumsDirectory) {
+        File[] ultimatumFiles = ultimatumsDirectory.listFiles(
+              file -> file.isFile() && file.getName().toLowerCase(Locale.ROOT).endsWith(".json"));
+        if (ultimatumFiles == null) {
+            throw new RuntimeException("Could not read ultimatum directory: " + ultimatumsDirectory.getPath());
         }
 
-        File ultimatumsDirectory = manifestFile.getAbsoluteFile().getParentFile();
+        // listFiles has no guaranteed order, and the first ultimatum loaded wins a date clash
+        Arrays.sort(ultimatumFiles, Comparator.comparing(File::getName));
+
         List<FactionStandingUltimatumData> ultimatums = new ArrayList<>();
-        for (String fileName : manifest.ultimatumFileNames) {
-            FactionStandingUltimatumData ultimatum = FactionStandingUltimatumData.deserialize(
-                  new File(ultimatumsDirectory, fileName));
+        for (File ultimatumFile : ultimatumFiles) {
+            FactionStandingUltimatumData ultimatum = FactionStandingUltimatumData.deserialize(ultimatumFile);
             if (ultimatum == null) {
-                LOGGER.error("Ultimatum file {} listed in {} could not be loaded", fileName, manifestFile.getPath());
+                LOGGER.error("Ultimatum file {} could not be loaded", ultimatumFile.getPath());
                 continue;
             }
 

@@ -65,13 +65,16 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
 import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +86,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class MissionViewPanel extends JScrollablePanel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+    private static final String GLOSSARY_MISSION_TYPE_PREFIX = "MISSION_TYPE_";
 
     private final AbstractContract mission;
     protected CampaignGUI gui;
@@ -179,9 +183,14 @@ public class MissionViewPanel extends JScrollablePanel {
 
         int y = 0;
 
-        // === Header: belligerents (the status is shown in the section's title border). The employer and enemy
-        // faction names are shown as tooltips on their logos (employer left, enemy right) rather than as their own
-        // label rows, to save vertical space.
+        // === Header: contract type and belligerents (the status is shown in the section's title border).
+        final ContractObjectiveType objectiveType = mission.getObjectiveType();
+        if (objectiveType != null) {
+            addHeaderRow(getContractTypeLabel(objectiveType), y++, GridBagConstraints.NORTH);
+        }
+
+        // The employer and enemy faction names are shown as tooltips on their logos (employer left, enemy right)
+        // rather than as their own label rows, to save vertical space.
         final String employerTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.employer.tooltip",
               mission.getEmployerDisplayName());
         final String enemyTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.enemy.tooltip",
@@ -464,6 +473,38 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     /**
+     * Creates a label showing the contract type. When the type has a glossary entry the label is a hyperlink that
+     * opens that entry; otherwise it is plain text.
+     *
+     * @param objectiveType the contract's objective type
+     *
+     * @return the contract type label
+     */
+    private JLabel getContractTypeLabel(ContractObjectiveType objectiveType) {
+        JLabel label = new JLabel();
+        label.setName("txtContractType");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setToolTipText(wordWrap(objectiveType.getToolTipText()));
+
+        final GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(
+              GLOSSARY_MISSION_TYPE_PREFIX + objectiveType.name());
+        if (glossaryEntry == null) {
+            label.setText(String.format("<html><h2>%s</h2></html>", objectiveType));
+            return label;
+        }
+
+        label.setText(String.format("<html><h2><a href='#'>%s</a></h2></html>", objectiveType));
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new GlossaryEntryDialog(null, glossaryEntry);
+            }
+        });
+        return label;
+    }
+
+    /**
      * Adds a standard two-column stat row: {@code label} in the left column and {@code value} in the right.
      *
      * @param label the label component (left column)
@@ -490,7 +531,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /**
      * Adds a component that spans both stat columns and is not part of the label/value grid (currently the belligerents
-     * panel).
+     * panel and the contract type).
      *
      * @param component the component to add
      * @param gridY     the grid row to place it on

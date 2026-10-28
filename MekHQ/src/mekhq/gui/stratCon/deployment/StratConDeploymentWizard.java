@@ -1344,7 +1344,8 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     /**
-     * Ported batchall-breach warning. Loops until the player confirms a decision.
+     * Ported batchall-breach warning. Choosing to breach the batchall loops until the player confirms it; backing out
+     * returns immediately.
      *
      * @return {@code true} if the player backed out of reinforcing rather than breaching the batchall
      */
@@ -1368,7 +1369,7 @@ public class StratConDeploymentWizard extends JDialog {
                   List.of(cancelButton, continueButton), outOfCharacter, null, true);
             backedOut = dialog.getDialogChoice() != continueOption;
 
-            if (MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
+            if (backedOut || MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_BATCHALL_BREACH)) {
                 dialogAccepted = true;
             } else {
                 dialogAccepted = new ImmersiveDialogConfirmation(campaign,

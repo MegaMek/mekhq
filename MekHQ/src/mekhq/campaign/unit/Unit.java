@@ -90,6 +90,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Era;
 import megamek.common.enums.Faction;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
@@ -257,6 +258,8 @@ public class Unit implements ITechnology, ILocatable {
     // mothballing variables - if mothball time is not zero then
     // mothballing/activating is in progress
     private int mothballTime;
+    /** The model the player ordered refit parts for ahead of the refit (issue #7848), or {@code null} */
+    private @Nullable String pendingRefitModel;
     private boolean mothballed;
 
     private double daysSinceMaintenance;
@@ -353,6 +356,24 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Says what a refit is waiting for before work can begin, for example {@code Refit kit arrives in 3 days}, so the
+     * Hangar does not show work time that is not yet passing.
+     *
+     * @return the status while the refit waits for its kit or parts, or {@code null} once everything is here
+     */
+    private @Nullable String describeRefitWaitingForParts() {
+        int daysUntilArrival = refit.getDaysUntilPartsArrive();
+        if (daysUntilArrival == 0) {
+            return null;
+        }
+        String delivery = refit.isCustomJob() ? "parts" : "kit";
+        if (daysUntilArrival == Refit.PARTS_NOT_FOUND) {
+            return getTextAt(RESOURCE_BUNDLE, "Unit.status.refitWaiting." + delivery);
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "Unit.status.refitArriving." + delivery, daysUntilArrival);
+    }
+
+    /**
      * A convenience function to tell whether the unit can be acted upon e.g. assigned pilots, techs, repaired, etc.
      */
     public boolean isAvailable(boolean ignoreRefit) {
@@ -381,6 +402,10 @@ public class Unit implements ITechnology, ILocatable {
         } else if (!isPresent()) {
             return "In transit (" + getDaysToArrival() + " days)";
         } else if (isRefitting()) {
+            String waitingForParts = describeRefitWaitingForParts();
+            if (waitingForParts != null) {
+                return waitingForParts;
+            }
             double timeLeft = refit.getTimeLeft();
             Person refitTech = refit.getTech();
 
@@ -3231,8 +3256,8 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Estimates what {@link #getBuyCost()} will return for an entity that has not yet been made into a unit, such as
-     * one rolled by the command generator. Under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the entity is valued by
-     * its Battle Value in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
+     * one rolled by the command generator. When the {@link CampaignOption#UNIT_COST_MODEL} values the entity by Battle
+     * Value, it is valued in its current state, exactly as {@link #getAlternateUnitCost()} values a unit.
      *
      * @param unitEntity      the entity to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
@@ -3243,7 +3268,7 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public static Money estimateBuyCost(Entity unitEntity, CampaignOptions campaignOptions) {
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+        if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(unitEntity)) {
             return calculateAlternateUnitCost(unitEntity.calculateBattleValue(true, true, true),
                   getUnitPriceMultiplier(unitEntity, campaignOptions), getQuirkPriceMultiplier(unitEntity),
                   campaignOptions);
@@ -3253,9 +3278,10 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Estimates what {@link #getBuyCost()} will return for a unit from its {@link MekSummary} alone, without loading
-     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. Under
-     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST} the unit is valued by the summary's Battle Value; the summary does
-     * not carry quirks, so the Good Reputation price multiplier is left out (see {@link #getQuirkPriceMultiplier}).
+     * it, so it is cheap enough to price every row of a unit list such as the Purchase Unit dialog. When the
+     * {@link CampaignOption#UNIT_COST_MODEL} values the unit by Battle Value, the summary's Battle Value is used; the
+     * summary does not carry quirks, so the Good Reputation price multiplier is left out (see
+     * {@link #getQuirkPriceMultiplier}).
      *
      * @param summary         the unit to price
      * @param campaignOptions the campaign options supplying the pricing rules and multipliers
@@ -3267,15 +3293,29 @@ public class Unit implements ITechnology, ILocatable {
      */
     public static Money estimateBuyCost(MekSummary summary, CampaignOptions campaignOptions) {
         double unitPriceMultiplier = getUnitPriceMultiplier(summary.isMixedTech(), summary.isClan(), campaignOptions);
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+        if (campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(summary)) {
             return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
         }
 
-        // Infantry, battle armor included, is priced by its alternate cost, as getTraditionalBuyCost does
+        return getConstructionCost(summary).multipliedBy(unitPriceMultiplier);
+    }
+
+    /**
+     * Returns a unit's construction cost from its {@link MekSummary}, before any campaign price multipliers. Infantry,
+     * battle armor included, is priced by its alternate (equipment-only) cost, as {@link #getTraditionalBuyCost} does,
+     * because MekHQ infantry comes without trained soldiers.
+     *
+     * @param summary the unit to price
+     *
+     * @return the unit's construction cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getConstructionCost(MekSummary summary) {
         int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
         boolean isInfantry = (unitTypeCode == UnitType.INFANTRY) || (unitTypeCode == UnitType.BATTLE_ARMOR);
-        Money cost = Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
-        return cost.multipliedBy(unitPriceMultiplier);
+        return Money.of(isInfantry ? summary.getAlternateCost() : summary.getCost());
     }
 
     /**
@@ -3340,13 +3380,13 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * @return {@code true} if units are valued by Battle Value ({@link CampaignOption#USE_ALTERNATE_UNIT_COST})
+     * @return {@code true} if the {@link CampaignOption#UNIT_COST_MODEL} values this unit by Battle Value
      *
      * @author Illiani
      * @since 0.51.01
      */
     private boolean isUseAlternateUnitCost() {
-        return getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST) && (getEntity() != null);
+        return getCampaign().getCampaignOptions().get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(getEntity());
     }
 
     /**
@@ -3393,7 +3433,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets the unit's value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: one support point per point of
+     * Gets the unit's value under {@link CampaignOption#UNIT_COST_MODEL}: one support point per point of
      * Battle Value, converted to C-bills when support point conversion is enabled, then adjusted by the unit price
      * multiplier for the unit's tech base.
      *
@@ -3415,7 +3455,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Values a unit under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} from its Battle Value (see
+     * Values a unit under {@link CampaignOption#UNIT_COST_MODEL} from its Battle Value (see
      * {@link #getAlternateUnitCost()}).
      *
      * @param battleValue          the unit's Battle Value, excluding pilot skill, C3, and TAG
@@ -3440,7 +3480,7 @@ public class Unit implements ITechnology, ILocatable {
 
     /**
      * Gets the price multiplier from quirks that affect a unit's traditional price, for use with
-     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
+     * {@link CampaignOption#UNIT_COST_MODEL}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
      * Good Reputation 2 (×1.25), which only affect 'Meks.
      *
      * @param unitEntity the unit's entity; may be {@code null}
@@ -3464,7 +3504,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets the unit's sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: half its
+     * Gets the unit's sell value under {@link CampaignOption#UNIT_COST_MODEL}: half its
      * {@link #getAlternateUnitCost()}, adjusted for the unit's quality (see {@link #getAlternateQualityMultiplier()}),
      * then reduced further by the obsolete quirk resale modifier as a traditionally priced unit would be.
      *
@@ -3484,7 +3524,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}.
+     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#UNIT_COST_MODEL}.
      * Battle Value takes no account of quality, so the Used Part Price Multipliers are applied relative to average
      * (quality D): a quality D unit sells for exactly half its value, while better and worse units sell for more and
      * less. With the default multipliers, quality A sells at x0.2 of that half and quality F at x1.8.
@@ -3664,6 +3704,10 @@ public class Unit implements ITechnology, ILocatable {
 
         if (mothballed) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballed", true);
+        }
+
+        if (pendingRefitModel != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pendingRefitModel", pendingRefitModel);
         }
 
         if (!fluffName.isEmpty()) {
@@ -3899,6 +3943,8 @@ public class Unit implements ITechnology, ILocatable {
                     retVal.salvaged = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
                     retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
+                } else if (wn2.getNodeName().equalsIgnoreCase("pendingRefitModel")) {
+                    retVal.pendingRefitModel = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, campaign);
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
@@ -5691,6 +5737,8 @@ public class Unit implements ITechnology, ILocatable {
             return MekHQ.getMHQOptions().getInTransitForeground();
         } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             return MekHQ.getMHQOptions().getQueuedForTravelForeground();
+        } else if (isPendingRefit()) {
+            return MekHQ.getMHQOptions().getPendingRefitForeground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingForeground();
         } else if (isMothballing()) {
@@ -5719,6 +5767,8 @@ public class Unit implements ITechnology, ILocatable {
             return MekHQ.getMHQOptions().getInTransitBackground();
         } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             return MekHQ.getMHQOptions().getQueuedForTravelBackground();
+        } else if (isPendingRefit()) {
+            return MekHQ.getMHQOptions().getPendingRefitBackground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingBackground();
         } else if (isMothballing()) {
@@ -5757,6 +5807,10 @@ public class Unit implements ITechnology, ILocatable {
         }
         if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
             reasons.add("colorReason.unit.queuedForTravel");
+        }
+        if (isPendingRefit()) {
+            boolean isReadyToBegin = !isRefitting() && RefitPartOrders.isEverythingOrderedAheadHere(getCampaign(), this);
+            reasons.add(isReadyToBegin ? "colorReason.unit.pendingRefitReady" : "colorReason.unit.pendingRefit");
         }
         if (isRefitting()) {
             reasons.add("colorReason.unit.refitting");
@@ -6844,8 +6898,10 @@ public class Unit implements ITechnology, ILocatable {
      *     </li>
      * </ul>
      *
-     * <p>The chosen engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
-     * previous engineer.</p>
+     * <p>A vessel's engineer is flagged with {@link Person#setEngineer(boolean)}, and the flag is cleared from the
+     * previous engineer. Infantry's engineer is not flagged: the flag shares the engineer's minutes with the whole
+     * crew, which suits a vessel crew working as one team but not a support platoon whose techs each look after their
+     * own units.</p>
      *
      * <p>After selecting the engineer (or determining that none exists), the method updates all scheduled
      * maintenance tasks:</p>
@@ -6891,7 +6947,10 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         if (engineer != null) {
-            engineer.setEngineer(true);
+            // Flagging infantry's engineer would give every trooper the engineer's minutes, so a support platoon's
+            // techs would lose their day whenever the ranking tech worked on their own units (#10654)
+            boolean isVesselEngineer = !(getEntity() instanceof Infantry);
+            engineer.setEngineer(isVesselEngineer);
             // change reference for any scheduled tasks
             for (IPartWork scheduledWork : getScheduledWork()) {
                 scheduledWork.setTech(engineer);
@@ -6981,7 +7040,41 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public int getFullCrewSize() {
+        if (isGunneryCoveredByDniDriver()) {
+            return Compute.getFullCrewSize(entity) - Compute.getTotalGunnerNeeds(entity);
+        }
         return Compute.getFullCrewSize(entity);
+    }
+
+    /**
+     * Whether this vehicle's driver handles its gunnery through a Direct Neural Interface, so it needs no gunners.
+     *
+     * <p>This holds when the unit is a vehicle and one of its drivers carries a VDNI or Buffered VDNI implant that the
+     * campaign's neural interface setting lets work in this vehicle: under Pilot Abilities Only the implant alone is
+     * enough, while under Full Tracking the vehicle must also carry the DNI Cockpit Modification. Non-gunner seats
+     * (communications, MASH, field kitchen, extra crew seats) still need crew.</p>
+     *
+     * @return {@code true} if the vehicle's gunner seats are covered by its DNI-linked driver
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isGunneryCoveredByDniDriver() {
+        if (!(entity instanceof Tank) || (campaign == null)) {
+            return false;
+        }
+
+        NeuralInterfaceMode neuralInterfaceMode = NeuralInterfaceMode.from(campaign.getGameOptions());
+        if (!neuralInterfaceMode.isOn()) {
+            return false;
+        }
+
+        boolean hasDniDriver = drivers.stream().anyMatch(driver -> {
+            PersonnelOptions options = driver.getOptions();
+            return options.booleanOption(OptionsConstants.MD_VDNI) || options.booleanOption(OptionsConstants.MD_BVDNI);
+        });
+
+        return neuralInterfaceMode.grantsBenefit(hasDniDriver, entity.hasDNICockpitMod());
     }
 
     public int getTotalDriverNeeds() {
@@ -7086,6 +7179,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public int getTotalGunnerNeeds() {
+        if (isGunneryCoveredByDniDriver()) {
+            return 0;
+        }
         return Compute.getTotalGunnerNeeds(entity);
     }
 
@@ -7532,6 +7628,19 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public int getFormationId() {
+        return formationId;
+    }
+
+    /**
+     * Gets the formation to display for this unit. Mothballing removes a unit from its formation, so while a
+     * pre-mothball restore is pending this falls back to the formation the unit will be returned to on activation.
+     *
+     * @return the current formation ID, the pre-mothball formation ID, or {@link Formation#FORMATION_NONE}
+     */
+    public int getDisplayFormationId() {
+        if ((formationId == Formation.FORMATION_NONE) && (mothballInfo != null)) {
+            return mothballInfo.getFormationId();
+        }
         return formationId;
     }
 
@@ -8197,6 +8306,37 @@ public class Unit implements ITechnology, ILocatable {
         return null != refit;
     }
 
+    /**
+     * @return the model the player ordered refit parts for ahead of the refit, for example {@code LCT-1E}, or
+     *       {@code null} when no parts were ordered ahead
+     */
+    public @Nullable String getPendingRefitModel() {
+        return pendingRefitModel;
+    }
+
+    /**
+     * Marks the unit as waiting for parts ordered ahead of a refit, or clears the mark.
+     *
+     * @param pendingRefitModel the model the parts were ordered for, or {@code null} to clear the mark
+     */
+    public void setPendingRefitModel(@Nullable String pendingRefitModel) {
+        this.pendingRefitModel = pendingRefitModel;
+    }
+
+    /**
+     * A refit is pending while its parts are awaited: either the refit has begun and its kit or parts are still to be
+     * found or on their way, or the player ordered its parts ahead and has not begun it yet. Parts ordered ahead count
+     * only while some are still on order, on their way or in the warehouse, so cancelling the orders ends it.
+     *
+     * @return {@code true} if the unit is waiting for parts for a refit
+     */
+    public boolean isPendingRefit() {
+        if (isRefitting()) {
+            return refit.getDaysUntilPartsArrive() != 0;
+        }
+        return (pendingRefitModel != null) && RefitPartOrders.isAnythingOrderedAheadFor(getCampaign(), this);
+    }
+
     public String getName() {
         return getFluffName().isBlank() ?
                      getEntity().getShortName() :
@@ -8472,7 +8612,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        double timeIncrease = Maintenance.isOnCombatContract(campaign) ? 1 : 0.25;
+        double timeIncrease = Maintenance.getDailyMaintenanceProgress(campaign);
 
         daysSinceMaintenance += timeIncrease;
         asTechDaysMaintained += asTechs * timeIncrease;

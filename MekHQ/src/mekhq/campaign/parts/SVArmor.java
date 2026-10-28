@@ -83,8 +83,9 @@ public class SVArmor extends Armor {
 
     /**
      * Tells whether a location of a unit carries support vehicle armor, which is weighed and priced by its BAR and
-     * armor tech rating rather than by points per ton. Unit files give BAR armor its own armor type for each BAR, so
-     * checking for standard armor alone misses almost every support vehicle.
+     * armor tech rating rather than by points per ton. Unit files give BAR armor its own armor type for each BAR.
+     * Standard armor is BAR 10 military armor, which a support vehicle mounts on an armored chassis; it is weighed by
+     * points per ton as on any other vehicle, so it is not support vehicle armor.
      *
      * @param entity   the unit
      * @param location the location on the unit
@@ -95,12 +96,8 @@ public class SVArmor extends Armor {
         if (!entity.isSupportVehicle()) {
             return false;
         }
-        int armorType = entity.getArmorType(location);
-        if (armorType == EquipmentType.T_ARMOR_STANDARD) {
-            return true;
-        }
-        ArmorType armor = ArmorType.of(armorType, false);
-        return (armor != null) && armor.hasFlag(MiscType.F_SUPPORT_VEE_BAR_ARMOR);
+        ArmorType armor = ArmorType.of(entity.getArmorType(location), false);
+        return armor.hasFlag(MiscType.F_SUPPORT_VEE_BAR_ARMOR);
     }
 
     /**
@@ -191,7 +188,9 @@ public class SVArmor extends Armor {
 
     @Override
     public double getArmorPointsPerTon() {
-        return 1.0 / ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        // A weight of zero means that the armor does not exist at that tech rating
+        double weightPerPoint = ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        return (weightPerPoint > 0) ? 1.0 / weightPerPoint : 0.0;
     }
 
     @Override

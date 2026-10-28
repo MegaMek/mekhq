@@ -347,6 +347,7 @@ public class StratConContractInitializer {
             FacilityTier facilityTier = adjustTier(facilityProfile,
                   getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false));
             double density = getFacilityDensity(campaignOptions, facilityProfile);
+            boolean isOpForPresent = !contract.isPeaceful();
 
             if ((facilityProfile == null) || (facilityProfile.getAlliedShare() == null)) {
                 ForceAlignment facilityOwner = contract.isPlayerAttacker() ?
@@ -357,6 +358,9 @@ public class StratConContractInitializer {
                       isFactorSupportPointsIntoScale,
                       objectiveFacilityCount,
                       density);
+                if ((facilityOwner == ForceAlignment.Opposing) && !isOpForPresent) {
+                    facilityCount = 0;
+                }
                 placeNonObjectiveFacilities(campaignState, facilityCount, facilityOwner, facilityTier,
                       facilityProfile);
             } else {
@@ -368,10 +372,13 @@ public class StratConContractInitializer {
                       objectiveFacilityCount,
                       density);
                 int alliedCount = (int) Math.round(facilityCount * facilityProfile.getAlliedShare());
-                int hostileCount = facilityCount - alliedCount;
+                int hostileCount = isOpForPresent ? facilityCount - alliedCount : 0;
 
                 FacilityType anchorType = facilityProfile.getAnchorType();
-                if ((anchorType != null) && placeAnchorFacility(campaignState, facilityProfile, facilityTier)) {
+                boolean isAnchorAllowed = isOpForPresent
+                                                || (facilityProfile.getAnchorOwner() != ForceAlignment.Opposing);
+                if ((anchorType != null) && isAnchorAllowed
+                          && placeAnchorFacility(campaignState, facilityProfile, facilityTier)) {
                     if (facilityProfile.getAnchorOwner() == ForceAlignment.Opposing) {
                         hostileCount = max(0, hostileCount - 1);
                     } else {
@@ -2680,16 +2687,21 @@ public class StratConContractInitializer {
             }
 
             // facility
-            boolean addedFacility = false;
+            StratConFacility facility = null;
             if (template.isFacilityScenario()) {
-                StratConFacility facility = createMidContractFacility(campaign,
+                facility = createMidContractFacility(campaign,
                       contract,
                       template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
                       true);
-                if (facility != null) {
-                    trackState.addFacility(coords, facility);
-                    addedFacility = true;
+                if (facility == null) {
+                    // Without a facility to sit on, a facility scenario has nothing to fight over; skip it rather
+                    // than place one whose objectives point at a missing facility.
+                    LOGGER.warn("No facility for objective scenario {} on track {}; skipping it.",
+                          template.name,
+                          trackState.getDisplayableName());
+                    continue;
                 }
+                trackState.addFacility(coords, facility);
             }
 
             // create scenario - don't assign a force yet
@@ -2702,6 +2714,10 @@ public class StratConContractInitializer {
                   null);
 
             if (scenario != null) {
+                if (facility != null) {
+                    StratConRulesManager.setupFacilityScenario(scenario, facility, null);
+                }
+
                 // These appear over the contract's run on their scheduled day and are meant to be fought like any
                 // normal scenario: keep the deployment dates generateScenario set and leave them uncloaked, so the
                 // player can engage immediately rather than having to scout them out first.
@@ -2721,11 +2737,8 @@ public class StratConContractInitializer {
                 // as befits a scenario that is already visible and fightable: the objectives list then shows its
                 // coordinates instead of the "Locate and..." wording used for hexes still to be scouted.
                 trackState.getRevealedCoords().add(coords);
-                if (addedFacility) {
-                    StratConFacility placedFacility = trackState.getFacility(coords);
-                    if (placedFacility != null) {
-                        placedFacility.setVisible(true);
-                    }
+                if (facility != null) {
+                    facility.setVisible(true);
                 }
 
                 StratConStrategicObjective sso = new StratConStrategicObjective();
@@ -2733,7 +2746,7 @@ public class StratConContractInitializer {
                 sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
                 sso.setDesiredObjectiveCount(1);
                 trackState.addStrategicObjective(sso);
-            } else if (addedFacility) {
+            } else if (facility != null) {
                 trackState.removeFacility(coords);
             }
         }

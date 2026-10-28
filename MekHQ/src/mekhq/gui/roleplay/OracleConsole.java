@@ -39,16 +39,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
@@ -63,6 +56,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import jakarta.annotation.Nullable;
+import megamek.SuiteOptions;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -137,7 +131,6 @@ public class OracleConsole extends JDialog {
     private volatile boolean refreshPending;
 
     private final HudGuideDrawer guideDrawer;
-    private final JPanel scrim;
     private final HudCheckBox autoOpenGuides;
 
     /**
@@ -207,20 +200,6 @@ public class OracleConsole extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.example"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.terms")), autoOpenGuides,
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.close"), this::closeGuide);
-        scrim = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics graphics) {
-                graphics.setColor(new Color(2, 7, 13, 160));
-                graphics.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        scrim.setOpaque(false);
-        scrim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent event) {
-                closeGuide();
-            }
-        });
 
         buildUI();
         refresh();
@@ -265,17 +244,8 @@ public class OracleConsole extends JDialog {
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
-        // The guide drawer and its scrim float over the pages on the layered pane.
-        getLayeredPane().add(scrim, JLayeredPane.MODAL_LAYER);
-        getLayeredPane().add(guideDrawer, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1));
-        scrim.setVisible(false);
-        guideDrawer.setVisible(false);
-        getLayeredPane().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent event) {
-                layoutGuide();
-            }
-        });
+        // The guide drawer and its scrim float over the pages; Escape closes the guide.
+        guideDrawer.install(getRootPane());
 
         installKeyBindings(content);
     }
@@ -392,14 +362,6 @@ public class OracleConsole extends JDialog {
                 }
             });
         }
-        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-              "closeGuide");
-        root.getActionMap().put("closeGuide", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                closeGuide();
-            }
-        });
     }
 
     private static boolean isTyping() {
@@ -609,25 +571,11 @@ public class OracleConsole extends JDialog {
      */
     void openGuide(final ConsolePage page) {
         OracleGuidePreferences.getInstance().setGuideSeen(page, true);
-        guideDrawer.showGuide(ConsoleGuides.build(page, this));
-        scrim.setVisible(true);
-        guideDrawer.setVisible(true);
-        layoutGuide();
-        guideDrawer.focusClose();
+        guideDrawer.open(ConsoleGuides.build(page, this));
     }
 
     void closeGuide() {
-        scrim.setVisible(false);
-        guideDrawer.setVisible(false);
-    }
-
-    private void layoutGuide() {
-        int width = getLayeredPane().getWidth();
-        int height = getLayeredPane().getHeight();
-        scrim.setBounds(0, 0, width, height);
-        int drawerWidth = Math.min(HudGuideDrawer.drawerWidth(), width);
-        guideDrawer.setBounds(width - drawerWidth, 0, drawerWidth, height);
-        guideDrawer.revalidate();
+        guideDrawer.close();
     }
 
     // endregion Guides
@@ -719,7 +667,7 @@ public class OracleConsole extends JDialog {
      * @return the number grouped as MekHQ's locale writes it, such as "1,234", matching counts in formatted text
      */
     static String formatCount(final long count) {
-        return NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale()).format(count);
+        return NumberFormat.getIntegerInstance(SuiteOptions.getNumberFormatLocale()).format(count);
     }
 
     /**

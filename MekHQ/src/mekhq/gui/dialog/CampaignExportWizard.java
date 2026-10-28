@@ -44,6 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
+import megamek.SuiteOptions;
 import megamek.common.equipment.AmmoType;
 import megamek.common.icons.Camouflage;
 import megamek.common.ui.FastJScrollPane;
@@ -553,7 +554,7 @@ public class CampaignExportWizard extends JDialog {
         double money = 0;
 
         try {
-            money = parseExportMoney(txtExportMoney.getText(), MekHQ.getMHQOptions().getLocale());
+            money = parseExportMoney(txtExportMoney.getText(), SuiteOptions.getNumberFormatLocale());
             if (money > 0) {
                 destinationCampaign.addFunds(TransactionType.STARTING_CAPITAL,
                       Money.of(money),

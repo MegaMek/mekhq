@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.List;
 
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
@@ -58,6 +59,7 @@ import megamek.common.universe.FactionLeaderData;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -77,7 +79,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionAccoladeConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles events where a campaign receives a faction accolade, such as adoption.
@@ -306,6 +307,8 @@ public class FactionAccoladeEvent {
                 speaker.setSurname(MAGISTRACY_HOLO_STAR_SURNAME);
                 speaker.setSecondaryRole(PersonnelRole.MILITARY_PROMOTER);
             } else if (isLetterFromHeadOfState) {
+                speaker.setPortrait(new Portrait());
+
                 FactionLeaderData leaderData = accoladingFaction.getLeaderForYear(campaign.getGameYear());
                 if (leaderData != null) {
                     String name = leaderData.getFullTitle(true);

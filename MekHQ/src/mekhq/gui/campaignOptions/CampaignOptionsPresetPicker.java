@@ -35,20 +35,13 @@ package mekhq.gui.campaignOptions;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.io.File;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.AppIcons;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -142,11 +135,20 @@ public class CampaignOptionsPresetPicker extends JDialog {
     /**
      * Constructs and displays the campaign options preset picker dialog.
      *
-     * @param parentFrame                  The parent {@link JFrame} for modal display.
+     * <p>If {@code parentFrame} is showing, the dialog is owned by it. Otherwise, such as while a new campaign is
+     * being created and the startup screen is hidden, the dialog has no owner window and carries the MekHQ icon,
+     * because Windows leaves windows owned by a hidden frame out of the taskbar and Alt+Tab.</p>
+     *
+     * @param parentFrame                  The parent {@link JFrame} for modal display, or {@code null}.
      * @param includeCustomizePresetOption If {@code true}, enables the "Customize" button.
      */
-    public CampaignOptionsPresetPicker(JFrame parentFrame, boolean includeCustomizePresetOption) {
-        super(parentFrame, true);
+    public CampaignOptionsPresetPicker(@Nullable JFrame parentFrame, boolean includeCustomizePresetOption) {
+        super(resolveOwner(parentFrame), ModalityType.APPLICATION_MODAL);
+        if (getOwner() == null) {
+            AppIcons.applyToWindow(this, "mekhq");
+        }
+        // With no owner window to clean it up, closing the window must release it like the Cancel button does
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.title"));
 
@@ -260,6 +262,19 @@ public class CampaignOptionsPresetPicker extends JDialog {
         pack();
         fitToScreen(parentFrame);
         setVisible(true);
+    }
+
+    /**
+     * Picks the owner window for this dialog: the parent frame when it is showing, otherwise none. An explicit
+     * {@code null} owner is needed because Swing attaches dialogs created with a {@code null} frame to a hidden shared
+     * frame, which leaves them out of the Windows taskbar.
+     *
+     * @param parentFrame the parent frame, or {@code null}
+     *
+     * @return the parent frame if it is showing, otherwise {@code null}
+     */
+    private static @Nullable Window resolveOwner(@Nullable JFrame parentFrame) {
+        return ((parentFrame != null) && parentFrame.isShowing()) ? parentFrame : null;
     }
 
     /**

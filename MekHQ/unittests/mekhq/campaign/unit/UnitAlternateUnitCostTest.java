@@ -62,6 +62,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.parts.enums.PartQuality;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,7 +99,7 @@ class UnitAlternateUnitCostTest {
         void setUp() {
             campaign = mockCampaign();
             campaignOptions = new CampaignOptions();
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, true);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
             campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
             campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 1.0);
@@ -173,7 +174,7 @@ class UnitAlternateUnitCostTest {
 
         @Test
         void optionOffKeepsTheConstructionCost() {
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
             assertEquals(Money.of(3_000_000), unit.getBuyCost());
             verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
@@ -215,7 +216,7 @@ class UnitAlternateUnitCostTest {
             @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 4500000",
                          "true, true, 4500000" })
             void optionOffStillAppliesTheSameMultipliers(boolean isClan, boolean isMixedTech, int expected) {
-                campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+                campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
@@ -248,13 +249,54 @@ class UnitAlternateUnitCostTest {
             @ParameterizedTest
             @CsvSource({ "false, false", "true, false", "false, true", "true, true" })
             void estimateBuyCostMatchesTheConstructionBuyCostWithTheOptionOff(boolean isClan, boolean isMixedTech) {
-                campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+                campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
                 when(entity.isClan()).thenReturn(isClan);
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
                 assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
                 verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
             }
+        }
+
+        /**
+         * Chaos Campaign values large craft by Battle Value like any other unit.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void chaosCampaignValuesLargeCraftByBattleValue() {
+            when(entity.isLargeCraft()).thenReturn(true);
+
+            assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void mekHQValuesOrdinaryUnitsByBattleValue() {
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+
+            assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            assertEquals(Money.of(2_500_000), unit.getSellValue());
+        }
+
+        /**
+         * MekHQ keeps large craft at their construction cost, both as units and when estimated.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void mekHQKeepsLargeCraftAtTheirConstructionCost() {
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+            when(entity.isLargeCraft()).thenReturn(true);
+
+            assertEquals(Money.of(3_000_000), unit.getBuyCost());
+            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
+            verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
         }
 
         /** A WarShip's BV times 10,000 is well past the range of an int. */
@@ -530,7 +572,7 @@ class UnitAlternateUnitCostTest {
             campaignOptions.set(CampaignOption.EQUIPMENT_CONTRACT_SALE_VALUE, false);
             Money alternateMaintenance = unit.getWeeklyMaintenanceCost();
 
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             Money constructionMaintenance = unit.getWeeklyMaintenanceCost();
 
             // Meks cost 2% of their value a year, spread over 52 weeks
@@ -553,7 +595,7 @@ class UnitAlternateUnitCostTest {
         @BeforeEach
         void setUp() {
             campaignOptions = new CampaignOptions();
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, true);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
             campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.1);
             campaignOptions.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, 2.0);
@@ -598,11 +640,47 @@ class UnitAlternateUnitCostTest {
         @ParameterizedTest
         @CsvSource({ "false, false, 3300000", "true, false, 6000000", "false, true, 4500000", "true, true, 4500000" })
         void optionOffPricesTheConstructionCost(boolean isClan, boolean isMixedTech, int expected) {
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             when(summary.isClan()).thenReturn(isClan);
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
             assertEquals(Money.of(expected), Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void mekHQPricesOrdinarySummariesByBattleValue() {
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @ParameterizedTest
+        @ValueSource(ints = { UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
+        void mekHQPricesLargeCraftSummariesByTheirConstructionCost(int unitType) {
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
+            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
+
+            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions));
+        }
+
+        /**
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @ParameterizedTest
+        @ValueSource(ints = { UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
+        void chaosCampaignPricesLargeCraftSummariesByBattleValue(int unitType) {
+            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
+
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
         }
 
         /**
@@ -614,7 +692,7 @@ class UnitAlternateUnitCostTest {
         @ParameterizedTest
         @ValueSource(ints = { UnitType.INFANTRY, UnitType.BATTLE_ARMOR })
         void optionOffPricesInfantryByItsAlternateCost(int unitType) {
-            campaignOptions.set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
             assertEquals(Money.of(440_000), Unit.estimateBuyCost(summary, campaignOptions));
@@ -630,7 +708,7 @@ class UnitAlternateUnitCostTest {
         @BeforeEach
         void setUp() {
             campaign = MHQTestUtilities.getTestCampaign();
-            campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATE_UNIT_COST, true);
+            campaign.getCampaignOptions().set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.CHAOS_CAMPAIGN);
             campaign.getCampaignOptions().set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
             campaign.getCampaignOptions().set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.0);
             unit = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
@@ -673,7 +751,7 @@ class UnitAlternateUnitCostTest {
         void optionOffRestoresTheConstructionCost() {
             Money alternate = unit.getBuyCost();
 
-            campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaign.getCampaignOptions().set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
             assertNotEquals(alternate, unit.getBuyCost());
             assertEquals(Money.of(unit.getEntity().getCost(false)), unit.getBuyCost());
@@ -682,7 +760,7 @@ class UnitAlternateUnitCostTest {
         /** Without the option, selling goes back to parts value, quality, and obsolescence. */
         @Test
         void optionOffRestoresTheNormalSellValue() {
-            campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATE_UNIT_COST, false);
+            campaign.getCampaignOptions().set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
             assertNotEquals(unit.getBuyCost().multipliedBy(0.5), unit.getSellValue());
             assertTrue(unit.getSellValue().isPositive());

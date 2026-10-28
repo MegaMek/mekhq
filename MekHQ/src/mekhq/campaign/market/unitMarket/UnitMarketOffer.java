@@ -158,7 +158,7 @@ public class UnitMarketOffer {
         }
 
         // Battle Value ignores price quirks, which the construction cost already includes
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+        if (isBattleValueCost()) {
             cost = cost.multipliedBy(Unit.getQuirkPriceMultiplier(entity));
         }
 
@@ -166,15 +166,27 @@ public class UnitMarketOffer {
     }
 
     /**
+     * @return {@code true} if the {@link CampaignOption#UNIT_COST_MODEL} values the offered unit by Battle Value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isBattleValueCost() {
+        return campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isBattleValueCost(getUnit());
+    }
+
+    /**
      * @return the offered unit's list price before the market percentage and tech base multipliers: its construction
-     *       cost, or under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} one support point per point of Battle Value
+     *       cost (equipment-only for infantry, see {@link Unit#getConstructionCost(MekSummary)}), or, when the
+     *       {@link CampaignOption#UNIT_COST_MODEL} values it by Battle Value, one support point per point of Battle
+     *       Value
      *
      * @author Illiani
      * @since 0.51.01
      */
     private Money getBaseCost() {
-        if (!campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
-            return Money.of((double) getUnit().getCost());
+        if (!isBattleValueCost()) {
+            return Unit.getConstructionCost(getUnit());
         }
 
         // The summary's Battle Value is the unit's own, with no pilot, C3, or TAG adjustments

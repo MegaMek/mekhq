@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,16 +53,36 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 class PlanetViewPanelTest {
     @Test
-    void administrationPathPreservesHierarchyOrder() {
-        assertEquals("Pesht Military District > Kagoshima Prefecture",
-              PlanetViewPanel.formatAdministrationPath(
-                    List.of("Pesht Military District", "Kagoshima Prefecture")));
-        assertEquals("", PlanetViewPanel.formatAdministrationPath(List.of()));
+    void sharedWorldListsEachFactionAlphabeticallyAsABullet() {
+        Faction lyranCommonwealth = mock(Faction.class);
+        when(lyranCommonwealth.getFullName(3025)).thenReturn("Lyran Commonwealth");
+        Faction draconisCombine = mock(Faction.class);
+        when(draconisCombine.getFullName(3025)).thenReturn("Draconis Combine");
+
+        List<String> factionNames = PlanetViewPanel.getSortedFactionNames(
+              List.of(lyranCommonwealth, draconisCombine), 3025);
+
+        assertEquals(List.of("Draconis Combine", "Lyran Commonwealth"), factionNames);
+        assertEquals("<html><nobr><i>&bull; Draconis Combine</i></nobr></html>",
+              PlanetViewPanel.createAffiliationBullet("Draconis Combine").getText());
+    }
+
+    @Test
+    void administrationLevelsIndentOneStepPerDepth() {
+        JLabel topLevel = PlanetViewPanel.createAdministrationLevel("Pesht Military District", 0);
+        JLabel secondLevel = PlanetViewPanel.createAdministrationLevel("Kagoshima Prefecture", 1);
+        JLabel thirdLevel = PlanetViewPanel.createAdministrationLevel("Kagoshima Prefecture", 2);
+
+        assertEquals("Pesht Military District", topLevel.getText());
+        assertEquals(0, topLevel.getInsets().left);
+        assertTrue(secondLevel.getInsets().left > 0);
+        assertEquals(2 * secondLevel.getInsets().left, thirdLevel.getInsets().left);
     }
 
     @Test

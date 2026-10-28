@@ -120,6 +120,7 @@ class ContractMarketPage {
     private JCheckBox chkHideContractType;
     private JLabel lblDropShipBonusPercentage;
     private JSpinner spnDropShipBonusPercentage;
+    private JCheckBox chkUseDropShipBonusInSpace;
     private JLabel lblPityContracts;
     private JSpinner spnPityContracts;
     private JLabel lblContractBasePayMultiplier;
@@ -344,6 +345,10 @@ class ContractMarketPage {
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
         spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
 
+        chkUseDropShipBonusInSpace = new CampaignOptionsCheckBox("UseDropShipBonusInSpace",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkUseDropShipBonusInSpace.addMouseListener(createTipPanelUpdater("UseDropShipBonusInSpace"));
+
         lblPityContracts = new CampaignOptionsLabel("PityContracts", getMetadata(new Version(0, 51, 0)));
         lblPityContracts.addMouseListener(createTipPanelUpdater("PityContracts"));
         spnPityContracts = new CampaignOptionsSpinner("PityContracts", 4, 0, 20, 1);
@@ -384,6 +389,7 @@ class ContractMarketPage {
               chkBLCSaleValue,
               chkOverageRepaymentInFinalPayment);
         panel.addRow(lblDropShipBonusPercentage, spnDropShipBonusPercentage);
+        panel.addCheckBox(chkUseDropShipBonusInSpace);
         panel.addRow(lblPityContracts, spnPityContracts);
 
         return panel;
@@ -756,6 +762,7 @@ class ContractMarketPage {
         chkUseOperationCodenames.setSelected(model.useOperationCodenames);
         chkHideContractType.setSelected(model.hideContractType);
         spnDropShipBonusPercentage.setValue(model.dropShipBonusPercentage);
+        chkUseDropShipBonusInSpace.setSelected(model.useDropShipBonusInSpace);
         spnPityContracts.setValue(model.pityContracts);
         spnContractBasePayMultiplier.setValue(model.contractBasePayMultiplier);
         spnContractStraightSupportMultiplier.setValue(model.contractStraightSupportMultiplier);
@@ -823,6 +830,7 @@ class ContractMarketPage {
         model.useOperationCodenames = chkUseOperationCodenames.isSelected();
         model.hideContractType = chkHideContractType.isSelected();
         model.dropShipBonusPercentage = (int) spnDropShipBonusPercentage.getValue();
+        model.useDropShipBonusInSpace = chkUseDropShipBonusInSpace.isSelected();
         model.pityContracts = (int) spnPityContracts.getValue();
         model.contractBasePayMultiplier = (double) spnContractBasePayMultiplier.getValue();
         model.contractStraightSupportMultiplier = (double) spnContractStraightSupportMultiplier.getValue();

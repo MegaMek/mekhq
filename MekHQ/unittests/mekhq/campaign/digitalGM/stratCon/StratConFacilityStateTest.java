@@ -219,7 +219,7 @@ class StratConFacilityStateTest {
         @Test
         void changingSidesDropsTheModifiersAddedAtPlacement() {
             StratConFacility facility = mekBase(ForceAlignment.Allied);
-            facility.addAdditionalLocalModifiers(List.of("LocalGarrisonTurrets.json"));
+            facility.addAdditionalLocalModifiers(List.of("Concealed Defences.json"));
 
             facility.setOwner(ForceAlignment.Opposing);
 

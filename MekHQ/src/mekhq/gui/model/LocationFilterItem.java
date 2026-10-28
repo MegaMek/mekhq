@@ -135,21 +135,21 @@ public final class LocationFilterItem {
     }
 
     /**
-     * The spare parts this filter selects: every warehouse for {@link #ALL}, the campaign warehouse for
-     * {@link #MAIN_FORCE}, or the selected base's warehouse.
+     * The parts this filter's warehouses hold, spares and parts set aside for refits and repairs alike, from every
+     * warehouse for {@link #ALL}, the campaign warehouse for {@link #MAIN_FORCE}, or the selected base's warehouse.
      */
-    public List<Part> selectSpareParts(Campaign campaign) {
+    public List<Part> selectHeldParts(Campaign campaign) {
         if (isAll()) {
-            List<Part> parts = new ArrayList<>(campaign.getPlayerForce().getWarehouse().getSpareParts());
+            List<Part> parts = campaign.getPlayerForce().getWarehouse().getHeldParts();
             for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
-                parts.addAll(playerBase.getBaseWarehouse().getSpareParts());
+                parts.addAll(playerBase.getBaseWarehouse().getHeldParts());
             }
             return parts;
         }
         if (isMainForce()) {
-            return new ArrayList<>(campaign.getPlayerForce().getWarehouse().getSpareParts());
+            return campaign.getPlayerForce().getWarehouse().getHeldParts();
         }
-        return new ArrayList<>(base.getBaseWarehouse().getSpareParts());
+        return base.getBaseWarehouse().getHeldParts();
     }
 
     @Override
