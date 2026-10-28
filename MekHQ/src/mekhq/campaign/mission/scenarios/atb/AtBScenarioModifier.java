@@ -540,7 +540,6 @@ public class AtBScenarioModifier implements Cloneable {
         return forceDefinition;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setForceDefinition(ScenarioForceTemplate forceDefinition) {
         this.forceDefinition = forceDefinition;
     }
