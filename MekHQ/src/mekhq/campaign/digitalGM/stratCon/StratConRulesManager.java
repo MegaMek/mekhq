@@ -4671,9 +4671,11 @@ public class StratConRulesManager {
                 // afterwards only when a GM edits the map - its terrain or its cities. Resolving a scenario is playing
                 // on the map, not editing it: taking a base, or losing one, changes who holds the ground at the end of
                 // a road, not whether the road was ever built. Who holds it does decide where supply can go, though,
-                // so the supply routes are brought up to date at once rather than the next day.
+                // so the supply routes, and which facilities they leave cut off, are brought up to date at once rather
+                // than the next day.
                 if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
                     StratConFacilitySupply.reconcileNetworks(track);
+                    StratConFacilitySupply.refreshCutOffFacilities(track, campaign);
                 }
 
                 processTrackForceReturnDates(track, campaign);

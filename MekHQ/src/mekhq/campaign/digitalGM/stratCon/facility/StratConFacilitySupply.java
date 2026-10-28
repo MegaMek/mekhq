@@ -428,6 +428,30 @@ public final class StratConFacilitySupply {
         }
         track.setPlayerSupplyUnsourced(isWithoutSupply);
 
+        Set<StratConCoords> cutOff = refreshCutOffFacilities(track, campaign);
+
+        if (isStartOfMonth) {
+            for (StratConCoords coords : cutOff) {
+                StratConFacility facility = track.getFacility(coords);
+                facility.setCondition(facility.getCondition().worsened());
+                reportFacility(campaign, track, coords, "report.starved");
+            }
+        }
+    }
+
+    /**
+     * Marks afresh which facilities in a sector are cut off, reading the supply routes as they stand, and reports those
+     * newly cut off or reconnected that the player can see. Call after {@link #reconcileNetworks}.
+     *
+     * @param track    the sector
+     * @param campaign the current campaign
+     *
+     * @return the hexes of the facilities now cut off
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Set<StratConCoords> refreshCutOffFacilities(StratConTrackState track, Campaign campaign) {
         // Only a facility still with the side it was cut off on can be back on its supply lines: changing sides clears
         // its mark, so it must be read before the check below sets the mark afresh.
         Set<StratConCoords> previouslyCutOff = track.getCutOffFacilities();
@@ -452,14 +476,7 @@ public final class StratConFacilitySupply {
         }
         previouslyCutOff.clear();
         previouslyCutOff.addAll(cutOff);
-
-        if (isStartOfMonth) {
-            for (StratConCoords coords : cutOff) {
-                StratConFacility facility = track.getFacility(coords);
-                facility.setCondition(facility.getCondition().worsened());
-                reportFacility(campaign, track, coords, "report.starved");
-            }
-        }
+        return cutOff;
     }
 
     /**
