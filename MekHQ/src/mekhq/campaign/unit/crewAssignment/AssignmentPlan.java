@@ -375,9 +375,22 @@ public class AssignmentPlan {
      * @return {@code true} if staging them there would succeed
      */
     public boolean canStage(final Person person, final Unit unit, final SeatType type) {
+        return couldTake(person, unit, type) && (openSeats(unit, type) > 0);
+    }
+
+    /**
+     * Whether a person could be staged into a seat once it has room: as {@link #canStage}, but a full seat does not
+     * rule them out.
+     *
+     * @param person the person
+     * @param unit   the unit
+     * @param type   the seat
+     *
+     * @return {@code true} if they could take the seat once a place in it is free
+     */
+    public boolean couldTake(final Person person, final Unit unit, final SeatType type) {
         return !Objects.equals(plannedUnitOf(person), unit)
                      && unit.isAvailable()
-                     && (openSeats(unit, type) > 0)
                      && SeatEligibility.canTake(person, unit, type, useAltAdvancedMedical, useImplants)
                      && LocationUtils.areSameEffectiveLocation(unit, person);
     }
@@ -638,14 +651,13 @@ public class AssignmentPlan {
     }
 
     /**
-     * Stages taking every crew member out of each unit, and, if asked, its tech too, as one step of history.
+     * Stages taking every crew member out of each unit, as one step of history. Their techs stay.
      *
-     * @param units      the units
-     * @param alsoTechs  {@code true} to also leave each unit without a tech
+     * @param units the units
      *
      * @return how many changes were staged
      */
-    public int clearUnits(final List<Unit> units, final boolean alsoTechs) {
+    public int clearUnits(final List<Unit> units) {
         final List<Runnable> reverts = new ArrayList<>();
         int staged = 0;
         for (Unit unit : units) {
@@ -656,9 +668,6 @@ public class AssignmentPlan {
                 if (canUnassign(person) && (put(person, null, null, reverts) != null)) {
                     staged++;
                 }
-            }
-            if (alsoTechs && (plannedTechOf(unit) != null) && (putTech(unit, null, reverts) != null)) {
-                staged++;
             }
         }
         record(reverts);

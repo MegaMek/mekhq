@@ -110,7 +110,9 @@ final class CrewInspector extends JPanel {
 
         void unassignSelectedPeople();
 
-        void clearSelectedUnits(boolean alsoTechs);
+        void clearSelectedUnits();
+
+        void removeSelectedTechs();
 
         void fillTempCrew();
 
@@ -129,7 +131,7 @@ final class CrewInspector extends JPanel {
     private final HudButton clearButton = new HudButton(upper("inspector.clear"), false, true);
     private final HudButton unassignButton = new HudButton(upper("inspector.unassign"), false, true);
     private final HudButton removeCrewButton = new HudButton(upper("inspector.removeCrew"), false, true);
-    private final HudButton removeAllButton = new HudButton(upper("inspector.removeCrewAndTech"), false, true);
+    private final HudButton removeTechButton = new HudButton(upper("inspector.removeTech"), false, true);
     private final HudButton fillTempButton = new HudButton(upper("inspector.fillTempCrew"), false, true);
     private final HudButton removeTempButton = new HudButton(upper("inspector.removeTempCrew"), false, true);
 
@@ -144,13 +146,13 @@ final class CrewInspector extends JPanel {
         autoFillButton.addActionListener(event -> actions.autoFill());
         clearButton.addActionListener(event -> actions.clearSelection());
         unassignButton.addActionListener(event -> actions.unassignSelectedPeople());
-        removeCrewButton.addActionListener(event -> actions.clearSelectedUnits(false));
-        removeAllButton.addActionListener(event -> actions.clearSelectedUnits(true));
+        removeCrewButton.addActionListener(event -> actions.clearSelectedUnits());
+        removeTechButton.addActionListener(event -> actions.removeSelectedTechs());
         fillTempButton.addActionListener(event -> actions.fillTempCrew());
         removeTempButton.addActionListener(event -> actions.removeTempCrew());
         unassignButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.unassign.toolTipText"));
         removeCrewButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeCrew.toolTipText"));
-        removeAllButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeCrewAndTech.toolTipText"));
+        removeTechButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeTech.toolTipText"));
         fillTempButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.fillTempCrew.toolTipText"));
         removeTempButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeTempCrew.toolTipText"));
 
@@ -308,7 +310,7 @@ final class CrewInspector extends JPanel {
         boolean anyTeched = state.selectedUnits.stream().anyMatch(unit -> plan.plannedTechOf(unit) != null);
         unassignButton.setArmed(anyPersonPlaced);
         removeCrewButton.setArmed(anyCrewed);
-        removeAllButton.setArmed(anyCrewed || anyTeched);
+        removeTechButton.setArmed(anyTeched);
         fillTempButton.setArmed(state.selectedUnits.stream().anyMatch(unit -> plan.plannedRealCrew(unit) > 0));
         removeTempButton.setArmed(hasTempCrew);
 
@@ -318,7 +320,7 @@ final class CrewInspector extends JPanel {
         }
         if (unitCount > 0) {
             moreButtons.add(removeCrewButton);
-            moreButtons.add(removeAllButton);
+            moreButtons.add(removeTechButton);
             moreButtons.add(fillTempButton);
             moreButtons.add(removeTempButton);
         }
@@ -375,17 +377,14 @@ final class CrewInspector extends JPanel {
         }
         for (CrewCoverage.SeatCoverage seatCoverage : coverage.seats()) {
             CrewSeat seat = seatCoverage.seat();
-            // Real people can take any place temporary crew hold, so "Find" stays offered while those remain
-            int open = Math.max(0, plan.openSeats(unit, seat.type()));
             String seatName = CrewRowRenderers.seatLabel(unit, seat.type());
 
             JPanel head = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
             head.add(Hud.eyebrow(seatName + "  " + seatCoverage.real() + "/" + seat.capacity()),
                   BorderLayout.WEST);
-            if (open > 0) {
-                head.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.findPeople", seatName),
-                      () -> actions.findPeopleFor(unit, seat.type())), BorderLayout.EAST);
-            }
+            // Offered even when the seat is full, to find someone to swap in
+            head.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.findPeople", seatName),
+                  () -> actions.findPeopleFor(unit, seat.type())), BorderLayout.EAST);
             detail.add(leftAligned(head));
 
             // Who will hold the seat once the plan is applied: those staying, then those arriving

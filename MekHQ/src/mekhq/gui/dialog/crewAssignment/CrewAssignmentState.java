@@ -90,7 +90,7 @@ final class CrewAssignmentState {
     Assignment assignment = Assignment.UNASSIGNED;
     @Nullable PersonnelRole role;
     String peopleQuery = "";
-    /** When set, the Personnel page shows only people who could take this seat. */
+    /** When set, the Personnel page shows only people who could take this seat, even if it is full now. */
     @Nullable SeatFilter qualifiedFor;
     /** When set, the Personnel page shows only techs who could take this unit on, or already maintain it. */
     @Nullable Unit techFor;
@@ -180,7 +180,7 @@ final class CrewAssignmentState {
         if ((role != null) && !person.hasRole(role)) {
             return false;
         }
-        if ((qualifiedFor != null) && !plan.canStage(person, qualifiedFor.unit(), qualifiedFor.seat())
+        if ((qualifiedFor != null) && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
                   && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
             return false;
         }

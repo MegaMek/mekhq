@@ -888,8 +888,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     }
 
     @Override
-    public void clearSelectedUnits(boolean alsoTechs) {
-        int staged = data.plan().clearUnits(orderedSelectedUnits(), alsoTechs);
+    public void clearSelectedUnits() {
+        int staged = data.plan().clearUnits(orderedSelectedUnits());
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
+        refresh();
+    }
+
+    @Override
+    public void removeSelectedTechs() {
+        int staged = data.plan().unassignTechs(orderedSelectedUnits());
         setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
         refresh();
     }

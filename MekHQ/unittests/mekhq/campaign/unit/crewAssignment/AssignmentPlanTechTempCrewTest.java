@@ -101,20 +101,27 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
-    void clearingUnitsTakesEveryoneOutAndCanKeepTheTech() {
+    void clearingUnitsTakesEveryoneOutButKeepsTheTech() {
         Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
         Person tech = fixture.tech("Tech", 480);
         Unit unit = mek("Mek").with(pilot, SeatType.PILOT).maintainedBy(tech).unit;
 
-        plan.clearUnits(List.of(unit), false);
+        plan.clearUnits(List.of(unit));
 
         assertNull(plan.plannedUnitOf(pilot));
         assertEquals(tech, plan.plannedTechOf(unit));
+    }
 
-        plan.undo();
-        plan.clearUnits(List.of(unit), true);
+    @Test
+    void removingTechsKeepsTheCrew() {
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
+        Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").with(pilot, SeatType.PILOT).maintainedBy(tech).unit;
+
+        plan.unassignTechs(List.of(unit));
 
         assertNull(plan.plannedTechOf(unit));
+        assertEquals(unit, plan.plannedUnitOf(pilot));
     }
 
     // endregion Unassigning
