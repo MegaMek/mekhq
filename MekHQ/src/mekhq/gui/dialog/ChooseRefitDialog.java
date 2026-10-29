@@ -498,7 +498,7 @@ public class ChooseRefitDialog extends JDialog {
                     notice = RefitWithoutKitNotice.describe(kitRefit, new Refit(unit, customEntity, true, false, false));
                 }
             } catch (EntityLoadingException exception) {
-                logger.error(exception, "[RefitWithoutKit] {}: could not load {}", unit.getName(), designName);
+                logger.error(exception, "[RefitWithoutKit] %s: could not load %s", unit.getName(), designName);
             }
         }
         customizeNotices.put(kitRefit, notice);
