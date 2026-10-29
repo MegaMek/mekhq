@@ -62,10 +62,12 @@ import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -79,6 +81,7 @@ import mekhq.campaign.parts.RefitFacility;
 import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
+import mekhq.campaign.parts.RefitWithoutKitNotice;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
@@ -104,6 +107,8 @@ public class ChooseRefitDialog extends JDialog {
     private RefitTableModel refitModel;
     private RefitDesignSearch.Result designSearch;
     private int failedRefitCheck;
+    // How Customize to Model differs from the kit, by the refit as the list grades it; null when it does not
+    private final Map<Refit, String> customizeNotices = new HashMap<>();
 
     private JButton btnRefit;
     private JButton btnCustomize;
@@ -437,6 +442,10 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setEnabled(isAllowedDesign && canBuyKit);
         btnRefit.setToolTipText(getTextAt(RESOURCE_BUNDLE, canBuyKit ? "btnRefit.tooltip" : "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
+        String customizeNotice = describeCustomizeDifference(selectedRefit);
+        String customizeTooltip = getTextAt(RESOURCE_BUNDLE, "btnCustomize.tooltip");
+        btnCustomize.setToolTipText((customizeNotice == null) ? customizeTooltip
+                                          : (customizeTooltip + ' ' + customizeNotice));
 
         List<Refit.RefitNeed> needs = selectedRefit.describeNeeds();
         boolean hasPartsToOrder = false;
@@ -455,10 +464,66 @@ public class ChooseRefitDialog extends JDialog {
 
         JList<String> lstShopping = new JList<>(listNeeds(needs).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
-        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(selectedRefit)));
+        scrShoppingList.setColumnHeaderView(createPartsHeader(refitModel.getPartsStatus(selectedRefit),
+              customizeNotice));
         EntityReadout newUnitReadout = EntityReadout.createReadout(selectedRefit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + newUnitReadout.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
+    }
+
+    /**
+     * The refit list grades each refit as kit work. Customize to Model works without a kit, which can be a higher class
+     * needing a better site, and costs the unit a quality level, so the player is told before choosing it.
+     *
+     * @param kitRefit the selected refit, as the list grades it
+     *
+     * @return how beginning this refit with Customize to Model differs from using the refit kit, or {@code null} when
+     *       it does not or the design cannot be loaded
+     */
+    private @Nullable String describeCustomizeDifference(Refit kitRefit) {
+        if (customizeNotices.containsKey(kitRefit)) {
+            return customizeNotices.get(kitRefit);
+        }
+        String notice = null;
+        String designName = kitRefit.getNewEntity().getShortNameRaw();
+        MekSummary summary = MekSummaryCache.getInstance().getMek(designName);
+        if (summary == null) {
+            logger.debug("[RefitWithoutKit] {}: no design file for {}, so no customize notice", unit.getName(),
+                  designName);
+        } else {
+            try {
+                // Its own copy of the design, as Customize to Model loads one when the refit begins
+                Entity customEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                if (customEntity != null) {
+                    notice = RefitWithoutKitNotice.describe(kitRefit, new Refit(unit, customEntity, true, false, false));
+                }
+            } catch (EntityLoadingException exception) {
+                logger.error(exception, "[RefitWithoutKit] {}: could not load {}", unit.getName(), designName);
+            }
+        }
+        customizeNotices.put(kitRefit, notice);
+        return notice;
+    }
+
+    /**
+     * @return the parts status line above the parts list, followed by how Customize to Model differs from the kit when
+     *       it does
+     */
+    private static JComponent createPartsHeader(RefitPartsStatus partsStatus, @Nullable String customizeNotice) {
+        JLabel statusLabel = createPartsStatusLabel(partsStatus);
+        if (customizeNotice == null) {
+            return statusLabel;
+        }
+        JLabel noticeLabel = new JLabel("<html>" + customizeNotice + "</html>");
+        noticeLabel.setForeground(MekHQ.getMHQOptions().getFontColorWarning());
+        noticeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, UIUtil.scaleForGUI(5), 0));
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        noticeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        header.add(statusLabel);
+        header.add(noticeLabel);
+        return header;
     }
 
     /**
