@@ -47,6 +47,9 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.gui.dialog.markets.contractMarket.ContractReadout.Row;
 import mekhq.gui.dialog.markets.contractMarket.ContractReadout.Section;
+import org.apache.fontbox.ttf.TTFParser;
+import org.apache.fontbox.ttf.TrueTypeFont;
+import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -414,7 +417,13 @@ public final class ContractPdfExporter {
         File fontFile = new File(FONT_FOLDER, fileName);
         if (fontFile.isFile()) {
             try {
-                return PDType0Font.load(document, fontFile);
+                TrueTypeFont font = new TTFParser().parse(new RandomAccessReadBufferedFile(fontFile));
+                // Noto Sans's glyph substitutions swap the digits for alternates PDFBox embeds without a Unicode
+                // mapping, so every figure would print but could not be searched or copied out of the PDF.
+                font.setEnableGsub(false);
+                // Subsetting reads the font when the document is saved, so it stays open until the document closes.
+                document.registerTrueTypeFontForClosing(font);
+                return PDType0Font.load(document, font, true);
             } catch (IOException ex) {
                 LOGGER.warn(ex, "Unable to load {} for the contract PDF; falling back to {}.", fontFile, fallback);
             }

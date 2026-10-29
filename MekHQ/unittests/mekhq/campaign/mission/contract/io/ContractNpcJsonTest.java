@@ -86,7 +86,7 @@ class ContractNpcJsonTest {
     private Person negotiator() {
         Person person = campaign.getPlayerForce()
                               .getHumanResources()
-                              .newPerson(campaign, PersonnelRole.ADMINISTRATOR_COMMAND, null, Gender.FEMALE);
+                              .newPerson(campaign, PersonnelRole.LAWYER, null, Gender.FEMALE);
         person.setGivenName("Katrina");
         person.setSurname("Steiner");
         person.setPortrait(new Portrait("Female/Command", "steiner.png"));
@@ -118,7 +118,7 @@ class ContractNpcJsonTest {
         assertEquals("Katrina", rebuilt.getGivenName());
         assertEquals("Steiner", rebuilt.getSurname());
         assertEquals(Gender.FEMALE, rebuilt.getGender());
-        assertEquals(PersonnelRole.ADMINISTRATOR_COMMAND, rebuilt.getPrimaryRole());
+        assertEquals(PersonnelRole.LAWYER, rebuilt.getPrimaryRole());
         assertEquals(12, rebuilt.getRankNumeric());
         assertEquals("Female/Command", rebuilt.getPortrait().getCategory());
         assertEquals("steiner.png", rebuilt.getPortrait().getFilename());
@@ -181,7 +181,7 @@ class ContractNpcJsonTest {
     @Test
     void anUnknownAbilityOrAttributeIsIgnored() {
         ContractNpcJson snapshot = new ContractNpcJson("Ada", "Lovelace", Gender.FEMALE.name(),
-              PersonnelRole.ADMINISTRATOR_COMMAND.name(), null, "NONE", false, null, 0, 0, null,
+              PersonnelRole.LAWYER.name(), null, "NONE", false, null, 0, 0, null,
               Map.of("NOT_AN_ATTRIBUTE", 9), Map.of(), List.of("not_a_real_ability"), List.of());
 
         Person rebuilt = snapshot.toPerson(campaign);
