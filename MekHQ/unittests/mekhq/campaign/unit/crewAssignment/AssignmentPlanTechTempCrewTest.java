@@ -48,6 +48,7 @@ import megamek.common.units.Mek;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
@@ -213,6 +214,38 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
+    void aUnitInSalvageModeTakesNoneOfItsTechsTime() {
+        Person tech = fixture.tech("Tech", 120);
+        Unit salvage = mek("Salvage").maintainedBy(tech).unit;
+        when(salvage.isSalvage()).thenReturn(true);
+        // As the real Person counts it: a unit in salvage mode is not maintained
+        when(tech.getMaintenanceTimeUsing()).thenReturn(0);
+        List<Unit> units = List.of(mek("A").unit, mek("B").unit, mek("C").unit);
+
+        plan.unassignTechs(List.of(salvage));
+        TechStageResult result = plan.stageTechs(List.of(tech), units);
+
+        // Giving up the salvage unit frees no time, so 120 minutes still cover only two 60 minute units
+        assertEquals(2, result.staged().size());
+        assertEquals(120, plan.plannedTechMinutes(tech));
+    }
+
+    @Test
+    void assigningCrewAndTechsIsOneStepOfHistory() {
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
+        Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
+
+        AssignResult result = plan.assign(List.of(pilot, tech), List.of(unit));
+
+        assertEquals(1, result.crew().staged().size());
+        assertEquals(1, result.techs().staged().size());
+        assertTrue(plan.undo());
+        assertTrue(plan.isEmpty());
+        assertFalse(plan.canUndo());
+    }
+
+    @Test
     void validationNoticesATechWhoNoLongerHasTheTime() {
         Person tech = fixture.tech("Tech", 480);
         Unit unit = mek("Mek").unit;
@@ -319,6 +352,37 @@ class AssignmentPlanTechTempCrewTest {
 
         assertEquals(3, plan.size());
         assertEquals(Map.of(PersonnelRole.SOLDIER, 0), plan.tempCrewChanges().get(0).after());
+    }
+
+    @Test
+    void aTempCrewRemovalCannotBeTakenBackOnceItsCrewAreGivenAway() {
+        Person first = fixture.person("First", PersonnelRole.SOLDIER);
+        Person second = fixture.person("Second", PersonnelRole.SOLDIER);
+        Unit platoonA = fixture.infantry(mock(Infantry.class), "A", true, 10).with(first, SeatType.SOLDIER)
+                              .withTempCrew(PersonnelRole.SOLDIER, 5).unit;
+        Unit platoonB = fixture.infantry(mock(Infantry.class), "B", true, 10).with(second, SeatType.SOLDIER)
+                              .withTempCrew(PersonnelRole.SOLDIER, 0).unit;
+        plan.removeTempCrew(List.of(platoonA));
+        plan.fillTempCrew(List.of(platoonB), pool(0));
+
+        // B took the five A gave up, so A cannot keep them
+        assertFalse(plan.removeTempCrewChange(platoonA, pool(0)));
+        assertEquals(0, plan.plannedTempCrewPool(PersonnelRole.SOLDIER, pool(0)));
+        // With five more in the pool, A can
+        assertTrue(plan.removeTempCrewChange(platoonA, pool(5)));
+    }
+
+    @Test
+    void validationNoticesAFillOnAUnitLeftWithoutRealCrew() {
+        Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
+        Unit platoon = fixture.infantry(mock(Infantry.class), "Platoon", true, 10)
+                             .with(soldier, SeatType.SOLDIER)
+                             .withTempCrew(PersonnelRole.SOLDIER, 0).unit;
+        plan.fillTempCrew(List.of(platoon), pool(20));
+
+        plan.clearUnits(List.of(platoon));
+
+        assertEquals(Reason.NO_REAL_CREW, plan.problemWith(plan.tempCrewChanges().get(0)));
     }
 
     // endregion Temporary crew

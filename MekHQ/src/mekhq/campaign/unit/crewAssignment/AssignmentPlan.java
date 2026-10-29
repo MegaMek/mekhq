@@ -139,6 +139,14 @@ public class AssignmentPlan {
     }
 
     /**
+     * What an assignment of people to units did.
+     *
+     * @param crew  the people staged into seats, and those left over
+     * @param techs the techs among those left over staged to maintain units, and the units still without one
+     */
+    public record AssignResult(StageResult crew, TechStageResult techs) {}
+
+    /**
      * What a bulk tech stage did.
      *
      * @param staged   the changes it made, in order
@@ -205,9 +213,11 @@ public class AssignmentPlan {
         NO_TECH_TIME,
         /** The person, the unit's tech or the unit's temporary crew have changed since the change was staged. */
         OUT_OF_DATE,
+        /** Temporary crew would be added to a unit that will have no real crew member aboard. */
+        NO_REAL_CREW,
         /**
          * The seat had no room, or the unit refused the person, when the change was applied. The person was returned
-         * to the seat they held before.
+         * to the seat they held before, if it was still free.
          */
         REFUSED
     }
@@ -225,6 +235,8 @@ public class AssignmentPlan {
     /** How each seat's head count would change: +1 for each staged arrival, -1 for each staged departure. */
     private final Map<SeatKey, Integer> seatChanges = new HashMap<>();
     private final Map<UUID, StagedTech> techChanges = new LinkedHashMap<>();
+    /** How each tech's daily maintenance minutes would change, kept up to date as tech changes are staged. */
+    private final Map<UUID, Integer> techMinuteChanges = new HashMap<>();
     private final Map<UUID, StagedTempCrew> tempCrewChanges = new LinkedHashMap<>();
     /** Each step of history is the list of reverts its edits need, applied last first. */
     private final Deque<List<Runnable>> history = new ArrayDeque<>();
@@ -273,12 +285,15 @@ public class AssignmentPlan {
      * @param type the seat
      *
      * @return how many more people the seat could take once the staged changes are applied; negative if more are
-     *       staged into it than it holds
+     *       staged into it, or already hold it, than it holds
      */
     public int openSeats(final Unit unit, final SeatType type) {
         for (CrewSeat seat : seatsOf(unit)) {
             if (seat.type() == type) {
-                return seat.openSeats() - seatChanges.getOrDefault(new SeatKey(unit.getId(), type), 0);
+                // Not CrewSeat.openSeats(), which stops at zero: a seat already over capacity must stay full until
+                // enough of its occupants leave
+                final int openNow = seat.capacity() - seat.occupants().size();
+                return openNow - seatChanges.getOrDefault(new SeatKey(unit.getId(), type), 0);
             }
         }
         return 0;
@@ -471,16 +486,23 @@ public class AssignmentPlan {
      * @return the minutes of daily maintenance the tech's units will take once the staged changes are applied
      */
     public int plannedTechMinutes(final Person tech) {
-        int minutes = tech.getMaintenanceTimeUsing();
-        for (StagedTech change : techChanges.values()) {
-            final int unitMinutes = change.unit().getMaintenanceTime();
-            if (tech.equals(change.fromTech()) && !tech.equals(change.toTech())) {
-                minutes -= unitMinutes;
-            } else if (tech.equals(change.toTech()) && !tech.equals(change.fromTech())) {
-                minutes += unitMinutes;
-            }
+        return tech.getMaintenanceTimeUsing() + techMinuteChanges.getOrDefault(tech.getId(), 0);
+    }
+
+    /**
+     * @param tech a tech
+     * @param unit a unit
+     *
+     * @return the minutes of daily maintenance the unit takes from the tech, counted as
+     *       {@link Person#getMaintenanceTimeUsing()} counts them: none while the unit is in salvage mode, or while the
+     *       tech is refitting it
+     */
+    private static int techMinutesFor(final Person tech, final Unit unit) {
+        if (unit.isSalvage() || (unit.isRefitting() && (unit.getRefit() != null)
+                                       && tech.equals(unit.getRefit().getTech()))) {
+            return 0;
         }
-        return minutes;
+        return unit.getMaintenanceTime();
     }
 
     /**
@@ -508,7 +530,7 @@ public class AssignmentPlan {
                      && SeatEligibility.canTech(tech, unit)
                      && !isTechBusy.test(tech)
                      && LocationUtils.areSameEffectiveLocation(unit, tech)
-                     && ((plannedTechMinutes(tech) + unit.getMaintenanceTime()) <= techMinutesAvailable(tech));
+                     && ((plannedTechMinutes(tech) + techMinutesFor(tech, unit)) <= techMinutesAvailable(tech));
     }
 
     // endregion Reading techs
@@ -579,6 +601,70 @@ public class AssignmentPlan {
      */
     public StageResult stage(final List<Person> people, final List<Unit> units) {
         final List<Runnable> reverts = new ArrayList<>();
+        final StageResult result = stage(people, units, reverts);
+        record(reverts);
+        return result;
+    }
+
+    /**
+     * Stages each person, in the order given, into the first unit in the order given that has a seat they can take, and
+     * then stages the techs among those left over to maintain the units that will have no tech. The whole call is one
+     * step of history, so one undo reverts both.
+     *
+     * @param people the people, best first
+     * @param units  the units, in the order they should be filled
+     *
+     * @return what was staged into seats, and what was staged as techs
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public AssignResult assign(final List<Person> people, final List<Unit> units) {
+        final List<Runnable> reverts = new ArrayList<>();
+        final StageResult crew = stage(people, units, reverts);
+        // A tech no seat suits may still maintain a unit that has no tech
+        final List<Person> spareTechs = crew.leftOver().stream().filter(Person::isTech).toList();
+        final TechStageResult techs = stageTechs(spareTechs, units, reverts);
+        record(reverts);
+        return new AssignResult(crew, techs);
+    }
+
+    /**
+     * Stages people, best first, into one kind of seat on the given units, as one step of history. Each person goes
+     * into the first unit, in order, where they could take that seat and it still has room. Someone who fits none of
+     * them is passed over, and once every seat is taken nobody else is tried.
+     *
+     * @param people the people, best first
+     * @param units  the units, in the order they should be filled
+     * @param type   the seat to fill
+     *
+     * @return what was staged; nobody is reported left over, as nobody was promised a seat
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StageResult fillSeats(final List<Person> people, final List<Unit> units, final SeatType type) {
+        final List<Runnable> reverts = new ArrayList<>();
+        final List<StagedAssignment> staged = new ArrayList<>();
+        for (Person person : people) {
+            if (units.stream().noneMatch(unit -> openSeats(unit, type) > 0)) {
+                break;
+            }
+            for (Unit unit : units) {
+                if (canStage(person, unit, type)) {
+                    final StagedAssignment change = put(person, unit, type, reverts);
+                    if (change != null) {
+                        staged.add(change);
+                    }
+                    break;
+                }
+            }
+        }
+        record(reverts);
+        return new StageResult(staged, List.of());
+    }
+
+    private StageResult stage(final List<Person> people, final List<Unit> units, final List<Runnable> reverts) {
         final List<StagedAssignment> staged = new ArrayList<>();
         final List<Person> leftOver = new ArrayList<>();
 
@@ -600,8 +686,6 @@ public class AssignmentPlan {
                 leftOver.add(person);
             }
         }
-
-        record(reverts);
         return new StageResult(staged, leftOver);
     }
 
@@ -752,6 +836,13 @@ public class AssignmentPlan {
      */
     public TechStageResult stageTechs(final List<Person> techs, final List<Unit> units) {
         final List<Runnable> reverts = new ArrayList<>();
+        final TechStageResult result = stageTechs(techs, units, reverts);
+        record(reverts);
+        return result;
+    }
+
+    private TechStageResult stageTechs(final List<Person> techs, final List<Unit> units,
+          final List<Runnable> reverts) {
         final List<StagedTech> staged = new ArrayList<>();
         final List<Unit> leftOver = new ArrayList<>();
         for (Unit unit : units) {
@@ -774,7 +865,6 @@ public class AssignmentPlan {
                 }
             }
         }
-        record(reverts);
         return new TechStageResult(staged, leftOver);
     }
 
@@ -837,7 +927,8 @@ public class AssignmentPlan {
         }
         final Person fromTech = change.fromTech();
         if ((fromTech != null)
-                  && ((plannedTechMinutes(fromTech) + unit.getMaintenanceTime()) > techMinutesAvailable(fromTech))) {
+                  && ((plannedTechMinutes(fromTech) + techMinutesFor(fromTech, unit))
+                            > techMinutesAvailable(fromTech))) {
             return false;
         }
         final List<Runnable> reverts = new ArrayList<>();
@@ -924,16 +1015,25 @@ public class AssignmentPlan {
     }
 
     /**
-     * Takes a unit's staged temporary crew change out of the plan, as one step of history.
+     * Takes a unit's staged temporary crew change out of the plan, as one step of history. This is refused when the
+     * change removed temporary crew that have since been staged to another unit, so the unit cannot keep them.
      *
-     * @param unit the unit
+     * @param unit          the unit
+     * @param availablePool the campaign's free temporary crew of each role, before any staged change
      *
      * @return {@code true} if a change was removed
      */
-    public boolean removeTempCrewChange(final Unit unit) {
+    public boolean removeTempCrewChange(final Unit unit, final ToIntFunction<PersonnelRole> availablePool) {
         final StagedTempCrew change = tempCrewChanges.get(unit.getId());
         if (change == null) {
             return false;
+        }
+        // Keeping the temporary crew the change would have removed takes them back out of the pool
+        for (Map.Entry<PersonnelRole, Integer> entry : change.before().entrySet()) {
+            final int kept = entry.getValue() - change.after().getOrDefault(entry.getKey(), 0);
+            if ((kept > 0) && (plannedTempCrewPool(entry.getKey(), availablePool) < kept)) {
+                return false;
+            }
         }
         final List<Runnable> reverts = new ArrayList<>();
         tempCrewChanges.remove(unit.getId());
@@ -967,6 +1067,7 @@ public class AssignmentPlan {
         changes.clear();
         seatChanges.clear();
         techChanges.clear();
+        techMinuteChanges.clear();
         tempCrewChanges.clear();
         history.clear();
     }
@@ -1047,18 +1148,38 @@ public class AssignmentPlan {
 
     private void replaceTech(final Unit unit, final @Nullable StagedTech before, final @Nullable StagedTech after,
           final List<Runnable> reverts) {
+        if (before != null) {
+            adjustTechMinutes(before, -1);
+        }
         if (after != null) {
+            adjustTechMinutes(after, 1);
             techChanges.put(unit.getId(), after);
         } else {
             techChanges.remove(unit.getId());
         }
         reverts.add(() -> {
+            if (after != null) {
+                adjustTechMinutes(after, -1);
+            }
             if (before != null) {
+                adjustTechMinutes(before, 1);
                 techChanges.put(unit.getId(), before);
             } else {
                 techChanges.remove(unit.getId());
             }
         });
+    }
+
+    /** Moves a tech change's minutes from the old tech to the new one, or back again when {@code sign} is -1. */
+    private void adjustTechMinutes(final StagedTech change, final int sign) {
+        if (change.fromTech() != null) {
+            techMinuteChanges.merge(change.fromTech().getId(), -sign * techMinutesFor(change.fromTech(),
+                  change.unit()), Integer::sum);
+        }
+        if (change.toTech() != null) {
+            techMinuteChanges.merge(change.toTech().getId(), sign * techMinutesFor(change.toTech(), change.unit()),
+                  Integer::sum);
+        }
     }
 
     /**
@@ -1257,7 +1378,11 @@ public class AssignmentPlan {
                 return Reason.OUT_OF_DATE;
             }
         }
-        return unit.isAvailable() ? null : Reason.UNIT_UNAVAILABLE;
+        if (!unit.isAvailable()) {
+            return Reason.UNIT_UNAVAILABLE;
+        }
+        // Temporary crew need a real crew member aboard, so a unit the plan leaves without one cannot be given more
+        return ((change.change() > 0) && (plannedRealCrew(unit) == 0)) ? Reason.NO_REAL_CREW : null;
     }
 
     // endregion Validation

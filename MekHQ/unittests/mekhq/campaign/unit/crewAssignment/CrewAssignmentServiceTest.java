@@ -33,6 +33,7 @@
 package mekhq.campaign.unit.crewAssignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -111,6 +112,25 @@ class CrewAssignmentServiceTest {
         assertEquals(Reason.REFUSED, report.skipped().get(0).reason());
         assertEquals(home.unit, pilot.getUnit());
         assertEquals(List.of(pilot), home.drivers);
+    }
+
+    @Test
+    void aRefusedPersonIsNotPutBackIntoASeatSomeoneElseHasTaken() {
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+        CrewFixture.CrewUnit home = mek("Home").with(pilot, SeatType.PILOT);
+        CrewFixture.CrewUnit away = mek("Away");
+        // The newcomer is staged first, so their move into Home is applied before the pilot is refused
+        plan.stage(newcomer, mek("Spare").unit, SeatType.PILOT);
+        plan.stage(pilot, away.unit, SeatType.PILOT);
+        plan.stage(newcomer, home.unit, SeatType.PILOT);
+        away.refuse = pilot;
+
+        CommitReport report = CrewAssignmentService.commit(plan, false, TODAY);
+
+        assertEquals(Reason.REFUSED, report.skipped().get(0).reason());
+        assertEquals(List.of(newcomer), home.drivers);
+        assertNull(pilot.getUnit());
     }
 
     @Test

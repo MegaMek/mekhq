@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
@@ -790,9 +791,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                     }
                 }
                 case CrewRowRenderers.TempCrewItem item -> {
-                    plan.removeTempCrewChange(item.change().unit());
-                    setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed",
-                          item.change().unit().getName()), false);
+                    Unit unit = item.change().unit();
+                    if (plan.removeTempCrewChange(unit, data.tempCrewPool())) {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed", unit.getName()), false);
+                    } else {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removeTempCrewRefused",
+                              unit.getName()), true);
+                    }
                 }
             }
             refresh();
@@ -811,12 +816,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     @Override
     public void assignSelected() {
-        AssignmentPlan plan = data.plan();
-        List<Unit> units = orderedSelectedUnits();
-        // Crew first; a tech no seat suits may still maintain a unit that has no tech
-        StageResult crew = plan.stage(sortedSelectedPeople(), units);
-        List<Person> spareTechs = crew.leftOver().stream().filter(Person::isTech).toList();
-        TechStageResult techs = plan.stageTechs(spareTechs, units);
+        // Crew first, then spare techs, as one step of history
+        AssignResult result = data.plan().assign(sortedSelectedPeople(), orderedSelectedUnits());
+        StageResult crew = result.crew();
+        TechStageResult techs = result.techs();
         Set<Person> techsPlaced = new HashSet<>();
         techs.staged().forEach(change -> techsPlaced.add(change.toTech()));
 

@@ -33,6 +33,7 @@
 package mekhq.campaign.unit.crewAssignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -44,8 +45,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
+import megamek.common.units.Tank;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -59,7 +63,11 @@ class AutoFillTest {
     private final AssignmentPlan plan = new AssignmentPlan(false, false);
 
     private Person soldier(String name, SkillLevel level) {
-        Person person = fixture.person(name, PersonnelRole.SOLDIER);
+        return person(name, PersonnelRole.SOLDIER, level);
+    }
+
+    private Person person(String name, PersonnelRole role, SkillLevel level) {
+        Person person = fixture.person(name, role);
         when(person.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(level);
         return person;
     }
@@ -122,6 +130,34 @@ class AutoFillTest {
 
         assertEquals(first, plan.plannedUnitOf(best));
         assertEquals(second, plan.plannedUnitOf(next));
+    }
+
+    @Test
+    void peopleNoUnitCanTakeDoNotUseUpTheOpenSeats() {
+        Unit squad = fixture.infantry(mock(BattleArmor.class), "Squad", false, 1).unit;
+        Unit platoon = fixture.infantry(mock(Infantry.class), "Platoon", true, 1).unit;
+        Person eliteTrooper = person("Elite", PersonnelRole.BATTLE_ARMOUR, SkillLevel.ELITE);
+        Person veteranTrooper = person("Veteran", PersonnelRole.BATTLE_ARMOUR, SkillLevel.VETERAN);
+        Person soldier = soldier("Green", SkillLevel.GREEN);
+
+        AutoFill.fill(plan, List.of(squad, platoon), SeatType.SOLDIER,
+              List.of(eliteTrooper, veteranTrooper, soldier), ranking(Map.of()));
+
+        assertEquals(squad, plan.plannedUnitOf(eliteTrooper));
+        assertNull(plan.plannedUnitOf(veteranTrooper));
+        assertEquals(platoon, plan.plannedUnitOf(soldier));
+    }
+
+    @Test
+    void peopleGoIntoTheSeatBeingFilled() {
+        Tank tank = mock(Tank.class);
+        when(tank.getMovementMode()).thenReturn(EntityMovementMode.TRACKED);
+        Unit unit = fixture.vehicle(tank, "Tank", 1).unit;
+        Person crew = person("Crew", PersonnelRole.VEHICLE_CREW_GROUND, SkillLevel.REGULAR);
+
+        AutoFill.fill(plan, List.of(unit), SeatType.GUNNER, List.of(crew), ranking(Map.of()));
+
+        assertEquals(SeatType.GUNNER, plan.changeFor(crew).toSeat());
     }
 
     @Test

@@ -78,7 +78,6 @@ import mekhq.gui.model.LocationFilterItem;
  * @since 0.51.01
  */
 final class CrewAssignmentData {
-    /** A unit and what the dialog shows about it. */
     /**
      * A unit and what the dialog shows about it.
      *
@@ -91,7 +90,6 @@ final class CrewAssignmentData {
     /** A special ability, as shown on a chip and in its tooltip. */
     record AbilityEntry(String name, String description) {}
 
-    /** A person and what the dialog shows about them. */
     /**
      * A person and what the dialog shows about them.
      *

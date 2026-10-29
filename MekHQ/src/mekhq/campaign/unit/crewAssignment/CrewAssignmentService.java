@@ -62,8 +62,8 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewProblem;
  *     <li>Temporary crew are filled or removed. A fill was sized for the crew the unit will end up with, so it comes
  *     after the departures and before the arrivals, and never leaves the unit over strength.</li>
  *     <li>Everyone moving into a seat takes it. The seat is checked for room first; if it has none, or the unit
- *     refuses them, they are put back in the seat they left, so nobody is left without a seat by a failed
- *     assignment. A person taking a place temporary crew hold replaces one of them.</li>
+ *     refuses them, they are put back in the seat they left if it is still free, and otherwise left unassigned
+ *     rather than overfilling it. A person taking a place temporary crew hold replaces one of them.</li>
  *     <li>Techs change. A unit whose new tech is refused keeps the tech it had.</li>
  * </ol>
  *
@@ -176,11 +176,18 @@ public final class CrewAssignmentService {
                 }
                 applied.add(change);
             } else {
-                LOGGER.warn("Could not seat {} as {} of {}; returning them to their previous seat",
-                      person.getFullName(), change.toSeat(), change.toUnit().getName());
+                LOGGER.warn("Could not seat {} as {} of {}", person.getFullName(), change.toSeat(),
+                      change.toUnit().getName());
                 skipped.add(new Problem(change, Reason.REFUSED));
                 if ((change.fromUnit() != null) && (change.fromSeat() != null)) {
-                    seat(person, change.fromUnit(), change.fromSeat(), null, false);
+                    // Someone else may have taken the seat they left already, and the unit would not stop them
+                    // overfilling it
+                    if (hasRoom(change.fromUnit(), change.fromSeat())) {
+                        seat(person, change.fromUnit(), change.fromSeat(), null, false);
+                    } else {
+                        LOGGER.warn("Could not return {} to {} of {}, which is now full; they are left unassigned",
+                              person.getFullName(), change.fromSeat(), change.fromUnit().getName());
+                    }
                 }
             }
         }

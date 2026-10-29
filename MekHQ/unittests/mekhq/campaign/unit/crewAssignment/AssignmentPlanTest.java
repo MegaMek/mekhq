@@ -100,6 +100,20 @@ class AssignmentPlanTest {
     }
 
     @Test
+    void aSeatAlreadyOverCapacityStaysFullUntilEnoughPeopleLeave() {
+        List<Person> crew = soldiers(3);
+        Unit unit = fixture.infantry(mock(Infantry.class), "Platoon", true, 2)
+                          .with(crew.get(0), SeatType.SOLDIER)
+                          .with(crew.get(1), SeatType.SOLDIER)
+                          .with(crew.get(2), SeatType.SOLDIER).unit;
+
+        plan.unassign(List.of(crew.get(0)));
+
+        assertEquals(0, plan.openSeats(unit, SeatType.SOLDIER));
+        assertFalse(plan.canStage(fixture.person("Newcomer", PersonnelRole.SOLDIER), unit, SeatType.SOLDIER));
+    }
+
+    @Test
     void undoRevertsAWholeBulkStage() {
         Unit unit = platoon("Platoon", 5);
         plan.stage(soldiers(2), List.of(unit));
