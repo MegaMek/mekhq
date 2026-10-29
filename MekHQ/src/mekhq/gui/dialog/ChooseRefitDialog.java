@@ -466,6 +466,8 @@ public class ChooseRefitDialog extends JDialog {
         scrShoppingList.setViewportView(lstShopping);
         scrShoppingList.setColumnHeaderView(createPartsHeader(refitModel.getPartsStatus(selectedRefit),
               customizeNotice));
+        // The header knows how tall its wrapped lines are only once it has its width, so lay it out again then
+        SwingUtilities.invokeLater(scrShoppingList::revalidate);
         EntityReadout newUnitReadout = EntityReadout.createReadout(selectedRefit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + newUnitReadout.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
@@ -506,37 +508,41 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     /**
-     * @return the parts status line above the parts list, followed by how Customize to Model differs from the kit when
-     *       it does
+     * The lines above the parts list: where the refit stands for parts, in the colour the refit list uses, then how
+     * Customize to Model differs from the kit when it does. Both wrap to the width of the list, as a long part list or
+     * notice would otherwise run off the edge.
+     *
+     * @return a read-only text pane holding the lines
      */
-    private static JComponent createPartsHeader(RefitPartsStatus partsStatus, @Nullable String customizeNotice) {
-        JLabel statusLabel = createPartsStatusLabel(partsStatus);
-        if (customizeNotice == null) {
-            return statusLabel;
+    private static JEditorPane createPartsHeader(RefitPartsStatus partsStatus, @Nullable String customizeNotice) {
+        StringBuilder html = new StringBuilder("<html><body>");
+        appendColouredLine(html, partsStatus.describe(), getPartsStatusColor(partsStatus.state()));
+        if (customizeNotice != null) {
+            appendColouredLine(html, customizeNotice, MekHQ.getMHQOptions().getFontColorWarning());
         }
-        JLabel noticeLabel = new JLabel("<html>" + customizeNotice + "</html>");
-        noticeLabel.setForeground(MekHQ.getMHQOptions().getFontColorWarning());
-        noticeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, UIUtil.scaleForGUI(5), 0));
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        noticeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        header.add(statusLabel);
-        header.add(noticeLabel);
+        html.append("</body></html>");
+
+        JEditorPane header = new JEditorPane("text/html", html.toString());
+        // Draws in the normal label font and colour rather than the HTML defaults
+        header.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        header.setFont(UIManager.getFont("Label.font"));
+        header.setForeground(UIManager.getColor("Label.foreground"));
+        header.setEditable(false);
+        header.setFocusable(false);
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(0, 0, UIUtil.scaleForGUI(5), 0));
         return header;
     }
 
     /**
-     * @return a line above the parts list saying where the refit stands for parts, in the colour the refit list uses
+     * Adds one line of text to the parts header, in the given colour or the normal text colour when there is none.
      */
-    private static JLabel createPartsStatusLabel(RefitPartsStatus partsStatus) {
-        JLabel statusLabel = new JLabel("<html>" + partsStatus.describe() + "</html>");
-        Color statusColor = getPartsStatusColor(partsStatus.state());
-        if (statusColor != null) {
-            statusLabel.setForeground(statusColor);
+    private static void appendColouredLine(StringBuilder html, String text, @Nullable Color colour) {
+        html.append("<div");
+        if (colour != null) {
+            html.append(String.format(" style='color: #%06x'", colour.getRGB() & 0xFFFFFF));
         }
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        return statusLabel;
+        html.append('>').append(text).append("</div>");
     }
 
     /**
