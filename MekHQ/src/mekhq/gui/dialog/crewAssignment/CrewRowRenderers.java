@@ -42,6 +42,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -116,6 +117,29 @@ final class CrewRowRenderers {
         };
     }
 
+    /** A unit's damage level: green when undamaged, amber when moderately damaged, red when heavily or worse. */
+    static Color damageColor(int damageState) {
+        return switch (damageState) {
+            case Entity.DMG_NONE -> READY;
+            case Entity.DMG_LIGHT -> TEXT;
+            case Entity.DMG_MODERATE -> AMBER;
+            default -> DANGER;
+        };
+    }
+
+    /** A person's hits: muted at none, amber when hurt, red when close to death. */
+    static Color hitsColor(int hits) {
+        if (hits <= 0) {
+            return TEXT_MUTED;
+        }
+        return (hits >= 4) ? DANGER : AMBER;
+    }
+
+    /** A person's fatigue: muted at none, amber otherwise. */
+    static Color fatigueColor(int fatigue) {
+        return (fatigue <= 0) ? TEXT_MUTED : AMBER;
+    }
+
     static Color crewingColor(CrewAssignmentState.Crewing crewing) {
         return switch (crewing) {
             case FULL -> READY;
@@ -174,6 +198,8 @@ final class CrewRowRenderers {
         final HudCheckBox checkBox = new HudCheckBox("");
         final JLabel name = label(NAME_FONT, TEXT);
         final JLabel role = label(ROLE_FONT, TEXT_MUTED);
+        /** A short status after the role: a unit's damage, or a person's hits and fatigue. */
+        final JLabel status = label(ROLE_FONT, TEXT_MUTED);
         final JPanel secondLine = transparent();
         final JPanel badges = transparent();
 
@@ -194,6 +220,8 @@ final class CrewRowRenderers {
             firstLine.add(name);
             firstLine.add(Box.createHorizontalStrut(scaleForGUI(6)));
             firstLine.add(role);
+            firstLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
+            firstLine.add(status);
             firstLine.add(Box.createHorizontalGlue());
             secondLine.setLayout(new BoxLayout(secondLine, BoxLayout.X_AXIS));
 
@@ -271,6 +299,8 @@ final class CrewRowRenderers {
             ring.setColor(crewingColor(CrewAssignmentState.crewing(unit, plan)), false);
             name.setText(unit.getName());
             role.setText(entry.typeName());
+            status.setText(entry.damageName());
+            status.setForeground(damageColor(entry.damageState()));
             formation.setText(entry.formationName().isEmpty() ? "" : entry.formationName() + "  ·  ");
 
             Person leader = firstCrew(unit);
@@ -334,6 +364,16 @@ final class CrewRowRenderers {
             paintState(isSelected.test(person));
             name.setText(person.getFullTitle());
             role.setText(person.getPrimaryRole().getLabel(false));
+            List<String> condition = new ArrayList<>();
+            if (entry.hits() > 0) {
+                condition.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.hits", entry.hits()));
+            }
+            if ((entry.fatigue() != null) && (entry.fatigue() > 0)) {
+                condition.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.fatigue", entry.fatigue()));
+            }
+            status.setText(String.join("  \u00b7  ", condition));
+            status.setForeground((entry.hits() > 0) ? hitsColor(entry.hits()) :
+                                       fatigueColor((entry.fatigue() == null) ? 0 : entry.fatigue()));
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);
@@ -404,6 +444,7 @@ final class CrewRowRenderers {
             name.setFont(HudLinkList.isLinkHovered(list, index, person) ? NAME_FONT.deriveFont(Map.of(
                   TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON)) : NAME_FONT);
             role.setText(person.getPrimaryRole().getLabel(false));
+            status.setText("");
 
             if (change.fromUnit() == null) {
                 setLink(list, index, from, getTextAt(RESOURCE_BUNDLE, "row.unassigned"), null);

@@ -55,6 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
@@ -73,13 +74,27 @@ import mekhq.gui.model.LocationFilterItem;
  */
 final class CrewAssignmentData {
     /** A unit and what the dialog shows about it. */
-    record UnitEntry(Unit unit, String typeName, String formationName, String searchText) {}
+    /**
+     * A unit and what the dialog shows about it.
+     *
+     * @param damageState the unit's damage level, one of the {@code Entity.DMG_} values
+     * @param damageName  the damage level as the Hangar tab names it, such as "Light Damage"
+     */
+    record UnitEntry(Unit unit, String typeName, String formationName, int damageState, String damageName,
+          String searchText) {}
 
     /** A special ability, as shown on a chip and in its tooltip. */
     record AbilityEntry(String name, String description) {}
 
     /** A person and what the dialog shows about them. */
-    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities, String searchText) {}
+    /**
+     * A person and what the dialog shows about them.
+     *
+     * @param hits    the person's hits, counting advanced medical injuries
+     * @param fatigue the person's effective fatigue, or {@code null} when the campaign does not use fatigue
+     */
+    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities, int hits,
+          @Nullable Integer fatigue, String searchText) {}
 
     private final Map<UUID, UnitEntry> units = new LinkedHashMap<>();
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
@@ -102,6 +117,7 @@ final class CrewAssignmentData {
               options.get(CampaignOption.USE_IMPLANTS));
 
         boolean isClan = campaign.getPlayerForce().isClanForce();
+        boolean useFatigue = options.get(CampaignOption.USE_FATIGUE);
         Map<Person, SkillLevel> levels = new HashMap<>();
         for (Person person : location.selectPersonnel(campaign)) {
             if (isShown(person)) {
@@ -112,7 +128,8 @@ final class CrewAssignmentData {
                         .thenComparing(Person::getFullName);
         levels.keySet().stream()
               .sorted(ranking)
-              .forEach(person -> people.put(person.getId(), describe(person, levels.get(person))));
+              .forEach(person -> people.put(person.getId(), describe(campaign, person, levels.get(person),
+                    useFatigue)));
 
         List<UnitEntry> unitEntries = new ArrayList<>();
         for (Unit unit : location.selectUnits(campaign)) {
@@ -130,7 +147,7 @@ final class CrewAssignmentData {
                      && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat());
     }
 
-    private static PersonEntry describe(Person person, SkillLevel level) {
+    private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {
         List<AbilityEntry> abilities = new ArrayList<>();
         for (Enumeration<IOption> options = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES);
               options.hasMoreElements(); ) {
@@ -145,7 +162,9 @@ final class CrewAssignmentData {
         for (AbilityEntry ability : abilities) {
             search.append(' ').append(ability.name());
         }
-        return new PersonEntry(person, level, List.copyOf(abilities), search.toString().toLowerCase(Locale.ROOT));
+        Integer fatigue = useFatigue ? Fatigue.getEffectiveFatigue(person, campaign) : null;
+        return new PersonEntry(person, level, List.copyOf(abilities), person.getTotalInjurySeverity(), fatigue,
+              search.toString().toLowerCase(Locale.ROOT));
     }
 
     private static UnitEntry describe(Campaign campaign, Unit unit) {
@@ -154,7 +173,9 @@ final class CrewAssignmentData {
         Formation formation = campaign.getPlayerForce().getFormationFor(unit);
         String formationName = (formation == null) ? "" : formation.getFullName();
         String search = (unit.getName() + ' ' + typeName + ' ' + formationName).toLowerCase(Locale.ROOT);
-        return new UnitEntry(unit, typeName, formationName, search);
+        int damageState = unit.getDamageState();
+        return new UnitEntry(unit, typeName, formationName, damageState, Unit.getDamageStateName(damageState),
+              search);
     }
 
     /** @return the units, by formation and then name */

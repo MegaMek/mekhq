@@ -77,6 +77,7 @@ import mekhq.gui.baseComponents.hud.HudChip;
 import mekhq.gui.baseComponents.hud.HudToolTip;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.AbilityEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
  * The right-hand panel of the {@link CrewAssignmentDialog}: what is selected on each page, the actions that assign
@@ -163,7 +164,10 @@ final class CrewInspector extends JPanel {
         buildSelection(state, plan);
         detail.removeAll();
         if (state.focusedUnit != null) {
-            buildUnitDetail(state.focusedUnit, plan);
+            UnitEntry unitEntry = data.entryFor(state.focusedUnit);
+            if (unitEntry != null) {
+                buildUnitDetail(unitEntry, plan);
+            }
         } else if (state.focusedPerson != null) {
             PersonEntry entry = data.entryFor(state.focusedPerson);
             if (entry != null) {
@@ -278,9 +282,15 @@ final class CrewInspector extends JPanel {
 
     // region Details
 
-    private void buildUnitDetail(Unit unit, AssignmentPlan plan) {
+    private void buildUnitDetail(UnitEntry entry, AssignmentPlan plan) {
+        Unit unit = entry.unit();
         detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.unit"))));
         detail.add(leftAligned(title(unit.getName())));
+        detail.add(leftAligned(Hud.hint(entry.formationName().isEmpty() ? entry.typeName() :
+                                              entry.typeName() + "  ·  " + entry.formationName())));
+        detail.add(Box.createVerticalStrut(scaleForGUI(8)));
+        detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.unit.condition"), entry.damageName(),
+              CrewRowRenderers.damageColor(entry.damageState()))));
         detail.add(Box.createVerticalStrut(scaleForGUI(10)));
 
         List<StagedAssignment> changes = plan.changes();
@@ -324,6 +334,13 @@ final class CrewInspector extends JPanel {
         detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.person"))));
         detail.add(leftAligned(title(person.getFullTitle())));
         detail.add(leftAligned(Hud.hint(person.getPrimaryRole().getLabel(false) + "  ·  " + entry.skillLevel())));
+        detail.add(Box.createVerticalStrut(scaleForGUI(8)));
+        detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.person.hits"),
+              String.valueOf(entry.hits()), CrewRowRenderers.hitsColor(entry.hits()))));
+        if (entry.fatigue() != null) {
+            detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.person.fatigue"),
+                  String.valueOf(entry.fatigue()), CrewRowRenderers.fatigueColor(entry.fatigue()))));
+        }
         detail.add(Box.createVerticalStrut(scaleForGUI(10)));
 
         detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.person.unit"))));
@@ -375,6 +392,18 @@ final class CrewInspector extends JPanel {
     }
 
     // endregion Details
+
+    /** A small caption with its value beside it, such as "HITS  2". */
+    private static JComponent statLine(String caption, String value, Color color) {
+        JPanel line = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(1)));
+        line.add(Hud.eyebrow(caption));
+        line.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setForeground(color);
+        valueLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
+        line.add(valueLabel);
+        return line;
+    }
 
     private static JLabel title(String text) {
         JLabel label = new JLabel(text);
