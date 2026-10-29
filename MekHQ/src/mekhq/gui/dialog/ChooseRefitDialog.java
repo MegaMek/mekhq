@@ -62,12 +62,10 @@ import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
-import megamek.common.loaders.MekSummaryCache;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
@@ -81,7 +79,6 @@ import mekhq.campaign.parts.RefitFacility;
 import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.RefitPartsStatus;
 import mekhq.campaign.parts.RefitPurchaseCheck;
-import mekhq.campaign.parts.RefitWithoutKitNotice;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
@@ -107,8 +104,6 @@ public class ChooseRefitDialog extends JDialog {
     private RefitTableModel refitModel;
     private RefitDesignSearch.Result designSearch;
     private int failedRefitCheck;
-    // How Customize to Model differs from the kit, by the refit as the list grades it; null when it does not
-    private final Map<Refit, String> customizeNotices = new HashMap<>();
 
     private JButton btnRefit;
     private JButton btnCustomize;
@@ -442,10 +437,6 @@ public class ChooseRefitDialog extends JDialog {
         btnRefit.setEnabled(isAllowedDesign && canBuyKit);
         btnRefit.setToolTipText(getTextAt(RESOURCE_BUNDLE, canBuyKit ? "btnRefit.tooltip" : "btnRefit.cannotBuy.tooltip"));
         btnCustomize.setEnabled(true);
-        String customizeNotice = describeCustomizeDifference(selectedRefit);
-        String customizeTooltip = getTextAt(RESOURCE_BUNDLE, "btnCustomize.tooltip");
-        btnCustomize.setToolTipText((customizeNotice == null) ? customizeTooltip
-                                          : (customizeTooltip + ' ' + customizeNotice));
 
         List<Refit.RefitNeed> needs = selectedRefit.describeNeeds();
         boolean hasPartsToOrder = false;
@@ -464,85 +455,23 @@ public class ChooseRefitDialog extends JDialog {
 
         JList<String> lstShopping = new JList<>(listNeeds(needs).toArray(new String[0]));
         scrShoppingList.setViewportView(lstShopping);
-        scrShoppingList.setColumnHeaderView(createPartsHeader(refitModel.getPartsStatus(selectedRefit),
-              customizeNotice));
-        // The header knows how tall its wrapped lines are only once it has its width, so lay it out again then
-        SwingUtilities.invokeLater(scrShoppingList::revalidate);
+        scrShoppingList.setColumnHeaderView(createPartsStatusLabel(refitModel.getPartsStatus(selectedRefit)));
         EntityReadout newUnitReadout = EntityReadout.createReadout(selectedRefit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + newUnitReadout.getFullReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
 
     /**
-     * The refit list grades each refit as kit work. Customize to Model works without a kit, which can be a higher class
-     * needing a better site, and costs the unit a quality level, so the player is told before choosing it.
-     *
-     * @param kitRefit the selected refit, as the list grades it
-     *
-     * @return how beginning this refit with Customize to Model differs from using the refit kit, or {@code null} when
-     *       it does not or the design cannot be loaded
+     * @return a line above the parts list saying where the refit stands for parts, in the colour the refit list uses
      */
-    private @Nullable String describeCustomizeDifference(Refit kitRefit) {
-        if (customizeNotices.containsKey(kitRefit)) {
-            return customizeNotices.get(kitRefit);
+    private static JLabel createPartsStatusLabel(RefitPartsStatus partsStatus) {
+        JLabel statusLabel = new JLabel("<html>" + partsStatus.describe() + "</html>");
+        Color statusColor = getPartsStatusColor(partsStatus.state());
+        if (statusColor != null) {
+            statusLabel.setForeground(statusColor);
         }
-        String notice = null;
-        String designName = kitRefit.getNewEntity().getShortNameRaw();
-        MekSummary summary = MekSummaryCache.getInstance().getMek(designName);
-        if (summary == null) {
-            logger.debug("[RefitWithoutKit] {}: no design file for {}, so no customize notice", unit.getName(),
-                  designName);
-        } else {
-            try {
-                // Its own copy of the design, as Customize to Model loads one when the refit begins
-                Entity customEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                if (customEntity != null) {
-                    notice = RefitWithoutKitNotice.describe(kitRefit, new Refit(unit, customEntity, true, false, false));
-                }
-            } catch (EntityLoadingException exception) {
-                logger.error(exception, "[RefitWithoutKit] %s: could not load %s", unit.getName(), designName);
-            }
-        }
-        customizeNotices.put(kitRefit, notice);
-        return notice;
-    }
-
-    /**
-     * The lines above the parts list: where the refit stands for parts, in the colour the refit list uses, then how
-     * Customize to Model differs from the kit when it does. Both wrap to the width of the list, as a long part list or
-     * notice would otherwise run off the edge.
-     *
-     * @return a read-only text pane holding the lines
-     */
-    private static JEditorPane createPartsHeader(RefitPartsStatus partsStatus, @Nullable String customizeNotice) {
-        StringBuilder html = new StringBuilder("<html><body>");
-        appendColouredLine(html, partsStatus.describe(), getPartsStatusColor(partsStatus.state()));
-        if (customizeNotice != null) {
-            appendColouredLine(html, customizeNotice, MekHQ.getMHQOptions().getFontColorWarning());
-        }
-        html.append("</body></html>");
-
-        JEditorPane header = new JEditorPane("text/html", html.toString());
-        // Draws in the normal label font and colour rather than the HTML defaults
-        header.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        header.setFont(UIManager.getFont("Label.font"));
-        header.setForeground(UIManager.getColor("Label.foreground"));
-        header.setEditable(false);
-        header.setFocusable(false);
-        header.setOpaque(false);
-        header.setBorder(BorderFactory.createEmptyBorder(0, 0, UIUtil.scaleForGUI(5), 0));
-        return header;
-    }
-
-    /**
-     * Adds one line of text to the parts header, in the given colour or the normal text colour when there is none.
-     */
-    private static void appendColouredLine(StringBuilder html, String text, @Nullable Color colour) {
-        html.append("<div");
-        if (colour != null) {
-            html.append(String.format(" style='color: #%06x'", colour.getRGB() & 0xFFFFFF));
-        }
-        html.append('>').append(text).append("</div>");
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        return statusLabel;
     }
 
     /**

@@ -80,14 +80,14 @@ import mekhq.campaign.unit.Unit;
  * <ul>
  *     <li><b>Unit ordering:</b> higher battle value units are assigned before lower battle value units, unless
  *     the caller supplied its own ordering.</li>
- *     <li><b>Tech ordering:</b> techs are ordered by {@code person.getTechUnits().size()} ascending (least loaded
+ *     <li><b>Tech ordering:</b> techs are ordered by {@link Rules#unitCount(Person)} ascending (least loaded
  *     first). If two techs have the same assigned-unit count, the tie is broken by
  *     {@link #getTechLevel(Person, String)} descending (higher skill level first).</li>
  * </ul>
  *
  * <p><b>Notes</b></p>
  * <ul>
- *   <li>Units that already have a tech assigned ({@code unit.getTech() != null}) are ignored.</li>
+ *   <li>Units that already have a tech assigned (see {@link Rules#needsTech(Unit)}) are ignored.</li>
  *   <li>Units with {@code null} entities are ignored.</li>
  * </ul>
  *
@@ -96,6 +96,79 @@ import mekhq.campaign.unit.Unit;
  */
 public class AutomatedTechAssignments {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AutomatedTechAssignments";
+    private static final int MAX_UNITS_PER_TECH = 2;
+
+    /**
+     * One unit and the tech chosen to maintain it.
+     *
+     * @param unit the unit
+     * @param tech the tech
+     */
+    public record Assignment(Unit unit, Person tech) {}
+
+    /**
+     * What the assigner needs to know about units and techs, and what it does with each choice it makes.
+     *
+     * <p>{@link #CAMPAIGN_RULES} reads the campaign and assigns each tech at once. A caller that only plans changes,
+     * such as the Crew Assignment dialog, supplies rules that read its plan and stage each choice into it instead, so
+     * the same choices are made either way.</p>
+     *
+     * @since 0.51.01
+     */
+    public interface Rules {
+        /**
+         * @param unit a unit
+         *
+         * @return {@code true} if the unit has no tech and should be offered one
+         */
+        boolean needsTech(Unit unit);
+
+        /**
+         * @param tech a tech
+         *
+         * @return how many units the tech maintains, counting every choice made so far
+         */
+        int unitCount(Person tech);
+
+        /**
+         * A limit of the caller's own, checked on top of the two-unit cap before a tech is given a unit.
+         *
+         * @param tech a tech
+         * @param unit a unit
+         *
+         * @return {@code true} if the tech may take on the unit
+         */
+        default boolean canTakeOn(Person tech, Unit unit) {
+            return true;
+        }
+
+        /**
+         * Acts on a choice: the tech will maintain the unit. Called before the next unit is considered, so
+         * {@link #unitCount} and {@link #canTakeOn} see it.
+         *
+         * @param unit the unit
+         * @param tech the tech
+         */
+        void assign(Unit unit, Person tech);
+    }
+
+    /** The rules for assigning techs in the campaign directly: each choice is applied as soon as it is made. */
+    public static final Rules CAMPAIGN_RULES = new Rules() {
+        @Override
+        public boolean needsTech(Unit unit) {
+            return unit.getTech() == null;
+        }
+
+        @Override
+        public int unitCount(Person tech) {
+            return tech.getTechUnits().size();
+        }
+
+        @Override
+        public void assign(Unit unit, Person tech) {
+            unit.setTech(tech);
+        }
+    };
 
     private final List<Unit> unmaintainedMeks = new ArrayList<>();
     private final List<Unit> unmaintainedAero = new ArrayList<>();
@@ -113,10 +186,23 @@ public class AutomatedTechAssignments {
      */
     private final Comparator<Unit> unitPriorityOrder;
 
+    private final Rules rules;
+
     final private List<String> reports = new ArrayList<>();
+
+    private final List<Assignment> assignments = new ArrayList<>();
 
     public List<String> getReports() {
         return reports;
+    }
+
+    /**
+     * @return every unit given a tech, in the order the choices were made
+     *
+     * @since 0.51.01
+     */
+    public List<Assignment> getAssignments() {
+        return List.copyOf(assignments);
     }
 
     /**
@@ -150,7 +236,25 @@ public class AutomatedTechAssignments {
      */
     public AutomatedTechAssignments(List<Person> techs, Collection<Unit> units,
           @Nullable Comparator<Unit> unitPriorityOrder) {
+        this(techs, units, unitPriorityOrder, CAMPAIGN_RULES);
+    }
+
+    /**
+     * Creates an assignment helper that makes the same choices as the other constructors, but reads units and techs,
+     * and acts on each choice, through the caller's rules.
+     *
+     * @param techs             all available personnel to consider for assignment
+     * @param units             all units that may require a tech assignment
+     * @param unitPriorityOrder the order to offer units a tech in, or {@code null} for battle value descending
+     * @param rules             how to read units and techs, and what to do with each choice
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public AutomatedTechAssignments(List<Person> techs, Collection<Unit> units,
+          @Nullable Comparator<Unit> unitPriorityOrder, Rules rules) {
         this.unitPriorityOrder = unitPriorityOrder;
+        this.rules = rules;
         arrangeUnitsIntoBuckets(units);
         sortUnitBuckets();
         arrangeTechsIntoBuckets(techs);
@@ -197,7 +301,7 @@ public class AutomatedTechAssignments {
         final Set<Person> tempSetOfTechMechanic = new HashSet<>();
 
         for (Person person : techs) {
-            if (person.isNeverAssignMaintenanceAutomatically() || person.getTechUnits().size() >= 2) {
+            if (person.isNeverAssignMaintenanceAutomatically() || rules.unitCount(person) >= MAX_UNITS_PER_TECH) {
                 continue;
             }
 
@@ -240,7 +344,8 @@ public class AutomatedTechAssignments {
      * </ol>
      *
      * <p><b>Capacity limit:</b> a tech may be assigned at most two units total. Techs that already have
-     * {@code person.getTechUnits().size() >= 2} are skipped. After assigning a unit, a tech is only reinserted into
+     * {@code rules.unitCount(person) >= 2} are skipped, and a tech the rules' {@link Rules#canTakeOn} turns away from
+     * one unit is offered the next. After assigning a unit, a tech is only reinserted into
      * the priority queue if they are still under the limit.</p>
      *
      * <p>If {@code unmaintainedUnits} is {@code null} or empty, this method does nothing. If {@code techs} is
@@ -279,12 +384,18 @@ public class AutomatedTechAssignments {
         queue.addAll(techs);
 
         for (Unit unit : unmaintainedUnits) {
+            // Techs at capacity (>= 2 units) are dropped for good; those the caller's rules turn away from this unit
+            // are offered the next one again
+            final List<Person> passedOver = new ArrayList<>();
             Person tech = queue.poll();
-
-            // Skip techs who are already at/over capacity (>= 2 units).
-            while (tech != null && tech.getTechUnits().size() >= 2) {
+            while (tech != null
+                         && ((rules.unitCount(tech) >= MAX_UNITS_PER_TECH) || !rules.canTakeOn(tech, unit))) {
+                if (rules.unitCount(tech) < MAX_UNITS_PER_TECH) {
+                    passedOver.add(tech);
+                }
                 tech = queue.poll();
             }
+            queue.addAll(passedOver);
 
             if (tech == null) {
                 // No more eligible techs: report this unit as unassignable.
@@ -297,7 +408,8 @@ public class AutomatedTechAssignments {
                 continue;
             }
 
-            unit.setTech(tech);
+            rules.assign(unit, tech);
+            assignments.add(new Assignment(unit, tech));
 
             reports.add(getFormattedTextAt(
                   RESOURCE_BUNDLE,
@@ -307,7 +419,7 @@ public class AutomatedTechAssignments {
             ));
 
             // Only re-queue if still eligible after assignment.
-            if (tech.getTechUnits().size() < 2) {
+            if (rules.unitCount(tech) < MAX_UNITS_PER_TECH) {
                 queue.offer(tech);
             }
         }
@@ -325,7 +437,7 @@ public class AutomatedTechAssignments {
      * <ol>
      *     <li><b>Tie-breaker</b>: higher tech skill first, using {@link #getTechLevel(Person, String)} with the
      *     provided {@code techSkill}.</li>
-     *     <li><b>Lowest current workload first</b>: {@code person.getTechUnits().size()} ascending (fewest assigned
+     *     <li><b>Lowest current workload first</b>: {@link Rules#unitCount(Person)} ascending (fewest assigned
      *     units).</li>
      * </ol>
      *
@@ -343,7 +455,7 @@ public class AutomatedTechAssignments {
         Comparator<Person> bestTechFirst = Comparator
                                                  .comparingInt((Person p) -> getTechLevel(p, techSkill))
                                                  .reversed() // highest tech level first
-                                                 .thenComparingInt(p -> p.getTechUnits().size()); // smallest to largest
+                                                 .thenComparingInt(rules::unitCount); // smallest to largest
 
         return new PriorityQueue<>(bestTechFirst);
     }
@@ -398,7 +510,7 @@ public class AutomatedTechAssignments {
      *
      * <ol>
      *     <li>{@link #getTechLevel(Person, String)} descending (highest proficiency first)</li>
-     *     <li>{@code person.getTechUnits().size()} ascending (least loaded first)</li>
+     *     <li>{@link Rules#unitCount(Person)} ascending (least loaded first)</li>
      * </ol>
      *
      * <p>If {@code techs} is {@code null} or empty, this method does nothing.</p>
@@ -418,14 +530,14 @@ public class AutomatedTechAssignments {
               Comparator
                     .comparingInt((Person tech) -> getTechLevel(tech, skillType))
                     .reversed() // highest tech level first
-                    .thenComparingInt(tech -> tech.getTechUnits().size()) // smallest -> largest
+                    .thenComparingInt(rules::unitCount) // smallest -> largest
         );
     }
 
     /**
      * Buckets units into the appropriate unmaintained category lists based on entity unit type.
      *
-     * <p>Only units without an assigned tech ({@code unit.getTech() == null}) are considered. Units whose
+     * <p>Only units without an assigned tech (see {@link Rules#needsTech(Unit)}) are considered. Units whose
      * {@link Unit#getEntity()} is {@code null} are ignored.</p>
      *
      * <p>Unit type mapping:</p>
@@ -457,7 +569,7 @@ public class AutomatedTechAssignments {
                 continue;
             }
 
-            if (unit.getTech() == null) {
+            if (rules.needsTech(unit)) {
                 int unitType = entity.getUnitType();
                 switch (unitType) {
                     // Self-crewed or not yet supported
