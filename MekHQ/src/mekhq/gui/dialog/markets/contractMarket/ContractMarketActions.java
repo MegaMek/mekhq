@@ -54,4 +54,7 @@ public interface ContractMarketActions {
 
     /** Open the GM editor for the offer. */
     void edit(AbstractContract contract);
+
+    /** Copy the offer to the clipboard, formatted for posting on Discord. */
+    void copyForDiscord(AbstractContract contract);
 }
