@@ -65,7 +65,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
-import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
@@ -143,6 +142,7 @@ final class CrewRowRenderers {
     static Color crewingColor(CrewAssignmentState.Crewing crewing) {
         return switch (crewing) {
             case FULL -> READY;
+            case TEMP -> ACCENT;
             case PARTIAL -> AMBER;
             case EMPTY -> DANGER;
         };
@@ -296,7 +296,8 @@ final class CrewRowRenderers {
               boolean selectedInList, boolean cellHasFocus) {
             Unit unit = entry.unit();
             paintState(isSelected.test(unit));
-            ring.setColor(crewingColor(CrewAssignmentState.crewing(unit, plan)), false);
+            CrewCoverage.UnitCoverage coverage = CrewCoverage.of(unit, plan);
+            ring.setColor(crewingColor(coverage.crewing()), false);
             name.setText(unit.getName());
             role.setText(entry.typeName());
             status.setText(entry.damageName());
@@ -305,20 +306,28 @@ final class CrewRowRenderers {
 
             Person leader = firstCrew(unit);
             if (leader == null) {
-                setLink(list, index, lead, getTextAt(RESOURCE_BUNDLE, "row.noCrew"), null);
+                setLink(list, index, lead, getTextAt(RESOURCE_BUNDLE,
+                      (coverage.temp() > 0) ? "row.tempCrewOnly" : "row.noCrew"), null);
             } else {
                 setLink(list, index, lead,
                       getFormattedTextAt(RESOURCE_BUNDLE, "row.lead", leader.getFullTitle()), leader);
             }
 
             badges.removeAll();
-            for (CrewSeat seat : plan.seatsOf(unit)) {
-                int open = Math.max(0, plan.openSeats(unit, seat.type()));
+            for (CrewCoverage.SeatCoverage seat : coverage.seats()) {
+                // Real people over the seat's size, then any places temporary crew hold, such as "GUNNER 2/10 +8 TEMP"
                 JLabel badge = badge();
-                badge.setText(seatLabel(unit, seat.type()).toUpperCase(Locale.ROOT) + ' '
-                                    + (seat.capacity() - open) + '/' + seat.capacity());
-                if (open > 0) {
+                String text = seatLabel(unit, seat.seat().type()).toUpperCase(Locale.ROOT) + ' ' + seat.real() + '/'
+                                    + seat.seat().capacity();
+                if (seat.temp() > 0) {
+                    text += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrew", seat.temp())
+                                        .toUpperCase(Locale.ROOT);
+                }
+                badge.setText(text);
+                if (seat.uncovered() > 0) {
                     setBadgeColor(badge, AMBER, AMBER.darker());
+                } else if (seat.temp() > 0) {
+                    setBadgeColor(badge, ACCENT, BORDER_CYAN);
                 } else {
                     setBadgeColor(badge, READY, BORDER);
                 }
@@ -343,6 +352,8 @@ final class CrewRowRenderers {
         private final AssignmentPlan plan;
         private final Predicate<Person> isSelected;
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
+        /** Hits and fatigue, on the second line beside where the person serves. */
+        private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
         private final JLabel abilities = badge();
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
@@ -351,6 +362,8 @@ final class CrewRowRenderers {
             this.plan = plan;
             this.isSelected = isSelected;
             secondLine.add(where);
+            secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
+            secondLine.add(condition);
             badges.add(abilities);
             badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             skill.setHorizontalAlignment(JLabel.RIGHT);
@@ -364,16 +377,17 @@ final class CrewRowRenderers {
             paintState(isSelected.test(person));
             name.setText(person.getFullTitle());
             role.setText(person.getPrimaryRole().getLabel(false));
-            List<String> condition = new ArrayList<>();
+            status.setText("");
+            List<String> parts = new ArrayList<>();
             if (entry.hits() > 0) {
-                condition.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.hits", entry.hits()));
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.hits", entry.hits()));
             }
             if ((entry.fatigue() != null) && (entry.fatigue() > 0)) {
-                condition.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.fatigue", entry.fatigue()));
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.fatigue", entry.fatigue()));
             }
-            status.setText(String.join("  \u00b7  ", condition));
-            status.setForeground((entry.hits() > 0) ? hitsColor(entry.hits()) :
-                                       fatigueColor((entry.fatigue() == null) ? 0 : entry.fatigue()));
+            condition.setText(String.join("  \u00b7  ", parts));
+            condition.setForeground((entry.hits() > 0) ? hitsColor(entry.hits()) :
+                                          fatigueColor((entry.fatigue() == null) ? 0 : entry.fatigue()));
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);

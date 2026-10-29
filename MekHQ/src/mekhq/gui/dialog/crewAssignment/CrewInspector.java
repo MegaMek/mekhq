@@ -33,15 +33,7 @@
 package mekhq.gui.dialog.crewAssignment;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
-import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
-import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.DIVIDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.GROUND;
-import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
-import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
-import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
-import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -187,7 +179,9 @@ final class CrewInspector extends JPanel {
         selection.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.selection"))));
 
         Map<SeatType, Integer> openBySeat = new EnumMap<>(SeatType.class);
+        int heldByTemp = 0;
         for (Unit unit : state.selectedUnits) {
+            heldByTemp += CrewCoverage.of(unit, plan).temp();
             for (CrewSeat seat : plan.seatsOf(unit)) {
                 int open = plan.openSeats(unit, seat.type());
                 if (open > 0) {
@@ -201,7 +195,9 @@ final class CrewInspector extends JPanel {
               (unitCount == 0) ? getTextAt(RESOURCE_BUNDLE, "inspector.units.none") :
                     getFormattedTextAt(RESOURCE_BUNDLE, "inspector.units.count", unitCount),
               (unitCount == 0) ? getTextAt(RESOURCE_BUNDLE, "inspector.units.none.hint") :
-                    getFormattedTextAt(RESOURCE_BUNDLE, "inspector.units.open", openTotal),
+                    (heldByTemp == 0) ? getFormattedTextAt(RESOURCE_BUNDLE, "inspector.units.open", openTotal) :
+                          getFormattedTextAt(RESOURCE_BUNDLE, "inspector.units.openWithTemp", openTotal,
+                                heldByTemp),
               getTextAt(RESOURCE_BUNDLE, "inspector.units.link"), CrewAssignmentPage.UNITS)));
 
         int peopleCount = state.selectedPeople.size();
@@ -294,12 +290,20 @@ final class CrewInspector extends JPanel {
         detail.add(Box.createVerticalStrut(scaleForGUI(10)));
 
         List<StagedAssignment> changes = plan.changes();
-        for (CrewSeat seat : plan.seatsOf(unit)) {
+        CrewCoverage.UnitCoverage coverage = CrewCoverage.of(unit, plan);
+        if (coverage.pooled() > 0) {
+            detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.unit.tempPool"),
+                  String.valueOf(coverage.pooled()), ACCENT)));
+            detail.add(Box.createVerticalStrut(scaleForGUI(10)));
+        }
+        for (CrewCoverage.SeatCoverage seatCoverage : coverage.seats()) {
+            CrewSeat seat = seatCoverage.seat();
+            // Real people can take any place temporary crew hold, so "Find" stays offered while those remain
             int open = Math.max(0, plan.openSeats(unit, seat.type()));
             String seatName = CrewRowRenderers.seatLabel(unit, seat.type());
 
             JPanel head = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
-            head.add(Hud.eyebrow(seatName + "  " + (seat.capacity() - open) + "/" + seat.capacity()),
+            head.add(Hud.eyebrow(seatName + "  " + seatCoverage.real() + "/" + seat.capacity()),
                   BorderLayout.WEST);
             if (open > 0) {
                 head.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.findPeople", seatName),
@@ -321,8 +325,13 @@ final class CrewInspector extends JPanel {
                           person.getFullTitle()), () -> actions.openPerson(person)));
                 }
             }
-            if (open > 0) {
-                crew.add(colored(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.open", open), AMBER));
+            if (seatCoverage.temp() > 0) {
+                crew.add(colored(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.temp", seatCoverage.temp()),
+                      ACCENT));
+            }
+            if (seatCoverage.uncovered() > 0) {
+                crew.add(colored(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.open", seatCoverage.uncovered()),
+                      AMBER));
             }
             detail.add(leftAligned(crew));
             detail.add(Box.createVerticalStrut(scaleForGUI(10)));

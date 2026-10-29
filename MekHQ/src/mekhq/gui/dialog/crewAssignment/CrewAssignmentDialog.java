@@ -490,7 +490,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         Map<String, Integer> byFormation = new TreeMap<>();
         int statusMatches = 0;
         for (UnitEntry entry : data.units()) {
-            if (CrewAssignmentState.matches(CrewAssignmentState.crewing(entry.unit(), plan), state.unitStatus)) {
+            if (CrewAssignmentState.matches(CrewCoverage.of(entry.unit(), plan), state.unitStatus)) {
                 statusMatches++;
                 byType.merge(entry.typeName(), 1, Integer::sum);
                 if (!entry.formationName().isEmpty()) {
@@ -618,8 +618,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         int open = 0;
         int unmanned = 0;
         for (UnitEntry entry : data.units()) {
-            open += plan.openSeats(entry.unit());
-            if (CrewAssignmentState.crewing(entry.unit(), plan) == Crewing.EMPTY) {
+            // Places temporary crew hold are crewed, so they are not counted as open
+            CrewCoverage.UnitCoverage coverage = CrewCoverage.of(entry.unit(), plan);
+            open += coverage.uncovered();
+            if (coverage.crewing() == Crewing.EMPTY) {
                 unmanned++;
             }
         }

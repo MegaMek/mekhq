@@ -41,7 +41,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
-import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
@@ -57,9 +56,13 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  * @since 0.51.01
  */
 final class CrewAssignmentState {
-    /** Which units the Units page shows, by how well they are crewed once the plan is applied. */
+    /**
+     * Which units the Units page shows, by how well they are crewed once the plan is applied. Seats temporary crew
+     * hold count as crewed, so a unit running on temporary crew does not need crew; {@link #ON_TEMP_CREW} finds those
+     * units, to replace their temporary crew with real people.
+     */
     enum UnitStatus {
-        NEEDS_CREW, UNMANNED, FULLY_CREWED, ALL
+        NEEDS_CREW, UNMANNED, ON_TEMP_CREW, FULLY_CREWED, ALL
     }
 
     /** Which people the Personnel page shows, by whether they crew a unit once the plan is applied. */
@@ -130,7 +133,7 @@ final class CrewAssignmentState {
         if (!matches(entry.searchText(), unitQuery)) {
             return false;
         }
-        return matches(crewing(unit, plan), unitStatus);
+        return matches(CrewCoverage.of(unit, plan), unitStatus);
     }
 
     /**
@@ -156,29 +159,21 @@ final class CrewAssignmentState {
         return matches(entry.searchText(), peopleQuery);
     }
 
-    /** How well a unit is crewed once the plan is applied. */
+    /**
+     * How well a unit is crewed once the plan is applied: no one at all, some places empty, every place filled with
+     * temporary crew among them, or every place filled by real people.
+     */
     enum Crewing {
-        EMPTY, PARTIAL, FULL
+        EMPTY, PARTIAL, TEMP, FULL
     }
 
-    static Crewing crewing(Unit unit, AssignmentPlan plan) {
-        int capacity = 0;
-        int open = 0;
-        for (CrewSeat seat : plan.seatsOf(unit)) {
-            capacity += seat.capacity();
-            open += Math.max(0, plan.openSeats(unit, seat.type()));
-        }
-        if (open == 0) {
-            return Crewing.FULL;
-        }
-        return (open >= capacity) ? Crewing.EMPTY : Crewing.PARTIAL;
-    }
-
-    static boolean matches(Crewing crewing, UnitStatus status) {
+    static boolean matches(CrewCoverage.UnitCoverage coverage, UnitStatus status) {
+        Crewing crewing = coverage.crewing();
         return switch (status) {
-            case NEEDS_CREW -> crewing != Crewing.FULL;
+            case NEEDS_CREW -> (crewing == Crewing.EMPTY) || (crewing == Crewing.PARTIAL);
             case UNMANNED -> crewing == Crewing.EMPTY;
-            case FULLY_CREWED -> crewing == Crewing.FULL;
+            case ON_TEMP_CREW -> coverage.temp() > 0;
+            case FULLY_CREWED -> (crewing == Crewing.FULL) || (crewing == Crewing.TEMP);
             case ALL -> true;
         };
     }

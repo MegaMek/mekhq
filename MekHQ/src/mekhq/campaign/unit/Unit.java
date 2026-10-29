@@ -7524,7 +7524,8 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
-        final boolean hadFreeSeat = hasFreeSeatFor(getDriverRole());
+        final PersonnelRole seatRole = getDriverRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(seatRole);
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
@@ -7532,8 +7533,10 @@ public class Unit implements ITechnology, ILocatable {
         }
         person.setUnit(this);
 
-        // Replace one temp crew member only if the real Person took a seat that was already filled
-        releaseTempCrewForAssignedRole(person.getPrimaryRole(), hadFreeSeat);
+        // Replace one temp crew member only if the real Person took a seat that was already filled. The temp crew
+        // released are those of the seat, not of the person's primary role: someone who serves here through their
+        // secondary role still replaces one of this unit's temp crew.
+        releaseTempCrewForAssignedRole(seatRole, hadFreeSeat);
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
