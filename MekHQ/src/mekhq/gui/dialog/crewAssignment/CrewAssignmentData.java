@@ -217,7 +217,7 @@ final class CrewAssignmentData {
         return tempCrewPool;
     }
 
-    /** @return best first, by experience level and then name; {@link AutoFill} uses the same order */
+    /** @return best first, by experience level and then name; {@link AutoFill} fills seats in this order */
     Comparator<Person> ranking() {
         return ranking;
     }

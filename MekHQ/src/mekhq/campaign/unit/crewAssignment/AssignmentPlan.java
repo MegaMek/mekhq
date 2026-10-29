@@ -41,6 +41,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 
 /**
  * A set of crew changes the player has staged but not yet applied. Nothing here touches a real {@link Unit} or
@@ -839,6 +840,53 @@ public class AssignmentPlan {
         final TechStageResult result = stageTechs(techs, units, reverts);
         record(reverts);
         return result;
+    }
+
+    /**
+     * Gives the units that will have no tech one each, chosen as the campaign's automatic tech assignment chooses (see
+     * {@link AutomatedTechAssignments}), as one step of history. Units are offered a tech by battle value, highest
+     * first; each goes to the tech with the best skill for that kind of unit, at most two units per tech, and techs
+     * who never take maintenance automatically are left out. On top of that a tech must pass {@link #canStageTech}, so
+     * their daily time still has to cover every unit they take.
+     *
+     * @param techs the techs to choose from
+     * @param units the units
+     *
+     * @return what was staged, and the units still left without a tech
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public TechStageResult autoStageTechs(final List<Person> techs, final List<Unit> units) {
+        final List<Runnable> reverts = new ArrayList<>();
+        final List<StagedTech> staged = new ArrayList<>();
+        final Predicate<Unit> needsTech = unit -> (plannedTechOf(unit) == null) && SeatEligibility.takesTech(unit);
+        new AutomatedTechAssignments(techs, units, null, new AutomatedTechAssignments.Rules() {
+            @Override
+            public boolean needsTech(Unit unit) {
+                return needsTech.test(unit);
+            }
+
+            @Override
+            public int unitCount(Person tech) {
+                return plannedTechUnits(tech).size();
+            }
+
+            @Override
+            public boolean canTakeOn(Person tech, Unit unit) {
+                return canStageTech(tech, unit);
+            }
+
+            @Override
+            public void assign(Unit unit, Person tech) {
+                final StagedTech change = putTech(unit, tech, reverts);
+                if (change != null) {
+                    staged.add(change);
+                }
+            }
+        });
+        record(reverts);
+        return new TechStageResult(staged, units.stream().filter(needsTech).toList());
     }
 
     private TechStageResult stageTechs(final List<Person> techs, final List<Unit> units,

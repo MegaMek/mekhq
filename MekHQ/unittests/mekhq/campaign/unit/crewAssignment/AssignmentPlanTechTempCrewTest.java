@@ -196,6 +196,50 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
+    void autoStagingTechsKeepsTheCampaignAssignersTwoUnitCap() {
+        Person tech = fixture.tech("Tech", 480);
+        when(tech.isTechMek()).thenReturn(true);
+        List<Unit> units = List.of(mek("A").unit, mek("B").unit, mek("C").unit);
+
+        TechStageResult result = plan.autoStageTechs(List.of(tech), units);
+
+        // 480 minutes would cover all three, but the assigner gives a tech at most two units
+        assertEquals(2, result.staged().size());
+        assertEquals(1, result.leftOver().size());
+        assertTrue(plan.undo());
+        assertTrue(plan.isEmpty());
+    }
+
+    @Test
+    void autoStagingTechsPassesOverATechWithoutTheTime() {
+        Person shortOnTime = fixture.tech("Short", 30);
+        when(shortOnTime.isTechMek()).thenReturn(true);
+        Person free = fixture.tech("Free", 480);
+        when(free.isTechMek()).thenReturn(true);
+        Unit first = mek("A").unit;
+        Unit second = mek("B").unit;
+
+        plan.autoStageTechs(List.of(shortOnTime, free), List.of(first, second));
+
+        assertEquals(free, plan.plannedTechOf(first));
+        assertEquals(free, plan.plannedTechOf(second));
+        assertTrue(plan.plannedTechUnits(shortOnTime).isEmpty());
+    }
+
+    @Test
+    void autoStagingTechsLeavesOutTechsWhoNeverTakeMaintenanceAutomatically() {
+        Person tech = fixture.tech("Tech", 480);
+        when(tech.isTechMek()).thenReturn(true);
+        when(tech.isNeverAssignMaintenanceAutomatically()).thenReturn(true);
+        Unit unit = mek("Mek").unit;
+
+        TechStageResult result = plan.autoStageTechs(List.of(tech), List.of(unit));
+
+        assertTrue(result.staged().isEmpty());
+        assertEquals(List.of(unit), result.leftOver());
+    }
+
+    @Test
     void unassigningEverythingTakesSomeoneOffTheirUnitAndTheirTechWorkInOneStep() {
         Person techWhoPilots = fixture.tech("Both", 480);
         when(techWhoPilots.getSecondaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);

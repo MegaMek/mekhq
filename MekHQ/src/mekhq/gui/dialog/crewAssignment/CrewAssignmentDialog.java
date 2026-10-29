@@ -836,8 +836,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     public void autoFill() {
         List<Person> candidates = data.people().stream().map(PersonEntry::person).toList();
         if (state.targetTech) {
-            TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates,
-                  data.ranking());
+            TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates);
             reportStaged(result.staged().size(), 0);
             if (!result.leftOver().isEmpty()) {
                 setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsLeftOver", result.staged().size(),
