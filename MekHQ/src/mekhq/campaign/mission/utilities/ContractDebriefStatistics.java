@@ -54,9 +54,9 @@ import mekhq.campaign.mission.scenarios.ScenarioStatus;
  *
  * <p>The recommendation follows the game's own success rule: the canonical contract score
  * ({@link ContractScore#getContractScore(boolean, AbstractContract)}) must reach the required victory points, exactly
- * as {@code CampaignNewDayManager} tests before ending a contract early. Ending a contract before its end date without
- * meeting that target is a breach, not a success - completing the strategic objectives does not by itself carry the
- * contract.</p>
+ * as {@code CampaignNewDayManager} tests before ending a contract early. Ending a contract before its end date is a
+ * breach unless the employer would have released the unit - that is, unless StratCon allows the early end
+ * ({@link StratConCampaignState#canEndContractEarly()}). A high score alone does not carry an early end.</p>
  *
  * <p>Nothing here mutates the contract; build one with {@link #from(AbstractContract, boolean, LocalDate)} and read
  * the getters.</p>
@@ -81,6 +81,7 @@ public class ContractDebriefStatistics {
     private final int requiredVictoryPoints;
     private final boolean hasVictoryPointTarget;
     private final boolean endedEarly;
+    private final boolean earlyEndSanctioned;
 
     private final Money totalContractPay;
     private final Money salvageWonValue;
@@ -151,6 +152,7 @@ public class ContractDebriefStatistics {
         // The player is ending the contract early if its end date is known and still in the future.
         LocalDate endDate = contract.getEndingDate();
         this.endedEarly = (endDate != null) && (today != null) && today.isBefore(endDate);
+        this.earlyEndSanctioned = (stratConState != null) && stratConState.canEndContractEarly();
 
         this.totalContractPay = contract.getTotalPay();
         this.salvageWonValue = contract.getSalvagedByUnitValue();
@@ -179,16 +181,16 @@ public class ContractDebriefStatistics {
      * Recommends the {@link MissionStatus} the contract's performance implies.
      *
      * <p>The win condition mirrors the game's own: the contract score must reach the required victory points (for a
-     * contract without a positive target, a non-negative score, or no fighting at all, stands in). When that is met the
-     * contract is a {@link MissionStatus#SUCCESS} - a Complete Success - whether it runs to term or ends early, so long
-     * as no strategic objective was failed; with one failed, it is only a {@link MissionStatus#PARTIAL}. When it is not
-     * met:</p>
+     * contract without a positive target, a non-negative score, or no fighting at all, stands in).</p>
      *
      * <ul>
-     *   <li>ending the contract <em>early</em> is a {@link MissionStatus#BREACH} - its terms were abandoned before they
-     *   were fulfilled, regardless of how the strategic objectives fared;</li>
-     *   <li>running to term but falling short is a {@link MissionStatus#PARTIAL} where there was some progress (a
-     *   positive score or at least one strategic objective secured), otherwise a {@link MissionStatus#FAILED}.</li>
+     *   <li>ending the contract <em>early</em> is a {@link MissionStatus#BREACH} unless StratCon allows the early end -
+     *   otherwise its terms were abandoned before they were fulfilled, however well the fighting went;</li>
+     *   <li>otherwise, meeting the target is a {@link MissionStatus#SUCCESS} - a Complete Success - so long as no
+     *   strategic objective was failed; with one failed, it is only a {@link MissionStatus#PARTIAL};</li>
+     *   <li>falling short, whether at term or after an allowed early end, is a {@link MissionStatus#PARTIAL} where
+     *   there was some progress (a positive score or at least one strategic objective secured), otherwise a
+     *   {@link MissionStatus#FAILED}.</li>
      * </ul>
      *
      * @return the recommended status; never {@link MissionStatus#ACTIVE}
@@ -207,14 +209,14 @@ public class ContractDebriefStatistics {
             meetsTarget = contractScore >= 0;
         }
 
+        // The contract was abandoned before the employer released the unit.
+        if (endedEarly && !earlyEndSanctioned) {
+            return MissionStatus.BREACH;
+        }
+
         if (meetsTarget) {
             // A failed strategic objective - a lapsed Deployment Order, say - costs the contract its Complete Success.
             return (objectivesFailed > 0) ? MissionStatus.PARTIAL : MissionStatus.SUCCESS;
-        }
-
-        // The contract's terms were not met.
-        if (endedEarly) {
-            return MissionStatus.BREACH;
         }
 
         boolean anyProgress = (contractScore > 0) || (hasStratConObjectives && (objectivesCompleted > 0));
