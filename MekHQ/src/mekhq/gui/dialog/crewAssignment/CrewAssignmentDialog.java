@@ -75,15 +75,8 @@ import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.hud.Hud;
-import mekhq.gui.baseComponents.hud.HudButton;
-import mekhq.gui.baseComponents.hud.HudChip;
-import mekhq.gui.baseComponents.hud.HudConfirmButton;
-import mekhq.gui.baseComponents.hud.HudFilterList;
+import mekhq.gui.baseComponents.hud.*;
 import mekhq.gui.baseComponents.hud.HudFilterList.Item;
-import mekhq.gui.baseComponents.hud.HudModeSelector;
-import mekhq.gui.baseComponents.hud.HudStatTile;
-import mekhq.gui.baseComponents.hud.HudVerdictBanner;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
@@ -164,6 +157,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private final HudVerdictBanner problemsBanner = new HudVerdictBanner();
     private final CrewInspector inspector = new CrewInspector(this);
 
+    // Guides: one per page, sliding over the window from the right
+    private final HudCheckBox autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "guide.autoOpen"));
+    private final HudGuideDrawer guideDrawer;
+    private final HudButton guideButton = new HudButton("", false, true);
+    /** The page whose guide was last offered, so moving to another page offers that page's guide once. */
+    private CrewAssignmentPage guideOfferedFor;
+
     private final JLabel dockSummary = new JLabel();
     private final JLabel dockMessage = new JLabel();
     private final HudButton undoButton = new HudButton(upper("dock.undo"), false);
@@ -235,12 +235,26 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         peoplePage.setLinkHandler((entry, link) -> openLink(link));
         reviewPage.setLinkHandler((change, link) -> openLink(link));
 
+        CrewAssignmentGuidePreferences guidePreferences = CrewAssignmentGuidePreferences.getInstance();
+        autoOpenGuides.setSelected(guidePreferences.isGuideAutoOpen());
+        autoOpenGuides.addActionListener(event -> guidePreferences.setGuideAutoOpen(autoOpenGuides.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(getTextAt(RESOURCE_BUNDLE, "guide.tab.steps"),
+              getTextAt(RESOURCE_BUNDLE, "guide.tab.example"), getTextAt(RESOURCE_BUNDLE, "guide.tab.terms")),
+              autoOpenGuides, getTextAt(RESOURCE_BUNDLE, "guide.close"), this::closeGuide);
+        guideButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "guide.button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide(state.page));
+
         preselect(units, people);
         buildUI();
         refresh();
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide(state.page);
+            }
+
             @Override
             public void windowClosing(WindowEvent event) {
                 requestClose();
@@ -344,6 +358,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         content.add(body, BorderLayout.CENTER);
         content.add(buildDock(), BorderLayout.SOUTH);
         setContentPane(content);
+        // The guide drawer and its scrim float over the window; Escape closes the guide
+        guideDrawer.install(getRootPane());
     }
 
     private JComponent buildCommandBar() {
@@ -371,7 +387,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
         bar.add(topRow, BorderLayout.CENTER);
-        bar.add(modeSelector, BorderLayout.SOUTH);
+        JPanel modesRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        modesRow.add(modeSelector, BorderLayout.CENTER);
+        modesRow.add(guideButton, BorderLayout.EAST);
+        bar.add(modesRow, BorderLayout.SOUTH);
         return bar;
     }
 
@@ -469,6 +488,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private void refresh() {
         AssignmentPlan plan = data.plan();
         modeSelector.setSelected(state.page);
+        if (state.page != guideOfferedFor) {
+            // Whatever moved the player to another page (a tab, a link, a "Find" action), that page's guide is offered
+            closeGuide();
+            guideOfferedFor = state.page;
+            maybeOpenGuide(state.page);
+        }
+        guideButton.setText("?  " + getFormattedTextAt(RESOURCE_BUNDLE, "guide.button", state.page.getLabel())
+                                             .toUpperCase(Locale.ROOT));
         pageCards.show(pageHolder, state.page.name());
         railCards.show(railHolder, state.page.name());
         subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", data.locationName(),
@@ -729,7 +756,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     public void assignSelected() {
         StageResult result = data.plan().stage(sortedSelectedPeople(), orderedSelectedUnits());
         reportStaged(result);
-        state.selectedPeople.clear();
+        // Those placed are done; anyone left over stays selected, ready to try with other units
+        state.selectedPeople.retainAll(result.leftOver());
         refresh();
     }
 
@@ -860,6 +888,30 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     }
 
     // endregion Inspector actions
+
+    // region Guides
+
+    /** Opens a page's guide the first time the player visits that page, unless they have turned that off. */
+    private void maybeOpenGuide(CrewAssignmentPage page) {
+        if (!isShowing()) {
+            return;
+        }
+        CrewAssignmentGuidePreferences preferences = CrewAssignmentGuidePreferences.getInstance();
+        if (preferences.isGuideAutoOpen() && !preferences.isGuideSeen(page)) {
+            openGuide(page);
+        }
+    }
+
+    private void openGuide(CrewAssignmentPage page) {
+        CrewAssignmentGuidePreferences.getInstance().setGuideSeen(page, true);
+        guideDrawer.open(CrewAssignmentGuides.build(page, this));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    // endregion Guides
 
     // region Location, commit and close
 
