@@ -45,10 +45,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import javax.swing.*;
@@ -69,6 +71,9 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
@@ -153,7 +158,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private final JPanel pageHolder = new JPanel(pageCards);
     private final CrewListPage<UnitEntry> unitsPage;
     private final CrewListPage<PersonEntry> peoplePage;
-    private final CrewListPage<StagedAssignment> reviewPage;
+    private final CrewListPage<CrewRowRenderers.ReviewItem> reviewPage;
     private final HudVerdictBanner problemsBanner = new HudVerdictBanner();
     private final CrewInspector inspector = new CrewInspector(this);
 
@@ -227,8 +232,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         }, new CrewRowRenderers.PersonRow(plan, state.selectedPeople::contains), PERSON_ROW_HEIGHT,
               this::onPersonRow);
         reviewPage = new CrewListPage<>(null, text -> {}, new CrewRowRenderers.ReviewRow(plan), REVIEW_ROW_HEIGHT,
-              (change, index, isRange) -> {
-                  state.focus(change.person());
+              (item, index, isRange) -> {
+                  switch (item) {
+                      case CrewRowRenderers.CrewItem crewItem -> state.focus(crewItem.change().person());
+                      case CrewRowRenderers.TechItem techItem -> state.focus(techItem.change().unit());
+                      case CrewRowRenderers.TempCrewItem tempItem -> state.focus(tempItem.change().unit());
+                  }
                   refresh();
               });
         unitsPage.setLinkHandler((entry, link) -> openLink(link));
@@ -517,7 +526,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         Map<String, Integer> byFormation = new TreeMap<>();
         int statusMatches = 0;
         for (UnitEntry entry : data.units()) {
-            if (CrewAssignmentState.matches(CrewCoverage.of(entry.unit(), plan), state.unitStatus)) {
+            if (state.matchesStatus(entry, plan)) {
                 statusMatches++;
                 byType.merge(entry.typeName(), 1, Integer::sum);
                 if (!entry.formationName().isEmpty()) {
@@ -550,6 +559,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.seatsFor",
                   state.seatsForPerson.getFullTitle()), () -> {
                 state.seatsForPerson = null;
+                refresh();
+            });
+            chip.setActive(true);
+            chips.add(chip);
+        }
+        if (state.unitsForTech != null) {
+            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.forTech",
+                  state.unitsForTech.getFullTitle()), () -> {
+                state.unitsForTech = null;
                 refresh();
             });
             chip.setActive(true);
@@ -609,21 +627,34 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             chip.setActive(true);
             chips.add(chip);
         }
+        if (state.techFor != null) {
+            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "personnel.techFor",
+                  state.techFor.getName()), () -> {
+                state.techFor = null;
+                refresh();
+            });
+            chip.setActive(true);
+            chips.add(chip);
+        }
         peoplePage.setChips(chips);
     }
 
     private void refreshReviewPage(AssignmentPlan plan) {
-        List<StagedAssignment> changes = plan.changes();
-        reviewPage.setRows(changes);
-        long reassignments = changes.stream().filter(StagedAssignment::isReassignment).count();
-        reviewPage.setCount(changes.isEmpty() ? getTextAt(RESOURCE_BUNDLE, "review.empty") :
-                                  getFormattedTextAt(RESOURCE_BUNDLE, "review.count", changes.size(),
+        // Crew moves first, then techs, then temporary crew: the order they read best in, not the order they apply in
+        List<CrewRowRenderers.ReviewItem> items = new ArrayList<>();
+        plan.changes().forEach(change -> items.add(new CrewRowRenderers.CrewItem(change)));
+        plan.techChanges().forEach(change -> items.add(new CrewRowRenderers.TechItem(change)));
+        plan.tempCrewChanges().forEach(change -> items.add(new CrewRowRenderers.TempCrewItem(change)));
+        reviewPage.setRows(items);
+        long reassignments = plan.changes().stream().filter(StagedAssignment::isReassignment).count();
+        reviewPage.setCount(items.isEmpty() ? getTextAt(RESOURCE_BUNDLE, "review.empty") :
+                                  getFormattedTextAt(RESOURCE_BUNDLE, "review.count", items.size(),
                                         reassignments));
-        List<Problem> problems = plan.validate();
-        problemsBanner.setVisible(!problems.isEmpty());
-        if (!problems.isEmpty()) {
+        int problems = plan.validate().size() + plan.validateTechs().size() + plan.validateTempCrew().size();
+        problemsBanner.setVisible(problems > 0);
+        if (problems > 0) {
             problemsBanner.setVerdict(getTextAt(RESOURCE_BUNDLE, "review.problems.verdict"),
-                  getFormattedTextAt(RESOURCE_BUNDLE, "review.problems.reason", problems.size()),
+                  getFormattedTextAt(RESOURCE_BUNDLE, "review.problems.reason", problems),
                   getTextAt(RESOURCE_BUNDLE, "review.problems.badge"), DANGER);
         }
     }
@@ -660,24 +691,30 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     private void refreshDock(AssignmentPlan plan) {
         List<StagedAssignment> changes = plan.changes();
-        if (changes.isEmpty()) {
+        int pending = plan.size();
+        if (pending == 0) {
             dockSummary.setText(getTextAt(RESOURCE_BUNDLE, "dock.none"));
         } else {
-            long units = changes.stream().map(StagedAssignment::toUnit).distinct().count();
+            Set<Unit> units = new HashSet<>();
+            for (StagedAssignment change : changes) {
+                units.add((change.toUnit() != null) ? change.toUnit() : change.fromUnit());
+            }
+            plan.techChanges().forEach(change -> units.add(change.unit()));
+            plan.tempCrewChanges().forEach(change -> units.add(change.unit()));
+            units.remove(null);
             long reassignments = changes.stream().filter(StagedAssignment::isReassignment).count();
-            dockSummary.setText(getFormattedTextAt(RESOURCE_BUNDLE, "dock.summary", changes.size(), units,
+            dockSummary.setText(getFormattedTextAt(RESOURCE_BUNDLE, "dock.summary", pending, units.size(),
                   reassignments));
         }
         dockMessage.setText(message);
         dockMessage.setForeground(isWarning ? AMBER : TEXT_FAINT);
-        modeSelector.setModeLabel(CrewAssignmentPage.REVIEW, changes.isEmpty() ?
+        modeSelector.setModeLabel(CrewAssignmentPage.REVIEW, (pending == 0) ?
                                                                CrewAssignmentPage.REVIEW.getLabel() :
                                                                getFormattedTextAt(RESOURCE_BUNDLE,
-                                                                     "CrewAssignmentPage.REVIEW.count",
-                                                                     changes.size()));
+                                                                     "CrewAssignmentPage.REVIEW.count", pending));
         undoButton.setArmed(plan.canUndo());
-        cancelButton.setArmed(!changes.isEmpty());
-        commitButton.setArmed(!changes.isEmpty());
+        cancelButton.setArmed(pending > 0);
+        commitButton.setArmed(pending > 0);
     }
 
     private void setMessage(String text, boolean isWarning) {
@@ -731,12 +768,32 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         } else if (link instanceof Person person) {
             openPerson(person);
         } else if (link instanceof CrewRowRenderers.RemoveLink removeLink) {
-            Person person = removeLink.person();
-            if (data.plan().remove(person)) {
-                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed", person.getFullTitle()), false);
-            } else {
-                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removeRefused", person.getFullTitle()),
-                      true);
+            AssignmentPlan plan = data.plan();
+            switch (removeLink.item()) {
+                case CrewRowRenderers.CrewItem item -> {
+                    Person person = item.change().person();
+                    if (plan.remove(person)) {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed", person.getFullTitle()),
+                              false);
+                    } else {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removeRefused",
+                              person.getFullTitle()), true);
+                    }
+                }
+                case CrewRowRenderers.TechItem item -> {
+                    Unit unit = item.change().unit();
+                    if (plan.removeTechChange(unit)) {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed", unit.getName()), false);
+                    } else {
+                        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removeTechRefused",
+                              unit.getName()), true);
+                    }
+                }
+                case CrewRowRenderers.TempCrewItem item -> {
+                    plan.removeTempCrewChange(item.change().unit());
+                    setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removed",
+                          item.change().unit().getName()), false);
+                }
             }
             refresh();
         }
@@ -754,28 +811,44 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     @Override
     public void assignSelected() {
-        StageResult result = data.plan().stage(sortedSelectedPeople(), orderedSelectedUnits());
-        reportStaged(result);
+        AssignmentPlan plan = data.plan();
+        List<Unit> units = orderedSelectedUnits();
+        // Crew first; a tech no seat suits may still maintain a unit that has no tech
+        StageResult crew = plan.stage(sortedSelectedPeople(), units);
+        List<Person> spareTechs = crew.leftOver().stream().filter(Person::isTech).toList();
+        TechStageResult techs = plan.stageTechs(spareTechs, units);
+        Set<Person> techsPlaced = new HashSet<>();
+        techs.staged().forEach(change -> techsPlaced.add(change.toTech()));
+
+        int staged = crew.staged().size() + techs.staged().size();
+        int leftOver = (int) crew.leftOver().stream().filter(person -> !techsPlaced.contains(person)).count();
+        reportStaged(staged, leftOver);
         // Those placed are done; anyone left over stays selected, ready to try with other units
-        state.selectedPeople.retainAll(result.leftOver());
+        state.selectedPeople.retainAll(crew.leftOver());
+        state.selectedPeople.removeAll(techsPlaced);
         refresh();
     }
 
     @Override
     public void autoFill() {
-        if (state.targetSeat == null) {
-            return;
-        }
         List<Person> candidates = data.people().stream().map(PersonEntry::person).toList();
-        StageResult result = AutoFill.fill(data.plan(), orderedSelectedUnits(), state.targetSeat, candidates,
-              data.ranking());
-        reportStaged(result);
+        if (state.targetTech) {
+            TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates,
+                  data.ranking());
+            reportStaged(result.staged().size(), 0);
+            if (!result.leftOver().isEmpty()) {
+                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsLeftOver", result.staged().size(),
+                      result.leftOver().size()), true);
+            }
+        } else if (state.targetSeat != null) {
+            StageResult result = AutoFill.fill(data.plan(), orderedSelectedUnits(), state.targetSeat, candidates,
+                  data.ranking());
+            reportStaged(result.staged().size(), result.leftOver().size());
+        }
         refresh();
     }
 
-    private void reportStaged(StageResult result) {
-        int staged = result.staged().size();
-        int leftOver = result.leftOver().size();
+    private void reportStaged(int staged, int leftOver) {
         if (staged == 0) {
             setMessage(getTextAt(RESOURCE_BUNDLE, "message.nothingStaged"), true);
         } else if (leftOver > 0) {
@@ -797,6 +870,80 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     @Override
     public void chooseTargetSeat(SeatType seat) {
         state.targetSeat = seat;
+        state.targetTech = false;
+        refresh();
+    }
+
+    @Override
+    public void chooseTargetTech() {
+        state.targetTech = true;
+        refresh();
+    }
+
+    @Override
+    public void unassignSelectedPeople() {
+        int staged = data.plan().unassignEverything(sortedSelectedPeople());
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
+        refresh();
+    }
+
+    @Override
+    public void clearSelectedUnits(boolean alsoTechs) {
+        int staged = data.plan().clearUnits(orderedSelectedUnits(), alsoTechs);
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
+        refresh();
+    }
+
+    @Override
+    public void fillTempCrew() {
+        TempCrewResult result = data.plan().fillTempCrew(orderedSelectedUnits(), data.tempCrewPool());
+        int filled = result.staged().size();
+        int added = result.staged().stream().mapToInt(StagedTempCrew::change).sum();
+        if (filled == 0) {
+            setMessage(getTextAt(RESOURCE_BUNDLE, "message.tempCrewNone"), true);
+        } else if (!result.leftOver().isEmpty()) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilledSome", added, filled,
+                  result.leftOver().size()), true);
+        } else {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilled", added, filled), false);
+        }
+        refresh();
+    }
+
+    @Override
+    public void removeTempCrew() {
+        TempCrewResult result = data.plan().removeTempCrew(orderedSelectedUnits());
+        int removed = -result.staged().stream().mapToInt(StagedTempCrew::change).sum();
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewRemoved", removed,
+              result.staged().size()), result.staged().isEmpty());
+        refresh();
+    }
+
+    @Override
+    public void findTechFor(Unit unit) {
+        state.selectedUnits.add(unit);
+        state.targetTech = true;
+        state.techFor = unit;
+        state.qualifiedFor = null;
+        state.assignment = Assignment.EVERYONE;
+        state.role = null;
+        state.peopleQuery = "";
+        peoplePage.setSearchText("");
+        state.page = CrewAssignmentPage.PERSONNEL;
+        refresh();
+    }
+
+    @Override
+    public void findUnitsForTech(Person tech) {
+        state.selectedPeople.add(tech);
+        state.unitsForTech = tech;
+        state.seatsForPerson = null;
+        state.unitStatus = UnitStatus.ALL;
+        state.unitType = null;
+        state.formation = null;
+        state.unitQuery = "";
+        unitsPage.setSearchText("");
+        state.page = CrewAssignmentPage.UNITS;
         refresh();
     }
 
@@ -813,6 +960,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             state.unitType = null;
             state.formation = null;
             state.seatsForPerson = null;
+            state.unitsForTech = null;
             state.unitQuery = "";
             unitsPage.setSearchText("");
         }
@@ -834,6 +982,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             state.assignment = Assignment.EVERYONE;
             state.role = null;
             state.qualifiedFor = null;
+            state.techFor = null;
             state.peopleQuery = "";
             peoplePage.setSearchText("");
         }
@@ -848,6 +997,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.selectedUnits.add(unit);
         state.targetSeat = seat;
         state.qualifiedFor = new SeatFilter(unit, seat);
+        state.techFor = null;
+        state.targetTech = false;
         state.assignment = Assignment.UNASSIGNED;
         state.role = null;
         state.peopleQuery = "";
@@ -860,6 +1011,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     public void findUnitsFor(Person person) {
         state.selectedPeople.add(person);
         state.seatsForPerson = person;
+        state.unitsForTech = null;
         state.unitStatus = UnitStatus.NEEDS_CREW;
         state.unitType = null;
         state.formation = null;
@@ -940,7 +1092,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.focusedUnit = null;
         state.focusedPerson = null;
         state.seatsForPerson = null;
+        state.unitsForTech = null;
         state.qualifiedFor = null;
+        state.techFor = null;
+        state.targetTech = false;
         state.unitType = null;
         state.formation = null;
         state.role = null;
@@ -958,15 +1113,21 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             return;
         }
         CommitReport report = CrewAssignmentService.commit(plan, data.isUseTransfers(), data.today());
-        if (report.skipped().isEmpty()) {
-            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.committed", report.applied().size()), false);
+        if (report.skippedCount() == 0) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.committed", report.appliedCount()), false);
         } else {
             for (Problem problem : report.skipped()) {
-                LOGGER.info("Skipped assigning {} to {}: {}", problem.change().person().getFullName(),
-                      problem.change().toUnit().getName(), problem.reason());
+                Unit target = (problem.change().toUnit() != null) ? problem.change().toUnit() :
+                                    problem.change().fromUnit();
+                LOGGER.info("Skipped crew change for {} on {}: {}", problem.change().person().getFullName(),
+                      (target == null) ? "-" : target.getName(), problem.reason());
             }
-            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.committedSkipped", report.applied().size(),
-                  report.skipped().size()), true);
+            report.techsSkipped().forEach(problem -> LOGGER.info("Skipped tech change on {}: {}",
+                  problem.change().unit().getName(), problem.reason()));
+            report.tempCrewSkipped().forEach(problem -> LOGGER.info("Skipped temp crew change on {}: {}",
+                  problem.change().unit().getName(), problem.reason()));
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.committedSkipped", report.appliedCount(),
+                  report.skippedCount()), true);
         }
         String kept = message;
         boolean keptWarning = isWarning;

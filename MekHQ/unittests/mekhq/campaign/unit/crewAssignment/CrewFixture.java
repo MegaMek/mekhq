@@ -39,6 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,6 +62,7 @@ import mekhq.campaign.unit.Unit;
  */
 class CrewFixture {
     private final Map<Person, Unit> unitOf = new HashMap<>();
+    private final Map<Person, List<Unit>> techUnitsOf = new HashMap<>();
 
     /** A unit's crew lists, behind a mock {@link Unit}. */
     final class CrewUnit {
@@ -72,6 +74,8 @@ class CrewFixture {
         Person techOfficer;
         /** Whoever is named here is refused by every add method, as if the unit turned them away. */
         Person refuse;
+        Person tech;
+        final Map<PersonnelRole, Integer> tempCrew = new EnumMap<>(PersonnelRole.class);
 
         private CrewUnit(Entity entity, String name, int drivers, int gunners, int crew, boolean soloPilot,
               boolean soldiers) {
@@ -89,6 +93,37 @@ class CrewFixture {
             when(unit.getVesselCrew()).thenAnswer(invocation -> List.copyOf(vesselCrew));
             when(unit.getNavigator()).thenAnswer(invocation -> navigator);
             when(unit.getTechOfficer()).thenAnswer(invocation -> techOfficer);
+            when(unit.getFullCrewSize()).thenReturn(soldiers ? gunners : drivers + (soloPilot ? 0 : gunners) + crew);
+            when(unit.getActiveCrew()).thenAnswer(invocation -> List.copyOf(this.drivers));
+
+            // Maintenance: every unit needs a tech, takes an hour a day, and keeps one tech
+            when(unit.requiresMaintenance()).thenReturn(true);
+            when(unit.getMaintenanceTime()).thenReturn(60);
+            when(unit.getTech()).thenAnswer(invocation -> tech);
+            doAnswer(invocation -> {
+                Person newTech = invocation.getArgument(0);
+                if (newTech != refuse) {
+                    tech = newTech;
+                    techUnitsOf.computeIfAbsent(newTech, key -> new ArrayList<>()).add(unit);
+                }
+                return null;
+            }).when(unit).setTech(any());
+
+            // Temporary crew, by role
+            when(unit.getTempCrewByPersonnelRole(any())).thenAnswer(invocation ->
+                                                                          tempCrew.getOrDefault(invocation.getArgument(0), 0));
+            when(unit.getTotalTempCrew()).thenAnswer(invocation ->
+                                                           tempCrew.values().stream().mapToInt(Integer::intValue).sum());
+            doAnswer(invocation -> {
+                PersonnelRole role = invocation.getArgument(0);
+                int count = invocation.getArgument(1);
+                if (count <= 0) {
+                    tempCrew.remove(role);
+                } else {
+                    tempCrew.put(role, count);
+                }
+                return null;
+            }).when(unit).setTempCrew(any(), org.mockito.ArgumentMatchers.anyInt());
 
             doAnswer(invocation -> {
                 Person person = invocation.getArgument(0);
@@ -128,6 +163,10 @@ class CrewFixture {
                 if (person == techOfficer) {
                     techOfficer = null;
                 }
+                if (person == tech) {
+                    tech = null;
+                    techUnitsOf.getOrDefault(person, new ArrayList<>()).remove(unit);
+                }
                 if (unitOf.get(person) == unit) {
                     unitOf.remove(person);
                 }
@@ -157,6 +196,22 @@ class CrewFixture {
                 case TECH_OFFICER, CONSOLE_COMMANDER -> techOfficer = person;
             }
             unitOf.put(person, unit);
+            return this;
+        }
+
+        /** Makes someone this unit's tech, as if they already maintained it before the test. */
+        CrewUnit maintainedBy(Person newTech) {
+            tech = newTech;
+            techUnitsOf.computeIfAbsent(newTech, key -> new ArrayList<>()).add(unit);
+            return this;
+        }
+
+        /** Gives this unit temporary crew of a role, and the role its driver seat takes. */
+        CrewUnit withTempCrew(PersonnelRole role, int count) {
+            when(unit.getDriverRole()).thenReturn(role);
+            if (count > 0) {
+                tempCrew.put(role, count);
+            }
             return this;
         }
     }
@@ -202,6 +257,19 @@ class CrewFixture {
         when(person.getUnit()).thenAnswer(invocation -> unitOf.get(person));
         when(person.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean()))
               .thenReturn(SkillLevel.REGULAR);
+        when(person.getTechUnits()).thenAnswer(invocation -> List.copyOf(techUnitsOf.getOrDefault(person, List.of())));
+        when(person.getMaintenanceTimeUsing()).thenAnswer(invocation ->
+                                                                techUnitsOf.getOrDefault(person, List.of()).stream()
+                                                                      .mapToInt(Unit::getMaintenanceTime).sum());
         return person;
+    }
+
+    /** A tech who can work on anything and has the given minutes of tech time a day. */
+    Person tech(String name, int minutesPerDay) {
+        Person tech = person(name, PersonnelRole.MEK_TECH);
+        when(tech.isTech()).thenReturn(true);
+        when(tech.canTech(any())).thenReturn(true);
+        when(tech.getDailyAvailableTechTime(anyBoolean())).thenReturn(minutesPerDay);
+        return tech;
     }
 }

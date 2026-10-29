@@ -61,6 +61,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
+import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.Hud;
@@ -104,6 +105,20 @@ final class CrewInspector extends JPanel {
         void findPeopleFor(Unit unit, SeatType seat);
 
         void findUnitsFor(Person person);
+
+        void chooseTargetTech();
+
+        void unassignSelectedPeople();
+
+        void clearSelectedUnits(boolean alsoTechs);
+
+        void fillTempCrew();
+
+        void removeTempCrew();
+
+        void findTechFor(Unit unit);
+
+        void findUnitsForTech(Person tech);
     }
 
     private final Actions actions;
@@ -112,6 +127,11 @@ final class CrewInspector extends JPanel {
     private final HudButton assignButton = new HudButton("", true, true);
     private final HudButton autoFillButton = new HudButton("", false, true);
     private final HudButton clearButton = new HudButton(upper("inspector.clear"), false, true);
+    private final HudButton unassignButton = new HudButton(upper("inspector.unassign"), false, true);
+    private final HudButton removeCrewButton = new HudButton(upper("inspector.removeCrew"), false, true);
+    private final HudButton removeAllButton = new HudButton(upper("inspector.removeCrewAndTech"), false, true);
+    private final HudButton fillTempButton = new HudButton(upper("inspector.fillTempCrew"), false, true);
+    private final HudButton removeTempButton = new HudButton(upper("inspector.removeTempCrew"), false, true);
 
     CrewInspector(Actions actions) {
         super(new BorderLayout());
@@ -123,6 +143,16 @@ final class CrewInspector extends JPanel {
         assignButton.addActionListener(event -> actions.assignSelected());
         autoFillButton.addActionListener(event -> actions.autoFill());
         clearButton.addActionListener(event -> actions.clearSelection());
+        unassignButton.addActionListener(event -> actions.unassignSelectedPeople());
+        removeCrewButton.addActionListener(event -> actions.clearSelectedUnits(false));
+        removeAllButton.addActionListener(event -> actions.clearSelectedUnits(true));
+        fillTempButton.addActionListener(event -> actions.fillTempCrew());
+        removeTempButton.addActionListener(event -> actions.removeTempCrew());
+        unassignButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.unassign.toolTipText"));
+        removeCrewButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeCrew.toolTipText"));
+        removeAllButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeCrewAndTech.toolTipText"));
+        fillTempButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.fillTempCrew.toolTipText"));
+        removeTempButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "inspector.removeTempCrew.toolTipText"));
 
         selection.setOpaque(true);
         selection.setBackground(SURFACE);
@@ -211,24 +241,39 @@ final class CrewInspector extends JPanel {
                     getFormattedTextAt(RESOURCE_BUNDLE, "inspector.people.count", peopleCount),
               peopleHint, getTextAt(RESOURCE_BUNDLE, "inspector.people.link"), CrewAssignmentPage.PERSONNEL)));
 
-        // The seat auto-fill fills: one chip per seat type with room on the selected units
-        if (!openBySeat.isEmpty()) {
-            if ((state.targetSeat == null) || !openBySeat.containsKey(state.targetSeat)) {
-                state.targetSeat = openBySeat.keySet().iterator().next();
+        // What auto-fill fills: one chip per seat type with room on the selected units, and one for missing techs
+        int needTech = 0;
+        boolean hasTempCrew = false;
+        for (Unit unit : state.selectedUnits) {
+            if (SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null)) {
+                needTech++;
             }
+            hasTempCrew |= plan.plannedTotalTempCrew(unit) > 0;
+        }
+        if ((state.targetSeat == null) || !openBySeat.containsKey(state.targetSeat)) {
+            state.targetSeat = openBySeat.isEmpty() ? null : openBySeat.keySet().iterator().next();
+        }
+        if ((needTech == 0) || ((state.targetSeat == null) && !state.targetTech)) {
+            state.targetTech = (needTech > 0) && (state.targetSeat == null);
+        }
+        if (!openBySeat.isEmpty() || (needTech > 0)) {
             JPanel chips = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(4), scaleForGUI(4)));
             Unit sample = state.selectedUnits.iterator().next();
             for (Map.Entry<SeatType, Integer> entry : openBySeat.entrySet()) {
                 HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.seatChip",
                       CrewRowRenderers.seatLabel(sample, entry.getKey()), entry.getValue()),
                       () -> actions.chooseTargetSeat(entry.getKey()));
-                chip.setActive(entry.getKey() == state.targetSeat);
+                chip.setActive(!state.targetTech && (entry.getKey() == state.targetSeat));
+                chips.add(chip);
+            }
+            if (needTech > 0) {
+                HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.techChip", needTech),
+                      actions::chooseTargetTech);
+                chip.setActive(state.targetTech);
                 chips.add(chip);
             }
             selection.add(Box.createVerticalStrut(scaleForGUI(8)));
             selection.add(leftAligned(chips));
-        } else {
-            state.targetSeat = null;
         }
 
         boolean canAssign = (peopleCount > 0) && (unitCount > 0);
@@ -237,9 +282,12 @@ final class CrewInspector extends JPanel {
                                          unitCount).toUpperCase(Locale.ROOT) :
                                    upper("inspector.assign"));
         assignButton.setArmed(canAssign);
-        int wanted = (state.targetSeat == null) ? 0 : openBySeat.get(state.targetSeat);
+        int wanted = state.targetTech ? needTech :
+                           (state.targetSeat == null) ? 0 : openBySeat.get(state.targetSeat);
         autoFillButton.setText((wanted > 0) ?
-                                     getFormattedTextAt(RESOURCE_BUNDLE, "inspector.autoFill.count", wanted)
+                                     getFormattedTextAt(RESOURCE_BUNDLE, state.targetTech ?
+                                                                               "inspector.autoFill.techs" :
+                                                                               "inspector.autoFill.count", wanted)
                                            .toUpperCase(Locale.ROOT) :
                                      upper("inspector.autoFill"));
         autoFillButton.setArmed(wanted > 0);
@@ -251,6 +299,32 @@ final class CrewInspector extends JPanel {
         buttons.add(clearButton);
         selection.add(Box.createVerticalStrut(scaleForGUI(6)));
         selection.add(leftAligned(buttons));
+
+        // Taking people out, and the units' crew and temporary crew, once something is selected
+        boolean anyPersonPlaced = state.selectedPeople.stream()
+                                        .anyMatch(person -> plan.canUnassign(person)
+                                                                  || !plan.plannedTechUnits(person).isEmpty());
+        boolean anyCrewed = state.selectedUnits.stream().anyMatch(unit -> !plan.plannedCrewOf(unit).isEmpty());
+        boolean anyTeched = state.selectedUnits.stream().anyMatch(unit -> plan.plannedTechOf(unit) != null);
+        unassignButton.setArmed(anyPersonPlaced);
+        removeCrewButton.setArmed(anyCrewed);
+        removeAllButton.setArmed(anyCrewed || anyTeched);
+        fillTempButton.setArmed(state.selectedUnits.stream().anyMatch(unit -> plan.plannedRealCrew(unit) > 0));
+        removeTempButton.setArmed(hasTempCrew);
+
+        JPanel moreButtons = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(4)));
+        if (peopleCount > 0) {
+            moreButtons.add(unassignButton);
+        }
+        if (unitCount > 0) {
+            moreButtons.add(removeCrewButton);
+            moreButtons.add(removeAllButton);
+            moreButtons.add(fillTempButton);
+            moreButtons.add(removeTempButton);
+        }
+        if (moreButtons.getComponentCount() > 0) {
+            selection.add(leftAligned(moreButtons));
+        }
     }
 
     private JComponent basket(String title, String hint, String linkText, CrewAssignmentPage page) {
@@ -287,6 +361,9 @@ final class CrewInspector extends JPanel {
         detail.add(Box.createVerticalStrut(scaleForGUI(8)));
         detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.unit.condition"), entry.damageName(),
               CrewRowRenderers.damageColor(entry.damageState()))));
+        if (SeatEligibility.takesTech(unit)) {
+            detail.add(leftAligned(techLine(unit, plan)));
+        }
         detail.add(Box.createVerticalStrut(scaleForGUI(10)));
 
         List<StagedAssignment> changes = plan.changes();
@@ -319,7 +396,7 @@ final class CrewInspector extends JPanel {
                 }
             }
             for (StagedAssignment change : changes) {
-                if (change.toUnit().equals(unit) && (change.toSeat() == seat.type())) {
+                if (unit.equals(change.toUnit()) && (change.toSeat() == seat.type())) {
                     Person person = change.person();
                     crew.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.arriving",
                           person.getFullTitle()), () -> actions.openPerson(person)));
@@ -352,6 +429,11 @@ final class CrewInspector extends JPanel {
         }
         detail.add(Box.createVerticalStrut(scaleForGUI(10)));
 
+        if (person.isTech()) {
+            buildTechDetail(person, plan);
+            detail.add(Box.createVerticalStrut(scaleForGUI(10)));
+        }
+
         detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.person.unit"))));
         Unit unit = person.getUnit();
         detail.add(leftAligned((unit == null) ?
@@ -364,8 +446,13 @@ final class CrewInspector extends JPanel {
             detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.person.pending"))));
             JPanel move = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(6), 0));
             move.add(Hud.hint("→"));
-            move.add(Hud.link(change.toUnit().getName(), () -> actions.openUnit(change.toUnit())));
-            move.add(Hud.hint(CrewRowRenderers.seatLabel(change.toUnit(), change.toSeat())));
+            Unit toUnit = change.toUnit();
+            if (toUnit == null) {
+                move.add(Hud.hint(getTextAt(RESOURCE_BUNDLE, "row.unassigned")));
+            } else {
+                move.add(Hud.link(toUnit.getName(), () -> actions.openUnit(toUnit)));
+                move.add(Hud.hint(CrewRowRenderers.seatLabel(toUnit, change.toSeat())));
+            }
             detail.add(leftAligned(move));
         }
 
@@ -401,6 +488,50 @@ final class CrewInspector extends JPanel {
     }
 
     // endregion Details
+
+    /** The unit's tech once the plan is applied, as a link, with a link to find one. */
+    private JComponent techLine(Unit unit, AssignmentPlan plan) {
+        JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        JPanel left = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(1)));
+        left.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.unit.tech")));
+        left.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        Person tech = plan.plannedTechOf(unit);
+        if (tech == null) {
+            left.add(colored(getTextAt(RESOURCE_BUNDLE, "inspector.unit.noTech"), AMBER));
+        } else {
+            boolean isStaged = plan.techChangeFor(unit) != null;
+            left.add(Hud.link(isStaged ? getFormattedTextAt(RESOURCE_BUNDLE, "inspector.arriving",
+                  tech.getFullTitle()) : tech.getFullTitle(), () -> actions.openPerson(tech)));
+        }
+        line.add(left, BorderLayout.CENTER);
+        line.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "inspector.findTech"), () -> actions.findTechFor(unit)),
+              BorderLayout.EAST);
+        return line;
+    }
+
+    /** A tech's units and time once the plan is applied. */
+    private void buildTechDetail(Person tech, AssignmentPlan plan) {
+        int used = plan.plannedTechMinutes(tech);
+        int available = plan.techMinutesAvailable(tech);
+        detail.add(leftAligned(statLine(getTextAt(RESOURCE_BUNDLE, "inspector.person.techTime"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "inspector.person.techTime.value", used, available),
+              (used > available) ? DANGER : TEXT)));
+        detail.add(Box.createVerticalStrut(scaleForGUI(8)));
+        detail.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "inspector.person.maintains"))));
+        List<Unit> units = plan.plannedTechUnits(tech);
+        if (units.isEmpty()) {
+            detail.add(leftAligned(Hud.hint(getTextAt(RESOURCE_BUNDLE, "inspector.person.maintains.none"))));
+        } else {
+            JPanel links = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(10), scaleForGUI(2)));
+            for (Unit unit : units) {
+                links.add(Hud.link(unit.getName(), () -> actions.openUnit(unit)));
+            }
+            detail.add(leftAligned(links));
+        }
+        detail.add(Box.createVerticalStrut(scaleForGUI(8)));
+        detail.add(leftAligned(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "inspector.findUnitsForTech",
+              tech.getGivenName()), () -> actions.findUnitsForTech(tech))));
+    }
 
     /** A small caption with its value beside it, such as "HITS  2". */
     private static JComponent statLine(String caption, String value, Color color) {

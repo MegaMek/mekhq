@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.ToIntFunction;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -50,16 +51,20 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewSeatLayout;
+import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.gui.model.LocationFilterItem;
 
 /**
@@ -99,6 +104,7 @@ final class CrewAssignmentData {
     private final Map<UUID, UnitEntry> units = new LinkedHashMap<>();
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
     private final AssignmentPlan plan;
+    private final ToIntFunction<PersonnelRole> tempCrewPool;
     private final Comparator<Person> ranking;
     private final boolean useTransfers;
     private final LocalDate today;
@@ -114,7 +120,15 @@ final class CrewAssignmentData {
         useTransfers = options.get(CampaignOption.USE_TRANSFERS);
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
-              options.get(CampaignOption.USE_IMPLANTS));
+              options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
+        // A tech busy on a refit at this location cannot take on more units
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        LocalHangar hangar = (location.getBase() == null) ? campaign.getPlayerForce().getHangar() :
+                                   location.getBase().getBaseHangar();
+        plan.setTechBusy(person -> humanResources.isWorkingOnRefit(hangar, person));
+        // The pool is read when a fill is staged; the plan subtracts what it has already staged from it
+        tempCrewPool = role -> humanResources.isBlobCrewEnabled(role, options) ?
+                                     humanResources.getAvailableTempCrewPool(campaign, role) : 0;
 
         boolean isClan = campaign.getPlayerForce().isClanForce();
         boolean useFatigue = options.get(CampaignOption.USE_FATIGUE);
@@ -133,7 +147,7 @@ final class CrewAssignmentData {
 
         List<UnitEntry> unitEntries = new ArrayList<>();
         for (Unit unit : location.selectUnits(campaign)) {
-            if (CrewSeatLayout.takesCrew(unit) && unit.isAvailable()) {
+            if ((CrewSeatLayout.takesCrew(unit) || SeatEligibility.takesTech(unit)) && unit.isAvailable()) {
                 unitEntries.add(describe(campaign, unit));
             }
         }
@@ -141,10 +155,10 @@ final class CrewAssignmentData {
         unitEntries.forEach(entry -> units.put(entry.unit().getId(), entry));
     }
 
-    /** Someone is listed if they are active and have a combat role; techs and other support staff are not. */
+    /** Someone is listed if they are active and either have a combat role or are a tech; other support staff are not. */
     private static boolean isShown(Person person) {
         return person.getStatus().isActive()
-                     && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat());
+                     && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech());
     }
 
     private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {
@@ -198,6 +212,11 @@ final class CrewAssignmentData {
 
     AssignmentPlan plan() {
         return plan;
+    }
+
+    /** @return the campaign's free temporary crew of each role, before any staged change; 0 where it uses none */
+    ToIntFunction<PersonnelRole> tempCrewPool() {
+        return tempCrewPool;
     }
 
     /** @return best first, by experience level and then name; {@link AutoFill} uses the same order */

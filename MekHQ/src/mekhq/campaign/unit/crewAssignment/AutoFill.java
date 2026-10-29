@@ -97,6 +97,32 @@ public final class AutoFill {
         return plan.stage(chosen, withSeat);
     }
 
+    /**
+     * Gives each of the given units that will have no tech the best tech from {@code candidates} who can take it on.
+     * The best tech takes units until their daily time runs out, then the next takes over.
+     *
+     * @param plan       the plan to stage into
+     * @param units      the units, in the order they should be given techs
+     * @param candidates the people to choose from; anyone who is not a tech is skipped
+     * @param ranking    best first; see {@link #byExperience}
+     *
+     * @return what was staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static AssignmentPlan.TechStageResult fillTechs(final AssignmentPlan plan, final List<Unit> units,
+          final Collection<Person> candidates, final Comparator<Person> ranking) {
+        final List<Person> techs = new ArrayList<>();
+        for (Person person : candidates) {
+            if (person.isTech()) {
+                techs.add(person);
+            }
+        }
+        techs.sort(ranking);
+        return plan.stageTechs(techs, units);
+    }
+
     private static boolean qualifiesForAny(final AssignmentPlan plan, final Person person, final List<Unit> units,
           final SeatType type) {
         for (Unit unit : units) {

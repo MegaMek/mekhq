@@ -35,7 +35,9 @@ package mekhq.campaign.unit.crewAssignment;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * One group of crew seats on a unit, as it stands right now: its type, how many people it holds, who holds them, and
@@ -50,11 +52,14 @@ import mekhq.campaign.personnel.Person;
  * @param capacity  how many people the seat holds
  * @param occupants the real people in the seat now
  * @param tempCrew  the temporary crew counted against this seat
+ * @param tempRole  the role this seat's temporary crew have, or {@code null} where the unit does not keep them per
+ *                  seat
  *
  * @author Illiani
  * @since 0.51.01
  */
-public record CrewSeat(SeatType type, int capacity, List<Person> occupants, int tempCrew) {
+public record CrewSeat(SeatType type, int capacity, List<Person> occupants, int tempCrew,
+      @Nullable PersonnelRole tempRole) {
     public CrewSeat {
         Objects.requireNonNull(type);
         occupants = List.copyOf(occupants);

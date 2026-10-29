@@ -102,17 +102,19 @@ final class CrewCoverage {
         int open = 0;
         for (CrewSeat seat : plan.seatsOf(unit)) {
             int seatReal = Math.max(0, seat.capacity() - Math.max(0, plan.openSeats(unit, seat.type())));
-            int temp = Math.min(seat.tempCrew(), Math.max(0, seat.capacity() - seatReal));
+            // Counts staged temporary crew fills and removals, not just the temporary crew aboard now
+            int seatTempPlanned = plan.plannedTempCrew(unit, seat);
+            int temp = Math.min(seatTempPlanned, Math.max(0, seat.capacity() - seatReal));
             seats.add(new SeatCoverage(seat, seatReal, temp, Math.max(0, seat.capacity() - seatReal - temp)));
             capacity += seat.capacity();
             real += seatReal;
             seatTemp += temp;
-            seatTempHeld += seat.tempCrew();
+            seatTempHeld += seatTempPlanned;
             open += Math.max(0, seat.capacity() - seatReal - temp);
         }
 
         // Temporary crew the unit keeps outside any one seat, such as a vehicle's shared pool, cover what is left
-        int pooled = Math.min(Math.max(0, unit.getTotalTempCrew() - seatTempHeld), open);
+        int pooled = Math.min(Math.max(0, plan.plannedTotalTempCrew(unit) - seatTempHeld), open);
         if (pooled > 0) {
             seats = sharePool(seats, pooled);
         }

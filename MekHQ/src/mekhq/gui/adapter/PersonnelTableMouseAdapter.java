@@ -196,7 +196,6 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
-import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.roleplay.OracleConsole;
@@ -2676,7 +2675,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(evt -> CrewAssignmentDialog.showFor(getFrame(), getCampaign(), List.of(),
               List.of(selected)));
         popup.add(menuItem);
-        JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
 
         if (Arrays.stream(selected)
                   .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)

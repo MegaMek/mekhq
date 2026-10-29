@@ -65,6 +65,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
+import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
@@ -82,7 +85,19 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  */
 final class CrewRowRenderers {
     /** The Review page's link that takes a change out of the plan. */
-    record RemoveLink(Person person) {}
+    record RemoveLink(ReviewItem item) {}
+
+    /** One row of the Review page: a staged crew move, tech change or temporary crew change. */
+    sealed interface ReviewItem permits CrewItem, TechItem, TempCrewItem {}
+
+    /** A staged crew move, as a Review row. */
+    record CrewItem(StagedAssignment change) implements ReviewItem {}
+
+    /** A staged tech change, as a Review row. */
+    record TechItem(StagedTech change) implements ReviewItem {}
+
+    /** A staged temporary crew change, as a Review row. */
+    record TempCrewItem(StagedTempCrew change) implements ReviewItem {}
 
     private static final String RESOURCE_BUNDLE = CrewAssignmentDialog.RESOURCE_BUNDLE;
 
@@ -334,6 +349,20 @@ final class CrewRowRenderers {
                 badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
                 badges.add(badge);
             }
+            if (SeatEligibility.takesTech(unit)) {
+                JLabel techBadge = badge();
+                Person tech = plan.plannedTechOf(unit);
+                techBadge.setText(getTextAt(RESOURCE_BUNDLE, (tech == null) ? "row.noTech" : "row.tech")
+                                        .toUpperCase(Locale.ROOT));
+                if (tech == null) {
+                    setBadgeColor(techBadge, AMBER, AMBER.darker());
+                } else {
+                    setBadgeColor(techBadge, READY, BORDER);
+                    techBadge.setToolTipText(tech.getFullTitle());
+                }
+                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
+                badges.add(techBadge);
+            }
             return this;
         }
 
@@ -391,7 +420,14 @@ final class CrewRowRenderers {
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);
-            if (planned == null) {
+            if ((planned == null) && person.isTech()) {
+                int units = plan.plannedTechUnits(person).size();
+                int used = plan.plannedTechMinutes(person);
+                int available = plan.techMinutesAvailable(person);
+                setLink(list, index, where, getFormattedTextAt(RESOURCE_BUNDLE, "row.techLoad", units, used,
+                      available), null);
+                where.setForeground((used > available) ? DANGER : (units == 0) ? TEXT_MUTED : TEXT);
+            } else if (planned == null) {
                 setLink(list, index, where, getTextAt(RESOURCE_BUNDLE, "row.unassigned"), null);
             } else {
                 String text = (change == null) ? planned.getName() :
@@ -422,13 +458,13 @@ final class CrewRowRenderers {
     // region Review
 
     /** A staged change: who, from where to where, and anything that would stop it being applied. */
-    static final class ReviewRow extends Row implements ListCellRenderer<StagedAssignment> {
+    static final class ReviewRow extends Row implements ListCellRenderer<ReviewItem> {
         private final AssignmentPlan plan;
         private final JLabel from = label(LINE_FONT, ACCENT_BRIGHT);
         private final JLabel arrow = label(LINE_FONT, TEXT_FAINT);
         private final JLabel to = label(LINE_FONT, ACCENT_BRIGHT);
         private final JLabel seat = label(LINE_FONT, TEXT_MUTED);
-        private final JLabel reassign = badge();
+        private final JLabel kind = badge();
         private final JLabel problem = label(LINE_FONT, DANGER);
         private final JLabel remove = label(LINE_FONT, ACCENT_BRIGHT);
 
@@ -440,39 +476,98 @@ final class CrewRowRenderers {
             secondLine.add(arrow);
             secondLine.add(to);
             secondLine.add(seat);
-            reassign.setText(getTextAt(RESOURCE_BUNDLE, "row.reassign").toUpperCase(Locale.ROOT));
-            setBadgeColor(reassign, AMBER, AMBER.darker());
             badges.add(problem);
             badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
-            badges.add(reassign);
+            badges.add(kind);
             badges.add(Box.createHorizontalStrut(scaleForGUI(12)));
             badges.add(remove);
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends StagedAssignment> list,
-              StagedAssignment change, int index, boolean selectedInList, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends ReviewItem> list, ReviewItem item, int index,
+              boolean selectedInList, boolean cellHasFocus) {
             paintState(false);
-            Person person = change.person();
-            setLink(list, index, name, person.getFullTitle(), person);
-            name.setFont(HudLinkList.isLinkHovered(list, index, person) ? NAME_FONT.deriveFont(Map.of(
-                  TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON)) : NAME_FONT);
-            role.setText(person.getPrimaryRole().getLabel(false));
             status.setText("");
+            Reason reason;
+            switch (item) {
+                case CrewItem crewItem -> reason = showCrew(list, index, crewItem.change());
+                case TechItem techItem -> reason = showTech(list, index, techItem.change());
+                case TempCrewItem tempItem -> reason = showTempCrew(list, index, tempItem.change());
+            }
+            problem.setText((reason == null) ? "" : reasonText(reason));
+            setLink(list, index, remove, getTextAt(RESOURCE_BUNDLE, "row.remove"), new RemoveLink(item));
+            return this;
+        }
 
+        private Reason showCrew(JList<?> list, int index, StagedAssignment change) {
+            Person person = change.person();
+            showPersonName(list, index, person);
             if (change.fromUnit() == null) {
                 setLink(list, index, from, getTextAt(RESOURCE_BUNDLE, "row.unassigned"), null);
             } else {
                 setLink(list, index, from, change.fromUnit().getName(), change.fromUnit());
             }
-            setLink(list, index, to, change.toUnit().getName(), change.toUnit());
-            seat.setText("  ·  " + seatLabel(change.toUnit(), change.toSeat()));
+            if (change.isRemoval()) {
+                setLink(list, index, to, getTextAt(RESOURCE_BUNDLE, "row.unassigned"), null);
+                seat.setText("");
+                showKind("row.kind.unassign", AMBER);
+            } else {
+                setLink(list, index, to, change.toUnit().getName(), change.toUnit());
+                seat.setText("  ·  " + seatLabel(change.toUnit(), change.toSeat()));
+                showKind(change.isReassignment() ? "row.reassign" : null, AMBER);
+            }
+            return plan.problemWith(change);
+        }
 
-            reassign.setVisible(change.isReassignment());
-            Reason reason = plan.problemWith(change);
-            problem.setText((reason == null) ? "" : reasonText(reason));
-            setLink(list, index, remove, getTextAt(RESOURCE_BUNDLE, "row.remove"), new RemoveLink(person));
-            return this;
+        private Reason showTech(JList<?> list, int index, StagedTech change) {
+            Unit unit = change.unit();
+            setLink(list, index, name, unit.getName(), unit);
+            name.setFont(HudLinkList.isLinkHovered(list, index, unit) ? NAME_FONT.deriveFont(Map.of(
+                  TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON)) : NAME_FONT);
+            role.setText(getTextAt(RESOURCE_BUNDLE, "row.techChange"));
+            showTechName(list, index, from, change.fromTech());
+            showTechName(list, index, to, change.toTech());
+            seat.setText("");
+            showKind("row.kind.tech", ACCENT);
+            return plan.problemWith(change);
+        }
+
+        private Reason showTempCrew(JList<?> list, int index, StagedTempCrew change) {
+            Unit unit = change.unit();
+            setLink(list, index, name, unit.getName(), unit);
+            name.setFont(HudLinkList.isLinkHovered(list, index, unit) ? NAME_FONT.deriveFont(Map.of(
+                  TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON)) : NAME_FONT);
+            role.setText(getTextAt(RESOURCE_BUNDLE, "row.tempCrewChange"));
+            int before = change.before().values().stream().mapToInt(Integer::intValue).sum();
+            int after = change.after().values().stream().mapToInt(Integer::intValue).sum();
+            setLink(list, index, from, getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCount", before), null);
+            setLink(list, index, to, getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCount", after), null);
+            seat.setText("");
+            showKind("row.kind.tempCrew", ACCENT);
+            return plan.problemWith(change);
+        }
+
+        private void showPersonName(JList<?> list, int index, Person person) {
+            setLink(list, index, name, person.getFullTitle(), person);
+            name.setFont(HudLinkList.isLinkHovered(list, index, person) ? NAME_FONT.deriveFont(Map.of(
+                  TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON)) : NAME_FONT);
+            role.setText(person.getPrimaryRole().getLabel(false));
+        }
+
+        private void showTechName(JList<?> list, int index, JLabel label, Person tech) {
+            if (tech == null) {
+                setLink(list, index, label, getTextAt(RESOURCE_BUNDLE, "row.noTechName"), null);
+            } else {
+                setLink(list, index, label, tech.getFullTitle(), tech);
+            }
+        }
+
+        private void showKind(String key, Color color) {
+            kind.setVisible(key != null);
+            if (key != null) {
+                kind.setText(getTextAt(RESOURCE_BUNDLE, key).toUpperCase(Locale.ROOT));
+                setBadgeColor(kind, color, color.darker());
+            }
         }
     }
 

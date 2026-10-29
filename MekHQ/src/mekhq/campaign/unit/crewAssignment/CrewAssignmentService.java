@@ -45,16 +45,27 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechProblem;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewProblem;
 
 /**
  * Applies an {@link AssignmentPlan} to the campaign. This is the only part of crew assignment that changes units and
  * people; it shows no dialogs.
  *
- * <p>Every change is checked again first, and any that can no longer be applied is skipped. Then every person who is
- * changing seat leaves their old one, and only after that does anyone take a new seat, so a swap or a chain of moves
- * never finds its seat still taken. Before each person takes a seat, the seat is checked for room; if it has none, or
- * the unit refuses them, they are put back in the seat they left, so nobody is left without a seat by a failed
- * assignment.</p>
+ * <p>Every change is checked again first, and any that can no longer be applied is skipped. The rest are applied in
+ * this order:</p>
+ * <ol>
+ *     <li>Everyone changing seat, or leaving their unit, leaves their old seat, so a swap or a chain of moves never
+ *     finds its seat still taken.</li>
+ *     <li>Temporary crew are filled or removed. A fill was sized for the crew the unit will end up with, so it comes
+ *     after the departures and before the arrivals, and never leaves the unit over strength.</li>
+ *     <li>Everyone moving into a seat takes it. The seat is checked for room first; if it has none, or the unit
+ *     refuses them, they are put back in the seat they left, so nobody is left without a seat by a failed
+ *     assignment. A person taking a place temporary crew hold replaces one of them.</li>
+ *     <li>Techs change. A unit whose new tech is refused keeps the tech it had.</li>
+ * </ol>
  *
  * @author Illiani
  * @since 0.51.01
@@ -65,13 +76,32 @@ public final class CrewAssignmentService {
     /**
      * What applying a plan did.
      *
-     * @param applied the changes that were applied, in order
-     * @param skipped the changes that were not, and why
+     * @param applied         the crew moves that were applied, in order
+     * @param skipped         the crew moves that were not, and why
+     * @param techsApplied    the tech changes that were applied
+     * @param techsSkipped    the tech changes that were not, and why
+     * @param tempCrewApplied the temporary crew changes that were applied
+     * @param tempCrewSkipped the temporary crew changes that were not, and why
      */
-    public record CommitReport(List<StagedAssignment> applied, List<Problem> skipped) {
+    public record CommitReport(List<StagedAssignment> applied, List<Problem> skipped, List<StagedTech> techsApplied,
+          List<TechProblem> techsSkipped, List<StagedTempCrew> tempCrewApplied, List<TempCrewProblem> tempCrewSkipped) {
         public CommitReport {
             applied = List.copyOf(applied);
             skipped = List.copyOf(skipped);
+            techsApplied = List.copyOf(techsApplied);
+            techsSkipped = List.copyOf(techsSkipped);
+            tempCrewApplied = List.copyOf(tempCrewApplied);
+            tempCrewSkipped = List.copyOf(tempCrewSkipped);
+        }
+
+        /** @return how many changes of every kind were applied */
+        public int appliedCount() {
+            return applied.size() + techsApplied.size() + tempCrewApplied.size();
+        }
+
+        /** @return how many changes of every kind were skipped */
+        public int skippedCount() {
+            return skipped.size() + techsSkipped.size() + tempCrewSkipped.size();
         }
     }
 
@@ -104,16 +134,36 @@ public final class CrewAssignmentService {
                 toApply.add(change);
             }
         }
+        // Checked now, before anything changes, as they were staged against the campaign as it is now
+        final List<TechProblem> techsSkipped = new ArrayList<>(plan.validateTechs());
+        final List<TempCrewProblem> tempCrewSkipped = new ArrayList<>(plan.validateTempCrew());
 
-        // Everyone leaves their old seat first
+        // 1. Everyone leaves their old seat first. Only a move to another unit counts as a transfer: leaving a unit
+        // altogether is always logged as a removal
+        final List<StagedAssignment> applied = new ArrayList<>();
         for (StagedAssignment change : toApply) {
             if (change.fromUnit() != null) {
-                change.fromUnit().remove(change.person(), !useTransfers);
+                change.fromUnit().remove(change.person(), !(useTransfers && !change.isRemoval()));
+            }
+            if (change.isRemoval()) {
+                applied.add(change);
             }
         }
 
-        final List<StagedAssignment> applied = new ArrayList<>();
+        // 2. Temporary crew
+        final List<StagedTempCrew> tempCrewApplied = new ArrayList<>();
+        for (StagedTempCrew change : plan.tempCrewChanges()) {
+            if (tempCrewSkipped.stream().noneMatch(problem -> problem.change().equals(change))) {
+                change.after().forEach((role, count) -> change.unit().setTempCrew(role, count));
+                tempCrewApplied.add(change);
+            }
+        }
+
+        // 3. Everyone moving into a seat takes it
         for (StagedAssignment change : toApply) {
+            if (change.isRemoval()) {
+                continue;
+            }
             final Person person = change.person();
             final boolean isTransfer = useTransfers && change.isReassignment();
             if (hasRoom(change.toUnit(), change.toSeat())) {
@@ -135,9 +185,49 @@ public final class CrewAssignmentService {
             }
         }
 
+        // 4. Techs
+        final List<StagedTech> techsApplied = new ArrayList<>();
+        for (StagedTech change : plan.techChanges()) {
+            if (techsSkipped.stream().anyMatch(problem -> problem.change().equals(change))) {
+                continue;
+            }
+            if (applyTech(change)) {
+                techsApplied.add(change);
+            } else {
+                techsSkipped.add(new TechProblem(change, Reason.REFUSED));
+            }
+        }
+
         plan.clear();
         plan.refreshSeats();
-        return new CommitReport(applied, skipped);
+        return new CommitReport(applied, skipped, techsApplied, techsSkipped, tempCrewApplied, tempCrewSkipped);
+    }
+
+    /**
+     * Replaces a unit's tech. If the unit refuses the new tech, it is given back the tech it had.
+     *
+     * @return {@code true} if the unit ends up with the staged tech
+     */
+    private static boolean applyTech(final StagedTech change) {
+        final Unit unit = change.unit();
+        final Person fromTech = change.fromTech();
+        final Person toTech = change.toTech();
+        if (fromTech != null) {
+            unit.remove(fromTech, true);
+        }
+        if (toTech == null) {
+            return true;
+        }
+        unit.setTech(toTech);
+        if (toTech.equals(unit.getTech())) {
+            return true;
+        }
+        LOGGER.warn("Could not make {} the tech of {}; returning it to its previous tech", toTech.getFullName(),
+              unit.getName());
+        if (fromTech != null) {
+            unit.setTech(fromTech);
+        }
+        return false;
     }
 
     private static boolean hasRoom(final Unit unit, final SeatType type) {

@@ -41,6 +41,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
+import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
@@ -62,7 +63,7 @@ final class CrewAssignmentState {
      * units, to replace their temporary crew with real people.
      */
     enum UnitStatus {
-        NEEDS_CREW, UNMANNED, ON_TEMP_CREW, FULLY_CREWED, ALL
+        NEEDS_CREW, UNMANNED, ON_TEMP_CREW, NEEDS_TECH, FULLY_CREWED, ALL
     }
 
     /** Which people the Personnel page shows, by whether they crew a unit once the plan is applied. */
@@ -82,6 +83,8 @@ final class CrewAssignmentState {
     String unitQuery = "";
     /** When set, the Units page shows only units with a seat this person could take. */
     @Nullable Person seatsForPerson;
+    /** When set, the Units page shows only units this tech could take on, or already maintains. */
+    @Nullable Person unitsForTech;
 
     // Personnel page
     Assignment assignment = Assignment.UNASSIGNED;
@@ -89,6 +92,8 @@ final class CrewAssignmentState {
     String peopleQuery = "";
     /** When set, the Personnel page shows only people who could take this seat. */
     @Nullable SeatFilter qualifiedFor;
+    /** When set, the Personnel page shows only techs who could take this unit on, or already maintain it. */
+    @Nullable Unit techFor;
 
     // Selections, kept in the order they were made
     final Set<Unit> selectedUnits = new LinkedHashSet<>();
@@ -96,6 +101,8 @@ final class CrewAssignmentState {
 
     /** The seat auto-fill fills on the selected units, or {@code null} to pick the first one with room. */
     @Nullable SeatType targetSeat;
+    /** {@code true} when auto-fill gives techs to the selected units instead of filling a seat. */
+    boolean targetTech;
 
     // The row whose details the inspector shows; at most one is set
     @Nullable Unit focusedUnit;
@@ -130,8 +137,27 @@ final class CrewAssignmentState {
         if ((seatsForPerson != null) && (plan.seatFor(seatsForPerson, unit) == null)) {
             return false;
         }
+        if ((unitsForTech != null) && !unitsForTech.equals(plan.plannedTechOf(unit))
+                  && !plan.canStageTech(unitsForTech, unit)) {
+            return false;
+        }
+
         if (!matches(entry.searchText(), unitQuery)) {
             return false;
+        }
+        return matchesStatus(entry, plan);
+    }
+
+    /**
+     * @param entry a unit
+     * @param plan  the staged plan
+     *
+     * @return {@code true} if the unit matches the Units page's status filter, ignoring its other filters
+     */
+    boolean matchesStatus(UnitEntry entry, AssignmentPlan plan) {
+        Unit unit = entry.unit();
+        if (unitStatus == UnitStatus.NEEDS_TECH) {
+            return SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null);
         }
         return matches(CrewCoverage.of(unit, plan), unitStatus);
     }
@@ -144,7 +170,9 @@ final class CrewAssignmentState {
      */
     boolean shows(PersonEntry entry, AssignmentPlan plan) {
         Person person = entry.person();
-        boolean isAssigned = plan.plannedUnitOf(person) != null;
+        // A tech is assigned while they maintain any unit, even though they crew none
+        boolean isAssigned = (plan.plannedUnitOf(person) != null)
+                                   || (person.isTech() && !plan.plannedTechUnits(person).isEmpty());
         if (((assignment == Assignment.UNASSIGNED) && isAssigned)
                   || ((assignment == Assignment.ASSIGNED) && !isAssigned)) {
             return false;
@@ -154,6 +182,9 @@ final class CrewAssignmentState {
         }
         if ((qualifiedFor != null) && !plan.canStage(person, qualifiedFor.unit(), qualifiedFor.seat())
                   && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
+            return false;
+        }
+        if ((techFor != null) && !person.equals(plan.plannedTechOf(techFor)) && !plan.canStageTech(person, techFor)) {
             return false;
         }
         return matches(entry.searchText(), peopleQuery);
@@ -173,6 +204,8 @@ final class CrewAssignmentState {
             case NEEDS_CREW -> (crewing == Crewing.EMPTY) || (crewing == Crewing.PARTIAL);
             case UNMANNED -> crewing == Crewing.EMPTY;
             case ON_TEMP_CREW -> coverage.temp() > 0;
+            // Needing a tech is decided from the unit and the plan, in shows()
+            case NEEDS_TECH -> true;
             case FULLY_CREWED -> (crewing == Crewing.FULL) || (crewing == Crewing.TEMP);
             case ALL -> true;
         };

@@ -112,6 +112,37 @@ public final class SeatEligibility {
     }
 
     /**
+     * Whether a unit is maintained by a tech at all: it needs maintenance and does not maintain itself, as DropShips,
+     * JumpShips and self-maintained infantry do.
+     *
+     * @param unit the unit
+     *
+     * @return {@code true} if a tech can be assigned to the unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean takesTech(final Unit unit) {
+        return (unit.getEntity() != null) && unit.requiresMaintenance() && !unit.isSelfCrewed();
+    }
+
+    /**
+     * Whether a person may maintain a unit: they are assignable, are a tech, and have the skill for that kind of unit.
+     * This does not check their remaining tech time.
+     *
+     * @param person the person
+     * @param unit   the unit
+     *
+     * @return {@code true} if the person may be the unit's tech
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canTech(final Person person, final Unit unit) {
+        return takesTech(unit) && isAssignable(person) && person.isTech() && person.canTech(unit.getEntity());
+    }
+
+    /**
      * Whether a person's primary role is what qualifies them for a seat, so their primary role's experience level is
      * the one that matters there. A person qualified only through their secondary role should be judged by that
      * role's level instead.

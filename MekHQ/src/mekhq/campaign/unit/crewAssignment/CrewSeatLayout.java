@@ -89,36 +89,38 @@ public final class CrewSeatLayout {
                                                     PersonnelRole.BATTLE_ARMOUR;
             // Soldiers go into both the driver and gunner lists, and the gunner count is what limits them
             seats.add(new CrewSeat(SeatType.SOLDIER, unit.getTotalGunnerNeeds(), new ArrayList<>(unit.getGunners()),
-                  unit.getTempCrewByPersonnelRole(soldierRole)));
+                  unit.getTempCrewByPersonnelRole(soldierRole), soldierRole));
             return seats;
         }
 
         final boolean isVessel = (entity instanceof SmallCraft) || (entity instanceof Jumpship);
 
         if (unit.getTotalDriverNeeds() > 0) {
+            final PersonnelRole tempRole = isVessel ? PersonnelRole.VESSEL_PILOT : null;
             seats.add(new CrewSeat(usesPilotSeat(entity) ? SeatType.PILOT : SeatType.DRIVER,
-                  unit.getTotalDriverNeeds(), unit.getDrivers(),
-                  isVessel ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT) : 0));
+                  unit.getTotalDriverNeeds(), unit.getDrivers(), tempCrewOf(unit, tempRole), tempRole));
         }
 
         if (hasGunnerSeat(unit, entity) && (unit.getTotalGunnerNeeds() > 0)) {
+            final PersonnelRole tempRole = isVessel ? PersonnelRole.VESSEL_GUNNER : null;
             seats.add(new CrewSeat(SeatType.GUNNER, unit.getTotalGunnerNeeds(), new ArrayList<>(unit.getGunners()),
-                  isVessel ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER) : 0));
+                  tempCrewOf(unit, tempRole), tempRole));
         }
 
         if (unit.getTotalCrewNeeds() > 0) {
             final boolean isAerospaceVessel = (entity instanceof Aero) && !(entity instanceof ConvFighter);
+            final PersonnelRole tempRole = isAerospaceVessel ? PersonnelRole.VESSEL_CREW : null;
             seats.add(new CrewSeat(SeatType.CREW, unit.getTotalCrewNeeds(), unit.getVesselCrew(),
-                  isAerospaceVessel ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) : 0));
+                  tempCrewOf(unit, tempRole), tempRole));
         }
 
         if (unit.hasNavigatorSeat()) {
-            seats.add(new CrewSeat(SeatType.NAVIGATOR, 1, listOf(unit.getNavigator()), 0));
+            seats.add(new CrewSeat(SeatType.NAVIGATOR, 1, listOf(unit.getNavigator()), 0, null));
         }
 
         if (unit.hasTechOfficerSeat()) {
             seats.add(new CrewSeat((entity instanceof Tank) ? SeatType.CONSOLE_COMMANDER : SeatType.TECH_OFFICER, 1,
-                  listOf(unit.getTechOfficer()), 0));
+                  listOf(unit.getTechOfficer()), 0, null));
         }
 
         return seats;
@@ -179,6 +181,10 @@ public final class CrewSeatLayout {
                      || (entity instanceof SmallCraft)
                      || (entity instanceof Jumpship)
                      || (entity instanceof Mek);
+    }
+
+    private static int tempCrewOf(final Unit unit, final @Nullable PersonnelRole role) {
+        return (role == null) ? 0 : unit.getTempCrewByPersonnelRole(role);
     }
 
     private static List<Person> listOf(final @Nullable Person person) {
