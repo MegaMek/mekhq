@@ -66,6 +66,7 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsBomb;
     int unitTransitTime;
     boolean noDeliveriesInTransit;
+    boolean useMarginOfSuccessDelivery;
     boolean usePlanetaryAcquisition;
     int maxJumpsPlanetaryAcquisition;
     PlanetaryAcquisitionFactionLimit planetAcquisitionFactionLimit;
@@ -112,6 +113,7 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsBomb = options.get(CampaignOption.AUTO_LOGISTICS_BOMB);
         unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
         noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
+        useMarginOfSuccessDelivery = options.get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY);
         usePlanetaryAcquisition = options.get(CampaignOption.USE_PLANETARY_ACQUISITION);
         maxJumpsPlanetaryAcquisition = options.get(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION);
         planetAcquisitionFactionLimit = options.get(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT);
@@ -169,6 +171,7 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AUTO_LOGISTICS_BOMB, autoLogisticsBomb);
         options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
         options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);
+        options.set(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY, useMarginOfSuccessDelivery);
         options.set(CampaignOption.USE_PLANETARY_ACQUISITION, usePlanetaryAcquisition);
         options.set(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION, maxJumpsPlanetaryAcquisition);
         options.set(CampaignOption.PLANET_ACQUISITION_FACTION_LIMIT, planetAcquisitionFactionLimit);
