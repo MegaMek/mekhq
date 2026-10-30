@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@
 package mekhq.gui.sorter;
 
 import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import megamek.logging.MMLogger;
 
@@ -43,54 +45,36 @@ import megamek.logging.MMLogger;
  */
 public class TargetSorter implements Comparator<String> {
     private static final MMLogger LOGGER = MMLogger.create(TargetSorter.class);
+    private static final Pattern TARGET_NUMBER = Pattern.compile("-?\\d+");
 
     @Override
-    public int compare(String s0, String s1) {
-        s0 = s0.replaceAll("\\+", "");
-        s1 = s1.replaceAll("\\+", "");
-        int r0;
-        int r1;
+    public int compare(String target0, String target1) {
+        return Integer.compare(toSortValue(target0), toSortValue(target1));
+    }
 
-        switch (s0) {
-            case "Impossible":
-                r0 = Integer.MAX_VALUE;
-                break;
-            case "Automatic Failure":
-                r0 = Integer.MAX_VALUE - 1;
-                break;
-            case "Automatic Success":
-                r0 = Integer.MIN_VALUE;
-                break;
-            default:
-                try {
-                    r0 = Integer.parseInt(s0);
-                } catch (Exception e) {
-                    LOGGER.error("", e);
-                    r0 = Integer.MAX_VALUE - 1;
+    /**
+     * @return the number a target string sorts by. A target the dice cannot reach, shown as {@code Impossible (13+)},
+     *       sorts by its number: after every target that can be rolled and before the outright impossible ones.
+     */
+    private static int toSortValue(String target) {
+        String targetWithoutPlus = target.replace("+", "");
+        return switch (targetWithoutPlus) {
+            case "Impossible" -> Integer.MAX_VALUE;
+            case "Automatic Failure" -> Integer.MAX_VALUE - 1;
+            case "Automatic Success" -> Integer.MIN_VALUE;
+            default -> {
+                Matcher targetNumber = TARGET_NUMBER.matcher(targetWithoutPlus);
+                if (!targetNumber.find()) {
+                    LOGGER.error("Cannot sort target number text: {}", target);
+                    yield Integer.MAX_VALUE - 1;
                 }
-                break;
-        }
-
-        switch (s1) {
-            case "Impossible":
-                r1 = Integer.MAX_VALUE;
-                break;
-            case "Automatic Failure":
-                r1 = Integer.MAX_VALUE - 1;
-                break;
-            case "Automatic Success":
-                r1 = Integer.MIN_VALUE;
-                break;
-            default:
                 try {
-                    r1 = Integer.parseInt(s1);
-                } catch (Exception e) {
-                    LOGGER.error("", e);
-                    r1 = Integer.MAX_VALUE - 1;
+                    yield Integer.parseInt(targetNumber.group());
+                } catch (NumberFormatException exception) {
+                    LOGGER.error(exception, "Cannot sort target number text: {}", target);
+                    yield Integer.MAX_VALUE - 1;
                 }
-                break;
-        }
-
-        return Integer.compare(r0, r1);
+            }
+        };
     }
 }

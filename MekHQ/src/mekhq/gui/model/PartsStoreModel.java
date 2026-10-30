@@ -49,6 +49,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.work.AcquisitionTargetText;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.gui.CampaignGUI;
@@ -77,17 +79,20 @@ public class PartsStoreModel extends AbstractTableModel {
      * Provides a lazy view to a {@link TargetRoll} for use in a UI (e.g. sorting in a table).
      */
     public static class TargetProxy implements Comparable<TargetProxy> {
+        private final SkillCheck acquisitionCheck;
         private final TargetRoll target;
         private String details;
         private String description;
 
         /**
-         * Creates a new proxy object for a {@link TargetRoll}.
+         * Creates a new proxy object for the {@link TargetRoll} of an acquisition check.
          *
-         * @param t The {@link TargetRoll} to be proxied. May be null.
+         * @param acquisitionCheck The acquisition check whose target is proxied, or {@code null} when the part cannot
+         *                         be bought.
          */
-        public TargetProxy(@Nullable TargetRoll t) {
-            target = t;
+        public TargetProxy(@Nullable SkillCheck acquisitionCheck) {
+            this.acquisitionCheck = acquisitionCheck;
+            target = (acquisitionCheck == null) ? null : acquisitionCheck.getTargetNumber();
         }
 
         /**
@@ -110,7 +115,7 @@ public class PartsStoreModel extends AbstractTableModel {
                 return null;
             }
             if (null == description) {
-                description = target.getDesc();
+                description = AcquisitionTargetText.describeModifiers(acquisitionCheck, null);
             }
             return description;
         }
@@ -127,12 +132,7 @@ public class PartsStoreModel extends AbstractTableModel {
             }
 
             if (null == details) {
-                details = target.getValueAsString();
-                if (target.getValue() != TargetRoll.IMPOSSIBLE &&
-                          target.getValue() != TargetRoll.AUTOMATIC_SUCCESS &&
-                          target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
-                    details += "+";
-                }
+                details = AcquisitionTargetText.describeTarget(acquisitionCheck);
             }
 
             return details;
@@ -321,7 +321,7 @@ public class PartsStoreModel extends AbstractTableModel {
                 if (null != shoppingItem) {
                     targetProxy = new TargetProxy(
                           PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, shoppingItem,
-                                campaign.checkAcquisition(shoppingItem, getLogisticsPerson(), true)).getTargetNumber());
+                                campaign.checkAcquisition(shoppingItem, getLogisticsPerson(), true)));
                 } else {
                     targetProxy = new TargetProxy(null);
                 }

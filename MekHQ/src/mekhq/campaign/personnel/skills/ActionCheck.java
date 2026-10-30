@@ -286,6 +286,18 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
+     * Whether any roll can pass this check. A check that is impossible or an automatic failure cannot be passed, and
+     * neither can one whose target number lies outside what the dice can roll: two dice never make 13, so a 13+ check
+     * always fails. Count-up checks succeed at or under the target number, so their reachable range runs the other way.
+     *
+     * @return {@code true} if some roll passes this check, {@code false} if every roll fails it
+     */
+    public boolean canSucceed() {
+        int target = targetNumber.getValue();
+        return !targetNumber.cannotSucceed() && (isCountUp() ? (target >= 2) : (target <= 12));
+    }
+
+    /**
      * Executes action check for the specified person.
      *
      * <p>Performs a roll and determines margin of success as <code>Roll - TN</code> if <code>isCountUp ==
@@ -302,11 +314,11 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         boolean usedEdge = false;
         boolean canSpendEdge = useEdge && person.getCurrentEdge() > 0;
 
-        // A check that cannot be beaten (AUTOMATIC_FAIL, IMPOSSIBLE) never re-rolls, so edge is never wasted on it -
-        // this guard applies to a caller-supplied condition as well, which may only narrow it further.
-        // Count-up checks succeed at or under the target number, so the achievable range runs the other way.
+        // A check that cannot be beaten (AUTOMATIC_FAIL, IMPOSSIBLE, out of the dice's range) never re-rolls, so edge
+        // is never wasted on it - this guard applies to a caller-supplied condition as well, which may only narrow it
+        // further.
         int target = targetNumber.getValue();
-        boolean canSucceed = !targetNumber.cannotSucceed() && (isCountUp() ? target >= 2 : target <= 12);
+        boolean canSucceed = canSucceed();
         final boolean shouldReroll;
         if (edgeRerollCondition != null) {
             shouldReroll = canSpendEdge && canSucceed && edgeRerollCondition.test(roll);

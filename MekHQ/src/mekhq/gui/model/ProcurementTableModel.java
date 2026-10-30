@@ -40,11 +40,14 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import jakarta.annotation.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.work.AcquisitionTargetText;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 
@@ -132,13 +135,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
-                TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
-                      getCampaign().checkGenericAcquisition(shoppingItem)).getTargetNumber();
-                String value = target.getValueAsString();
-                if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
-                    value += "+";
-                }
-                return value;
+                return AcquisitionTargetText.describeTarget(checkShownTarget(shoppingItem));
             case COL_NEXT:
                 final int days = shoppingItem.getDaysToWait();
                 return String.format("%d %s", days, resources.getString((days == 1) ? "Day.text" : "Days.text"));
@@ -185,10 +182,29 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
 
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
         if (column == COL_TARGET) {
-            return PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
-                  getCampaign().checkAcquisition(shoppingItem)).getTargetNumber().getDesc();
+            SkillCheck shownCheck = checkShownTarget(shoppingItem);
+            String staffProblem = shownCheck.getTargetNumber().needsRoll() ? describeStaffProblem(shoppingItem) : null;
+            return AcquisitionTargetText.describeModifiers(shownCheck, staffProblem);
         }
         return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
+    }
+
+    /**
+     * @return the check the Target column and its tooltip show: a stand-in procurement person with average skill, so
+     *       the number does not change with who is on staff or how many attempts they have left
+     */
+    private SkillCheck checkShownTarget(final IAcquisitionWork shoppingItem) {
+        return PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
+              getCampaign().checkGenericAcquisition(shoppingItem));
+    }
+
+    /**
+     * @return why the campaign's own procurement staff cannot roll for this item now, for example because they have
+     *       used up their attempts for the period, or {@code null} when they can roll
+     */
+    private @Nullable String describeStaffProblem(final IAcquisitionWork shoppingItem) {
+        TargetRoll staffTarget = getCampaign().checkAcquisition(shoppingItem).getTargetNumber();
+        return staffTarget.cannotSucceed() ? staffTarget.getDesc() : null;
     }
 
     private Campaign getCampaign() {

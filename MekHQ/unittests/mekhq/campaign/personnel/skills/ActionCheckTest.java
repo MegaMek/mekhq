@@ -548,4 +548,29 @@ class ActionCheckTest {
         assertFalse(check.getCheckTarget().rollOfTwoFails());
         assertTrue(check.getCheckTarget().succeeds(2));
     }
+
+    @ParameterizedTest(name = "target {0}, count up {1}: can succeed = {2}")
+    @CsvSource({
+          "12, false, true",
+          "13, false, false",
+          "2, true, true",
+          "1, true, false"
+    })
+    void canSucceedOnlyWhenTheDiceCanReachTheTarget(int targetNumber, boolean isCountUp, boolean expected) {
+        ConcreteActionCheck check = new ConcreteActionCheck(mock(Person.class), new TargetRoll(targetNumber, ""),
+              isCountUp, false, "Action");
+
+        assertEquals(expected, check.canSucceed());
+    }
+
+    @Test
+    void canSucceedIsFalseForImpossibleAndAutomaticFailure() {
+        ConcreteActionCheck impossible = new ConcreteActionCheck(mock(Person.class),
+              new TargetRoll(TargetRoll.IMPOSSIBLE, "extinct"), false, false, "Action");
+        ConcreteActionCheck automaticFailure = new ConcreteActionCheck(mock(Person.class),
+              new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "no attempts"), false, false, "Action");
+
+        assertFalse(impossible.canSucceed());
+        assertFalse(automaticFailure.canSucceed());
+    }
 }
