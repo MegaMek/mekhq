@@ -60,6 +60,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosActOfPiracy;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.ChaosGameWorlds;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
@@ -283,7 +284,7 @@ class ContractXmlCodecTest {
     // region concrete types
 
     @ParameterizedTest
-    @ValueSource(classes = { ChaosContract.class, ChaosGameWorlds.class, ChaosActOfPiracy.class })
+    @ValueSource(classes = { ChaosContract.class, ChaosGameWorlds.class, ChaosActOfPiracy.class, ShellContract.class })
     void concreteContractTypeIsPreservedAcrossARoundTrip(Class<? extends AbstractContract> contractClass)
           throws Exception {
         AbstractContract contract = contractClass.getDeclaredConstructor().newInstance();

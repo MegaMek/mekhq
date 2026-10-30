@@ -63,6 +63,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -529,7 +530,9 @@ public class PrisonerEventManager {
         }
 
         List<AbstractContract> activeContracts = campaign.getActiveContracts();
-        activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
+        // Shell contracts have no morale to shift
+        activeContracts.removeIf(contract -> contract instanceof ShellContract ||
+                                                   contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
             return; // No risk of event

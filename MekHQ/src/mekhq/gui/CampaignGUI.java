@@ -106,6 +106,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -993,7 +994,8 @@ public class CampaignGUI extends JPanel {
      * Determines whether the contract market should be inaccessible because the campaign already holds a contract.
      *
      * <p>Access is only permitted while a contract is held if StratCon is disabled campaign-wide and none of the held
-     * contracts (including accepted contracts that have not yet started) have StratCon enabled.</p>
+     * contracts (including accepted contracts that have not yet started) have StratCon enabled. Shell contracts never
+     * block it: they hold manual scenarios alongside other work and are never tied into StratCon.</p>
      *
      * @return {@code true} if the contract market should be blocked
      *
@@ -1002,7 +1004,9 @@ public class CampaignGUI extends JPanel {
      */
     private boolean isContractMarketBlockedByActiveContract() {
         Campaign campaign = getCampaign();
-        List<AbstractContract> heldContracts = campaign.getActiveContracts(true);
+        List<AbstractContract> heldContracts = campaign.getActiveContracts(true).stream()
+                                                     .filter(contract -> !(contract instanceof ShellContract))
+                                                     .toList();
         if (heldContracts.isEmpty()) {
             return false;
         }
