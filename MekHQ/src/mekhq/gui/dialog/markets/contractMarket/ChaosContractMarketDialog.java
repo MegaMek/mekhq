@@ -370,7 +370,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         // Not tied to the selected offer, so it sits apart from the buttons that act on it.
         HudButton shellContract = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.shellContract")
                                                       .toUpperCase(Locale.ROOT), false);
-        shellContract.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        // A GM tool, like creating an offer by hand: armed only in GM mode, with a tooltip saying why when it is not.
+        shellContract.setArmed(isGM());
+        shellContract.setToolTipText(MarketHud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
               "button.contractMarket.shellContract.tooltip")));
         shellContract.addActionListener(event -> createShellContract());
 
@@ -787,12 +789,16 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * Opens the shell contract dialog, where the player enters a contract's basics themselves. A shell contract never
      * passes through the board: confirming adds it to the campaign as an active mission straight away, so it is
      * recorded as the accepted contract and the market closes, as it does after accepting an offer. The on-departure
-     * options do not apply, as a shell contract runs no contract automation.
+     * options do not apply, as a shell contract runs no contract automation. A GM tool, so only available in GM mode.
      *
      * @author Illiani
      * @since 0.51.01
      */
     void createShellContract() {
+        if (!isGM()) {
+            return;
+        }
+
         closeGuide();
         ShellContractDialog dialog = new ShellContractDialog(this, campaign, null);
         if (!dialog.wasConfirmed()) {

@@ -55,6 +55,8 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,6 +113,9 @@ import mekhq.gui.utilities.JSuggestField;
  * it and the faction its liaison or commander is drawn from. A problem with the form is reported in the footer rather
  * than in a pop-up.</p>
  *
+ * <p>A guide slides over the window, as the market's do, opened by the guide button or by itself the first time the
+ * dialog is opened (see {@link ContractMarketGuidePreferences}).</p>
+ *
  * <p>In create mode, confirming adds the new contract to the campaign as an active mission (read it back with
  * {@link #getContract()}); in edit mode the given contract is updated in place.</p>
  *
@@ -127,6 +132,8 @@ public class ShellContractDialog extends JDialog {
     private static final int COLUMN_GAP = 22;
     /** The search type liaisons are generated for: shell contracts have no market, so treat them as a government's */
     private static final ContractSearchType LIAISON_SEARCH_TYPE = ContractSearchType.GOVERNMENT;
+    /** The resource-key prefix the dialog's guide is read from, in the contract market's bundle */
+    static final String GUIDE_PREFIX = "guide.shellContract.";
     /**
      * The generic factions a custom belligerent can stand in front of, in the order they are offered: Inner Sphere,
      * Periphery and Clan. The first is the default.
@@ -138,6 +145,7 @@ public class ShellContractDialog extends JDialog {
     private transient @Nullable ShellContract contract;
 
     private final JLabel titleLabel = new JLabel();
+    private MarketGuide guide;
     private JLabel footerMessage;
 
     private JTextField nameField;
@@ -199,12 +207,18 @@ public class ShellContractDialog extends JDialog {
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
+        guide = new MarketGuide(this);
+        // Escape closes the guide when it is open, and the dialog otherwise.
         content.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
               "cancel");
         content.getActionMap().put("cancel", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                dispose();
+                if (guide.isOpen()) {
+                    guide.close();
+                } else {
+                    dispose();
+                }
             }
         });
 
@@ -214,7 +228,21 @@ public class ShellContractDialog extends JDialog {
         setSize(scaleForGUI(860, 680)); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(getOwner());
         setPreferences(); // Must be before setVisible
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                // The guide opens by itself the first time the player writes a shell contract.
+                if (ContractMarketGuidePreferences.getInstance().shouldAutoOpen(GUIDE_PREFIX)) {
+                    openGuide();
+                }
+            }
+        });
         setVisible(true);
+    }
+
+    private void openGuide() {
+        ContractMarketGuidePreferences.getInstance().setGuideSeen(GUIDE_PREFIX, true);
+        guide.open(GUIDE_PREFIX);
     }
 
     /**
@@ -230,9 +258,9 @@ public class ShellContractDialog extends JDialog {
         }
     }
 
-    /** The market-style command bar: what is being made or edited, over the contract's live name. */
+    /** The market-style command bar: what is being made or edited, over the contract's live name, and the guide. */
     private JPanel buildCommandBar() {
-        JPanel bar = new JPanel(new BorderLayout());
+        JPanel bar = new JPanel(new BorderLayout(scaleForGUI(20), 0));
         bar.setOpaque(true);
         bar.setBackground(GROUND);
         bar.setBorder(BorderFactory.createCompoundBorder(
@@ -247,7 +275,14 @@ public class ShellContractDialog extends JDialog {
         titleLabel.setFont(hudFont(Font.BOLD, 1.12f, 0.12f));
         identity.add(leftAligned(titleLabel));
 
+        HudButton guideButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.guide").toUpperCase(Locale.ROOT),
+              false, true);
+        guideButton.addActionListener(event -> openGuide());
+        JPanel guideHolder = Hud.transparentPanel(new BorderLayout());
+        guideHolder.add(guideButton, BorderLayout.NORTH);
+
         bar.add(identity, BorderLayout.CENTER);
+        bar.add(guideHolder, BorderLayout.EAST);
         return bar;
     }
 
