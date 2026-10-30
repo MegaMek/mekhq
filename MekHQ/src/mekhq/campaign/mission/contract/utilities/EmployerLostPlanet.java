@@ -56,6 +56,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEnemy;
@@ -184,6 +185,11 @@ public final class EmployerLostPlanet {
         }
 
         for (AbstractContract contract : campaign.getActiveContracts(true)) {
+            // Shell contracts run no contract automation
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             if (isEmployerLosingControl(contract, before, after)) {
                 affectedContracts.add(contract);
             }

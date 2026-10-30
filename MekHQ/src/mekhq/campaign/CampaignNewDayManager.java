@@ -131,6 +131,7 @@ import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
@@ -1272,6 +1273,11 @@ public class CampaignNewDayManager {
              * First of the month; roll Morale.
              */
             for (AbstractContract contract : campaign.getActiveContracts()) {
+                // Shell contracts run no contract automation
+                if (contract instanceof ShellContract) {
+                    continue;
+                }
+
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 MHQMorale.checkMorale(campaign, contract, true);
@@ -1301,6 +1307,11 @@ public class CampaignNewDayManager {
             List<AbstractContract> activeContracts = campaign.getActiveContracts();
             AbstractContract firstNonSubcontract = null;
             for (AbstractContract contract : activeContracts) {
+                // Shell contracts run no contract automation, so they are never resupplied
+                if (contract instanceof ShellContract) {
+                    continue;
+                }
+
                 firstNonSubcontract = contract;
                 break;
             }
@@ -1329,6 +1340,11 @@ public class CampaignNewDayManager {
 
         // Daily events
         for (AbstractContract contract : campaign.getActiveContracts()) {
+            // Shell contracts run no contract automation
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             if (campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                       !contract.getObjectiveType().isGarrisonType() &&
                       today.equals(contract.getStartDate())) {
@@ -2240,6 +2256,11 @@ public class CampaignNewDayManager {
 
         // Second, we process them and any already generated scenarios
         for (AbstractContract contract : contracts) {
+            // Shell contracts run no contract automation: the player owns their dates and their scenarios
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             /*
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
