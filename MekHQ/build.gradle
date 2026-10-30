@@ -1,3 +1,4 @@
+import groovy.io.FileType
 import java.time.LocalDateTime
 
 plugins {
@@ -505,6 +506,53 @@ tasks.register('stageDataFiles') {
     dependsOn stageData
 }
 
+// Copies of mm-data files in testresources fall out of date, so the tests check old data
+// (MegaMek/megamek#9289). Tests load canon units through testUtilities.CanonUnits instead, and this
+// fails the build when a new copy appears. Copies that predate the check are listed in
+// config/testresources/mm-data-copies.txt until they are moved over; a hand-made fixture that is
+// not canon data takes a name mm-data does not use.
+tasks.register('checkTestResourcesForMmDataCopies') {
+    description = "Fails when testresources holds a file with the same name as an mm-data file."
+    group = 'verification'
+    def testResourcesDir = file('testresources')
+    def mmDataFilesDir = file("${mmDataDir}/data")
+    def allowListFile = file('config/testresources/mm-data-copies.txt')
+    onlyIf { !suiteDataFromPin && mmDataFilesDir.isDirectory() }
+    doLast {
+        Set<String> mmDataFileNames = [] as Set
+        mmDataFilesDir.eachFileRecurse(FileType.FILES) { mmDataFile -> mmDataFileNames << mmDataFile.name }
+        Set<String> listedCopies = allowListFile.readLines()*.trim()
+                .findAll { line -> line && !line.startsWith('#') } as Set
+        List<String> newCopies = []
+        Set<String> presentListedCopies = [] as Set
+        testResourcesDir.eachFileRecurse(FileType.FILES) { testFile ->
+            String relativePath = testResourcesDir.toPath().relativize(testFile.toPath()).toString().replace('\\', '/')
+            if (!mmDataFileNames.contains(testFile.name)) {
+                return
+            }
+            if (listedCopies.contains(relativePath)) {
+                presentListedCopies << relativePath
+            } else {
+                newCopies << relativePath
+            }
+        }
+        List<String> problems = []
+        if (newCopies) {
+            problems << "These testresources files copy mm-data files by name. Load canon units with " +
+                    "testUtilities.CanonUnits.loadUnit(name, uuid) instead, or give a hand-made fixture a name " +
+                    "mm-data does not use:\n  " + newCopies.sort().join('\n  ')
+        }
+        List<String> movedCopies = (listedCopies - presentListedCopies).sort()
+        if (movedCopies) {
+            problems << "These copies are gone; remove them from ${allowListFile.name}:\n  " + movedCopies.join('\n  ')
+        }
+        if (problems) {
+            throw new GradleException(problems.join('\n'))
+        }
+        logger.info("[TestData] testresources checked: ${presentListedCopies.size()} listed mm-data copies remain")
+    }
+}
+
 tasks.register('generateDynamicFiles') {
     def jvmOptions = project.ext.mhqJvmOptions.join('\n')
 
@@ -934,6 +982,7 @@ test {
     // only if someone happened to stage it, and absent on CI, so such a test passes on a developer
     // machine and fails in the pipeline.
     dependsOn(stageDataFiles)
+    dependsOn(checkTestResourcesForMmDataCopies)
 
     minHeapSize = "1024m"
     maxHeapSize = "8192m"
