@@ -102,6 +102,15 @@ public final class InjuryUtil {
         person.decrementDaysToWaitForHealing();
     }
 
+    /**
+     * Run a daily healing check for a student whose injuries are tended by their academy's medical staff. The staff
+     * keep the injuries from worsening, so no untreated effects are applied.
+     */
+    public static void resolveDailyHealingUnderAcademyCare(Campaign campaign, Person person) {
+        genNaturalHealing(campaign, person).forEach(GameEffect::apply);
+        person.decrementDaysToWaitForHealing();
+    }
+
     /** Resolve injury modifications in case of entering combat with active ones */
     public static void resolveAfterCombat(Campaign c, Person p, int hits) {
         // Gather all the injury actions resulting from the combat situation

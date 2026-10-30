@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.TargetRollModifier;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -55,10 +56,15 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -137,6 +143,16 @@ public class MedicalController {
             return; // Early exit as there is no point continuing to process the character
         }
 
+        // Students are away at their academy, so its medical staff tend to them instead of the campaign's doctors
+        if (patient.getStatus().isStudent() && patient.needsFixing()) {
+            Academy academy = EducationController.getAcademy(patient.getEduAcademySet(),
+                  patient.getEduAcademyNameInSet());
+            if (academy != null && !academy.isHomeSchool()) {
+                processAcademyMedicalCare(patient, academy.getFacultySkill());
+                return;
+            }
+        }
+
         Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(patient.getDoctorId());
 
         if (doctor != null) {
@@ -172,6 +188,53 @@ public class MedicalController {
                 unit.resetPilotAndEntity();
             }
         }
+    }
+
+    /**
+     * Processes daily healing for a student whose injuries are tended by their academy's medical staff.
+     *
+     * <p>Academy care stands in for an assigned doctor: under standard rules the staff make a {@code Surgery} check
+     * against the academy's faculty skill on the doctor-assisted healing schedule, while under Advanced Medical (and
+     * Alternate Advanced Medical) the patient is treated as being under proper care.</p>
+     *
+     * @param patient      the student undergoing healing
+     * @param facultySkill the target number of the academy's medical staff
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void processAcademyMedicalCare(Person patient, int facultySkill) {
+        patient.decrementDaysToWaitForHealing();
+
+        if (isUseAdvancedMedical) {
+            if (isUseAltAdvancedMedical) {
+                AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient, facultySkill);
+            } else {
+                InjuryUtil.resolveDailyHealingUnderAcademyCare(campaign, patient);
+            }
+            return;
+        }
+
+        if (patient.getDaysToWaitForHealing() > 0) {
+            return;
+        }
+
+        TargetRoll targetNumber = new TargetRoll(facultySkill, getTextAt(RESOURCE_BUNDLE,
+              "MedicalController.modifier.academyStaff"));
+        // The academy's staff make the roll, so the patient's own aptitude must not affect it
+        ActionCheckResult actionCheckResult =
+              new SkillCheck(patient, SkillType.getType(S_SURGERY), targetNumber)
+                    .withRollType(RollType.NORMAL)
+                    .withExternalModifiers(List.of(patient.getHealingMods(campaign)))
+                    .resolve(false, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.academyCare"));
+
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+
+        if (actionCheckResult.isSuccess()) {
+            patient.heal();
+        }
+
+        patient.setDaysToWaitForHealing(healingWaitingPeriod);
     }
 
     private Person verifyTheatreAvailability(Person patient, Person doctor) {
