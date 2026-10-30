@@ -157,6 +157,7 @@ public class MekHQ implements GameListener {
     private static ObservableString campaignsDirectory;
     private static ObservableString scenarioTemplatesDirectory;
     private static ObservableString financesDirectory;
+    private static ObservableString contractsDirectory;
 
     // stuff related to MM games
     private Server myServer = null;
@@ -221,6 +222,10 @@ public class MekHQ implements GameListener {
 
     public static ObservableString getFinancesDirectory() {
         return financesDirectory;
+    }
+
+    public static ObservableString getContractsDirectory() {
+        return contractsDirectory;
     }
 
     protected static MekHQ getInstance() {
@@ -326,6 +331,9 @@ public class MekHQ implements GameListener {
 
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
+
+            contractsDirectory = new ObservableString("contractsDirectory", ".");
+            preferences.manage(new StringPreference(contractsDirectory));
         } catch (Exception ex) {
             LOGGER.error(ex, "Failed to set user preferences");
         }

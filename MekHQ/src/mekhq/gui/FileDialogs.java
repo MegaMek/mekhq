@@ -570,6 +570,40 @@ public class FileDialogs {
     }
 
     /**
+     * Displays a dialog window from which the user can select a <code>.json</code> file to export contract offers to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ContractOffers.json as default filename.
+     */
+    public static Optional<File> saveContracts(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveContracts.title"), MekHQ.getContractsDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveContracts.fileSuffix")), FileType.JSON);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.json</code> file of exported contract offers to
+     * import.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openContracts(JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame,
+              getTextAt("dlgOpenContracts.title"),
+              FileType.JSON,
+              MekHQ.getContractsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getContractsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.pdf</code> file to export contract offers to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ContractOffers.pdf as default filename.
+     */
+    public static Optional<File> saveContractsPDF(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveContractsPDF.title"), MekHQ.getContractsDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveContractsPDF.fileSuffix")), FileType.PDF);
+    }
+
+    /**
      * Displays a dialog pointing at the default directory where the user can save a file, ensures its extension, and
      * creates a backup if it already exists.
      *

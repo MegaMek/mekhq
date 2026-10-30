@@ -44,15 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
@@ -92,6 +84,7 @@ public class ContractDossierPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
     private static final int PORTRAIT_SIZE = 48;
+    private static final int COPIED_CONFIRMATION_MILLIS = 1800;
 
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
@@ -169,9 +162,18 @@ public class ContractDossierPanel extends JPanel {
                                                              .toUpperCase(Locale.ROOT),
               getTextAt(RESOURCE_BUNDLE, "button.contractMarket.delete.confirm").toUpperCase(Locale.ROOT), true);
         delete.addActionListener(event -> actions.delete(contract));
+        HudButton discord = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord")
+                                                .toUpperCase(Locale.ROOT), false, true);
+        discord.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord.tooltip"));
+        discord.addActionListener(event -> {
+            actions.copyForDiscord(contract);
+            confirmCopied(discord);
+        });
 
         JPanel buttons = Hud.transparentPanel(null);
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+        buttons.add(discord);
+        buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(edit);
         buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(delete);
@@ -181,6 +183,15 @@ public class ContractDossierPanel extends JPanel {
 
         header.add(side, BorderLayout.EAST);
         return header;
+    }
+
+    /** Briefly relabels the Discord button to confirm the copy, then puts its label back. */
+    private static void confirmCopied(HudButton button) {
+        button.setText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord.copied").toUpperCase(Locale.ROOT));
+        Timer restore = new Timer(COPIED_CONFIRMATION_MILLIS, event -> button.setText(
+              getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord").toUpperCase(Locale.ROOT)));
+        restore.setRepeats(false);
+        restore.start();
     }
 
     private JPanel buildIdentity() {
