@@ -2,7 +2,7 @@ name: MekHQ CI with Gradle
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'releases/**' ]
 
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
@@ -32,6 +32,8 @@ jobs:
           DATA_BRANCH: ${{ github.event.pull_request.head.ref }}
           DATA_REMOTE_URL: ${{ github.event.pull_request.head.repo.owner.html_url }}/mm-data.git
           DATA_REPO_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
+          # A Core hotfix PR targets releases/<line>, which also exists in the other repositories.
+          BASE_BRANCH: ${{ github.base_ref }}
         run: |
           if git ls-remote --exit-code --heads \
             "$DATA_REMOTE_URL" "$DATA_BRANCH" > /dev/null 2>&1
@@ -40,7 +42,7 @@ jobs:
             printf 'dataBranch=%s\n' "$DATA_BRANCH" >> "$GITHUB_OUTPUT"
           else
             printf 'dataRepo=MegaMek/mm-data\n' >> "$GITHUB_OUTPUT"
-            printf 'dataBranch=main\n' >> "$GITHUB_OUTPUT"
+            printf 'dataBranch=%s\n' "$BASE_BRANCH" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout Data Repo
@@ -66,7 +68,7 @@ jobs:
             echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
-            echo "mmBranch=main" >> $GITHUB_OUTPUT
+            echo "mmBranch=${{ github.base_ref }}" >> $GITHUB_OUTPUT
           fi
           exit 0
 
@@ -94,7 +96,7 @@ jobs:
             echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
           else
             echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
-            echo "mmlBranch=main" >> $GITHUB_OUTPUT
+            echo "mmlBranch=${{ github.base_ref }}" >> $GITHUB_OUTPUT
           fi
           exit 0
 
