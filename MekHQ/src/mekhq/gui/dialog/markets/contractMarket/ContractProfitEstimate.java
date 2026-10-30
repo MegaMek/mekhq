@@ -46,6 +46,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractAutomation;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.unit.Unit;
@@ -62,15 +63,19 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * <p>Expenses follow the way they are actually charged. Salaries, overhead, Hot Spots upkeep, and peacetime operating
  * costs are charged each month wherever the force is. Food is charged throughout, but housing only once the force is on
  * the target planet. Maintenance is projected per unit for each leg: off contract and travelling during the transit,
- * then on contract on the planet, where a combat contract maintains more often but at its own cost multiplier. Straight
- * support covers repairs, not maintenance (Hot Spots: Draconis Reach pg 27), so it is not counted.</p>
+ * then on contract on the planet, where a combat contract maintains more often but at its own cost multiplier.</p>
+ *
+ * <p>Straight support pays back its share of overhead and food and housing, but only for the contract term: the
+ * contract is not active during the trip out. It does not cover maintenance (Hot Spots: Draconis Reach pg 27), and the
+ * repairs it does cover are excluded along with the rest of the fighting's cost.</p>
  *
  * <p>When the player has chosen to mothball units on departure, the units contract automation will mothball (see
  * {@link ContractAutomation#getAutomatedMothballCandidates}) cost nothing on the way out: they leave the TO&amp;E, so
  * add no Hot Spots upkeep or peacetime operating costs, and need no maintenance until they are activated on arrival.
  * Their crews are still paid and fed.</p>
  *
- * <p>The estimated net is deliberately conservative: it counts only guaranteed pay, and excludes repairs and
+ * <p>The estimated net is deliberately conservative: it counts only guaranteed pay and straight support, and excludes
+ * repairs and
  * battlefield losses (which depend on how the fighting goes). Combat pay is given separately, as the most the contract
  * can pay if every chance at the bonus is won (see {@link StratConCombatBonusProjection}).</p>
  *
@@ -79,7 +84,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @param contractMonths     the contract term, in months
  * @param guaranteedIncome   monthly pay across the contract term plus the transport payment
  * @param operatingCosts     the total expenses across the contract term and the transit out
- * @param estimatedNet       {@code guaranteedIncome} minus {@code operatingCosts}
+ * @param estimatedNet       {@code guaranteedIncome} plus {@code straightSupport}, minus {@code operatingCosts}
  * @param salaries           the payroll part of {@code operatingCosts}
  * @param maintenance        the unit maintenance part of {@code operatingCosts}
  * @param overhead           the overhead part of {@code operatingCosts}
@@ -88,7 +93,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @param trainingMunitions  the peacetime training munitions part of {@code operatingCosts}
  * @param fuel               the peacetime fuel part of {@code operatingCosts}
  * @param foodAndHousing     the food and housing part of {@code operatingCosts}
- * @param combatBonus        how many times the combat bonus can be paid, and what pays it
+ * @param straightSupport    the straight support paid back on overhead and food and housing over the contract term
+ * @param combatBonus       how many times the combat bonus can be paid, and what pays it
  * @param potentialCombatPay the combat pay if every chance at the bonus is won
  *
  * @author Illiani
@@ -96,8 +102,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public record ContractProfitEstimate(int transitDays, int contractMonths, Money guaranteedIncome, Money operatingCosts,
       Money estimatedNet, Money salaries, Money maintenance, Money overhead, Money hotSpotsUpkeep, Money spareParts,
-      Money trainingMunitions, Money fuel, Money foodAndHousing, StratConCombatBonusProjection combatBonus,
-      Money potentialCombatPay) {
+      Money trainingMunitions, Money fuel, Money foodAndHousing, Money straightSupport,
+      StratConCombatBonusProjection combatBonus, Money potentialCombatPay) {
     /**
      * The {@link #transitDays} of an offer whose target no jump path reaches. Its trip out cannot be costed, so the
      * estimate covers the contract term alone, and the offer is never ranked as the nearest.
@@ -144,7 +150,8 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
 
         Accountant accountant = campaign.getAccountant();
         Money salaries = getMonthlySalaries(campaign, accountant).multipliedBy(engagementMonths);
-        Money overhead = accountant.getOverheadExpenses().multipliedBy(engagementMonths);
+        Money monthlyOverhead = accountant.getOverheadExpenses();
+        Money overhead = monthlyOverhead.multipliedBy(engagementMonths);
         Money hotSpotsUpkeep = getHotSpotsUpkeep(accountant, months, transitMonths, mothballedForTransit);
         Money foodAndHousing = getFoodAndHousing(campaign, contract, months, transitMonths);
         Money maintenance = getMaintenance(campaign, contract, months, costedTransitDays, mothballedForTransit);
@@ -170,7 +177,8 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
                                      .plus(trainingMunitions)
                                      .plus(fuel)
                                      .plus(foodAndHousing);
-        Money estimatedNet = guaranteedIncome.minus(operatingCosts);
+        Money straightSupport = getStraightSupport(campaign, contract, monthlyOverhead, months);
+        Money estimatedNet = guaranteedIncome.plus(straightSupport).minus(operatingCosts);
 
         StratConCombatBonusProjection combatBonus = StratConCombatBonusProjection.project(campaign, contract);
         Money potentialCombatPay = contract.getContractFinanceData().combatPay()
@@ -189,6 +197,7 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
               trainingMunitions,
               fuel,
               foodAndHousing,
+              straightSupport,
               combatBonus,
               potentialCombatPay);
     }
@@ -256,6 +265,24 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
         Money contractFoodAndHousing = ContractExpenseProjection.getMonthlyContractFoodAndHousing(campaign, contract)
                                              .multipliedBy(months);
         return transitFood.plus(contractFoodAndHousing);
+    }
+
+    /**
+     * Straight support on the overhead and food and housing charged over the contract term. Nothing is paid back for
+     * the trip out, as the contract is not yet active. The offer is costed alone: once accepted, support is drawn from
+     * whichever active contract is most generous (see {@link ContractSupportPayments#getStraightSupportContract}).
+     *
+     * @return the straight support paid back across the contract term
+     */
+    private static Money getStraightSupport(Campaign campaign, AbstractContract contract, Money monthlyOverhead,
+          int months) {
+        double supportShare = ContractSupportPayments.getStraightSupportShare(contract);
+        if (supportShare <= 0) {
+            return Money.zero();
+        }
+        Money monthlyContractFoodAndHousing = ContractExpenseProjection.getMonthlyContractFoodAndHousing(campaign,
+              contract);
+        return monthlyOverhead.plus(monthlyContractFoodAndHousing).multipliedBy(months).multipliedBy(supportShare);
     }
 
     /**
