@@ -186,7 +186,7 @@ public final class CargoShipGenerator {
         double remaining = shortfall;
         while ((remaining > 0) && (ships.size() < MAX_SHIPS)) {
             Candidate chosen = pickHull(candidates, remaining);
-            Unit ship = addCrewedShip(campaign, chosen.hull());
+            Unit ship = addCrewedShip(campaign, factionCode, chosen.hull());
             if (ship == null) {
                 // Loading failed and was logged. Drop the hull so the loop cannot spin on it, and try
                 // again with what is left.
@@ -482,7 +482,7 @@ public final class CargoShipGenerator {
                             + " collars; {} DropShip(s) still have nowhere to dock", remaining);
                 break;
             }
-            Unit jumpShip = addCrewedShip(campaign, hull);
+            Unit jumpShip = addCrewedShip(campaign, factionCode, hull);
             if (jumpShip == null) {
                 continue;
             }
@@ -549,8 +549,8 @@ public final class CargoShipGenerator {
      *
      * @return the new unit, or {@code null} when the design could not be loaded
      */
-    private static @Nullable Unit addCrewedShip(Campaign campaign, MekSummary hull) {
-        return GeneratedShipUnits.addCrewedShip(campaign, hull, "[CompanyGen][Cargo]");
+    private static @Nullable Unit addCrewedShip(Campaign campaign, @Nullable String factionCode, MekSummary hull) {
+        return GeneratedShipUnits.addCrewedShip(campaign, hull, factionCode, "[CompanyGen][Cargo]");
     }
 
     private static double round(double tons) {

@@ -156,8 +156,8 @@ public final class LiftTopUp {
             return Result.none();
         }
 
-        List<Unit> dropShips = GeneratedShipUnits.addCrewedShips(campaign, dropshipHulls, LOG_TAG);
-        List<Unit> jumpShips = GeneratedShipUnits.addCrewedShips(campaign, jumpshipHulls, LOG_TAG);
+        List<Unit> dropShips = GeneratedShipUnits.addCrewedShips(campaign, dropshipHulls, factionCode, LOG_TAG);
+        List<Unit> jumpShips = GeneratedShipUnits.addCrewedShips(campaign, jumpshipHulls, factionCode, LOG_TAG);
         // addNewUnit only reaches the hangar; the ships have to be filed to appear in the order of battle.
         if (!dropShips.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, dropShips,
