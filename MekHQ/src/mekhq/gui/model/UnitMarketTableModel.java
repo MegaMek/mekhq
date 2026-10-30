@@ -42,10 +42,12 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import jakarta.annotation.Nullable;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Model for displaying offers on the UnitMarket
@@ -67,14 +69,32 @@ public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
+
+    // The buying campaign's faction and year, which the offer prices depend on
+    private @Nullable Faction faction;
+    private int gameYear;
     //endregion Variable Declarations
 
     //region Constructors
-    public UnitMarketTableModel(final List<UnitMarketOffer> offers) {
+    public UnitMarketTableModel(final List<UnitMarketOffer> offers, final @Nullable Faction faction,
+          final int gameYear) {
         columnNames = resources.getString("UnitMarketTableModel.columnNames").split(",");
-        setData(offers);
+        setData(offers, faction, gameYear);
     }
     //endregion Constructors
+
+    /**
+     * Replaces the displayed offers, along with the faction and year their prices are worked out for.
+     *
+     * @param offers   the offers to display
+     * @param faction  the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear the current year
+     */
+    public void setData(final List<UnitMarketOffer> offers, final @Nullable Faction faction, final int gameYear) {
+        this.faction = faction;
+        this.gameYear = gameYear;
+        setData(offers);
+    }
 
     public int getColumnWidth(final int column) {
         return switch (column) {
@@ -111,7 +131,7 @@ public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
             case COL_WEIGHT_CLASS -> EntityWeightClass.getClassName(offer.getUnit().getWeightClass(),
                   offer.getUnit().getUnitType(), offer.getUnit().isSupport());
             case COL_UNIT -> offer.getUnit().getName();
-            case COL_PRICE -> offer.getPrice().toAmountAndSymbolString();
+            case COL_PRICE -> offer.getPrice(faction, gameYear).toAmountAndSymbolString();
             case COL_PERCENT -> offer.getPercent() + "%";
             case COL_DELIVERY -> offer.getTransitDuration();
             default -> "?";

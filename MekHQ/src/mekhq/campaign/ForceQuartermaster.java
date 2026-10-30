@@ -702,7 +702,7 @@ public record ForceQuartermaster(Campaign campaign) {
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) {
             double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-            Money cost = new Unit(en, campaign()).getBuyCost()
+            Money cost = new Unit(en, campaign()).getPurchaseCost()
                                .multipliedBy(valueMultiplier)
                                .multipliedBy(contractMultiplier);
             if (campaign().getPlayerForce()
@@ -1032,7 +1032,7 @@ public record ForceQuartermaster(Campaign campaign) {
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
             double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-            Money cost = part.getActualValue()
+            Money cost = part.getPurchaseCost()
                                .multipliedBy(costMultiplier)
                                .multipliedBy(contractMultiplier);
 

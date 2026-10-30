@@ -826,7 +826,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     Part replacement = newMissingPart.getNewPart();
                     // set entity for variable cost items
                     replacement.setUnit(newUnit);
-                    cost = cost.plus(replacement.getActualValue());
+                    cost = cost.plus(replacement.getPurchaseCost());
                     shoppingList.add(newPart);
                 }
 
@@ -983,7 +983,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (shotsNeeded > 0) {
                 ammoShotsToBuy.put(type, shotsNeeded);
                 // Priced like any ammunition bought for the campaign, so the campaign price multipliers apply
-                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getActualValue());
+                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getPurchaseCost());
             }
         }
 
@@ -1054,7 +1054,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (!isFoundInTheWarehouse((MissingPart) newHeatSinkPart, partQuantity, plannedReplacementParts)) {
                 // Heat sinks built into the engine are parts of the kit like any other: a double heat sink costs the
                 // same inside the engine as outside it (TM p.277)
-                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getActualValue());
+                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getPurchaseCost());
                 shoppingList.add(newHeatSinkPart);
             }
         }
@@ -2071,7 +2071,7 @@ public class Refit extends Part implements IAcquisitionWork {
         for (int sink = 0; sink < sinksToBuy; sink++) {
             shoppingList.add(new MissingAeroHeatSink(0, newSinkType, false, campaign));
         }
-        cost = cost.plus(new AeroHeatSink(0, newSinkType, false, campaign).getActualValue().multipliedBy(sinksToBuy));
+        cost = cost.plus(new AeroHeatSink(0, newSinkType, false, campaign).getPurchaseCost().multipliedBy(sinksToBuy));
         for (int sink = 0; sink < sinksToReturn; sink++) {
             oldIntegratedHeatSinks.add(new AeroHeatSink(0, oldSinkType, false, campaign));
         }
@@ -3487,6 +3487,15 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public Money getBuyCost() {
+        return getActualValue();
+    }
+
+    /**
+     * @return the refit kit's cost, which already sums each part's purchase cost, so no acquisition multiplier is
+     *       added on top
+     */
+    @Override
+    public Money getPurchaseCost() {
         return getActualValue();
     }
 

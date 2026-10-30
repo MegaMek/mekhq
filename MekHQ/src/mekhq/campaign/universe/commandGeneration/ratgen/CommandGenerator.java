@@ -979,13 +979,12 @@ public final class CommandGenerator {
      * pricing when the {@link CampaignOption#UNIT_COST_MODEL} calls for it. Used by the Command
      * Designer's starting-cash preview to price the design model before anything is committed.
      *
-     * @param campaign the campaign supplying the pricing rules and multipliers
-     * @param entities the rolled entities to price (e.g. from {@link #collectEntities})
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     * @param entities        the rolled entities to price (e.g. from {@link #collectEntities})
      *
      * @return the estimated total purchase value
      */
-    public static Money estimateUnitValue(Campaign campaign, List<Entity> entities) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+    public static Money estimateUnitValue(CampaignOptions campaignOptions, List<Entity> entities) {
         Money total = Money.zero();
         for (Entity entity : entities) {
             total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));

@@ -654,7 +654,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             for (Unit u : units) {
-                Money refundAmount = u.getBuyCost()
+                Money refundAmount = u.getPurchaseCost()
                                            .multipliedBy(gui.getCampaign()
                                                                .getCampaignOptions()
                                                                .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER));
