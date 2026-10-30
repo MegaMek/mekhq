@@ -44,11 +44,9 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.missing.MissingPart;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsScenario;
@@ -65,12 +63,6 @@ class PlanetaryAcquisitionModifiersTest {
     private Campaign campaign;
     private MissingPart missingLaser;
 
-    @BeforeAll
-    static void loadSkillTypes() {
-        // the generic acquisition check gives its stand-in admin regular skills, which needs the skill types
-        SkillType.initializeTypes();
-    }
-
     @BeforeEach
     void setUp() {
         PartsScenario scenario = PartsScenario.create();
@@ -85,17 +77,17 @@ class PlanetaryAcquisitionModifiersTest {
         missingLaser = PartsScenario.unitParts(locust, MissingPart.class).getFirst();
     }
 
-    private int shownTargetNumber() {
+    private int shownModifiers() {
         return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, missingLaser,
-              campaign.checkGenericAcquisition(missingLaser)).getTargetNumber().getValue();
+              campaign.getAcquisitionModifiers(missingLaser)).getValue();
     }
 
-    private int targetNumberWithoutThePlanet() {
-        return campaign.checkGenericAcquisition(missingLaser).getTargetNumber().getValue();
+    private int modifiersWithoutThePlanet() {
+        return campaign.getAcquisitionModifiers(missingLaser).getValue();
     }
 
     @Test
-    void theShownTargetNumberIncludesTheCurrentPlanet() {
+    void theShownModifiersIncludeTheCurrentPlanet() {
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
         assertNotNull(currentSystem, "The test campaign starts in a star system");
         List<TargetRollModifier> planetModifiers = PlanetaryAcquisitionModifiers.forSystem(campaign, missingLaser,
@@ -103,15 +95,15 @@ class PlanetaryAcquisitionModifiersTest {
         int planetTotal = planetModifiers.stream().mapToInt(TargetRollModifier::value).sum();
         assertTrue(planetTotal >= PLANET_TECH_PENALTY, "Every tech level carries a penalty in this test");
 
-        assertEquals(targetNumberWithoutThePlanet() + planetTotal, shownTargetNumber(),
-              "The shown number is the one the daily search rolls against here");
+        assertEquals(modifiersWithoutThePlanet() + planetTotal, shownModifiers(),
+              "The shown modifiers include the ones the daily search adds here");
     }
 
     @Test
-    void theShownTargetNumberIgnoresThePlanetWithoutPlanetaryAcquisition() {
+    void theShownModifiersIgnoreThePlanetWithoutPlanetaryAcquisition() {
         campaign.getCampaignOptions().set(CampaignOption.USE_PLANETARY_ACQUISITION, false);
 
-        assertEquals(targetNumberWithoutThePlanet(), shownTargetNumber());
+        assertEquals(modifiersWithoutThePlanet(), shownModifiers());
     }
 
     @Test

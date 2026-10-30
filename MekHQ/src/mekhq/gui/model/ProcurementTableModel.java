@@ -66,7 +66,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public static final int COL_TYPE = 1;
     public static final int COL_COST = 2;
     public static final int COL_TOTAL_COST = 3;
-    public static final int COL_TARGET = 4;
+    public static final int COL_MODIFIERS = 4;
     public static final int COL_NEXT = 5;
     public static final int COL_QUEUE = 6;
     public static final int COL_PRIORITY = 7;
@@ -131,14 +131,8 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
                 return shoppingItem.getBuyCost().toAmountAndSymbolString();
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
-            case COL_TARGET:
-                TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
-                      getCampaign().checkGenericAcquisition(shoppingItem)).getTargetNumber();
-                String value = target.getValueAsString();
-                if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
-                    value += "+";
-                }
-                return value;
+            case COL_MODIFIERS:
+                return formatModifiers(getAcquisitionModifiers(getCampaign(), shoppingItem));
             case COL_NEXT:
                 final int days = shoppingItem.getDaysToWait();
                 return String.format("%d %s", days, resources.getString((days == 1) ? "Day.text" : "Days.text"));
@@ -166,7 +160,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public int getColumnWidth(final int column) {
         return switch (column) {
             case COL_NAME -> 200;
-            case COL_COST, COL_TOTAL_COST, COL_TARGET, COL_NEXT -> 40;
+            case COL_COST, COL_TOTAL_COST, COL_MODIFIERS, COL_NEXT -> 40;
             default -> 15;
         };
     }
@@ -174,7 +168,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     public int getAlignment(final int column) {
         return switch (column) {
             case COL_COST, COL_TOTAL_COST, COL_QUEUE -> SwingConstants.RIGHT;
-            case COL_TARGET, COL_NEXT, COL_TYPE, COL_PRIORITY -> SwingConstants.CENTER;
+            case COL_MODIFIERS, COL_NEXT, COL_TYPE, COL_PRIORITY -> SwingConstants.CENTER;
             default -> SwingConstants.LEFT;
         };
     }
@@ -184,11 +178,34 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     }
 
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
-        if (column == COL_TARGET) {
-            return PlanetaryAcquisitionModifiers.addForCurrentSystem(getCampaign(), shoppingItem,
-                  getCampaign().checkAcquisition(shoppingItem)).getTargetNumber().getDesc();
+        if (column == COL_MODIFIERS) {
+            String description = getAcquisitionModifiers(getCampaign(), shoppingItem).getDesc();
+            if (!description.isBlank()) {
+                return description;
+            }
         }
         return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
+    }
+
+    /**
+     * @param campaign    the campaign
+     * @param acquisition what is being bought
+     *
+     * @return the modifiers to buying the item that do not depend on who buys it, including the current system's when
+     *       Planetary Acquisition is on
+     */
+    public static TargetRoll getAcquisitionModifiers(Campaign campaign, IAcquisitionWork acquisition) {
+        return PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, acquisition,
+              campaign.getAcquisitionModifiers(acquisition));
+    }
+
+    /**
+     * @param modifiers the acquisition modifiers
+     *
+     * @return the signed total of the modifiers (e.g. {@code +2}), or the outcome when they settle it
+     */
+    public static String formatModifiers(TargetRoll modifiers) {
+        return modifiers.needsRoll() ? String.format("%+d", modifiers.getValue()) : modifiers.getValueAsString();
     }
 
     private Campaign getCampaign() {
