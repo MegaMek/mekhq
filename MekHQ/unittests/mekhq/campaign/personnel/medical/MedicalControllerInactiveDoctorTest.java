@@ -131,6 +131,7 @@ class MedicalControllerInactiveDoctorTest {
         Person patient = mock(Person.class);
         UUID doctorId = doctor.getId();
         when(patient.getDoctorId()).thenReturn(doctorId);
+        when(patient.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(patient.getHyperlinkedFullTitle()).thenReturn("Patient");
         return patient;
     }

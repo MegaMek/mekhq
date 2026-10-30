@@ -39,6 +39,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
+import static mekhq.campaign.personnel.education.EducationController.isBeingHomeSchooled;
 import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
@@ -371,13 +372,14 @@ public class ForceHumanResources {
 
     /**
      * Retrieves all personnel who can be treated in the infirmary, as determined by
-     * {@link PersonnelStatus#isInfirmaryEligible()}. This includes prisoners and camp followers.
+     * {@link PersonnelStatus#isInfirmaryEligible()}. This includes prisoners and camp followers, as well as students
+     * being home-schooled, who remain with the unit.
      *
      * @return a {@link List} of {@link Person} objects who can be treated in the infirmary
      */
     public List<Person> getInfirmaryEligiblePersonnel() {
         return new ArrayList<>(getPersonnel()).stream()
-                     .filter(person -> person.getStatus().isInfirmaryEligible())
+                     .filter(person -> person.getStatus().isInfirmaryEligible() || isBeingHomeSchooled(person))
                      .collect(Collectors.toList());
     }
 
