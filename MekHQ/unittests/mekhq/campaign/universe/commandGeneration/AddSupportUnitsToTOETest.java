@@ -115,6 +115,55 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void organize_filesRecoveryVehiclesInASalvageFormation() {
+        // The Recovery Company was built as a Support formation, so the salvage planner never offered it as a team.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 8), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle's formation is a Salvage formation");
+        assertEquals(FormationType.SUPPORT,
+              campaign.getPlayerForce().getSupportCommandFormation().getFormationType(),
+              "while Support Command itself stays a Support formation");
+    }
+
+    @Test
+    void organize_keepsTheRecoveryCompanyWhenItIsAllTheSectionHolds() {
+        // With a single mechanic, the whole maintenance section is the recovery vehicle's crew. The tidy-up pass that
+        // splices out single-child layers used to fold the Recovery Company into the section, and the vehicle with it.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 1), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle still sits in a Salvage formation");
+    }
+
+    @Test
+    void topUp_buildsTheRecoveryCompanyAsASalvageFormation() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, SupportCapability.SALVAGE,
+              SupportPersonnelToTOE.VehicleCrewSource.TEMPORARY_CREW, campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "a Recovery Company made when salvage is switched on later is a Salvage formation too");
+    }
+
+    @Test
     void topUp_putsAnIdleOwnedRecoveryVehicleToWorkFromExistingStaff() {
         // Issue 10375: switching salvage on mid-campaign counted a recovery vehicle the player already owned towards
         // the target, built only the rest, and left the owned one in the hangar with nobody aboard.
@@ -616,6 +665,12 @@ class AddSupportUnitsToTOETest {
             staff.add(campaign.getPlayerForce().getHumanResources().newPerson(campaign, role, PersonnelRole.NONE));
         }
         return staff;
+    }
+
+    private static Formation formationOf(Campaign campaign, Unit unit) {
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        assertNotNull(formation, "expected " + unit.getName() + " to be filed in a formation");
+        return formation;
     }
 
     private static Unit unitNamedLike(Campaign campaign, String namePart) {
