@@ -322,8 +322,6 @@ public class Campaign implements ITechManager {
     // is set. The operation fires one refresh event when it completes.
     private transient boolean bulkGenerationInProgress;
 
-    private Person genericAcquisitionPerson;
-
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
     // the LogEntry class used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
@@ -4749,35 +4747,24 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Prepares a skill check for acquiring the specified item or unit while ignoring real acquisition personnel. A
-     * synthetic person with baseline skills is used.
+     * Collects the modifiers for acquiring the specified item or unit that do not depend on who makes the roll: the
+     * campaign's restrictions, the item itself, contract parts availability and Gray Monday. No skill, attribute or
+     * trait of any character is included.
      *
      * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
      *
-     * @return a {@link SkillCheck} reflecting the acquisition complexity
+     * @return a {@link TargetRoll} holding those modifiers, or a single decisive modifier when the campaign makes the
+     *       acquisition automatic or impossible
      */
-    public SkillCheck checkGenericAcquisition(final IAcquisitionWork acquisition) {
-        return checkAcquisition(acquisition, getGenericAcquisitionPerson(), false);
-    }
-
-    private Person getGenericAcquisitionPerson() {
-        if (genericAcquisitionPerson == null) {
-            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE);
+    public TargetRoll getAcquisitionModifiers(final IAcquisitionWork acquisition) {
+        TargetRollModifier decisiveModifier = getDecisiveAcquisitionModifier(acquisition);
+        if (decisiveModifier != null) {
+            return new TargetRoll(decisiveModifier);
         }
-        return genericAcquisitionPerson;
-    }
 
-    /**
-     * Creates a person used for generic acquisitions. See {@link #checkGenericAcquisition(IAcquisitionWork)}
-     *
-     * @param skills the list of skills to prepopulate
-     */
-    private Person createGenericAcquisitionPerson(String... skills) {
-        Person person = new Person(this);
-        Arrays.stream(skills).forEach(skillName -> {
-            person.addSkill(skillName, SkillType.getType(skillName).getRegularLevel(), 0);
-        });
-        return person;
+        TargetRoll modifiers = new TargetRoll();
+        getSituationalAcquisitionModifiers(acquisition).forEach(modifiers::addModifier);
+        return modifiers;
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
@@ -4814,7 +4801,7 @@ public class Campaign implements ITechManager {
      *
      * <p>This method evaluates a sequence of rules and conditions to determine whether the acquisition is possible,
      * impossible, automatically successful, or automatically fails for the period due to cooldowns. Otherwise, it
-     * computes the target roll value based on the skill of the assigned (real or synthetic) person and all relevant
+     * computes the target roll value based on the skill of the assigned person and all relevant
      * modifiers such as item attributes, availability, campaign configuration (including AtB and "Gray Monday"
      * effects), technical year, and extinction.</p>
      *
@@ -4838,6 +4825,53 @@ public class Campaign implements ITechManager {
      * @return a {@link SkillCheck} reflecting the acquisition complexity
      */
     public SkillCheck checkAcquisition(IAcquisitionWork acquisition, @Nullable Person person, boolean checkDaysToWait) {
+        TargetRollModifier decisiveModifier = getDecisiveAcquisitionModifier(acquisition);
+        if (decisiveModifier == null) {
+            if (checkDaysToWait &&
+                      (getPlayerForce().getShoppingList().getShoppingItem(acquisition.getNewEquipment()) != null)) {
+                decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                      getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.waitForNewCycle"));
+            } else if (person == null) {
+                decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                      getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.noPersonnel"));
+            }
+        }
+
+        if (person == null) {
+            // a blank stand-in so the check has someone to name; the outcome is already decided, so it never rolls
+            person = new Person(this);
+        }
+
+        SkillType skillType = switch (getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE)) {
+            case ADMINISTRATION -> SkillType.getType(S_ADMIN);
+            case NEGOTIATION -> SkillType.getType(S_NEGOTIATION);
+            case AUTOMATIC -> SkillType.getType(S_ADMIN); // used as a placeholder, the check succeeds automatically
+            case ANY_TECH -> {
+                Skill bestTechSkill = person.getBestTechSkill();
+                // since the person has no tech skills, we can create the skill check for any of them
+                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_VEHICLE) : bestTechSkill.getType();
+            }
+        };
+        if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.missingRequiredSkill"));
+        }
+
+        if (decisiveModifier != null) {
+            return new SkillCheck(person, skillType, new TargetRoll(decisiveModifier));
+        }
+
+        return person.checkSkill(skillType.getName(), this)
+                     .withExternalModifiers(getSituationalAcquisitionModifiers(acquisition));
+    }
+
+    /**
+     * @param acquisition what is being acquired
+     *
+     * @return the modifier that settles the acquisition regardless of who attempts it (automatic acquisitions, or
+     *       items the campaign's rules forbid), or {@code null} when a roll is still needed
+     */
+    private @Nullable TargetRollModifier getDecisiveAcquisitionModifier(IAcquisitionWork acquisition) {
         TargetRollModifier decisiveModifier = null;
         if (getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.AUTOMATIC) {
             decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_SUCCESS,
@@ -4862,41 +4896,16 @@ public class Campaign implements ITechManager {
                                 acquisition.getAvailability().equals(AvailabilityValue.X))) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.extinct"));
-        } else if (checkDaysToWait &&
-                         (getPlayerForce().getShoppingList().getShoppingItem(acquisition.getNewEquipment()) != null)) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.waitForNewCycle"));
-        } else if (person == null) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.noPersonnel"));
         }
+        return decisiveModifier;
+    }
 
-        if (person == null) {
-            // default to the acquisition person if person == null was passed
-            person = getGenericAcquisitionPerson();
-        }
-
-        // if you change skill mappings here, make sure to update createGenericAcquisitionPerson,
-        // so that it has skills for any case of campaignOptions.getAcquisitionType()
-        SkillType skillType = switch (getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE)) {
-            case ADMINISTRATION -> SkillType.getType(S_ADMIN);
-            case NEGOTIATION -> SkillType.getType(S_NEGOTIATION);
-            case AUTOMATIC -> SkillType.getType(S_ADMIN); // used as a placeholder, the check succeeds automatically
-            case ANY_TECH -> {
-                Skill bestTechSkill = person.getBestTechSkill();
-                // since the person has no tech skills, we can create the skill check for any of them
-                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_VEHICLE) : bestTechSkill.getType();
-            }
-        };
-        if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.missingRequiredSkill"));
-        }
-
-        if (decisiveModifier != null) {
-            return new SkillCheck(person, skillType, new TargetRoll(decisiveModifier));
-        }
-
+    /**
+     * @param acquisition what is being acquired
+     *
+     * @return the modifiers from the item itself, contract parts availability and Gray Monday
+     */
+    private List<TargetRollModifier> getSituationalAcquisitionModifiers(IAcquisitionWork acquisition) {
         List<TargetRollModifier> modifiers = new ArrayList<>(acquisition.getAllAcquisitionMods().getModifiers());
         if (getCampaignOptions().isUseStratCon() && getCampaignOptions().get(CampaignOption.RESTRICT_PARTS_BY_MISSION)) {
             int contractAvailability = findPartsAvailabilityLevel();
@@ -4908,8 +4917,7 @@ public class Campaign implements ITechManager {
         if (isGrayMonday(currentDay, getCampaignOptions().get(CampaignOption.SIMULATE_GRAY_MONDAY))) {
             modifiers.add(new TargetRollModifier(4, getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.grayMonday")));
         }
-
-        return person.checkSkill(skillType.getName(), this).withExternalModifiers(modifiers);
+        return modifiers;
     }
 
     public int findPartsAvailabilityLevel() {
