@@ -293,6 +293,14 @@ public class RefitClassGrader {
     }
 
     /**
+     * Turning a standard unit into an Omni, or an Omni into a standard unit, changes which of its components are fixed
+     * to the chassis, so it is Class F like any other change to an Omni unit's fixed components (CamOps p.212).
+     */
+    public void gradeOmniConversion() {
+        raise(Refit.CLASS_F, "RefitClass.omniConversion");
+    }
+
+    /**
      * Moving an Omni unit's weightless fixed slots, such as Endo Steel or Ferro-Fibrous, into a location is part of a
      * Class F refit.
      *
