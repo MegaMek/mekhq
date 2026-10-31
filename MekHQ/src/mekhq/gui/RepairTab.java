@@ -422,7 +422,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(UIUtil.scaleForGUI(70));
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
-        taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
+        taskTable.getSelectionModel().addListSelectionListener(ev -> {
+            if (!ev.getValueIsAdjusting()) {
+                taskTableValueChanged();
+            }
+        });
         taskSorter = new TableRowSorter<>(taskModel);
         taskSorter.setComparator(0, new TaskSorter());
         taskTable.setRowSorter(taskSorter);
@@ -655,7 +659,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void servicedUnitTableValueChanged(ListSelectionEvent evt) {
-        if (ignoreUnitTable) {
+        // Wait for the final event: a filter or sort restores the selection through adjusting events, and reacting
+        // during that restore can clear the table's cached selection mid-restore
+        if (ignoreUnitTable || evt.getValueIsAdjusting()) {
             return;
         }
         refreshTaskList();
@@ -684,6 +690,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void techTableValueChanged(ListSelectionEvent evt) {
+        if (evt.getValueIsAdjusting()) {
+            return;
+        }
         updateTechTarget();
 
         taskTable.repaint();
