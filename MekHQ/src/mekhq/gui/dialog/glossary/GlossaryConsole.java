@@ -114,6 +114,20 @@ public class GlossaryConsole extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(GlossaryConsole.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryConsole";
 
+    /**
+     * The command a hyperlink to a glossary entry starts with, as in {@code "GLOSSARY:entryKey"}.
+     *
+     * @see #handleGlossaryHyperlinkClick(Window, HyperlinkEvent)
+     */
+    public static final String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+
+    /**
+     * The command a hyperlink to a documentation entry starts with, as in {@code "DOCUMENTATION:entryKey"}.
+     *
+     * @see #handleGlossaryHyperlinkClick(Window, HyperlinkEvent)
+     */
+    public static final String DOCUMENTATION_COMMAND_STRING = "DOCUMENTATION";
+
     private static final int INDEX_WIDTH = 330;
     private static final int SIDE_WIDTH = 230;
     private static final int SNIPPET_BEFORE = 45;
@@ -247,6 +261,51 @@ public class GlossaryConsole extends JDialog {
         console.showMode(Mode.DOCUMENTATION);
         console.selectDocument(document);
         console.openDocument(document);
+    }
+
+    /**
+     * Follows a glossary or documentation hyperlink clicked anywhere in MekHQ: a glossary link opens the glossary at
+     * that entry, and a documentation link opens the document in the document viewer.
+     *
+     * @param parent         the window the link was clicked in; {@code null} for whichever window is active
+     * @param hyperlinkEvent the event; only activations are followed
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static void handleGlossaryHyperlinkClick(@Nullable Window parent, HyperlinkEvent hyperlinkEvent) {
+        if (hyperlinkEvent.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
+            return;
+        }
+        String[] splitReference = hyperlinkEvent.getDescription().split(":", 2);
+        if (splitReference.length != 2) {
+            LOGGER.warn("Malformed hyperlink: {}", hyperlinkEvent.getDescription());
+            return;
+        }
+        String command = splitReference[0];
+        String entry = splitReference[1];
+
+        if (command.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
+            GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entry);
+            if (glossaryEntry == null) {
+                LOGGER.warn("Glossary entry not found: {}", entry);
+                return;
+            }
+            showEntry(parent, glossaryEntry);
+        } else if (command.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
+            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
+            if (documentationEntry == null) {
+                LOGGER.warn("Documentation entry not found: {}", entry);
+                return;
+            }
+            Window owner = parent != null ? parent
+                                 : KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+            try {
+                new GlossaryDocumentationEntryDialog(owner, documentationEntry);
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to open PDF");
+            }
+        }
     }
 
     private static GlossaryConsole open(@Nullable Window owner) {

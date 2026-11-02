@@ -42,8 +42,8 @@ import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
-import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryConsole.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryConsole.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;

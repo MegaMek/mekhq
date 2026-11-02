@@ -32,14 +32,14 @@
  */
 package mekhq.gui.dialog.glossary;
 
-import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.GlossaryDialog.documentationEntries;
+import static mekhq.gui.dialog.glossary.GlossaryConsole.DOCUMENTATION_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -51,6 +51,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
@@ -88,13 +89,13 @@ public class GlossaryDocumentationEntryDialog extends JDialog {
     /**
      * Constructs a dialog for the specified parent and initial documentation entry.
      *
-     * @param parent             the parent dialog for modal positioning
+     * @param parent             the window opening the dialog, or {@code null} for none
      * @param documentationEntry the initial documentation entry to display
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public GlossaryDocumentationEntryDialog(JDialog parent, DocumentationEntry documentationEntry) {
+    public GlossaryDocumentationEntryDialog(@Nullable Window parent, DocumentationEntry documentationEntry) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.title"));
 
         tabbedPane = new EnhancedTabbedPane(false, true);
@@ -239,7 +240,7 @@ public class GlossaryDocumentationEntryDialog extends JDialog {
         StringBuilder formatedDocumentationText = new StringBuilder();
         formatedDocumentationText.append(getTextAt(RESOURCE_BUNDLE, "GlossaryDialog.contentsPane.title"));
 
-        for (String entry : documentationEntries) {
+        for (String entry : DocumentationEntry.getLookUpNamesSortedByTitle()) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entry);
             String title = documentationEntry != null ? documentationEntry.getTitle() : "-";
 
