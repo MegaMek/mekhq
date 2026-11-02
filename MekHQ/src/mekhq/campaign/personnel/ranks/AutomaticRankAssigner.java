@@ -37,6 +37,8 @@ import static mekhq.campaign.personnel.ranks.Rank.RE_MIN;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MAX;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,6 +46,7 @@ import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -62,10 +65,16 @@ import mekhq.campaign.universe.Faction;
  * <p>Only crew members who do not already hold a rank are affected; existing ranks
  * are always preserved.</p>
  *
+ * <p>Everyone this class gives a rank to is first put on the faction's rank system. A rank is an index into a
+ * table, and the table is the person's own, so a Draconis Combine crew left on a mercenary campaign's default table
+ * would read index 12 as "Sergeant" where the Combine's table says "Gunsho".</p>
+ *
  * @author Illiani
  * @since 0.51.0
  */
 public final class AutomaticRankAssigner {
+    private static final MMLogger LOGGER = MMLogger.create(AutomaticRankAssigner.class);
+
     private static final String NO_RANK = "None";
     private static final String MISSING_RANK = "-";
 
@@ -115,15 +124,18 @@ public final class AutomaticRankAssigner {
         boolean factionIsClan = faction.isClan();
         boolean factionIsComStarOrWoB = faction.isComStarOrWoB();
 
+        Person unitCommander = null;
         if (!factionIsClan && !factionIsComStarOrWoB) {
-            Person unitCommander = unit.getCommander();
+            unitCommander = unit.getCommander();
             if ((unitCommander == null) && !crew.isEmpty()) {
                 unitCommander = crew.getFirst();
             }
+        }
 
-            if (unitCommander != null) {
-                unitCommander.setRank(COMMANDER_RANK_INDEX);
-            }
+        putRankedCrewOnFactionRankSystem(unit, crew, unitCommander, faction);
+
+        if (unitCommander != null) {
+            unitCommander.setRank(COMMANDER_RANK_INDEX);
         }
 
         for (Person person : crew) {
@@ -162,6 +174,96 @@ public final class AutomaticRankAssigner {
             // Everyone else
             cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
+    }
+
+    /**
+     * Puts everyone about to be ranked on the faction's rank system, so the indices assigned below are read from the
+     * faction's table. Crew who already hold a rank are not about to be ranked and keep their own system.
+     *
+     * @param unit          the unit being ranked, named in the log
+     * @param crew          the unit's crew
+     * @param unitCommander the crew member who is given the commander's rank whether ranked already or not, or
+     *                      {@code null} when the faction gives no commander's rank
+     * @param faction       the faction whose rank system the crew adopt
+     */
+    private static void putRankedCrewOnFactionRankSystem(Unit unit, List<Person> crew, @Nullable Person unitCommander,
+          Faction faction) {
+        List<Person> aboutToBeRanked = new ArrayList<>();
+        for (Person person : crew) {
+            if ((person == unitCommander) || hasNoRank(person)) {
+                aboutToBeRanked.add(person);
+            }
+        }
+        int moved = putOnFactionRankSystem(aboutToBeRanked, faction);
+        LOGGER.debug("[AutoRank] unit '{}': {} of the {} crew about to be ranked moved to the rank system of {}",
+              unit.getName(), moved, aboutToBeRanked.size(), faction.getShortName());
+    }
+
+    /**
+     * Puts people on the faction's rank system, as the Command Generator does for everyone it creates, so the rank
+     * system the roster offers for them is the same as for the rest of the command. Nobody is given a rank; a person's
+     * existing rank index is kept and read from the new table.
+     *
+     * @param people  the people to move
+     * @param faction the faction whose rank system they adopt, or {@code null} to leave them as they are
+     *
+     * @return how many people changed rank system; {@code 0} when they were on it already, no faction was given or
+     *       the faction's rank system is missing or invalid, which is logged
+     */
+    public static int putOnFactionRankSystem(Collection<Person> people, @Nullable Faction faction) {
+        RankValidator rankValidator = new RankValidator();
+        RankSystem rankSystem = usableRankSystemOf(faction, rankValidator);
+        if (rankSystem == null) {
+            return 0;
+        }
+        int moved = 0;
+        for (Person person : people) {
+            if (adoptRankSystem(person, rankSystem, rankValidator)) {
+                moved++;
+            }
+        }
+        return moved;
+    }
+
+    /**
+     * The faction's rank system, when it is one personnel can be put on.
+     *
+     * @param faction       the faction, or {@code null} for none
+     * @param rankValidator the validator that decides whether the system is usable
+     *
+     * @return the faction's rank system, or {@code null} when there is no faction or its rank system is missing or
+     *       invalid; the reason is logged
+     */
+    private static @Nullable RankSystem usableRankSystemOf(@Nullable Faction faction, RankValidator rankValidator) {
+        if (faction == null) {
+            LOGGER.debug("[AutoRank] no faction given; personnel keep the rank system they were created with");
+            return null;
+        }
+        RankSystem rankSystem = faction.getRankSystem();
+        if (!rankValidator.validate(rankSystem, false)) {
+            LOGGER.warn("[AutoRank] faction {} names rank system '{}', which is missing or invalid; personnel keep the"
+                        + " rank system they were created with, so their rank names are read from that table",
+                  faction.getShortName(), faction.getRankSystemCode());
+            return null;
+        }
+        return rankSystem;
+    }
+
+    /**
+     * Puts the person on the given rank system, unless they are on it already.
+     *
+     * @param person        the person
+     * @param rankSystem    the rank system to adopt
+     * @param rankValidator the validator that checks the person's rank still exists on the new system
+     *
+     * @return {@code true} when the person's rank system changed; {@code false} when they were on it already
+     */
+    private static boolean adoptRankSystem(Person person, RankSystem rankSystem, RankValidator rankValidator) {
+        if (rankSystem.equals(person.getRankSystem())) {
+            return false;
+        }
+        person.setRankSystem(rankValidator, rankSystem);
+        return true;
     }
 
     /**
@@ -310,12 +412,12 @@ public final class AutomaticRankAssigner {
             return;
         }
 
-        RankSystem rankSystem = person.getOriginFaction().getRankSystem();
         final RankValidator rankValidator = new RankValidator();
-        if (!rankValidator.validate(rankSystem, false)) {
+        RankSystem rankSystem = usableRankSystemOf(person.getOriginFaction(), rankValidator);
+        if (rankSystem == null) {
             return;
         }
-        person.setRankSystem(rankValidator, rankSystem);
+        adoptRankSystem(person, rankSystem, rankValidator);
 
         AutomaticRankAssigner.assignAscendingRank(person, rankLevel);
     }

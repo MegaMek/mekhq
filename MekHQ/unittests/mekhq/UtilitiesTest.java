@@ -44,12 +44,16 @@ import static mekhq.gui.enums.PersonnelTableModelColumn.SKILL_LEVEL;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.util.List;
 import javax.swing.JTable;
@@ -258,6 +262,59 @@ class UtilitiesTest {
                 }
                 return records;
             }
+        }
+    }
+
+    @Nested
+    class LastFileModified {
+        private static final FilenameFilter SAVE_FILTER = (dir, name) -> name.endsWith(".cpnx");
+
+        @TempDir
+        Path directory;
+
+        @Test
+        void findsNewestMatchingFileInSubdirectories() throws IOException {
+            createFile(directory.resolve("old.cpnx"), 1000);
+            Path newest = createFile(directory.resolve("campaign/autosave/newest.cpnx"), 3000);
+            createFile(directory.resolve("campaign/newer.cpnx"), 2000);
+            createFile(directory.resolve("campaign/newest-but-not-a-save.txt"), 4000);
+
+            assertEquals(newest.toFile(), Utilities.lastFileModified(directory.toString(), SAVE_FILTER));
+        }
+
+        @Test
+        void ignoresFilesBelowTheMaximumDepth() throws IOException {
+            Path shallow = createFile(directory.resolve("a/shallow.cpnx"), 1000);
+            createFile(directory.resolve("a/b/c/too-deep.cpnx"), 2000);
+
+            assertEquals(shallow.toFile(), Utilities.lastFileModified(directory.toString(), SAVE_FILTER));
+            assertEquals(shallow.toFile(), Utilities.lastFileModified(directory.toString(), SAVE_FILTER, 2));
+            assertNull(Utilities.lastFileModified(directory.toString(), SAVE_FILTER, 1));
+        }
+
+        @Test
+        void doesNotFollowSymbolicLinkLoops() throws IOException {
+            Path save = createFile(directory.resolve("a/save.cpnx"), 1000);
+            try {
+                Files.createSymbolicLink(directory.resolve("a/loop"), directory);
+            } catch (UnsupportedOperationException | IOException ex) {
+                assumeTrue(false, "Symbolic links are not supported here");
+            }
+
+            assertEquals(save.toFile(),
+                  Utilities.lastFileModified(directory.toString(), SAVE_FILTER, Integer.MAX_VALUE));
+        }
+
+        @Test
+        void returnsNullForMissingDirectory() {
+            assertNull(Utilities.lastFileModified(directory.resolve("missing").toString(), SAVE_FILTER));
+        }
+
+        private Path createFile(Path file, long lastModified) throws IOException {
+            Files.createDirectories(file.getParent());
+            Files.createFile(file);
+            Files.setLastModifiedTime(file, FileTime.fromMillis(lastModified));
+            return file;
         }
     }
 }
