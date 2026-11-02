@@ -619,6 +619,19 @@ public class FileDialogs {
     }
 
     /**
+     * Displays a dialog window from which the user can choose where to save a copy of one of MekHQ's guides.
+     *
+     * @param frame           the dialog's parent frame, or {@code null} for none
+     * @param defaultFilename the default filename, excluding its extension
+     *
+     * @return the file the user chose, or <code>Optional.empty</code> if the dialog was cancelled
+     */
+    public static Optional<File> saveGuideCopy(@Nullable JFrame frame, String defaultFilename) {
+        return saveWithBackup(frame, getTextAt("dlgSaveGuideCopy.title"), MekHQ.getGlossaryDirectory(),
+              defaultFilename, FileType.PDF);
+    }
+
+    /**
      * Displays a dialog pointing at the default directory where the user can save a file, ensures its extension, and
      * creates a backup if it already exists.
      *

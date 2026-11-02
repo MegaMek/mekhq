@@ -304,13 +304,7 @@ public class GlossaryConsole extends JDialog {
                 LOGGER.warn("Documentation entry not found: {}", entry);
                 return;
             }
-            Window owner = parent != null ? parent
-                                 : KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-            try {
-                new GlossaryDocumentationEntryDialog(owner, documentationEntry);
-            } catch (Exception ex) {
-                LOGGER.error(ex, "Failed to open PDF");
-            }
+            GuideViewer.showGuide(parent, documentationEntry);
         }
     }
 
@@ -1315,11 +1309,7 @@ public class GlossaryConsole extends JDialog {
     private void openDocument(DocumentationEntry document) {
         readPreferences.markRead(DOCUMENT_READ_PREFIX + document.getLookUpName(),
               document.getVersionAddedOrLastUpdated());
-        try {
-            new GlossaryDocumentationEntryDialog(this, document);
-        } catch (Exception ex) {
-            LOGGER.error(ex, "Failed to open document {}", document.getFileAddress());
-        }
+        GuideViewer.showGuide(this, document);
     }
 
     private void refreshNavigation(boolean isGlossary) {
@@ -1563,7 +1553,7 @@ public class GlossaryConsole extends JDialog {
                                       MHQConstants.VERSION.toString());
         // Titles such as "Mission Type: Security Duty" hold characters some systems refuse in a file name.
         fileName = UNSAFE_FILE_NAME_CHARACTERS.matcher(fileName).replaceAll("-");
-        Optional<File> file = FileDialogs.saveGlossaryPDF(findFrame(), fileName);
+        Optional<File> file = FileDialogs.saveGlossaryPDF(frameAbove(this), fileName);
         if (file.isEmpty()) {
             return;
         }
@@ -1596,9 +1586,15 @@ public class GlossaryConsole extends JDialog {
               referencedBy);
     }
 
-    /** The file dialog wants a frame; the glossary may belong to a dialog, so the frame above it is found. */
-    private @Nullable JFrame findFrame() {
-        Window window = getOwner();
+    /**
+     * The file dialogs want a frame, and the glossary and the guide viewer may belong to a dialog, so the frame above
+     * a window is found; failing that, any frame MekHQ is showing.
+     *
+     * @param window the window
+     *
+     * @return the frame, or {@code null} if MekHQ is showing none
+     */
+    static @Nullable JFrame frameAbove(@Nullable Window window) {
         while (window != null && !(window instanceof JFrame)) {
             window = window.getOwner();
         }

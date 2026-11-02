@@ -60,6 +60,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nullable;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
@@ -68,16 +69,20 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.dialog.glossary.GlossaryConsole.Mode;
 
 /**
- * Builds the guide for each {@link GlossaryConsole} page from the resource bundle. Each page's steps, example lines and
- * terms are numbered keys ({@code GlossaryGuide.glossary.step.1.title}, {@code .step.2.title}, ...), read until the
- * next number is missing, so text can be added or reworded without code changes.
+ * Builds the guide for each {@link GlossaryConsole} page, and for the {@link GuideViewer}, from the resource bundle.
+ * Each guide's steps, example lines and terms are numbered keys ({@code GlossaryGuide.glossary.step.1.title},
+ * {@code .step.2.title}, ...), read until the next number is missing, so text can be added or reworded without code
+ * changes.
  *
  * @author Illiani
  * @since 0.51.01
  */
 final class GlossaryGuides {
-    /** The keyboard shortcuts the Glossary page's guide lists, each as its key and its meaning's resource key. */
+    /** The keyboard shortcuts the Glossary page's guide lists, by the name of their resource keys. */
     private static final List<String> SHORTCUTS = List.of("search", "results", "escape", "history", "export");
+    /** The keyboard shortcuts the guide viewer's guide lists, by the name of their resource keys. */
+    private static final List<String> VIEWER_SHORTCUTS = List.of("library", "find", "pages", "zoom", "closeTab",
+          "viewerEscape");
 
     private GlossaryGuides() {}
 
@@ -87,7 +92,18 @@ final class GlossaryGuides {
      * @return the page's guide
      */
     static Guide build(final Mode mode) {
-        String prefix = guidePrefix(mode);
+        return build(guidePrefix(mode), getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryGuide.eyebrow", mode.label()),
+              mode == Mode.GLOSSARY ? shortcuts(SHORTCUTS) : null);
+    }
+
+    /**
+     * @return the guide viewer's guide
+     */
+    static Guide buildViewer() {
+        return build("GlossaryGuide.viewer.", text("GlossaryGuide.viewer.eyebrow"), shortcuts(VIEWER_SHORTCUTS));
+    }
+
+    private static Guide build(final String prefix, final String eyebrow, final @Nullable JComponent stepsExtra) {
 
         List<Step> steps = new ArrayList<>();
         for (int number = 1; isResourceKeyValid(text(prefix + "step." + number + ".title")); number++) {
@@ -103,9 +119,8 @@ final class GlossaryGuides {
             terms.add(new Term(text(prefix + "term." + number + ".name"), text(prefix + "term." + number + ".text")));
         }
 
-        return new Guide(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryGuide.eyebrow", mode.label()),
-              text(prefix + "title"), steps, mode == Mode.GLOSSARY ? shortcuts() : null,
-              text(prefix + "exampleIntro"), example, terms, null);
+        return new Guide(eyebrow, text(prefix + "title"), steps, stepsExtra, text(prefix + "exampleIntro"), example,
+              terms, null);
     }
 
     /**
@@ -126,7 +141,7 @@ final class GlossaryGuides {
     }
 
     /** The keyboard shortcuts, each key beside what it does, set out like the Oracle's key to its answers. */
-    private static JComponent shortcuts() {
+    private static JComponent shortcuts(final List<String> names) {
         // The toolkit cannot be asked for the menu key without a screen, as in tests; Ctrl is then the likeliest.
         int menuMask = GraphicsEnvironment.isHeadless() ? InputEvent.CTRL_DOWN_MASK
                              : Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
@@ -136,11 +151,11 @@ final class GlossaryGuides {
         key.setLayout(new BoxLayout(key, BoxLayout.Y_AXIS));
         key.add(leftAligned(Hud.eyebrow(text("GlossaryGuide.shortcuts"))));
         key.add(Box.createVerticalStrut(scaleForGUI(6)));
-        JPanel grid = new JPanel(new GridLayout(SHORTCUTS.size(), 1, 0, scaleForGUI(1)));
+        JPanel grid = new JPanel(new GridLayout(names.size(), 1, 0, scaleForGUI(1)));
         grid.setOpaque(true);
         grid.setBackground(DIVIDER);
         grid.setBorder(BorderFactory.createLineBorder(DIVIDER, scaleForGUI(1)));
-        for (String shortcut : SHORTCUTS) {
+        for (String shortcut : names) {
             JPanel row = new JPanel();
             row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
             row.setBackground(SURFACE);

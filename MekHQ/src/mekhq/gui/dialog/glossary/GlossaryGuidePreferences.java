@@ -40,8 +40,8 @@ import mekhq.gui.dialog.glossary.GlossaryConsole.Mode;
 import mekhq.gui.preferences.PreferenceFlags;
 
 /**
- * The glossary console's tutorial settings: whether the welcome banner has been dismissed, whether each page's guide
- * has been seen, and whether guides open by themselves on a page's first visit.
+ * The tutorial settings of the glossary console and the guide viewer: whether the welcome banner has been dismissed,
+ * whether each page's guide has been seen, and whether guides open by themselves on a page's first visit.
  *
  * <p>They are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's node,
  * so they follow the MekHQ install rather than a campaign. Deleting this class's entry from that file (while MekHQ is
@@ -54,6 +54,7 @@ public final class GlossaryGuidePreferences {
     static final String WELCOME_DISMISSED = "welcomeDismissed";
     static final String GUIDE_AUTO_OPEN = "guideAutoOpen";
     static final String GUIDE_SEEN_PREFIX = "guideSeen.";
+    static final String VIEWER_GUIDE_SEEN = "guideSeen.viewer";
 
     private static GlossaryGuidePreferences instance;
 
@@ -69,6 +70,7 @@ public final class GlossaryGuidePreferences {
         for (Mode mode : Mode.values()) {
             flags.register(seenKey(mode), false);
         }
+        flags.register(VIEWER_GUIDE_SEEN, false);
     }
 
     /**
@@ -115,5 +117,14 @@ public final class GlossaryGuidePreferences {
 
     void setGuideSeen(final Mode mode, final boolean seen) {
         flags.set(seenKey(mode), seen);
+    }
+
+    /** @return {@code true} if the player has opened the guide viewer's guide before */
+    boolean isViewerGuideSeen() {
+        return flags.get(VIEWER_GUIDE_SEEN);
+    }
+
+    void setViewerGuideSeen(final boolean seen) {
+        flags.set(VIEWER_GUIDE_SEEN, seen);
     }
 }

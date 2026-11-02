@@ -83,7 +83,7 @@ import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.glossary.GlossaryConsole;
-import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
+import mekhq.gui.dialog.glossary.GuideViewer;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -699,11 +699,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            try {
-                new GlossaryDocumentationEntryDialog(parent, documentationEntry);
-            } catch (Exception ex) {
-                LOGGER.error("Failed to open PDF", ex);
-            }
+            GuideViewer.showGuide(parent, documentationEntry);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);
