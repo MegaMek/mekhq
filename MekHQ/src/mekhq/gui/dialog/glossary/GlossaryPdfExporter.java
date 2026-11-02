@@ -587,13 +587,14 @@ public final class GlossaryPdfExporter {
     }
 
     private void newPage() throws IOException {
+        // Closing the last page's stream marks no page open, so this comes before the new page is marked open.
+        closeStream();
         isPageOpen = true;
         y = pageSize.getHeight() - MARGIN;
         if (isMeasuring) {
             measuredPages++;
             return;
         }
-        closeStream();
         PDPage newPage = new PDPage(pageSize);
         if (insertBefore != null) {
             document.getPages().insertBefore(newPage, insertBefore);

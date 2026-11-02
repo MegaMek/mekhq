@@ -62,7 +62,7 @@ class GuideSearchTest {
 
     @Test
     void aPhraseBrokenAcrossLinesInTheQueryStillMatches() {
-        assertEquals(1, GuideSearch.find(PAGES, "ransom\n  of").size());
+        assertEquals(List.of(new PageHit(3, 4, 19)), GuideSearch.find(PAGES, "ransom\n  of prisoners"));
     }
 
     @Test
