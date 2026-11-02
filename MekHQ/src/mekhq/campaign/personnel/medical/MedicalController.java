@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.TargetRollModifier;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -55,10 +56,15 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -70,6 +76,13 @@ import mekhq.campaign.unit.Unit;
  */
 public class MedicalController {
     private static final MMLogger LOGGER = MMLogger.create(MedicalController.class);
+
+    /**
+     * The target number for healing checks made by an academy's medical staff. This is a flat value rather than the
+     * academy's faculty skill, as the faculty skill of children's schools would leave academy care worse than natural
+     * healing.
+     */
+    public static final int ACADEMY_MEDICAL_CARE_TARGET_NUMBER = 8;
 
     final String RESOURCE_BUNDLE = "mekhq.resources.MedicalController";
 
@@ -137,6 +150,16 @@ public class MedicalController {
             return; // Early exit as there is no point continuing to process the character
         }
 
+        // Students are away at their academy, so its medical staff tend to them instead of the campaign's doctors
+        if (patient.getStatus().isStudent() && patient.needsFixing()) {
+            Academy academy = EducationController.getAcademy(patient.getEduAcademySet(),
+                  patient.getEduAcademyNameInSet());
+            if (academy != null && !academy.isHomeSchool()) {
+                processAcademyMedicalCare(patient);
+                return;
+            }
+        }
+
         Person doctor = campaign.getPlayerForce().getHumanResources().getPerson(patient.getDoctorId());
 
         if (doctor != null) {
@@ -172,6 +195,53 @@ public class MedicalController {
                 unit.resetPilotAndEntity();
             }
         }
+    }
+
+    /**
+     * Processes daily healing for a student whose injuries are tended by their academy's medical staff.
+     *
+     * <p>Academy care stands in for an assigned doctor, with the staff's checks always made against
+     * {@link #ACADEMY_MEDICAL_CARE_TARGET_NUMBER}. Under standard rules the staff make a {@code Surgery} check on the
+     * doctor-assisted healing schedule. Under Advanced Medical a successful check marks the patient's injuries as
+     * treated, and under Alternate Advanced Medical the injuries recover at the assisted pace.</p>
+     *
+     * @param patient the student undergoing healing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void processAcademyMedicalCare(Person patient) {
+        patient.decrementDaysToWaitForHealing();
+
+        if (isUseAdvancedMedical) {
+            if (isUseAltAdvancedMedical) {
+                AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient);
+            } else {
+                InjuryUtil.resolveDailyHealingUnderAcademyCare(campaign, patient);
+            }
+            return;
+        }
+
+        if (patient.getDaysToWaitForHealing() > 0) {
+            return;
+        }
+
+        TargetRoll targetNumber = new TargetRoll(ACADEMY_MEDICAL_CARE_TARGET_NUMBER, getTextAt(RESOURCE_BUNDLE,
+              "MedicalController.modifier.academyStaff"));
+        // The academy's staff make the roll, so the patient's own aptitude must not affect it
+        ActionCheckResult actionCheckResult =
+              new SkillCheck(patient, SkillType.getType(S_SURGERY), targetNumber)
+                    .withRollType(RollType.NORMAL)
+                    .withExternalModifiers(List.of(patient.getHealingMods(campaign)))
+                    .resolve(false, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.academyCare"));
+
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+
+        if (actionCheckResult.isSuccess()) {
+            patient.heal();
+        }
+
+        patient.setDaysToWaitForHealing(healingWaitingPeriod);
     }
 
     private Person verifyTheatreAvailability(Person patient, Person doctor) {
