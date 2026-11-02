@@ -46,6 +46,7 @@ import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 
 /**
  * The default Chaos Campaign pay scheme: monthly and combat pay are derived from the contract's abstract scale and
@@ -159,13 +160,16 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
     }
 
     /**
-     * The monthly running costs Base Pay covers: salaries, unit maintenance, Hot Spots upkeep, overhead, and food and
-     * housing. Each is only included while the campaign actually charges it. The player force is a single detachment,
-     * so its costs are the detachment's costs.
+     * The monthly running costs Base Pay covers: salaries, unit maintenance, and Hot Spots upkeep. Each is only included
+     * while the campaign actually charges it. The player force is a single detachment, so its costs are the
+     * detachment's costs.
      *
-     * <p>Maintenance and food and housing are projected for the contract itself rather than taken from where the force
-     * is now (see {@link ContractExpenseProjection}): maintenance at the pace and cost multiplier of this contract, and
-     * housing on its target planet.</p>
+     * <p>Overhead and food and housing are left out: the contract's straight support pays those back as they are
+     * charged (see {@link ContractSupportPayments#reimburseMonthlyStraightSupport}), so Base Pay covering them too would
+     * pay for them twice.</p>
+     *
+     * <p>Maintenance is projected for the contract itself rather than taken from where the force is now (see
+     * {@link ContractExpenseProjection}), at the pace and cost multiplier of this contract.</p>
      *
      * @param campaign the campaign
      * @param contract the contract being paid
@@ -189,11 +193,8 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
                   contract));
         }
 
-        // These are zero unless their options are enabled
+        // Zero unless its option is enabled
         coveredCosts = coveredCosts.plus(accountant.getHotSpotsUpkeepCosts());
-        coveredCosts = coveredCosts.plus(accountant.getOverheadExpenses());
-        coveredCosts = coveredCosts.plus(ContractExpenseProjection.getMonthlyContractFoodAndHousing(campaign,
-              contract));
 
         return coveredCosts;
     }

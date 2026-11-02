@@ -72,6 +72,11 @@ public enum FileType {
     XML("XML file", "xml"),
 
     /**
+     * Value for pdf files.
+     */
+    PDF("PDF file", "pdf"),
+
+    /**
      * Value for png files.
      */
     PNG("PNG file", "png"),
