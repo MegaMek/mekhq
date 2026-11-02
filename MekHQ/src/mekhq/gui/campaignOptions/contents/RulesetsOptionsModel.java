@@ -75,7 +75,6 @@ class RulesetsOptionsModel {
     int moraleDefeatEffect;
     int moraleDecisiveDefeatEffect;
     AutoResolveMethod autoResolveMethod;
-    String strategicViewTheme;
     boolean autoResolveVictoryChanceEnabled;
     int autoResolveNumberOfScenarios;
     boolean autoResolveExperimentalPacarGuiEnabled;
@@ -129,7 +128,6 @@ class RulesetsOptionsModel {
         moraleDefeatEffect = options.get(CampaignOption.MORALE_DEFEAT_EFFECT);
         moraleDecisiveDefeatEffect = options.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT);
         autoResolveMethod = options.get(CampaignOption.AUTO_RESOLVE_METHOD);
-        strategicViewTheme = options.get(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME);
         autoResolveVictoryChanceEnabled = options.get(CampaignOption.AUTO_RESOLVE_VICTORY_CHANCE_ENABLED);
         autoResolveNumberOfScenarios = options.get(CampaignOption.AUTO_RESOLVE_NUMBER_OF_SCENARIOS);
         autoResolveExperimentalPacarGuiEnabled = options.get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
@@ -184,7 +182,6 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.MORALE_DEFEAT_EFFECT, moraleDefeatEffect);
         options.set(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT, moraleDecisiveDefeatEffect);
         options.set(CampaignOption.AUTO_RESOLVE_METHOD, autoResolveMethod);
-        options.set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, strategicViewTheme);
         options.set(CampaignOption.AUTO_RESOLVE_VICTORY_CHANCE_ENABLED, autoResolveVictoryChanceEnabled);
         options.set(CampaignOption.AUTO_RESOLVE_NUMBER_OF_SCENARIOS, autoResolveNumberOfScenarios);
         options.set(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED, autoResolveExperimentalPacarGuiEnabled);

@@ -1206,8 +1206,6 @@ public final class CampaignOption<T> {
           of(Double.class, 0.0, "jumpShipContractPercent");
     public static final CampaignOption<Double> WAR_SHIP_CONTRACT_PERCENT =
           of(Double.class, 0.0, "warShipContractPercent");
-    public static final CampaignOption<String> STRATEGIC_VIEW_MINIMAP_THEME =
-          of(String.class, "gbc green.theme", "strategicViewTheme");
     public static final CampaignOption<String> PERSONNEL_MARKET_NAME =
           of(String.class, "", "personnelMarketName");
     public static final CampaignOption<double[]> USED_PART_PRICE_MULTIPLIERS =
