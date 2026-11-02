@@ -277,12 +277,20 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void upkeepOverheadAndFoodAndHousingAreAllCovered() {
+        void upkeepIsCovered() {
             when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.of(5_000_000));
+
+            assertEquals(Money.of(5_000_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+        }
+
+        /** Straight support pays back overhead and food and housing, so Base Pay leaves them out. */
+        @Test
+        void overheadAndFoodAndHousingAreNotCovered() {
+            campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
             when(accountant.getOverheadExpenses()).thenReturn(Money.of(30_000));
             projectedMonthlyFoodAndHousing(12_000);
 
-            assertEquals(Money.of(5_042_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+            assertEquals(Money.zero(), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
         }
 
         @Test
@@ -295,9 +303,9 @@ class ChaosContractDeterminationPayTest {
             projectedMonthlyFoodAndHousing(3_000);
             AbstractContract contract = contract(3, 1.0);
 
-            // 100,000 + 2,000 + 5,000 + 3,000
-            assertEquals(Money.of(110_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign, contract));
-            assertEquals(Money.of(110_000), payScheme.getMonthlyPay(campaign, contract));
+            // 100,000 + 2,000; overhead and food and housing are left out
+            assertEquals(Money.of(102_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign, contract));
+            assertEquals(Money.of(102_000), payScheme.getMonthlyPay(campaign, contract));
         }
 
         @ParameterizedTest

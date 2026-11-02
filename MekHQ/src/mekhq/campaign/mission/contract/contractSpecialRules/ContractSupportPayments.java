@@ -61,7 +61,8 @@ import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
  * <p>Both payouts are doubled for a contract carrying the {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}
  * special rule. The doubling is applied before the withhold check, so a contract that also carries
  * {@link ChaosObjectiveSpecialRules#NO_IN_CONTRACT_SUPPORT} withholds - and later pays out - the already-doubled
- * amount.</p>
+ * amount. The straight-support share of overhead and food and housing is capped at the whole cost, so those monthly
+ * charges can be refunded in full but never turn a profit.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -71,6 +72,9 @@ public final class ContractSupportPayments {
 
     /** The factor applied to every support payout of a contract carrying {@code DOUBLE_SUPPORT_PAYOUTS}. */
     private static final double DOUBLE_SUPPORT_PAYOUT_MULTIPLIER = 2.0;
+
+    /** The most of a monthly overhead or food and housing charge straight support can pay back: all of it. */
+    private static final double MAXIMUM_MONTHLY_SUPPORT_SHARE = 1.0;
 
     private ContractSupportPayments() {
     }
@@ -101,7 +105,8 @@ public final class ContractSupportPayments {
      * Reimburses the straight-support share of a monthly overhead or food and housing charge the player has just paid,
      * reporting the reimbursement when it is credited.
      *
-     * <p>The share is worked out exactly as for {@link #reimburseStraightSupport(Campaign, Money, String)}.</p>
+     * <p>The share is worked out as for {@link #reimburseStraightSupport(Campaign, Money, String)}, but capped at the
+     * whole cost (see {@link #getMonthlyStraightSupportShare(AbstractContract)}).</p>
      *
      * @param campaign        the active campaign
      * @param cost            the cost the player paid, whose support share is reimbursed
@@ -116,7 +121,7 @@ public final class ContractSupportPayments {
     }
 
     private static void reimburseStraightSupport(Campaign campaign, Money cost, String costDescription,
-          boolean isReported) {
+          boolean isMonthlyCost) {
         if (!cost.isPositive()) {
             return;
         }
@@ -126,7 +131,9 @@ public final class ContractSupportPayments {
             return;
         }
 
-        double supportShare = getStraightSupportShare(contract);
+        double supportShare = isMonthlyCost
+                                    ? getMonthlyStraightSupportShare(contract)
+                                    : getStraightSupportShare(contract);
         if (supportShare <= 0) {
             return;
         }
@@ -137,7 +144,7 @@ public final class ContractSupportPayments {
         }
 
         String note = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.straightSupport.note", costDescription);
-        String report = isReported
+        String report = isMonthlyCost
                               ? getFormattedTextAt(RESOURCE_BUNDLE,
                                     "ContractSupport.straightSupport.report",
                                     share.toAmountAndSymbolString(),
@@ -231,8 +238,9 @@ public final class ContractSupportPayments {
     }
 
     /**
-     * The fraction of a repair cost the contract reimburses through straight support: its support
-     * multiplier, doubled when it carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}.
+     * The fraction of a covered cost the contract reimburses through straight support: its support multiplier, doubled
+     * when it carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}. This uncapped share applies to
+     * repairs; overhead and food and housing use {@link #getMonthlyStraightSupportShare(AbstractContract)}.
      *
      * @param contract the contract offering straight support
      *
@@ -247,6 +255,23 @@ public final class ContractSupportPayments {
             supportMultiplier *= DOUBLE_SUPPORT_PAYOUT_MULTIPLIER;
         }
         return supportMultiplier;
+    }
+
+    /**
+     * The fraction of a monthly overhead or food and housing charge the contract reimburses through straight support:
+     * the {@link #getStraightSupportShare(AbstractContract) straight-support share}, capped at the whole charge so the
+     * refund never exceeds what was paid.
+     *
+     * @param contract the contract offering straight support
+     *
+     * @return the reimbursed fraction of each monthly charge, at most {@code 1.0}; zero or less when the contract offers
+     *       no straight support
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getMonthlyStraightSupportShare(AbstractContract contract) {
+        return Math.min(MAXIMUM_MONTHLY_SUPPORT_SHARE, getStraightSupportShare(contract));
     }
 
     /**

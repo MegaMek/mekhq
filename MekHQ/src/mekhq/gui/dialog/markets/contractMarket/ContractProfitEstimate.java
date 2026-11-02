@@ -66,8 +66,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * then on contract on the planet, where a combat contract maintains more often but at its own cost multiplier.</p>
  *
  * <p>Straight support pays back its share of overhead and food and housing, but only for the contract term: the
- * contract is not active during the trip out. It does not cover maintenance (Hot Spots: Draconis Reach pg 27), and the
- * repairs it does cover are excluded along with the rest of the fighting's cost.</p>
+ * contract is not active during the trip out. That share is capped at the whole charge. It does not cover maintenance
+ * (Hot Spots: Draconis Reach pg 27), and the repairs it does cover are excluded along with the rest of the fighting's
+ * cost.</p>
  *
  * <p>When the player has chosen to mothball units on departure, the units contract automation will mothball (see
  * {@link ContractAutomation#getAutomatedMothballCandidates}) cost nothing on the way out: they leave the TO&amp;E, so
@@ -75,9 +76,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * Their crews are still paid and fed.</p>
  *
  * <p>The estimated net is deliberately conservative: it counts only guaranteed pay and straight support, and excludes
- * repairs and
- * battlefield losses (which depend on how the fighting goes). Combat pay is given separately, as the most the contract
- * can pay if every chance at the bonus is won (see {@link StratConCombatBonusProjection}).</p>
+ * repairs and battlefield losses (which depend on how the fighting goes). Combat pay is given separately, as the most
+ * the contract can pay if every chance at the bonus is won (see {@link StratConCombatBonusProjection}).</p>
  *
  * @param transitDays        one-way travel time to the target system, in days, or {@link #NO_ROUTE} when no jump path
  *                           reaches it
@@ -94,7 +94,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @param fuel               the peacetime fuel part of {@code operatingCosts}
  * @param foodAndHousing     the food and housing part of {@code operatingCosts}
  * @param straightSupport    the straight support paid back on overhead and food and housing over the contract term
- * @param combatBonus       how many times the combat bonus can be paid, and what pays it
+ * @param combatBonus        how many times the combat bonus can be paid, and what pays it
  * @param potentialCombatPay the combat pay if every chance at the bonus is won
  *
  * @author Illiani
@@ -272,11 +272,14 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
      * the trip out, as the contract is not yet active. The offer is costed alone: once accepted, support is drawn from
      * whichever active contract is most generous (see {@link ContractSupportPayments#getStraightSupportContract}).
      *
+     * <p>One charge is counted per month of the term. The real refund is paid on each first of the month the contract
+     * is active, so depending on the start date it can be one charge more or fewer.</p>
+     *
      * @return the straight support paid back across the contract term
      */
     private static Money getStraightSupport(Campaign campaign, AbstractContract contract, Money monthlyOverhead,
           int months) {
-        double supportShare = ContractSupportPayments.getStraightSupportShare(contract);
+        double supportShare = ContractSupportPayments.getMonthlyStraightSupportShare(contract);
         if (supportShare <= 0) {
             return Money.zero();
         }
