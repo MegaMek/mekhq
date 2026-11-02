@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.LEFT_HAND;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_FOREARM;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_HAND;
+import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.DISEASE_GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.NORMAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.PROSTHETIC_GENERIC;
@@ -52,19 +53,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Answers.RETURNS_SELF;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
@@ -77,6 +72,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import megamek.common.TargetRollModifier;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -100,6 +96,7 @@ import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 class AdvancedMedicalAlternateHealingTest {
@@ -404,6 +401,78 @@ class AdvancedMedicalAlternateHealingTest {
     }
 
     @Test
+    @DisplayName("processNewDayUnderAcademyCare heals at the assisted pace against the flat academy target number")
+    void processNewDayUnderAcademyCare_healsAgainstFlatTargetNumber() {
+        Campaign campaign = mock(Campaign.class);
+        Person patient = mock(Person.class);
+        Injury injury = mock(Injury.class);
+        stubAcademyCarePatient(campaign, patient, injury, 0);
+
+        AtomicBoolean removed = new AtomicBoolean(false);
+        doAnswer(invocation -> {
+            removed.set(true);
+            return null;
+        }).when(patient).removeInjury(eq(injury), eq(TUESDAY));
+        when(patient.getInjuries()).thenAnswer(invocation -> removed.get() ? List.of() : List.of(injury));
+
+        int[] targetNumber = new int[1];
+        try (MockedStatic<MHQInternationalization> i18n = mockStatic(MHQInternationalization.class);
+              MockedStatic<PatientLogger> patientLogger = mockStatic(PatientLogger.class);
+              MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class);
+              MockedConstruction<SkillCheck> skillChecks = mockConstruction(SkillCheck.class,
+                    withSettings().defaultAnswer(RETURNS_SELF),
+                    (skillCheck, context) -> {
+                        targetNumber[0] = ((TargetRoll) context.arguments().get(2)).getValue();
+                        when(skillCheck.resolve(anyBoolean(), any())).thenReturn(
+                              new ActionCheckResult(new ActionCheckRoll(11, List.of(6, 5)), 3, false, "success"));
+                    })) {
+            i18n.when(() -> MHQInternationalization.getTextAt(anyString(), anyString()))
+                  .thenAnswer(invocation -> invocation.getArgument(1));
+
+            // Tuesday: unassisted healing would be skipped, but academy care heals at the assisted pace
+            AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient);
+
+            assertEquals(1, skillChecks.constructed().size());
+            verify(skillChecks.constructed().get(0)).withRollType(ActionCheckRoll.RollType.NORMAL);
+            medicalLogger.verify(() -> MedicalLogger.injuryHealed(patient, TUESDAY, injury));
+            patientLogger.verifyNoInteractions();
+        }
+
+        assertEquals(ACADEMY_MEDICAL_CARE_TARGET_NUMBER, targetNumber[0]);
+        verify(patient).removeInjury(injury, TUESDAY);
+        verify(patient, never()).changeNTasks(anyInt());
+    }
+
+    @Test
+    @DisplayName("processNewDayUnderAcademyCare undoes the day's progress on a failed check before resolution")
+    void processNewDayUnderAcademyCare_failedCheckStallsProgress() {
+        Campaign campaign = mock(Campaign.class);
+        Person patient = mock(Person.class);
+        Injury injury = mock(Injury.class);
+        stubAcademyCarePatient(campaign, patient, injury, 3);
+        when(patient.getInjuries()).thenReturn(List.of(injury));
+
+        try (MockedStatic<MHQInternationalization> i18n = mockStatic(MHQInternationalization.class);
+              MockedStatic<MedicalLogger> medicalLogger = mockStatic(MedicalLogger.class);
+              MockedConstruction<SkillCheck> skillChecks = mockConstruction(SkillCheck.class,
+                    withSettings().defaultAnswer(RETURNS_SELF),
+                    (skillCheck, context) -> when(skillCheck.resolve(anyBoolean(), any())).thenReturn(
+                          new ActionCheckResult(new ActionCheckRoll(6, List.of(3, 3)), -2, false, "failure")))) {
+            i18n.when(() -> MHQInternationalization.getTextAt(anyString(), anyString()))
+                  .thenAnswer(invocation -> invocation.getArgument(1));
+
+            AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient);
+
+            medicalLogger.verifyNoInteractions();
+        }
+
+        verify(injury).changeTime(-1);
+        verify(injury).changeTime(1);
+        verify(injury, never()).setPermanent(anyBoolean());
+        verify(patient, never()).removeInjury(any(), any());
+    }
+
+    @Test
     @DisplayName("getMarginOfSuccessForHealing rerolls with edge when the first result would cause a permanent injury")
     void getMarginOfSuccessForHealing_usesEdgeReroll() throws Exception {
         Campaign campaign = mock(Campaign.class);
@@ -688,6 +757,35 @@ class AdvancedMedicalAlternateHealingTest {
                 }
             });
         }
+    }
+
+    /**
+     * Stubs a patient with a single ordinary injury, and no healing SPAs, for academy care on {@link #TUESDAY}.
+     *
+     * @param injuryTime the injury's remaining recovery time, as seen after the day's progress is applied
+     */
+    private static void stubAcademyCarePatient(Campaign campaign, Person patient, Injury injury, int injuryTime) {
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+
+        when(campaign.getLocalDate()).thenReturn(TUESDAY);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        lenient().when(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES))
+              .thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+        when(patient.getOptions()).thenReturn(options);
+        when(options.booleanOption(anyString())).thenReturn(false);
+        when(patient.getPermanentInjuries()).thenReturn(List.of());
+        when(patient.getTotalInjurySeverity()).thenReturn(0);
+        when(patient.getAdjustedToughness()).thenReturn(0);
+        when(injury.isPermanent()).thenReturn(false);
+        when(injury.isDisease()).thenReturn(false);
+        when(injury.getSubType()).thenReturn(NORMAL);
+        when(injury.getLocation()).thenReturn(GENERIC);
+        when(injury.getTime()).thenReturn(injuryTime);
+        when(injury.getOriginalTime()).thenReturn(1);
+        when(injury.getName()).thenReturn("Broken arm");
     }
 
     private static <T> T invokePrivateStatic(String methodName, Class<?>[] parameterTypes, Object... args)
