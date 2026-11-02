@@ -82,8 +82,8 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -656,7 +656,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * <b>Supported Commands:</b>
      * <ul>
-     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link GlossaryEntryDialog} to display the
+     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens the {@link GlossaryConsole} to display the
      *   referenced glossary entry.</li>
      *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
      *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
@@ -690,7 +690,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            new GlossaryEntryDialog(parent, glossaryEntry);
+            GlossaryConsole.showEntry(parent, glossaryEntry);
         } else if (commandKey.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entryKey);
 
