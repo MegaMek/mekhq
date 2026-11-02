@@ -54,6 +54,7 @@ import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -296,7 +297,7 @@ public final class SupportPersonnelToTOE {
         organizeSection(campaign, supportCommand, SupportSection.COMMAND, command, profile,
               useClanStructure, List.of(), List.of(), faction);
         // Staff seldom fill every seat - medics are a pool, not people - and a MASH truck short of crew treats nobody.
-        fillShortCrews(campaign, supportCommand);
+        fillShortCrews(campaign, supportCommand, faction);
 
         // A section's vehicles past one lance's worth are split into lances, so the TOE reads as a tree.
         lanceSupportVehicles(campaign, supportCommand, faction);
@@ -825,7 +826,7 @@ public final class SupportPersonnelToTOE {
             built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource, faction);
         }
         // Covers the temporary crew asked for, and any seat the section's staff could not fill.
-        fillShortCrews(campaign, supportCommand);
+        fillShortCrews(campaign, supportCommand, faction);
         // Owned vehicles with nobody left to crew them leave a newly made company with nothing in it.
         if (isNewCompany && vehicleCompany.getAllUnits(false).isEmpty()) {
             campaign.getPlayerForce().removeFormation(vehicleCompany, campaign);
@@ -943,8 +944,10 @@ public final class SupportPersonnelToTOE {
      *
      * @param campaign the campaign
      * @param root     Support Command, or any formation under it
+     * @param faction  the faction the command is organised as; new hires go on its rank system, as the rest of the
+     *                 command's personnel are
      */
-    static void fillShortCrews(Campaign campaign, Formation root) {
+    static void fillShortCrews(Campaign campaign, Formation root, Faction faction) {
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         Set<PersonnelRole> pooledRoles = EnumSet.noneOf(PersonnelRole.class);
         List<Unit> shortCrewed = new ArrayList<>();
@@ -961,7 +964,7 @@ public final class SupportPersonnelToTOE {
             if (humanResources.isBlobCrewEnabled(role, campaign.getCampaignOptions())) {
                 pooledRoles.add(role);
             } else {
-                hireForEmptySeats(campaign, unit, role);
+                hireForEmptySeats(campaign, unit, role, faction);
             }
         }
         for (PersonnelRole role : pooledRoles) {
@@ -975,19 +978,33 @@ public final class SupportPersonnelToTOE {
         }
     }
 
-    /** Hires one new crew member for each empty seat of a vehicle, in its driver role, which crews every seat. */
-    private static void hireForEmptySeats(Campaign campaign, Unit unit, PersonnelRole role) {
+    /**
+     * Hires one new crew member for each empty seat of a vehicle, in its driver role, which crews every seat. The
+     * hires go on the faction's rank system, as the rest of the command's personnel are; they hold no rank, so this
+     * shows only in the rank system the roster offers for them.
+     */
+    private static void hireForEmptySeats(Campaign campaign, Unit unit, PersonnelRole role, Faction faction) {
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        List<Person> hires = new ArrayList<>();
         for (int seat = unit.getDrivers().size(); seat < unit.getTotalDriverNeeds(); seat++) {
-            unit.addDriver(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addDriver(hire);
+            hires.add(hire);
         }
         for (int seat = unit.getGunners().size(); seat < unit.getTotalGunnerNeeds(); seat++) {
-            unit.addGunner(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addGunner(hire);
+            hires.add(hire);
         }
         for (int seat = unit.getVesselCrew().size(); seat < unit.getTotalCrewNeeds(); seat++) {
-            unit.addVesselCrew(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addVesselCrew(hire);
+            hires.add(hire);
         }
         unit.resetPilotAndEntity();
+        int moved = AutomaticRankAssigner.putOnFactionRankSystem(hires, faction);
+        LOGGER.debug("[SupportTeams]     {} of {} hire(s) for '{}' moved to the rank system of {}", moved, hires.size(),
+              unit.getName(), faction.getShortName());
     }
 
     /** Seats up to {@code seats} people from the pool, taking each out of the carrier they crew today. */
