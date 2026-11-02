@@ -862,7 +862,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(procurementModel);
         shoppingSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         shoppingSorter.setComparator(ProcurementTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
-        shoppingSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
+        shoppingSorter.setComparator(ProcurementTableModel.COL_MODIFIERS, new TargetSorter());
         procurementTable.setRowSorter(shoppingSorter);
         TableColumn column;
         for (int i = 0; i < ProcurementTableModel.N_COL; i++) {

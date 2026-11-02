@@ -54,6 +54,7 @@ import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -288,15 +289,15 @@ public final class SupportPersonnelToTOE {
 
         // Within each section, staff are grouped by profession into companies (e.g. "MekTech Company");
         // capability vehicles get their own company named for their function ("Recovery",
-        // "Field Hospital"). Command has no capability vehicles, so its label is unused.
-        organizeSection(campaign, supportCommand, label("maintenance"), maintenance, profile,
-              useClanStructure, maintenanceIdleVehicles, maintenanceVehicles, label("recovery"), faction);
-        organizeSection(campaign, supportCommand, label("medical"), medical, profile,
-              useClanStructure, medicalIdleVehicles, medicalVehicles, label("fieldHospital"), faction);
-        organizeSection(campaign, supportCommand, label("command"), command, profile,
-              useClanStructure, List.of(), List.of(), label("command"), faction);
+        // "Field Hospital"). Command has no capability vehicles.
+        organizeSection(campaign, supportCommand, SupportSection.MAINTENANCE, maintenance, profile,
+              useClanStructure, maintenanceIdleVehicles, maintenanceVehicles, faction);
+        organizeSection(campaign, supportCommand, SupportSection.MEDICAL, medical, profile,
+              useClanStructure, medicalIdleVehicles, medicalVehicles, faction);
+        organizeSection(campaign, supportCommand, SupportSection.COMMAND, command, profile,
+              useClanStructure, List.of(), List.of(), faction);
         // Staff seldom fill every seat - medics are a pool, not people - and a MASH truck short of crew treats nobody.
-        fillShortCrews(campaign, supportCommand);
+        fillShortCrews(campaign, supportCommand, faction);
 
         // A section's vehicles past one lance's worth are split into lances, so the TOE reads as a tree.
         lanceSupportVehicles(campaign, supportCommand, faction);
@@ -389,8 +390,9 @@ public final class SupportPersonnelToTOE {
         if (AddSupportUnitsToTOE.isLanceName(formation.getName(), namer)) {
             return;
         }
+        // Lances take their parent's type, so a Recovery Company's lances are Salvage formations like the company.
         created.addAll(AddSupportUnitsToTOE.arrangeIntoLances(campaign, formation, lanceSize, namer,
-              FormationType.SUPPORT));
+              formation.getFormationType()));
         for (Formation child : new ArrayList<>(formation.getSubFormations())) {
             lanceSubtree(campaign, child, lanceSize, namer, created);
         }
@@ -483,6 +485,13 @@ public final class SupportPersonnelToTOE {
         }
 
         Formation child = node.getSubFormations().get(0);
+        // A child of another type does a different job: a Maintenance section holding only its Recovery Company keeps
+        // it, or the company's vehicles would land in a Support formation the salvage planner never offers.
+        if (child.getFormationType() != node.getFormationType()) {
+            LOGGER.info("[CompanyGen][SupportTOE] keeping '{}' under '{}': it is a {} formation, not {}",
+                  child.getName(), node.getName(), child.getFormationType(), node.getFormationType());
+            return;
+        }
         LOGGER.info("[CompanyGen][SupportTOE] collapsing '{}' into '{}': it was the only thing there",
               child.getName(), node.getName());
 
@@ -490,9 +499,30 @@ public final class SupportPersonnelToTOE {
             campaign.getPlayerForce().addUnitToFormation(campaign.getUnit(unitId), node.getId(), campaign);
         }
         for (Formation grandChild : new ArrayList<>(child.getSubFormations())) {
-            campaign.getPlayerForce().moveFormation(grandChild, node, campaign);
+            moveKeepingParentTypes(campaign, grandChild, node);
         }
         campaign.getPlayerForce().removeFormation(child, campaign);
+    }
+
+    /**
+     * Moves {@code formation} under {@code newParent} without changing the type of any formation above it.
+     *
+     * <p>Moving a Salvage formation turns every formation above it into a Standard one, which is right when a player
+     * moves a salvage lance into a combat company by hand. Here it would turn Support Command, and the headquarters
+     * above it, into Standard formations just because the Recovery Company moved up one level.</p>
+     *
+     * @param campaign  the campaign that owns the TOE
+     * @param formation the formation to move
+     * @param newParent the formation it moves under
+     */
+    private static void moveKeepingParentTypes(Campaign campaign, Formation formation, Formation newParent) {
+        Map<Formation, FormationType> parentTypes = new LinkedHashMap<>();
+        parentTypes.put(newParent, newParent.getFormationType());
+        for (Formation parent : newParent.getAllParents()) {
+            parentTypes.put(parent, parent.getFormationType());
+        }
+        campaign.getPlayerForce().moveFormation(formation, newParent, campaign);
+        parentTypes.forEach((parent, formationType) -> parent.setFormationType(formationType, false));
     }
 
     static EchelonProfile innerSphereProfile() {
@@ -518,13 +548,14 @@ public final class SupportPersonnelToTOE {
      * it carries (e.g. "Support Squad - MekTech"). Capability vehicles the campaign already owns but has
      * left idle join that company first, crewed the same way, before any new vehicle is built.
      */
-    private static void organizeSection(Campaign campaign, Formation supportCommand, String sectionLabel,
+    private static void organizeSection(Campaign campaign, Formation supportCommand, SupportSection supportSection,
           List<Person> people, EchelonProfile profile, boolean useClanStructure, List<Unit> idleVehicles,
-          List<VehicleSpec> vehicles, String vehicleCompanyLabel, Faction faction) {
+          List<VehicleSpec> vehicles, Faction faction) {
         if (people.isEmpty()) {
             return;
         }
 
+        String sectionLabel = sectionLabel(supportSection);
         Formation section = createFormation(campaign, sectionLabel, FormationType.SUPPORT, supportCommand,
               profile.sectionLevel());
 
@@ -534,8 +565,8 @@ public final class SupportPersonnelToTOE {
         int consumed = 0;
         if (!idleVehicles.isEmpty() || !vehicles.isEmpty()) {
             Formation vehicleCompany = createFormation(campaign,
-                  vehicleCompanyLabel + " " + profile.rollupLabel(),
-                  FormationType.SUPPORT, section, profile.rollupLevel());
+                  vehicleCompanyLabel(supportSection) + " " + profile.rollupLabel(),
+                  vehicleCompanyType(supportSection), section, profile.rollupLevel());
             consumed += fileIdleVehicles(campaign, vehicleCompany, idleVehicles, pool, faction);
             for (VehicleSpec vehicle : vehicles) {
                 consumed += addCapabilityVehicles(campaign, vehicleCompany, vehicle, pool, consumed, faction);
@@ -773,7 +804,7 @@ public final class SupportPersonnelToTOE {
         if (sectionFormation == null) {
             sectionFormation = supportCommand;
         }
-        String companyLabel = (section == SupportSection.MAINTENANCE) ? label("recovery") : label("fieldHospital");
+        String companyLabel = vehicleCompanyLabel(section);
         Formation vehicleCompany = childStartingWith(sectionFormation, companyLabel);
         if ((vehicleCompany == null) && holdsVehiclesOf(campaign, sectionFormation, capability)) {
             // The company was collapsed into the section, which now holds its vehicles directly. The new ones join
@@ -783,7 +814,7 @@ public final class SupportPersonnelToTOE {
         boolean isNewCompany = vehicleCompany == null;
         if (isNewCompany) {
             vehicleCompany = createFormation(campaign, companyLabel + " " + profile.rollupLabel(),
-                  FormationType.SUPPORT, sectionFormation, profile.rollupLevel());
+                  vehicleCompanyType(section), sectionFormation, profile.rollupLevel());
         }
 
         List<Person> pool = (crewSource == VehicleCrewSource.EXISTING_STAFF)
@@ -795,7 +826,7 @@ public final class SupportPersonnelToTOE {
             built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource, faction);
         }
         // Covers the temporary crew asked for, and any seat the section's staff could not fill.
-        fillShortCrews(campaign, supportCommand);
+        fillShortCrews(campaign, supportCommand, faction);
         // Owned vehicles with nobody left to crew them leave a newly made company with nothing in it.
         if (isNewCompany && vehicleCompany.getAllUnits(false).isEmpty()) {
             campaign.getPlayerForce().removeFormation(vehicleCompany, campaign);
@@ -913,8 +944,10 @@ public final class SupportPersonnelToTOE {
      *
      * @param campaign the campaign
      * @param root     Support Command, or any formation under it
+     * @param faction  the faction the command is organised as; new hires go on its rank system, as the rest of the
+     *                 command's personnel are
      */
-    static void fillShortCrews(Campaign campaign, Formation root) {
+    static void fillShortCrews(Campaign campaign, Formation root, Faction faction) {
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         Set<PersonnelRole> pooledRoles = EnumSet.noneOf(PersonnelRole.class);
         List<Unit> shortCrewed = new ArrayList<>();
@@ -931,7 +964,7 @@ public final class SupportPersonnelToTOE {
             if (humanResources.isBlobCrewEnabled(role, campaign.getCampaignOptions())) {
                 pooledRoles.add(role);
             } else {
-                hireForEmptySeats(campaign, unit, role);
+                hireForEmptySeats(campaign, unit, role, faction);
             }
         }
         for (PersonnelRole role : pooledRoles) {
@@ -945,19 +978,33 @@ public final class SupportPersonnelToTOE {
         }
     }
 
-    /** Hires one new crew member for each empty seat of a vehicle, in its driver role, which crews every seat. */
-    private static void hireForEmptySeats(Campaign campaign, Unit unit, PersonnelRole role) {
+    /**
+     * Hires one new crew member for each empty seat of a vehicle, in its driver role, which crews every seat. The
+     * hires go on the faction's rank system, as the rest of the command's personnel are; they hold no rank, so this
+     * shows only in the rank system the roster offers for them.
+     */
+    private static void hireForEmptySeats(Campaign campaign, Unit unit, PersonnelRole role, Faction faction) {
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        List<Person> hires = new ArrayList<>();
         for (int seat = unit.getDrivers().size(); seat < unit.getTotalDriverNeeds(); seat++) {
-            unit.addDriver(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addDriver(hire);
+            hires.add(hire);
         }
         for (int seat = unit.getGunners().size(); seat < unit.getTotalGunnerNeeds(); seat++) {
-            unit.addGunner(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addGunner(hire);
+            hires.add(hire);
         }
         for (int seat = unit.getVesselCrew().size(); seat < unit.getTotalCrewNeeds(); seat++) {
-            unit.addVesselCrew(humanResources.newPerson(campaign, role));
+            Person hire = humanResources.newPerson(campaign, role);
+            unit.addVesselCrew(hire);
+            hires.add(hire);
         }
         unit.resetPilotAndEntity();
+        int moved = AutomaticRankAssigner.putOnFactionRankSystem(hires, faction);
+        LOGGER.debug("[SupportTeams]     {} of {} hire(s) for '{}' moved to the rank system of {}", moved, hires.size(),
+              unit.getName(), faction.getShortName());
     }
 
     /** Seats up to {@code seats} people from the pool, taking each out of the carrier they crew today. */
@@ -1033,6 +1080,23 @@ public final class SupportPersonnelToTOE {
             case MEDICAL -> label("medical");
             case COMMAND -> label("command");
         };
+    }
+
+    /** The name of the company that holds a section's capability vehicles, before its echelon word. */
+    private static String vehicleCompanyLabel(SupportSection section) {
+        return switch (section) {
+            case MAINTENANCE -> label("recovery");
+            case MEDICAL -> label("fieldHospital");
+            case COMMAND -> label("command");
+        };
+    }
+
+    /**
+     * The formation type of the company that holds a section's capability vehicles. The Recovery Company is a Salvage
+     * formation, so the salvage planner offers it as a salvage team; the others are plain support.
+     */
+    private static FormationType vehicleCompanyType(SupportSection section) {
+        return (section == SupportSection.MAINTENANCE) ? FormationType.SALVAGE : FormationType.SUPPORT;
     }
 
     /** The child formation with exactly this name, or {@code null} when the section has none. */

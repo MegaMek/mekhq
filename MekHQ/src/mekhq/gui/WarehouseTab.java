@@ -317,6 +317,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
         partsTable.getSelectionModel().addListSelectionListener(ev -> {
+            // Wait for the final event: a filter or sort restores the selection through adjusting events, and
+            // reacting during that restore can clear the table's cached selection mid-restore
+            if (ev.getValueIsAdjusting()) {
+                return;
+            }
             filterTechs();
             updateTechTarget();
         });
@@ -400,7 +405,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // Tall enough for a tech's name, skills, repair abilities and day
         techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
-        techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
+        techTable.getSelectionModel().addListSelectionListener(ev -> {
+            if (!ev.getValueIsAdjusting()) {
+                updateTechTarget();
+            }
+        });
         techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         techTable.setRowSorter(techSorter);

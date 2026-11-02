@@ -316,7 +316,14 @@ public final class HangarTab extends CampaignGuiTab {
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
         changeUnitView();
-        unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
+        // Skip adjusting events: JTable's sort manager restores the selection inside an adjusting block after each
+        // filter or sort, and rebuilding the unit view mid-restore can re-enter the table and clear the sort
+        // manager's cached selection, throwing a NullPointerException. The final non-adjusting event refreshes it.
+        unitTable.getSelectionModel().addListSelectionListener(ev -> {
+            if (!ev.getValueIsAdjusting()) {
+                refreshUnitView();
+            }
+        });
 
         JScrollPane scrollUnitTable = new FastJScrollPane(unitTable);
         scrollUnitTable.setFocusable(false);
