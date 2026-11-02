@@ -125,7 +125,7 @@ class ContractProfitEstimateTest {
     @Test
     void netWithCombatPayAddsThePotentialCombatPay() {
         ContractProfitEstimate estimate = new ContractProfitEstimate(0, 6, Money.zero(), Money.zero(),
-              Money.of(600_000), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), null, Money.of(150_000));
+              Money.of(600_000), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), Money.zero(), null, Money.of(150_000));
 
         assertEquals(750_000, estimate.getNetWithCombatPay().getAmount().doubleValue(), MONEY_DELTA);
     }
@@ -137,6 +137,7 @@ class ContractProfitEstimateTest {
               Money.zero(),
               Money.zero(),
               Money.of(estimatedNet),
+              Money.zero(),
               Money.zero(),
               Money.zero(),
               Money.zero(),

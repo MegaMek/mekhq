@@ -69,6 +69,7 @@ import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -498,6 +499,8 @@ public class Finances {
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {
                     campaign.addReport(FINANCES, String.format(resourceMap.getString("Overhead.text"),
                           overheadCost.toAmountAndSymbolString()));
+                    ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, overheadCost,
+                          resourceMap.getString("OverheadCosts.text"));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
                 }
@@ -528,6 +531,8 @@ public class Finances {
                       resourceMap.getString("FoodAndHousing.title"))) {
                     campaign.addReport(FINANCES, String.format(resourceMap.getString("FoodAndHousing.text"),
                           foodAndHousingExpenses.toAmountAndSymbolString()));
+                    ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, foodAndHousingExpenses,
+                          resourceMap.getString("HousingAndFoodCosts.text"));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("HousingAndFoodCosts.text"));
                 }
