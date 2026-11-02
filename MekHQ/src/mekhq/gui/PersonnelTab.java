@@ -353,6 +353,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable = new MHQTable<>(new PersonnelTableModel(getCampaign()));
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         personnelTable.getSelectionModel().addListSelectionListener(ev -> {
+            // Wait for the final event: a filter or sort restores the selection through adjusting events, and
+            // rebuilding the view during that restore can clear the table's cached selection mid-restore
+            if (ev.getValueIsAdjusting()) {
+                return;
+            }
             refreshPersonnelView();
             // The family tree is drawn around a single person, so it needs exactly one selection
             btnFamilyTree.setEnabled(getSelectedPersons().size() == 1);

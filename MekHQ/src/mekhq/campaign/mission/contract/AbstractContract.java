@@ -1370,8 +1370,8 @@ public abstract class AbstractContract {
 
     /**
      * Returns the support-point reserve this contract can be negotiated up to, used as the "full reserves" reference
-     * when displaying support points, and the cap applied during initial support-point negotiation - which calls this
-     * rather than repeating the rule (see {@link SupportPointNegotiation}).
+     * when displaying support points, and the cap applied during both initial and periodic support-point negotiation -
+     * which calls this rather than repeating the rule (see {@link SupportPointNegotiation}).
      *
      * @return the maximum support points the contract can hold in reserve
      */

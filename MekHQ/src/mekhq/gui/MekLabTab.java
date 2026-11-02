@@ -45,6 +45,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
@@ -131,6 +132,7 @@ public class MekLabTab extends CampaignGuiTab {
     private boolean refitNameProposed;
 
     private JPanel summaryPane;
+    private JSplitPane summaryAndLab;
     private JLabel lblName;
 
     private JLabel lblRefit;
@@ -240,6 +242,11 @@ public class MekLabTab extends CampaignGuiTab {
         c.weighty = 1.0;
         summaryPane.add(shoppingPanel, c);
 
+        summaryAndLab = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+        summaryAndLab.setLeftComponent(summaryPane);
+        // A wider window widens the lab, not the summary
+        summaryAndLab.setResizeWeight(0.0);
+
         // TODO: compare units dialog that pops up mek views back-to-back
     }
 
@@ -285,10 +292,18 @@ public class MekLabTab extends CampaignGuiTab {
         if (labPanel != null) {
             labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
             refreshRefitSummary();
-            add(summaryPane, BorderLayout.LINE_START);
-            add(labPanel, BorderLayout.CENTER);
+            showLab();
             labPanel.refreshAll();
         }
+    }
+
+    /**
+     * Shows the refit summary beside the lab. The border between them can be dragged, and stays where it was left when
+     * the next unit is loaded.
+     */
+    private void showLab() {
+        summaryAndLab.setRightComponent(labPanel);
+        add(summaryAndLab, BorderLayout.CENTER);
     }
 
     public void clearUnit() {
@@ -319,8 +334,7 @@ public class MekLabTab extends CampaignGuiTab {
         removeAll();
         labPanel = getCorrectLab(entity);
         refreshRefitSummary();
-        add(summaryPane, BorderLayout.LINE_START);
-        add(labPanel, BorderLayout.CENTER);
+        showLab();
         labPanel.refreshAll();
     }
 

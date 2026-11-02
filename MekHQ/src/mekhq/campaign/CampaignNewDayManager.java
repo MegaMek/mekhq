@@ -188,6 +188,7 @@ import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.randomEvents.other.ContractRandomEvent;
 import mekhq.campaign.randomEvents.other.GrayMonday;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
@@ -1253,8 +1254,8 @@ public class CampaignNewDayManager {
      * <p>
      * It generates contract offers in the contract market, updates ship search expiration and results, processes ship
      * search on Mondays, awards training experience to eligible training lances on active contracts on Mondays, adds or
-     * removes dependents at the start of the year if the options are enabled, rolls for morale at the start of the
-     * month, and processes ATB scenarios.
+     * removes dependents at the start of the year if the options are enabled, rolls for morale and contract random
+     * events at the start of the month, and processes ATB scenarios.
      */
     private void processNewDayATB() {
         // Before anything else touches the contracts: an employer losing its planet today resolves the contract's
@@ -1296,6 +1297,8 @@ public class CampaignNewDayManager {
                 if (!report.isBlank()) {
                     campaign.addReport(GENERAL, report);
                 }
+
+                ContractRandomEvent.processMonthlyEvent(campaign, contract);
             }
         }
 

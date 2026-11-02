@@ -142,6 +142,22 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
     }
 
+    public boolean getLockMainTabOrder() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.LOCK_MAIN_TAB_ORDER, false);
+    }
+
+    public void setLockMainTabOrder(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.LOCK_MAIN_TAB_ORDER, value);
+    }
+
+    public boolean getLockMainTabDetaching() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.LOCK_MAIN_TAB_DETACHING, false);
+    }
+
+    public void setLockMainTabDetaching(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.LOCK_MAIN_TAB_DETACHING, value);
+    }
+
     // region Personnel Record Logs
     public boolean getDisplayPersonnelLog() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.DISPLAY_PERSONNEL_LOG, false);
