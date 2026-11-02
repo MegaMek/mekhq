@@ -54,7 +54,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Verifies the combat-record roll-up, win-rate calculation, and - the substantive new behaviour - the
  * {@link MissionStatus} recommendation. The recommendation follows the game's own win rule (contract score vs required
- * victory points) and treats an early termination that has not met that target as a breach.
+ * victory points) and treats an early termination as a breach unless that target is met and StratCon allows the early
+ * end.
  *
  * @author Illiani
  * @since 0.51.01
@@ -173,14 +174,42 @@ class ContractDebriefStatisticsTest {
     }
 
     @Test
-    void recommendsSuccessWhenTargetMetEvenEndingEarly() {
+    void recommendsSuccessWhenTargetMetAndEarlyEndAllowed() {
         StratConCampaignState state = stratConWith(3, new ArrayList<>());
+        when(state.canEndContractEarly()).thenReturn(true);
         AbstractContract contract = baseContract(new ArrayList<>());
         when(contract.getRequiredVictoryPoints()).thenReturn(1);
         when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getEndingDate()).thenReturn(FUTURE_END);
 
         assertEquals(MissionStatus.SUCCESS, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsBreachWhenEndingEarlyAboveTargetButEarlyEndNotAllowed() {
+        // Victory points accrue mid-contract, so passing the target does not release the unit while strategic
+        // objectives remain open. Walking away then is a breach.
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(false, false));
+        StratConCampaignState state = stratConWith(5, objectives);
+        when(state.canEndContractEarly()).thenReturn(false);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+        when(contract.getEndingDate()).thenReturn(FUTURE_END);
+
+        assertEquals(MissionStatus.BREACH, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsBreachWhenEndingEarlyWithoutStratCon() {
+        // Without StratCon there is no early end on the contract's own terms, however well the fighting went.
+        List<Scenario> winning = new ArrayList<>();
+        winning.add(scenarioWith(ScenarioStatus.VICTORY));
+        AbstractContract contract = baseContract(winning);
+        when(contract.getEndingDate()).thenReturn(FUTURE_END);
+
+        assertEquals(MissionStatus.BREACH, from(contract).getRecommendedStatus());
     }
 
     @Test

@@ -583,10 +583,13 @@ public class Inoculations {
         getSpreadingDiseases(campaign, allPersonnel, planetCode, systemCode, activeDiseases, canonDiseases,
               diseaseChance);
 
-        // Now roll for the spread of bioweapons among unvaccinated characters
-        Set<InjuryType> activeBioweapons = CanonicalDiseaseType.getAllActiveBioweapons(systemCode, today, false);
-        diseaseChance = hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
-        getSpreadingBioweapons(campaign, allPersonnel, planetCode != null, systemCode, activeBioweapons, diseaseChance);
+        // Now roll for exposure to the system's bioweapons among unvaccinated characters. Exposure requires being
+        // on-planet; personnel already carrying a bioweapon continue to spread it via getSpreadingDiseases above.
+        if (planetCode != null) {
+            Set<InjuryType> activeBioweapons = CanonicalDiseaseType.getAllActiveBioweapons(systemCode, today, false);
+            diseaseChance = hasSuperSpreader ? MONTHLY_DISEASE_SPREAD_CHANCE / 3 : MONTHLY_DISEASE_SPREAD_CHANCE;
+            getSpreadingBioweapons(campaign, allPersonnel, systemCode, activeBioweapons, diseaseChance);
+        }
     }
 
     /**
@@ -679,7 +682,7 @@ public class Inoculations {
     }
 
     private static void getSpreadingBioweapons(Campaign campaign, Collection<Person> allPersonnel,
-          boolean isOnPlanet, String systemCode, Set<InjuryType> activeBioweapons, int diseaseChance) {
+          String systemCode, Set<InjuryType> activeBioweapons, int diseaseChance) {
         Map<String, List<Person>> spreadingBioweaponsWithCure = new HashMap<>();
         Map<String, List<Person>> spreadingBioweaponsDiseasesNoCure = new HashMap<>();
 
@@ -705,9 +708,7 @@ public class Inoculations {
                     continue;
                 }
 
-                // Inoculations offer no protection while in transit
-                boolean isInoculated = isOnPlanet && person.hasCanonDiseaseInoculation(disease.getKey());
-                if (isInoculated) {
+                if (person.hasCanonDiseaseInoculation(disease.getKey())) {
                     continue;
                 }
 
@@ -721,8 +722,8 @@ public class Inoculations {
             }
         }
 
-        triggerBioweaponSpreadMessages(campaign, !isOnPlanet, true, spreadingBioweaponsWithCure);
-        triggerBioweaponSpreadMessages(campaign, !isOnPlanet, false, spreadingBioweaponsDiseasesNoCure);
+        triggerBioweaponSpreadMessages(campaign, false, true, spreadingBioweaponsWithCure);
+        triggerBioweaponSpreadMessages(campaign, false, false, spreadingBioweaponsDiseasesNoCure);
     }
 
     private static void addInfectedPerson(Map<String, List<Person>> spreadingDiseases, InjuryType disease,

@@ -50,8 +50,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -116,6 +122,12 @@ public class Utilities {
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
           MekHQ.getMHQOptions().getLocale());
+
+    /**
+     * How deep {@link #lastFileModified(String, FilenameFilter)} searches below the starting directory by default: the
+     * directory itself and two levels of subdirectories.
+     */
+    public static final int LAST_FILE_MODIFIED_DEFAULT_DEPTH = 3;
 
     // A couple of arrays for use in the getLevelName() method
     private static final int[] arabicNumbers = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
@@ -226,49 +238,61 @@ public class Utilities {
     }
 
     /**
-     * Returns the last file modified in a directory and all subdirectories that conforms to a FilenameFilter
+     * Returns the last file modified in a directory and its subdirectories, down to
+     * {@link #LAST_FILE_MODIFIED_DEFAULT_DEPTH}, that conforms to a FilenameFilter
      *
-     * @param dir    direction name
+     * @param dir    directory name
      * @param filter filter for the file's name
      *
      * @return the last file modified in that dir that fits the filter
      */
     public static @Nullable File lastFileModified(String dir, FilenameFilter filter) {
-        File fl = new File(dir);
-        long lastMod = Long.MIN_VALUE;
-        File choice = null;
+        return lastFileModified(dir, filter, LAST_FILE_MODIFIED_DEFAULT_DEPTH);
+    }
 
-        File[] files = fl.listFiles(filter);
-        if (files == null) {
+    /**
+     * Returns the last file modified in a directory and its subdirectories that conforms to a FilenameFilter.
+     *
+     * <p>Symbolic links are not followed and unreadable directories are skipped, so a directory with a link loop or a
+     * huge tree (such as a Downloads folder picked as the campaigns directory) cannot stall the search.</p>
+     *
+     * @param dir      directory name
+     * @param filter   filter for the file's name
+     * @param maxDepth how many directory levels to search, where 1 is only the files directly in {@code dir}
+     *
+     * @return the last file modified in that dir that fits the filter
+     */
+    public static @Nullable File lastFileModified(String dir, FilenameFilter filter, int maxDepth) {
+        final Path root = Paths.get(dir);
+        if (!Files.isDirectory(root)) {
             return null;
         }
 
-        for (File file : files) {
-            if (file.lastModified() > lastMod) {
-                choice = file;
-                lastMod = file.lastModified();
-            }
-        }
-
-        // ok now we need to recursively search any subdirectories, so see if they
-        // contain more
-        // recent files
-        files = fl.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (!file.isDirectory()) {
-                    continue;
+        final File[] choice = { null };
+        final long[] lastMod = { Long.MIN_VALUE };
+        try {
+            Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), maxDepth, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
+                    long modified = attributes.lastModifiedTime().toMillis();
+                    if (attributes.isRegularFile() && (modified > lastMod[0])
+                              && filter.accept(file.getParent().toFile(), file.getFileName().toString())) {
+                        choice[0] = file.toFile();
+                        lastMod[0] = modified;
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
 
-                File subFile = lastFileModified(file.getPath(), filter);
-                if ((subFile != null) && (subFile.lastModified() > lastMod)) {
-                    choice = subFile;
-                    lastMod = subFile.lastModified();
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exception) {
+                    return FileVisitResult.CONTINUE;
                 }
-            }
+            });
+        } catch (IOException ex) {
+            LOGGER.error(ex, "Unable to search {} for the last modified file", dir);
         }
 
-        return choice;
+        return choice[0];
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)

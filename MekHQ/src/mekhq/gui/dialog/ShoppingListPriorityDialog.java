@@ -53,7 +53,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -62,8 +61,8 @@ import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.model.ProcurementTableModel;
 
 /**
  * Dialog for reviewing the campaign shopping list and adjusting procurement priority.
@@ -318,7 +317,7 @@ public class ShoppingListPriorityDialog extends JDialog {
         private static final int COL_TYPE = 2;
         private static final int COL_COST = 3;
         private static final int COL_TOTAL_COST = 4;
-        private static final int COL_TARGET = 5;
+        private static final int COL_MODIFIERS = 5;
         private static final int COL_QUEUE = 6;
         private static final int COL_NEXT = 7;
         private static final int N_COL = 8;
@@ -363,8 +362,8 @@ public class ShoppingListPriorityDialog extends JDialog {
                       "shoppingListPriorityDialog.column.cost");
                 case COL_TOTAL_COST -> getTextAt(RESOURCE_BUNDLE,
                       "shoppingListPriorityDialog.column.totalCost");
-                case COL_TARGET -> getTextAt(RESOURCE_BUNDLE,
-                      "shoppingListPriorityDialog.column.target");
+                case COL_MODIFIERS -> getTextAt(RESOURCE_BUNDLE,
+                      "shoppingListPriorityDialog.column.modifiers");
                 case COL_QUEUE -> getTextAt(RESOURCE_BUNDLE,
                       "shoppingListPriorityDialog.column.queue");
                 case COL_NEXT -> getTextAt(RESOURCE_BUNDLE,
@@ -387,15 +386,8 @@ public class ShoppingListPriorityDialog extends JDialog {
                 };
                 case COL_COST -> item.getBuyCost().toAmountAndSymbolString();
                 case COL_TOTAL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
-                case COL_TARGET -> {
-                    TargetRoll target = PlanetaryAcquisitionModifiers.addForCurrentSystem(campaign, item,
-                          campaign.checkGenericAcquisition(item)).getTargetNumber();
-                    String value = target.getValueAsString();
-                    if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
-                        value += "+";
-                    }
-                    yield value;
-                }
+                case COL_MODIFIERS -> ProcurementTableModel.formatModifiers(
+                      ProcurementTableModel.getAcquisitionModifiers(campaign, item));
                 case COL_NEXT -> {
                     final int days = item.getDaysToWait();
 
@@ -433,7 +425,7 @@ public class ShoppingListPriorityDialog extends JDialog {
         public int getColumnWidth(final int column) {
             return switch (column) {
                 case COL_NAME -> 200;
-                case COL_COST, COL_TOTAL_COST, COL_TARGET, COL_NEXT -> 40;
+                case COL_COST, COL_TOTAL_COST, COL_MODIFIERS, COL_NEXT -> 40;
                 default -> 15;
             };
         }
