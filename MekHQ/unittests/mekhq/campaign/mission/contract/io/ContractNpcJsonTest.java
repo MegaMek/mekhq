@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,6 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.EmployerData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
@@ -163,8 +163,7 @@ class ContractNpcJsonTest {
 
     @Test
     void anOffersNegotiatorArrivesThroughAContractFile() throws Exception {
-        AbstractContract offer = new ChaosContract();
-        offer.setContractName("Operation Handshake");
+        AbstractContract offer = ContractExchangeTest.fullyPopulatedOffer();
         offer.setEmployerData(new EmployerData(ChaosEmployerType.LOCAL_SYSTEM_OWNER, "LA", "LA", null,
               "Lyran Alliance", negotiator(), null, new Camouflage()));
 
@@ -188,5 +187,49 @@ class ContractNpcJsonTest {
 
         assertEquals("Ada", rebuilt.getGivenName());
         assertFalse(rebuilt.getOptionList("::", "lvl3Advantages").contains("not_a_real_ability"));
+    }
+
+    @Test
+    void missingIdentityFieldsFallBackToDefaults() {
+        ContractNpcJson snapshot = new ContractNpcJson(null, null, null, null, null, null, false, null, 0, 0, null,
+              null, null, null, null);
+
+        Person rebuilt = snapshot.toPerson(campaign);
+
+        assertNotNull(rebuilt, "a bad cosmetic field must not cost the player the offer");
+        assertEquals(PersonnelRole.MEKWARRIOR, rebuilt.getPrimaryRole());
+        assertNotNull(rebuilt.getGender());
+        assertNotNull(rebuilt.getPhenotype());
+        assertNotNull(rebuilt.getGivenName(), "the generated name stays when the file has none");
+    }
+
+    @Test
+    void aNegativeRankIsRaisedToTheLowestRank() {
+        ContractNpcJson snapshot = new ContractNpcJson("Ada", "Lovelace", Gender.FEMALE.name(),
+              PersonnelRole.LAWYER.name(), null, "NONE", false, null, -3, -1, null, Map.of(), Map.of(), List.of(),
+              List.of());
+
+        Person rebuilt = snapshot.toPerson(campaign);
+
+        assertEquals(0, rebuilt.getRankNumeric());
+        assertEquals(0, rebuilt.getRankLevel());
+    }
+
+    @Test
+    void anUnknownOrEmptySkillIsIgnored() {
+        Map<String, ContractNpcJson.SkillJson> skills = new HashMap<>();
+        skills.put(SkillType.S_NEGOTIATION, new ContractNpcJson.SkillJson(4, 0, false));
+        skills.put("Not A Real Skill", new ContractNpcJson.SkillJson(4, 0, false));
+        skills.put(SkillType.S_LEADER, null);
+        Map<String, Integer> attributes = new HashMap<>();
+        attributes.put(SkillAttribute.CHARISMA.name(), null);
+        ContractNpcJson snapshot = new ContractNpcJson("Ada", "Lovelace", Gender.FEMALE.name(),
+              PersonnelRole.LAWYER.name(), null, "NONE", false, null, 0, 0, null, attributes, skills, List.of(),
+              List.of());
+
+        Person rebuilt = snapshot.toPerson(campaign);
+
+        assertEquals(1, rebuilt.getSkills().size());
+        assertEquals(4, rebuilt.getSkill(SkillType.S_NEGOTIATION).getLevel());
     }
 }

@@ -777,13 +777,21 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * Copies the offer to the clipboard as a Discord message (see {@link ContractDiscordFormatter}), as it reads in
      * its dossier.
      *
+     * @return {@code true} if the clipboard took the text, {@code false} if another application was holding it
+     *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    public void copyForDiscord(AbstractContract contract) {
+    public boolean copyForDiscord(AbstractContract contract) {
         String message = ContractDiscordFormatter.format(readout(contract));
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+        try {
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            return true;
+        } catch (IllegalStateException ex) {
+            LOGGER.warn(ex, "The clipboard was unavailable; the offer was not copied.");
+            return false;
+        }
     }
 
     /**
@@ -834,8 +842,9 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     /**
      * Reads a contract file exported by another campaign and adds its offers to this campaign's market. Each offer goes
-     * on the board it was listed on, where this campaign may use that board, and otherwise on the board on screen.
-     * Offers that cannot be placed are listed for the player afterwards.
+     * on the board it was listed on, where this campaign may use that board, and otherwise on the board on screen (see
+     * {@link ContractImportPlan}). Offers that were moved to another board, or could not be imported, are listed for
+     * the player afterwards.
      *
      * @author Illiani
      * @since 0.51.01
@@ -855,15 +864,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
             return;
         }
 
-        List<ContractSearchType> allowed = allowedSearchTypes();
+        ContractImportPlan plan = ContractImportPlan.of(campaign, result, allowedSearchTypes(), searchType);
         AbstractContract firstOnThisBoard = null;
         AbstractContract firstElsewhere = null;
         ContractSearchType firstElsewhereBoard = null;
-        for (ContractExchange.ImportedOffer offer : result.imported()) {
-            ContractSearchType board = allowed.contains(offer.searchType()) ? offer.searchType() : searchType;
-            AbstractContract contract = offer.contract();
-            contract.setCachedContractDifficulty(
-                  ChaosContractDeterminationDifficulty.calculateContractDifficulty(campaign, contract));
+        for (ContractImportPlan.Placement placement : plan.placements()) {
+            ContractSearchType board = placement.board();
+            AbstractContract contract = placement.contract();
             contractMarket.addContract(board, contract);
             if (board == searchType) {
                 firstOnThisBoard = firstOnThisBoard == null ? contract : firstOnThisBoard;
@@ -884,32 +891,55 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         }
         refresh(true);
 
-        LOGGER.info("Imported {} contract offers from {} ({} skipped)", result.imported().size(), file.get(),
-              result.skipped().size());
-        showMessage(importSummary(result),
-              result.skipped().isEmpty() ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
+        List<ContractImportPlan.Placement> moved = plan.placements()
+                                                     .stream()
+                                                     .filter(ContractImportPlan.Placement::wasMoved)
+                                                     .toList();
+        LOGGER.info("Imported {} contract offers from {} ({} moved to another board, {} skipped)",
+              plan.placements().size(), file.get(), moved.size(), plan.skipped().size());
+        showMessage(importSummary(plan, moved),
+              plan.skipped().isEmpty() && moved.isEmpty()
+                    ? JOptionPane.INFORMATION_MESSAGE
+                    : JOptionPane.WARNING_MESSAGE);
     }
 
-    private static String importSummary(ContractExchange.ImportResult result) {
+    private static String importSummary(ContractImportPlan plan, List<ContractImportPlan.Placement> moved) {
+        String separator = getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator");
         StringBuilder summary = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              "import.contractMarket.summary", result.imported().size()));
-        if (!result.skipped().isEmpty()) {
+              "import.contractMarket.summary", plan.placements().size()));
+        if (!moved.isEmpty()) {
+            summary.append("<br><br>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved", moved.size()))
+                  .append("<ul>");
+            for (ContractImportPlan.Placement placement : moved) {
+                summary.append("<li>")
+                      .append(MarketHud.escape(offerName(placement.contract().getName())))
+                      .append(separator)
+                      .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved.entry",
+                            searchTypeLabel(placement.listedBoard()), searchTypeLabel(placement.board())))
+                      .append("</li>");
+            }
+            summary.append("</ul>");
+        }
+        if (!plan.skipped().isEmpty()) {
             summary.append("<br><br>")
                   .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped",
-                        result.skipped().size()))
+                        plan.skipped().size()))
                   .append("<ul>");
-            for (ContractExchange.SkippedOffer skipped : result.skipped()) {
+            for (ContractExchange.SkippedOffer skipped : plan.skipped()) {
                 summary.append("<li>")
-                      .append(MarketHud.escape(skipped.name().isBlank()
-                                                     ? getTextAt(RESOURCE_BUNDLE, "import.contractMarket.unnamed")
-                                                     : skipped.name()))
-                      .append(getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator"))
+                      .append(MarketHud.escape(offerName(skipped.name())))
+                      .append(separator)
                       .append(getTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped." + skipped.reason().name()))
                       .append("</li>");
             }
             summary.append("</ul>");
         }
         return "<html>" + summary + "</html>";
+    }
+
+    private static String offerName(String name) {
+        return name.isBlank() ? getTextAt(RESOURCE_BUNDLE, "import.contractMarket.unnamed") : name;
     }
 
     private void showMessage(String message, int messageType) {

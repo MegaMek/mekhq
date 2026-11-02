@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
@@ -66,6 +68,9 @@ import mekhq.campaign.mission.contract.io.ContractExchange.SkipReason;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -91,8 +96,11 @@ class ContractExchangeTest {
         campaign = MHQTestUtilities.getTestCampaign();
     }
 
-    /** An offer with every exported field set away from its default, so a dropped field shows up as a difference. */
-    private static AbstractContract fullyPopulatedOffer() {
+    /**
+     * An offer with every exported field set away from its default, so a dropped field shows up as a difference. The
+     * NPC tests build on it too.
+     */
+    static AbstractContract fullyPopulatedOffer() {
         AbstractContract contract = new ChaosContract();
         contract.setContractId(ORIGINAL_ID);
         contract.setContractName("Operation Sundowner");
@@ -215,6 +223,8 @@ class ContractExchangeTest {
         original.setContractName(piracy.getName());
         original.setEmployerData(piracy.getEmployerData());
         original.setEnemyData(piracy.getEnemyData());
+        original.setContractTerms(piracy.getContractTerms());
+        original.setContractFinanceData(piracy.getContractFinanceData());
         original.setScheduleData(piracy.getScheduleData());
 
         assertInstanceOf(ChaosActOfPiracy.class, roundTrip(original, ContractSearchType.PIRATE));
@@ -388,6 +398,66 @@ class ContractExchangeTest {
               json.replace("\"name\" :", "\"aFieldFromTheFuture\" : 42, \"name\" :"), campaign);
 
         assertEquals("Operation Sundowner", result.imported().getFirst().contract().getName());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "employer", "enemy", "terms", "finance", "schedule" })
+    void anOfferMissingASectionIsSkippedAsUnreadable(String section) throws IOException {
+        AbstractContract original = fullyPopulatedOffer();
+        switch (section) {
+            case "employer" -> original.setEmployerData(null);
+            case "enemy" -> original.setEnemyData(null);
+            case "terms" -> original.setContractTerms(null);
+            case "finance" -> original.setContractFinanceData(null);
+            case "schedule" -> original.setScheduleData(null);
+            default -> throw new IllegalArgumentException(section);
+        }
+
+        ImportResult result = ContractExchange.fromJson(ContractExchange.toJson(List.of(
+              new ExportEntry(original, ContractSearchType.MERCENARY))), campaign);
+
+        assertTrue(result.imported().isEmpty(), "the market cannot rate or show an offer without its " + section);
+        assertEquals(1, result.skipped().size());
+        assertEquals(SkipReason.UNREADABLE, result.skipped().getFirst().reason());
+        assertEquals("Operation Sundowner", result.skipped().getFirst().name());
+    }
+
+    @Test
+    void anOfferMissingASectionDoesNotCostTheRestOfTheFile() throws IOException {
+        AbstractContract second = fullyPopulatedOffer();
+        second.setContractName("Hand Edited");
+        second.setEnemyData(null);
+        AbstractContract third = fullyPopulatedOffer();
+        third.setContractName("Operation Daybreak");
+
+        ImportResult result = ContractExchange.fromJson(ContractExchange.toJson(List.of(
+              new ExportEntry(fullyPopulatedOffer(), ContractSearchType.MERCENARY),
+              new ExportEntry(second, ContractSearchType.MERCENARY),
+              new ExportEntry(third, ContractSearchType.MERCENARY))), campaign);
+
+        assertEquals(2, result.imported().size());
+        assertEquals("Operation Sundowner", result.imported().get(0).contract().getName());
+        assertEquals("Operation Daybreak", result.imported().get(1).contract().getName());
+        assertEquals(1, result.skipped().size());
+        assertEquals("Hand Edited", result.skipped().getFirst().name());
+    }
+
+    @Test
+    void anOfferWithNoTargetSystemStillImports() throws IOException {
+        AbstractContract original = fullyPopulatedOffer();
+        original.setSystemsTargetData(new SystemsTargetData(null, null));
+
+        AbstractContract imported = roundTrip(original, ContractSearchType.MERCENARY);
+
+        assertNull(imported.getTargetSystem(), "the market shows an offer with no target system as it is");
+    }
+
+    @Test
+    void aFileOverTheSizeLimitIsRefusedUnread(@TempDir Path directory) throws IOException {
+        Path file = directory.resolve("huge.json");
+        Files.write(file, new byte[(int) ContractExchange.MAX_FILE_BYTES + 1]);
+
+        assertThrows(IOException.class, () -> ContractExchange.importOffers(file.toFile(), campaign));
     }
 
     @Test

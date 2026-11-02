@@ -165,10 +165,10 @@ public final class ContractPdfExporter {
 
     private void writeTitle(String campaignName, String date, String boardName, int offerCount) throws IOException {
         newPage();
-        line(getTextAt(RESOURCE_BUNDLE, "pdf.contractMarket.title").toUpperCase(Locale.ROOT), bold, TITLE_SIZE,
-              ACCENT, MARGIN);
-        line(String.join(ContractReadout.separator(), campaignName, date, boardName), regular, BODY_SIZE + 1, INK,
-              MARGIN);
+        wrapped(getTextAt(RESOURCE_BUNDLE, "pdf.contractMarket.title").toUpperCase(Locale.ROOT), bold, TITLE_SIZE,
+              ACCENT, MARGIN, contentWidth());
+        wrapped(String.join(ContractReadout.separator(), campaignName, date, boardName), regular, BODY_SIZE + 1, INK,
+              MARGIN, contentWidth());
         line(getFormattedTextAt(RESOURCE_BUNDLE, "pdf.contractMarket.offerCount", offerCount), regular, BODY_SIZE,
               MUTED, MARGIN);
         y -= 6;
@@ -179,7 +179,7 @@ public final class ContractPdfExporter {
     private void writeOffer(ContractReadout offer) throws IOException {
         ensureSpace(OFFER_MINIMUM_SPACE);
 
-        line(offer.employerLine().toUpperCase(Locale.ROOT), bold, SMALL_SIZE, MUTED, MARGIN);
+        wrapped(offer.employerLine().toUpperCase(Locale.ROOT), bold, SMALL_SIZE, MUTED, MARGIN, contentWidth());
         wrapped(offer.title().toUpperCase(Locale.ROOT), bold, OFFER_TITLE_SIZE, ACCENT, MARGIN, contentWidth());
         wrapped(offer.statusLine(), regular, BODY_SIZE, INK, MARGIN, contentWidth());
 
@@ -191,7 +191,7 @@ public final class ContractPdfExporter {
 
         if (!offer.briefing().isBlank()) {
             if (offer.speaker() != null) {
-                line(offer.speaker(), bold, BODY_SIZE, INK, MARGIN + 10);
+                wrapped(offer.speaker(), bold, BODY_SIZE, INK, MARGIN + 10, contentWidth() - 10);
             }
             int startPage = pages.size();
             float top = y;
@@ -207,7 +207,7 @@ public final class ContractPdfExporter {
         for (Section section : offer.sections()) {
             ensureSpace(HEADING_SIZE * LEADING * 3);
             y -= 4;
-            line(section.heading().toUpperCase(Locale.ROOT), bold, HEADING_SIZE, ACCENT, MARGIN);
+            wrapped(section.heading().toUpperCase(Locale.ROOT), bold, HEADING_SIZE, ACCENT, MARGIN, contentWidth());
             rule(RULE, 0.6f);
             y -= 3;
             for (Row row : section.rows()) {

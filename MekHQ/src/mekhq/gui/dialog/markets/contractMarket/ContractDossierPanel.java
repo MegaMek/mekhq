@@ -165,10 +165,7 @@ public class ContractDossierPanel extends JPanel {
         HudButton discord = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord")
                                                 .toUpperCase(Locale.ROOT), false, true);
         discord.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord.tooltip"));
-        discord.addActionListener(event -> {
-            actions.copyForDiscord(contract);
-            confirmCopied(discord);
-        });
+        discord.addActionListener(event -> confirmCopied(discord, actions.copyForDiscord(contract)));
 
         JPanel buttons = Hud.transparentPanel(null);
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
@@ -185,9 +182,10 @@ public class ContractDossierPanel extends JPanel {
         return header;
     }
 
-    /** Briefly relabels the Discord button to confirm the copy, then puts its label back. */
-    private static void confirmCopied(HudButton button) {
-        button.setText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord.copied").toUpperCase(Locale.ROOT));
+    /** Briefly relabels the Discord button to say whether the copy worked, then puts its label back. */
+    private static void confirmCopied(HudButton button, boolean copied) {
+        String outcome = copied ? "button.contractMarket.discord.copied" : "button.contractMarket.discord.failed";
+        button.setText(getTextAt(RESOURCE_BUNDLE, outcome).toUpperCase(Locale.ROOT));
         Timer restore = new Timer(COPIED_CONFIRMATION_MILLIS, event -> button.setText(
               getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord").toUpperCase(Locale.ROOT)));
         restore.setRepeats(false);

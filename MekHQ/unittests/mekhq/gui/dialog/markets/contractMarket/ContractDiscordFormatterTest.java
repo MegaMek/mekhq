@@ -51,7 +51,7 @@ class ContractDiscordFormatterTest {
     private static ContractReadout readout(String title, String briefing) {
         return new ContractReadout("Lyran Alliance (Planetary Government)",
               title,
-              "Objective Raid · Galatea · 6-month term · 12 days transit",
+              "Objective Raid \u00B7 Galatea \u00B7 6-month term \u00B7 12 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground"),
               "Leutnant Katrina Steiner",
@@ -86,7 +86,7 @@ class ContractDiscordFormatterTest {
         String message = ContractDiscordFormatter.format(readout("Operation Sundowner", briefing));
 
         assertTrue(message.length() <= ContractDiscordFormatter.MAX_LENGTH, "length was " + message.length());
-        assertTrue(message.contains("…\n"), "a shortened briefing ends in an ellipsis");
+        assertTrue(message.contains("\u2026\n"), "a shortened briefing ends in an ellipsis");
         assertTrue(message.endsWith("```"), "the stat block must survive a shortened briefing");
     }
 
@@ -94,7 +94,7 @@ class ContractDiscordFormatterTest {
     private static ContractReadout fullDossier(String briefing) {
         return new ContractReadout("Draconis Combine (Planetary Government)",
               "Operation Iron Lantern",
-              "Asset Retrieval · Luthien · 6-month term · 214 days transit",
+              "Asset Retrieval \u00B7 Luthien \u00B7 6-month term \u00B7 214 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground", "Double Support Payouts"),
               "Tai-i Yatun Kartosuwiryo",
@@ -117,7 +117,7 @@ class ContractDiscordFormatterTest {
                     new Section("Money",
                           List.of(new Row("Total Payout", "123,456,789 C-bills", true),
                                 new Row("Net / Month", "+1,234,567", true),
-                                new Row("Monthly × 6", "18,456,789", false),
+                                new Row("Monthly \u00D7 6", "18,456,789", false),
                                 new Row("Transport Pay", "12,345,678", false),
                                 new Row("Operating Costs (6 mo + 214d transit)", "-98,765,432", false),
                                 new Row("Estimated Net", "+24,691,357", true),
@@ -143,7 +143,7 @@ class ContractDiscordFormatterTest {
         String message = ContractDiscordFormatter.format(fullDossier(TYPICAL_PITCH));
 
         assertTrue(message.length() <= ContractDiscordFormatter.MAX_LENGTH, "length was " + message.length());
-        assertFalse(message.contains("…"), "the briefing must not be shortened");
+        assertFalse(message.contains("\u2026"), "the briefing must not be shortened");
         assertTrue(message.contains("We expect your answer before the next jump."));
     }
 
@@ -174,7 +174,7 @@ class ContractDiscordFormatterTest {
     void aShortBriefingIsLeftWhole() {
         String message = ContractDiscordFormatter.format(readout("Operation Sundowner", "Short and sweet."));
 
-        assertFalse(message.contains("…"));
+        assertFalse(message.contains("\u2026"));
     }
 
     @Test

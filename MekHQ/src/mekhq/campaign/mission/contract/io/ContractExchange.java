@@ -71,6 +71,12 @@ public final class ContractExchange {
     /** The file format's version. Bump it when the format changes in a way older builds cannot read. */
     public static final int FORMAT_VERSION = 1;
 
+    /**
+     * The largest file {@link #importOffers(File, Campaign)} will read. An offer with its NPCs is a few kilobytes, so
+     * this allows thousands of offers while refusing a file picked by mistake.
+     */
+    static final long MAX_FILE_BYTES = 10L * 1024 * 1024;
+
     private static final ObjectMapper MAPPER = buildMapper();
 
     private ContractExchange() {}
@@ -185,11 +191,17 @@ public final class ContractExchange {
      *
      * @return the imported offers, and any that had to be skipped
      *
-     * @throws IOException if the file cannot be read or is not an exported contract file
+     * @throws IOException if the file cannot be read, is larger than {@link #MAX_FILE_BYTES}, or is not an exported
+     *                     contract file
      * @author Illiani
      * @since 0.51.01
      */
     public static ImportResult importOffers(File inputFile, Campaign campaign) throws IOException {
+        long size = Files.size(inputFile.toPath());
+        if (size > MAX_FILE_BYTES) {
+            throw new IOException("Contract offers file is " + size + " bytes, over the " + MAX_FILE_BYTES
+                                        + " byte limit.");
+        }
         return fromJson(Files.readString(inputFile.toPath(), StandardCharsets.UTF_8), campaign);
     }
 
@@ -222,6 +234,12 @@ public final class ContractExchange {
                 continue;
             }
             String name = offer.name() == null ? "" : offer.name();
+
+            if (!offer.isComplete()) {
+                LOGGER.warn("Contract offer '{}' is missing a section and was skipped.", name);
+                skipped.add(new SkippedOffer(name, SkipReason.UNREADABLE));
+                continue;
+            }
 
             if ((offer.targetSystemId() != null)
                       && (Systems.getInstance().getSystemById(offer.targetSystemId()) == null)) {

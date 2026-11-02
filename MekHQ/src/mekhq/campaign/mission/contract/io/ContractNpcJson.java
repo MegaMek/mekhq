@@ -52,6 +52,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.universe.Faction;
 
@@ -91,6 +92,9 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
 
     /** The separator {@link Person#getOptionList(String, String)} places between abilities. */
     private static final String OPTION_DELIMITER = "::";
+
+    /** The role a snapshot with no role is rebuilt as, matching the market's opposing commanders. */
+    private static final PersonnelRole DEFAULT_ROLE = PersonnelRole.MEKWARRIOR;
 
     /**
      * A skill's level and bonus.
@@ -170,14 +174,22 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
      * @since 0.51.01
      */
     public Person toPerson(Campaign campaign) {
-        PersonnelRole primaryRole = PersonnelRole.fromString(role);
+        // A missing or blank identity field keeps what the generator chose rather than costing the player the offer.
+        PersonnelRole primaryRole = isBlank(role) ? DEFAULT_ROLE : PersonnelRole.fromString(role);
         Person person = campaign.getPlayerForce()
                               .getHumanResources()
-                              .newPerson(campaign, primaryRole, factionCode, Gender.parseFromString(gender));
+                              .newPerson(campaign, primaryRole, factionCode,
+                                    isBlank(gender) ? Gender.RANDOMIZE : Gender.parseFromString(gender));
 
-        person.setGivenName(givenName);
-        person.setSurname(surname);
-        person.setPhenotype(Phenotype.fromString(phenotype));
+        if (!isBlank(givenName)) {
+            person.setGivenName(givenName);
+        }
+        if (!isBlank(surname)) {
+            person.setSurname(surname);
+        }
+        if (!isBlank(phenotype)) {
+            person.setPhenotype(Phenotype.fromString(phenotype));
+        }
         person.setClanPersonnel(clan);
         if (portrait != null) {
             person.setPortrait(new Portrait(portrait.category(), portrait.filename()));
@@ -188,8 +200,9 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
         if (importedRankSystem != null) {
             person.setRankSystem(new RankValidator(), importedRankSystem);
         }
-        person.setRank(rank);
-        person.setRankLevel(rankLevel);
+        // RankSystem.getRank clamps only the top of the range, so a negative rank would fail when the title is shown.
+        person.setRank(Math.max(0, rank));
+        person.setRankLevel(Math.max(0, rankLevel));
 
         // Abilities go on before attributes, as they can change the caps an attribute score is held to.
         person.getOptions().getOptionsList().forEach(IOption::clearValue);
@@ -199,6 +212,13 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
         person.getSkills().clear();
         for (Map.Entry<String, SkillJson> entry : safe(skills).entrySet()) {
             SkillJson skill = entry.getValue();
+            if (isBlank(entry.getKey()) || (skill == null)) {
+                continue;
+            }
+            if (SkillType.getType(entry.getKey()) == null) {
+                LOGGER.warn("Unknown NPC skill '{}' ignored.", entry.getKey());
+                continue;
+            }
             person.addSkill(entry.getKey(), skill.level(), skill.bonus());
             Skill added = person.getSkill(entry.getKey());
             if (added != null) {
@@ -207,6 +227,9 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
         }
 
         for (Map.Entry<String, Integer> entry : safe(attributes).entrySet()) {
+            if ((entry.getKey() == null) || (entry.getValue() == null)) {
+                continue;
+            }
             try {
                 person.setAttributeScore(SkillAttribute.valueOf(entry.getKey()), entry.getValue());
             } catch (IllegalArgumentException ex) {
@@ -244,5 +267,9 @@ public record ContractNpcJson(String givenName, String surname, String gender, S
 
     private static <K, V> Map<K, V> safe(@Nullable Map<K, V> map) {
         return map == null ? Map.of() : map;
+    }
+
+    private static boolean isBlank(@Nullable String text) {
+        return (text == null) || text.isBlank();
     }
 }

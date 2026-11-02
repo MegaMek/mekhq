@@ -148,7 +148,7 @@ public record ContractReadout(String employerLine, String title, String statusLi
               getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.caveat"));
     }
 
-    /** @return the separator the dossier places between the parts of a line, such as " · " */
+    /** @return the separator the dossier places between the parts of a line, a middle dot between spaces */
     static String separator() {
         return getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator");
     }

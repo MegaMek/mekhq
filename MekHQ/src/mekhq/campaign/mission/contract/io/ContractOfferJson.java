@@ -222,6 +222,21 @@ public record ContractOfferJson(@Nullable String type, @Nullable ContractSearchT
     // region Import
 
     /**
+     * Whether the offer has every section the market needs: the employer, enemy, terms, finance and schedule. A
+     * hand-edited file, or one from a newer build, may leave a section out. Without it the offer's getters fail, so
+     * such an offer is skipped rather than imported. A missing target system is allowed, because the market already
+     * shows an offer with no target system.
+     *
+     * @return {@code true} if the offer can be rebuilt as a usable market offer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isComplete() {
+        return (employer != null) && (enemy != null) && (terms != null) && (finance != null) && (schedule != null);
+    }
+
+    /**
      * Rebuilds the offer for the given campaign. The offer gets a fresh id and no status, and its NPCs are rebuilt from
      * their snapshots.
      *
@@ -330,7 +345,11 @@ public record ContractOfferJson(@Nullable String type, @Nullable ContractSearchT
         EnumSet<E> set = EnumSet.noneOf(type);
         if (values != null) {
             // An unrecognized name reads as a null entry; drop it rather than fail.
-            values.stream().filter(Objects::nonNull).forEach(set::add);
+            for (E value : values) {
+                if (value != null) {
+                    set.add(value);
+                }
+            }
         }
         return set;
     }
@@ -338,7 +357,11 @@ public record ContractOfferJson(@Nullable String type, @Nullable ContractSearchT
     private static List<Integer> withoutNulls(@Nullable List<Integer> values) {
         List<Integer> result = new ArrayList<>();
         if (values != null) {
-            values.stream().filter(Objects::nonNull).forEach(result::add);
+            for (Integer value : values) {
+                if (value != null) {
+                    result.add(value);
+                }
+            }
         }
         return result;
     }

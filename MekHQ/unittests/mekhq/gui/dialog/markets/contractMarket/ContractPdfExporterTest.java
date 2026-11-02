@@ -61,7 +61,7 @@ class ContractPdfExporterTest {
         }
         return new ContractReadout(employer,
               title,
-              "Objective Raid · Galatea · 6-month term · 12 days transit",
+              "Objective Raid \u00B7 Galatea \u00B7 6-month term \u00B7 12 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground"),
               "Leutnant Katrina Steiner",
@@ -116,7 +116,8 @@ class ContractPdfExporterTest {
 
     @Test
     void namesOutsideTheLatinAlphabetDoNotBreakTheExport() throws IOException {
-        byte[] pdf = export(List.of(readout("Ōkami Raid", "Draconis Combine 竜", "Ряд \u0007 control")));
+        byte[] pdf = export(List.of(readout("\u014Ckami Raid", "Draconis Combine \u7ADC",
+              "\u0420\u044F\u0434 \u0007 control")));
 
         try (PDDocument document = Loader.loadPDF(pdf)) {
             assertEquals(1, document.getNumberOfPages());
@@ -137,7 +138,7 @@ class ContractPdfExporterTest {
     void charactersAFontCannotShowAreReplaced() {
         PDType1Font helvetica = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
-        assertEquals("Okami ?", ContractPdfExporter.printable("Okami 竜", helvetica));
+        assertEquals("Okami ?", ContractPdfExporter.printable("Okami \u7ADC", helvetica));
         assertEquals("tab here", ContractPdfExporter.printable("tab\there", helvetica));
     }
 }
