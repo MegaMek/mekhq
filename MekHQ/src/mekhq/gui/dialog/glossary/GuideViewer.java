@@ -499,19 +499,29 @@ public class GuideViewer extends JDialog {
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, menuKey), "zoomOutPad", () -> zoomBy(1 / ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_0, menuKey), "fitWidth", () -> setFit(Fit.WIDTH));
         for (int key : new int[] { KeyEvent.VK_RIGHT, KeyEvent.VK_PAGE_DOWN }) {
-            bind(root, KeyStroke.getKeyStroke(key, 0), "next" + key, () -> {
+            bindPageKey(root, KeyStroke.getKeyStroke(key, 0), "next" + key, () -> {
                 if (!isTyping()) {
                     stepPage(1);
                 }
             });
         }
         for (int key : new int[] { KeyEvent.VK_LEFT, KeyEvent.VK_PAGE_UP }) {
-            bind(root, KeyStroke.getKeyStroke(key, 0), "previous" + key, () -> {
+            bindPageKey(root, KeyStroke.getKeyStroke(key, 0), "previous" + key, () -> {
                 if (!isTyping()) {
                     stepPage(-1);
                 }
             });
         }
+    }
+
+    /**
+     * Binds a page key for the whole window and, as the scroll pane claims the arrow and page keys for scrolling
+     * while it or the pages have focus, for the scroll pane too.
+     */
+    private void bindPageKey(JComponent root, KeyStroke keyStroke, String name, Runnable action) {
+        bind(root, keyStroke, name, action);
+        canvasScroll.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, name);
+        canvasScroll.getActionMap().put(name, root.getActionMap().get(name));
     }
 
     private static void bind(JComponent root, KeyStroke keyStroke, String name, Runnable action) {
@@ -531,10 +541,9 @@ public class GuideViewer extends JDialog {
 
     /** Escape closes an open guide drawer, then clears the find box, then closes the viewer. */
     private void onEscape() {
-        Component focus = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if (guideDrawer.isVisible()) {
             closeGuide();
-        } else if (focus == findField && !findField.getText().isEmpty()) {
+        } else if (!findField.getText().isEmpty()) {
             findField.setText("");
             findTimer.stop();
             runFind(false);
@@ -559,6 +568,15 @@ public class GuideViewer extends JDialog {
             if (!find.isEmpty()) {
                 findField.setText(find);
                 findTimer.stop();
+            }
+            if (!isReady()) {
+                // Still loading: the page and the find box are taken up once the guide arrives.
+                if (newPage > 0) {
+                    page = newPage;
+                }
+                return;
+            }
+            if (!find.isEmpty()) {
                 runFind(newPage <= 0);
             }
             if (newPage > 0) {

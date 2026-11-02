@@ -135,7 +135,6 @@ public class GlossaryConsole extends JDialog {
     private static final int SEARCH_DELAY_MILLIS = 150;
     private static final int LINK_PREVIEW_LENGTH = 220;
     private static final Pattern UNSAFE_FILE_NAME_CHARACTERS = Pattern.compile("[\\\\/:*?\"<>|]");
-    private static final String DOCUMENT_READ_PREFIX = "DOCUMENTATION:";
 
     private static @Nullable GlossaryConsole openConsole;
 
@@ -175,6 +174,9 @@ public class GlossaryConsole extends JDialog {
     /** A document. */
     private record DocumentRow(DocumentationEntry document, GlossaryChange change) implements Row {}
 
+    /** How many entries are unread, changed in this build, and changed since the last core release. */
+    private record Counts(int unread, int thisBuild, int sinceCore) {}
+
     private final GlossaryIndex index = GlossaryIndex.build();
     private final GlossaryReadPreferences readPreferences = GlossaryReadPreferences.getInstance();
 
@@ -191,6 +193,8 @@ public class GlossaryConsole extends JDialog {
     /** Set while the index is rebuilt or its selection is set to follow the reader, so selection is not navigation. */
     private boolean isSyncing;
     private int lastSelectedIndex = -1;
+    /** The glossary's counts, taken again whenever the player reads an entry. */
+    private Counts glossaryCounts = new Counts(0, 0, 0);
 
     private final HudModeSelector<Mode> modeSelector;
     private final HudStatTile entriesTile;
@@ -248,9 +252,7 @@ public class GlossaryConsole extends JDialog {
      * @since 0.51.01
      */
     public static void showEntry(@Nullable Window owner, GlossaryEntry entry) {
-        GlossaryConsole console = open(owner);
-        console.showMode(Mode.GLOSSARY);
-        console.navigate(entry, true);
+        open(owner).navigate(entry, true);
     }
 
     /**
@@ -264,7 +266,7 @@ public class GlossaryConsole extends JDialog {
      */
     public static void showDocument(@Nullable Window owner, DocumentationEntry document) {
         GlossaryConsole console = open(owner);
-        console.showMode(Mode.DOCUMENTATION);
+        console.showMode(Mode.DOCUMENTATION, false);
         console.selectDocument(document);
         console.openDocument(document);
     }
@@ -360,6 +362,7 @@ public class GlossaryConsole extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.close"), this::closeGuide);
 
         buildUI();
+        recount();
         refreshTiles();
         refreshList();
         showOverview();
@@ -825,6 +828,17 @@ public class GlossaryConsole extends JDialog {
     // region Index
 
     private void showMode(Mode newMode) {
+        showMode(newMode, true);
+    }
+
+    /**
+     * Switches page.
+     *
+     * @param newMode  the page
+     * @param showPage {@code true} to show the page's entry, overview or introduction in the reader; {@code false}
+     *                 when the caller is about to show something there itself
+     */
+    private void showMode(Mode newMode, boolean showPage) {
         modeSelector.setSelected(newMode);
         if (mode == newMode) {
             return;
@@ -838,13 +852,13 @@ public class GlossaryConsole extends JDialog {
         searchInTextBox.setEnabled(mode == Mode.GLOSSARY);
         filterChips.get(Filter.UNREAD).setVisible(mode == Mode.GLOSSARY);
         refreshList();
-        if (mode == Mode.GLOSSARY) {
+        if (showPage && mode == Mode.GLOSSARY) {
             if (current != null) {
                 renderEntry(current, false);
             } else {
                 showOverview();
             }
-        } else {
+        } else if (showPage) {
             showDocumentationIntro();
         }
         maybeOpenGuide(mode);
@@ -942,10 +956,11 @@ public class GlossaryConsole extends JDialog {
               true));
         String query = String.join(" ", terms);
         if (!terms.isEmpty()) {
-            // Documents have only their titles to search, and every word must be in the title.
+            // Documents have only titles to search; every word, or a simpler form of it, must be in the title.
             documents.removeIf(document -> {
                 String title = document.getTitle().toLowerCase(Locale.ROOT);
-                return !terms.stream().allMatch(title::contains);
+                return !terms.stream()
+                              .allMatch(term -> GlossarySearch.variants(term).stream().anyMatch(title::contains));
             });
         }
         Comparator<DocumentationEntry> byTitle = Comparator.comparing(DocumentationEntry::getTitle,
@@ -1004,17 +1019,51 @@ public class GlossaryConsole extends JDialog {
         return getFormattedTextAt(RESOURCE_BUNDLE, key, item.version().toString());
     }
 
+    /** Counts the glossary's unread and recently changed entries again, after the player has read some. */
+    private void recount() {
+        int unread = 0;
+        int thisBuild = 0;
+        int sinceCore = 0;
+        for (Item item : index.items()) {
+            if (isUnread(item)) {
+                unread++;
+            }
+            if (item.change() == GlossaryChange.THIS_BUILD) {
+                thisBuild++;
+            }
+            if (item.change().isChanged()) {
+                sinceCore++;
+            }
+        }
+        glossaryCounts = new Counts(unread, thisBuild, sinceCore);
+    }
+
+    /** Counts the recently changed documents; documents are never unread. */
+    private static Counts documentCounts() {
+        int thisBuild = 0;
+        int sinceCore = 0;
+        for (DocumentationEntry document : DocumentationEntry.values()) {
+            GlossaryChange change = GlossaryChange.of(document.getVersionAddedOrLastUpdated());
+            if (change == GlossaryChange.THIS_BUILD) {
+                thisBuild++;
+            }
+            if (change.isChanged()) {
+                sinceCore++;
+            }
+        }
+        return new Counts(0, thisBuild, sinceCore);
+    }
+
     private void refreshChips() {
-        int unread = (int) index.items().stream().filter(this::isUnread).count();
-        int thisBuild = (int) index.items().stream().filter(item -> item.change() == GlossaryChange.THIS_BUILD)
-                                    .count();
-        int sinceCore = (int) index.items().stream().filter(item -> item.change().isChanged()).count();
+        // The chips count what they filter: entries on the Glossary page, documents on the Documentation page.
+        Counts counts = mode == Mode.GLOSSARY ? glossaryCounts : documentCounts();
         int all = mode == Mode.GLOSSARY ? index.items().size() : DocumentationEntry.values().length;
         filterChips.get(Filter.ALL).setText(chipLabel("GlossaryConsole.filter.ALL", all));
-        filterChips.get(Filter.UNREAD).setText(chipLabel("GlossaryConsole.filter.UNREAD", unread));
-        filterChips.get(Filter.THIS_BUILD).setText(chipLabel("GlossaryConsole.filter.THIS_BUILD", thisBuild));
+        filterChips.get(Filter.UNREAD).setText(chipLabel("GlossaryConsole.filter.UNREAD", counts.unread()));
+        filterChips.get(Filter.THIS_BUILD).setText(chipLabel("GlossaryConsole.filter.THIS_BUILD",
+              counts.thisBuild()));
         filterChips.get(Filter.SINCE_LAST_CORE).setText(chipLabel("GlossaryConsole.filter.SINCE_LAST_CORE",
-              sinceCore));
+              counts.sinceCore()));
         filterChips.forEach((chipFilter, chip) -> chip.setActive(chipFilter == filter));
         sortChips.forEach((chipSort, chip) -> {
             chip.setActive(chipSort == sort);
@@ -1028,10 +1077,9 @@ public class GlossaryConsole extends JDialog {
     }
 
     private void refreshTiles() {
-        int unread = (int) index.items().stream().filter(this::isUnread).count();
-        int thisBuild = (int) index.items().stream().filter(item -> item.change() == GlossaryChange.THIS_BUILD)
-                                    .count();
-        int sinceCore = (int) index.items().stream().filter(item -> item.change().isChanged()).count();
+        int unread = glossaryCounts.unread();
+        int thisBuild = glossaryCounts.thisBuild();
+        int sinceCore = glossaryCounts.sinceCore();
         entriesTile.setValue(Integer.toString(index.items().size()), TEXT);
         entriesTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.entries.sub",
               DocumentationEntry.values().length));
@@ -1192,7 +1240,7 @@ public class GlossaryConsole extends JDialog {
         }
         current = entry;
         if (mode != Mode.GLOSSARY) {
-            showMode(Mode.GLOSSARY);
+            showMode(Mode.GLOSSARY, false);
         }
         renderEntry(entry, true);
         selectCurrentRow();
@@ -1220,8 +1268,9 @@ public class GlossaryConsole extends JDialog {
         if (item == null) {
             return;
         }
+        // Only a changed entry can be unread, so only reading one is worth noting.
         boolean wasUnread = isUnread(item);
-        if (markRead) {
+        if (markRead && wasUnread) {
             readPreferences.markRead(entry.getLookUpName(), item.version());
         }
 
@@ -1233,6 +1282,7 @@ public class GlossaryConsole extends JDialog {
         refreshNavigation(true);
 
         if (wasUnread && markRead) {
+            recount();
             refreshTiles();
             refreshChips();
             list.repaint();
@@ -1243,7 +1293,7 @@ public class GlossaryConsole extends JDialog {
     private void showOverview() {
         current = null;
         if (mode != Mode.GLOSSARY) {
-            showMode(Mode.GLOSSARY);
+            showMode(Mode.GLOSSARY, false);
         }
         readerEyebrow.setText(text("GlossaryConsole.overview.eyebrow"));
         readerTitle.setText(text("GlossaryConsole.overview.title"));
@@ -1307,8 +1357,6 @@ public class GlossaryConsole extends JDialog {
     }
 
     private void openDocument(DocumentationEntry document) {
-        readPreferences.markRead(DOCUMENT_READ_PREFIX + document.getLookUpName(),
-              document.getVersionAddedOrLastUpdated());
         GuideViewer.showGuide(this, document);
     }
 
@@ -1528,6 +1576,7 @@ public class GlossaryConsole extends JDialog {
                 readPreferences.markRead(item.entry().getLookUpName(), item.version());
             }
         }
+        recount();
         refreshTiles();
         refreshList();
         if (current == null && mode == Mode.GLOSSARY) {

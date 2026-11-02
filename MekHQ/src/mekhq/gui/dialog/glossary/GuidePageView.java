@@ -73,6 +73,8 @@ final class GuidePageView extends JComponent {
     private @Nullable BufferedImage image;
     private float imageScale;
     private float requestedScale;
+    /** Set when the image is let go, so a drawing still on its way is not kept; cleared when the page is painted. */
+    private boolean isDropped;
     private int matches;
 
     /**
@@ -119,6 +121,7 @@ final class GuidePageView extends JComponent {
         image = null;
         imageScale = 0;
         requestedScale = 0;
+        isDropped = true;
     }
 
     @Override
@@ -140,6 +143,8 @@ final class GuidePageView extends JComponent {
     @Override
     protected void paintComponent(Graphics graphics) {
         Graphics2D canvas = (Graphics2D) graphics.create();
+        // Being painted means the page is in view again, so a drawing on its way is wanted after all.
+        isDropped = false;
         try {
             int width = getWidth();
             int height = getHeight();
@@ -157,7 +162,8 @@ final class GuidePageView extends JComponent {
                 requestedScale = wantedScale;
                 renderer.render(pageIndex, wantedScale, rendered -> {
                     // A zoom changed while this was drawing asks for another size; this one is still better than none.
-                    if (image == null || requestedScale == wantedScale) {
+                    // A page let go while this was drawing is far from view, so the drawing is not kept.
+                    if (!isDropped && (image == null || requestedScale == wantedScale)) {
                         image = rendered;
                         imageScale = wantedScale;
                         repaint();
