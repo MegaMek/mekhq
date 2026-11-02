@@ -43,8 +43,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -52,7 +50,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -70,8 +67,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryChange;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
-import mekhq.campaign.utilities.glossary.GlossaryIndex;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
@@ -79,23 +74,20 @@ import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.baseComponents.hud.HudStatTile;
-import mekhq.gui.baseComponents.hud.HudTabStrip;
 import mekhq.gui.dialog.glossary.GuideDocument.OutlineItem;
 import mekhq.gui.dialog.glossary.GuideDocument.PageSize;
-import mekhq.gui.dialog.glossary.GuideSearch.LibraryHit;
-import mekhq.gui.dialog.glossary.GuideSearch.LibraryResult;
 import mekhq.gui.dialog.glossary.GuideSearch.PageHit;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
- * Reads MekHQ's guides, in the heads-up-display style of the glossary console.
+ * Reads one of MekHQ's guides, in the heads-up-display style of the glossary console.
  *
- * <p>The library down the left lists every guide, and can search inside all of them at once; choosing a page it found
- * opens the guide at that page. Open guides sit as tabs across the top. The guide itself scrolls as one run of pages,
- * drawn in the background so scrolling never waits, with page and zoom controls and a find box above it. Beside it,
- * the guide's own outline follows the reader, and the Pages, Matches and Related tabs show thumbnails, every place the
- * find box's words appear, and the glossary entries that point to the guide.</p>
+ * <p>The guide scrolls as one run of pages, drawn in the background so scrolling never waits, with page and zoom
+ * controls and a find box above it. Tiles across the top show the page being read and the section it is in, the zoom,
+ * and how many times the find box's words appear; pages with matches are outlined.</p>
+ *
+ * <p>The viewer shows one guide at a time. Opening another guide while it is open shows that guide in its place.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -111,13 +103,8 @@ public class GuideViewer extends JDialog {
     private static final float ZOOM_STEP = 1.15f;
     private static final int PAGE_GAP = 22;
     private static final int CANVAS_MARGIN = 24;
-    private static final int THUMBNAIL_WIDTH = 104;
     /** Pages further than this from the one being read let their images go. */
     private static final int KEPT_PAGES = 8;
-    private static final int MAXIMUM_LISTED_MATCHES = 300;
-    private static final int MAXIMUM_LIBRARY_PAGES = 80;
-    private static final int PASSAGE_BEFORE = 50;
-    private static final int PASSAGE_AFTER = 110;
     private static final int TYPING_DELAY_MILLIS = 180;
     /** Section titles in the Page tile are cut to this many characters, so the tiles keep their width. */
     private static final int TILE_TEXT_LENGTH = 28;
@@ -131,56 +118,20 @@ public class GuideViewer extends JDialog {
         CUSTOM
     }
 
-    /** The tabs beside the guide. */
-    private enum SideTab {
-        OUTLINE,
-        PAGES,
-        MATCHES,
-        RELATED
-    }
-
-    /** A guide open in a tab, and where the player was in it. */
-    private static final class OpenGuide {
-        private final DocumentationEntry entry;
-        private @Nullable GuideRenderer renderer;
-        private @Nullable GuideDocument document;
-        private @Nullable String error;
-        private int page = 1;
-        private float zoom = ACTUAL_SIZE;
-        private Fit fit = Fit.WIDTH;
-        private String find = "";
-        private List<PageHit> hits = List.of();
-        private int hitIndex = -1;
-        /** Set when the guide should be shown at a page once it has opened. */
-        private int pendingPage = 1;
-
-        private OpenGuide(DocumentationEntry entry) {
-            this.entry = entry;
-        }
-
-        private boolean isReady() {
-            return renderer != null && document != null;
-        }
-    }
-
-    /** A row of the library. */
-    private sealed interface LibraryRow permits Heading, GuideRow, PageRow {}
-
-    private record Heading(String label, boolean isNotice) implements LibraryRow {}
-
-    private record GuideRow(DocumentationEntry entry, @Nullable String query) implements LibraryRow {}
-
-    private record PageRow(DocumentationEntry entry, PageHit hit, String text, String query) implements LibraryRow {}
-
-    private final GuideLibrary library = GuideLibrary.getInstance();
     private final GlossaryGuidePreferences guidePreferences = GlossaryGuidePreferences.getInstance();
-    private final List<OpenGuide> open = new ArrayList<>();
-    private @Nullable OpenGuide active;
-    private @Nullable GlossaryIndex glossaryIndex;
-    private SideTab sideTab = SideTab.OUTLINE;
+
+    private @Nullable DocumentationEntry entry;
+    private @Nullable GuideRenderer renderer;
+    private @Nullable GuideDocument document;
+    private @Nullable String error;
+    private int page = 1;
+    private float zoom = ACTUAL_SIZE;
+    private Fit fit = Fit.WIDTH;
+    private List<PageHit> hits = List.of();
+    private int hitIndex = -1;
+    /** Counts the guides opened, so a guide still loading when another is opened is let go when it arrives. */
+    private int loadCount;
     private final List<GuidePageView> pageViews = new ArrayList<>();
-    private final List<GuidePageView> thumbnails = new ArrayList<>();
-    private final List<SideRow> outlineRows = new ArrayList<>();
     private boolean isRestoringView;
 
     private final JLabel titleLabel = new JLabel();
@@ -188,13 +139,7 @@ public class GuideViewer extends JDialog {
     private final HudStatTile pageTile;
     private final HudStatTile zoomTile;
     private final HudStatTile findTile;
-    private final JPanel tabStrip = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(2), 0));
     private final HudButton guideButton;
-    private final JTextField librarySearch = new JTextField();
-    private final HudCheckBox searchInsideBox;
-    private final JLabel libraryCount = new JLabel();
-    private final DefaultListModel<LibraryRow> libraryModel = new DefaultListModel<>();
-    private final JList<LibraryRow> libraryList = new JList<>(libraryModel);
     private final HudButton previousButton;
     private final HudButton nextButton;
     private final JTextField pageField = new JTextField(3);
@@ -210,21 +155,13 @@ public class GuideViewer extends JDialog {
     private final HudButton findNextButton;
     private final JPanel pagesColumn = new JPanel();
     private final JScrollPane canvasScroll = new JScrollPane(pagesColumn);
-    private final HudTabStrip sideTabs;
-    private final CardLayout sideCards = new CardLayout();
-    private final JPanel sideBody = new JPanel(sideCards);
-    private final Map<SideTab, JPanel> sideColumns = new EnumMap<>(SideTab.class);
-    private final Map<SideTab, JScrollPane> sideScrolls = new EnumMap<>(SideTab.class);
     private final JLabel footerSummary = new JLabel();
     private final HudButton saveButton;
     private final HudButton externalButton;
-    private final HudButton closeTabButton;
     private final HudCheckBox autoOpenGuides;
     private final HudGuideDrawer guideDrawer;
-    private final Timer libraryTimer;
     private final Timer findTimer;
     private final Timer refitTimer;
-    private final Runnable libraryListener = this::onLibraryRead;
 
     // region Opening
 
@@ -268,7 +205,7 @@ public class GuideViewer extends JDialog {
             openViewer.toFront();
             openViewer.requestFocus();
         }
-        openViewer.openGuide(entry, page, find, false);
+        openViewer.open(entry, page, find);
     }
 
     private GuideViewer(@Nullable Window owner) {
@@ -278,7 +215,6 @@ public class GuideViewer extends JDialog {
         zoomTile = new HudStatTile(text("GuideViewer.tile.zoom"), "");
         findTile = new HudStatTile(text("GuideViewer.tile.find"), "");
         guideButton = new HudButton("?  " + upper("GlossaryGuide.viewer.button"), false, true);
-        searchInsideBox = new HudCheckBox(text("GuideViewer.library.inside"));
         previousButton = new HudButton("\u2039", false, true);
         nextButton = new HudButton("\u203A", false, true);
         zoomOutButton = new HudButton("\u2212", false, true);
@@ -287,12 +223,8 @@ public class GuideViewer extends JDialog {
         fitPageChip = new HudChip(text("GuideViewer.zoom.fitPage"), () -> setFit(Fit.PAGE));
         findPreviousButton = new HudButton("\u2039", false, true);
         findNextButton = new HudButton("\u203A", false, true);
-        sideTabs = new HudTabStrip(List.of(text("GuideViewer.side.OUTLINE"), text("GuideViewer.side.PAGES"),
-              text("GuideViewer.side.MATCHES"), text("GuideViewer.side.RELATED")), true,
-              index -> showSideTab(SideTab.values()[index]));
         saveButton = new HudButton(upper("GuideViewer.footer.save"), false);
         externalButton = new HudButton(upper("GuideViewer.footer.external"), false);
-        closeTabButton = new HudButton(upper("GuideViewer.footer.closeTab"), false);
         autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.autoOpen"));
         autoOpenGuides.setSelected(guidePreferences.isGuideAutoOpen());
         autoOpenGuides.addActionListener(event -> guidePreferences.setGuideAutoOpen(autoOpenGuides.isSelected()));
@@ -300,22 +232,16 @@ public class GuideViewer extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.tab.example"),
               getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.tab.terms")), autoOpenGuides,
               getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.close"), this::closeGuide);
-        libraryTimer = new Timer(TYPING_DELAY_MILLIS, event -> refreshLibrary());
-        libraryTimer.setRepeats(false);
         findTimer = new Timer(TYPING_DELAY_MILLIS, event -> runFind(true));
         findTimer.setRepeats(false);
         refitTimer = new Timer(120, event -> refit());
         refitTimer.setRepeats(false);
 
         buildUI();
-        library.addListener(libraryListener);
-        library.readAll();
-        refreshLibrary();
-        showActive();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setMinimumSize(scaleForGUI(980, 620));
-        getContentPane().setPreferredSize(scaleForGUI(1320, 840));
+        setMinimumSize(scaleForGUI(760, 560));
+        getContentPane().setPreferredSize(scaleForGUI(1040, 840));
         pack();
         setLocationRelativeTo(owner);
         setPreferences();
@@ -330,12 +256,9 @@ public class GuideViewer extends JDialog {
 
             @Override
             public void windowClosed(WindowEvent event) {
-                libraryTimer.stop();
                 findTimer.stop();
                 refitTimer.stop();
-                library.removeListener(libraryListener);
-                open.forEach(GuideViewer::closeRenderer);
-                open.clear();
+                closeRenderer();
                 if (openViewer == GuideViewer.this) {
                     openViewer = null;
                 }
@@ -352,14 +275,7 @@ public class GuideViewer extends JDialog {
         content.setOpaque(true);
         content.setBackground(GROUND);
         content.add(buildCommandBar(), BorderLayout.NORTH);
-
-        JPanel body = new JPanel(new BorderLayout());
-        body.setOpaque(true);
-        body.setBackground(GROUND);
-        body.add(buildLibrary(), BorderLayout.WEST);
-        body.add(buildDocument(), BorderLayout.CENTER);
-        body.add(buildSide(), BorderLayout.EAST);
-        content.add(body, BorderLayout.CENTER);
+        content.add(buildDocument(), BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
@@ -376,12 +292,12 @@ public class GuideViewer extends JDialog {
     }
 
     private JPanel buildCommandBar() {
-        JPanel commandBar = new JPanel(new BorderLayout(0, scaleForGUI(12)));
+        JPanel commandBar = new JPanel(new BorderLayout(scaleForGUI(24), 0));
         commandBar.setOpaque(true);
         commandBar.setBackground(GROUND);
         commandBar.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), 0, scaleForGUI(16))));
+              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
 
         JPanel identity = column();
         JLabel eyebrow = new JLabel(upper("GuideViewer.eyebrow"));
@@ -391,112 +307,18 @@ public class GuideViewer extends JDialog {
         titleLabel.setFont(hudFont(Font.BOLD, 1.3f, 0.12f));
         subtitleLabel.setForeground(TEXT_MUTED);
         subtitleLabel.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
+        guideButton.addActionListener(event -> openHowTo());
         identity.add(leftAligned(eyebrow));
         identity.add(Box.createVerticalStrut(scaleForGUI(3)));
         identity.add(leftAligned(titleLabel));
         identity.add(Box.createVerticalStrut(scaleForGUI(4)));
         identity.add(leftAligned(subtitleLabel));
+        identity.add(Box.createVerticalStrut(scaleForGUI(10)));
+        identity.add(leftAligned(guideButton));
 
-        JPanel topRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(24), 0));
-        topRow.add(identity, BorderLayout.CENTER);
-        topRow.add(Hud.tileRow(pageTile, zoomTile, findTile), BorderLayout.EAST);
-
-        JScrollPane tabScroll = new JScrollPane(tabStrip, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tabScroll.setBorder(null);
-        tabScroll.setOpaque(false);
-        tabScroll.getViewport().setOpaque(false);
-        tabScroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, scaleForGUI(4)));
-        guideButton.addActionListener(event -> openHowTo());
-        JPanel tabsRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
-        tabsRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        tabsRow.add(tabScroll, BorderLayout.CENTER);
-        JPanel guideHolder = Hud.transparentPanel(new BorderLayout());
-        guideHolder.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(6), 0));
-        guideHolder.add(guideButton, BorderLayout.SOUTH);
-        tabsRow.add(guideHolder, BorderLayout.EAST);
-
-        commandBar.add(topRow, BorderLayout.CENTER);
-        commandBar.add(tabsRow, BorderLayout.SOUTH);
+        commandBar.add(identity, BorderLayout.CENTER);
+        commandBar.add(Hud.tileRow(pageTile, zoomTile, findTile), BorderLayout.EAST);
         return commandBar;
-    }
-
-    private JPanel buildLibrary() {
-        JPanel controls = column();
-        controls.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(8),
-              scaleForGUI(12)));
-        Hud.styleField(librarySearch);
-        librarySearch.putClientProperty("JTextField.placeholderText",
-              getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.placeholder"));
-        librarySearch.putClientProperty("JTextField.showClearButton", true);
-        librarySearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.toolTipText"));
-        onTyping(librarySearch, libraryTimer);
-        librarySearch.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-                    focusLibraryList();
-                    event.consume();
-                }
-            }
-        });
-        controls.add(leftAligned(librarySearch));
-        controls.add(Box.createVerticalStrut(scaleForGUI(6)));
-        searchInsideBox.setSelected(true);
-        searchInsideBox.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.inside.toolTipText"));
-        searchInsideBox.addActionListener(event -> refreshLibrary());
-        controls.add(leftAligned(searchInsideBox));
-        controls.add(Box.createVerticalStrut(scaleForGUI(8)));
-        libraryCount.setForeground(TEXT_FAINT);
-        libraryCount.setFont(hudFont(Font.PLAIN, 0.78f, 0.0f));
-        controls.add(leftAligned(libraryCount));
-
-        libraryList.setOpaque(true);
-        libraryList.setBackground(SURFACE_DEEP);
-        libraryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        libraryList.setCellRenderer(new LibraryRenderer());
-        libraryList.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.list.toolTipText"));
-        libraryList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent event) {
-                int index = libraryList.locationToIndex(event.getPoint());
-                if (index >= 0 && libraryList.getCellBounds(index, index).contains(event.getPoint())) {
-                    chooseLibraryRow(libraryModel.get(index), event.isShiftDown());
-                }
-            }
-        });
-        libraryList.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.VK_ENTER && libraryList.getSelectedValue() != null) {
-                    chooseLibraryRow(libraryList.getSelectedValue(), event.isShiftDown());
-                    event.consume();
-                } else if (event.getKeyCode() == KeyEvent.VK_UP && libraryList.getSelectedIndex() <= 0) {
-                    librarySearch.requestFocusInWindow();
-                    event.consume();
-                }
-            }
-        });
-        JScrollPane listScroll = new JScrollPane(libraryList);
-        Hud.styleScroll(listScroll, SURFACE_DEEP, false);
-        listScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        // Rows wrap to the list's width, so their heights are measured again whenever it changes.
-        listScroll.getViewport().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent event) {
-                libraryList.setFixedCellHeight(10);
-                libraryList.setFixedCellHeight(-1);
-            }
-        });
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(true);
-        panel.setBackground(SURFACE_DEEP);
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, scaleForGUI(1), BORDER));
-        panel.setPreferredSize(scaleForGUI(300, 0));
-        panel.add(controls, BorderLayout.NORTH);
-        panel.add(listScroll, BorderLayout.CENTER);
-        return panel;
     }
 
     private JPanel buildDocument() {
@@ -535,7 +357,22 @@ public class GuideViewer extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "GuideViewer.find.placeholder"));
         findField.putClientProperty("JTextField.showClearButton", true);
         findField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.find.toolTipText"));
-        onTyping(findField, findTimer);
+        findField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                findTimer.restart();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                findTimer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                findTimer.restart();
+            }
+        });
         findField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent event) {
@@ -620,32 +457,6 @@ public class GuideViewer extends JDialog {
         return panel;
     }
 
-    private JPanel buildSide() {
-        for (SideTab tab : SideTab.values()) {
-            JPanel columnPanel = column();
-            columnPanel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), 0, scaleForGUI(12), 0));
-            JPanel holder = Hud.transparentPanel(new BorderLayout());
-            holder.add(columnPanel, BorderLayout.NORTH);
-            JScrollPane scroll = new JScrollPane(holder);
-            Hud.styleScroll(scroll, SURFACE_DEEP, false);
-            scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            sideColumns.put(tab, columnPanel);
-            sideScrolls.put(tab, scroll);
-            sideBody.add(scroll, tab.name());
-        }
-        sideBody.setOpaque(false);
-        sideTabs.setSelected(SideTab.OUTLINE.ordinal());
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(true);
-        panel.setBackground(SURFACE_DEEP);
-        panel.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
-        panel.setPreferredSize(scaleForGUI(284, 0));
-        panel.add(sideTabs, BorderLayout.NORTH);
-        panel.add(sideBody, BorderLayout.CENTER);
-        return panel;
-    }
-
     private JPanel buildFooter() {
         JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
         footer.setOpaque(true);
@@ -661,12 +472,6 @@ public class GuideViewer extends JDialog {
         saveButton.addActionListener(event -> saveCopy());
         externalButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.footer.external.toolTipText"));
         externalButton.addActionListener(event -> openExternally());
-        closeTabButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.footer.closeTab.toolTipText"));
-        closeTabButton.addActionListener(event -> {
-            if (active != null) {
-                closeGuideTab(active);
-            }
-        });
         HudButton close = new HudButton(upper("GuideViewer.footer.close"), false);
         close.addActionListener(event -> dispose());
 
@@ -675,8 +480,6 @@ public class GuideViewer extends JDialog {
         buttons.add(saveButton);
         buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
         buttons.add(externalButton);
-        buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
-        buttons.add(closeTabButton);
         buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
         buttons.add(close);
         footer.add(buttons, BorderLayout.EAST);
@@ -689,33 +492,22 @@ public class GuideViewer extends JDialog {
             findField.requestFocusInWindow();
             findField.selectAll();
         });
-        bind(root, KeyStroke.getKeyStroke('/'), "searchLibrary", () -> {
-            if (!isTyping()) {
-                librarySearch.requestFocusInWindow();
-                librarySearch.selectAll();
-            }
-        });
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, menuKey), "zoomIn", () -> zoomBy(ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, menuKey), "zoomInPlus", () -> zoomBy(ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_ADD, menuKey), "zoomInPad", () -> zoomBy(ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, menuKey), "zoomOut", () -> zoomBy(1 / ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, menuKey), "zoomOutPad", () -> zoomBy(1 / ZOOM_STEP));
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_0, menuKey), "fitWidth", () -> setFit(Fit.WIDTH));
-        bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuKey), "closeTab", () -> {
-            if (active != null) {
-                closeGuideTab(active);
-            }
-        });
         for (int key : new int[] { KeyEvent.VK_RIGHT, KeyEvent.VK_PAGE_DOWN }) {
             bind(root, KeyStroke.getKeyStroke(key, 0), "next" + key, () -> {
-                if (!isTyping() && !isInLibraryList()) {
+                if (!isTyping()) {
                     stepPage(1);
                 }
             });
         }
         for (int key : new int[] { KeyEvent.VK_LEFT, KeyEvent.VK_PAGE_UP }) {
             bind(root, KeyStroke.getKeyStroke(key, 0), "previous" + key, () -> {
-                if (!isTyping() && !isInLibraryList()) {
+                if (!isTyping()) {
                     stepPage(-1);
                 }
             });
@@ -732,35 +524,12 @@ public class GuideViewer extends JDialog {
         });
     }
 
-    private static void onTyping(JTextField field, Timer timer) {
-        field.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent event) {
-                timer.restart();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent event) {
-                timer.restart();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent event) {
-                timer.restart();
-            }
-        });
-    }
-
     private static boolean isTyping() {
         return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof JTextComponent
                      component && component.isEditable();
     }
 
-    private boolean isInLibraryList() {
-        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == libraryList;
-    }
-
-    /** Escape closes an open guide drawer, then clears the box being typed in, then closes the viewer. */
+    /** Escape closes an open guide drawer, then clears the find box, then closes the viewer. */
     private void onEscape() {
         Component focus = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         if (guideDrawer.isVisible()) {
@@ -769,10 +538,6 @@ public class GuideViewer extends JDialog {
             findField.setText("");
             findTimer.stop();
             runFind(false);
-        } else if (focus == librarySearch && !librarySearch.getText().isEmpty()) {
-            librarySearch.setText("");
-            libraryTimer.stop();
-            refreshLibrary();
         } else {
             dispose();
         }
@@ -780,50 +545,49 @@ public class GuideViewer extends JDialog {
 
     // endregion Layout
 
-    // region Tabs
+    // region Guide
 
     /**
-     * Opens a guide, or shows it if it is already open.
+     * Shows a guide, opening it if it is not the one already shown.
      *
-     * @param entry  the guide
-     * @param page   the page to show, from 1; 0 to keep the place in a guide already open
-     * @param find   the words to put in the find box, or empty to keep the guide's own
-     * @param newTab {@code true} to open it beside the guide being read rather than in its place
+     * @param newEntry the guide
+     * @param newPage  the page to show, from 1; 0 to keep the place in the guide already shown
+     * @param find     the words to put in the find box, or empty to leave the box as it is
      */
-    private void openGuide(DocumentationEntry entry, int page, String find, boolean newTab) {
-        rememberView();
-        OpenGuide guide = open.stream().filter(candidate -> candidate.entry == entry).findFirst().orElse(null);
-        if (guide == null) {
-            guide = new OpenGuide(entry);
-            if (newTab || active == null) {
-                open.add(guide);
-            } else {
-                // Opening without asking for a new tab replaces the guide being read, as a browser link does.
-                int index = open.indexOf(active);
-                closeRenderer(active);
-                open.set(index, guide);
+    private void open(DocumentationEntry newEntry, int newPage, String find) {
+        if (newEntry == entry && error == null) {
+            if (!find.isEmpty()) {
+                findField.setText(find);
+                findTimer.stop();
+                runFind(newPage <= 0);
             }
-            load(guide);
+            if (newPage > 0) {
+                goToPage(newPage);
+            }
+            return;
         }
-        if (page > 0) {
-            guide.pendingPage = page;
-        }
-        if (!find.isEmpty()) {
-            guide.find = find;
-        }
-        active = guide;
-        showActive();
+
+        closeRenderer();
+        entry = newEntry;
+        document = null;
+        error = null;
+        page = Math.max(1, newPage);
+        hits = List.of();
+        hitIndex = -1;
+        findField.setText(find);
+        findTimer.stop();
+        showCurrent();
+        load(newEntry, ++loadCount);
     }
 
-    private void load(OpenGuide guide) {
-        File file = GuideLibrary.fileFor(guide.entry);
+    private void load(DocumentationEntry loading, int loadNumber) {
+        File file = GuideReader.fileFor(loading);
         new SwingWorker<Object[], Void>() {
             @Override
             protected Object[] doInBackground() throws Exception {
                 PDDocument pdf = Loader.loadPDF(file);
                 try {
-                    GuideDocument known = library.document(guide.entry);
-                    return new Object[] { pdf, known != null ? known : GuideReader.read(pdf) };
+                    return new Object[] { pdf, GuideReader.read(pdf) };
                 } catch (IOException | RuntimeException ex) {
                     pdf.close();
                     throw ex;
@@ -832,139 +596,90 @@ public class GuideViewer extends JDialog {
 
             @Override
             protected void done() {
+                boolean isCurrent = loadNumber == loadCount && isDisplayable();
                 try {
                     Object[] result = get();
                     PDDocument pdf = (PDDocument) result[0];
-                    if (!open.contains(guide) || !isDisplayable()) {
+                    if (!isCurrent) {
                         pdf.close();
                         return;
                     }
-                    guide.renderer = new GuideRenderer(pdf);
-                    guide.document = (GuideDocument) result[1];
-                    library.store(guide.entry, guide.document);
+                    renderer = new GuideRenderer(pdf);
+                    document = (GuideDocument) result[1];
                 } catch (Exception ex) {
-                    guide.error = file.getPath();
+                    if (!isCurrent) {
+                        return;
+                    }
+                    error = file.getPath();
                     LOGGER.error(ex, "Unable to open the guide {}", file);
                 }
-                if (guide == active) {
-                    showActive();
-                }
+                showCurrent();
             }
         }.execute();
     }
 
-    private void closeGuideTab(OpenGuide guide) {
-        int index = open.indexOf(guide);
-        if (index < 0) {
+    private void closeRenderer() {
+        if (renderer != null) {
+            renderer.close();
+            renderer = null;
+        }
+    }
+
+    private boolean isReady() {
+        return renderer != null && document != null;
+    }
+
+    /** Shows the guide: its header, and its pages at the page asked for, or why it cannot be shown yet. */
+    private void showCurrent() {
+        pageViews.clear();
+        pagesColumn.removeAll();
+        if (entry == null) {
             return;
         }
-        open.remove(index);
-        closeRenderer(guide);
-        if (guide == active) {
-            active = open.isEmpty() ? null : open.get(Math.min(index, open.size() - 1));
-        }
-        showActive();
-    }
 
-    private static void closeRenderer(OpenGuide guide) {
-        if (guide.renderer != null) {
-            guide.renderer.close();
-            guide.renderer = null;
-        }
-    }
-
-    private void switchTo(OpenGuide guide) {
-        if (guide != active) {
-            rememberView();
-            active = guide;
-            showActive();
-        }
-    }
-
-    /** Notes where the player is in the guide being read, to return there when they come back to its tab. */
-    private void rememberView() {
-        if (active != null && active.isReady()) {
-            active.pendingPage = active.page;
-            active.find = findField.getText();
-        }
-    }
-
-    private void refreshTabs() {
-        tabStrip.removeAll();
-        for (OpenGuide guide : open) {
-            tabStrip.add(new GuideTab(guide, guide == active));
-        }
-        tabStrip.revalidate();
-        tabStrip.repaint();
-    }
-
-    // endregion Tabs
-
-    // region Guide
-
-    /** Shows the active guide: its header, its pages at the remembered page, its find and its side panel. */
-    private void showActive() {
-        refreshTabs();
-        refreshLibrary();
-        pageViews.clear();
-        thumbnails.clear();
-        outlineRows.clear();
-        pagesColumn.removeAll();
-
-        OpenGuide guide = active;
-        if (guide == null) {
-            titleLabel.setText(upper("GuideViewer.empty.title"));
-            subtitleLabel.setText(getTextAt(RESOURCE_BUNDLE, "GuideViewer.empty.subtitle"));
-            pagesColumn.add(centred(Hud.notice(getTextAt(RESOURCE_BUNDLE, "GuideViewer.empty.notice"))));
+        titleLabel.setText(entry.getTitle().toUpperCase(Locale.ROOT));
+        if (error != null) {
+            subtitleLabel.setText(error);
+            pagesColumn.add(centred(Hud.notice(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.error", error))));
+        } else if (!isReady()) {
+            subtitleLabel.setText(versionLine());
+            pagesColumn.add(centred(Hud.notice(getTextAt(RESOURCE_BUNDLE, "GuideViewer.loading"))));
         } else {
-            titleLabel.setText(guide.entry.getTitle().toUpperCase(Locale.ROOT));
-            if (guide.error != null) {
-                subtitleLabel.setText(guide.error);
-                pagesColumn.add(centred(Hud.notice(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.error",
-                      guide.error))));
-            } else if (!guide.isReady()) {
-                subtitleLabel.setText(versionLine(guide));
-                pagesColumn.add(centred(Hud.notice(getTextAt(RESOURCE_BUNDLE, "GuideViewer.loading"))));
-            } else {
-                subtitleLabel.setText(versionLine(guide) + "  \u00B7  " + getFormattedTextAt(RESOURCE_BUNDLE,
-                      "GuideViewer.pages", guide.document.pageCount()) + "  \u00B7  "
-                                            + GuideLibrary.fileFor(guide.entry).getName());
-                buildPages(guide);
-            }
+            subtitleLabel.setText(versionLine() + "  \u00B7  " + getFormattedTextAt(RESOURCE_BUNDLE,
+                  "GuideViewer.pages", document.pageCount()) + "  \u00B7  " + GuideReader.fileFor(entry).getName());
+            buildPages();
         }
         pagesColumn.revalidate();
         pagesColumn.repaint();
 
-        boolean isReady = guide != null && guide.isReady();
-        findField.setText(guide == null ? "" : guide.find);
-        findTimer.stop();
-        findField.setEnabled(isReady);
-        for (HudButton button : List.of(saveButton, externalButton)) {
-            button.setArmed(guide != null && guide.error == null);
-        }
-        closeTabButton.setArmed(guide != null);
+        findField.setEnabled(isReady());
+        saveButton.setArmed(error == null);
+        externalButton.setArmed(error == null);
         runFind(false);
-        rebuildSide();
         refreshZoomControls();
         refreshPageControls();
 
-        if (isReady) {
-            int page = guide.pendingPage;
+        if (isReady()) {
+            int target = page;
             isRestoringView = true;
             SwingUtilities.invokeLater(() -> {
+                // The scroll pane sizes the pages first, so the page is found where it will be drawn.
                 canvasScroll.validate();
-                goToPage(page);
+                goToPage(target);
                 isRestoringView = false;
                 onScrolled();
+                if (!hits.isEmpty()) {
+                    runFind(true);
+                }
             });
         }
     }
 
-    private void buildPages(OpenGuide guide) {
-        guide.zoom = fittedZoom(guide);
-        List<PageSize> sizes = guide.document.pageSizes();
+    private void buildPages() {
+        zoom = fittedZoom();
+        List<PageSize> sizes = document.pageSizes();
         for (int index = 0; index < sizes.size(); index++) {
-            GuidePageView view = new GuidePageView(guide.renderer, index, sizes.get(index), guide.zoom, false,
+            GuidePageView view = new GuidePageView(renderer, index, sizes.get(index), zoom,
                   count -> getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.page.matches", count));
             view.setAlignmentX(Component.CENTER_ALIGNMENT);
             pageViews.add(view);
@@ -978,108 +693,101 @@ public class GuideViewer extends JDialog {
         }
     }
 
-    private String versionLine(OpenGuide guide) {
-        return GlossaryConsole.versionLine(guide.entry.getVersionAddedOrLastUpdated(),
-              GlossaryChange.of(guide.entry.getVersionAddedOrLastUpdated()));
+    private String versionLine() {
+        return GlossaryConsole.versionLine(entry.getVersionAddedOrLastUpdated(),
+              GlossaryChange.of(entry.getVersionAddedOrLastUpdated()));
     }
 
-    /** The zoom the guide's fit asks for, at the canvas's present size; a custom zoom is kept as it is. */
-    private float fittedZoom(OpenGuide guide) {
-        if (guide.fit == Fit.CUSTOM || guide.document == null || guide.document.pageCount() == 0) {
-            return guide.zoom;
+    /** The zoom the fit asks for, at the canvas's present size; a zoom of the player's own is kept as it is. */
+    private float fittedZoom() {
+        if (fit == Fit.CUSTOM || document == null || document.pageCount() == 0) {
+            return zoom;
         }
         Dimension viewport = canvasScroll.getViewport().getExtentSize();
         if (viewport.width <= 0) {
             viewport = scaleForGUI(700, 600);
         }
         float widest = 1;
-        for (PageSize size : guide.document.pageSizes()) {
+        for (PageSize size : document.pageSizes()) {
             widest = Math.max(widest, size.width());
         }
         int scrollBar = canvasScroll.getVerticalScrollBar().getPreferredSize().width;
         float available = viewport.width - (scaleForGUI(CANVAS_MARGIN) * 2f) - scrollBar;
-        float zoom = available / widest;
-        if (guide.fit == Fit.PAGE) {
-            PageSize first = guide.document.pageSizes().get(0);
-            float tall = (viewport.height - (scaleForGUI(PAGE_GAP) * 2f)) / first.height();
-            zoom = Math.min(zoom, tall);
+        float fitted = available / widest;
+        if (fit == Fit.PAGE) {
+            PageSize first = document.pageSizes().get(0);
+            fitted = Math.min(fitted, (viewport.height - (scaleForGUI(PAGE_GAP) * 2f)) / first.height());
         }
-        return clampZoom(zoom);
+        return clampZoom(fitted);
     }
 
     private static float clampZoom(float zoom) {
         return Math.max(MINIMUM_ZOOM, Math.min(MAXIMUM_ZOOM, zoom));
     }
 
-    private void setFit(Fit fit) {
-        if (active == null || !active.isReady()) {
-            return;
+    private void setFit(Fit newFit) {
+        if (isReady()) {
+            fit = newFit;
+            applyZoom(fittedZoom());
         }
-        active.fit = fit;
-        applyZoom(fittedZoom(active));
     }
 
     private void zoomBy(float factor) {
-        if (active == null || !active.isReady()) {
-            return;
+        if (isReady()) {
+            fit = Fit.CUSTOM;
+            applyZoom(clampZoom(zoom * factor));
         }
-        active.fit = Fit.CUSTOM;
-        applyZoom(clampZoom(active.zoom * factor));
     }
 
     /** Re-fits the pages when the window changes size, unless the player chose a zoom of their own. */
     private void refit() {
-        if (active != null && active.isReady() && active.fit != Fit.CUSTOM) {
-            float zoom = fittedZoom(active);
-            if (Math.abs(zoom - active.zoom) > 0.001f) {
-                applyZoom(zoom);
+        if (isReady() && fit != Fit.CUSTOM) {
+            float fitted = fittedZoom();
+            if (Math.abs(fitted - zoom) > 0.001f) {
+                applyZoom(fitted);
             }
         }
     }
 
     /** Resizes every page to a zoom, keeping the page being read in view. */
-    private void applyZoom(float zoom) {
-        OpenGuide guide = active;
-        if (guide == null) {
-            return;
-        }
-        int page = guide.page;
-        guide.zoom = zoom;
-        pageViews.forEach(view -> view.setZoom(zoom));
+    private void applyZoom(float newZoom) {
+        int target = page;
+        zoom = newZoom;
+        pageViews.forEach(view -> view.setZoom(newZoom));
         refreshZoomControls();
         isRestoringView = true;
         SwingUtilities.invokeLater(() -> {
             canvasScroll.validate();
-            goToPage(page);
+            goToPage(target);
             isRestoringView = false;
             onScrolled();
         });
     }
 
     private void refreshZoomControls() {
-        boolean isReady = active != null && active.isReady();
-        int percent = isReady ? Math.round(active.zoom / ACTUAL_SIZE * 100) : 0;
+        boolean isReady = isReady();
+        int percent = Math.round(zoom / ACTUAL_SIZE * 100);
         zoomLabel.setText(isReady ? percent + "%" : "");
         zoomTile.setValue(isReady ? percent + "%" : "\u2013", TEXT);
-        zoomTile.setSub(isReady ? getTextAt(RESOURCE_BUNDLE, "GuideViewer.zoom." + active.fit.name()) : "");
-        fitWidthChip.setActive(isReady && active.fit == Fit.WIDTH);
-        fitPageChip.setActive(isReady && active.fit == Fit.PAGE);
-        zoomInButton.setArmed(isReady && active.zoom < MAXIMUM_ZOOM);
-        zoomOutButton.setArmed(isReady && active.zoom > MINIMUM_ZOOM);
+        zoomTile.setSub(isReady ? getTextAt(RESOURCE_BUNDLE, "GuideViewer.zoom." + fit.name()) : "");
+        fitWidthChip.setActive(isReady && fit == Fit.WIDTH);
+        fitPageChip.setActive(isReady && fit == Fit.PAGE);
+        zoomInButton.setArmed(isReady && zoom < MAXIMUM_ZOOM);
+        zoomOutButton.setArmed(isReady && zoom > MINIMUM_ZOOM);
     }
 
     private void stepPage(int step) {
-        if (active != null && active.isReady()) {
-            goToPage(active.page + step);
+        if (isReady()) {
+            goToPage(page + step);
         }
     }
 
     /** Scrolls a page's top into view. */
-    private void goToPage(int page) {
-        if (active == null || !active.isReady() || pageViews.isEmpty()) {
+    private void goToPage(int target) {
+        if (!isReady() || pageViews.isEmpty()) {
             return;
         }
-        int index = Math.max(1, Math.min(pageViews.size(), page)) - 1;
+        int index = Math.max(1, Math.min(pageViews.size(), target)) - 1;
         Rectangle bounds = pageViews.get(index).getBounds();
         JViewport viewport = canvasScroll.getViewport();
         int maxY = Math.max(0, pagesColumn.getHeight() - viewport.getExtentSize().height);
@@ -1090,42 +798,36 @@ public class GuideViewer extends JDialog {
 
     /** Works out which page is being read from how far the guide is scrolled. */
     private void onScrolled() {
-        if (isRestoringView || active == null || !active.isReady() || pageViews.isEmpty()) {
+        if (isRestoringView || !isReady() || pageViews.isEmpty()) {
             return;
         }
         Rectangle visible = canvasScroll.getViewport().getViewRect();
         int line = visible.y + (visible.height * 3 / 10);
-        int page = 1;
+        int current = 1;
         for (GuidePageView view : pageViews) {
             if (view.getY() <= line) {
-                page = view.pageIndex() + 1;
+                current = view.pageIndex() + 1;
             }
         }
-        if (page != active.page) {
-            setPage(page);
+        if (current != page) {
+            setPage(current);
         }
     }
 
-    private void setPage(int page) {
-        if (active == null) {
-            return;
-        }
-        active.page = page;
+    private void setPage(int newPage) {
+        page = newPage;
         refreshPageControls();
         // Pages far from the one being read let their images go; they are drawn again if they come back.
         for (GuidePageView view : pageViews) {
-            if (Math.abs(view.pageIndex() + 1 - page) > KEPT_PAGES) {
+            if (Math.abs(view.pageIndex() + 1 - newPage) > KEPT_PAGES) {
                 view.dropImage();
             }
         }
-        thumbnails.forEach(thumbnail -> thumbnail.setCurrent(thumbnail.pageIndex() + 1 == page));
-        refreshOutlineSelection();
     }
 
     private void refreshPageControls() {
-        boolean isReady = active != null && active.isReady();
-        int count = isReady ? active.document.pageCount() : 0;
-        int page = isReady ? active.page : 0;
+        boolean isReady = isReady();
+        int count = isReady ? document.pageCount() : 0;
         if (!pageField.isFocusOwner()) {
             pageField.setText(isReady ? Integer.toString(page) : "");
         }
@@ -1133,17 +835,17 @@ public class GuideViewer extends JDialog {
         pageOfLabel.setText(isReady ? getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.page.of", count) : "");
         previousButton.setArmed(isReady && page > 1);
         nextButton.setArmed(isReady && page < count);
-        OutlineItem section = isReady ? active.document.sectionAt(page) : null;
+        OutlineItem section = isReady ? document.sectionAt(page) : null;
         pageTile.setValue(isReady ? page + " / " + count : "\u2013", TEXT);
-        pageTile.setSub(section != null ? shorten(section.title(), TILE_TEXT_LENGTH)
+        pageTile.setSub(section != null ? shorten(section.title())
                               : (isReady ? getTextAt(RESOURCE_BUNDLE, "GuideViewer.page.noOutline") : ""));
-        if (active == null) {
+        if (entry == null) {
             footerSummary.setText("");
         } else if (!isReady) {
-            footerSummary.setText(active.entry.getTitle());
+            footerSummary.setText(entry.getTitle());
         } else {
             footerSummary.setText(getFormattedTextAt(RESOURCE_BUNDLE, section == null ? "GuideViewer.footer.summary"
-                  : "GuideViewer.footer.summary.section", active.entry.getTitle(), page, count,
+                  : "GuideViewer.footer.summary.section", entry.getTitle(), page, count,
                   section == null ? "" : section.title()));
         }
     }
@@ -1153,356 +855,55 @@ public class GuideViewer extends JDialog {
     // region Find
 
     private void runFind(boolean jump) {
-        OpenGuide guide = active;
-        if (guide == null || !guide.isReady()) {
-            refreshFindControls();
-            return;
-        }
-        guide.find = findField.getText();
-        guide.hits = GuideSearch.find(guide.document.pageTexts(), guide.find);
-        guide.hitIndex = -1;
-        if (!guide.hits.isEmpty()) {
-            guide.hitIndex = 0;
-            for (int i = 0; i < guide.hits.size(); i++) {
-                if (guide.hits.get(i).page() >= guide.page) {
-                    guide.hitIndex = i;
-                    break;
-                }
+        hits = isReady() ? GuideSearch.find(document.pageTexts(), findField.getText()) : List.of();
+        hitIndex = -1;
+        for (int i = 0; i < hits.size(); i++) {
+            if (hits.get(i).page() >= page) {
+                hitIndex = i;
+                break;
             }
         }
+        if (hitIndex < 0 && !hits.isEmpty()) {
+            hitIndex = 0;
+        }
 
-        Map<Integer, Integer> counts = matchCounts(guide);
+        Map<Integer, Integer> counts = matchCounts();
         pageViews.forEach(view -> view.setMatches(counts.getOrDefault(view.pageIndex() + 1, 0)));
-        thumbnails.forEach(view -> view.setMatches(counts.getOrDefault(view.pageIndex() + 1, 0)));
         refreshFindControls();
-        rebuildMatches();
-        if (jump && guide.hitIndex >= 0) {
-            showSideTab(SideTab.MATCHES);
-            goToPage(guide.hits.get(guide.hitIndex).page());
+        if (jump && hitIndex >= 0) {
+            goToPage(hits.get(hitIndex).page());
         }
     }
 
-    private static Map<Integer, Integer> matchCounts(OpenGuide guide) {
+    private Map<Integer, Integer> matchCounts() {
         Map<Integer, Integer> counts = new TreeMap<>();
-        guide.hits.forEach(hit -> counts.merge(hit.page(), 1, Integer::sum));
+        hits.forEach(hit -> counts.merge(hit.page(), 1, Integer::sum));
         return counts;
     }
 
     private void stepFind(int step) {
-        OpenGuide guide = active;
-        if (guide == null || guide.hits.isEmpty()) {
+        if (hits.isEmpty()) {
             return;
         }
-        guide.hitIndex = Math.floorMod(guide.hitIndex + step, guide.hits.size());
-        goToPage(guide.hits.get(guide.hitIndex).page());
+        hitIndex = Math.floorMod(hitIndex + step, hits.size());
+        goToPage(hits.get(hitIndex).page());
         refreshFindControls();
-        rebuildMatches();
     }
 
     private void refreshFindControls() {
-        OpenGuide guide = active;
-        boolean hasQuery = guide != null && guide.isReady() && !GuideSearch.normalise(findField.getText()).isEmpty();
-        int count = hasQuery ? guide.hits.size() : 0;
+        boolean hasQuery = isReady() && !GuideSearch.normalise(findField.getText()).isEmpty();
+        int count = hits.size();
         findCount.setText(!hasQuery ? "" : count == 0 ? getTextAt(RESOURCE_BUNDLE, "GuideViewer.find.none")
                                              : getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.find.position",
-                                                   guide.hitIndex + 1, count));
+                                                   hitIndex + 1, count));
         findPreviousButton.setArmed(count > 1);
         findNextButton.setArmed(count > 1);
         findTile.setValue(hasQuery ? Integer.toString(count) : "\u2013", count > 0 ? AMBER : TEXT_FAINT);
         findTile.setSub(hasQuery ? getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.find.pages",
-              matchCounts(guide).size()) : getTextAt(RESOURCE_BUNDLE, "GuideViewer.find.nothing"));
-        sideTabs.setLabel(SideTab.MATCHES.ordinal(), count > 0
-                                                          ? getFormattedTextAt(RESOURCE_BUNDLE,
-              "GuideViewer.side.MATCHES.count", count) : text("GuideViewer.side.MATCHES"));
+              matchCounts().size()) : getTextAt(RESOURCE_BUNDLE, "GuideViewer.find.nothing"));
     }
 
     // endregion Find
-
-    // region Library
-
-    private void refreshLibrary() {
-        String query = GuideSearch.normalise(librarySearch.getText());
-        LibraryRow selected = libraryList.getSelectedValue();
-        libraryModel.clear();
-        if (query.isEmpty()) {
-            libraryModel.addElement(new Heading(getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.all"), false));
-            for (DocumentationEntry entry : GuideLibrary.entries()) {
-                libraryModel.addElement(new GuideRow(entry, null));
-            }
-            libraryCount.setText(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.library.count",
-                  DocumentationEntry.values().length) + readingNote());
-        } else {
-            LibraryResult result = GuideSearch.searchLibrary(library.searchable(), query,
-                  searchInsideBox.isSelected());
-            if (!result.titleMatches().isEmpty()) {
-                libraryModel.addElement(new Heading(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "GuideViewer.library.titleMatches", result.titleMatches().size()), false));
-                result.titleMatches().forEach(guide -> libraryModel.addElement(
-                      new GuideRow(entryFor(guide.key()), query)));
-            }
-            if (!result.pageMatches().isEmpty()) {
-                libraryModel.addElement(new Heading(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "GuideViewer.library.pageMatches", result.pageMatches().size()), false));
-                for (LibraryHit hit : result.pageMatches().subList(0,
-                      Math.min(MAXIMUM_LIBRARY_PAGES, result.pageMatches().size()))) {
-                    libraryModel.addElement(new PageRow(entryFor(hit.guide().key()), hit.hit(),
-                          hit.guide().pageTexts().get(hit.hit().page() - 1), query));
-                }
-            }
-            if (result.titleMatches().isEmpty() && result.pageMatches().isEmpty()) {
-                libraryModel.addElement(new Heading(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "GuideViewer.library.noMatches", librarySearch.getText().strip()), true));
-            }
-            long guides = result.pageMatches().stream().map(hit -> hit.guide().key()).distinct().count();
-            libraryCount.setText(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.library.found",
-                  result.titleMatches().size() + guides, result.pageMatches().size()) + readingNote());
-        }
-        if (selected != null && libraryModel.contains(selected)) {
-            libraryList.setSelectedValue(selected, false);
-        }
-    }
-
-    private String readingNote() {
-        if (library.isComplete() || !searchInsideBox.isSelected()) {
-            return "";
-        }
-        return getTextAt(RESOURCE_BUNDLE, "GuideViewer.library.reading");
-    }
-
-    /** Refreshes the library's search as each guide is read in the background. */
-    private void onLibraryRead() {
-        if (!GuideSearch.normalise(librarySearch.getText()).isEmpty() || library.isComplete()) {
-            refreshLibrary();
-        } else {
-            libraryCount.setText(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.library.count",
-                  DocumentationEntry.values().length) + readingNote());
-        }
-    }
-
-    private static DocumentationEntry entryFor(String key) {
-        DocumentationEntry entry = DocumentationEntry.getDocumentationEntryFromLookUpName(key);
-        if (entry == null) {
-            throw new IllegalStateException("Unknown guide " + key);
-        }
-        return entry;
-    }
-
-    private void chooseLibraryRow(LibraryRow row, boolean newTab) {
-        if (row instanceof GuideRow guideRow) {
-            openGuide(guideRow.entry(), 0, "", newTab);
-        } else if (row instanceof PageRow pageRow) {
-            openGuide(pageRow.entry(), pageRow.hit().page(), librarySearch.getText().strip(), newTab);
-        }
-    }
-
-    private void focusLibraryList() {
-        for (int i = 0; i < libraryModel.size(); i++) {
-            if (!(libraryModel.get(i) instanceof Heading)) {
-                libraryList.requestFocusInWindow();
-                libraryList.setSelectedIndex(i);
-                libraryList.ensureIndexIsVisible(i);
-                return;
-            }
-        }
-    }
-
-    // endregion Library
-
-    // region Side panel
-
-    private void showSideTab(SideTab tab) {
-        sideTab = tab;
-        sideTabs.setSelected(tab.ordinal());
-        sideCards.show(sideBody, tab.name());
-        if (tab == SideTab.PAGES && thumbnails.isEmpty()) {
-            rebuildThumbnails();
-        }
-    }
-
-    private void rebuildSide() {
-        rebuildOutline();
-        thumbnails.clear();
-        sideColumns.get(SideTab.PAGES).removeAll();
-        if (sideTab == SideTab.PAGES) {
-            rebuildThumbnails();
-        }
-        rebuildMatches();
-        rebuildRelated();
-        for (JPanel columnPanel : sideColumns.values()) {
-            columnPanel.revalidate();
-            columnPanel.repaint();
-        }
-    }
-
-    private void rebuildOutline() {
-        JPanel outline = sideColumns.get(SideTab.OUTLINE);
-        outline.removeAll();
-        outlineRows.clear();
-        if (active == null || !active.isReady()) {
-            return;
-        }
-        if (active.document.outline().isEmpty()) {
-            outline.add(leftAligned(sideNote(getTextAt(RESOURCE_BUNDLE, "GuideViewer.outline.none"))));
-            return;
-        }
-        for (OutlineItem item : active.document.outline()) {
-            SideRow row = new SideRow(escape(item.title()), item.page() > 0 ? Integer.toString(item.page()) : "",
-                  item.depth(), () -> goToPage(item.page()));
-            row.item = item;
-            outlineRows.add(row);
-            outline.add(leftAligned(row));
-        }
-        refreshOutlineSelection();
-    }
-
-    private void refreshOutlineSelection() {
-        OutlineItem section = active != null && active.isReady() ? active.document.sectionAt(active.page) : null;
-        for (SideRow row : outlineRows) {
-            boolean isCurrent = row.item == section;
-            row.setCurrent(isCurrent);
-            if (isCurrent && sideTab == SideTab.OUTLINE) {
-                SwingUtilities.invokeLater(() -> row.scrollRectToVisible(new Rectangle(0, 0, 1, row.getHeight())));
-            }
-        }
-    }
-
-    private void rebuildThumbnails() {
-        JPanel pages = sideColumns.get(SideTab.PAGES);
-        pages.removeAll();
-        thumbnails.clear();
-        if (active == null || !active.isReady()) {
-            return;
-        }
-        JPanel grid = Hud.transparentPanel(new GridLayout(0, 2, scaleForGUI(12), scaleForGUI(12)));
-        grid.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(14), 0, scaleForGUI(14)));
-        Map<Integer, Integer> counts = matchCounts(active);
-        List<PageSize> sizes = active.document.pageSizes();
-        for (int index = 0; index < sizes.size(); index++) {
-            PageSize size = sizes.get(index);
-            float zoom = scaleForGUI(THUMBNAIL_WIDTH) / Math.max(1, size.width());
-            GuidePageView thumbnail = new GuidePageView(active.renderer, index, size, zoom, true,
-                  Integer::toString);
-            thumbnail.setMatches(counts.getOrDefault(index + 1, 0));
-            thumbnail.setCurrent(index + 1 == active.page);
-            thumbnail.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            thumbnail.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.thumbnail.toolTipText",
-                  index + 1));
-            int page = index + 1;
-            thumbnail.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    goToPage(page);
-                }
-            });
-            thumbnails.add(thumbnail);
-            JPanel cell = Hud.transparentPanel(new BorderLayout(0, scaleForGUI(3)));
-            JPanel holder = Hud.transparentPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            holder.add(thumbnail);
-            cell.add(holder, BorderLayout.CENTER);
-            JLabel number = new JLabel(Integer.toString(page), SwingConstants.CENTER);
-            number.setForeground(TEXT_FAINT);
-            number.setFont(hudFont(Font.PLAIN, 0.74f, 0.04f));
-            cell.add(number, BorderLayout.SOUTH);
-            grid.add(cell);
-        }
-        pages.add(leftAligned(grid));
-        pages.revalidate();
-        pages.repaint();
-    }
-
-    private void rebuildMatches() {
-        JPanel matches = sideColumns.get(SideTab.MATCHES);
-        matches.removeAll();
-        OpenGuide guide = active;
-        if (guide == null || !guide.isReady()) {
-            return;
-        }
-        if (guide.hits.isEmpty()) {
-            matches.add(leftAligned(sideNote(getTextAt(RESOURCE_BUNDLE,
-                  GuideSearch.normalise(findField.getText()).isEmpty() ? "GuideViewer.matches.empty"
-                        : "GuideViewer.matches.none"))));
-        } else {
-            for (int i = 0; i < Math.min(MAXIMUM_LISTED_MATCHES, guide.hits.size()); i++) {
-                PageHit hit = guide.hits.get(i);
-                String[] passage = GuideSearch.passage(guide.document.pageTexts().get(hit.page() - 1), hit,
-                      PASSAGE_BEFORE, PASSAGE_AFTER);
-                String html = "<font color='" + hex(TEXT_FAINT) + "'><b>"
-                                    + escape(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.matches.page",
-                      hit.page()).toUpperCase(Locale.ROOT)) + "</b></font><br>" + markedPassage(passage);
-                int index = i;
-                SideRow row = new SideRow(html, "", 0, () -> {
-                    guide.hitIndex = index;
-                    goToPage(hit.page());
-                    refreshFindControls();
-                    rebuildMatches();
-                });
-                row.setCurrent(i == guide.hitIndex);
-                row.useAmberMark();
-                matches.add(leftAligned(row));
-                if (i == guide.hitIndex && sideTab == SideTab.MATCHES) {
-                    SwingUtilities.invokeLater(() -> row.scrollRectToVisible(
-                          new Rectangle(0, 0, 1, row.getHeight())));
-                }
-            }
-        }
-        matches.revalidate();
-        matches.repaint();
-    }
-
-    private void rebuildRelated() {
-        JPanel related = sideColumns.get(SideTab.RELATED);
-        related.removeAll();
-        if (active == null) {
-            return;
-        }
-        related.add(leftAligned(sideHeading(getTextAt(RESOURCE_BUNDLE, "GuideViewer.related.glossary"))));
-        if (glossaryIndex == null) {
-            glossaryIndex = GlossaryIndex.build();
-        }
-        List<GlossaryEntry> entries = glossaryIndex.items().stream()
-                                            .filter(item -> item.documents().contains(active.entry))
-                                            .map(GlossaryIndex.Item::entry)
-                                            .toList();
-        if (entries.isEmpty()) {
-            related.add(leftAligned(sideNote(getTextAt(RESOURCE_BUNDLE, "GuideViewer.related.none"))));
-        }
-        for (GlossaryEntry entry : entries) {
-            related.add(leftAligned(new SideRow(escape(entry.getTitle()), "", 0,
-                  () -> GlossaryConsole.showEntry(this, entry))));
-        }
-        related.add(Box.createVerticalStrut(scaleForGUI(10)));
-        related.add(leftAligned(sideHeading(getTextAt(RESOURCE_BUNDLE, "GuideViewer.related.record"))));
-        related.add(leftAligned(sideNote(versionLine(active))));
-        if (active.isReady()) {
-            related.add(leftAligned(sideNote(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.pages",
-                  active.document.pageCount()))));
-        }
-        related.add(leftAligned(sideNote(GuideLibrary.fileFor(active.entry).getName())));
-    }
-
-    private static String markedPassage(String[] passage) {
-        return escape(passage[0]) + "<b><font color='" + hex(AMBER) + "'>" + escape(passage[1]) + "</font></b>"
-                     + escape(passage[2]);
-    }
-
-    private static JComponent sideHeading(String text) {
-        JComponent heading = Hud.sectionHeading(text);
-        JPanel holder = Hud.transparentPanel(new BorderLayout());
-        holder.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(14), scaleForGUI(6),
-              scaleForGUI(14)));
-        holder.add(heading, BorderLayout.CENTER);
-        return holder;
-    }
-
-    private static JComponent sideNote(String text) {
-        JLabel label = Hud.hint("<html><div style='width:" + scaleForGUI(230) + "px'>" + escape(text)
-                                      + "</div></html>");
-        label.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(14), scaleForGUI(3),
-              scaleForGUI(14)));
-        return label;
-    }
-
-    // endregion Side panel
 
     // region Actions
 
@@ -1516,10 +917,10 @@ public class GuideViewer extends JDialog {
     }
 
     private void saveCopy() {
-        if (active == null || active.error != null) {
+        if (entry == null || error != null) {
             return;
         }
-        File source = GuideLibrary.fileFor(active.entry);
+        File source = GuideReader.fileFor(entry);
         String name = source.getName().replaceFirst("(?i)\\.pdf$", "");
         Optional<File> target = FileDialogs.saveGuideCopy(GlossaryConsole.frameAbove(this), name);
         if (target.isEmpty()) {
@@ -1537,10 +938,10 @@ public class GuideViewer extends JDialog {
     }
 
     private void openExternally() {
-        if (active == null || active.error != null) {
+        if (entry == null || error != null) {
             return;
         }
-        File file = GuideLibrary.fileFor(active.entry).getAbsoluteFile();
+        File file = GuideReader.fileFor(entry).getAbsoluteFile();
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             showExternalFailure(file);
             return;
@@ -1576,12 +977,8 @@ public class GuideViewer extends JDialog {
         return getTextAt(RESOURCE_BUNDLE, key).toUpperCase(Locale.ROOT);
     }
 
-    private static String escape(String text) {
-        return GlossaryConsole.escape(text);
-    }
-
-    private static String shorten(String text, int length) {
-        return text.length() <= length ? text : text.substring(0, length - 1).strip() + "\u2026";
+    private static String shorten(String text) {
+        return text.length() <= TILE_TEXT_LENGTH ? text : text.substring(0, TILE_TEXT_LENGTH - 1).strip() + "\u2026";
     }
 
     private static JPanel column() {
@@ -1607,251 +1004,4 @@ public class GuideViewer extends JDialog {
     }
 
     // endregion Helpers
-
-    /** An open guide's tab: its title, and a cross that closes it. */
-    private final class GuideTab extends JPanel {
-        private final boolean isSelected;
-        private boolean isHovered;
-
-        private GuideTab(OpenGuide guide, boolean isSelected) {
-            super(new BorderLayout(scaleForGUI(8), 0));
-            this.isSelected = isSelected;
-            setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(scaleForGUI(7), scaleForGUI(14), scaleForGUI(7), scaleForGUI(8)));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setToolTipText(guide.entry.getTitle());
-
-            JLabel title = new JLabel(guide.entry.getTitle());
-            title.setForeground(isSelected ? ACCENT_BRIGHT : TEXT_MUTED);
-            title.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
-            Dimension size = title.getPreferredSize();
-            title.setPreferredSize(new Dimension(Math.min(size.width, scaleForGUI(230)), size.height));
-            add(title, BorderLayout.CENTER);
-
-            JLabel close = new JLabel("\u00D7");
-            close.setForeground(TEXT_FAINT);
-            close.setFont(hudFont(Font.PLAIN, 1.05f, 0.0f));
-            close.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.tab.close.toolTipText",
-                  guide.entry.getTitle()));
-            close.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    if (close.contains(event.getPoint())) {
-                        closeGuideTab(guide);
-                    }
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent event) {
-                    close.setForeground(TEXT);
-                }
-
-                @Override
-                public void mouseExited(MouseEvent event) {
-                    close.setForeground(TEXT_FAINT);
-                }
-            });
-            add(close, BorderLayout.EAST);
-
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    if (contains(event.getPoint())) {
-                        // A middle click closes a tab, as it does in a browser.
-                        if (SwingUtilities.isMiddleMouseButton(event)) {
-                            closeGuideTab(guide);
-                        } else {
-                            switchTo(guide);
-                        }
-                    }
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent event) {
-                    isHovered = true;
-                    repaint();
-                }
-
-                @Override
-                public void mouseExited(MouseEvent event) {
-                    isHovered = false;
-                    repaint();
-                }
-            });
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            graphics.setColor(isSelected ? SURFACE_HIGHLIGHT : (isHovered ? SURFACE : SURFACE_DEEP));
-            graphics.fillRect(0, 0, getWidth(), getHeight());
-            graphics.setColor(BORDER);
-            graphics.drawLine(0, 0, 0, getHeight());
-            graphics.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight());
-            graphics.drawLine(0, 0, getWidth(), 0);
-            if (isSelected) {
-                graphics.setColor(ACCENT);
-                graphics.fillRect(0, 0, getWidth(), scaleForGUI(2));
-            }
-        }
-    }
-
-    /** A clickable row of the side panel: an outline heading, a match, or a related entry. */
-    private static final class SideRow extends JPanel {
-        private final JLabel label = new JLabel();
-        private @Nullable OutlineItem item;
-        private boolean isCurrent;
-        private boolean isHovered;
-        private Color mark = ACCENT;
-
-        private SideRow(String html, String trailing, int depth, Runnable onChoose) {
-            super(new BorderLayout(scaleForGUI(8), 0));
-            setOpaque(false);
-            setBorder(BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(12 + (depth * 14)), scaleForGUI(5),
-                  scaleForGUI(12)));
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            int width = scaleForGUI(220 - (depth * 14));
-            label.setText("<html><div style='width:" + width + "px'>" + html + "</div></html>");
-            label.setFont(hudFont(Font.PLAIN, depth == 0 ? 0.88f : 0.84f, 0.0f));
-            label.setForeground(depth == 0 ? TEXT_MUTED : TEXT_FAINT);
-            add(label, BorderLayout.CENTER);
-            if (!trailing.isEmpty()) {
-                JLabel page = new JLabel(trailing);
-                page.setForeground(TEXT_FAINT);
-                page.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
-                page.setVerticalAlignment(SwingConstants.TOP);
-                add(page, BorderLayout.EAST);
-            }
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent event) {
-                    if (contains(event.getPoint())) {
-                        onChoose.run();
-                    }
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent event) {
-                    isHovered = true;
-                    repaint();
-                }
-
-                @Override
-                public void mouseExited(MouseEvent event) {
-                    isHovered = false;
-                    repaint();
-                }
-            });
-        }
-
-        private void setCurrent(boolean isCurrent) {
-            this.isCurrent = isCurrent;
-            label.setForeground(isCurrent ? ACCENT_BRIGHT : TEXT_MUTED);
-            repaint();
-        }
-
-        /** Marks the current row in amber rather than cyan, as the find box's matches are. */
-        private void useAmberMark() {
-            mark = AMBER;
-        }
-
-        @Override
-        public Dimension getMaximumSize() {
-            return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
-        }
-
-        @Override
-        protected void paintComponent(Graphics graphics) {
-            if (isCurrent || isHovered) {
-                graphics.setColor(isCurrent ? SURFACE_HIGHLIGHT : SURFACE);
-                graphics.fillRect(0, 0, getWidth(), getHeight());
-            }
-            if (isCurrent) {
-                graphics.setColor(mark);
-                graphics.fillRect(0, 0, scaleForGUI(2), getHeight());
-            }
-        }
-    }
-
-    /** Draws the library's rows: headings, guides, and the pages a search found. */
-    private final class LibraryRenderer implements ListCellRenderer<LibraryRow> {
-        private final JLabel label = new JLabel();
-
-        private LibraryRenderer() {
-            label.setOpaque(true);
-            label.setVerticalAlignment(SwingConstants.TOP);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends LibraryRow> source, LibraryRow row, int index,
-              boolean isSelected, boolean cellHasFocus) {
-            int width = Math.max(scaleForGUI(120), source.getWidth() - scaleForGUI(40));
-            label.setBackground(isSelected ? SURFACE_HIGHLIGHT : SURFACE_DEEP);
-            label.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-            label.setForeground(TEXT);
-
-            if (row instanceof Heading heading) {
-                label.setBackground(SURFACE_DEEP);
-                label.setFont(heading.isNotice() ? hudFont(Font.PLAIN, 0.88f, 0.0f) : hudFont(Font.BOLD, 0.7f, 0.14f));
-                label.setForeground(heading.isNotice() ? TEXT_FAINT : ACCENT);
-                label.setText(heading.isNotice() ? "<html><div style='width:" + width + "px'>"
-                                                         + escape(heading.label()) + "</div></html>"
-                                    : heading.label().toUpperCase(Locale.ROOT));
-                label.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(heading.isNotice() ? 14 : 10),
-                      scaleForGUI(12), scaleForGUI(4), scaleForGUI(10)));
-                return label;
-            }
-
-            DocumentationEntry entry = row instanceof GuideRow guideRow ? guideRow.entry() : ((PageRow) row).entry();
-            boolean isOpen = open.stream().anyMatch(guide -> guide.entry == entry);
-            boolean isActive = active != null && active.entry == entry;
-            label.setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, isActive ? ACCENT : SURFACE_DEEP),
-                  BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(10), scaleForGUI(5), scaleForGUI(8))));
-            StringBuilder html = new StringBuilder("<html><div style='width:").append(width).append("px'>");
-            if (isOpen) {
-                html.append("<font color='").append(hex(ACCENT)).append("'>\u25CF</font> ");
-            }
-            String query = row instanceof GuideRow guideRow ? guideRow.query() : ((PageRow) row).query();
-            html.append(marked(entry.getTitle(), query, isActive ? ACCENT_BRIGHT : TEXT));
-            html.append("<br><font color='").append(hex(TEXT_FAINT)).append("'>");
-            if (row instanceof PageRow pageRow) {
-                html.append(escape(getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.matches.page",
-                      pageRow.hit().page()))).append("</font><br><font color='").append(hex(TEXT_MUTED))
-                      .append("'>").append(markedPassage(GuideSearch.passage(pageRow.text(), pageRow.hit(),
-                            PASSAGE_BEFORE, PASSAGE_AFTER)));
-            } else {
-                GuideDocument document = library.document(entry);
-                String pages = document == null ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "GuideViewer.pages",
-                      document.pageCount()) + "  \u00B7  ";
-                html.append(escape(pages + versionLine(entry)));
-            }
-            html.append("</font></div></html>");
-            label.setText(html.toString());
-            return label;
-        }
-
-        private String versionLine(DocumentationEntry entry) {
-            return GlossaryConsole.versionLine(entry.getVersionAddedOrLastUpdated(),
-                  GlossaryChange.of(entry.getVersionAddedOrLastUpdated()));
-        }
-
-        /** Escapes text and marks the search's words in it. */
-        private String marked(String text, @Nullable String query, Color color) {
-            String start = "<font color='" + hex(color) + "'>";
-            if (query == null || query.isEmpty()) {
-                return start + escape(text) + "</font>";
-            }
-            String lower = GuideSearch.lower(text);
-            StringBuilder result = new StringBuilder(start);
-            int last = 0;
-            int at = lower.indexOf(query);
-            while (at >= 0) {
-                result.append(escape(text.substring(last, at))).append("<b><font color='").append(hex(AMBER))
-                      .append("'>").append(escape(text.substring(at, at + query.length()))).append("</font></b>");
-                last = at + query.length();
-                at = lower.indexOf(query, last);
-            }
-            return result.append(escape(text.substring(last))).append("</font>").toString();
-        }
-    }
 }

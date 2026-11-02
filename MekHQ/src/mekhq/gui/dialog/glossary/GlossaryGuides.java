@@ -81,8 +81,7 @@ final class GlossaryGuides {
     /** The keyboard shortcuts the Glossary page's guide lists, by the name of their resource keys. */
     private static final List<String> SHORTCUTS = List.of("search", "results", "escape", "history", "export");
     /** The keyboard shortcuts the guide viewer's guide lists, by the name of their resource keys. */
-    private static final List<String> VIEWER_SHORTCUTS = List.of("library", "find", "pages", "zoom", "closeTab",
-          "viewerEscape");
+    private static final List<String> VIEWER_SHORTCUTS = List.of("find", "pages", "zoom", "viewerEscape");
 
     private GlossaryGuides() {}
 

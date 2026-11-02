@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog.glossary;
 
-import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
 import static mekhq.gui.baseComponents.hud.HudStyle.GROUND;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
@@ -58,8 +57,6 @@ import mekhq.gui.dialog.glossary.GuideDocument.PageSize;
  * painted at a new size, and shows the last image it had, stretched, until the new one arrives; pages scrolled far
  * out of view can let their images go to save memory.
  *
- * <p>The same component serves as a thumbnail in the viewer's Pages list.</p>
- *
  * @author Illiani
  * @since 0.51.01
  */
@@ -77,24 +74,20 @@ final class GuidePageView extends JComponent {
     private float imageScale;
     private float requestedScale;
     private int matches;
-    private boolean isCurrent;
-    private final boolean isThumbnail;
 
     /**
      * @param renderer     the renderer of the guide the page belongs to
      * @param pageIndex    the page, from 0
      * @param size         the page's size, in points
      * @param zoom         screen pixels per point
-     * @param isThumbnail  {@code true} for a thumbnail, which shows which page is current rather than a match count
      * @param matchesLabel gives the label of a page's match count
      */
-    GuidePageView(GuideRenderer renderer, int pageIndex, PageSize size, float zoom, boolean isThumbnail,
+    GuidePageView(GuideRenderer renderer, int pageIndex, PageSize size, float zoom,
           IntFunction<String> matchesLabel) {
         this.renderer = renderer;
         this.pageIndex = pageIndex;
         this.size = size;
         this.zoom = zoom;
-        this.isThumbnail = isThumbnail;
         this.matchesLabel = matchesLabel;
         setOpaque(false);
     }
@@ -117,14 +110,6 @@ final class GuidePageView extends JComponent {
     void setMatches(int matches) {
         if (this.matches != matches) {
             this.matches = matches;
-            repaint();
-        }
-    }
-
-    /** Marks a thumbnail as the page being read. */
-    void setCurrent(boolean isCurrent) {
-        if (this.isCurrent != isCurrent) {
-            this.isCurrent = isCurrent;
             repaint();
         }
     }
@@ -181,19 +166,14 @@ final class GuidePageView extends JComponent {
             }
 
             canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            if (isThumbnail && isCurrent) {
-                canvas.setColor(ACCENT);
-                canvas.setStroke(new BasicStroke(UIUtil.scaleForGUI(2)));
-                canvas.drawRect(0, 0, width - 1, height - 1);
-            }
             if (matches > 0) {
                 canvas.setColor(AMBER);
                 canvas.setStroke(new BasicStroke(UIUtil.scaleForGUI(2)));
                 canvas.drawRect(1, 1, width - 3, height - 3);
                 String flag = matchesLabel.apply(matches);
-                canvas.setFont(hudFont(Font.BOLD, isThumbnail ? 0.7f : 0.74f, 0.04f));
+                canvas.setFont(hudFont(Font.BOLD, 0.74f, 0.04f));
                 FontMetrics metrics = canvas.getFontMetrics();
-                int padding = UIUtil.scaleForGUI(isThumbnail ? 3 : 7);
+                int padding = UIUtil.scaleForGUI(7);
                 int flagWidth = metrics.stringWidth(flag) + (padding * 2);
                 int flagHeight = metrics.getHeight() + UIUtil.scaleForGUI(2);
                 canvas.fillRect(width - flagWidth, 0, flagWidth, flagHeight);

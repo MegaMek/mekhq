@@ -145,7 +145,7 @@ class GuideReaderTest {
     @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
     void everyGuideThatShipsWithMekHQReads(DocumentationEntry entry) throws IOException {
-        GuideDocument guide = GuideReader.read(GuideLibrary.fileFor(entry));
+        GuideDocument guide = GuideReader.read(GuideReader.fileFor(entry));
 
         assertTrue(guide.pageCount() > 0, entry + " has no pages");
         assertEquals(guide.pageCount(), guide.pageTexts().size());

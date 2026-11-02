@@ -37,8 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Finds words in guides: on the pages of one guide, for the viewer's find box, and across every guide, for its
- * library.
+ * Finds words on the pages of a guide, for the guide viewer's find box.
  *
  * <p>Searching ignores case. Page text has its white space collapsed when read, so a phrase broken across lines is
  * still found.</p>
@@ -61,31 +60,6 @@ final class GuideSearch {
      * @param length how long the words are
      */
     record PageHit(int page, int start, int length) {}
-
-    /**
-     * One guide, as the library searches it.
-     *
-     * @param key       the guide's lookup name
-     * @param title     the guide's title
-     * @param pageTexts the text of each page, or an empty list while the guide has not been read yet
-     */
-    record Guide(String key, String title, List<String> pageTexts) {}
-
-    /**
-     * What a library search found: guides whose titles hold the words, and pages that hold them.
-     *
-     * @param titleMatches the guides whose titles hold the words, in the order given
-     * @param pageMatches  the pages that hold the words, at most one per page, guide by guide
-     */
-    record LibraryResult(List<Guide> titleMatches, List<LibraryHit> pageMatches) {}
-
-    /**
-     * A page of a guide that holds the words.
-     *
-     * @param guide the guide
-     * @param hit   the first place on the page they appear
-     */
-    record LibraryHit(Guide guide, PageHit hit) {}
 
     /**
      * @param query the words as typed
@@ -120,72 +94,6 @@ final class GuideSearch {
             }
         }
         return hits;
-    }
-
-    /**
-     * Searches every guide's title and, if asked, every page of every guide that has been read.
-     *
-     * @param guides       the guides
-     * @param query        the words as typed
-     * @param searchInside {@code true} to search the guides' pages as well as their titles
-     *
-     * @return what was found
-     */
-    static LibraryResult searchLibrary(List<Guide> guides, String query, boolean searchInside) {
-        String needle = normalise(query);
-        List<Guide> titleMatches = new ArrayList<>();
-        List<LibraryHit> pageMatches = new ArrayList<>();
-        if (needle.isEmpty()) {
-            return new LibraryResult(titleMatches, pageMatches);
-        }
-        for (Guide guide : guides) {
-            if (lower(guide.title()).contains(needle)) {
-                titleMatches.add(guide);
-            }
-            if (!searchInside) {
-                continue;
-            }
-            for (int page = 0; page < guide.pageTexts().size(); page++) {
-                int at = lower(guide.pageTexts().get(page)).indexOf(needle);
-                if (at >= 0) {
-                    pageMatches.add(new LibraryHit(guide, new PageHit(page + 1, at, needle.length())));
-                }
-            }
-        }
-        return new LibraryResult(titleMatches, pageMatches);
-    }
-
-    /**
-     * Cuts the passage around a place on a page, for showing where the words were found.
-     *
-     * @param text   the page's text
-     * @param hit    the place
-     * @param before roughly how many characters to keep before it
-     * @param after  roughly how many characters to keep after it
-     *
-     * @return the passage, as three parts: before the words, the words, and after them; each cut part starts or
-     *       ends with an ellipsis
-     */
-    static String[] passage(String text, PageHit hit, int before, int after) {
-        int start = Math.max(0, hit.start() - before);
-        int end = Math.min(text.length(), hit.start() + hit.length() + after);
-        // Cut at word boundaries where there is one nearby.
-        if (start > 0) {
-            int space = text.indexOf(' ', start);
-            if (space >= 0 && space < hit.start()) {
-                start = space + 1;
-            }
-        }
-        if (end < text.length()) {
-            int space = text.lastIndexOf(' ', end);
-            if (space > hit.start() + hit.length()) {
-                end = space;
-            }
-        }
-        int wordsEnd = Math.min(text.length(), hit.start() + hit.length());
-        return new String[] { (start > 0 ? "\u2026" : "") + text.substring(start, hit.start()),
-                              text.substring(hit.start(), wordsEnd),
-                              text.substring(wordsEnd, end) + (end < text.length() ? "\u2026" : "") };
     }
 
     /**

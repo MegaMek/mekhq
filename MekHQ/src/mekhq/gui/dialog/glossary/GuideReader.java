@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.dialog.glossary.GuideDocument.OutlineItem;
 import mekhq.gui.dialog.glossary.GuideDocument.PageSize;
 import org.apache.pdfbox.Loader;
@@ -63,6 +64,15 @@ final class GuideReader {
     private static final Pattern SPACES = Pattern.compile("\\s+");
 
     private GuideReader() {
+    }
+
+    /**
+     * @param entry a guide
+     *
+     * @return the guide's file
+     */
+    static File fileFor(DocumentationEntry entry) {
+        return new File(entry.getFileAddress());
     }
 
     /**

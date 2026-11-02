@@ -37,14 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import mekhq.gui.dialog.glossary.GuideSearch.Guide;
-import mekhq.gui.dialog.glossary.GuideSearch.LibraryResult;
 import mekhq.gui.dialog.glossary.GuideSearch.PageHit;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link GuideSearch}: finding words on a guide's pages, across the library, and cutting the passage around
- * them.
+ * Tests for {@link GuideSearch}: finding words on a guide's pages.
  */
 class GuideSearchTest {
     private static final List<String> PAGES = List.of("Ransom offers arrive. A RANSOM is paid.", "No mention here.",
@@ -66,43 +63,6 @@ class GuideSearchTest {
     @Test
     void aPhraseBrokenAcrossLinesInTheQueryStillMatches() {
         assertEquals(1, GuideSearch.find(PAGES, "ransom\n  of").size());
-    }
-
-    @Test
-    void theLibraryFindsTitlesAndPages() {
-        List<Guide> guides = List.of(new Guide("POW", "Prisoners of War", PAGES),
-              new Guide("CONVOYS", "Resupply & Convoys", List.of("Convoys carry supplies.")),
-              new Guide("UNREAD", "Unit Markets", List.of()));
-
-        LibraryResult prisoners = GuideSearch.searchLibrary(guides, "prisoners", true);
-        assertEquals(1, prisoners.titleMatches().size());
-        assertEquals(1, prisoners.pageMatches().size());
-        assertEquals(3, prisoners.pageMatches().get(0).hit().page());
-
-        LibraryResult convoys = GuideSearch.searchLibrary(guides, "convoys", false);
-        assertEquals(1, convoys.titleMatches().size());
-        assertTrue(convoys.pageMatches().isEmpty(), "pages are not searched when searching inside is off");
-    }
-
-    @Test
-    void theLibraryListsEachPageOnce() {
-        LibraryResult result = GuideSearch.searchLibrary(List.of(new Guide("POW", "Prisoners", PAGES)), "ransom",
-              true);
-
-        assertEquals(2, result.pageMatches().size());
-    }
-
-    @Test
-    void thePassageIsCutAtWordsWithEllipses() {
-        String text = "one two three four five six seven eight nine ten eleven twelve";
-        PageHit hit = GuideSearch.find(List.of(text), "six").get(0);
-
-        String[] passage = GuideSearch.passage(text, hit, 10, 10);
-
-        assertEquals("six", passage[1]);
-        assertTrue(passage[0].startsWith("\u2026"), passage[0]);
-        assertTrue(passage[0].endsWith("five "), passage[0]);
-        assertTrue(passage[2].endsWith("\u2026"), passage[2]);
     }
 
     @Test
