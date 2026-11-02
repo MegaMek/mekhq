@@ -36,7 +36,6 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -91,6 +90,7 @@ import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.utilities.WrapLayout;
@@ -216,6 +216,12 @@ public class GlossaryConsole extends JDialog {
     private final JLabel footerSummary = new JLabel();
     private final HudButton markAllReadButton;
     private final HudButton exportButton;
+    private final HudButton guideButton;
+    private final HudCheckBox autoOpenGuides;
+    private final HudGuideDrawer guideDrawer;
+    private final GlossaryGuidePreferences guidePreferences = GlossaryGuidePreferences.getInstance();
+    private JPanel welcomeBanner;
+    private JScrollPane sideScroll;
     private final Timer searchTimer;
 
     // region Opening
@@ -349,6 +355,15 @@ public class GlossaryConsole extends JDialog {
         exportButton = new HudButton(text("GlossaryConsole.footer.export"), false);
         searchTimer = new Timer(SEARCH_DELAY_MILLIS, event -> refreshList());
         searchTimer.setRepeats(false);
+        guideButton = new HudButton("?  " + GlossaryGuides.buttonLabel(Mode.GLOSSARY).toUpperCase(Locale.ROOT),
+              false, true);
+        autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.autoOpen"));
+        autoOpenGuides.setSelected(guidePreferences.isGuideAutoOpen());
+        autoOpenGuides.addActionListener(event -> guidePreferences.setGuideAutoOpen(autoOpenGuides.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.tab.steps"),
+              getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.tab.example"),
+              getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.tab.terms")), autoOpenGuides,
+              getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.close"), this::closeGuide);
 
         buildUI();
         refreshTiles();
@@ -397,6 +412,16 @@ public class GlossaryConsole extends JDialog {
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
+        // The guide drawer and its scrim float over the console. The drawer claims Escape for itself, so its action is
+        // replaced with one that closes an open guide first and otherwise does what Escape does in the console.
+        guideDrawer.install(getRootPane());
+        getRootPane().getActionMap().put("closeGuide", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                onEscape();
+            }
+        });
+
         installKeyBindings(content);
     }
 
@@ -437,8 +462,14 @@ public class GlossaryConsole extends JDialog {
         topRow.add(identity, BorderLayout.CENTER);
         topRow.add(tiles, BorderLayout.EAST);
 
+        guideButton.addActionListener(event -> openGuide(mode));
+        JPanel modesRow = new JPanel(new BorderLayout(scaleForGUI(8), 0));
+        modesRow.setOpaque(false);
+        modesRow.add(modeSelector, BorderLayout.CENTER);
+        modesRow.add(guideButton, BorderLayout.EAST);
+
         commandBar.add(topRow, BorderLayout.CENTER);
-        commandBar.add(modeSelector, BorderLayout.SOUTH);
+        commandBar.add(modesRow, BorderLayout.SOUTH);
         return commandBar;
     }
 
@@ -635,7 +666,7 @@ public class GlossaryConsole extends JDialog {
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(14), scaleForGUI(14),
               scaleForGUI(14)));
-        JScrollPane sideScroll = new JScrollPane(topAligned(sidePanel));
+        sideScroll = new JScrollPane(topAligned(sidePanel));
         Hud.styleScroll(sideScroll, SURFACE_DEEP, false);
         sideScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sideScroll.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
@@ -644,10 +675,56 @@ public class GlossaryConsole extends JDialog {
         JPanel readerPanel = new JPanel(new BorderLayout());
         readerPanel.setOpaque(true);
         readerPanel.setBackground(GROUND);
+        welcomeBanner = buildWelcome();
+        JPanel welcomeHolder = Hud.transparentPanel(new BorderLayout());
+        welcomeHolder.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(20), 0,
+              scaleForGUI(20)));
+        welcomeHolder.add(welcomeBanner, BorderLayout.CENTER);
+        JPanel readerArea = Hud.transparentPanel(new BorderLayout());
+        readerArea.add(welcomeHolder, BorderLayout.NORTH);
+        readerArea.add(readerScroll, BorderLayout.CENTER);
+
         readerPanel.add(header, BorderLayout.NORTH);
-        readerPanel.add(readerScroll, BorderLayout.CENTER);
+        readerPanel.add(readerArea, BorderLayout.CENTER);
         readerPanel.add(sideScroll, BorderLayout.EAST);
         return readerPanel;
+    }
+
+    /** The overview's invitation to read the guide, shown until the player takes it up or dismisses it. */
+    private JPanel buildWelcome() {
+        JPanel banner = new JPanel(new BorderLayout(scaleForGUI(12), 0));
+        banner.setOpaque(true);
+        banner.setBackground(SURFACE_HIGHLIGHT);
+        banner.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER_CYAN,
+              scaleForGUI(1)), BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), scaleForGUI(10),
+              scaleForGUI(12))));
+        JPanel words = column();
+        JLabel title = new JLabel(text("GlossaryGuide.welcome.title"));
+        title.setForeground(ACCENT_BRIGHT);
+        title.setFont(hudFont(Font.BOLD, 0.95f, 0.12f));
+        words.add(leftAligned(title));
+        words.add(Box.createVerticalStrut(scaleForGUI(2)));
+        JLabel intro = new JLabel("<html>" + escape(getTextAt(RESOURCE_BUNDLE, "GlossaryGuide.welcome.text"))
+                                        + "</html>");
+        intro.setForeground(TEXT_MUTED);
+        intro.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
+        words.add(leftAligned(intro));
+
+        HudButton notNow = new HudButton(text("GlossaryGuide.welcome.dismiss"), false, true);
+        notNow.addActionListener(event -> dismissWelcome());
+        HudButton showMe = new HudButton(text("GlossaryGuide.welcome.show"), true, true);
+        showMe.addActionListener(event -> {
+            dismissWelcome();
+            openGuide(Mode.GLOSSARY);
+        });
+        JPanel buttons = column();
+        buttons.add(showMe);
+        buttons.add(Box.createVerticalStrut(scaleForGUI(6)));
+        buttons.add(notNow);
+
+        banner.add(words, BorderLayout.CENTER);
+        banner.add(buttons, BorderLayout.EAST);
+        return banner;
     }
 
     private JPanel buildFooter() {
@@ -691,17 +768,20 @@ public class GlossaryConsole extends JDialog {
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuKey), "export", this::exportPdf);
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "back", this::goBack);
         bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "forward", this::goForward);
-        bind(root, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape", () -> {
-            // Escape first clears a search, then closes the glossary.
-            if (!searchField.getText().isEmpty()) {
-                searchField.setText("");
-                searchTimer.stop();
-                refreshList();
-                focusSearch();
-            } else {
-                dispose();
-            }
-        });
+    }
+
+    /** Escape closes an open guide, then clears a search, then closes the glossary. */
+    private void onEscape() {
+        if (guideDrawer.isVisible()) {
+            closeGuide();
+        } else if (!searchField.getText().isEmpty()) {
+            searchField.setText("");
+            searchTimer.stop();
+            refreshList();
+            focusSearch();
+        } else {
+            dispose();
+        }
     }
 
     private static void bind(JComponent root, KeyStroke keyStroke, String name, Runnable action) {
@@ -756,6 +836,8 @@ public class GlossaryConsole extends JDialog {
             return;
         }
         mode = newMode;
+        closeGuide();
+        guideButton.setText("?  " + GlossaryGuides.buttonLabel(mode).toUpperCase(Locale.ROOT));
         if (mode == Mode.DOCUMENTATION && filter == Filter.UNREAD) {
             filter = Filter.ALL;
         }
@@ -771,6 +853,7 @@ public class GlossaryConsole extends JDialog {
         } else {
             showDocumentationIntro();
         }
+        maybeOpenGuide(mode);
     }
 
     private void setFilter(Filter newFilter) {
@@ -1195,7 +1278,7 @@ public class GlossaryConsole extends JDialog {
             });
         }
         setReaderText(html.toString());
-        refreshSideForOverview();
+        clearSide();
         refreshNavigation(true);
         selectCurrentRow();
     }
@@ -1205,9 +1288,7 @@ public class GlossaryConsole extends JDialog {
         readerEyebrow.setText(text("GlossaryConsole.documentation.eyebrow"));
         readerTitle.setText(text("GlossaryConsole.documentation.title"));
         setReaderText(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.documentation.about"));
-        sidePanel.removeAll();
-        sidePanel.revalidate();
-        sidePanel.repaint();
+        clearSide();
         refreshNavigation(false);
         selectCurrentRow();
     }
@@ -1227,8 +1308,7 @@ public class GlossaryConsole extends JDialog {
             addSideSection("GlossaryConsole.side.mentionedIn",
                   mentioning.stream().map(Item::entry).toList());
         }
-        sidePanel.revalidate();
-        sidePanel.repaint();
+        setSideVisible(!mentioning.isEmpty());
         refreshNavigation(false);
     }
 
@@ -1253,6 +1333,8 @@ public class GlossaryConsole extends JDialog {
     }
 
     private void setReaderText(String html) {
+        // The welcome banner belongs to the overview, until the player takes up or dismisses it.
+        welcomeBanner.setVisible(mode == Mode.GLOSSARY && current == null && !guidePreferences.isWelcomeDismissed());
         reader.setText("<html><body>" + html + "</body></html>");
         reader.getHighlighter().removeAllHighlights();
         reader.setCaretPosition(0);
@@ -1360,6 +1442,34 @@ public class GlossaryConsole extends JDialog {
 
     // endregion Reader
 
+    // region Guides
+
+    /**
+     * Opens a page's guide the first time the page is shown, if the player has not turned that off. The Glossary
+     * page offers its guide from the overview's welcome banner instead, as the glossary is often opened at an entry.
+     */
+    private void maybeOpenGuide(Mode page) {
+        if (page != Mode.GLOSSARY && !guidePreferences.isGuideSeen(page) && guidePreferences.isGuideAutoOpen()) {
+            openGuide(page);
+        }
+    }
+
+    private void openGuide(Mode page) {
+        guidePreferences.setGuideSeen(page, true);
+        guideDrawer.open(GlossaryGuides.build(page));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    private void dismissWelcome() {
+        guidePreferences.setWelcomeDismissed(true);
+        welcomeBanner.setVisible(false);
+    }
+
+    // endregion Guides
+
     // region Side panel
 
     private void refreshSide(Item item) {
@@ -1383,27 +1493,20 @@ public class GlossaryConsole extends JDialog {
         sidePanel.add(Box.createVerticalStrut(scaleForGUI(4)));
         sidePanel.add(leftAligned(Hud.hint(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.side.words",
               item.document().text().isBlank() ? 0 : item.document().text().split("\\s+").length))));
-        sidePanel.revalidate();
-        sidePanel.repaint();
+        setSideVisible(true);
     }
 
-    private void refreshSideForOverview() {
+    /** Empties the side panel and hides it, giving the reader its width. */
+    private void clearSide() {
         sidePanel.removeAll();
-        sidePanel.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.side.tips"))));
-        sidePanel.add(Box.createVerticalStrut(scaleForGUI(6)));
-        for (int i = 1; ; i++) {
-            String key = "GlossaryConsole.side.tip." + i;
-            String tip = getTextAt(RESOURCE_BUNDLE, key);
-            if (!isResourceKeyValid(tip)) {
-                break;
-            }
-            JLabel label = Hud.hint("<html><div style='width:" + scaleForGUI(SIDE_WIDTH - 40) + "px'>" + tip
-                                          + "</div></html>");
-            sidePanel.add(leftAligned(label));
-            sidePanel.add(Box.createVerticalStrut(scaleForGUI(8)));
-        }
+        setSideVisible(false);
+    }
+
+    private void setSideVisible(boolean visible) {
+        sideScroll.setVisible(visible);
         sidePanel.revalidate();
         sidePanel.repaint();
+        sideScroll.getParent().revalidate();
     }
 
     /** A link that wraps to the side panel's width rather than running off its edge. */
