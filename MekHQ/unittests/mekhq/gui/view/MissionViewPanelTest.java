@@ -95,6 +95,13 @@ class MissionViewPanelTest {
     }
 
     @Test
+    void openEndedContractLandedAtDestinationDoesNotShowTimeline() {
+        assertFalse(MissionViewPanel.shouldShowContractTimeline(
+              campaignOnDate(CONTRACT_SYSTEM, true),
+              openEndedContractAt(CONTRACT_SYSTEM, true)));
+    }
+
+    @Test
     void landedCurrentLocationWithoutPlanetUsesSystemName() {
         assertEquals("Somewhere Else (landed)",
               MissionViewPanel.currentLocationDescription(campaignOnDate(OTHER_SYSTEM, true)));
@@ -141,6 +148,12 @@ class MissionViewPanelTest {
     }
 
     private static AbstractContract contractAt(PlanetarySystem system, boolean activeOnCampaignDate) {
+        final AbstractContract contract = openEndedContractAt(system, activeOnCampaignDate);
+        when(contract.getEndingDate()).thenReturn(CAMPAIGN_DATE.plusMonths(6));
+        return contract;
+    }
+
+    private static AbstractContract openEndedContractAt(PlanetarySystem system, boolean activeOnCampaignDate) {
         final AbstractContract contract = mock(AbstractContract.class);
         when(contract.getTargetSystem()).thenReturn(system);
         when(contract.isActiveOn(CAMPAIGN_DATE)).thenReturn(activeOnCampaignDate);

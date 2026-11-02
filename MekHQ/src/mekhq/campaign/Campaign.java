@@ -5544,6 +5544,9 @@ public class Campaign implements ITechManager {
         }
         mission.setStatus(status);
 
+        // An open-ended contract ends the day it is completed, as everything that reads completed contracts expects
+        mission.closeOpenEndedSchedule(getLocalDate());
+
         // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
         final Money grossPayout = getGrossFinalContractPayment(mission, status);
 

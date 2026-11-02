@@ -1027,7 +1027,8 @@ public class CampaignGUI extends JPanel {
      *
      * <p>Access is only permitted while a contract is held if StratCon is disabled campaign-wide and none of the held
      * contracts (including accepted contracts that have not yet started) have StratCon enabled. Shell contracts never
-     * block it: they hold manual scenarios alongside other work and are never tied into StratCon.</p>
+     * block it, as they are never tied into StratCon, so a shell can be followed by a market contract. The reverse is
+     * not true: shells are created from the market, so none can be added while a StratCon contract blocks it.</p>
      *
      * @return {@code true} if the contract market should be blocked
      *
@@ -1036,9 +1037,12 @@ public class CampaignGUI extends JPanel {
      */
     private boolean isContractMarketBlockedByActiveContract() {
         Campaign campaign = getCampaign();
-        List<AbstractContract> heldContracts = campaign.getActiveContracts(true).stream()
-                                                     .filter(contract -> !(contract instanceof ShellContract))
-                                                     .toList();
+        List<AbstractContract> heldContracts = new ArrayList<>();
+        for (AbstractContract contract : campaign.getActiveContracts(true)) {
+            if (!(contract instanceof ShellContract)) {
+                heldContracts.add(contract);
+            }
+        }
         if (heldContracts.isEmpty()) {
             return false;
         }

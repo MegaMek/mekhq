@@ -792,6 +792,8 @@ public class ShellContractDialog extends JDialog {
             contract = ShellContractFactory.create(details, generateLiaison(employerFaction),
                   generateCommander(enemyFaction));
             campaign.addMission(contract);
+            // The cached flag is otherwise only refreshed at the start of the next day
+            campaign.setHasActiveContract();
         } else {
             // Only generate replacement NPCs for a side whose faction changed; the factory keeps the rest. Renaming a
             // custom side keeps its generic faction, so it keeps its NPC too.
