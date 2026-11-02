@@ -468,6 +468,14 @@ public class ContractDossierPanel extends JPanel {
         costBar.setToolTipText(expensesBreakdown);
         MarketHud.addSpanning(money, costBar, 3);
 
+        Money straightSupport = estimate.straightSupport();
+        if (straightSupport.isPositive()) {
+            MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.straightSupport"),
+                  signedAmount(straightSupport), READY,
+                  MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                        "dossier.contractMarket.profit.straightSupport.tooltip")), false);
+        }
+
         Money net = estimate.estimatedNet();
         MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
               signedAmount(net), net.isNegative() ? DANGER : READY, null, true);
