@@ -77,6 +77,13 @@ import mekhq.campaign.unit.Unit;
 public class MedicalController {
     private static final MMLogger LOGGER = MMLogger.create(MedicalController.class);
 
+    /**
+     * The target number for healing checks made by an academy's medical staff. This is a flat value rather than the
+     * academy's faculty skill, as the faculty skill of children's schools would leave academy care worse than natural
+     * healing.
+     */
+    public static final int ACADEMY_MEDICAL_CARE_TARGET_NUMBER = 8;
+
     final String RESOURCE_BUNDLE = "mekhq.resources.MedicalController";
 
     final private Campaign campaign;
@@ -148,7 +155,7 @@ public class MedicalController {
             Academy academy = EducationController.getAcademy(patient.getEduAcademySet(),
                   patient.getEduAcademyNameInSet());
             if (academy != null && !academy.isHomeSchool()) {
-                processAcademyMedicalCare(patient, academy.getFacultySkill());
+                processAcademyMedicalCare(patient);
                 return;
             }
         }
@@ -193,22 +200,22 @@ public class MedicalController {
     /**
      * Processes daily healing for a student whose injuries are tended by their academy's medical staff.
      *
-     * <p>Academy care stands in for an assigned doctor: under standard rules the staff make a {@code Surgery} check
-     * against the academy's faculty skill on the doctor-assisted healing schedule, while under Advanced Medical (and
-     * Alternate Advanced Medical) the patient is treated as being under proper care.</p>
+     * <p>Academy care stands in for an assigned doctor, with the staff's checks always made against
+     * {@link #ACADEMY_MEDICAL_CARE_TARGET_NUMBER}. Under standard rules the staff make a {@code Surgery} check on the
+     * doctor-assisted healing schedule. Under Advanced Medical a successful check marks the patient's injuries as
+     * treated, and under Alternate Advanced Medical the injuries recover at the assisted pace.</p>
      *
-     * @param patient      the student undergoing healing
-     * @param facultySkill the target number of the academy's medical staff
+     * @param patient the student undergoing healing
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private void processAcademyMedicalCare(Person patient, int facultySkill) {
+    private void processAcademyMedicalCare(Person patient) {
         patient.decrementDaysToWaitForHealing();
 
         if (isUseAdvancedMedical) {
             if (isUseAltAdvancedMedical) {
-                AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient, facultySkill);
+                AdvancedMedicalAlternateHealing.processNewDayUnderAcademyCare(campaign, patient);
             } else {
                 InjuryUtil.resolveDailyHealingUnderAcademyCare(campaign, patient);
             }
@@ -219,7 +226,7 @@ public class MedicalController {
             return;
         }
 
-        TargetRoll targetNumber = new TargetRoll(facultySkill, getTextAt(RESOURCE_BUNDLE,
+        TargetRoll targetNumber = new TargetRoll(ACADEMY_MEDICAL_CARE_TARGET_NUMBER, getTextAt(RESOURCE_BUNDLE,
               "MedicalController.modifier.academyStaff"));
         // The academy's staff make the roll, so the patient's own aptitude must not affect it
         ActionCheckResult actionCheckResult =

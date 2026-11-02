@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.MEDICAL_COMPLICATIONS;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
+import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_CYBERNETICS;
@@ -67,6 +68,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.AttributeCheck;
@@ -128,17 +130,16 @@ public class AdvancedMedicalAlternateHealing {
      * Processes the start-of-day healing for a student whose injuries are tended by their academy's medical staff.
      *
      * <p>Academy care is treated as assisted healing: injuries recover at the assisted pace and each resolving check
-     * is a Surgery check against the academy's faculty skill. The campaign's own doctors play no part, so no doctor
-     * SPAs, Edge, or task awards apply.</p>
+     * is a Surgery check against {@link MedicalController#ACADEMY_MEDICAL_CARE_TARGET_NUMBER}. The campaign's own
+     * doctors play no part, so no doctor SPAs, Edge, or task awards apply.</p>
      *
-     * @param campaign     the {@link Campaign} context
-     * @param patient      the student undergoing healing
-     * @param facultySkill the target number of the academy's medical staff
+     * @param campaign the {@link Campaign} context
+     * @param patient  the student undergoing healing
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void processNewDayUnderAcademyCare(Campaign campaign, Person patient, int facultySkill) {
+    public static void processNewDayUnderAcademyCare(Campaign campaign, Person patient) {
         List<TargetRollModifier> modifiers = getSPAModifiers(patient);
         Set<BodyLocation> prostheticPenalties = getProstheticPenalties(patient);
         HealingSPAOptions healingSPAOptions = HealingSPAOptions.fromPatientOnly(patient);
@@ -147,7 +148,7 @@ public class AdvancedMedicalAlternateHealing {
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             attemptHealing(campaign, patient, patient, modifiers, prostheticPenalties, 0, injury,
-                  healingSPAOptions, today, facultySkill);
+                  healingSPAOptions, today, true);
         }
     }
 
@@ -297,7 +298,7 @@ public class AdvancedMedicalAlternateHealing {
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
             attemptHealing(campaign, patient, doctor, modifiers, prostheticPenalties, cyberneticsLevel, injury,
-                  healingSPAOptions, today, null);
+                  healingSPAOptions, today, false);
         }
     }
 
@@ -319,20 +320,19 @@ public class AdvancedMedicalAlternateHealing {
      *                            holistic care or medical proficiency features.
      * @param today               The current date in the campaign, used for determining the healing progress for
      *                            unassisted healing and for reporting healing outcomes.
-     * @param academyFacultySkill The faculty skill of the academy whose medical staff are treating the patient, or
-     *                            {@code null} if the patient is not under academy care.
+     * @param isUnderAcademyCare  {@code true} if the patient is being treated by their academy's medical staff rather
+     *                            than {@code doctor}.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private static void attemptHealing(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, int cyberneticsLevel,
-          Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today, @Nullable Integer academyFacultySkill) {
+          Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today, boolean isUnderAcademyCare) {
         addPathologicInsightModifier(modifiers, injury, healingSPAOptions.hasPathologicInsight());
 
         // If we're performing unassisted healing, recovery time is substantially decreased sevenfold, as per ATOW
         // pg193 (6th printing). We represent this by only decreasing healing time on Mondays.
-        boolean isUnderAcademyCare = academyFacultySkill != null;
         boolean isUnassistedHealing = !isUnderAcademyCare && Objects.equals(doctor, patient);
         if (isUnassistedHealing) {
             if (today.getDayOfWeek() != DayOfWeek.MONDAY) {
@@ -365,7 +365,6 @@ public class AdvancedMedicalAlternateHealing {
             int marginOfSuccess = isUnderAcademyCare
                                         ? getMarginOfSuccessForAcademyCare(patient,
                                               campaign,
-                                              academyFacultySkill,
                                               modifiers,
                                               miscPenalty)
                                         : getMarginOfSuccessForHealing(doctor,
@@ -448,24 +447,24 @@ public class AdvancedMedicalAlternateHealing {
     /**
      * Performs the healing roll for a patient under academy care and returns its margin of success.
      *
-     * <p>The roll is a {@code Surgery} check against the academy's faculty skill, modified by the provided target roll
-     * modifiers and miscellaneous penalties. The academy's staff have no Edge to spend.</p>
+     * <p>The roll is a {@code Surgery} check against {@link MedicalController#ACADEMY_MEDICAL_CARE_TARGET_NUMBER},
+     * modified by the provided target roll modifiers and miscellaneous penalties. The academy's staff have no Edge to
+     * spend.</p>
      *
-     * @param patient      the student being healed
-     * @param campaign     the {@link Campaign} context
-     * @param facultySkill the target number of the academy's medical staff
-     * @param modifiers    the list of modifiers applied to the surgery roll
-     * @param miscPenalty  the combined penalty for this healing attempt
+     * @param patient     the student being healed
+     * @param campaign    the {@link Campaign} context
+     * @param modifiers   the list of modifiers applied to the surgery roll
+     * @param miscPenalty the combined penalty for this healing attempt
      *
      * @return the margin of success of the healing roll
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static int getMarginOfSuccessForAcademyCare(Person patient, Campaign campaign, int facultySkill,
+    private static int getMarginOfSuccessForAcademyCare(Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty) {
-        TargetRoll targetNumber = new TargetRoll(facultySkill, getTextAt(RESOURCE_BUNDLE,
-              "AdvancedMedicalAlternateHealing.academyHealing.facultySkill"));
+        TargetRoll targetNumber = new TargetRoll(ACADEMY_MEDICAL_CARE_TARGET_NUMBER, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.academyHealing.staff"));
         // The academy's staff make the roll, so the patient's own aptitude must not affect it
         SkillCheck skillCheck = new SkillCheck(patient, SkillType.getType(S_SURGERY), targetNumber)
                                       .withRollType(RollType.NORMAL)
