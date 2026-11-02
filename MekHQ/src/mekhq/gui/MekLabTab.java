@@ -320,8 +320,10 @@ public class MekLabTab extends CampaignGuiTab {
         if (labPanel == null) {
             return;
         }
-        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
+        // The year override must come first: setting the faction can remove equipment that fails the current
+        // legality check, which would use the previous year cutoff
         labPanel.setGameYearOverride(campaignGUI.getCampaign().getTechIntroYear());
+        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
     }
 
     /**
