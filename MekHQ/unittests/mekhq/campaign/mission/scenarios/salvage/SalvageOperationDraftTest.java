@@ -63,10 +63,12 @@ import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
@@ -222,12 +224,99 @@ class SalvageOperationDraftTest {
         }
 
         @Test
-        void salvageFormationsNestedInSalvageFormationsAreNotListedSeparately() {
-            Formation parent = salvageTeam("Recovery Company", List.of(salvageUnit(List.of(), true)), null);
-            Formation child = salvageTeam("Recovery Lance", List.of(salvageUnit(List.of(), true)), null);
-            when(child.getParentFormation()).thenReturn(parent);
+        void salvageFormationsNestedInSalvageFormationsAreListedAfterTheirParent() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation secondChild = salvageTeam("Recovery II, Recovery", List.of(salvageUnit(List.of(), true)),
+                  null);
+            when(secondChild.getParentFormation()).thenReturn(parent);
+            Formation firstChild = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(firstChild.getParentFormation()).thenReturn(parent);
+            Formation other = salvageTeam("Recovery B", List.of(salvageUnit(List.of(), true)), null);
 
-            assertEquals(1, draft().getTeamOptions().size());
+            List<Formation> listed = new ArrayList<>();
+            for (TeamOption option : draft().getTeamOptions()) {
+                listed.add(option.formation());
+            }
+
+            // Plain alphabetical order would put "Recovery I, Recovery" before its parent
+            assertEquals(List.of(parent, firstChild, secondChild, other), listed);
+        }
+
+        @Test
+        void stagingANestedTeamUnstagesItsParent() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation child = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(child.getParentFormation()).thenReturn(parent);
+            SalvageOperationDraft draft = draft();
+            draft.stage(option(draft, parent));
+
+            assertTrue(draft.stage(option(draft, child)));
+
+            assertEquals(List.of(option(draft, child)), draft.getStagedTeams());
+        }
+
+        @Test
+        void stagingAParentUnstagesItsNestedTeams() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation firstChild = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(firstChild.getParentFormation()).thenReturn(parent);
+            Formation secondChild = salvageTeam("Recovery II, Recovery", List.of(salvageUnit(List.of(), true)),
+                  null);
+            when(secondChild.getParentFormation()).thenReturn(parent);
+            Formation other = salvageTeam("Other", List.of(salvageUnit(List.of(), true)), null);
+            SalvageOperationDraft draft = draft();
+            draft.stage(option(draft, firstChild));
+            draft.stage(option(draft, secondChild));
+            draft.stage(option(draft, other));
+
+            assertTrue(draft.stage(option(draft, parent)));
+
+            assertEquals(List.of(option(draft, other), option(draft, parent)), draft.getStagedTeams());
+        }
+
+        @Test
+        void siblingNestedTeamsCanBothBeStaged() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation firstChild = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(firstChild.getParentFormation()).thenReturn(parent);
+            Formation secondChild = salvageTeam("Recovery II, Recovery", List.of(salvageUnit(List.of(), true)),
+                  null);
+            when(secondChild.getParentFormation()).thenReturn(parent);
+            SalvageOperationDraft draft = draft();
+
+            draft.stage(option(draft, firstChild));
+            draft.stage(option(draft, secondChild));
+
+            assertEquals(2, draft.getStagedTeams().size());
+        }
+
+        @Test
+        void aNestedTeamWhoseParentIsOnStratConIsDeployed() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation child = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(child.getParentFormation()).thenReturn(parent);
+            StratConCampaignState stratConState = mock(StratConCampaignState.class);
+            when(stratConState.isForceDeployedHere(parent.getId())).thenReturn(true);
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getStratConCampaignState()).thenReturn(stratConState);
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            assertEquals(TeamAvailability.DEPLOYED, option(draft(), child).availability());
+        }
+
+        @Test
+        void aNestedTeamWhoseParentIsAlreadyOnThisOperationIsAvailable() {
+            Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            Formation child = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(child.getParentFormation()).thenReturn(parent);
+            StratConCampaignState stratConState = mock(StratConCampaignState.class);
+            when(stratConState.isForceDeployedHere(parent.getId())).thenReturn(true);
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getStratConCampaignState()).thenReturn(stratConState);
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+            scenarioFormations.add(parent.getId());
+
+            assertEquals(TeamAvailability.AVAILABLE, option(draft(), child).availability());
         }
 
         @Test
