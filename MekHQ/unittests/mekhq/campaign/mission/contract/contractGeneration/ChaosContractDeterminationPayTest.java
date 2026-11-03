@@ -128,7 +128,7 @@ class ChaosContractDeterminationPayTest {
 
     private static AbstractContract contract(double exactScale, double basePayMultiplier) {
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(exactScale));
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundScale(exactScale));
         when(contract.getExactScale()).thenReturn(exactScale);
         when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
               ChaosContractDeterminationScale.getEconomicScale(exactScale, invocation.getArgument(0)));

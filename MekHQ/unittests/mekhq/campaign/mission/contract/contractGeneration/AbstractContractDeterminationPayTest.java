@@ -295,7 +295,7 @@ class AbstractContractDeterminationPayTest {
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
 
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(scale));
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundScale(scale));
         when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
               ChaosContractDeterminationScale.getEconomicScale(scale, invocation.getArgument(0)));
         when(contract.getTransportMultiplier()).thenReturn(transportMultiplier);
