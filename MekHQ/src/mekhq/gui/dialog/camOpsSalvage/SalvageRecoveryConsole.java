@@ -45,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridBagLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -92,16 +93,16 @@ import mekhq.gui.baseComponents.hud.HudChip;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 import mekhq.gui.baseComponents.hud.HudStatTile;
-import mekhq.gui.baseComponents.hud.HudVerdictBanner;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * The post-scenario salvage console, where the player recovers a scenario's wrecks and decides what happens to them.
  *
  * <p>The console is styled on the contract debrief and the StratCon deployment wizard. Its header shows the recovery
- * conditions and running tallies (salvage rights, money, tech time), and a verdict banner lists anything that stops
- * the player confirming. Below, a board of wreck cards sits beside an inspector for the selected wreck: its recovery
- * units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining capacity.</p>
+ * conditions and running tallies (salvage rights, money, tech time), and the Confirm button's tooltip lists anything
+ * that stops the player confirming. Below, a board of wreck cards sits beside an inspector for the selected wreck: its
+ * recovery units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining
+ * capacity.</p>
  *
  * <p>The console holds no salvage rules of its own. It renders a {@link SalvageRecoverySession}, which applies the
  * campaign's salvage system and settlement, and records the player's choices in it. The salvage rules build the
@@ -133,7 +134,6 @@ public class SalvageRecoveryConsole extends JDialog {
     private HudStatTile secondMoneyTile;
     /** The tech time tile, or {@code null} under salvage systems that don't use salvage teams. */
     private HudStatTile techTimeTile;
-    private final HudVerdictBanner verdictBanner = new HudVerdictBanner();
 
     // Board
     private final Map<BoardFilter, HudChip> chips = new HashMap<>();
@@ -143,8 +143,10 @@ public class SalvageRecoveryConsole extends JDialog {
     // Inspector
     private final JLabel dossierTitle = new JLabel();
     private final JLabel dossierSub = new JLabel();
-    private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false);
-    private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false);
+    // Compact, as they sit on the row beside the wreck's name
+    private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false,
+          true);
+    private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false, true);
     private final JPanel assignmentSection = Hud.transparentPanel(null);
     // Each wreck offers different recovery units, so the searchable slots are rebuilt inside their rows. The slots are
     // null until the first wreck is shown.
@@ -212,10 +214,6 @@ public class SalvageRecoveryConsole extends JDialog {
         north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
         north.add(leftAligned(buildCommandBar(scenario)));
         north.add(leftAligned(buildTiles()));
-        JPanel bannerHolder = Hud.transparentPanel(new BorderLayout());
-        bannerHolder.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), 0, scaleForGUI(12)));
-        bannerHolder.add(verdictBanner, BorderLayout.CENTER);
-        north.add(leftAligned(bannerHolder));
         add(north, BorderLayout.NORTH);
 
         JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildBoard(), buildInspector());
@@ -411,11 +409,13 @@ public class SalvageRecoveryConsole extends JDialog {
         dossier.add(Box.createVerticalStrut(scaleForGUI(4)));
         dossierTitle.setForeground(TEXT);
         dossierTitle.setFont(hudFont(Font.BOLD, 1.15f, 0.04f));
-        dossier.add(leftAligned(dossierTitle));
         dossierSub.setForeground(TEXT_MUTED);
         dossierSub.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
-        dossier.add(leftAligned(dossierSub));
-        dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
+        JPanel identity = Hud.transparentPanel(null);
+        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
+        identity.add(leftAligned(dossierTitle));
+        identity.add(leftAligned(dossierSub));
+
         readoutButton.addActionListener(event -> showReadout());
         // Field stripping isn't implemented yet; the disabled button reserves its place in the dossier
         stripButton.setArmed(false);
@@ -425,10 +425,17 @@ public class SalvageRecoveryConsole extends JDialog {
                 fieldStrip(focused);
             }
         });
-        JPanel dossierButtons = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(8), 0));
+        JPanel dossierButtons = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
         dossierButtons.add(readoutButton);
         dossierButtons.add(stripButton);
-        dossier.add(leftAligned(wrapWest(dossierButtons)));
+        // The buttons share the wreck's name and details row, centred against them, to save vertical space
+        JPanel buttonHolder = Hud.transparentPanel(new GridBagLayout());
+        buttonHolder.add(dossierButtons);
+
+        JPanel headerRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(12), 0));
+        headerRow.add(identity, BorderLayout.CENTER);
+        headerRow.add(buttonHolder, BorderLayout.EAST);
+        dossier.add(leftAligned(stretch(headerRow)));
 
         if (session.isUsingSalvageOperations()) {
             assignmentSection.setLayout(new BoxLayout(assignmentSection, BoxLayout.Y_AXIS));
@@ -570,12 +577,6 @@ public class SalvageRecoveryConsole extends JDialog {
         return buttons;
     }
 
-    private static JComponent wrapWest(JComponent component) {
-        JPanel holder = Hud.transparentPanel(new BorderLayout());
-        holder.add(component, BorderLayout.WEST);
-        return stretch(holder);
-    }
-
     /**
      * Lets a component fill the width of a vertical box. The wrapper follows the component's height as its content
      * changes, where a fixed maximum size would not.
@@ -594,11 +595,11 @@ public class SalvageRecoveryConsole extends JDialog {
         isRefreshing = true;
         try {
             refreshTiles();
-            refreshBanner();
             refreshBoard();
             refreshInspector();
             refreshFleet();
             confirmButton.setArmed(requireSession().canConfirm());
+            confirmButton.setToolTipText(confirmBlockText());
             if (stealButton != null) {
                 stealButton.setArmed(requireSession().canSteal());
             }
@@ -657,17 +658,15 @@ public class SalvageRecoveryConsole extends JDialog {
         }
     }
 
-    private void refreshBanner() {
+    /**
+     * @return what stops the player confirming, one reason per line, for the Confirm button's tooltip; or {@code null}
+     *       if nothing does
+     */
+    private @Nullable String confirmBlockText() {
         SalvageRecoverySession session = requireSession();
         List<ConfirmBlocker> blockers = session.getConfirmBlockers();
         if (blockers.isEmpty()) {
-            int wreckCount = session.getRecoveries().size();
-            String reason = session.isUsingSalvageOperations() ?
-                                  formatted("verdict.ready.operations", session.getRecoveredCount(), wreckCount,
-                                        wreckCount - session.getRecoveredCount()) :
-                                  formatted("verdict.ready.automatic", wreckCount);
-            verdictBanner.setVerdict(text("verdict.ready"), reason, text("badge.ready"), READY);
-            return;
+            return null;
         }
 
         List<String> reasons = new ArrayList<>();
@@ -683,8 +682,8 @@ public class SalvageRecoveryConsole extends JDialog {
                       session.getAvailableMinutes());
             });
         }
-        verdictBanner.setVerdict(text("verdict.blocked"), String.join(text("blocker.separator"), reasons),
-              text("badge.blocked"), DANGER);
+        return "<html><div style='width:" + scaleForGUI(280) + "px'><b>" + text("verdict.blocked") + "</b><br>" +
+                     String.join("<br>", reasons) + "</div></html>";
     }
 
     private void refreshBoard() {
@@ -734,6 +733,7 @@ public class SalvageRecoveryConsole extends JDialog {
 
         TestUnit wreck = recovery.getWreck();
         dossierTitle.setText(wreck.getName());
+        dossierTitle.setToolTipText(wreck.getName()); // The name can be cut short beside the dossier buttons
         String sub = formatted("dossier.sub", wreckWeight(wreck),
               session.getSettlement().getSalvageValue(wreck).toAmountString());
         if (session.isUsingSalvageOperations()) {
