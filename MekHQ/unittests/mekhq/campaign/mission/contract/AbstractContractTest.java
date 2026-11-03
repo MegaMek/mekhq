@@ -262,6 +262,39 @@ class AbstractContractTest {
     }
 
     @Test
+    void closingAnOpenEndedScheduleEndsItOnTheCompletionDate() {
+        AbstractContract contract = new ShellContract();
+        contract.setScheduleData(new ContractScheduleData(START, null, 0));
+
+        contract.closeOpenEndedSchedule(START.plusMonths(5));
+
+        assertEquals(START, contract.getStartDate());
+        assertEquals(START.plusMonths(5), contract.getEndingDate());
+        assertEquals(5, contract.getLengthInMonths(), "the length must describe the span the contract actually ran");
+    }
+
+    @Test
+    void closingAnOpenEndedScheduleBeforeItStartsEndsItOnTheStartDate() {
+        AbstractContract contract = new ShellContract();
+        contract.setScheduleData(new ContractScheduleData(START, null, 0));
+
+        contract.closeOpenEndedSchedule(START.minusDays(10));
+
+        assertEquals(START, contract.getEndingDate(), "a contract must never end before it begins");
+        assertEquals(0, contract.getLengthInMonths());
+    }
+
+    @Test
+    void closingAScheduleThatAlreadyHasAnEndDateLeavesItUntouched() {
+        AbstractContract contract = contract();
+
+        contract.closeOpenEndedSchedule(START.plusMonths(2));
+
+        assertEquals(START.plusMonths(6), contract.getEndingDate());
+        assertEquals(6, contract.getLengthInMonths());
+    }
+
+    @Test
     void totalPayMultipliesMonthlyPayByLengthAndAddsTransport() {
         AbstractContract contract = contract();
         contract.setContractFinanceData(new ContractFinanceData(Money.of(1_000), Money.of(100), Money.of(50)));

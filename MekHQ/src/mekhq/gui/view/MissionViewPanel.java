@@ -266,9 +266,11 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown once the
         // contract is active and the player has landed at the destination. Contracts that have not started yet, are
-        // still in transit, or have been completed keep the compact dates row instead.
+        // still in transit, have been completed, or are open-ended keep the compact dates row instead.
         final String startLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(mission.getStartDate());
-        final String endLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(mission.getEndingDate());
+        final String endLabel = (mission.getEndingDate() == null)
+                                      ? getTextAt(RESOURCE_BUNDLE, "lblDates.openEnded.text")
+                                      : MekHQ.getMHQOptions().getDisplayFormattedDate(mission.getEndingDate());
         if (shouldShowContractTimeline(campaign, mission)) {
             final String todayLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getLocalDate());
             addGaugeRow(ContractMeterBar.timeline(mission.getStartDate(), mission.getEndingDate(),
@@ -395,13 +397,18 @@ public class MissionViewPanel extends JScrollablePanel {
 
         final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
         final PlanetarySystem contractSystem = contract.getTargetSystem();
-        return contract.isActiveOn(campaign.getLocalDate()) &&
+        // An open-ended contract has no end date to measure progress against
+        return contract.isActiveOn(campaign.getLocalDate()) && (contract.getEndingDate() != null) &&
                      (currentLocation != null) && currentLocation.isOnPlanet() &&
                      (currentSystem != null) && (contractSystem != null) &&
                      currentSystem.getId().equals(contractSystem.getId());
     }
 
     static String contractTimelineFallbackTooltip(Campaign campaign, AbstractContract contract) {
+        if (contract.getEndingDate() == null) {
+            return wordWrap(getTextAt(RESOURCE_BUNDLE, "contractTimelineBar.openEnded.tooltip"));
+        }
+
         final String contractLocation = contract.getTargetSystemName(campaign.getLocalDate());
         final String currentLocation = currentLocationDescription(campaign);
         return wordWrap(getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.fallback.tooltip", contractLocation,

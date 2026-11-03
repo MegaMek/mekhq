@@ -60,9 +60,12 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosActOfPiracy;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.ChaosGameWorlds;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
+import mekhq.campaign.mission.contract.utilities.ShellContractFactory;
+import mekhq.campaign.mission.contract.utilities.ShellContractFactory.ShellContractDetails;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -283,7 +286,7 @@ class ContractXmlCodecTest {
     // region concrete types
 
     @ParameterizedTest
-    @ValueSource(classes = { ChaosContract.class, ChaosGameWorlds.class, ChaosActOfPiracy.class })
+    @ValueSource(classes = { ChaosContract.class, ChaosGameWorlds.class, ChaosActOfPiracy.class, ShellContract.class })
     void concreteContractTypeIsPreservedAcrossARoundTrip(Class<? extends AbstractContract> contractClass)
           throws Exception {
         AbstractContract contract = contractClass.getDeclaredConstructor().newInstance();
@@ -293,6 +296,29 @@ class ContractXmlCodecTest {
         AbstractContract reloaded = reparse(write(contract));
 
         assertInstanceOf(contractClass, reloaded, "the concrete contract type must be restored from the save");
+    }
+
+    @Test
+    void openEndedShellContractSurvivesARoundTrip() throws Exception {
+        ShellContractDetails details = new ShellContractDetails("Shell", "A holder for manual scenarios",
+              ContractObjectiveType.RECON_RAID, "FS", "FS Name", "DC", "DC Name", "Terra", "Terra", START, 4, true,
+              Money.of(25_000), ChaosContractStepsTable.STEP_FIVE, ContractCommandRights.LIAISON);
+        ShellContract contract = ShellContractFactory.create(details, null, null);
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertInstanceOf(ShellContract.class, reloaded);
+        assertEquals(MissionStatus.ACTIVE, reloaded.getStatus());
+        assertEquals(START, reloaded.getStartDate());
+        assertNull(reloaded.getEndingDate(), "an open-ended contract must still have no end date after loading");
+        assertEquals(0, reloaded.getLengthInMonths());
+        assertTrue(reloaded.isActiveOn(START.plusYears(10)), "an open-ended contract runs until it is completed");
+        assertEquals("FS", reloaded.getEmployerFactionCode());
+        assertEquals("DC Name", reloaded.getEnemyDisplayName());
+        assertEquals("Terra", reloaded.getTargetSystemId());
+        assertEquals(Money.of(25_000), reloaded.getMonthlyPayOut());
+        assertEquals(ChaosContractStepsTable.STEP_FIVE, reloaded.getSalvageRightsStep());
+        assertEquals(ContractCommandRights.LIAISON, reloaded.getCommandRights());
     }
 
     // endregion concrete types

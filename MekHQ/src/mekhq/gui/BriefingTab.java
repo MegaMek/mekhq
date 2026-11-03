@@ -97,6 +97,7 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -121,6 +122,7 @@ import mekhq.gui.dialog.camOpsSalvage.SalvageOperationPlanner;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.dialog.markets.contractMarket.ContractEditorDialog;
+import mekhq.gui.dialog.markets.contractMarket.ShellContractDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -837,7 +839,12 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        new ContractEditorDialog(getCampaign(), mission);
+        // Shell contracts are edited through the same basics they were created with, rather than the full GM editor
+        if (mission instanceof ShellContract shellContract) {
+            new ShellContractDialog(getFrame(), getCampaign(), shellContract);
+        } else {
+            new ContractEditorDialog(getCampaign(), mission);
+        }
 
         MekHQ.triggerEvent(new MissionChangedEvent(mission));
     }
