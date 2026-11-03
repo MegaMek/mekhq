@@ -2152,6 +2152,9 @@ public class Campaign implements ITechManager {
         }
 
         List<IAcquisitionWork> currentList = new ArrayList<>(sList.getShoppingList());
+        // items someone actually rolled for this period, and items only ever out of reach of whoever looked at them
+        Set<IAcquisitionWork> rolledItems = new HashSet<>();
+        Set<IAcquisitionWork> outOfReachItems = new HashSet<>();
         for (Person person : logisticsPersonnel) {
             if (currentList.isEmpty()) {
                 // Nothing left to shop for!
@@ -2162,7 +2165,17 @@ public class Campaign implements ITechManager {
             for (IAcquisitionWork shoppingItem : currentList) {
                 if (shoppingItem.getDaysToWait() <= 0) {
                     while (canAcquireParts(person) && shoppingItem.getQuantity() > 0) {
-                        if (!acquireEquipment(shoppingItem, person)) {
+                        AcquisitionAttempt attempt = attemptAcquisition(shoppingItem, person, null, -1);
+                        if (attempt == AcquisitionAttempt.OUT_OF_REACH) {
+                            // leave the wait alone so a better procurer later in the list can still try
+                            if (!rolledItems.contains(shoppingItem)) {
+                                outOfReachItems.add(shoppingItem);
+                            }
+                            break;
+                        }
+                        rolledItems.add(shoppingItem);
+                        outOfReachItems.remove(shoppingItem);
+                        if (attempt == AcquisitionAttempt.FAILED) {
                             shoppingItem.resetDaysToWait();
                             break;
                         }
@@ -2174,6 +2187,15 @@ public class Campaign implements ITechManager {
             }
 
             currentList = remainingItems;
+        }
+
+        // no one who looked could reach the target number, so wait for the next period like any other failure
+        for (IAcquisitionWork shoppingItem : currentList) {
+            if (outOfReachItems.contains(shoppingItem) && (shoppingItem.getDaysToWait() <= 0)) {
+                shoppingItem.resetDaysToWait();
+                addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE, "goShoppingStandard.outOfReach.format",
+                      ReportingUtilities.getNegativeColor(), shoppingItem.getAcquisitionName()));
+            }
         }
 
         return new ForceShoppingList(currentList);
@@ -2444,6 +2466,39 @@ public class Campaign implements ITechManager {
      */
     private boolean acquireEquipment(IAcquisitionWork acquisition, @Nullable Person person, PlanetarySystem system,
           int transitDays) {
+        return attemptAcquisition(acquisition, person, system, transitDays) == AcquisitionAttempt.FOUND;
+    }
+
+    /**
+     * The outcome of a single acquisition attempt.
+     */
+    private enum AcquisitionAttempt {
+        /** The item was found. */
+        FOUND,
+        /** The roll failed, or nobody could acquire the item at all. */
+        FAILED,
+        /**
+         * The target number is above 12 for this person, so no roll was made and no acquisition attempt was spent.
+         * Nothing is reported; the caller decides whether someone else should try.
+         */
+        OUT_OF_REACH
+    }
+
+    /**
+     * Attempts to acquire a given {@link IAcquisitionWork} object.
+     *
+     * @param acquisition the {@link IAcquisitionWork} being acquired
+     * @param person      the {@link Person} attempting the acquisition; may be {@code null} if no one on the force has
+     *                    the skill or the user is using automatic acquisition
+     * @param system      the {@link PlanetarySystem} where the acquisition is being attempted; may be {@code null} if
+     *                    the user is not using planetary acquisition
+     * @param transitDays the number of days the item should take to be delivered, or -1 to determine the transit time
+     *                    from the campaign options
+     *
+     * @return the {@link AcquisitionAttempt} describing the outcome
+     */
+    private AcquisitionAttempt attemptAcquisition(IAcquisitionWork acquisition, @Nullable Person person,
+          PlanetarySystem system, int transitDays) {
         boolean found = false;
         String report = "";
 
@@ -2473,12 +2528,17 @@ public class Campaign implements ITechManager {
                       getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
                 addReport(ACQUISITIONS, report);
             }
-            return false;
+            return AcquisitionAttempt.FAILED;
+        }
+
+        int targetValue = skillCheck.getTargetNumber().getValue();
+        // no roll can reach this target, so don't spend an acquisition attempt on it
+        if (skillCheck.getTargetNumber().needsRoll() && (targetValue > 12)) {
+            return AcquisitionAttempt.OUT_OF_REACH;
         }
 
         report += "  needs " + skillCheck.getTargetNumber().getValueAsString();
 
-        int targetValue = skillCheck.getTargetNumber().getValue();
         String useEdgeOption;
         if (targetValue >= 11) {
             useEdgeOption = PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN;
@@ -2568,7 +2628,7 @@ public class Campaign implements ITechManager {
         if (!getCampaignOptions().get(CampaignOption.USE_PLANETARY_ACQUISITION) || getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
             addReport(ACQUISITIONS, report);
         }
-        return found;
+        return found ? AcquisitionAttempt.FOUND : AcquisitionAttempt.FAILED;
     }
 
     /**
