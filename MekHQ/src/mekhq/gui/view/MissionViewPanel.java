@@ -56,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -74,7 +75,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.commons.lang3.StringUtils;
@@ -498,7 +499,7 @@ public class MissionViewPanel extends JScrollablePanel {
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new GlossaryEntryDialog(null, glossaryEntry);
+                GlossaryConsole.showEntry(SwingUtilities.getWindowAncestor(e.getComponent()), glossaryEntry);
             }
         });
         return label;
