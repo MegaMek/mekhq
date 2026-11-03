@@ -191,7 +191,7 @@ class UnitAlternateUnitCostTest {
 
             @Test
             void innerSphereMultiplierApplies() {
-                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round(), unit.getBuyCost());
             }
 
             @Test
@@ -223,6 +223,17 @@ class UnitAlternateUnitCostTest {
                 assertEquals(Money.of(expected), unit.getBuyCost());
             }
 
+            /** MegaMek keeps construction costs to the hundredth of a C-bill, but MekHQ prices in whole C-bills. */
+            @ParameterizedTest
+            @CsvSource({ "311998.40, 343198", "311999.00, 343199" })
+            void fractionalConstructionCostIsRoundedToWholeCBills(double constructionCost, long expected) {
+                campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
+                when(entity.getCost(false)).thenReturn(constructionCost);
+
+                assertEquals(Money.of(expected), unit.getBuyCost());
+                assertEquals(Money.of(expected), Unit.estimateBuyCost(entity, campaignOptions));
+            }
+
             /**
              * The Command Designer's starting-cash preview prices rolled entities before they become units, so it must
              * value them exactly as the units will be valued once built.
@@ -238,7 +249,7 @@ class UnitAlternateUnitCostTest {
                 when(entity.isMixedTech()).thenReturn(isMixedTech);
 
                 Money estimate = Unit.estimateBuyCost(entity, campaignOptions);
-                assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS), estimate);
+                assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS).round(), estimate);
                 assertEquals(unit.getBuyCost(), estimate);
             }
 
@@ -439,8 +450,9 @@ class UnitAlternateUnitCostTest {
             void goodReputationOneAddsTenPercent() {
                 when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)).thenReturn(true);
 
-                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
-                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).multipliedBy(0.5), unit.getSellValue());
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round(), unit.getBuyCost());
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round().multipliedBy(0.5),
+                      unit.getSellValue());
             }
 
             @Test
@@ -456,7 +468,7 @@ class UnitAlternateUnitCostTest {
                 when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)).thenReturn(true);
                 when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)).thenReturn(true);
 
-                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round(), unit.getBuyCost());
             }
 
             @Test
@@ -618,7 +630,7 @@ class UnitAlternateUnitCostTest {
             when(summary.isClan()).thenReturn(isClan);
             when(summary.isMixedTech()).thenReturn(isMixedTech);
 
-            assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS),
+            assertEquals(Money.of(500 * multiplier * SUPPORT_POINTS_TO_C_BILLS).round(),
                   Unit.estimateBuyCost(summary, campaignOptions));
         }
 
@@ -630,7 +642,7 @@ class UnitAlternateUnitCostTest {
         void withoutConversionTheSummaryIsPricedInRawSupportPoints() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
 
-            assertEquals(Money.of(500 * 1.1), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1).round(), Unit.estimateBuyCost(summary, campaignOptions));
         }
 
         /**
@@ -655,7 +667,8 @@ class UnitAlternateUnitCostTest {
         void mekHQPricesOrdinarySummariesByBattleValue() {
             campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round(),
+                  Unit.estimateBuyCost(summary, campaignOptions));
         }
 
         /**
@@ -680,7 +693,8 @@ class UnitAlternateUnitCostTest {
         void chaosCampaignPricesLargeCraftSummariesByBattleValue(int unitType) {
             when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
 
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
+            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).round(),
+                  Unit.estimateBuyCost(summary, campaignOptions));
         }
 
         /**
@@ -754,7 +768,7 @@ class UnitAlternateUnitCostTest {
             campaign.getCampaignOptions().set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
 
             assertNotEquals(alternate, unit.getBuyCost());
-            assertEquals(Money.of(unit.getEntity().getCost(false)), unit.getBuyCost());
+            assertEquals(Money.of(unit.getEntity().getCost(false)).round(), unit.getBuyCost());
         }
 
         /** Without the option, selling goes back to parts value, quality, and obsolescence. */

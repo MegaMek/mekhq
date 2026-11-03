@@ -108,6 +108,15 @@ class UnitMarketOfferAlternateCostTest {
     }
 
     @Test
+    void offerPriceIsRoundedToWholeCBills() {
+        campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
+        campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 1.15);
+
+        // 600 SP at 87% is 522, which the Inner Sphere multiplier takes to 600.3
+        assertEquals(Money.of(600), offer(87).getPrice());
+    }
+
+    @Test
     void clanMultiplierStillApplies() {
         when(entity.isClan()).thenReturn(true);
 

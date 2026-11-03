@@ -137,7 +137,7 @@ public class UnitMarketOffer {
     }
 
     /**
-     * @return the final price of this Offer
+     * @return the final price of this Offer, rounded to whole C-bills
      */
     public Money getPrice() {
         Money cost = getBaseCost().multipliedBy(getPercent()).dividedBy(100);
@@ -146,7 +146,7 @@ public class UnitMarketOffer {
         if (entity == null) {
             // The unit failed to load; skip the tech-based price multiplier rather than crashing the market display.
             // We should be dropping it elsewhere, so this is just added security.
-            return cost;
+            return cost.round();
         }
 
         if (entity.isMixedTech()) {
@@ -162,7 +162,9 @@ public class UnitMarketOffer {
             cost = cost.multipliedBy(Unit.getQuirkPriceMultiplier(entity));
         }
 
-        return cost;
+        // MegaMek keeps construction costs to the hundredth of a C-bill (TM p.22), but MekHQ prices units in whole
+        // C-bills
+        return cost.round();
     }
 
     /**

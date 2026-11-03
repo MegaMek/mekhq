@@ -3297,7 +3297,7 @@ public class Unit implements ITechnology, ILocatable {
             return calculateAlternateUnitCost(summary.getBV(), unitPriceMultiplier, 1.0, campaignOptions);
         }
 
-        return getConstructionCost(summary).multipliedBy(unitPriceMultiplier);
+        return getConstructionCost(summary).multipliedBy(unitPriceMultiplier).round();
     }
 
     /**
@@ -3323,7 +3323,7 @@ public class Unit implements ITechnology, ILocatable {
      * @param campaignOptions the campaign options supplying the unit price multipliers
      *
      * @return the entity's construction cost (alternate cost for conventional infantry) times the unit price
-     *       multiplier for its tech base
+     *       multiplier for its tech base, rounded to whole C-bills
      *
      * @author Illiani
      * @since 0.51.01
@@ -3333,7 +3333,9 @@ public class Unit implements ITechnology, ILocatable {
                                     unitEntity.getAlternateCost() :
                                     unitEntity.getCost(false));
 
-        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions));
+        // MegaMek keeps construction costs to the hundredth of a C-bill (TM p.22), but MekHQ prices units in whole
+        // C-bills
+        return cost.multipliedBy(getUnitPriceMultiplier(unitEntity, campaignOptions)).round();
     }
 
     /**
@@ -3463,7 +3465,7 @@ public class Unit implements ITechnology, ILocatable {
      * @param quirkPriceMultiplier the price multiplier from the unit's quirks
      * @param campaignOptions      the campaign options supplying the support point conversion
      *
-     * @return the unit's Battle Value-based value
+     * @return the unit's Battle Value-based value, rounded to whole C-bills
      *
      * @author Illiani
      * @since 0.51.01
@@ -3472,10 +3474,10 @@ public class Unit implements ITechnology, ILocatable {
           double quirkPriceMultiplier, CampaignOptions campaignOptions) {
         double valueInSupportPoints = battleValue * unitPriceMultiplier * quirkPriceMultiplier;
         if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
-            return Money.of(valueInSupportPoints);
+            return Money.of(valueInSupportPoints).round();
         }
         // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
-        return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
+        return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION).round();
     }
 
     /**

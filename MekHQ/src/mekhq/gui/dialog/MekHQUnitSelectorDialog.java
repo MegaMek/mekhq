@@ -365,7 +365,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      */
     @Override
     protected long getDisplayedPrice(MekSummary summary) {
-        return Unit.estimateBuyCost(summary, campaign.getCampaignOptions()).round().getAmount().longValue();
+        return Unit.estimateBuyCost(summary, campaign.getCampaignOptions()).getAmount().longValue();
     }
 
     static boolean isPersistentCampaignUnitSummary(@Nullable MekSummary unitSummary) {
