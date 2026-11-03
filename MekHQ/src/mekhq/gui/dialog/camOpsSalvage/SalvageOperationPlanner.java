@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -86,6 +87,7 @@ import mekhq.campaign.mission.scenarios.salvage.SalvageTechFilter.HiddenReason;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.campaign.work.TechJobs;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
@@ -93,9 +95,15 @@ import mekhq.gui.baseComponents.hud.HudCard;
 import mekhq.gui.baseComponents.hud.HudCard.Tag;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.utilities.PersonnelStateColors;
 import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
 
@@ -111,6 +119,9 @@ import mekhq.gui.utilities.PersonnelStateColors.ColorReason;
  * <p>The Techs page is built for campaigns with hundreds of techs: filters hide injured and pregnant techs and techs
  * already assigned to units, or show only one experience level, with a count of what each filter hides. Techs the
  * player has selected are always shown. Filter choices are remembered between scenarios.</p>
+ *
+ * <p>Each page has a guide that slides over the planner, opened by the guide button or by itself the first time the
+ * player reaches the page, as the Oracle Console's guides do.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -194,17 +205,27 @@ public class SalvageOperationPlanner extends JDialog {
     private final JList<SalvageTechCandidate> crewList = new JList<>(crewModel);
     private final JLabel crewEmpty = Hud.hint(text("crew.empty"));
 
+    // Guide
+    private final HudButton guideButton = new HudButton("", false, true);
+    private final HudCheckBox autoOpenGuides = new HudCheckBox(text("guide.autoOpen"));
+    private final HudGuideDrawer guideDrawer;
+
     // Buttons
     private final HudButton backNextButton = new HudButton("", false);
     private final HudButton commitButton = new HudButton(upper(text("button.commit")), true);
     private final JLabel footer = new JLabel();
 
     /** The planner's pages. */
-    private enum Page {
+    enum Page {
         TEAMS, TECHS;
 
         private String label() {
             return text("page." + name());
+        }
+
+        /** @return the key the page's guide is stored and read under, such as {@code "teams"} */
+        String guideKey() {
+            return name().toLowerCase(Locale.ROOT);
         }
     }
 
@@ -266,6 +287,12 @@ public class SalvageOperationPlanner extends JDialog {
                                                text("techTile.injuries") :
                                                text("techTile.hits"), "");
 
+        autoOpenGuides.setSelected(SalvagePlannerGuidePreferences.getInstance().isGuideAutoOpen());
+        autoOpenGuides.addActionListener(event -> SalvagePlannerGuidePreferences.getInstance()
+                                                        .setGuideAutoOpen(autoOpenGuides.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(text("guide.tab.steps"), text("guide.tab.example"),
+              text("guide.tab.terms")), autoOpenGuides, text("guide.close"), this::closeGuide);
+
         buildWindow();
         showPage(Page.TEAMS);
         setVisible(true);
@@ -291,6 +318,11 @@ public class SalvageOperationPlanner extends JDialog {
             public void windowClosing(WindowEvent event) {
                 dispose(); // Closing the window cancels the plan
             }
+
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
         });
         getContentPane().setBackground(GROUND);
         setLayout(new BorderLayout());
@@ -311,6 +343,9 @@ public class SalvageOperationPlanner extends JDialog {
         add(pageHolder, BorderLayout.CENTER);
 
         add(buildButtons(), BorderLayout.SOUTH);
+
+        // The guide drawer and its scrim float over the pages; Escape closes the guide.
+        guideDrawer.install(getRootPane());
 
         setSize(DEFAULT_SIZE);
         setPreferredSize(DEFAULT_SIZE);
@@ -339,6 +374,9 @@ public class SalvageOperationPlanner extends JDialog {
 
         JPanel selectorRow = Hud.transparentPanel(new BorderLayout());
         selectorRow.add(pageSelector, BorderLayout.WEST);
+        guideButton.setToolTipText(text("guide.button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+        selectorRow.add(guideButton, BorderLayout.EAST);
         commandBar.add(leftAligned(selectorRow));
         commandBar.add(Box.createVerticalStrut(scaleForGUI(8)));
 
@@ -769,11 +807,17 @@ public class SalvageOperationPlanner extends JDialog {
 
     // region Refresh
 
+    /**
+     * Switches to a page, opening its guide if the player has not seen it yet.
+     */
     private void showPage(Page newPage) {
+        closeGuide();
         page = newPage;
         pageSelector.setSelected(newPage);
         pages.show(pageHolder, newPage.name());
+        guideButton.setText("?  " + upper(guideText(newPage, "button")));
         refreshAll();
+        maybeOpenGuide();
     }
 
     private void refreshAll() {
@@ -1180,6 +1224,69 @@ public class SalvageOperationPlanner extends JDialog {
     }
 
     // endregion Actions
+
+    // region Guides
+
+    /** Opens the page's guide by itself the first time the player sees the page, unless they turned that off. */
+    private void maybeOpenGuide() {
+        SalvagePlannerGuidePreferences preferences = SalvagePlannerGuidePreferences.getInstance();
+        if (isShowing() && preferences.isGuideAutoOpen() && !preferences.isGuideSeen(page)) {
+            openGuide();
+        }
+    }
+
+    /** Opens the guide for the page on screen, marking it seen so it does not open by itself again. */
+    private void openGuide() {
+        SalvagePlannerGuidePreferences.getInstance().setGuideSeen(page, true);
+        guideDrawer.open(buildGuide(page));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds a page's guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code SalvageOperationPlanner.guide.teams.step.1.title}, {@code .step.2.title}, ...), read until the next
+     * number is missing, so text can be added or reworded without code changes.
+     *
+     * @param guidePage the page
+     *
+     * @return the page's guide
+     */
+    private Guide buildGuide(Page guidePage) {
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(guidePage, "step." + number + ".title")); number++) {
+            steps.add(new Step(guideText(guidePage, "step." + number + ".title"),
+                  guideText(guidePage, "step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(guidePage, "example." + number + ".who")); number++) {
+            example.add(new ExampleLine(guideText(guidePage, "example." + number + ".who"),
+                  guideText(guidePage, "example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(guidePage, "term." + number + ".name")); number++) {
+            terms.add(new Term(guideText(guidePage, "term." + number + ".name"),
+                  guideText(guidePage, "term." + number + ".text")));
+        }
+
+        JPanel glossary = Hud.transparentPanel(null);
+        glossary.setLayout(new BoxLayout(glossary, BoxLayout.Y_AXIS));
+        glossary.add(leftAligned(Hud.eyebrow(text("guide.glossary"))));
+        glossary.add(Box.createVerticalStrut(scaleForGUI(4)));
+        glossary.add(leftAligned(Hud.link(GlossaryEntry.FORCE_TYPE_SALVAGE.getTitle(),
+              () -> GlossaryConsole.showEntry(this, GlossaryEntry.FORCE_TYPE_SALVAGE))));
+
+        return new Guide(formatted("guide.eyebrow", guidePage.label()), guideText(guidePage, "title"), steps, null,
+              text("guide.exampleIntro"), example, terms, glossary);
+    }
+
+    private static String guideText(Page guidePage, String key) {
+        return text("guide." + guidePage.guideKey() + "." + key);
+    }
+
+    // endregion Guides
 
     // region Presentation helpers
 
