@@ -32,7 +32,9 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -88,6 +90,8 @@ import testUtilities.parts.UnitFixture;
 class AcquisitionCharacterizationTest {
     private static final int WAITING_PERIOD_DAYS = 7;
     private static final Money STARTING_FUNDS = Money.of(1_000_000);
+    private static final int OUT_OF_REACH_TARGET = 13;
+    private static final String OUT_OF_REACH_REPORT = "can reach the target number for";
 
     private PartsScenario scenario;
     private Campaign campaign;
@@ -150,6 +154,52 @@ class AcquisitionCharacterizationTest {
 
     private Money balance() {
         return campaign.getPlayerForce().getFinances().getBalance();
+    }
+
+    private int targetNumberFor(Person procurer, IAcquisitionWork order) {
+        return campaign.checkAcquisition(order, procurer).getTargetNumber().getValue();
+    }
+
+    /**
+     * Raises the order's target number through the tech-base acquisition penalty until {@code procurer} needs a 13,
+     * which no roll can reach. Both penalties are set, so the one applied does not depend on the laser's tech base.
+     */
+    private void putOrderOutOfReachOf(Person procurer, IAcquisitionWork order) {
+        CampaignOptions options = campaign.getCampaignOptions();
+        options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, 0);
+        options.set(CampaignOption.IS_ACQUISITION_PENALTY, 0);
+        int targetNumber = targetNumberFor(procurer, order);
+        assertTrue(targetNumber < OUT_OF_REACH_TARGET, "the procurer must start within reach");
+
+        int penalty = OUT_OF_REACH_TARGET - targetNumber;
+        options.set(CampaignOption.CLAN_ACQUISITION_PENALTY, penalty);
+        options.set(CampaignOption.IS_ACQUISITION_PENALTY, penalty);
+        assertEquals(OUT_OF_REACH_TARGET, targetNumberFor(procurer, order));
+    }
+
+    /**
+     * Adds an ultra-green tech who shops before the regular one, and puts the order out of their reach while leaving
+     * it within the regular tech's.
+     */
+    private Person withUltraGreenTechWhoCannotReach(IAcquisitionWork order) {
+        Person ultraGreenTech = scenario.withTech(EXP_ULTRA_GREEN);
+        putOrderOutOfReachOf(ultraGreenTech, order);
+        assertTrue(targetNumberFor(tech, order) < OUT_OF_REACH_TARGET, "the regular tech must still be within reach");
+
+        List<Person> shoppingOrder = campaign.getPlayerForce().getHumanResources()
+                                           .getLogisticsPersonnel(campaign.getCampaignOptions(),
+                                                 campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        assertEquals(List.of(ultraGreenTech, tech), shoppingOrder, "procurers shop worst first");
+        return ultraGreenTech;
+    }
+
+    private boolean acquisitionsReportContains(String text) {
+        for (String report : campaign.getDailyReportLog().getLines(ACQUISITIONS)) {
+            if (report.contains(text)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -245,6 +295,62 @@ class AcquisitionCharacterizationTest {
         assertEquals(WAITING_PERIOD_DAYS - 1, order.getDaysToWait());
         assertEquals(Map.of(), PartsCensus.ofWarehouseStock(scenario.getWarehouse()));
         assertEquals(1, tech.getAcquisitions());
+    }
+
+    @Test
+    void procurerWhoCannotReachTheTargetSpendsNoAttemptAndLeavesTheOrderToTheNext() {
+        IAcquisitionWork order = orderReplacementLaser();
+        Person ultraGreenTech = withUltraGreenTechWhoCannotReach(order);
+        Money price = order.getBuyCost();
+
+        // A roll of 12 cannot meet the ultra-green tech's 13, but finds the laser for the regular tech after them
+        shopForTheDayWithEveryDieShowing(6);
+
+        assertTrue(shoppingList().getShoppingList().isEmpty());
+        assertEquals(Map.of("Medium Laser" + PartsCensus.IN_TRANSIT_TAG, 1),
+              PartsCensus.ofWarehouseStock(scenario.getWarehouse()));
+        assertEquals(STARTING_FUNDS.minus(price), balance());
+        assertEquals(0, ultraGreenTech.getAcquisitions());
+        assertEquals(1, tech.getAcquisitions());
+        assertFalse(acquisitionsReportContains(OUT_OF_REACH_REPORT));
+    }
+
+    @Test
+    void failedRollByTheNextProcurerStartsTheWaitWithoutTheOutOfReachReport() {
+        IAcquisitionWork order = orderReplacementLaser();
+        Person ultraGreenTech = withUltraGreenTechWhoCannotReach(order);
+
+        // A roll of 2 fails the regular tech's target too; it is their failed roll that starts the wait
+        shopForTheDayWithEveryDieShowing(1);
+
+        assertSame(order, shoppingList().getShoppingList().getFirst());
+        assertEquals(WAITING_PERIOD_DAYS, order.getDaysToWait());
+        assertEquals(0, ultraGreenTech.getAcquisitions());
+        assertEquals(1, tech.getAcquisitions());
+        assertFalse(acquisitionsReportContains(OUT_OF_REACH_REPORT));
+    }
+
+    @Test
+    void orderNoProcurerCanReachWaitsForTheWaitingPeriodWithoutSpendingAttempts() {
+        IAcquisitionWork order = orderReplacementLaser();
+        putOrderOutOfReachOf(tech, order);
+
+        // Not even a roll of 12 can meet a 13, so no roll is made
+        shopForTheDayWithEveryDieShowing(6);
+
+        assertSame(order, shoppingList().getShoppingList().getFirst());
+        assertEquals(1, order.getQuantity());
+        assertEquals(WAITING_PERIOD_DAYS, order.getDaysToWait());
+        assertEquals(Map.of(), PartsCensus.ofWarehouseStock(scenario.getWarehouse()));
+        assertEquals(STARTING_FUNDS, balance());
+        assertEquals(0, tech.getAcquisitions());
+        assertTrue(acquisitionsReportContains(OUT_OF_REACH_REPORT));
+
+        // The next day only counts the wait down, as after any failed roll
+        shopForTheDayWithEveryDieShowing(6);
+
+        assertEquals(WAITING_PERIOD_DAYS - 1, order.getDaysToWait());
+        assertEquals(0, tech.getAcquisitions());
     }
 
     /**
