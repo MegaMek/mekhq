@@ -99,8 +99,16 @@ public final class GlossaryReadPreferences {
         read.add(record(lookUpName, version));
     }
 
+    /**
+     * Builds the record from the version's numbers alone. {@link Version#toString()} is not used because it appends
+     * the running build's branch and git hash, which would make every entry unread again with each new build.
+     */
     private static String record(String lookUpName, Version version) {
-        return lookUpName + VERSION_MARK + version;
+        return lookUpName + VERSION_MARK + String.format("%d.%02d.%02d%s",
+              version.getMajor(),
+              version.getMinor(),
+              version.getPatch(),
+              version.hasRevision() ? "." + version.getRevision() : "");
     }
 
     String serialize() {
