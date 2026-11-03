@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -50,6 +51,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,15 +88,23 @@ import mekhq.campaign.mission.scenarios.salvage.WreckRecovery;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard;
 import mekhq.gui.baseComponents.hud.HudCard.Tag;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * The post-scenario salvage console, where the player recovers a scenario's wrecks and decides what happens to them.
@@ -103,6 +114,9 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * that stops the player confirming. Below, a board of wreck cards sits beside an inspector for the selected wreck: its
  * recovery units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining
  * capacity.</p>
+ *
+ * <p>A guide slides over the console to explain it, opened by its button or by itself the first time the console
+ * opens, as the Oracle Console's guides do.</p>
  *
  * <p>The console holds no salvage rules of its own. It renders a {@link SalvageRecoverySession}, which applies the
  * campaign's salvage system and settlement, and records the player's choices in it. The salvage rules build the
@@ -116,6 +130,7 @@ public class SalvageRecoveryConsole extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
     private static final String KEY = "SalvageRecoveryConsole.";
     private static final Dimension DEFAULT_SIZE = scaleForGUI(1120, 760);
+    private static final String GUIDE_PREFIX = "guide.";
 
     private final transient Campaign campaign;
     private final boolean isInSpace;
@@ -163,6 +178,9 @@ public class SalvageRecoveryConsole extends JDialog {
     private final JList<Unit> fleetList = new JList<>(fleetModel);
     private final JPanel dossier = Hud.transparentPanel(null);
     private final JLabel emptyDossier = Hud.notice(text("dossier.empty"));
+
+    // Guide
+    private HudGuideDrawer guideDrawer;
 
     // Buttons
     private HudButton confirmButton;
@@ -226,6 +244,8 @@ public class SalvageRecoveryConsole extends JDialog {
 
         add(buildButtons(), BorderLayout.SOUTH);
 
+        buildGuide();
+
         setSize(DEFAULT_SIZE);
         setPreferredSize(DEFAULT_SIZE);
         setLocationRelativeTo(null);
@@ -247,7 +267,13 @@ public class SalvageRecoveryConsole extends JDialog {
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.25f, 0.16f));
         titleRow.add(title, BorderLayout.WEST);
-        titleRow.add(buildConditionChips(), BorderLayout.EAST);
+        HudButton guideButton = new HudButton("?  " + guideText("button").toUpperCase(Locale.ROOT), false, true);
+        guideButton.setToolTipText(guideText("button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+        JPanel titleControls = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
+        titleControls.add(buildConditionChips());
+        titleControls.add(guideButton);
+        titleRow.add(titleControls, BorderLayout.EAST);
         commandBar.add(leftAligned(titleRow));
         commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
         commandBar.add(leftAligned(Hud.hint(instructions())));
@@ -588,6 +614,85 @@ public class SalvageRecoveryConsole extends JDialog {
     }
 
     // endregion Layout
+
+    // region Guide
+
+    /**
+     * Builds the guide drawer, which floats over the console above a scrim, and opens it by itself when the console
+     * first appears if the player hasn't seen it yet. Escape or a click on the scrim closes it.
+     */
+    private void buildGuide() {
+        SalvageRecoveryGuidePreferences preferences = SalvageRecoveryGuidePreferences.getInstance();
+        HudCheckBox alwaysOpen = new HudCheckBox(guideText("alwaysOpen"));
+        alwaysOpen.setSelected(preferences.isGuideAlwaysOpen());
+        alwaysOpen.addActionListener(event -> preferences.setGuideAlwaysOpen(alwaysOpen.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(guideText("tab.steps"), guideText("tab.example"),
+              guideText("tab.terms")), alwaysOpen, guideText("close"), this::closeGuide);
+        guideDrawer.install(getRootPane());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
+        });
+    }
+
+    /** Opens the guide if the player hasn't seen it yet, or has asked to see it every time. */
+    private void maybeOpenGuide() {
+        SalvageRecoveryGuidePreferences preferences = SalvageRecoveryGuidePreferences.getInstance();
+        if (!preferences.isGuideSeen() || preferences.isGuideAlwaysOpen()) {
+            openGuide();
+        }
+    }
+
+    private void openGuide() {
+        SalvageRecoveryGuidePreferences.getInstance().setGuideSeen(true);
+        guideDrawer.open(createGuide());
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds the guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code SalvageRecoveryConsole.guide.step.1.title}, {@code .step.2.title}, ...), read until the next number is
+     * missing, so text can be added or reworded without code changes.
+     *
+     * @return the guide
+     */
+    private Guide createGuide() {
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("step." + number + ".title")); number++) {
+            steps.add(new Step(guideText("step." + number + ".title"), guideText("step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("example." + number + ".who")); number++) {
+            example.add(new ExampleLine(guideText("example." + number + ".who"),
+                  guideText("example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("term." + number + ".name")); number++) {
+            terms.add(new Term(guideText("term." + number + ".name"), guideText("term." + number + ".text")));
+        }
+
+        JPanel glossary = Hud.transparentPanel(null);
+        glossary.setLayout(new BoxLayout(glossary, BoxLayout.Y_AXIS));
+        glossary.add(leftAligned(Hud.eyebrow(guideText("glossary"))));
+        glossary.add(Box.createVerticalStrut(scaleForGUI(4)));
+        glossary.add(leftAligned(Hud.link(GlossaryEntry.FORCE_TYPE_SALVAGE.getTitle(),
+              () -> GlossaryConsole.showEntry(this, GlossaryEntry.FORCE_TYPE_SALVAGE))));
+
+        return new Guide(guideText("eyebrow"), guideText("title"), steps, null, guideText("exampleIntro"), example,
+              terms, glossary);
+    }
+
+    private static String guideText(String key) {
+        return text(GUIDE_PREFIX + key);
+    }
+
+    // endregion Guide
 
     // region Refresh
 
