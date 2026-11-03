@@ -32,6 +32,8 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -383,7 +385,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     private JPanel createDetailsPanel() {
         setTxtPresetName(new JTextField());
-        getTxtPresetName().setToolTipText(resources.getString("txtPresetName.toolTipText"));
+        getTxtPresetName().setToolTipText(wordWrap(resources.getString("txtPresetName.toolTipText")));
         getTxtPresetName().setName("txtPresetName");
         getTxtPresetName().putClientProperty("JTextField.placeholderText",
                 resources.getString("txtPresetName.text"));
@@ -405,7 +407,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setTxtPresetDescription(new JTextArea(DESCRIPTION_ROWS, DESCRIPTION_COLUMNS));
-        getTxtPresetDescription().setToolTipText(resources.getString("txtPresetDescription.toolTipText"));
+        getTxtPresetDescription().setToolTipText(wordWrap(resources.getString("txtPresetDescription.toolTipText")));
         getTxtPresetDescription().setName("txtPresetDescription");
         getTxtPresetDescription().setLineWrap(true);
         getTxtPresetDescription().setWrapStyleWord(true);
@@ -423,7 +425,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         final int padding = UIUtil.scaleForGUI(5);
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("detailsCampaignPresetPanel.title")));
-        panel.setToolTipText(resources.getString("detailsCampaignPresetPanel.toolTipText"));
+        panel.setToolTipText(wordWrap(resources.getString("detailsCampaignPresetPanel.toolTipText")));
         panel.setName("detailsCampaignPresetPanel");
 
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -452,12 +454,12 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         // Create Panel Components
         setChkSpecifyDate(new JCheckBox(resources.getString("chkSpecifyDate.text")));
-        getChkSpecifyDate().setToolTipText(String.format(resources.getString("chkSpecifyDate.toolTipText"),
-              MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1))));
+        getChkSpecifyDate().setToolTipText(wordWrap(String.format(resources.getString("chkSpecifyDate.toolTipText"),
+              MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.ofYearDay(3067, 1)))));
         getChkSpecifyDate().setName("chkSpecifyDate");
         getChkSpecifyDate().addActionListener(evt -> btnDate.setEnabled(getChkSpecifyDate().isSelected()));
 
-        btnDate.setToolTipText(resources.getString("btnDate.toolTipText"));
+        btnDate.setToolTipText(wordWrap(resources.getString("btnDate.toolTipText")));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> {
             final DateChooser dateChooser = new DateChooser(getFrame(), getDate());
@@ -468,7 +470,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setChkSpecifyFaction(new JCheckBox(resources.getString("chkSpecifyFaction.text")));
-        getChkSpecifyFaction().setToolTipText(resources.getString("chkSpecifyFaction.toolTipText"));
+        getChkSpecifyFaction().setToolTipText(wordWrap(resources.getString("chkSpecifyFaction.toolTipText")));
         getChkSpecifyFaction().setName("chkSpecifyFaction");
         getChkSpecifyFaction().addActionListener(evt -> {
             final boolean selected = getChkSpecifyFaction().isSelected();
@@ -485,7 +487,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         setComboFaction(new MMComboBox<>("comboFactions", factionModel));
 
         setChkSpecifyPlanet(new JCheckBox(resources.getString("chkSpecifyPlanet.text")));
-        getChkSpecifyPlanet().setToolTipText(resources.getString("chkSpecifyPlanet.toolTipText"));
+        getChkSpecifyPlanet().setToolTipText(wordWrap(resources.getString("chkSpecifyPlanet.toolTipText")));
         getChkSpecifyPlanet().setName("chkSpecifyPlanet");
         getChkSpecifyPlanet().addActionListener(evt -> {
             final boolean selected = getChkSpecifyPlanet().isSelected();
@@ -495,8 +497,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setChkStartingSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
-        getChkStartingSystemFactionSpecific().setToolTipText(resources.getString(
-              "chkStartingSystemFactionSpecific.toolTipText"));
+        getChkStartingSystemFactionSpecific().setToolTipText(wordWrap(resources.getString(
+              "chkStartingSystemFactionSpecific.toolTipText")));
         getChkStartingSystemFactionSpecific().setName("chkStartingSystemFactionSpecific");
         getChkStartingSystemFactionSpecific().addActionListener(evt -> {
             final FactionDisplay factionDisplay = getComboFaction().getSelectedItem();
@@ -511,7 +513,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setComboStartingSystem(new MMComboBox<>("comboStartingSystem"));
-        getComboStartingSystem().setToolTipText(resources.getString("comboStartingSystem.toolTipText"));
+        getComboStartingSystem().setToolTipText(wordWrap(resources.getString("comboStartingSystem.toolTipText")));
         getComboStartingSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -534,7 +536,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setComboStartingPlanet(new MMComboBox<>("comboStartingPlanet"));
-        getComboStartingPlanet().setToolTipText(resources.getString("comboStartingPlanet.toolTipText"));
+        getComboStartingPlanet().setToolTipText(wordWrap(resources.getString("comboStartingPlanet.toolTipText")));
         getComboStartingPlanet().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -549,7 +551,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setChkSpecifyRankSystem(new JCheckBox(resources.getString("chkSpecifyRankSystem.text")));
-        getChkSpecifyRankSystem().setToolTipText(resources.getString("chkSpecifyRankSystem.toolTipText"));
+        getChkSpecifyRankSystem().setToolTipText(wordWrap(resources.getString("chkSpecifyRankSystem.toolTipText")));
         getChkSpecifyRankSystem().setName("chkSpecifyRankSystem");
         getChkSpecifyRankSystem().addActionListener(evt -> getComboRankSystem().setEnabled(getChkSpecifyRankSystem().isSelected()));
 
@@ -561,7 +563,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             rankSystemModel.addElement(getCampaign().getPlayerForce().getRankSystem());
         }
         setComboRankSystem(new MMComboBox<>("comboRankSystem", rankSystemModel));
-        getComboRankSystem().setToolTipText(resources.getString("comboRankSystem.toolTipText"));
+        getComboRankSystem().setToolTipText(wordWrap(resources.getString("comboRankSystem.toolTipText")));
         getComboRankSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -569,14 +571,15 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
                   final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RankSystem) {
-                    list.setToolTipText(((RankSystem) value).getDescription());
+                    String description = ((RankSystem) value).getDescription();
+                    list.setToolTipText(description == null ? null : wordWrap(description));
                 }
                 return this;
             }
         });
 
         setChkGM(new JCheckBox(resources.getString("chkGM.text")));
-        getChkGM().setToolTipText(resources.getString("chkGM.toolTipText"));
+        getChkGM().setToolTipText(wordWrap(resources.getString("chkGM.toolTipText")));
         getChkGM().setName("chkGM");
 
         // Disable Panel Portions by Default
@@ -592,7 +595,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         // Layout the UI
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("startupCampaignPresetPanel.title")));
-        panel.setToolTipText(resources.getString("startupCampaignPresetPanel.toolTipText"));
+        panel.setToolTipText(wordWrap(resources.getString("startupCampaignPresetPanel.toolTipText")));
         panel.setName("startupCampaignPresetPanel");
 
         final int gap = UIUtil.scaleForGUI(4);
@@ -667,12 +670,12 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private JPanel createContinuousPanel() {
         // Create Panel Components
         setChkSpecifyGameOptions(new JCheckBox(resources.getString("chkSpecifyGameOptions.text")));
-        getChkSpecifyGameOptions().setToolTipText(resources.getString("chkSpecifyGameOptions.toolTipText"));
+        getChkSpecifyGameOptions().setToolTipText(wordWrap(resources.getString("chkSpecifyGameOptions.toolTipText")));
         getChkSpecifyGameOptions().setName("chkSpecifyGameOptions");
 
         final JButton btnGameOptions = new JButton(resources.getString("btnGameOptions.text"));
         btnGameOptions.setName("btnGameOptions");
-        btnGameOptions.setToolTipText(resources.getString("btnGameOptions.toolTipText"));
+        btnGameOptions.setToolTipText(wordWrap(resources.getString("btnGameOptions.toolTipText")));
         btnGameOptions.addActionListener(evt -> {
             final GameOptionsDialog gameOptionsDialog = new GameOptionsDialog(getFrame(), getGameOptions(), false);
             gameOptionsDialog.refreshOptions();
@@ -681,14 +684,15 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         });
 
         setChkSpecifyCampaignOptions(new JCheckBox(resources.getString("chkSpecifyCampaignOptions.text")));
-        getChkSpecifyCampaignOptions().setToolTipText(resources.getString("chkSpecifyCampaignOptions.toolTipText"));
+        getChkSpecifyCampaignOptions().setToolTipText(wordWrap(resources.getString(
+              "chkSpecifyCampaignOptions.toolTipText")));
         getChkSpecifyCampaignOptions().setName("chkSpecifyCampaignOptions");
         getChkSpecifyCampaignOptions().setSelected(true);
 
         // Layout the UI
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("continuousCampaignPresetPanel.title")));
-        panel.setToolTipText(resources.getString("continuousCampaignPresetPanel.toolTipText"));
+        panel.setToolTipText(wordWrap(resources.getString("continuousCampaignPresetPanel.toolTipText")));
         panel.setName("continuousCampaignPresetPanel");
 
         final int gap = UIUtil.scaleForGUI(4);
@@ -839,19 +843,19 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         final JButton validateButton = new JButton(resources.getString("Validate.text"));
         validateButton.setName("validateButton");
-        validateButton.setToolTipText(resources.getString("Validate.toolTipText"));
+        validateButton.setToolTipText(wordWrap(resources.getString("Validate.toolTipText")));
         validateButton.addActionListener(this::validateButtonActionPerformed);
         panel.add(validateButton);
 
         setOkButton(new JButton(resources.getString("Ok.text")));
         getOkButton().setName("okButton");
-        getOkButton().setToolTipText(resources.getString("Ok.toolTipText"));
+        getOkButton().setToolTipText(wordWrap(resources.getString("Ok.toolTipText")));
         getOkButton().addActionListener(this::okButtonActionPerformed);
         panel.add(getOkButton());
 
         final JButton cancelButton = new JButton(resources.getString("Cancel.text"));
         cancelButton.setName("cancelButton");
-        cancelButton.setToolTipText(resources.getString("Cancel.toolTipText"));
+        cancelButton.setToolTipText(wordWrap(resources.getString("Cancel.toolTipText")));
         cancelButton.addActionListener(this::cancelActionPerformed);
         panel.add(cancelButton);
 
@@ -908,7 +912,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
                       JOptionPane.ERROR_MESSAGE);
             }
             getOkButton().setEnabled(false);
-            getOkButton().setToolTipText(text);
+            getOkButton().setToolTipText(wordWrap(text));
             return ValidationState.FAILURE;
         }
 
@@ -917,7 +921,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         if (getChkSpecifyFaction().isSelected() && (getComboFaction().getSelectedItem() == null)) {
             final String text = resources.getString("nullFactionSpecified.text");
-            getOkButton().setToolTipText(text);
+            getOkButton().setToolTipText(wordWrap(text));
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                   resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
                                  JOptionPane.OK_OPTION) {
@@ -929,7 +933,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         if (getChkSpecifyPlanet().isSelected()
                   && (getComboStartingPlanet().getSelectedItem() == null)) {
             final String text = resources.getString("nullPlanetSpecified.text");
-            getOkButton().setToolTipText(text);
+            getOkButton().setToolTipText(wordWrap(text));
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                   resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
                                  JOptionPane.OK_OPTION) {
@@ -941,7 +945,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         if (getChkSpecifyRankSystem().isSelected()
                   && (getComboRankSystem().getSelectedItem() == null)) {
             final String text = resources.getString("nullRankSystemSpecified.text");
-            getOkButton().setToolTipText(text);
+            getOkButton().setToolTipText(wordWrap(text));
             if (display && JOptionPane.showConfirmDialog(getFrame(), text,
                   resources.getString("ValidationWarning.title"), JOptionPane.OK_CANCEL_OPTION) !=
                                  JOptionPane.OK_OPTION) {
@@ -954,7 +958,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             return display ? ValidationState.WARNING : ValidationState.FAILURE;
         }
 
-        getOkButton().setToolTipText(resources.getString("ValidationSuccess.text"));
+        getOkButton().setToolTipText(wordWrap(resources.getString("ValidationSuccess.text")));
         return ValidationState.SUCCESS;
     }
     //endregion Button Actions

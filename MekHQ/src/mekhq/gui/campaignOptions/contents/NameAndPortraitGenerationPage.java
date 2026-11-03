@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -287,7 +288,7 @@ class NameAndPortraitGenerationPage {
     private @Nonnull JButton createPortraitAssignmentButton(String name) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
         button.setName("btn" + name);
-        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"));
+        button.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip")));
         setSmallSizeVariant(button);
         return button;
     }
