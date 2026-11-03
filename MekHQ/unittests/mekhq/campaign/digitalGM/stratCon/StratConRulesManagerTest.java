@@ -2355,4 +2355,65 @@ class StratConRulesManagerTest {
             }
         }
     }
+
+    /**
+     * Tests for {@link StratConRulesManager#getAvailableForceIDs}, covering the fallback to busy combat formations
+     * when no idle combat team can be found.
+     */
+    @Nested
+    class GetAvailableForceIDsTests {
+        private Campaign campaign;
+        private AbstractContract contract;
+        private List<CombatTeam> combatTeams;
+
+        private void setUp() {
+            campaign = MHQTestUtilities.mockCampaign();
+            contract = mock(AbstractContract.class);
+            combatTeams = new ArrayList<>();
+            when(campaign.getPlayerForce().getCombatTeamsAsList(campaign)).thenReturn(combatTeams);
+        }
+
+        private void addCombatTeam(int formationId, CombatRole role, boolean isDeployed,
+              AbstractContract teamContract) {
+            Formation formation = mock(Formation.class);
+            when(formation.isDeployed()).thenReturn(isDeployed);
+
+            CombatTeam combatTeam = mock(CombatTeam.class);
+            when(combatTeam.getContract(campaign)).thenReturn(teamContract);
+            when(combatTeam.getFormation(campaign)).thenReturn(formation);
+            when(combatTeam.getRole()).thenReturn(role);
+            when(combatTeam.getFormationId()).thenReturn(formationId);
+            combatTeams.add(combatTeam);
+        }
+
+        @Test
+        void idleCombatTeamIsPreferredOverBusyFormation() {
+            setUp();
+            addCombatTeam(1, CombatRole.RESERVE, false, contract);
+            addCombatTeam(2, CombatRole.FRONTLINE, true, contract);
+
+            assertEquals(List.of(1), StratConRulesManager.getAvailableForceIDs(campaign, contract, false));
+        }
+
+        @Test
+        void noIdleCombatTeam_busyManeuverAndFrontlineFormationsAreAvailable() {
+            setUp();
+            addCombatTeam(1, CombatRole.MANEUVER, true, contract);
+            addCombatTeam(2, CombatRole.FRONTLINE, true, contract);
+            addCombatTeam(3, CombatRole.PATROL, true, contract);
+            addCombatTeam(4, CombatRole.TRAINING, true, contract);
+            addCombatTeam(5, CombatRole.AUXILIARY, true, contract);
+            addCombatTeam(6, CombatRole.RESERVE, true, contract);
+
+            assertEquals(List.of(1, 2), StratConRulesManager.getAvailableForceIDs(campaign, contract, false));
+        }
+
+        @Test
+        void busyFormationOnAnotherContractIsNotAvailable() {
+            setUp();
+            addCombatTeam(1, CombatRole.FRONTLINE, true, mock(AbstractContract.class));
+
+            assertTrue(StratConRulesManager.getAvailableForceIDs(campaign, contract, false).isEmpty());
+        }
+    }
 }

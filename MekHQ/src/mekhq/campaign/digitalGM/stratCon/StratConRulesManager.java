@@ -3722,6 +3722,9 @@ public class StratConRulesManager {
      *       (unless role restrictions are bypassed).</li>
      * </ul>
      *
+     * <p>If no idle combat team qualifies, even with role restrictions relaxed, busy combat formations (Maneuver or
+     * Frontline combat teams already assigned to a scenario) are treated as available instead.</p>
+     *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
      *                               statuses.
      * @param contract               The {@link AbstractContract} contract for which combat teams are evaluated based on
@@ -3785,12 +3788,55 @@ public class StratConRulesManager {
                 LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
                 suitableForces = getAvailableForceIDs(campaign, contract, true);
             } else {
-                LOGGER.info("No suitable combat teams found for contract {} despite relaxed restrictions." +
-                                  " Scenario generation will likely be skipped.", contract.getId());
+                LOGGER.info("No idle combat teams found for contract {} despite relaxed restrictions. Treating busy" +
+                                  " combat formations as available", contract.getId());
+                suitableForces = getBusyCombatFormationIDs(campaign, contract, combatTeams);
+
+                if (suitableForces.isEmpty()) {
+                    LOGGER.info("No busy combat formations found for contract {} either. Scenario generation will" +
+                                      " likely be skipped.", contract.getId());
+                }
             }
         }
 
         return suitableForces;
+    }
+
+    /**
+     * Retrieves the force IDs of combat teams on the contract that are already assigned to a scenario and hold a combat
+     * role ({@link CombatRole#MANEUVER} or {@link CombatRole#FRONTLINE}). These stand in for available forces when no
+     * idle combat team can be found, so that a scenario can still be generated.
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract the combat teams must be assigned to
+     * @param combatTeams all combat teams in the campaign
+     *
+     * @return the force IDs of busy combat formations on the contract; empty if there are none
+     */
+    private static List<Integer> getBusyCombatFormationIDs(Campaign campaign, AbstractContract contract,
+          List<CombatTeam> combatTeams) {
+        List<Integer> busyCombatFormations = new ArrayList<>();
+        for (CombatTeam combatTeam : combatTeams) {
+            if (!contract.equals(combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            Formation formation = combatTeam.getFormation(campaign);
+            if ((formation == null) || !formation.isDeployed()) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+                continue;
+            }
+
+            CombatRole combatRole = combatTeam.getRole();
+            if ((combatRole != null) && (combatRole.isManeuver() || combatRole.isFrontline())) {
+                busyCombatFormations.add(combatTeam.getFormationId());
+            }
+        }
+
+        return busyCombatFormations;
     }
 
     /**
