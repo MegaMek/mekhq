@@ -87,7 +87,6 @@ class SkillTrainingCostsTest {
     private SkillType skillType;
     private Campaign campaign;
     private CampaignOptions campaignOptions;
-    private SkillModifierData skillModifierData;
 
     @BeforeEach
     void setUp() {
@@ -100,8 +99,6 @@ class SkillTrainingCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getLocalDate()).thenReturn(TODAY);
-
-        skillModifierData = mock(SkillModifierData.class);
     }
 
     @AfterEach
@@ -119,9 +116,10 @@ class SkillTrainingCostsTest {
         return ladder;
     }
 
-    private Person personWithSkillAt(int totalLevel) {
+    /** @return a person with the skill trained to this level; improvement costs follow the trained level alone */
+    private Person personWithSkillAt(int trainedLevel) {
         Skill skill = mock(Skill.class);
-        when(skill.getTotalSkillLevel(any())).thenReturn(totalLevel);
+        when(skill.getLevel()).thenReturn(trainedLevel);
         Person person = mock(Person.class);
         when(person.getSkill(SKILL_NAME)).thenReturn(skill);
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.NONE);
@@ -301,18 +299,21 @@ class SkillTrainingCostsTest {
 
     @Nested
     class SkillModifiers {
-        /** The experience level shown to the player includes modifiers, so pricing must use the total level. */
+        /**
+         * Attributes, abilities, injuries and other modifiers change how well the person uses the skill, not what
+         * training it costs, so pricing follows the trained level alone.
+         */
         @Test
-        void totalSkillLevelIsPricedNotTheBaseLevel() {
+        void trainedLevelIsPricedNotTheTotalLevel() {
             Skill skill = mock(Skill.class);
-            when(skill.getLevel()).thenReturn(1);
-            when(skill.getTotalSkillLevel(skillModifierData)).thenReturn(3);
+            when(skill.getLevel()).thenReturn(3);
+            when(skill.getTotalSkillLevel(any())).thenReturn(1);
             Person person = mock(Person.class);
             when(person.getSkill(SKILL_NAME)).thenReturn(skill);
 
-            // Total 3 -> 4 is Regular to Veteran
+            // Trained 3 -> 4 is Regular to Veteran; the total level would have been free
             assertEquals(supportPoints(300), cost(person, false));
-            verify(skill).getTotalSkillLevel(skillModifierData);
+            verify(skill, never()).getTotalSkillLevel(any());
         }
     }
 
@@ -465,7 +466,7 @@ class SkillTrainingCostsTest {
     class RoleDetection {
         private Person mekWarrior(PersonnelRole primaryRole, PersonnelRole secondaryRole, String skillName) {
             Skill skill = mock(Skill.class);
-            when(skill.getTotalSkillLevel(any())).thenReturn(3);
+            when(skill.getLevel()).thenReturn(3);
             Person person = mock(Person.class);
             when(person.getSkill(skillName)).thenReturn(skill);
             when(person.getPrimaryRole()).thenReturn(primaryRole);

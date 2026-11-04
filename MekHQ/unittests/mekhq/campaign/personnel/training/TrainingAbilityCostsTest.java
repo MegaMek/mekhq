@@ -137,6 +137,7 @@ class TrainingAbilityCostsTest {
         when(mocked.getPrereqAbilities()).thenReturn(new Vector<>());
         when(mocked.getInvalidAbilities()).thenReturn(new Vector<>());
         when(mocked.getChoiceValues()).thenReturn(new Vector<>());
+        when(mocked.getRemovedAbilities()).thenReturn(new Vector<>());
         when(mocked.isClanRequirementMet(anyBoolean())).thenReturn(true);
         return mocked;
     }
