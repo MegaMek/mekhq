@@ -42,8 +42,8 @@ import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
-import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryConsole.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryConsole.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.*;
@@ -82,8 +82,8 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
+import mekhq.gui.dialog.glossary.GuideViewer;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -656,7 +656,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * <b>Supported Commands:</b>
      * <ul>
-     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link GlossaryEntryDialog} to display the
+     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens the {@link GlossaryConsole} to display the
      *   referenced glossary entry.</li>
      *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
      *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
@@ -690,7 +690,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            new GlossaryEntryDialog(parent, glossaryEntry);
+            GlossaryConsole.showEntry(parent, glossaryEntry);
         } else if (commandKey.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entryKey);
 
@@ -699,11 +699,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            try {
-                new GlossaryDocumentationEntryDialog(parent, documentationEntry);
-            } catch (Exception ex) {
-                LOGGER.error("Failed to open PDF", ex);
-            }
+            GuideViewer.showGuide(parent, documentationEntry);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);

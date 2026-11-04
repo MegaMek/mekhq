@@ -34,6 +34,7 @@ package mekhq.campaign.mission.scenarios.atb;
 
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.bot.princess.CardinalEdge;
@@ -68,6 +69,8 @@ import mekhq.campaign.universe.Factions;
  */
 public class AtBScenarioModifierApplicator {
     private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifierApplicator.class);
+
+    static final int MINIMUM_UNITS_AFTER_REMOVAL = 1;
 
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
@@ -132,6 +135,10 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that removes the number of units from the specified side.
+     *
+     * <p>Units are only taken from that side's bot forces that are subject to random removal, and the side always
+     * keeps at least one unit. Without that floor, a modifier that removes a full lance would wipe out a side that
+     * only fielded a lance or fewer in total, leaving the scenario with no opposition.</p>
      */
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient,
           int unitRemovalCount) {
@@ -155,20 +162,34 @@ public class AtBScenarioModifierApplicator {
             actualUnitsToRemove = CombatTeam.getStandardFormationSize(faction);
         }
 
-        for (int x = 0; x < actualUnitsToRemove; x++) {
-            int botForceIndex = Compute.randomInt(scenario.getNumBots());
-            BotForce bf = scenario.getBotForce(botForceIndex);
-            ScenarioForceTemplate template = scenario.getBotForceTemplates().get(bf);
-            boolean subjectToRemoval = (template != null) && template.isSubjectToRandomRemoval();
+        int recipientTeam = ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal());
 
-            // only remove units from a bot force if it's on the affected team
-            // AND if it has any units to remove
-            if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) &&
-                      !bf.getFullEntityList(campaign).isEmpty() &&
-                      subjectToRemoval) {
-                int unitIndexToRemove = Compute.randomInt(bf.getFullEntityList(campaign).size());
-                bf.removeEntity(unitIndexToRemove);
+        for (int x = 0; x < actualUnitsToRemove; x++) {
+            int sideUnitCount = 0;
+            List<BotForce> eligibleForces = new ArrayList<>();
+
+            for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+                BotForce botForce = scenario.getBotForce(botIndex);
+                if (botForce.getTeam() != recipientTeam) {
+                    continue;
+                }
+
+                sideUnitCount += botForce.getFullEntityList(campaign).size();
+
+                // Only fixed entities can be removed, so forces without any can't give up a unit
+                ScenarioForceTemplate template = scenario.getBotForceTemplates().get(botForce);
+                if ((template != null) && template.isSubjectToRandomRemoval() &&
+                          !botForce.getFixedEntityList().isEmpty()) {
+                    eligibleForces.add(botForce);
+                }
             }
+
+            if ((sideUnitCount <= MINIMUM_UNITS_AFTER_REMOVAL) || eligibleForces.isEmpty()) {
+                return;
+            }
+
+            BotForce botForce = eligibleForces.get(Compute.randomInt(eligibleForces.size()));
+            botForce.removeEntity(Compute.randomInt(botForce.getFixedEntityList().size()));
         }
     }
 

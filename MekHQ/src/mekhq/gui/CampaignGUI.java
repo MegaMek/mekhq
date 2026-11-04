@@ -106,6 +106,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -136,7 +137,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
@@ -348,6 +349,22 @@ public class CampaignGUI extends JPanel {
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
+        applyTabLockOptions();
+
+        // While the tab order is locked, a tab dropped back onto the tab strip returns to its usual place rather than
+        // wherever it was dropped
+        tabMain.addTabStateListener(new EnhancedTabbedPane.TabStateListener() {
+            @Override
+            public void onTabReattached(int tabIndex, Component component) {
+                if (MekHQ.getMHQOptions().getLockMainTabOrder() && (component instanceof CampaignGuiTab tab)) {
+                    tabMain.remove(tab);
+                    int index = tabInsertIndex(tab);
+                    tabMain.insertTab(tab.getTabName(), null, tab, null, index);
+                    tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
+                    tabMain.setSelectedIndex(index);
+                }
+            }
+        });
 
         boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
         int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
@@ -642,7 +659,7 @@ public class CampaignGUI extends JPanel {
         AccentRoundedJButton btnGlossary = new AccentRoundedJButton(resourceMap.getString("btnGlossary.text"),
               Accent.REFERENCE);
         btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
-        btnGlossary.addActionListener(event -> new GlossaryDialog(getFrame()));
+        btnGlossary.addActionListener(event -> GlossaryConsole.showFor(getFrame()));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnGlossary, gridBagConstraints);
@@ -762,15 +779,31 @@ public class CampaignGUI extends JPanel {
         if (tabMain.indexOfComponent(tab) >= 0) {
             return;
         }
-        int position = tabOrder.indexOf(tab.tabType());
-        int index =
-              IntStream.range(0, tabMain.getTabCount()).filter(
-                          i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
-                    .findFirst()
-                    .orElse(tabMain.getTabCount());
+        int index = tabInsertIndex(tab);
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
         SwingUtilities.invokeLater(tab::refreshAll);
+    }
+
+    /**
+     * @param tab a tab that is not currently in the tab panel
+     *
+     * @return the index the tab belongs at in the tab panel, before the first tab that comes after it
+     */
+    private int tabInsertIndex(CampaignGuiTab tab) {
+        int position = tabOrder.indexOf(tab.tabType());
+        return IntStream.range(0, tabMain.getTabCount())
+                     .filter(i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
+                     .findFirst()
+                     .orElse(tabMain.getTabCount());
+    }
+
+    /**
+     * Applies the client options that lock the main tabs against being reordered or detached.
+     */
+    private void applyTabLockOptions() {
+        tabMain.setTabReorderingEnabled(!MekHQ.getMHQOptions().getLockMainTabOrder());
+        tabMain.setTabDetachingEnabled(!MekHQ.getMHQOptions().getLockMainTabDetaching());
     }
 
     /**
@@ -993,7 +1026,9 @@ public class CampaignGUI extends JPanel {
      * Determines whether the contract market should be inaccessible because the campaign already holds a contract.
      *
      * <p>Access is only permitted while a contract is held if StratCon is disabled campaign-wide and none of the held
-     * contracts (including accepted contracts that have not yet started) have StratCon enabled.</p>
+     * contracts (including accepted contracts that have not yet started) have StratCon enabled. Shell contracts never
+     * block it, as they are never tied into StratCon, so a shell can be followed by a market contract. The reverse is
+     * not true: shells are created from the market, so none can be added while a StratCon contract blocks it.</p>
      *
      * @return {@code true} if the contract market should be blocked
      *
@@ -1002,7 +1037,12 @@ public class CampaignGUI extends JPanel {
      */
     private boolean isContractMarketBlockedByActiveContract() {
         Campaign campaign = getCampaign();
-        List<AbstractContract> heldContracts = campaign.getActiveContracts(true);
+        List<AbstractContract> heldContracts = new ArrayList<>();
+        for (AbstractContract contract : campaign.getActiveContracts(true)) {
+            if (!(contract instanceof ShellContract)) {
+                heldContracts.add(contract);
+            }
+        }
         if (heldContracts.isEmpty()) {
             return false;
         }
@@ -2638,6 +2678,7 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
         refreshGuiScale();
+        applyTabLockOptions();
     }
     // endregion Subscriptions
 }

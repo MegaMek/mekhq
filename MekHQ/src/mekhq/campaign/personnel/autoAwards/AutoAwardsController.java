@@ -321,19 +321,23 @@ public class AutoAwardsController {
             return today;
         }
 
-        // Initialize a variable to hold the ending date of the last contract.
-
-        // Return the ending date of the last contract.
-        return getLastContractEndingDate(completedContracts);
+        // Return the ending date of the last contract, or today's date if none of them has one.
+        LocalDate lastContractEndingDate = getLastContractEndingDate(completedContracts);
+        return (lastContractEndingDate == null) ? today : lastContractEndingDate;
     }
 
-    private static LocalDate getLastContractEndingDate(List<AbstractContract> completedContracts) {
+    static @Nullable LocalDate getLastContractEndingDate(List<AbstractContract> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
         for (AbstractContract contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
+
+            // Completion stamps an end date on open-ended contracts, but a contract without one must not break the search
+            if (endingDate == null) {
+                continue;
+            }
 
             // If this is the first iteration, assign the ending date of the current contract to lastContractEndingDate and continue to the next iteration.
             if (lastContractEndingDate == null) {

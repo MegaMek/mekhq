@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
@@ -112,6 +115,55 @@ class AddSupportUnitsToTOETest {
             assertEquals(PersonnelRole.MECHANIC, crewMember.getPrimaryRole(),
                   "its crew comes from the section, not from new hires");
         }
+    }
+
+    @Test
+    void organize_filesRecoveryVehiclesInASalvageFormation() {
+        // The Recovery Company was built as a Support formation, so the salvage planner never offered it as a team.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 8), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle's formation is a Salvage formation");
+        assertEquals(FormationType.SUPPORT,
+              campaign.getPlayerForce().getSupportCommandFormation().getFormationType(),
+              "while Support Command itself stays a Support formation");
+    }
+
+    @Test
+    void organize_keepsTheRecoveryCompanyWhenItIsAllTheSectionHolds() {
+        // With a single mechanic, the whole maintenance section is the recovery vehicle's crew. The tidy-up pass that
+        // splices out single-child layers used to fold the Recovery Company into the section, and the vehicle with it.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 1), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle still sits in a Salvage formation");
+    }
+
+    @Test
+    void topUp_buildsTheRecoveryCompanyAsASalvageFormation() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, SupportCapability.SALVAGE,
+              SupportPersonnelToTOE.VehicleCrewSource.TEMPORARY_CREW, campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "a Recovery Company made when salvage is switched on later is a Salvage formation too");
     }
 
     @Test
@@ -341,7 +393,7 @@ class AddSupportUnitsToTOETest {
         SupportPersonnelToTOE.addCapabilityVehicles(campaign, company,
               new SupportPersonnelToTOE.VehicleSpec(vehicleName, 2), newStaff(campaign, PersonnelRole.DOCTOR, 1), 0,
               campaign.getPlayerForce().getFaction());
-        SupportPersonnelToTOE.fillShortCrews(campaign, company);
+        SupportPersonnelToTOE.fillShortCrews(campaign, company, campaign.getPlayerForce().getFaction());
 
         assertEquals(2, company.getUnits().size(), "both vehicles are built although the staff ran out");
         for (Unit vehicle : unitsNamedLike(campaign, "APC")) {
@@ -364,10 +416,36 @@ class AddSupportUnitsToTOETest {
         assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
               "this test is only meaningful while the vehicle is short of crew");
 
-        SupportPersonnelToTOE.fillShortCrews(campaign, company);
+        SupportPersonnelToTOE.fillShortCrews(campaign, company, campaign.getPlayerForce().getFaction());
 
         assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are covered");
         assertTrue(vehicle.getTotalTempCrew() > 0, "by the temporary crew pool, not by new hires");
+    }
+
+    @Test
+    void fillShortCrews_newHiresGoOnTheCommandFactionsRankSystem() {
+        // Issue 10756: the hires were left on the campaign's rank system while every other person the Command
+        // Generator made had been put on the faction's, so the roster offered them a different rank system.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit vehicle = unitNamedLike(campaign, "APC");
+        Formation company = new Formation("Field Hospital Company");
+        campaign.getPlayerForce().addFormation(company,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        campaign.getPlayerForce().addUnitToFormation(vehicle, company.getId(), campaign);
+        assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
+              "this test is only meaningful while the vehicle is short of crew");
+        Faction combine = mock(Faction.class);
+        when(combine.getRankSystem()).thenReturn(Ranks.getRankSystemFromCode("DCMS"));
+
+        SupportPersonnelToTOE.fillShortCrews(campaign, company, combine);
+
+        assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are filled with hires");
+        for (Person hire : vehicle.getCrew()) {
+            assertEquals("DCMS", hire.getRankSystem().getCode(),
+                  hire.getFullName() + " is on the Combine's rank table like the rest of the command");
+        }
     }
 
     @Test
@@ -616,6 +694,12 @@ class AddSupportUnitsToTOETest {
             staff.add(campaign.getPlayerForce().getHumanResources().newPerson(campaign, role, PersonnelRole.NONE));
         }
         return staff;
+    }
+
+    private static Formation formationOf(Campaign campaign, Unit unit) {
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        assertNotNull(formation, "expected " + unit.getName() + " to be filed in a formation");
+        return formation;
     }
 
     private static Unit unitNamedLike(Campaign campaign, String namePart) {

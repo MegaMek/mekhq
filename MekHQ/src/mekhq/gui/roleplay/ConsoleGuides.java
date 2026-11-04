@@ -33,7 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.DIVIDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
+import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -59,7 +63,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * Builds the guide for each {@link OracleConsole} page from the resource bundle. Each page's steps, example lines and
@@ -143,7 +147,7 @@ final class ConsoleGuides {
         links.add(leftAligned(Hud.eyebrow(text("OracleGuide.glossary"))));
         links.add(Box.createVerticalStrut(scaleForGUI(4)));
         for (GlossaryEntry entry : glossaryEntriesFor(page)) {
-            links.add(leftAligned(Hud.link(entry.getTitle(), () -> new GlossaryEntryDialog(console, entry))));
+            links.add(leftAligned(Hud.link(entry.getTitle(), () -> GlossaryConsole.showEntry(console, entry))));
             links.add(Box.createVerticalStrut(scaleForGUI(3)));
         }
         return links;

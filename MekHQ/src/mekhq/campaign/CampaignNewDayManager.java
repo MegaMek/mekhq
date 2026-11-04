@@ -131,6 +131,7 @@ import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
@@ -187,6 +188,7 @@ import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.randomEvents.other.ContractRandomEvent;
 import mekhq.campaign.randomEvents.other.GrayMonday;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
@@ -1252,8 +1254,8 @@ public class CampaignNewDayManager {
      * <p>
      * It generates contract offers in the contract market, updates ship search expiration and results, processes ship
      * search on Mondays, awards training experience to eligible training lances on active contracts on Mondays, adds or
-     * removes dependents at the start of the year if the options are enabled, rolls for morale at the start of the
-     * month, and processes ATB scenarios.
+     * removes dependents at the start of the year if the options are enabled, rolls for morale and contract random
+     * events at the start of the month, and processes ATB scenarios.
      */
     private void processNewDayATB() {
         // Before anything else touches the contracts: an employer losing its planet today resolves the contract's
@@ -1272,6 +1274,11 @@ public class CampaignNewDayManager {
              * First of the month; roll Morale.
              */
             for (AbstractContract contract : campaign.getActiveContracts()) {
+                // Shell contracts run no contract automation
+                if (contract instanceof ShellContract) {
+                    continue;
+                }
+
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 MHQMorale.checkMorale(campaign, contract, true);
@@ -1290,6 +1297,8 @@ public class CampaignNewDayManager {
                 if (!report.isBlank()) {
                     campaign.addReport(GENERAL, report);
                 }
+
+                ContractRandomEvent.processMonthlyEvent(campaign, contract);
             }
         }
 
@@ -1301,6 +1310,11 @@ public class CampaignNewDayManager {
             List<AbstractContract> activeContracts = campaign.getActiveContracts();
             AbstractContract firstNonSubcontract = null;
             for (AbstractContract contract : activeContracts) {
+                // Shell contracts run no contract automation, so they are never resupplied
+                if (contract instanceof ShellContract) {
+                    continue;
+                }
+
                 firstNonSubcontract = contract;
                 break;
             }
@@ -1329,6 +1343,11 @@ public class CampaignNewDayManager {
 
         // Daily events
         for (AbstractContract contract : campaign.getActiveContracts()) {
+            // Shell contracts run no contract automation
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             if (campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                       !contract.getObjectiveType().isGarrisonType() &&
                       today.equals(contract.getStartDate())) {
@@ -2240,6 +2259,11 @@ public class CampaignNewDayManager {
 
         // Second, we process them and any already generated scenarios
         for (AbstractContract contract : contracts) {
+            // Shell contracts run no contract automation: the player owns their dates and their scenarios
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             /*
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.

@@ -145,6 +145,9 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.set(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER, 0.5);
                 }
             }
+            // Removed option: the strategic view always uses the default minimap theme now.
+            case "strategicViewTheme" -> {
+            }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }

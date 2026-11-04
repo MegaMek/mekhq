@@ -68,7 +68,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * This class is used to update Faction Standings when campaign options change.
@@ -315,7 +315,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      */
     private void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            GlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
+            GlossaryConsole.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }

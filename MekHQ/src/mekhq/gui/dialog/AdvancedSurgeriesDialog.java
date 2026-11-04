@@ -125,7 +125,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudStatTile;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * Dialog for planning and performing advanced surgeries - replacement limbs, prosthetics, implants and the like - on a
@@ -2118,7 +2118,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
         GlossaryEntry glossaryEntry = GlossaryEntry.PROSTHETICS;
 
         try {
-            new GlossaryEntryDialog(this, glossaryEntry);
+            GlossaryConsole.showEntry(this, glossaryEntry);
         } catch (Exception ex) {
             LOGGER.error("Failed to open Glossary Entry", ex);
         }

@@ -1,6 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.51.01
+This file is no longer updated. From 0.51.01 on, the changes in each release are listed in
+its release notes: https://github.com/MegaMek/mekhq/releases
 
 0.51.0 (2026-06-06 1600 UTC) - First version requiring Java 21
 ## What's Changed

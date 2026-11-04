@@ -45,12 +45,14 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import megamek.common.MPCalculationSetting;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Faction;
+import megamek.common.event.Subscribe;
 import megamek.common.interfaces.ITechManager;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
@@ -103,6 +105,7 @@ import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.HeatGenerationEstimate;
 import megameklab.util.UnitUtil;
+import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTimeEstimate;
@@ -131,6 +134,7 @@ public class MekLabTab extends CampaignGuiTab {
     private boolean refitNameProposed;
 
     private JPanel summaryPane;
+    private JSplitPane summaryAndLab;
     private JLabel lblName;
 
     private JLabel lblRefit;
@@ -240,6 +244,11 @@ public class MekLabTab extends CampaignGuiTab {
         c.weighty = 1.0;
         summaryPane.add(shoppingPanel, c);
 
+        summaryAndLab = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+        summaryAndLab.setLeftComponent(summaryPane);
+        // A wider window widens the lab, not the summary
+        summaryAndLab.setResizeWeight(0.0);
+
         // TODO: compare units dialog that pops up mek views back-to-back
     }
 
@@ -272,23 +281,64 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
-        // We need to override the values in the MML properties file with the campaign
-        // options settings.
+        applyCampaignTechSettings();
+        labPanel = getCorrectLab(entity);
+        if (labPanel != null) {
+            applyCampaignTechRules();
+            refreshRefitSummary();
+            showLab();
+            labPanel.refreshAll();
+        }
+    }
+
+    /**
+     * Shows the refit summary beside the lab. The border between them can be dragged, and stays where it was left when
+     * the next unit is loaded.
+     */
+    private void showLab() {
+        summaryAndLab.setRightComponent(labPanel);
+        add(summaryAndLab, BorderLayout.CENTER);
+    }
+
+    /**
+     * Overrides the tech settings in the MML properties file with the campaign options. These must be set before the
+     * lab panels are created, as the panels read them during construction.
+     */
+    private void applyCampaignTechSettings() {
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
         CConfig.setParam(CConfig.TECH_SHOW_FACTION,
               String.valueOf(campaignGUI.getCampaign().getTechFaction() != Faction.NONE));
         CConfig.setParam(CConfig.TECH_UNOFFICIAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
-        CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
-        CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
-        labPanel = getCorrectLab(entity);
-        if (labPanel != null) {
-            labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
-            refreshRefitSummary();
-            add(summaryPane, BorderLayout.LINE_START);
-            add(labPanel, BorderLayout.CENTER);
-            labPanel.refreshAll();
+    }
+
+    /**
+     * Applies the campaign's tech faction and year limit to the lab. The year limit uses the campaign's tech intro year
+     * so that disabling "Limit Tech Purchases by Game Year" also allows equipment introduced after the current date.
+     */
+    private void applyCampaignTechRules() {
+        if (labPanel == null) {
+            return;
         }
+        // The year override must come first: setting the faction can remove equipment that fails the current
+        // legality check, which would use the previous year cutoff
+        labPanel.setGameYearOverride(campaignGUI.getCampaign().getTechIntroYear());
+        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
+    }
+
+    /**
+     * Reapplies the campaign's tech rules to a lab that is already open, so changes to the campaign options (such as
+     * "Limit Tech Purchases by Game Year") take effect without reopening the refit.
+     */
+    @Subscribe
+    public void handle(OptionsChangedEvent event) {
+        if ((labPanel == null) || (unit == null)) {
+            return;
+        }
+        applyCampaignTechSettings();
+        applyCampaignTechRules();
+        labPanel.refreshAll();
+        refreshRefitSummary();
     }
 
     public void clearUnit() {
@@ -318,9 +368,9 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedUnit(entity);
         removeAll();
         labPanel = getCorrectLab(entity);
+        applyCampaignTechRules();
         refreshRefitSummary();
-        add(summaryPane, BorderLayout.LINE_START);
-        add(labPanel, BorderLayout.CENTER);
+        showLab();
         labPanel.refreshAll();
     }
 
@@ -394,6 +444,8 @@ public class MekLabTab extends CampaignGuiTab {
         if (null == testEntity) {
             return;
         }
+        // Validate equipment intro dates against the campaign's tech year limit rather than the unit's year
+        testEntity.setGameYear(campaignGUI.getCampaign().getTechIntroYear());
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb);
 
@@ -527,6 +579,8 @@ public class MekLabTab extends CampaignGuiTab {
         public abstract Entity getEntity();
 
         abstract void setTechFaction(Faction techFaction);
+
+        abstract void setGameYearOverride(int gameYear);
 
         @Override
         public void scheduleRefresh() {
@@ -686,6 +740,11 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.setTechFaction(techFaction);
         }
 
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
+        }
+
     }
 
     private class DropshipPanel extends EntityPanel {
@@ -819,6 +878,11 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.setTechFaction(techFaction);
         }
 
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
+        }
+
     }
 
     private class MekPanel extends EntityPanel {
@@ -946,6 +1010,11 @@ public class MekLabTab extends CampaignGuiTab {
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
+        }
     }
 
     private class TankPanel extends EntityPanel {
@@ -1072,6 +1141,11 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
+        }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
         }
     }
 
@@ -1211,6 +1285,11 @@ public class MekLabTab extends CampaignGuiTab {
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
+        }
     }
 
     private class BattleArmorPanel extends EntityPanel {
@@ -1338,6 +1417,11 @@ public class MekLabTab extends CampaignGuiTab {
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
         }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
+        }
     }
 
     private class InfantryPanel extends EntityPanel {
@@ -1451,6 +1535,11 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
+        }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
         }
     }
 
@@ -1581,6 +1670,11 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
+        }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
         }
     }
 
@@ -1713,6 +1807,11 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         void setTechFaction(Faction techFaction) {
             structureTab.setTechFaction(techFaction);
+        }
+
+        @Override
+        void setGameYearOverride(int gameYear) {
+            structureTab.setGameYearOverride(gameYear);
         }
     }
 }

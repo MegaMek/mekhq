@@ -191,6 +191,13 @@ class RefitClassGraderTest {
     }
 
     @Test
+    void convertingBetweenOmniAndStandardIsClassF() {
+        grader.gradeOmniConversion();
+
+        assertEquals(Refit.CLASS_F, grader.getRefitClass());
+    }
+
+    @Test
     void theHighestClassWins() {
         // The Wolverine WVR-6M example: A, B and C work make a Class C refit
         grader.gradeArmorChange();

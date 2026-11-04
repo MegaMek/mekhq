@@ -553,6 +553,28 @@ public abstract class AbstractContract {
     }
 
     /**
+     * Gives an open-ended contract an end date on the day it is completed, so everything that reads completed
+     * contracts (history, reputation windows, auto-awards) can rely on one. The length is recomputed from the resulting
+     * dates. A contract that already has an end date is left untouched.
+     *
+     * <p>A contract completed before its start date is ended on its start date, so it never ends before it begins.</p>
+     *
+     * @param completionDate the day the contract is completed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void closeOpenEndedSchedule(LocalDate completionDate) {
+        if (getEndingDate() != null) {
+            return;
+        }
+
+        LocalDate startDate = getStartDate();
+        LocalDate endDate = ((startDate != null) && startDate.isAfter(completionDate)) ? startDate : completionDate;
+        setScheduleData(scheduleData.withEndDate(endDate));
+    }
+
+    /**
      * Adjusts the current {@link ContractMoraleLevel} by the specified delta and returns the resulting morale level.
      *
      * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
@@ -1370,8 +1392,8 @@ public abstract class AbstractContract {
 
     /**
      * Returns the support-point reserve this contract can be negotiated up to, used as the "full reserves" reference
-     * when displaying support points, and the cap applied during initial support-point negotiation - which calls this
-     * rather than repeating the rule (see {@link SupportPointNegotiation}).
+     * when displaying support points, and the cap applied during both initial and periodic support-point negotiation -
+     * which calls this rather than repeating the rule (see {@link SupportPointNegotiation}).
      *
      * @return the maximum support points the contract can hold in reserve
      */

@@ -55,20 +55,16 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -85,9 +81,11 @@ import mekhq.campaign.mission.contract.ContractMarket;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationDifficulty;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
+import mekhq.campaign.mission.contract.io.ContractExchange;
 import mekhq.campaign.mission.contract.utilities.ContractAcceptance;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
@@ -367,9 +365,19 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         HudButton close = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.close")
                                               .toUpperCase(Locale.ROOT), false);
         close.addActionListener(event -> dispose());
+        // Not tied to the selected offer, so it sits apart from the buttons that act on it.
+        HudButton shellContract = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.shellContract")
+                                                      .toUpperCase(Locale.ROOT), false);
+        // A GM tool, like creating an offer by hand: armed only in GM mode, with a tooltip saying why when it is not.
+        shellContract.setArmed(isGM());
+        shellContract.setToolTipText(MarketHud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
+              "button.contractMarket.shellContract.tooltip")));
+        shellContract.addActionListener(event -> createShellContract());
 
         JPanel actions = Hud.transparentPanel(null);
         actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
+        actions.add(shellContract);
+        actions.add(Box.createHorizontalStrut(scaleForGUI(16)));
         actions.add(selectedLabel);
         actions.add(Box.createHorizontalStrut(scaleForGUI(10)));
         actions.add(negotiateButton);
@@ -773,6 +781,210 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         loadOffersForSearchType();
         selected = contract;
         refresh(true);
+    }
+
+    /**
+     * Copies the offer to the clipboard as a Discord message (see {@link ContractDiscordFormatter}), as it reads in
+     * its dossier.
+     *
+     * @return {@code true} if the clipboard took the text, {@code false} if another application was holding it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public boolean copyForDiscord(AbstractContract contract) {
+        String message = ContractDiscordFormatter.format(readout(contract));
+        try {
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(message), null);
+            return true;
+        } catch (IllegalStateException ex) {
+            LOGGER.warn(ex, "The clipboard was unavailable; the offer was not copied.");
+            return false;
+        }
+    }
+
+    /**
+     * Lets the player choose offers on the board and export them, either as a contract file another campaign can
+     * import ({@link ContractExchange}) or as a PDF to read ({@link ContractPdfExporter}).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void exportOffers() {
+        if (contracts.isEmpty()) {
+            return;
+        }
+        ContractExportDialog exportDialog = new ContractExportDialog(this, sortedContracts());
+        List<AbstractContract> chosen = exportDialog.getSelectedOffers();
+        if (!exportDialog.wasConfirmed() || chosen.isEmpty()) {
+            return;
+        }
+
+        try {
+            if (exportDialog.getSelectedFormat() == ContractExportDialog.ExportFormat.PDF) {
+                Optional<File> file = FileDialogs.saveContractsPDF(parent, campaign);
+                if (file.isEmpty()) {
+                    return;
+                }
+                List<ContractReadout> readouts = chosen.stream().map(this::readout).toList();
+                ContractPdfExporter.export(file.get(), campaign.getPlayerForce().getName(),
+                      MekHQ.getMHQOptions().getDisplayFormattedDate(currentDate), searchTypeLabel(searchType),
+                      readouts);
+                LOGGER.info("Exported {} contract offers to PDF {}", chosen.size(), file.get());
+            } else {
+                Optional<File> file = FileDialogs.saveContracts(parent, campaign);
+                if (file.isEmpty()) {
+                    return;
+                }
+                List<ContractExchange.ExportEntry> entries = chosen.stream()
+                                                                   .map(contract -> new ContractExchange.ExportEntry(
+                                                                         contract, searchType))
+                                                                   .toList();
+                ContractExchange.exportOffers(file.get(), entries);
+                LOGGER.info("Exported {} contract offers to {}", chosen.size(), file.get());
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex, "Unable to export contract offers");
+            showMessage(getTextAt(RESOURCE_BUNDLE, "export.contractMarket.failed"), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Reads a contract file exported by another campaign and adds its offers to this campaign's market. Each offer goes
+     * on the board it was listed on, where this campaign may use that board, and otherwise on the board on screen (see
+     * {@link ContractImportPlan}). Offers that were moved to another board, or could not be imported, are listed for
+     * the player afterwards.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void importOffers() {
+        Optional<File> file = FileDialogs.openContracts(parent);
+        if (file.isEmpty()) {
+            return;
+        }
+
+        ContractExchange.ImportResult result;
+        try {
+            result = ContractExchange.importOffers(file.get(), campaign);
+        } catch (IOException ex) {
+            LOGGER.error(ex, "Unable to import contract offers from {}", file.get());
+            showMessage(getTextAt(RESOURCE_BUNDLE, "import.contractMarket.failed"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        ContractImportPlan plan = ContractImportPlan.of(campaign, result, allowedSearchTypes(), searchType);
+        AbstractContract firstOnThisBoard = null;
+        AbstractContract firstElsewhere = null;
+        ContractSearchType firstElsewhereBoard = null;
+        for (ContractImportPlan.Placement placement : plan.placements()) {
+            ContractSearchType board = placement.board();
+            AbstractContract contract = placement.contract();
+            contractMarket.addContract(board, contract);
+            if (board == searchType) {
+                firstOnThisBoard = firstOnThisBoard == null ? contract : firstOnThisBoard;
+            } else if (firstElsewhere == null) {
+                firstElsewhere = contract;
+                firstElsewhereBoard = board;
+            }
+        }
+
+        // Show an imported offer: on the board on screen if any landed there, or else on the board the first went to.
+        if (firstOnThisBoard == null && firstElsewhere != null) {
+            searchType = firstElsewhereBoard;
+            firstOnThisBoard = firstElsewhere;
+        }
+        loadOffersForSearchType();
+        if (firstOnThisBoard != null) {
+            selected = firstOnThisBoard;
+        }
+        refresh(true);
+
+        List<ContractImportPlan.Placement> moved = plan.placements()
+                                                     .stream()
+                                                     .filter(ContractImportPlan.Placement::wasMoved)
+                                                     .toList();
+        LOGGER.info("Imported {} contract offers from {} ({} moved to another board, {} skipped)",
+              plan.placements().size(), file.get(), moved.size(), plan.skipped().size());
+        showMessage(importSummary(plan, moved),
+              plan.skipped().isEmpty() && moved.isEmpty()
+                    ? JOptionPane.INFORMATION_MESSAGE
+                    : JOptionPane.WARNING_MESSAGE);
+    }
+
+    private static String importSummary(ContractImportPlan plan, List<ContractImportPlan.Placement> moved) {
+        String separator = getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator");
+        StringBuilder summary = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
+              "import.contractMarket.summary", plan.placements().size()));
+        if (!moved.isEmpty()) {
+            summary.append("<br><br>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved", moved.size()))
+                  .append("<ul>");
+            for (ContractImportPlan.Placement placement : moved) {
+                summary.append("<li>")
+                      .append(MarketHud.escape(offerName(placement.contract().getName())))
+                      .append(separator)
+                      .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved.entry",
+                            searchTypeLabel(placement.listedBoard()), searchTypeLabel(placement.board())))
+                      .append("</li>");
+            }
+            summary.append("</ul>");
+        }
+        if (!plan.skipped().isEmpty()) {
+            summary.append("<br><br>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped",
+                        plan.skipped().size()))
+                  .append("<ul>");
+            for (ContractExchange.SkippedOffer skipped : plan.skipped()) {
+                summary.append("<li>")
+                      .append(MarketHud.escape(offerName(skipped.name())))
+                      .append(separator)
+                      .append(getTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped." + skipped.reason().name()))
+                      .append("</li>");
+            }
+            summary.append("</ul>");
+        }
+        return "<html>" + summary + "</html>";
+    }
+
+    private static String offerName(String name) {
+        return name.isBlank() ? getTextAt(RESOURCE_BUNDLE, "import.contractMarket.unnamed") : name;
+    }
+
+    private void showMessage(String message, int messageType) {
+        JOptionPane.showMessageDialog(this, message, getTextAt(RESOURCE_BUNDLE, "exchange.contractMarket.title"),
+              messageType);
+    }
+
+    /** The offer's dossier as plain text, for the exports. */
+    private ContractReadout readout(AbstractContract contract) {
+        return ContractReadout.of(campaign, contract, estimate(contract), currentDate, hideContractType);
+    }
+
+    /**
+     * Opens the shell contract dialog, where the player enters a contract's basics themselves. A shell contract never
+     * passes through the board: confirming adds it to the campaign as an active mission straight away, so it is
+     * recorded as the accepted contract and the market closes, as it does after accepting an offer. The on-departure
+     * options do not apply, as a shell contract runs no contract automation. A GM tool, so only available in GM mode.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void createShellContract() {
+        if (!isGM()) {
+            return;
+        }
+
+        closeGuide();
+        ShellContractDialog dialog = new ShellContractDialog(this, campaign, null);
+        if (!dialog.wasConfirmed()) {
+            return;
+        }
+
+        LOGGER.info("Shell contract created from market: {}", dialog.getContract().getName());
+        this.acceptedContract = dialog.getContract();
+        dispose();
     }
 
     // endregion Actions

@@ -38,14 +38,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Exhaustive round-trip test for {@link RulesetsOptionsModel}. {@link OptionsModelTestSupport#mutateScalarFields}
  * mutates every boolean, enum, and int field and {@link OptionsModelTestSupport#assertAllFieldsMatch} verifies each one
- * survives a save/reload. {@code strategicViewTheme} is a {@link String}, so it is set by hand.
+ * survives a save/reload.
  */
 class RulesetsOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
         RulesetsOptionsModel model = new RulesetsOptionsModel(new CampaignOptions());
         OptionsModelTestSupport.mutateScalarFields(model);
-        model.strategicViewTheme = "test.theme";
 
         CampaignOptions destination = new CampaignOptions();
         model.applyTo(destination);

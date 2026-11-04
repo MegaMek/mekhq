@@ -82,7 +82,7 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
+import mekhq.gui.dialog.glossary.GuideViewer;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -228,11 +228,7 @@ public class PersonnelMarketDialog extends JDialog {
     private void documentationAction() {
         DocumentationEntry documentationEntry = DocumentationEntry.RECRUITMENT;
 
-        try {
-            new GlossaryDocumentationEntryDialog(this, documentationEntry);
-        } catch (Exception ex) {
-            LOGGER.error("Failed to open PDF", ex);
-        }
+        GuideViewer.showGuide(this, documentationEntry);
     }
 
 

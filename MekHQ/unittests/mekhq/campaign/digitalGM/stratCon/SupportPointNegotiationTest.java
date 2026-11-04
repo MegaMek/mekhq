@@ -198,8 +198,24 @@ public class SupportPointNegotiationTest {
             SupportPointNegotiation.negotiateAdditionalSupportPoints(campaign);
 
             verify(state).changeSupportPoints(3);
-            // Weekly negotiations report against the contract scale as the maximum.
-            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.biweekly", 3, 5));
+            // Weekly negotiations report against the same maximum as the initial negotiation.
+            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.biweekly", 3, 99));
+        }
+
+        @Test
+        void weeklyNegotiationCanExceedTheContractScaleUpToTheMaximum() {
+            // Current points already equal the scale, but the maximum is higher, so the admin is still used.
+            Person admin = mockAdmin(5, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(admin));
+
+            StratConCampaignState state = mockState(3);
+            AbstractContract contract = mockContract(TODAY, state, 9, 3);
+            when(campaign.getActiveContracts()).thenReturn(mutableList(contract));
+
+            SupportPointNegotiation.negotiateAdditionalSupportPoints(campaign);
+
+            verify(state).changeSupportPoints(1);
+            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.biweekly", 1, 9));
         }
     }
 

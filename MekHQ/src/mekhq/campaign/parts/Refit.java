@@ -563,6 +563,7 @@ public class Refit extends Part implements IAcquisitionWork {
             classGrader.gradeFixedOmniChange();
         }
         boolean isOmniRefit = isOmniUnit && !isFixedEquipmentChanged;
+        gradeOmniConversion();
         time = 0;
         if (isWeightlessSlotChanged) {
             time += planWeightlessSlotMoves();
@@ -1971,6 +1972,19 @@ public class Refit extends Part implements IAcquisitionWork {
     private static boolean isHeldByCampaign(Part part) {
         LocalWarehouse partWarehouse = part.getWarehouse();
         return (partWarehouse != null) && (partWarehouse.getPart(part.getId()) == part);
+    }
+
+    /**
+     * Grades a refit between an Omni unit and a standard one, such as an Eisensturm EST-O refitted to the EST-R3, its
+     * standard pre-production version. Every component changes from pod-mounted to fixed or back, so it is Class F.
+     */
+    private void gradeOmniConversion() {
+        boolean wasOmni = oldUnit.getEntity().isOmni();
+        if (wasOmni == newEntity.isOmni()) {
+            return;
+        }
+        LOGGER.debug("[Refit] {} converts {} an Omni unit: Class F", oldUnit.getName(), wasOmni ? "from" : "to");
+        classGrader.gradeOmniConversion();
     }
 
     /**

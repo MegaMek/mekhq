@@ -74,6 +74,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
@@ -1120,6 +1121,36 @@ public class MissionCompletionManagerTest {
                 verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
             }
         }
+
+        @Test
+        void shellContractSkipsEmployerStepsButStillRunsToCompletion() {
+            Fixture fixture = new Fixture(ShellContract.class);
+            // StratCon on, so a non-shell contract would roll for an emergency extension
+            when(fixture.campaignOptions.isUseStratCon()).thenReturn(true);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedStatic<ContractEmergencyExtension> contractEmergencyExtension = mockStatic(
+                        ContractEmergencyExtension.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class)) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+                contractEmergencyExtension.verify(() -> ContractEmergencyExtension.contractExtended(any(), any()),
+                      never());
+                contractCharacteristics.verify(() -> ContractCharacteristics.payCompletionBonus(any(), any(), any()),
+                      never());
+                verify(fixture.mission, never()).getWithheldSupportPayments();
+                contractJournalPrompt.verify(() -> ContractJournalPrompt.offer(any(), eq(fixture.campaign),
+                      eq(fixture.mission), eq(MissionStatus.SUCCESS)));
+            }
+        }
     }
     // endregion completeMission
 
@@ -1162,6 +1193,10 @@ public class MissionCompletionManagerTest {
         private final MissionCompletionManager manager;
 
         private Fixture() {
+            this(AbstractContract.class);
+        }
+
+        private Fixture(Class<? extends AbstractContract> missionClass) {
             app = mock(MekHQ.class, RETURNS_DEEP_STUBS);
             campaignGui = mock(CampaignGUI.class);
             campaign = mock(Campaign.class);
@@ -1169,7 +1204,7 @@ public class MissionCompletionManagerTest {
             playerForce = mock(PlayerForce.class);
             humanResources = mock(ForceHumanResources.class);
             newPersonnelMarket = mock(NewPersonnelMarket.class);
-            mission = mock(AbstractContract.class);
+            mission = mock(missionClass);
             tracker = mock(RetirementDefectionTracker.class);
             finances = mock(Finances.class);
 

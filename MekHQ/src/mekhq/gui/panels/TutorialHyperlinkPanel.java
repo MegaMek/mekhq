@@ -36,12 +36,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
-import javax.swing.JDialog;
+import java.awt.Window;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * {@code TutorialHyperlinkPanel} is a GUI component for displaying text (typically instructional or tutorial content)
@@ -65,7 +66,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      * Creates a {@code TutorialHyperlinkPanel} displaying text associated with the specified resource key.
      *
      * <p>Displays HTML-formatted, centered text with hyperlinks on a transparent background. Hyperlinks are handled by
-     * {@link GlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
+     * {@link GlossaryConsole#handleGlossaryHyperlinkClick(Window, HyperlinkEvent)}.</p>
      *
      * @param key The resource key used to look up the tutorial/instructional text for display.
      *
@@ -85,7 +86,7 @@ public class TutorialHyperlinkPanel extends JPanel {
         paneTutorial.setOpaque(false);
         paneTutorial.addHyperlinkListener(evt -> {
             if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                GlossaryDialog.handleGlossaryHyperlinkClick(null, evt);
+                GlossaryConsole.handleGlossaryHyperlinkClick(SwingUtilities.getWindowAncestor(paneTutorial), evt);
             }
         });
 

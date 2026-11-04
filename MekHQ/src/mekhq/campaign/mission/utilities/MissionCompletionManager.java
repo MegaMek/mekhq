@@ -60,6 +60,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
@@ -156,7 +157,12 @@ public class MissionCompletionManager {
             return false;
         }
 
-        if (!resolveContractExtension()) {
+        // A shell contract runs no contract automation, so the employer-facing steps (extension, completion bonus and
+        // reputation, withheld support, faction standing, and pirate crime) are skipped. Its final pay and the
+        // force's own steps (turnover, experience, prisoners, awards, and undeployment) still run.
+        final boolean isShellContract = mission instanceof ShellContract;
+
+        if (!isShellContract && !resolveContractExtension()) {
             return false;
         }
 
@@ -173,9 +179,11 @@ public class MissionCompletionManager {
 
         applyTurnover();
 
-        payCompletionBonusAndReputation(campaign, mission, missionStatus);
+        if (!isShellContract) {
+            payCompletionBonusAndReputation(campaign, mission, missionStatus);
 
-        ContractSupportPayments.renderWithheldSupport(campaign, mission);
+            ContractSupportPayments.renderWithheldSupport(campaign, mission);
+        }
 
         awardMissionExperience(campaign, campaignOptions, mission, missionStatus);
 
@@ -183,7 +191,9 @@ public class MissionCompletionManager {
 
         promptAutoAwards();
 
-        updateFactionStandings(campaign, campaignOptions, mission, missionStatus);
+        if (!isShellContract) {
+            updateFactionStandings(campaign, campaignOptions, mission, missionStatus);
+        }
 
         refreshPersonnelMarketIfNeeded();
 
@@ -192,7 +202,9 @@ public class MissionCompletionManager {
 
         resolveOutstandingScenarios(mission);
 
-        applyPirateCrimeModifier(campaign, mission);
+        if (!isShellContract) {
+            applyPirateCrimeModifier(campaign, mission);
+        }
 
         // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
         // end to ensure there isn't any risk of us accidentally killing the data when it's still required.

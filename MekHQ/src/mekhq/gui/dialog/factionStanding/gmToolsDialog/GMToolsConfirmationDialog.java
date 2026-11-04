@@ -63,7 +63,7 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * A confirmation dialog for {@link GMTools} actions in MekHQ's Faction Standing system.
@@ -264,7 +264,7 @@ public class GMToolsConfirmationDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            GlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
+            GlossaryConsole.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 }
