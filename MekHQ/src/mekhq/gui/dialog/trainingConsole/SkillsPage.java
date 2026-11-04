@@ -41,6 +41,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
 import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -307,6 +308,12 @@ final class SkillsPage {
             return card;
         }
 
+        // The skill's description and linked attributes, as its tooltip in the character panel describes it
+        SkillType type = SkillType.getType(stats.name);
+        if ((type != null) && isResourceKeyValid(type.getFlavorText(false, false))
+                  && !type.getFlavorText(false, false).isBlank()) {
+            card.addToBody(ConsoleWidgets.wrapped(type.getFlavorText(false, true), TEXT_MUTED));
+        }
         if (stats.holders > 0) {
             card.addToBody(levelSpread(stats));
         }
