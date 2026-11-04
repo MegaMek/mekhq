@@ -179,6 +179,9 @@ public class CampaignUpgradeDialog {
                     campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
                 }
 
+                // Keep the MegaMek options that mirror campaign options (armor kits, edge, tech level, ...) in step
+                campaign.getCampaignOptions().updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
+
                 Map<String, SkillType> presetSkills = chosenPreset.getSkills();
                 for (final String skillName : SkillType.getSkillList()) {
                     SkillType storedType = SkillType.getType(skillName);
