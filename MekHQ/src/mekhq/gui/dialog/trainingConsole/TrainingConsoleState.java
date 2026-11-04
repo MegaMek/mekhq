@@ -52,6 +52,8 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 final class TrainingConsoleState {
     /** How the people list is sorted. */
     enum Sort {
+        /** Selected people first: the checkbox column. */
+        SELECTED,
         NAME,
         ROLE,
         FORMATION,
@@ -103,7 +105,8 @@ final class TrainingConsoleState {
     boolean isIncludePrisoners;
     boolean isOnlyStaged;
     boolean isHideExcluded;
-    Sort sort = Sort.NAME;
+    /** Selected people first, so whoever the console was opened for is at the top. */
+    Sort sort = Sort.SELECTED;
     boolean isAscending = true;
 
     // Skills page

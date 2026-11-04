@@ -198,7 +198,7 @@ final class PeopleList extends JPanel {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               // The same left and right padding as a row: its 2-pixel selection bar, then 8 pixels, and 10 on the right
               BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(10), scaleForGUI(6), scaleForGUI(10))));
-        setSortShown(Sort.NAME, true);
+        setSortShown(Sort.SELECTED, true);
 
         list.setCellRenderer(new PersonRowRenderer(isSelected, pendingCount, availableXp));
         list.setFixedCellHeight(scaleForGUI(ROW_HEIGHT));
@@ -250,9 +250,25 @@ final class PeopleList extends JPanel {
     /** Draws the column headers, marking the sorted one. */
     void setSortShown(Sort sort, boolean isAscending) {
         header.removeAll();
-        // A space as wide as a row's selection box, so each header starts where its column does
-        header.add(Box.createRigidArea(new Dimension(new HudCheckBox("").getPreferredSize().width, 0)),
-              constraints(0, 0));
+        // The checkbox column's header is exactly as wide as a row's selection box, so each header starts where its
+        // column does; it sorts the selection to the top
+        int boxWidth = new HudCheckBox("").getPreferredSize().width;
+        JLabel selectedHeader = new JLabel((sort == Sort.SELECTED) ? (isAscending ? "\u25B2" : "\u25BC") : "\u2713");
+        selectedHeader.setFont(hudFont(Font.BOLD, 0.72f, 0.0f));
+        selectedHeader.setForeground((sort == Sort.SELECTED) ? ACCENT : TEXT_FAINT);
+        selectedHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        selectedHeader.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        selectedHeader.setToolTipText(getTextAt(RESOURCE_BUNDLE, "people.column.SELECTED.toolTipText"));
+        Dimension boxSize = new Dimension(boxWidth, selectedHeader.getPreferredSize().height);
+        selectedHeader.setPreferredSize(boxSize);
+        selectedHeader.setMinimumSize(boxSize);
+        selectedHeader.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                onSort.accept(Sort.SELECTED);
+            }
+        });
+        header.add(selectedHeader, constraints(0, 0));
         Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.EXPERIENCE, Sort.XP };
         for (int index = 0; index < columns.length; index++) {
             Sort column = columns[index];

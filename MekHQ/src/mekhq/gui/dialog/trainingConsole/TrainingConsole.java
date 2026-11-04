@@ -582,6 +582,8 @@ public class TrainingConsole extends JDialog {
             }
         }
         Comparator<PersonEntry> comparator = switch (state.sort) {
+            // Not selected sorts after selected, so ascending puts the selection on top
+            case SELECTED -> Comparator.comparing((PersonEntry entry) -> !state.selected.contains(entry.person()));
             case NAME -> Comparator.comparing((PersonEntry entry) -> entry.person().getFullName());
             case ROLE -> Comparator.comparing(PersonEntry::roleName);
             case FORMATION -> Comparator.comparing(PersonEntry::formationName);
@@ -919,7 +921,8 @@ public class TrainingConsole extends JDialog {
     }
 
     private void sortBy(Sort sort) {
-        // XP sorts most first, as the people with XP to spend are usually the ones wanted
+        // XP sorts most first, as the people with XP to spend are usually the ones wanted; the checkbox column
+        // sorts the selection to the top
         state.isAscending = (state.sort == sort) ? !state.isAscending : (sort != Sort.XP);
         state.sort = sort;
         refresh();

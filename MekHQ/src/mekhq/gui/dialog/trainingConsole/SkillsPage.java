@@ -50,6 +50,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -122,6 +123,8 @@ final class SkillsPage {
         final Map<Integer, Object[]> feesByLevel = new TreeMap<>();
         final List<Person> readyPeople = new ArrayList<>();
         final List<Person> shortPeople = new ArrayList<>();
+        /** Everyone who can't improve or learn the skill, by why not. */
+        final Map<TrainingRefusal, List<Person>> cannot = new EnumMap<>(TrainingRefusal.class);
         final List<Person> lackingPeople = new ArrayList<>();
         final List<Person> holderPeople = new ArrayList<>();
 
@@ -192,6 +195,8 @@ final class SkillsPage {
             Quote quote = plan.quote(new SkillImprovement(person, skillName));
             if (level < 0) {
                 stats.lackingPeople.add(person);
+                // Even those who could learn it can't improve it yet, so they all count as not having it
+                stats.cannot.computeIfAbsent(TrainingRefusal.NOT_HELD, key -> new ArrayList<>()).add(person);
                 if (quote.isAllowed()) {
                     stats.learnReady++;
                     stats.learnXp += quote.xp();
@@ -225,8 +230,10 @@ final class SkillsPage {
             } else if (quote.refusal() == TrainingRefusal.NOT_ENOUGH_XP) {
                 stats.shortXp++;
                 stats.shortPeople.add(person);
+                stats.cannot.computeIfAbsent(TrainingRefusal.NOT_ENOUGH_XP, key -> new ArrayList<>()).add(person);
             } else {
                 stats.atLimit++;
+                stats.cannot.computeIfAbsent(quote.refusal(), key -> new ArrayList<>()).add(person);
             }
         }
         return stats;
@@ -320,17 +327,7 @@ final class SkillsPage {
                   stats.ready), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
                   () -> console.toggle(stats.readyPeople)));
         }
-        Set<Person> ready = new HashSet<>(stats.readyPeople);
-        List<Person> cannot = selection.stream().filter(person -> !ready.contains(person)).toList();
-        if (!cannot.isEmpty()) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "line.cannot",
-                  cannot.size()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(cannot)));
-        }
-        if (stats.shortXp > 0) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.short",
-                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
-                  () -> console.toggle(stats.shortPeople)));
-        }
+        ConsoleWidgets.cannotLines(stats.cannot, console::toggle).forEach(card::addToBody);
         if (!stats.lackingPeople.isEmpty() && (stats.holders > 0)) {
             JPanel learnLine = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
             learnLine.add(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.lacking",

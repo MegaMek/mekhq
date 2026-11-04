@@ -301,29 +301,10 @@ final class AbilitiesPage {
                   isBuyOff ? "abilities.line.canBuyOff" : "abilities.line.can", stats.ready),
                   getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(stats.readyPeople)));
         }
-        List<Person> cannot = new ArrayList<>(stats.shortPeople);
-        cannot.addAll(stats.heldPeople);
-        stats.blocked.values().forEach(cannot::addAll);
-        if (!cannot.isEmpty()) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "line.cannot",
-                  cannot.size()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(cannot)));
-        }
-        if (stats.shortXp > 0) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.short",
-                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
-                  () -> console.toggle(stats.shortPeople)));
-        }
-        if (stats.held > 0) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.reason.held",
-                  stats.held), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
-                  () -> console.toggle(stats.heldPeople)));
-        }
-        for (Map.Entry<TrainingRefusal, List<Person>> entry : stats.blocked.entrySet()) {
-            List<Person> people = entry.getValue();
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.reason.blocked",
-                  people.size(), entry.getKey().getLabel()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
-                  () -> console.toggle(people)));
-        }
+        Map<TrainingRefusal, List<Person>> cannot = new EnumMap<>(stats.blocked);
+        cannot.put(TrainingRefusal.NOT_ENOUGH_XP, stats.shortPeople);
+        cannot.put(TrainingRefusal.ALREADY_HELD, stats.heldPeople);
+        ConsoleWidgets.cannotLines(cannot, console::toggle).forEach(card::addToBody);
         return card;
     }
 

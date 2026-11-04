@@ -40,8 +40,12 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -53,6 +57,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.training.TrainingRefusal;
 import mekhq.gui.baseComponents.hud.Hud;
 
@@ -352,6 +357,48 @@ final class ConsoleWidgets {
     static String countedLabel(String plainKey, String countKey, int count) {
         return (count > 0) ? getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, countKey, count) :
                      getTextAt(TrainingConsole.RESOURCE_BUNDLE, plainKey);
+    }
+
+    /**
+     * The "can't" lines of a card: one line with everyone who can't and why, such as "5 can’t: 3 not enough XP, 2
+     * already have it", then, when there is more than one reason, a line per reason. Each has a link that toggles the
+     * selection to those people.
+     *
+     * @param reasons the people who can't, by why not, in any order; the lines put the most common reason first
+     * @param toggle  toggles the selection to a group
+     *
+     * @return the lines, or none if everyone can
+     */
+    static List<JComponent> cannotLines(Map<TrainingRefusal, List<Person>> reasons, Consumer<List<Person>> toggle) {
+        List<Map.Entry<TrainingRefusal, List<Person>>> sorted = reasons.entrySet().stream()
+                                                                      .filter(entry -> !entry.getValue().isEmpty())
+                                                                      .sorted(Comparator.comparingInt(
+                                                                            entry -> -entry.getValue().size()))
+                                                                      .toList();
+        if (sorted.isEmpty()) {
+            return List.of();
+        }
+        String link = getTextAt(TrainingConsole.RESOURCE_BUNDLE, "link.toggleThem");
+        List<JComponent> lines = new ArrayList<>();
+        if (sorted.size() == 1) {
+            List<Person> people = sorted.get(0).getValue();
+            lines.add(reasonLine(reason(people.size(), sorted.get(0).getKey()), link, () -> toggle.accept(people)));
+            return lines;
+        }
+        List<Person> everyone = new ArrayList<>();
+        List<String> parts = new ArrayList<>();
+        for (Map.Entry<TrainingRefusal, List<Person>> entry : sorted) {
+            everyone.addAll(entry.getValue());
+            parts.add(getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "line.cannot.part",
+                  entry.getValue().size(), entry.getKey().getLabel()));
+        }
+        lines.add(reasonLine(getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "line.cannot", everyone.size(),
+              String.join(", ", parts)), link, () -> toggle.accept(everyone)));
+        for (Map.Entry<TrainingRefusal, List<Person>> entry : sorted) {
+            List<Person> people = entry.getValue();
+            lines.add(reasonLine(reason(people.size(), entry.getKey()), link, () -> toggle.accept(people)));
+        }
+        return lines;
     }
 
     /** @return why a purchase is unavailable, such as "4 can’t: not enough XP" */
