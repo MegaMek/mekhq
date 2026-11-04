@@ -36,10 +36,13 @@ import static mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.IntFunction;
+import java.util.function.ToIntFunction;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -136,28 +139,28 @@ public class AddSupportUnitsToTOE {
     }
 
     /**
-     * Files support units into numbered sub-formations under their capability's formation, so a command's recovery
-     * vehicles and cargo trucks read as the lances or Stars they are fielded as rather than as one long list.
+     * Files support units under their capability's formation, grouped the way the command's combat formations are: a
+     * command's recovery vehicles and cargo trucks read as the lances, companies and battalions they are fielded as
+     * rather than as one long list.
      *
-     * <p>A command given twelve recovery vehicles gets three lances of four under Recovery Operations, not twelve
-     * vehicles under a single marker. A formation of one lance or fewer is that lance, so its vehicles stay filed
-     * directly under it; see {@link #arrangeIntoLances}.</p>
+     * <p>A command given twelve recovery vehicles gets three lances of four under Recovery Operations; given thirty, it
+     * gets three companies of lances. A formation of one lance or fewer is that lance, so its vehicles stay filed
+     * directly under it; see {@link #arrangeIntoEchelons}.</p>
      *
-     * <p>Units fill the lowest numbered sub-formation with room in it before a new one is created, so regenerating
+     * <p>Units fill the lowest numbered formation with room in it before a new one is created, so regenerating
      * support against a grown force tops up the last part-filled lance rather than opening a new one beside it.</p>
      *
-     * @param campaign            the active campaign that owns the TOE
-     * @param units               the units to file; an empty list does nothing
-     * @param formationTypes      the capability formation the sub-formations sit under
-     * @param subFormationSize  units per sub-formation; zero or less files them flat instead
-     * @param subFormationNamer the name for the sub-formation at a given position, counting from one
+     * @param campaign       the active campaign that owns the TOE
+     * @param units          the units to file; an empty list does nothing
+     * @param formationTypes the capability formation the sub-formations sit under
+     * @param echelons       how the vehicles are grouped; {@code null} files them flat instead
      */
     public static void addSupportUnitsToTOE(Campaign campaign, List<Unit> units,
-          SupportTOEFormationTypes formationTypes, int subFormationSize, IntFunction<String> subFormationNamer) {
+          SupportTOEFormationTypes formationTypes, @Nullable SupportEchelons echelons) {
         if (units.isEmpty()) {
             return;
         }
-        if (subFormationSize <= 0) {
+        if ((echelons == null) || (echelons.sizeOf(1) <= 0)) {
             addSupportUnitsToTOE(campaign, units, formationTypes);
             return;
         }
@@ -169,51 +172,88 @@ public class AddSupportUnitsToTOE {
         for (Unit unit : units) {
             campaign.getPlayerForce().addUnitToFormation(unit, capabilityFormation.getId(), campaign);
         }
-        arrangeIntoLances(campaign, capabilityFormation, subFormationSize, subFormationNamer,
-              formationTypes.getType());
+        arrangeIntoEchelons(campaign, capabilityFormation, echelons, formationTypes.getType());
     }
 
     /**
-     * Arranges the vehicles a support formation holds into lances once it holds more than one lance's worth, so the
-     * order of battle reads as a tree: a company of lances, not a company holding eleven vehicles.
+     * As {@link #addSupportUnitsToTOE(Campaign, List, SupportTOEFormationTypes, SupportEchelons)}, filing into lances
+     * with no grouping above them.
      *
-     * <p>A formation of one lance or fewer is itself that lance and is left flat. Past that, every vehicle filed
-     * directly under it moves into the lowest numbered lance with room, and new lances are opened as needed. Vehicles
-     * already in a lance stay where they are, so losing a vehicle never reshuffles the others; a lance left with
-     * nothing in it is removed. Support carriers - the squads and platoons that carry the support staff - are never
-     * moved.</p>
-     *
-     * <p>Convoy, Salvage and Security describe the team doing the job, so they stay on the bottom-most formations
-     * only: once the group holds lances it becomes a Standard formation and each lance is a team of its own. See
-     * {@link #isLeafOnlyType}.</p>
+     * @param campaign          the active campaign that owns the TOE
+     * @param units             the units to file; an empty list does nothing
+     * @param formationTypes    the capability formation the lances sit under
+     * @param subFormationSize  units per lance; zero or less files them flat instead
+     * @param subFormationNamer the name for the lance at a given position, counting from one
+     */
+    public static void addSupportUnitsToTOE(Campaign campaign, List<Unit> units,
+          SupportTOEFormationTypes formationTypes, int subFormationSize, IntFunction<String> subFormationNamer) {
+        addSupportUnitsToTOE(campaign, units, formationTypes,
+              SupportEchelons.lancesOnly(subFormationSize, subFormationNamer));
+    }
+
+    /**
+     * Arranges the vehicles a support formation holds into lances, with no grouping above them. See
+     * {@link #arrangeIntoEchelons}.
      *
      * @param campaign  the campaign that owns the TOE
      * @param group     the formation whose vehicles are arranged
      * @param lanceSize vehicles in a full lance; zero or less leaves the formation as it is
      * @param namer     the name of the lance at a given position, counting from one
-     * @param type      the formation type to give a new lance; a group already lanced as Convoy, Salvage or Security
-     *                  keeps its lances' type even when its own (now Standard) type is passed
+     * @param type      the formation type to give a new lance
      *
      * @return the lances created; empty when none were needed
      */
     public static List<Formation> arrangeIntoLances(Campaign campaign, Formation group, int lanceSize,
           IntFunction<String> namer, FormationType type) {
+        return arrangeIntoEchelons(campaign, group, SupportEchelons.lancesOnly(lanceSize, namer), type);
+    }
+
+    /**
+     * Arranges the vehicles a support formation holds into the command's echelons, so the order of battle reads as a
+     * tree: a battalion of companies of lances, not a formation holding thirty vehicles.
+     *
+     * <p>A formation of one lance or fewer is itself that lance and is left flat. Past that, every vehicle filed
+     * directly under it moves into the lowest numbered lance with room, and new lances are opened as needed. Once
+     * there are more lances than make a company, they are grouped into companies the same way, and companies into
+     * battalions. Vehicles already in a lance stay where they are, so losing a vehicle never reshuffles the others,
+     * and a lance or company left with nothing in it is removed. Support carriers - the squads and platoons that carry
+     * the support staff - are never moved.</p>
+     *
+     * <p>Convoy, Salvage and Security describe the team doing the job, so they stay on the lances only: the companies
+     * and battalions above them, and the group itself once it holds lances, are Standard formations. See
+     * {@link #isLeafOnlyType}.</p>
+     *
+     * @param campaign the campaign that owns the TOE
+     * @param group    the formation whose vehicles are arranged
+     * @param echelons how the vehicles are grouped
+     * @param type     the formation type to give a new lance; a group already lanced as Convoy, Salvage or Security
+     *                 keeps its lances' type even when its own (now Standard) type is passed
+     *
+     * @return the formations created, lances and the companies and battalions above them; empty when none were needed
+     */
+    public static List<Formation> arrangeIntoEchelons(Campaign campaign, Formation group, SupportEchelons echelons,
+          FormationType type) {
         List<Formation> created = new ArrayList<>();
-        if (lanceSize <= 0) {
+        if (echelons.sizeOf(1) <= 0) {
             return created;
         }
-        removeEmptyLances(campaign, group, namer);
+        removeEmptyEchelons(campaign, group, echelons);
         // A group already split into lances has been reset to Standard, so on a top-up its own type no longer says
         // what its lances are for; the lances themselves still do.
-        FormationType lanceType = isLeafOnlyType(type) ? type : existingLanceType(group, namer, type);
-        fileLooseVehiclesIntoLances(campaign, group, lanceSize, namer, lanceType, created);
+        FormationType lanceType = isLeafOnlyType(type) ? type : existingLanceType(group, echelons, type);
+        FormationType groupingType = isLeafOnlyType(lanceType) ? FormationType.STANDARD : lanceType;
+
+        fileLooseVehiclesIntoLances(campaign, group, echelons, lanceType, created);
+        for (int echelon = 2; echelon <= echelons.depth(); echelon++) {
+            groupLooseFormations(campaign, group, echelons, echelon, groupingType, created);
+        }
+        applyEchelonLevels(group, echelons);
         settleLeafOnlyType(group, lanceType);
         return created;
     }
 
-    private static void fileLooseVehiclesIntoLances(Campaign campaign, Formation group, int lanceSize,
-          IntFunction<String> namer, FormationType type, List<Formation> created) {
-
+    private static void fileLooseVehiclesIntoLances(Campaign campaign, Formation group, SupportEchelons echelons,
+          FormationType type, List<Formation> created) {
         List<Unit> looseVehicles = new ArrayList<>();
         for (UUID unitId : group.getUnits()) {
             Unit unit = campaign.getUnit(unitId);
@@ -221,32 +261,171 @@ public class AddSupportUnitsToTOE {
                 looseVehicles.add(unit);
             }
         }
-        boolean hasLances = false;
-        for (Formation child : group.getSubFormations()) {
-            if (isLanceName(child.getName(), namer)) {
-                hasLances = true;
-                break;
-            }
-        }
-        if (looseVehicles.isEmpty() || (!hasLances && (looseVehicles.size() <= lanceSize))) {
+        int lanceSize = echelons.sizeOf(1);
+        List<Formation> lances = echelonsUnder(group, echelons, 1);
+        if (looseVehicles.isEmpty() || (lances.isEmpty() && (looseVehicles.size() <= lanceSize))) {
             return;
         }
 
-        Set<Integer> before = new HashSet<>();
-        for (Formation child : group.getSubFormations()) {
-            before.add(child.getId());
-        }
+        int newLances = 0;
         for (Unit vehicle : looseVehicles) {
-            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, type, looseVehicles.size());
+            Formation lance = firstWithRoom(lances, lanceSize, formation -> formation.getUnits().size());
+            if (lance == null) {
+                lance = createEchelon(campaign, group, echelons, 1, type);
+                lances.add(lance);
+                created.add(lance);
+                newLances++;
+            }
             campaign.getPlayerForce().addUnitToFormation(vehicle, lance.getId(), campaign);
         }
+        LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
+              looseVehicles.size(), lanceSize, newLances);
+    }
+
+    /**
+     * Groups the formations of the echelon below {@code echelon} that sit directly under {@code group} into formations
+     * of {@code echelon}, once there are more of them than make one. Existing groupings are filled before new ones are
+     * opened, so a top-up never reshuffles formations already grouped. A formation that joins a grouping is renumbered
+     * within it.
+     */
+    private static void groupLooseFormations(Campaign campaign, Formation group, SupportEchelons echelons,
+          int echelon, FormationType type, List<Formation> created) {
+        List<Formation> loose = new ArrayList<>();
         for (Formation child : group.getSubFormations()) {
-            if (!before.contains(child.getId())) {
-                created.add(child);
+            if (echelons.echelonOf(child) == (echelon - 1)) {
+                loose.add(child);
             }
         }
-        LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
-              looseVehicles.size(), lanceSize, created.size());
+        int size = echelons.sizeOf(echelon);
+        List<Formation> containers = echelonsUnder(group, echelons, echelon);
+        if (loose.isEmpty() || (size <= 0) || (containers.isEmpty() && (loose.size() <= size))) {
+            return;
+        }
+
+        int newContainers = 0;
+        for (Formation formation : loose) {
+            Formation container = firstWithRoom(containers, size,
+                  candidate -> countEchelonChildren(candidate, echelons, echelon - 1));
+            if (container == null) {
+                container = createEchelon(campaign, group, echelons, echelon, type);
+                containers.add(container);
+                created.add(container);
+                newContainers++;
+            }
+            // Numbered within the formation it joins - Able, Baker, Charlie in every company - however it was
+            // numbered in the row it came from.
+            formation.setName(echelons.nameOf(echelon - 1, nextFreePosition(container, echelons, echelon - 1)));
+            moveKeepingParentTypes(campaign, formation, container);
+        }
+        LOGGER.info("[SupportTOE] '{}': {} formation(s) grouped at echelon {} in groups of {}, {} new", group.getName(),
+              loose.size(), echelon, size, newContainers);
+    }
+
+    /** Creates the next numbered formation of {@code echelon} directly under {@code parent}. */
+    private static Formation createEchelon(Campaign campaign, Formation parent, SupportEchelons echelons, int echelon,
+          FormationType type) {
+        String label = echelons.nameOf(echelon, nextFreePosition(parent, echelons, echelon));
+        return findOrCreateChild(campaign, parent, label, type);
+    }
+
+    /** The lowest position whose name no child of {@code parent} already carries at {@code echelon}. */
+    private static int nextFreePosition(Formation parent, SupportEchelons echelons, int echelon) {
+        Set<String> taken = new HashSet<>();
+        for (Formation child : parent.getSubFormations()) {
+            taken.add(child.getName().toLowerCase());
+        }
+        int position = 1;
+        while (taken.contains(echelons.nameOf(echelon, position).toLowerCase())) {
+            position++;
+        }
+        return position;
+    }
+
+    /** The first formation in order with fewer than {@code size} in it, or {@code null} when every one is full. */
+    private static @Nullable Formation firstWithRoom(List<Formation> formations, int size,
+          ToIntFunction<Formation> fill) {
+        for (Formation formation : formations) {
+            if (fill.applyAsInt(formation) < size) {
+                return formation;
+            }
+        }
+        return null;
+    }
+
+    private static int countEchelonChildren(Formation formation, SupportEchelons echelons, int echelon) {
+        int count = 0;
+        for (Formation child : formation.getSubFormations()) {
+            if (echelons.echelonOf(child) == echelon) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Every formation of {@code echelon} the ladder made under {@code group}, in TOE order. Only the ladder's own
+     * formations are looked into, so a formation the player made, and what is in it, is never touched.
+     */
+    private static List<Formation> echelonsUnder(Formation group, SupportEchelons echelons, int echelon) {
+        List<Formation> found = new ArrayList<>();
+        collectEchelons(group, echelons, echelon, found);
+        return found;
+    }
+
+    private static void collectEchelons(Formation formation, SupportEchelons echelons, int echelon,
+          List<Formation> found) {
+        for (Formation child : formation.getSubFormations()) {
+            int childEchelon = echelons.echelonOf(child);
+            if (childEchelon == echelon) {
+                found.add(child);
+            } else if (childEchelon > echelon) {
+                collectEchelons(child, echelons, echelon, found);
+            }
+        }
+    }
+
+    /**
+     * Gives every formation the ladder made under {@code group} the level of its echelon, and the group the level
+     * above the highest echelon it holds. Does nothing for a ladder that sets no levels.
+     */
+    private static void applyEchelonLevels(Formation group, SupportEchelons echelons) {
+        if (echelons.levelAtDepth() == null) {
+            return;
+        }
+        int highest = 0;
+        for (int echelon = 1; echelon <= echelons.depth(); echelon++) {
+            List<Formation> formations = echelonsUnder(group, echelons, echelon);
+            for (Formation formation : formations) {
+                formation.setOverrideFormationLevel(echelons.levelOf(echelon));
+            }
+            if (!formations.isEmpty()) {
+                highest = echelon;
+            }
+        }
+        if (highest > 0) {
+            group.setOverrideFormationLevel(echelons.levelOf(highest + 1));
+        }
+    }
+
+    /**
+     * Moves {@code formation} under {@code newParent} without changing the type of any formation above it.
+     *
+     * <p>Moving a Salvage or Standard formation turns every formation above it into a Standard one, which is right when
+     * a player moves a salvage lance into a combat company by hand. Here it would turn Support Command, and the
+     * headquarters above it, into Standard formations just because a lance was grouped into a company.</p>
+     *
+     * @param campaign  the campaign that owns the TOE
+     * @param formation the formation to move
+     * @param newParent the formation it moves under
+     */
+    static void moveKeepingParentTypes(Campaign campaign, Formation formation, Formation newParent) {
+        Map<Formation, FormationType> parentTypes = new LinkedHashMap<>();
+        parentTypes.put(newParent, newParent.getFormationType());
+        for (Formation parent : newParent.getAllParents()) {
+            parentTypes.put(parent, parent.getFormationType());
+        }
+        campaign.getPlayerForce().moveFormation(formation, newParent, campaign);
+        parentTypes.forEach((parent, formationType) -> parent.setFormationType(formationType, false));
     }
 
     /**
@@ -266,11 +445,11 @@ public class AddSupportUnitsToTOE {
     /**
      * The leaf-only type the lances under {@code group} already carry, or {@code fallback} when it has none.
      */
-    private static FormationType existingLanceType(Formation group, IntFunction<String> namer,
+    private static FormationType existingLanceType(Formation group, SupportEchelons echelons,
           FormationType fallback) {
-        for (Formation child : group.getSubFormations()) {
-            if (isLanceName(child.getName(), namer) && isLeafOnlyType(child.getFormationType())) {
-                return child.getFormationType();
+        for (Formation lance : echelonsUnder(group, echelons, 1)) {
+            if (isLeafOnlyType(lance.getFormationType())) {
+                return lance.getFormationType();
             }
         }
         return fallback;
@@ -296,19 +475,22 @@ public class AddSupportUnitsToTOE {
         }
     }
 
-    /** Removes the lances under {@code group} that no longer hold anything. */
-    private static void removeEmptyLances(Campaign campaign, Formation group, IntFunction<String> namer) {
+    /**
+     * Removes the ladder's formations under {@code group} that no longer hold anything, lances first, so a company
+     * whose last lance went goes with it.
+     */
+    private static void removeEmptyEchelons(Campaign campaign, Formation group, SupportEchelons echelons) {
         for (Formation child : new ArrayList<>(group.getSubFormations())) {
-            if (isLanceName(child.getName(), namer) && child.getUnits().isEmpty()
-                      && child.getSubFormations().isEmpty()) {
-                LOGGER.info("[SupportTOE] '{}': removing empty lance '{}'", group.getName(), child.getName());
+            if (echelons.echelonOf(child) == 0) {
+                continue;
+            }
+            removeEmptyEchelons(campaign, child, echelons);
+            if (child.getUnits().isEmpty() && child.getSubFormations().isEmpty()) {
+                LOGGER.info("[SupportTOE] '{}': removing empty '{}'", group.getName(), child.getName());
                 campaign.getPlayerForce().removeFormation(child, campaign);
             }
         }
     }
-
-    /** The most lances a support formation is looked through for, well past what any command fields. */
-    private static final int MAXIMUM_LANCES = 26;
 
     /**
      * Whether a formation name is one the lance namer produces, which is how a lance this class made is told apart
@@ -323,44 +505,12 @@ public class AddSupportUnitsToTOE {
         if (name == null) {
             return false;
         }
-        for (int position = 1; position <= MAXIMUM_LANCES; position++) {
+        for (int position = 1; position <= SupportEchelons.MAXIMUM_POSITIONS; position++) {
             if (name.equalsIgnoreCase(namer.apply(position))) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * The lowest numbered sub-formation of {@code parent} that still has room, creating the next one when every
-     * existing sub-formation is full.
-     *
-     * @param campaign         the campaign whose formations are searched
-     * @param parent           the capability formation the sub-formations sit under
-     * @param namer            the name for the sub-formation at a given position, counting from one
-     * @param subFormationSize units a sub-formation holds when full
-     * @param type             the formation type to give a newly created sub-formation
-     * @param unitsToFile      how many units are being filed, which bounds the search
-     *
-     * @return a sub-formation with room in it, never {@code null}
-     */
-    private static Formation nextSubFormationWithRoom(Campaign campaign, Formation parent,
-          IntFunction<String> namer, int subFormationSize, FormationType type, int unitsToFile) {
-        // Bounded rather than open ended: the units being filed cannot need more sub-formations than there are
-        // units, even if every existing one is full.
-        int searchLimit = unitsToFile + 1;
-        for (int number = 1; number <= searchLimit; number++) {
-            String label = namer.apply(number);
-            Formation existing = findChildFormationByName(campaign, parent, label);
-            if (existing == null) {
-                return findOrCreateChild(campaign, parent, label, type);
-            }
-            if (existing.getUnits().size() < subFormationSize) {
-                return existing;
-            }
-        }
-        // Unreachable while the limit above holds, but a formation must be returned rather than a null.
-        return findOrCreateChild(campaign, parent, namer.apply(searchLimit + 1), type);
     }
 
     /** Finds the named child of {@code parent}, creating and attaching it when absent. */

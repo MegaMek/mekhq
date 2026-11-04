@@ -613,13 +613,7 @@ public final class SupportUnitGenerator {
      * @return the faction's smallest formation
      */
     static FormationLevel baseFormationLevel(Faction faction) {
-        if (faction.isClan()) {
-            return FormationLevel.STAR_OR_NOVA;
-        }
-        if (faction.isComStarOrWoB()) {
-            return FormationLevel.LEVEL_II_OR_CHOIR;
-        }
-        return FormationLevel.LANCE;
+        return echelonLevel(faction, SUPPORT_SUB_FORMATION_DEPTH);
     }
 
     /**
@@ -654,6 +648,77 @@ public final class SupportUnitGenerator {
     static int supportFormationSize(Faction faction) {
         int baseSize = faction.getFormationBaseSize();
         return faction.isClan() ? baseSize * CLAN_VEHICLES_PER_POINT : baseSize;
+    }
+
+    /**
+     * Stars in a Trinary. The faction grouping figure for the Clans is five, which is right for Clusters and Galaxies
+     * but would make a Star-level grouping of five Stars - a formation the Clans field as Novas and Supernovas, not
+     * support Trinaries.
+     */
+    private static final int CLAN_STARS_PER_TRINARY = 3;
+
+    /**
+     * The levels the support echelons climb for a faction, smallest first: lance, company, battalion for the Inner
+     * Sphere; Star, Trinary, Cluster for the Clans; Level II, III, IV for ComStar and the Word of Blake.
+     */
+    private static final int SUPPORT_ECHELON_DEPTH = 3;
+
+    /**
+     * How a command groups its support vehicles: the faction's smallest formation, and the ladder above it, the same
+     * one its combat formations climb.
+     *
+     * <p>Sizes come from the faction: its formation base size (a Clan vehicle Star is five Points of
+     * {@value #CLAN_VEHICLES_PER_POINT}) and its formation grouping for each step up, except a Trinary, which is
+     * always {@value #CLAN_STARS_PER_TRINARY} Stars.</p>
+     *
+     * @param faction      the faction of the command being supported
+     * @param namingMethod the convention the command was generated with, or {@code null} for the default
+     *
+     * @return the faction's support echelons
+     */
+    static SupportEchelons supportEchelons(Faction faction, @Nullable ForceNamingMethod namingMethod) {
+        ForceNamingMethod method = (namingMethod == null) ? ForceNamingMethod.CCB_1943 : namingMethod;
+        int grouping = Math.max(2, faction.getFormationGrouping());
+        List<Integer> sizes = new ArrayList<>();
+        List<IntFunction<String>> namers = new ArrayList<>();
+        for (int echelon = 1; echelon <= SUPPORT_ECHELON_DEPTH; echelon++) {
+            if (echelon == 1) {
+                sizes.add(supportFormationSize(faction));
+            } else if ((echelon == 2) && faction.isClan()) {
+                sizes.add(CLAN_STARS_PER_TRINARY);
+            } else {
+                sizes.add(grouping);
+            }
+            String pattern = subFormationPattern(echelonLevel(faction, echelon));
+            namers.add(position -> MessageFormat.format(pattern, designator(method, position)));
+        }
+        return new SupportEchelons(sizes, namers, depth -> echelonLevel(faction, depth));
+    }
+
+    /**
+     * The formation level at a given echelon of the faction's ladder, the smallest formation being {@code 1}.
+     *
+     * @param faction the faction of the command being supported
+     * @param depth   the echelon; zero or less is a team, and past the top of the ladder stays at the top
+     *
+     * @return the formation level
+     */
+    static FormationLevel echelonLevel(Faction faction, int depth) {
+        if (depth <= 0) {
+            return FormationLevel.TEAM;
+        }
+        FormationLevel[] ladder;
+        if (faction.isClan()) {
+            ladder = new FormationLevel[] { FormationLevel.STAR_OR_NOVA, FormationLevel.BINARY_OR_TRINARY,
+                                            FormationLevel.CLUSTER, FormationLevel.GALAXY, FormationLevel.TOUMAN };
+        } else if (faction.isComStarOrWoB()) {
+            ladder = new FormationLevel[] { FormationLevel.LEVEL_II_OR_CHOIR, FormationLevel.LEVEL_III,
+                                            FormationLevel.LEVEL_IV, FormationLevel.LEVEL_V, FormationLevel.LEVEL_VI };
+        } else {
+            ladder = new FormationLevel[] { FormationLevel.LANCE, FormationLevel.COMPANY, FormationLevel.BATTALION,
+                                            FormationLevel.REGIMENT, FormationLevel.BRIGADE };
+        }
+        return ladder[Math.min(depth, ladder.length) - 1];
     }
 
     /**
@@ -1093,7 +1158,7 @@ public final class SupportUnitGenerator {
 
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
-                  subFormationSize(faction, formationType), subFormationNamer(faction, namingMethod));
+                  (subFormationSize(faction, formationType) > 0) ? supportEchelons(faction, namingMethod) : null);
             // Only command generation and the Support Teams conversion drew support icons, so a convoy or canteens
             // granted mid-campaign were filed blank. Generation redraws the whole TOE afterwards anyway.
             FormationIconBuilder.decorateUndecorated(AddSupportUnitsToTOE.findCapabilityFormation(campaign,

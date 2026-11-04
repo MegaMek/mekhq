@@ -360,6 +360,149 @@ class AddSupportUnitsToTOETest {
         assertEquals(FormationType.SECURITY, security.getFormationType(), "a group of one lance's worth is the team");
     }
 
+    @Test
+    void arrangeIntoEchelons_groupsLancesIntoCompanies() {
+        // Thirty trucks were eight lances in a row under Logistics; they are three companies of lances.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 30);
+        logistics.setFormationType(FormationType.CONVOY, false);
+
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), FormationType.CONVOY);
+
+        assertEquals(List.of(3, 3, 2), childCounts(logistics), "eight lances make three companies, filled in order");
+        assertEquals(FormationLevel.BATTALION, logistics.getOverrideFormationLevel(),
+              "three companies under one formation is a battalion");
+        assertEquals(FormationType.STANDARD, logistics.getFormationType());
+        for (Formation company : logistics.getSubFormations()) {
+            assertEquals("Company", company.getName().split(" ")[0]);
+            assertEquals(FormationType.STANDARD, company.getFormationType(), "a company is not itself a convoy");
+            assertEquals(FormationLevel.COMPANY, company.getOverrideFormationLevel());
+            for (Formation lance : company.getSubFormations()) {
+                assertEquals(FormationType.CONVOY, lance.getFormationType(), "each lance is a convoy");
+                assertEquals(FormationLevel.LANCE, lance.getOverrideFormationLevel());
+            }
+        }
+        assertEquals(List.of("Lance 1", "Lance 2", "Lance 3"), childNames(logistics.getSubFormations().get(1)),
+              "lances are numbered within their company");
+    }
+
+    @Test
+    void arrangeIntoEchelons_leavesThreeLancesUngrouped() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 12);
+
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), FormationType.CONVOY);
+
+        assertEquals(List.of(4, 4, 4), lanceSizes(logistics), "a company's worth of lances is that company");
+        assertEquals(FormationLevel.COMPANY, logistics.getOverrideFormationLevel());
+    }
+
+    @Test
+    void arrangeIntoEchelons_groupsCompaniesIntoBattalions() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 37);
+
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), FormationType.CONVOY);
+
+        assertEquals(List.of(3, 1), childCounts(logistics), "ten lances make four companies, so two battalions");
+        assertEquals(FormationLevel.REGIMENT, logistics.getOverrideFormationLevel());
+        assertEquals(FormationLevel.BATTALION, logistics.getSubFormations().get(0).getOverrideFormationLevel());
+    }
+
+    @Test
+    void arrangeIntoEchelons_topUpFillsTheLastLanceAndMovesNoOne() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 13);
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), FormationType.CONVOY);
+        Formation firstCompany = logistics.getSubFormations().get(0);
+        Formation lastLance = logistics.getSubFormations().get(1).getSubFormations().get(0);
+        List<java.util.UUID> firstLance = new ArrayList<>(firstCompany.getSubFormations().get(0).getUnits());
+
+        addVehicles(campaign, logistics, 3);
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), logistics.getFormationType());
+
+        assertEquals(List.of(3, 1), childCounts(logistics), "no new lance or company was needed");
+        assertEquals(4, lastLance.getUnits().size(), "the part-filled lance took the new trucks");
+        assertEquals(FormationType.CONVOY, lastLance.getFormationType());
+        assertEquals(firstLance, firstCompany.getSubFormations().get(0).getUnits(), "and no lance was reshuffled");
+    }
+
+    @Test
+    void arrangeIntoEchelons_regroupsAFlatRowOfLancesFromAnOlderSave() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 20);
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+        List<java.util.UUID> lanceFive = new ArrayList<>(logistics.getSubFormations().get(4).getUnits());
+
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, logistics, testEchelons(), logistics.getFormationType());
+
+        assertEquals(List.of(3, 2), childCounts(logistics), "five lances in a row become two companies");
+        Formation second = logistics.getSubFormations().get(1);
+        assertEquals(List.of("Lance 1", "Lance 2"), childNames(second), "renumbered within their new company");
+        assertEquals(lanceFive, second.getSubFormations().get(1).getUnits(), "with their trucks still together");
+        assertEquals(FormationType.CONVOY, second.getSubFormations().get(1).getFormationType());
+    }
+
+    @Test
+    void arrangeIntoEchelons_groupingInsideSupportCommandKeepsItsType() {
+        // Moving a Standard company would otherwise turn every formation above it Standard, Support Command included.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation supportCommand = new Formation("Support Command");
+        campaign.getPlayerForce().addFormation(supportCommand,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        supportCommand.setFormationType(FormationType.SUPPORT, false);
+        Formation recovery = new Formation("Recovery Company");
+        campaign.getPlayerForce().addFormation(recovery, supportCommand, campaign);
+        recovery.setFormationType(FormationType.SALVAGE, false);
+        addVehicles(campaign, recovery, 20);
+
+        AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, recovery, testEchelons(), FormationType.SALVAGE);
+
+        assertEquals(FormationType.SUPPORT, supportCommand.getFormationType());
+        assertEquals(List.of(3, 2), childCounts(recovery));
+    }
+
+    /** Lances of four, three to a company, three to a battalion, with plain test names. */
+    private static SupportEchelons testEchelons() {
+        return new SupportEchelons(List.of(4, 3, 3),
+              List.of(AddSupportUnitsToTOETest::lanceName, position -> "Company " + position,
+                    position -> "Battalion " + position),
+              depth -> switch (depth) {
+                  case 1 -> FormationLevel.LANCE;
+                  case 2 -> FormationLevel.COMPANY;
+                  case 3 -> FormationLevel.BATTALION;
+                  default -> FormationLevel.REGIMENT;
+              });
+    }
+
+    private static void addVehicles(Campaign campaign, Formation formation, int count) {
+        int before = campaign.getUnits().size();
+        for (int index = 0; index < count; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        List<Unit> all = new ArrayList<>(campaign.getUnits());
+        for (Unit vehicle : all.subList(before, all.size())) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, formation.getId(), campaign);
+        }
+    }
+
+    private static List<Integer> childCounts(Formation group) {
+        List<Integer> counts = new ArrayList<>();
+        for (Formation child : group.getSubFormations()) {
+            counts.add(child.getSubFormations().size());
+        }
+        return counts;
+    }
+
+    private static List<String> childNames(Formation group) {
+        List<String> names = new ArrayList<>();
+        for (Formation child : group.getSubFormations()) {
+            names.add(child.getName());
+        }
+        return names;
+    }
+
     private static String lanceName(int position) {
         return "Lance " + position;
     }

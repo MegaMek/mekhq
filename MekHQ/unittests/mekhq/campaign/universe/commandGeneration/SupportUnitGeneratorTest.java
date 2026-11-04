@@ -620,6 +620,27 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
+    void supportEchelonsClimbTheFactionsOwnLadder() {
+        SupportEchelons innerSphere = SupportUnitGenerator.supportEchelons(
+              MHQTestUtilities.getTestCampaign().getPlayerForce().getFaction(), null);
+        assertEquals(List.of(4, 3, 3), innerSphere.sizes(), "lances of four, three to a company, three to a battalion");
+        assertEquals("Able Company", innerSphere.nameOf(2, 1));
+        assertEquals("Baker Battalion", innerSphere.nameOf(3, 2));
+        assertEquals(FormationLevel.BATTALION, innerSphere.levelOf(3));
+        assertEquals(FormationLevel.REGIMENT, innerSphere.levelOf(4), "what holds battalions is a regiment");
+
+        SupportEchelons clan = SupportUnitGenerator.supportEchelons(testFaction("CJF"), null);
+        assertEquals(List.of(10, 3, 5), clan.sizes(), "vehicle Stars of ten, three to a Trinary, five to a Cluster");
+        assertEquals("Able Trinary", clan.nameOf(2, 1));
+        assertEquals(FormationLevel.CLUSTER, clan.levelOf(3));
+
+        SupportEchelons comStar = SupportUnitGenerator.supportEchelons(testFaction("CS"), null);
+        assertEquals(List.of(6, 6, 6), comStar.sizes(), "Level IIs of six, six to a Level III, six to a Level IV");
+        assertEquals("Able Level III", comStar.nameOf(2, 1));
+        assertEquals(FormationLevel.LEVEL_IV, comStar.levelOf(3));
+    }
+
+    @Test
     void aClanStarAndAComStarLevelIICarryTheDesignatorToo() {
         assertEquals("Able Star",
               SupportUnitGenerator.subFormationNamer(testFaction("CJF"), ForceNamingMethod.CCB_1943).apply(1));

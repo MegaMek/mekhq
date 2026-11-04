@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.IntFunction;
 
 import jakarta.annotation.Nullable;
 import megamek.common.loaders.MekSummary;
@@ -329,15 +328,34 @@ public final class SupportPersonnelToTOE {
      */
     static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
           boolean useClanStructure) {
+        Faction faction = campaign.getPlayerForce().getFaction();
+        return applyEchelonLevels(campaign, node, profile, useClanStructure,
+              SupportUnitGenerator.supportEchelons(faction, null), faction);
+    }
+
+    private static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
+          boolean useClanStructure, SupportEchelons echelons, Faction faction) {
         int squadEquivalents = 0;
+        int highestChildEchelon = 0;
         for (Formation child : node.getSubFormations()) {
-            squadEquivalents += applyEchelonLevels(campaign, child, profile, useClanStructure);
+            squadEquivalents += applyEchelonLevels(campaign, child, profile, useClanStructure, echelons, faction);
+            highestChildEchelon = Math.max(highestChildEchelon, echelons.echelonOf(child));
         }
         for (UUID unitId : node.getUnits()) {
             squadEquivalents += squadEquivalentsOf(campaign.getUnit(unitId), profile);
         }
 
-        node.setOverrideFormationLevel(echelonFor(squadEquivalents, profile, useClanStructure));
+        FormationLevel level = echelonFor(squadEquivalents, profile, useClanStructure);
+        // The vehicle lances, companies and battalions are real formations, so they show the echelon they are, and
+        // whatever holds them is at least the echelon above - a count alone would call four lances a company when they
+        // are a company and a lance.
+        int ownEchelon = echelons.echelonOf(node);
+        if (ownEchelon > 0) {
+            level = SupportUnitGenerator.echelonLevel(faction, ownEchelon);
+        } else if ((highestChildEchelon > 0) && (level.getDepth() <= highestChildEchelon)) {
+            level = SupportUnitGenerator.echelonLevel(faction, highestChildEchelon + 1);
+        }
+        node.setOverrideFormationLevel(level);
         return squadEquivalents;
     }
 
@@ -369,32 +387,32 @@ public final class SupportPersonnelToTOE {
 
     /**
      * Splits the support vehicles under {@code root} into lances wherever a formation holds more than one lance's
-     * worth, using the faction's lance size and the default lance names. Formations that are themselves lances are
-     * left alone. See {@link AddSupportUnitsToTOE#arrangeIntoLances}.
+     * worth, and groups those lances into companies and battalions as the faction does, using the default names.
+     * Formations the grouping made are left alone. See {@link AddSupportUnitsToTOE#arrangeIntoEchelons}.
      *
      * @param campaign the campaign that owns the TOE
      * @param root     Support Command, or any formation under it
      * @param faction  the faction the command is organised as, which sets the lance size and names
      *
-     * @return the lances created
+     * @return the formations created
      */
     static List<Formation> lanceSupportVehicles(Campaign campaign, Formation root, Faction faction) {
         List<Formation> created = new ArrayList<>();
-        lanceSubtree(campaign, root, SupportUnitGenerator.supportFormationSize(faction),
-              SupportUnitGenerator.subFormationNamer(faction, null), created);
+        lanceSubtree(campaign, root, SupportUnitGenerator.supportEchelons(faction, null), created);
         return created;
     }
 
-    private static void lanceSubtree(Campaign campaign, Formation formation, int lanceSize,
-          IntFunction<String> namer, List<Formation> created) {
-        if (AddSupportUnitsToTOE.isLanceName(formation.getName(), namer)) {
+    private static void lanceSubtree(Campaign campaign, Formation formation, SupportEchelons echelons,
+          List<Formation> created) {
+        if (echelons.echelonOf(formation) > 0) {
             return;
         }
-        // Lances take their parent's type, so a Recovery Company's lances are Salvage formations like the company.
-        created.addAll(AddSupportUnitsToTOE.arrangeIntoLances(campaign, formation, lanceSize, namer,
+        // Lances take their parent's type, so a Recovery Company's lances are Salvage formations; the company itself
+        // then becomes Standard, as only the bottom-most formation is a salvage team.
+        created.addAll(AddSupportUnitsToTOE.arrangeIntoEchelons(campaign, formation, echelons,
               formation.getFormationType()));
         for (Formation child : new ArrayList<>(formation.getSubFormations())) {
-            lanceSubtree(campaign, child, lanceSize, namer, created);
+            lanceSubtree(campaign, child, echelons, created);
         }
     }
 
@@ -516,13 +534,7 @@ public final class SupportPersonnelToTOE {
      * @param newParent the formation it moves under
      */
     private static void moveKeepingParentTypes(Campaign campaign, Formation formation, Formation newParent) {
-        Map<Formation, FormationType> parentTypes = new LinkedHashMap<>();
-        parentTypes.put(newParent, newParent.getFormationType());
-        for (Formation parent : newParent.getAllParents()) {
-            parentTypes.put(parent, parent.getFormationType());
-        }
-        campaign.getPlayerForce().moveFormation(formation, newParent, campaign);
-        parentTypes.forEach((parent, formationType) -> parent.setFormationType(formationType, false));
+        AddSupportUnitsToTOE.moveKeepingParentTypes(campaign, formation, newParent);
     }
 
     static EchelonProfile innerSphereProfile() {
