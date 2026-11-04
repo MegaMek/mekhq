@@ -36,6 +36,8 @@ import static javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -95,7 +97,20 @@ public class PersonnelTablePanel extends JPanel {
     public PersonnelTablePanel(Campaign campaign, List<Person> people) {
         setLayout(new BorderLayout());
         PersonTableModel model = new PersonTableModel(campaign, people);
-        table = new JTable(model);
+        table = new JTable(model) {
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                Point point = event.getPoint();
+                int row = rowAtPoint(point);
+                int column = columnAtPoint(point);
+                if (row < 0 || column < 0) {
+                    return super.getToolTipText(event);
+                }
+
+                String toolTip = model.getToolTipAt(convertRowIndexToModel(row), convertColumnIndexToModel(column));
+                return toolTip == null ? super.getToolTipText(event) : toolTip;
+            }
+        };
         table.setDefaultRenderer(Money.class, new DefaultTableCellRenderer() {
             @Override
             protected void setValue(Object value) {

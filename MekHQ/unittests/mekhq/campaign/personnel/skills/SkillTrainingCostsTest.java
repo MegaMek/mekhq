@@ -98,6 +98,8 @@ class SkillTrainingCostsTest {
         campaign = mockCampaign();
         campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
+        // Skills outside the role are Roleplay skills, which are free by default; price them so they can be tested
+        campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
@@ -148,8 +150,8 @@ class SkillTrainingCostsTest {
         }
 
         @ParameterizedTest
-        @CsvSource({ "2, 100", "3, 300", "4, 700", "5, 1200", "6, 2200" })
-        void otherSkillsUseTheNonProfessionTable(int currentLevel, int expectedSupportPoints) {
+        @CsvSource({ "2, 100", "3, 200", "4, 700", "5, 1200", "6, 1200" })
+        void skillsOutsideTheRoleUseTheProfessionTable(int currentLevel, int expectedSupportPoints) {
             assertEquals(supportPoints(expectedSupportPoints), cost(personWithSkillAt(currentLevel), false));
         }
 
@@ -157,25 +159,28 @@ class SkillTrainingCostsTest {
         void utilitySkillsUseTheProfessionTableOutsideTheRole() {
             when(skillType.isUtilitySkill()).thenReturn(true);
 
-            // Heroic to Legendary: 1200 on the profession table rather than 2200
+            // Heroic to Legendary: 1200 on the profession table
             assertEquals(supportPoints(1200), cost(personWithSkillAt(6), false));
         }
 
         @Test
         void roleplaySkillsUseTheProfessionTableOutsideTheRole() {
             when(skillType.isRoleplaySkill()).thenReturn(true);
-            // Roleplay skills are free by default
-            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
 
             assertEquals(supportPoints(200), cost(personWithSkillAt(3), false));
         }
 
+        /** A combat or support skill outside the person's roles is priced as a Roleplay skill. */
         @Test
-        void combatSkillsOutsideTheRoleUseTheNonProfessionTable() {
+        void combatSkillsOutsideTheRoleArePricedAsRoleplaySkills() {
             when(skillType.isUtilitySkill()).thenReturn(false);
             when(skillType.isRoleplaySkill()).thenReturn(false);
+            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 5.0);
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 5.0);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
 
-            assertEquals(supportPoints(300), cost(personWithSkillAt(3), false));
+            // Regular to Veteran: 200 x 0.5
+            assertEquals(supportPoints(100), cost(personWithSkillAt(3), false));
         }
 
         /** The price is set by the level reached, not the level left. */
@@ -224,12 +229,10 @@ class SkillTrainingCostsTest {
         }
 
         @Test
-        void otherSkillsIgnoreTheMultipliers() {
-            campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
-            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
+        void combatSkillsOutsideTheRoleAreFreeWhenRoleplaySkillsAre() {
             campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
 
-            assertEquals(supportPoints(300), cost(personWithSkillAt(3), false));
+            assertEquals(Money.zero(), cost(personWithSkillAt(3), false));
         }
 
         /** Costs are always charged in C-bills, even if contract pay is kept in raw support points. */
@@ -312,7 +315,7 @@ class SkillTrainingCostsTest {
             when(person.getSkill(SKILL_NAME)).thenReturn(skill);
 
             // Total 3 -> 4 is Regular to Veteran
-            assertEquals(supportPoints(300), cost(person, false));
+            assertEquals(supportPoints(200), cost(person, false));
             verify(skill).getTotalSkillLevel(skillModifierData);
         }
     }
@@ -369,11 +372,11 @@ class SkillTrainingCostsTest {
         }
 
         @ParameterizedTest
-        @CsvSource({ "0, 0", "2, 0", "3, 100", "4, 400", "5, 1100", "6, 2300", "7, 4500", "12, 4500" })
-        void nonProfessionSkillsAddUpEveryLevelReached(int level, int expectedSupportPoints) {
+        @CsvSource({ "0, 0", "2, 0", "3, 100", "4, 300", "5, 1000", "6, 2200", "7, 3400", "12, 3400" })
+        void skillsOutsideTheRoleAddUpEveryLevelReachedAsRoleplaySkills(int level, int expectedSupportPoints) {
             holdsSkills(SkillType.S_TACTICS, String.valueOf(level));
 
-            assertEquals(supportPoints(expectedSupportPoints), accumulated(SkillTrainingCategory.OTHER));
+            assertEquals(supportPoints(expectedSupportPoints), accumulated(SkillTrainingCategory.ROLEPLAY));
         }
 
         @ParameterizedTest
@@ -413,12 +416,12 @@ class SkillTrainingCostsTest {
 
         @Test
         void everySkillIsSummedIntoItsCategory() {
-            // Veteran role skill (300) + Elite other skill (1100) + Green skill (0)
+            // Veteran role skill (300) + Elite off-role skill (1000) + Green skill (0)
             holdsSkills(SkillType.S_GUN_MEK, "4", SkillType.S_TACTICS, "5", SkillType.S_LEADER, "2");
 
             assertEquals(supportPoints(300), accumulated(SkillTrainingCategory.PROFESSION));
-            assertEquals(supportPoints(1100), accumulated(SkillTrainingCategory.OTHER));
-            assertEquals(supportPoints(1400), accumulated());
+            assertEquals(supportPoints(1000), accumulated(SkillTrainingCategory.ROLEPLAY));
+            assertEquals(supportPoints(1300), accumulated());
         }
 
         /** Recruitment applies its own multipliers, so the improvement multipliers are left out. */
@@ -457,8 +460,8 @@ class SkillTrainingCostsTest {
             }
             holdsSkills(manySkills);
 
-            // 1,000 skills x 4,500 SP x 10,000 C-bills
-            assertEquals(Money.of(45_000_000_000.0), accumulated());
+            // 1,000 skills x 3,400 SP x 10,000 C-bills
+            assertEquals(Money.of(34_000_000_000.0), accumulated());
         }
     }
 
@@ -472,6 +475,12 @@ class SkillTrainingCostsTest {
             when(person.getPrimaryRole()).thenReturn(primaryRole);
             when(person.getSecondaryRole()).thenReturn(secondaryRole);
             return person;
+        }
+
+        /** Price Roleplay skills below profession skills, so the two can be told apart. */
+        @BeforeEach
+        void halveRoleplayCosts() {
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
         }
 
         @Test
@@ -494,7 +503,7 @@ class SkillTrainingCostsTest {
         void skillOutsideBothRolesIsNotAProfessionSkill() {
             Person person = mekWarrior(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE, SkillType.S_TACTICS);
 
-            assertEquals(supportPoints(300),
+            assertEquals(supportPoints(100),
                   SkillTrainingCosts.getSkillImprovementCost(campaign, person, SkillType.S_TACTICS));
         }
 
@@ -503,7 +512,7 @@ class SkillTrainingCostsTest {
             Person person = mekWarrior(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE, SkillType.S_ARTILLERY);
 
             campaignOptions.set(CampaignOption.USE_ARTILLERY, false);
-            assertEquals(supportPoints(300),
+            assertEquals(supportPoints(100),
                   SkillTrainingCosts.getSkillImprovementCost(campaign, person, SkillType.S_ARTILLERY));
 
             campaignOptions.set(CampaignOption.USE_ARTILLERY, true);
@@ -522,7 +531,7 @@ class SkillTrainingCostsTest {
         void setUpFinances() {
             finances = mock(Finances.class);
             when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
-            // Regular to Veteran in a skill outside the role: 300 SP
+            // Regular to Veteran in a skill outside the role: 200 SP
             person = personWithSkillAt(3);
             when(person.getFullTitle()).thenReturn("MekWarrior Test");
         }
@@ -545,7 +554,7 @@ class SkillTrainingCostsTest {
             debitSucceeds(true);
 
             assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME));
-            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(supportPoints(300)), anyString());
+            verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(supportPoints(200)), anyString());
         }
 
         @Test

@@ -75,6 +75,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
@@ -1367,5 +1368,19 @@ public class NewPersonnelMarket {
 
     public Money getHiringCost(Person applicant) {
         return Money.zero();
+    }
+
+    /**
+     * Gets the cost of hiring an applicant, split by part, so the hiring hall can show how it is made up.
+     *
+     * @param applicant the applicant
+     *
+     * @return the hiring cost, by part; its total matches {@link #getHiringCost(Person)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
+        return HiringCostBreakdown.free();
     }
 }

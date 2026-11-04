@@ -32,8 +32,10 @@
  */
 package mekhq.gui.dialog.markets.personnelMarket;
 
+import static mekhq.campaign.personnel.RecruitmentCosts.SALARY_MONTHS;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
 import static mekhq.campaign.personnel.skills.SkillType.getColoredExperienceLevelName;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -43,6 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.swing.table.AbstractTableModel;
 
+import jakarta.annotation.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
@@ -51,10 +54,13 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.RecruitmentCosts.TrainingCostBreakdown;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillTrainingCategory;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 
@@ -91,6 +97,8 @@ import mekhq.gui.sorter.LevelSorter;
  * @since 0.50.06
  */
 public class PersonTableModel extends AbstractTableModel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ApplicantTableColumns";
+
     MMLogger LOGGER = MMLogger.create(PersonTableModel.class);
 
     private final Campaign campaign;
@@ -204,6 +212,65 @@ public class PersonTableModel extends AbstractTableModel {
             case PERFORMANCE_EXAM -> person.getPerformanceExamScore();
             case HIRING_COST -> market.getHiringCost(person);
         };
+    }
+
+    /**
+     * Gets the tooltip for a cell. Only the hiring cost column has one, showing how the cost is made up.
+     *
+     * @param rowIndex    the model row
+     * @param columnIndex the model column
+     *
+     * @return the tooltip's HTML, or {@code null} if the cell has no tooltip
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getToolTipAt(int rowIndex, int columnIndex) {
+        if (rowIndex < 0 || rowIndex >= people.size() || columnIndex < 0 || columnIndex >= columns.size()
+                  || columns.get(columnIndex) != ApplicantTableColumns.HIRING_COST) {
+            return null;
+        }
+
+        NewPersonnelMarket market = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
+        HiringCostBreakdown breakdown = market.getHiringCostBreakdown(people.get(rowIndex));
+        if (breakdown == null) {
+            return null;
+        }
+
+        StringBuilder toolTip = new StringBuilder("<html>");
+        if (breakdown.salaryCost().isPositive()) {
+            appendToolTipLine(toolTip, getFormattedTextAt(RESOURCE_BUNDLE, "HIRING_COST.tooltip.salary",
+                  SALARY_MONTHS, breakdown.salaryCost().toAmountString()));
+        }
+
+        TrainingCostBreakdown trainingCost = breakdown.trainingCost();
+        if (trainingCost != null) {
+            for (SkillTrainingCategory category : SkillTrainingCategory.values()) {
+                Money skillCost = trainingCost.skillCosts().getOrDefault(category, Money.zero());
+                if (skillCost.isPositive()) {
+                    appendToolTipLine(toolTip, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "HIRING_COST.tooltip." + category.name(), skillCost.toAmountString()));
+                }
+            }
+
+            if (trainingCost.spaCost().isPositive()) {
+                appendToolTipLine(toolTip, getFormattedTextAt(RESOURCE_BUNDLE, "HIRING_COST.tooltip.spa",
+                      trainingCost.spaCost().toAmountString()));
+            }
+        }
+
+        if (breakdown.goldenHelloExtra().isPositive()) {
+            appendToolTipLine(toolTip, getFormattedTextAt(RESOURCE_BUNDLE, "HIRING_COST.tooltip.goldenHello",
+                  breakdown.goldenHelloExtra().toAmountString()));
+        }
+
+        toolTip.append(getFormattedTextAt(RESOURCE_BUNDLE, "HIRING_COST.tooltip.total",
+              breakdown.total().toAmountString()));
+        return toolTip.append("</html>").toString();
+    }
+
+    private static void appendToolTipLine(StringBuilder toolTip, String line) {
+        toolTip.append(line).append("<br>");
     }
 
     /**
