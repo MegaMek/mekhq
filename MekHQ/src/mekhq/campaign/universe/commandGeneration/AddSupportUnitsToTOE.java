@@ -278,7 +278,7 @@ public class AddSupportUnitsToTOE {
             }
             campaign.getPlayerForce().addUnitToFormation(vehicle, lance.getId(), campaign);
         }
-        LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
+        LOGGER.info("[SupportTOE] formation #{}: {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getId(),
               looseVehicles.size(), lanceSize, newLances);
     }
 
@@ -317,8 +317,8 @@ public class AddSupportUnitsToTOE {
             formation.setName(echelons.nameOf(echelon - 1, nextFreePosition(container, echelons, echelon - 1)));
             moveKeepingParentTypes(campaign, formation, container);
         }
-        LOGGER.info("[SupportTOE] '{}': {} formation(s) grouped at echelon {} in groups of {}, {} new", group.getName(),
-              loose.size(), echelon, size, newContainers);
+        LOGGER.info("[SupportTOE] formation #{}: {} formation(s) grouped at echelon {} in groups of {}, {} new",
+              group.getId(), loose.size(), echelon, size, newContainers);
     }
 
     /** Creates the next numbered formation of {@code echelon} directly under {@code parent}. */
@@ -486,7 +486,7 @@ public class AddSupportUnitsToTOE {
             }
             removeEmptyEchelons(campaign, child, echelons);
             if (child.getUnits().isEmpty() && child.getSubFormations().isEmpty()) {
-                LOGGER.info("[SupportTOE] '{}': removing empty '{}'", group.getName(), child.getName());
+                LOGGER.info("[SupportTOE] formation #{}: removing empty formation #{}", group.getId(), child.getId());
                 campaign.getPlayerForce().removeFormation(child, campaign);
             }
         }
