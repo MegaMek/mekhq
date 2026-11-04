@@ -331,11 +331,15 @@ final class PeopleList extends JPanel {
         return constraints;
     }
 
-    /** Lets the grid share the width by weight alone, so a long name is shortened instead of widening its column. */
+    /**
+     * Lets the grid share the width by weight alone, so a long name is shortened instead of widening its column. The
+     * height comes from the font as well as the text, as a row's cells are still empty when the renderer is built.
+     */
     private static void fixWidth(JComponent component) {
-        Dimension preferred = component.getPreferredSize();
-        component.setPreferredSize(new Dimension(0, preferred.height));
-        component.setMinimumSize(new Dimension(0, preferred.height));
+        int height = Math.max(component.getPreferredSize().height,
+              component.getFontMetrics(component.getFont()).getHeight());
+        component.setPreferredSize(new Dimension(0, height));
+        component.setMinimumSize(new Dimension(0, height));
     }
 
     /** A person row: the selection box, then name, role, formation and experience. */
