@@ -89,19 +89,20 @@ public final class SkillTrainingCosts {
 
         boolean isRoleSkill = isRoleSkill(campaign, person.getPrimaryRole(), skillName)
                                     || isRoleSkill(campaign, person.getSecondaryRole(), skillName);
-        return getSkillImprovementCost(campaign, person, skillName, isRoleSkill,
-              getSkillModifierData(campaign, person));
+        return getSkillImprovementCost(campaign, person, skillName, isRoleSkill);
     }
 
     /**
      * As {@link #getSkillImprovementCost(Campaign, Person, String)}, for callers that have already worked out the
-     * person's role skills and skill modifiers, such as a menu listing every skill.
+     * person's role skills, such as a menu listing every skill.
      *
-     * @param campaign          the campaign
-     * @param person            the person improving the skill
-     * @param skillName         the name of the skill being improved (or gained)
-     * @param isRoleSkill       whether the skill belongs to the person's primary or secondary role
-     * @param skillModifierData the person's skill modifiers, which decide the skill's experience level
+     * <p>The cost follows the skill's trained level alone. Attributes, abilities, injuries and other modifiers change
+     * how well the person uses the skill, not what training it costs.</p>
+     *
+     * @param campaign    the campaign
+     * @param person      the person improving the skill
+     * @param skillName   the name of the skill being improved (or gained)
+     * @param isRoleSkill whether the skill belongs to the person's primary or secondary role
      *
      * @return the cost, or zero if the option is disabled or the improvement doesn't reach a new priced experience
      *       level
@@ -110,21 +111,16 @@ public final class SkillTrainingCosts {
      * @since 0.51.01
      */
     public static Money getSkillImprovementCost(Campaign campaign, Person person, String skillName,
-          boolean isRoleSkill, SkillModifierData skillModifierData) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
-            return Money.zero();
-        }
-
+          boolean isRoleSkill) {
         SkillType skillType = SkillType.getType(skillName);
         if (skillType == null) {
             return Money.zero();
         }
 
-        // Use the level including modifiers, as shown to the player; improving the skill raises it by one
+        // Improving the skill raises its trained level by one
         Skill skill = person.getSkill(skillName);
-        int currentLevel = skill == null ? -1 : skill.getTotalSkillLevel(skillModifierData);
-        return getSkillImprovementCost(campaignOptions, skillType, isRoleSkill, currentLevel);
+        int currentLevel = skill == null ? -1 : skill.getLevel();
+        return getSkillImprovementCost(campaign.getCampaignOptions(), skillType, isRoleSkill, currentLevel);
     }
 
     /**
@@ -134,8 +130,8 @@ public final class SkillTrainingCosts {
      * @param campaignOptions the campaign's options
      * @param skillType       the skill
      * @param isRoleSkill     whether the skill is one of the person's role skills
-     * @param currentLevel    the skill's current total level, including modifiers, or {@code -1} if the person doesn't
-     *                        have the skill yet
+     * @param currentLevel    the skill's current trained level, without modifiers, or {@code -1} if the person
+     *                        doesn't have the skill yet
      *
      * @return the cost, or zero if improvement costs are disabled or the improvement doesn't reach a new, priced
      *       experience level

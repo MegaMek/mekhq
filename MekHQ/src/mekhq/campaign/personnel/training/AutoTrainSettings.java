@@ -100,11 +100,22 @@ public record AutoTrainSettings(String name, int targetLevel, boolean isContinuo
      * @return settings that train as Quick Train did by default
      */
     public static AutoTrainSettings defaults(String name, CampaignOptions campaignOptions) {
+        return defaultsBuilder(name, campaignOptions).build();
+    }
+
+    private static Builder defaultsBuilder(String name, CampaignOptions campaignOptions) {
         QuickTrainOptions options = QuickTrainOptions.buildQuickTrainOptions(campaignOptions);
-        return new AutoTrainSettings(name, DEFAULT_TARGET_LEVEL, false, options.isLevelArtillery(),
-              options.isLevelScoutingSkills(), options.isLevelEscapeSkills(), options.isLevelLeadership(),
-              options.isLevelTraining(), options.isLevelOtherCommandSkills(), null, 0, true, true, false,
-              Order.WEAKEST_FIRST, false);
+        return new Builder()
+                     .setName(name)
+                     .setTargetLevel(DEFAULT_TARGET_LEVEL)
+                     .setLevelArtillery(options.isLevelArtillery())
+                     .setLevelScouting(options.isLevelScoutingSkills())
+                     .setLevelEscape(options.isLevelEscapeSkills())
+                     .setLevelLeadership(options.isLevelLeadership())
+                     .setLevelTraining(options.isLevelTraining())
+                     .setLevelOtherCommand(options.isLevelOtherCommandSkills())
+                     .setSkipTrainingFormations(true)
+                     .setRespectExclusions(true);
     }
 
     /** @return the optional skills to train, in Quick Train's terms */
@@ -113,18 +124,25 @@ public record AutoTrainSettings(String name, int targetLevel, boolean isContinuo
               isLevelTraining, isLevelOtherCommand, isSkipTrainingFormations);
     }
 
-    /** @return these settings under another name */
-    public AutoTrainSettings withName(String newName) {
-        return new AutoTrainSettings(newName, targetLevel, isContinuous, isLevelArtillery, isLevelScouting,
-              isLevelEscape, isLevelLeadership, isLevelTraining, isLevelOtherCommand, specificSkill, reserveXp,
-              isSkipTrainingFormations, isRespectExclusions, isSkipFeeImprovements, order, isRunMonthly);
-    }
-
-    /** @return these settings, running monthly or not */
-    public AutoTrainSettings withRunMonthly(boolean runMonthly) {
-        return new AutoTrainSettings(name, targetLevel, isContinuous, isLevelArtillery, isLevelScouting,
-              isLevelEscape, isLevelLeadership, isLevelTraining, isLevelOtherCommand, specificSkill, reserveXp,
-              isSkipTrainingFormations, isRespectExclusions, isSkipFeeImprovements, order, runMonthly);
+    /** @return a builder holding these settings, to change some of them */
+    public Builder toBuilder() {
+        return new Builder()
+                     .setName(name)
+                     .setTargetLevel(targetLevel)
+                     .setContinuous(isContinuous)
+                     .setLevelArtillery(isLevelArtillery)
+                     .setLevelScouting(isLevelScouting)
+                     .setLevelEscape(isLevelEscape)
+                     .setLevelLeadership(isLevelLeadership)
+                     .setLevelTraining(isLevelTraining)
+                     .setLevelOtherCommand(isLevelOtherCommand)
+                     .setSpecificSkill(specificSkill)
+                     .setReserveXp(reserveXp)
+                     .setSkipTrainingFormations(isSkipTrainingFormations)
+                     .setRespectExclusions(isRespectExclusions)
+                     .setSkipFeeImprovements(isSkipFeeImprovements)
+                     .setOrder(order)
+                     .setRunMonthly(isRunMonthly);
     }
 
     // region XML
@@ -167,24 +185,7 @@ public record AutoTrainSettings(String name, int targetLevel, boolean isContinuo
      * @return the settings
      */
     public static AutoTrainSettings generateInstanceFromXML(Node node, CampaignOptions campaignOptions) {
-        AutoTrainSettings defaults = defaults("", campaignOptions);
-        String name = defaults.name();
-        int targetLevel = defaults.targetLevel();
-        boolean isContinuous = defaults.isContinuous();
-        boolean isLevelArtillery = defaults.isLevelArtillery();
-        boolean isLevelScouting = defaults.isLevelScouting();
-        boolean isLevelEscape = defaults.isLevelEscape();
-        boolean isLevelLeadership = defaults.isLevelLeadership();
-        boolean isLevelTraining = defaults.isLevelTraining();
-        boolean isLevelOtherCommand = defaults.isLevelOtherCommand();
-        String specificSkill = null;
-        int reserveXp = defaults.reserveXp();
-        boolean isSkipTrainingFormations = defaults.isSkipTrainingFormations();
-        boolean isRespectExclusions = defaults.isRespectExclusions();
-        boolean isSkipFeeImprovements = defaults.isSkipFeeImprovements();
-        Order order = defaults.order();
-        boolean isRunMonthly = defaults.isRunMonthly();
-
+        Builder builder = defaultsBuilder("", campaignOptions);
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
@@ -194,32 +195,204 @@ public record AutoTrainSettings(String name, int targetLevel, boolean isContinuo
             String text = child.getTextContent().trim();
             try {
                 switch (child.getNodeName()) {
-                    case "name" -> name = text;
-                    case "targetLevel" -> targetLevel = MathUtility.parseInt(text, targetLevel);
-                    case "continuous" -> isContinuous = Boolean.parseBoolean(text);
-                    case "levelArtillery" -> isLevelArtillery = Boolean.parseBoolean(text);
-                    case "levelScouting" -> isLevelScouting = Boolean.parseBoolean(text);
-                    case "levelEscape" -> isLevelEscape = Boolean.parseBoolean(text);
-                    case "levelLeadership" -> isLevelLeadership = Boolean.parseBoolean(text);
-                    case "levelTraining" -> isLevelTraining = Boolean.parseBoolean(text);
-                    case "levelOtherCommand" -> isLevelOtherCommand = Boolean.parseBoolean(text);
-                    case "specificSkill" -> specificSkill = text.isBlank() ? null : text;
-                    case "reserveXp" -> reserveXp = MathUtility.parseInt(text, reserveXp);
-                    case "skipTrainingFormations" -> isSkipTrainingFormations = Boolean.parseBoolean(text);
-                    case "respectExclusions" -> isRespectExclusions = Boolean.parseBoolean(text);
-                    case "skipFeeImprovements" -> isSkipFeeImprovements = Boolean.parseBoolean(text);
-                    case "order" -> order = Order.valueOf(text);
-                    case "runMonthly" -> isRunMonthly = Boolean.parseBoolean(text);
+                    case "name" -> builder.setName(text);
+                    case "targetLevel" -> builder.setTargetLevel(MathUtility.parseInt(text, builder.getTargetLevel()));
+                    case "continuous" -> builder.setContinuous(Boolean.parseBoolean(text));
+                    case "levelArtillery" -> builder.setLevelArtillery(Boolean.parseBoolean(text));
+                    case "levelScouting" -> builder.setLevelScouting(Boolean.parseBoolean(text));
+                    case "levelEscape" -> builder.setLevelEscape(Boolean.parseBoolean(text));
+                    case "levelLeadership" -> builder.setLevelLeadership(Boolean.parseBoolean(text));
+                    case "levelTraining" -> builder.setLevelTraining(Boolean.parseBoolean(text));
+                    case "levelOtherCommand" -> builder.setLevelOtherCommand(Boolean.parseBoolean(text));
+                    case "specificSkill" -> builder.setSpecificSkill(text.isBlank() ? null : text);
+                    case "reserveXp" -> builder.setReserveXp(MathUtility.parseInt(text, builder.getReserveXp()));
+                    case "skipTrainingFormations" -> builder.setSkipTrainingFormations(Boolean.parseBoolean(text));
+                    case "respectExclusions" -> builder.setRespectExclusions(Boolean.parseBoolean(text));
+                    case "skipFeeImprovements" -> builder.setSkipFeeImprovements(Boolean.parseBoolean(text));
+                    case "order" -> builder.setOrder(Order.valueOf(text));
+                    case "runMonthly" -> builder.setRunMonthly(Boolean.parseBoolean(text));
                     default -> LOGGER.debug("Ignoring unknown auto-train preset element {}", child.getNodeName());
                 }
             } catch (IllegalArgumentException exception) {
                 LOGGER.warn("Ignoring unreadable auto-train preset value {} for {}", text, child.getNodeName());
             }
         }
-        return new AutoTrainSettings(name, targetLevel, isContinuous, isLevelArtillery, isLevelScouting,
-              isLevelEscape, isLevelLeadership, isLevelTraining, isLevelOtherCommand, specificSkill, reserveXp,
-              isSkipTrainingFormations, isRespectExclusions, isSkipFeeImprovements, order, isRunMonthly);
+        return builder.build();
     }
 
     // endregion XML
+
+    /**
+     * Settings being put together or edited, such as on the Training Console's Auto-train page. Everything starts
+     * off, at level 0, with no name, training the weakest skill first.
+     */
+    public static final class Builder {
+        private String name = "";
+        private int targetLevel;
+        private boolean isContinuous;
+        private boolean isLevelArtillery;
+        private boolean isLevelScouting;
+        private boolean isLevelEscape;
+        private boolean isLevelLeadership;
+        private boolean isLevelTraining;
+        private boolean isLevelOtherCommand;
+        private @Nullable String specificSkill;
+        private int reserveXp;
+        private boolean isSkipTrainingFormations;
+        private boolean isRespectExclusions;
+        private boolean isSkipFeeImprovements;
+        private Order order = Order.WEAKEST_FIRST;
+        private boolean isRunMonthly;
+
+        /** @return the settings */
+        public AutoTrainSettings build() {
+            return new AutoTrainSettings(name, targetLevel, isContinuous, isLevelArtillery, isLevelScouting,
+                  isLevelEscape, isLevelLeadership, isLevelTraining, isLevelOtherCommand, specificSkill, reserveXp,
+                  isSkipTrainingFormations, isRespectExclusions, isSkipFeeImprovements, order, isRunMonthly);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public int getTargetLevel() {
+            return targetLevel;
+        }
+
+        public Builder setTargetLevel(int targetLevel) {
+            this.targetLevel = targetLevel;
+            return this;
+        }
+
+        public boolean isContinuous() {
+            return isContinuous;
+        }
+
+        public Builder setContinuous(boolean isContinuous) {
+            this.isContinuous = isContinuous;
+            return this;
+        }
+
+        public boolean isLevelArtillery() {
+            return isLevelArtillery;
+        }
+
+        public Builder setLevelArtillery(boolean isLevelArtillery) {
+            this.isLevelArtillery = isLevelArtillery;
+            return this;
+        }
+
+        public boolean isLevelScouting() {
+            return isLevelScouting;
+        }
+
+        public Builder setLevelScouting(boolean isLevelScouting) {
+            this.isLevelScouting = isLevelScouting;
+            return this;
+        }
+
+        public boolean isLevelEscape() {
+            return isLevelEscape;
+        }
+
+        public Builder setLevelEscape(boolean isLevelEscape) {
+            this.isLevelEscape = isLevelEscape;
+            return this;
+        }
+
+        public boolean isLevelLeadership() {
+            return isLevelLeadership;
+        }
+
+        public Builder setLevelLeadership(boolean isLevelLeadership) {
+            this.isLevelLeadership = isLevelLeadership;
+            return this;
+        }
+
+        public boolean isLevelTraining() {
+            return isLevelTraining;
+        }
+
+        public Builder setLevelTraining(boolean isLevelTraining) {
+            this.isLevelTraining = isLevelTraining;
+            return this;
+        }
+
+        public boolean isLevelOtherCommand() {
+            return isLevelOtherCommand;
+        }
+
+        public Builder setLevelOtherCommand(boolean isLevelOtherCommand) {
+            this.isLevelOtherCommand = isLevelOtherCommand;
+            return this;
+        }
+
+        public @Nullable String getSpecificSkill() {
+            return specificSkill;
+        }
+
+        public Builder setSpecificSkill(@Nullable String specificSkill) {
+            this.specificSkill = specificSkill;
+            return this;
+        }
+
+        public int getReserveXp() {
+            return reserveXp;
+        }
+
+        public Builder setReserveXp(int reserveXp) {
+            this.reserveXp = reserveXp;
+            return this;
+        }
+
+        public boolean isSkipTrainingFormations() {
+            return isSkipTrainingFormations;
+        }
+
+        public Builder setSkipTrainingFormations(boolean isSkipTrainingFormations) {
+            this.isSkipTrainingFormations = isSkipTrainingFormations;
+            return this;
+        }
+
+        public boolean isRespectExclusions() {
+            return isRespectExclusions;
+        }
+
+        public Builder setRespectExclusions(boolean isRespectExclusions) {
+            this.isRespectExclusions = isRespectExclusions;
+            return this;
+        }
+
+        public boolean isSkipFeeImprovements() {
+            return isSkipFeeImprovements;
+        }
+
+        public Builder setSkipFeeImprovements(boolean isSkipFeeImprovements) {
+            this.isSkipFeeImprovements = isSkipFeeImprovements;
+            return this;
+        }
+
+        public Order getOrder() {
+            return order;
+        }
+
+        public Builder setOrder(Order order) {
+            this.order = order;
+            return this;
+        }
+
+        public boolean isRunMonthly() {
+            return isRunMonthly;
+        }
+
+        public Builder setRunMonthly(boolean isRunMonthly) {
+            this.isRunMonthly = isRunMonthly;
+            return this;
+        }
+    }
 }

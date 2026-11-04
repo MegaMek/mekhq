@@ -61,6 +61,8 @@ final class TrainingRoster {
      * One person as the console lists them.
      *
      * @param person        the person
+     * @param name          their full name, for sorting
+     * @param title         their name with rank, for the list
      * @param role          their primary role
      * @param roleName      their primary role's name
      * @param formationName the formation their unit is in, or an empty string
@@ -68,8 +70,8 @@ final class TrainingRoster {
      * @param isPrisoner    {@code true} if they are a prisoner
      * @param search        what the search field matches against, in lower case
      */
-    record PersonEntry(Person person, PersonnelRole role, String roleName, String formationName,
-          SkillLevel skillLevel, boolean isPrisoner, String search) {}
+    record PersonEntry(Person person, String name, String title, PersonnelRole role, String roleName,
+          String formationName, SkillLevel skillLevel, boolean isPrisoner, String search) {}
 
     private final List<PersonEntry> entries = new ArrayList<>();
     private final Map<UUID, PersonEntry> byId = new HashMap<>();
@@ -88,12 +90,14 @@ final class TrainingRoster {
             String formationName = (formation == null) ? "" : formation.getFullName();
             SkillLevel level = person.getSkillLevel(options, isClan, today, false, true);
             boolean isPrisoner = person.getPrisonerStatus().isCurrentPrisoner();
-            String search = (person.getFullTitle() + ' ' + roleName + ' ' + formationName).toLowerCase(Locale.ROOT);
-            PersonEntry entry = new PersonEntry(person, role, roleName, formationName, level, isPrisoner, search);
+            String title = person.getFullTitle();
+            String search = (title + ' ' + roleName + ' ' + formationName).toLowerCase(Locale.ROOT);
+            PersonEntry entry = new PersonEntry(person, person.getFullName(), title, role, roleName, formationName,
+                  level, isPrisoner, search);
             entries.add(entry);
             byId.put(person.getId(), entry);
         }
-        entries.sort(Comparator.comparing(entry -> entry.person().getFullName()));
+        entries.sort(Comparator.comparing(PersonEntry::name));
     }
 
     /** @return everyone, by name */

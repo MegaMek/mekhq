@@ -32,7 +32,14 @@
  */
 package mekhq.campaign.personnel.training;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
@@ -40,6 +47,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.QuickTrain;
+import mekhq.campaign.personnel.training.TrainingPlan.StagedPurchase;
 import mekhq.campaign.personnel.training.TrainingPricer.Quote;
 import mekhq.campaign.personnel.training.TrainingPurchase.SkillImprovement;
 
@@ -68,19 +76,22 @@ public final class AutoTrainPlanner {
     /**
      * What auto-train would buy.
      *
-     * @param purchases the improvements, in the order to stage them
-     * @param xp        their XP cost
-     * @param fees      their training fees
-     * @param bySkill   how many improvements each skill gets, most first
-     * @param skipped   how many people were left out, by reason
+     * @param staged  the improvements and the prices they were planned at, in the order to stage them
+     * @param xp      their XP cost
+     * @param fees    their training fees
+     * @param bySkill how many improvements each skill gets, most first
+     * @param skipped how many people were left out, by reason
      */
-    public record Plan(List<SkillImprovement> purchases, int xp, Money fees, Map<String, Integer> bySkill,
+    public record Plan(List<StagedPurchase> staged, int xp, Money fees, Map<String, Integer> bySkill,
           Map<Skip, Integer> skipped) {
+        /** @return the improvements, in the order to stage them */
+        public List<TrainingPurchase> purchases() {
+            return staged.stream().map(StagedPurchase::purchase).toList();
+        }
+
         /** @return how many different people the plan trains */
         public int peopleCount() {
-            Set<UUID> people = new HashSet<>();
-            purchases.forEach(purchase -> people.add(purchase.person().getId()));
-            return people.size();
+            return TrainingPurchase.peopleCount(purchases());
         }
     }
 
@@ -95,8 +106,7 @@ public final class AutoTrainPlanner {
     public static Plan plan(Campaign campaign, TrainingPlan plan, Collection<Person> people,
           AutoTrainSettings settings) {
         TrainingPlan trial = plan.copy();
-        Money feeBudgetLeft = trial.fundsLeft();
-        List<SkillImprovement> purchases = new ArrayList<>();
+        List<StagedPurchase> staged = new ArrayList<>();
         Map<String, Integer> bySkill = new LinkedHashMap<>();
         Map<Skip, Integer> skipped = new EnumMap<>(Skip.class);
         int xp = 0;
@@ -126,18 +136,14 @@ public final class AutoTrainPlanner {
                     if (!quote.isAllowed()
                               || (quote.xp() > projection.availableXp() - settings.reserveXp())
                               || (settings.isSkipFeeImprovements() && !quote.fee().isZero())
-                              || quote.fee().isGreaterThan(feeBudgetLeft)) {
+                              || !trial.fits(quote)) {
                         continue;
                     }
-                    Quote applied = trial.tryApply(purchase);
-                    if (!applied.isAllowed()) {
-                        continue;
-                    }
-                    purchases.add(purchase);
+                    trial.applyQuoted(purchase, quote);
+                    staged.add(new StagedPurchase(purchase, quote));
                     bySkill.merge(skillName, 1, Integer::sum);
-                    xp += applied.xp();
-                    fees = fees.plus(applied.fee());
-                    feeBudgetLeft = feeBudgetLeft.minus(applied.fee());
+                    xp += quote.xp();
+                    fees = fees.plus(quote.fee());
                     improvedThisRound = true;
                 }
             } while (settings.isContinuous() && improvedThisRound);
@@ -147,7 +153,7 @@ public final class AutoTrainPlanner {
         bySkill.entrySet().stream()
               .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
               .forEach(entry -> sortedBySkill.put(entry.getKey(), entry.getValue()));
-        return new Plan(purchases, xp, fees, sortedBySkill, skipped);
+        return new Plan(List.copyOf(staged), xp, fees, sortedBySkill, skipped);
     }
 
     private static @Nullable Skip skipReason(Campaign campaign, Person person, AutoTrainSettings settings) {
@@ -180,14 +186,20 @@ public final class AutoTrainPlanner {
         return held;
     }
 
+    /**
+     * @return the skills in the order to train them this round: weakest first, by trained level, as Quick Train does;
+     *       or cheapest first, each priced once
+     */
     private static List<String> ordered(TrainingPlan trial, Person person, PersonProjection projection,
           List<String> targets, AutoTrainSettings settings) {
         List<String> ordered = new ArrayList<>(targets);
         if (settings.order() == AutoTrainSettings.Order.CHEAPEST_FIRST) {
-            ordered.sort(Comparator.comparingInt(skillName -> {
+            Map<String, Integer> prices = new HashMap<>();
+            for (String skillName : ordered) {
                 Quote quote = trial.quote(new SkillImprovement(person, skillName));
-                return quote.isAllowed() ? quote.xp() : Integer.MAX_VALUE;
-            }));
+                prices.put(skillName, quote.isAllowed() ? quote.xp() : Integer.MAX_VALUE);
+            }
+            ordered.sort(Comparator.comparingInt(prices::get));
         } else {
             ordered.sort(Comparator.comparingInt(projection::skillLevel));
         }

@@ -48,9 +48,8 @@ import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -113,6 +112,8 @@ public class TrainingConsole extends JDialog {
     /** Characters per line for the rail's check boxes, which wrap rather than run past its edge. */
     private static final int RAIL_WRAP = 30;
     private static final int PANEL_WIDTH = 470;
+    /** Counts grouped by thousands; only used on the Swing thread, so one instance is shared. */
+    private static final NumberFormat COUNT_FORMAT = NumberFormat.getIntegerInstance();
 
     private final Campaign campaign;
     private TrainingRoster roster;
@@ -125,6 +126,15 @@ public class TrainingConsole extends JDialog {
     private String message = "";
     private boolean isWarning;
     private boolean closeRequested;
+    /** Changes whenever the selection does, so what was worked out for the old selection is thrown away. */
+    private int selectionRevision;
+    /** Changes whenever the people shown do. */
+    private int shownRevision;
+    /** What the pages worked out from the plan and the selection, kept until either changes. */
+    private final Map<String, Object> cache = new HashMap<>();
+    private @Nullable TrainingPlan cachedPlan;
+    private int cachedPlanRevision;
+    private int cachedSelectionRevision;
 
     private final HudModeSelector<TrainingConsolePage> modeSelector;
     private final JLabel subtitle = new JLabel();
@@ -138,15 +148,15 @@ public class TrainingConsole extends JDialog {
     private final HudButton railToggle = new HudButton("", false, true);
     private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
-        refresh();
+        refreshList();
     });
     private final HudFilterList<String> formationFilter = new HudFilterList<>(value -> {
         state.formation = value;
-        refresh();
+        refreshList();
     });
     private final HudFilterList<SkillLevel> levelFilter = new HudFilterList<>(value -> {
         state.level = value;
-        refresh();
+        refreshList();
     });
     private final HudCheckBox includePrisoners = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE, "rail.prisoners"),
           RAIL_WRAP));
@@ -167,8 +177,6 @@ public class TrainingConsole extends JDialog {
     private final JPanel skillChips = ConsoleWidgets.row(6);
     private final JPanel abilityChips = ConsoleWidgets.row(6);
     private final JPanel attributeChips = ConsoleWidgets.row(6);
-    private final HudCheckBox includePrerequisites = new HudCheckBox(getTextAt(RESOURCE_BUNDLE,
-          "abilities.includePrerequisites"));
     private final JPanel catalog = ConsoleWidgets.column();
     private final JScrollPane catalogScroll;
     private final JPanel review = ConsoleWidgets.column();
@@ -222,10 +230,9 @@ public class TrainingConsole extends JDialog {
 
         peopleList = new PeopleList(text -> {
             state.query = text;
-            refresh();
+            refreshList();
         }, this::onRow, this::selectShown, this::clearSelection, this::sortBy, state.selected::contains,
-              person -> plan.projectionOf(person).purchaseCount(),
-              person -> plan.projectionOf(person).availableXp());
+              person -> plan.purchaseCountOf(person), person -> plan.availableXpOf(person));
 
         for (Person person : people) {
             PersonEntry entry = roster.entryFor(person);
@@ -372,15 +379,15 @@ public class TrainingConsole extends JDialog {
         }
         includePrisoners.addActionListener(event -> {
             state.isIncludePrisoners = includePrisoners.isSelected();
-            refresh();
+            refreshList();
         });
         onlyStaged.addActionListener(event -> {
             state.isOnlyStaged = onlyStaged.isSelected();
-            refresh();
+            refreshList();
         });
         hideExcluded.addActionListener(event -> {
             state.isHideExcluded = hideExcluded.isSelected();
-            refresh();
+            refreshList();
         });
         hideExcluded.setToolTipText(getTextAt(RESOURCE_BUNDLE, "rail.hideExcluded.toolTipText"));
         column.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(12),
@@ -403,22 +410,17 @@ public class TrainingConsole extends JDialog {
         toolsByPage.put(TrainingConsolePage.SKILLS, searchTools(getTextAt(RESOURCE_BUNDLE, "skills.search"), text -> {
             state.skillQuery = text;
             refreshPanel();
-        }, skillChips, null));
-        includePrerequisites.setToolTipText(getTextAt(RESOURCE_BUNDLE, "abilities.includePrerequisites.toolTipText"));
-        includePrerequisites.addActionListener(event -> {
-            state.isIncludePrerequisites = includePrerequisites.isSelected();
-            refreshPanel();
-        });
+        }, skillChips));
         toolsByPage.put(TrainingConsolePage.ABILITIES, searchTools(getTextAt(RESOURCE_BUNDLE, "abilities.search"),
               text -> {
                   state.abilityQuery = text;
                   refreshPanel();
-              }, abilityChips, includePrerequisites));
+              }, abilityChips));
         toolsByPage.put(TrainingConsolePage.ATTRIBUTES, searchTools(getTextAt(RESOURCE_BUNDLE,
               "attributes.search"), text -> {
             state.attributeQuery = text;
             refreshPanel();
-        }, attributeChips, null));
+        }, attributeChips));
 
         JPanel north = ConsoleWidgets.column();
         basket.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -439,27 +441,11 @@ public class TrainingConsole extends JDialog {
         return panel;
     }
 
-    private static JComponent searchTools(String label, Consumer<String> onSearch, JPanel chips,
-          @Nullable JComponent extra) {
+    private static JComponent searchTools(String label, Consumer<String> onSearch, JPanel chips) {
         JTextField field = new JTextField();
         Hud.styleField(field);
         field.getAccessibleContext().setAccessibleName(label);
-        field.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent event) {
-                onSearch.accept(field.getText());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent event) {
-                onSearch.accept(field.getText());
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent event) {
-                onSearch.accept(field.getText());
-            }
-        });
+        ConsoleWidgets.onTextSettled(field, onSearch);
         JPanel searchRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         searchRow.add(Hud.eyebrow(label), BorderLayout.WEST);
         searchRow.add(field, BorderLayout.CENTER);
@@ -472,10 +458,6 @@ public class TrainingConsole extends JDialog {
         tools.add(searchRow);
         tools.add(Box.createVerticalStrut(scaleForGUI(6)));
         tools.add(chips);
-        if (extra != null) {
-            extra.setAlignmentX(Component.LEFT_ALIGNMENT);
-            tools.add(extra);
-        }
         return tools;
     }
 
@@ -550,11 +532,22 @@ public class TrainingConsole extends JDialog {
                                        "work");
         subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", formatCount(roster.entries().size()),
               campaign.getLocalDate(), plan.funds().toAmountAndSymbolString()));
-        refreshList();
+        refreshShownPeople();
         refreshPanel();
     }
 
+    /**
+     * Redraws the people list after a search, filter or sort. The catalog only depends on who is shown when nobody is
+     * selected on the Auto-train page, which then trains everyone shown.
+     */
     private void refreshList() {
+        refreshShownPeople();
+        if ((state.page == TrainingConsolePage.AUTO_TRAIN) && state.selected.isEmpty()) {
+            refreshPanel();
+        }
+    }
+
+    private void refreshShownPeople() {
         List<PersonEntry> base = new ArrayList<>();
         Map<PersonnelRole, Integer> byRole = new TreeMap<>(Comparator.comparing(
               (PersonnelRole role) -> role.getLabel(false)));
@@ -565,7 +558,7 @@ public class TrainingConsole extends JDialog {
             Person person = entry.person();
             if ((entry.isPrisoner() && !state.isIncludePrisoners)
                       || (state.isHideExcluded && person.isQuickTrainIgnore())
-                      || (state.isOnlyStaged && (plan.projectionOf(person).purchaseCount() == 0))
+                      || (state.isOnlyStaged && (plan.purchaseCountOf(person) == 0))
                       || (!query.isEmpty() && !entry.search().contains(query))) {
                 continue;
             }
@@ -587,16 +580,19 @@ public class TrainingConsole extends JDialog {
         Comparator<PersonEntry> comparator = switch (state.sort) {
             // Not selected sorts after selected, so ascending puts the selection on top
             case SELECTED -> Comparator.comparing((PersonEntry entry) -> !state.selected.contains(entry.person()));
-            case NAME -> Comparator.comparing((PersonEntry entry) -> entry.person().getFullName());
+            case NAME -> Comparator.comparing(PersonEntry::name);
             case ROLE -> Comparator.comparing(PersonEntry::roleName);
             case FORMATION -> Comparator.comparing(PersonEntry::formationName);
             case EXPERIENCE -> Comparator.comparing(PersonEntry::skillLevel);
-            case XP -> Comparator.comparingInt((PersonEntry entry) -> plan.projectionOf(entry.person()).availableXp());
+            case XP -> Comparator.comparingInt((PersonEntry entry) -> plan.availableXpOf(entry.person()));
         };
         if (!state.isAscending) {
             comparator = comparator.reversed();
         }
-        filtered.sort(comparator.thenComparing((PersonEntry entry) -> entry.person().getFullName()));
+        filtered.sort(comparator.thenComparing(PersonEntry::name));
+        if (!filtered.equals(shown)) {
+            shownRevision++;
+        }
         shown = filtered;
         peopleList.setRows(shown);
         peopleList.setSortShown(state.sort, state.isAscending);
@@ -690,7 +686,7 @@ public class TrainingConsole extends JDialog {
         int none = 0;
         Map<String, Integer> byRole = new TreeMap<>();
         for (Person person : selection) {
-            int available = plan.projectionOf(person).availableXp();
+            int available = plan.availableXpOf(person);
             free += Math.max(0, available);
             if (available <= 0) {
                 none++;
@@ -772,31 +768,35 @@ public class TrainingConsole extends JDialog {
         }
         attributeChips.revalidate();
         attributeChips.repaint();
-        includePrerequisites.setSelected(state.isIncludePrerequisites);
     }
 
     private void refreshTiles(List<Person> selection) {
-        int unspent = 0;
-        int people = 0;
-        for (PersonEntry entry : roster.entries()) {
-            if (!entry.isPrisoner()) {
-                unspent += Math.max(0, plan.projectionOf(entry.person()).availableXp());
-                people++;
+        int[] totals = cached("tiles.unspent", () -> {
+            int xp = 0;
+            int count = 0;
+            for (PersonEntry entry : roster.entries()) {
+                if (!entry.isPrisoner()) {
+                    xp += Math.max(0, plan.availableXpOf(entry.person()));
+                    count++;
+                }
             }
-        }
+            return new int[] { xp, count };
+        });
+        int unspent = totals[0];
+        int people = totals[1];
         unspentTile.setValue(formatCount(unspent), TEXT);
         unspentTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "tile.unspent.sub", formatCount(people)));
 
         int selectedFree = 0;
         for (Person person : selection) {
-            selectedFree += Math.max(0, plan.projectionOf(person).availableXp());
+            selectedFree += Math.max(0, plan.availableXpOf(person));
         }
         selectedTile.setValue(formatCount(selection.size()), ACCENT_BRIGHT);
         selectedTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "tile.selected.sub", formatCount(selectedFree)));
 
         stagedTile.setValue(getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", plan.totalXp()), AMBER);
         stagedTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "tile.staged.sub", plan.purchaseCount(),
-              plan.changedPeople().size()));
+              plan.changedPeopleCount()));
 
         TrainingContext context = plan.context();
         if (!context.isUseSkillTrainingCosts() && !context.isUseSpaTrainingCosts()) {
@@ -820,10 +820,10 @@ public class TrainingConsole extends JDialog {
             dockSummary.setText(getTextAt(RESOURCE_BUNDLE, "dock.none"));
         } else if (plan.totalFees().isZero()) {
             dockSummary.setText(getFormattedTextAt(RESOURCE_BUNDLE, "dock.summary", plan.purchaseCount(),
-                  plan.changedPeople().size(), formatCount(plan.totalXp())));
+                  plan.changedPeopleCount(), formatCount(plan.totalXp())));
         } else {
             dockSummary.setText(getFormattedTextAt(RESOURCE_BUNDLE, "dock.summary.fees", plan.purchaseCount(),
-                  plan.changedPeople().size(), formatCount(plan.totalXp()),
+                  plan.changedPeopleCount(), formatCount(plan.totalXp()),
                   plan.totalFees().toAmountAndSymbolString()));
         }
         dockMessage.setText(message);
@@ -856,6 +856,11 @@ public class TrainingConsole extends JDialog {
 
     private List<Person> shownPeople() {
         return shown.stream().map(PersonEntry::person).toList();
+    }
+
+    /** Records that the selection changed, so what was worked out for the old one is worked out again. */
+    private void selectionChanged() {
+        selectionRevision++;
     }
 
     private void onRow(PersonEntry entry, int index, boolean isRange) {
@@ -895,6 +900,7 @@ public class TrainingConsole extends JDialog {
     void toggle(Collection<Person> people) {
         Set<Person> group = new LinkedHashSet<>(people);
         lastRowIndex = -1;
+        selectionChanged();
         if ((selectionBeforeToggle != null) && state.selected.equals(group)) {
             state.selected.clear();
             state.selected.addAll(selectionBeforeToggle);
@@ -909,6 +915,7 @@ public class TrainingConsole extends JDialog {
     }
 
     private void refreshAfterSelection() {
+        selectionChanged();
         selectionBeforeToggle = null;
         int selectedShown = 0;
         Set<Person> shownSet = new HashSet<>(shownPeople());
@@ -930,7 +937,7 @@ public class TrainingConsole extends JDialog {
         // sorts the selection to the top
         state.isAscending = (state.sort == sort) ? !state.isAscending : (sort != Sort.XP);
         state.sort = sort;
-        refresh();
+        refreshList();
     }
 
     // endregion Selection and rows
@@ -1012,6 +1019,7 @@ public class TrainingConsole extends JDialog {
         roster = new TrainingRoster(campaign);
         plan = newPlan();
         state.selected.removeIf(person -> roster.entryFor(person) == null);
+        selectionChanged();
         state.openStep = null;
         setMessage(text, report.skipped() > 0);
     }
@@ -1079,6 +1087,37 @@ public class TrainingConsole extends JDialog {
         return state;
     }
 
+    /** @return a number that changes whenever the people shown in the list do */
+    int shownRevision() {
+        return shownRevision;
+    }
+
+    /**
+     * Something a page works out from the plan and the selection, such as a card's tally, kept until either changes,
+     * so opening a card or typing in a search doesn't price everything again.
+     *
+     * @param key     what it is; it must name everything else the value depends on, such as a chosen level
+     * @param compute works it out
+     *
+     * @return the value
+     */
+    @SuppressWarnings("unchecked")
+    <T> T cached(String key, Supplier<T> compute) {
+        if ((cachedPlan != plan) || (cachedPlanRevision != plan.revision())
+                  || (cachedSelectionRevision != selectionRevision)) {
+            cache.clear();
+            cachedPlan = plan;
+            cachedPlanRevision = plan.revision();
+            cachedSelectionRevision = selectionRevision;
+        }
+        Object value = cache.get(key);
+        if (value == null) {
+            value = compute.get();
+            cache.put(key, value);
+        }
+        return (T) value;
+    }
+
     // endregion Accessors for the pages
 
     private void setPreferences() {
@@ -1093,7 +1132,7 @@ public class TrainingConsole extends JDialog {
 
     /** @return a count grouped by thousands, such as "3,412" */
     static String formatCount(int count) {
-        return NumberFormat.getIntegerInstance().format(count);
+        return COUNT_FORMAT.format(count);
     }
 
     private static String upper(String key) {

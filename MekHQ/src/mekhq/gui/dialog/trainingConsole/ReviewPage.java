@@ -52,7 +52,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -198,13 +197,10 @@ final class ReviewPage {
         boolean isOpen = (state.openStep != null) && (state.openStep == index);
         String meta = getFormattedTextAt(RESOURCE_BUNDLE, "review.step.meta", step.peopleCount(),
               step.purchases().size());
-        HudButton remove = new HudButton(getTextAt(RESOURCE_BUNDLE, "review.remove").toUpperCase(Locale.ROOT),
-              false, true);
-        remove.addActionListener(event -> console.removeStep(index));
-        int xp = step.xp();
-        JComponent action = ConsoleWidgets.actionColumn(remove,
-              (xp < 0) ? getFormattedTextAt(RESOURCE_BUNDLE, "xp.gained", -xp) :
-                    getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", xp), ConsoleWidgets.money(step.fees()));
+        HudButton remove = ConsoleWidgets.button(getTextAt(RESOURCE_BUNDLE, "review.remove"), false, true,
+              () -> console.removeStep(index));
+        JComponent action = ConsoleWidgets.actionColumn(remove, ConsoleWidgets.xpText(step.xp()),
+              ConsoleWidgets.money(step.fees()));
         CatalogCard card = new CatalogCard(getFormattedTextAt(RESOURCE_BUNDLE, "review.step.title", index + 1,
               step.label()), List.of(), meta, null, action, isOpen, () -> {
                   state.openStep = isOpen ? null : index;
@@ -228,9 +224,7 @@ final class ReviewPage {
         JPanel line = Hud.transparentPanel(new GridLayout(1, 3, scaleForGUI(8), 0));
         line.add(ConsoleWidgets.label(person.getFullTitle(), 0.82f, TEXT));
         line.add(ConsoleWidgets.label(describe(staged), 0.82f, TEXT_MUTED));
-        int xp = staged.quote().xp();
-        String cost = (xp < 0) ? getFormattedTextAt(RESOURCE_BUNDLE, "xp.gained", -xp) :
-                            getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", xp);
+        String cost = ConsoleWidgets.xpText(staged.quote().xp());
         if (!staged.quote().fee().isZero()) {
             cost = getFormattedTextAt(RESOURCE_BUNDLE, "review.line.withFee", cost,
                   staged.quote().fee().toAmountAndSymbolString());

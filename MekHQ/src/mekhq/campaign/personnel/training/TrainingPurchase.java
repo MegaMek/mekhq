@@ -32,6 +32,11 @@
  */
 package mekhq.campaign.personnel.training;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.Person;
@@ -53,6 +58,19 @@ public sealed interface TrainingPurchase {
      * @return the person the purchase is for
      */
     Person person();
+
+    /**
+     * @param purchases some purchases
+     *
+     * @return how many different people they are for
+     */
+    static int peopleCount(Collection<? extends TrainingPurchase> purchases) {
+        Set<UUID> people = new HashSet<>();
+        for (TrainingPurchase purchase : purchases) {
+            people.add(purchase.person().getId());
+        }
+        return people.size();
+    }
 
     /**
      * Raises a skill by one level, or learns it at level 0 if the person doesn't have it.

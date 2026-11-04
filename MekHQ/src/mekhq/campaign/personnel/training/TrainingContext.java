@@ -44,7 +44,6 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.utilities.spaUtilities.SpaUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
@@ -64,8 +63,6 @@ public final class TrainingContext {
     private final LocalDate today;
     private final boolean isUseReasoning;
     private final double xpCostMultiplier;
-    private final boolean isClanCampaign;
-    private final boolean isUseAgeEffects;
     private final boolean isAdminsHaveNegotiation;
     private final boolean isDoctorsUseAdministration;
     private final boolean isTechsUseAdministration;
@@ -82,7 +79,6 @@ public final class TrainingContext {
     private final int edgeRefreshCost;
 
     private final Map<Person, Set<String>> roleSkills = new HashMap<>();
-    private final Map<Person, SkillModifierData> modifiers = new HashMap<>();
     private final Map<String, AbilityCategory> abilityCategories = new HashMap<>();
 
     /**
@@ -94,8 +90,6 @@ public final class TrainingContext {
         today = campaign.getLocalDate();
         isUseReasoning = options.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
         xpCostMultiplier = options.get(CampaignOption.XP_COST_MULTIPLIER);
-        isClanCampaign = campaign.getPlayerForce().isClanForce();
-        isUseAgeEffects = options.get(CampaignOption.USE_AGE_EFFECTS);
         isAdminsHaveNegotiation = options.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
         isDoctorsUseAdministration = options.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         isTechsUseAdministration = options.get(CampaignOption.TECHS_USE_ADMINISTRATION);
@@ -197,27 +191,11 @@ public final class TrainingContext {
     }
 
     /**
-     * @param person a person
-     *
-     * @return the person's skill modifiers, which decide each skill's total level and so its experience level
-     */
-    public SkillModifierData modifiersOf(Person person) {
-        return modifiers.computeIfAbsent(person,
-              key -> key.getSkillModifierData(isUseAgeEffects, isClanCampaign, today));
-    }
-
-    /**
      * @param ability an ability
      *
      * @return the ability's category, worked out once, as working it out reads every prerequisite
      */
     public AbilityCategory categoryOf(SpecialAbility ability) {
         return abilityCategories.computeIfAbsent(ability.getName(), name -> SpaUtilities.getSpaCategory(ability));
-    }
-
-    /** Forgets the per-person facts, after training has changed people. */
-    public void forgetPeople() {
-        roleSkills.clear();
-        modifiers.clear();
     }
 }

@@ -121,7 +121,8 @@ public final class AbilityChoices {
     }
 
     /**
-     * Chooses the value that suits a person best: the weapon their unit mounts most of, or the class of that weapon.
+     * Chooses the value that suits a person best: for Weapon Specialist and Sandblaster, the weapon their unit mounts
+     * most of; for Specialist, the weapon class most of their unit's weapons belong to.
      *
      * @param ability the ability
      * @param person  the person
@@ -130,26 +131,22 @@ public final class AbilityChoices {
      *       cluster weapon
      */
     public static @Nullable String choiceFor(SpecialAbility ability, Person person) {
-        String name = ability.getName();
         if (!canChooseForEachPerson(ability)) {
             return null;
         }
-        Map<String, Integer> weapons = weaponsOf(person, name.equals(OptionsConstants.GUNNERY_SANDBLASTER));
-        String mostMounted = null;
-        int most = 0;
-        for (Map.Entry<String, Integer> entry : weapons.entrySet()) {
-            if (entry.getValue() > most) {
-                most = entry.getValue();
-                mostMounted = entry.getKey();
+        String name = ability.getName();
+        Map<String, Integer> counts = name.equals(OptionsConstants.GUNNERY_SPECIALIST) ?
+                                            weaponClassesOf(person) :
+                                            weaponsOf(person, name.equals(OptionsConstants.GUNNERY_SANDBLASTER));
+        String most = null;
+        int mostCount = 0;
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() > mostCount) {
+                mostCount = entry.getValue();
+                most = entry.getKey();
             }
         }
-        if (mostMounted == null) {
-            return null;
-        }
-        if (name.equals(OptionsConstants.GUNNERY_SPECIALIST)) {
-            return weaponClassOf(person, mostMounted);
-        }
-        return mostMounted;
+        return most;
     }
 
     /**
@@ -204,26 +201,27 @@ public final class AbilityChoices {
         return weapons;
     }
 
-    private static @Nullable String weaponClassOf(Person person, String weaponName) {
+    /** @return each weapon class on the person's unit, with how many of its weapons belong to it */
+    private static Map<String, Integer> weaponClassesOf(Person person) {
+        Map<String, Integer> classes = new HashMap<>();
         Unit unit = person.getUnit();
         Entity entity = (unit == null) ? null : unit.getEntity();
         if (entity == null) {
-            return null;
+            return classes;
         }
         for (WeaponMounted weapon : entity.getWeaponList()) {
             WeaponType type = weapon.getType();
-            if ((type == null) || !weapon.getName().equals(weaponName)) {
+            if (type == null) {
                 continue;
             }
             if (type.hasFlag(WeaponType.F_ENERGY)) {
-                return Crew.SPECIAL_ENERGY;
+                classes.merge(Crew.SPECIAL_ENERGY, 1, Integer::sum);
             } else if (type.hasFlag(WeaponType.F_MISSILE)) {
-                return Crew.SPECIAL_MISSILE;
+                classes.merge(Crew.SPECIAL_MISSILE, 1, Integer::sum);
             } else if (type.hasFlag(WeaponType.F_BALLISTIC)) {
-                return Crew.SPECIAL_BALLISTIC;
+                classes.merge(Crew.SPECIAL_BALLISTIC, 1, Integer::sum);
             }
-            return null;
         }
-        return null;
+        return classes;
     }
 }

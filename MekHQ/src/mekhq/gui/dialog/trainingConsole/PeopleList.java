@@ -57,8 +57,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.border.Border;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.hud.Hud;
@@ -148,22 +147,7 @@ final class PeopleList extends JPanel {
 
         Hud.styleField(search);
         search.getAccessibleContext().setAccessibleName(getTextAt(RESOURCE_BUNDLE, "people.search"));
-        search.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent event) {
-                onSearch.accept(search.getText());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent event) {
-                onSearch.accept(search.getText());
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent event) {
-                onSearch.accept(search.getText());
-            }
-        });
+        ConsoleWidgets.onTextSettled(search, onSearch);
         JPanel searchRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         searchRow.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "people.search")), BorderLayout.WEST);
         searchRow.add(search, BorderLayout.CENTER);
@@ -320,20 +304,6 @@ final class PeopleList extends JPanel {
         selectAll.setText(getFormattedTextAt(RESOURCE_BUNDLE, "people.selectAll", shown));
     }
 
-    /** Puts the keyboard in the search field. */
-    void focusSearch() {
-        search.requestFocusInWindow();
-    }
-
-    /** Scrolls to a row, if it is shown. */
-    void reveal(PersonEntry entry) {
-        int index = rows().indexOf(entry);
-        if (index >= 0) {
-            list.setSelectedIndex(index);
-            list.ensureIndexIsVisible(index);
-        }
-    }
-
     private static GridBagConstraints constraints(int column, double weight) {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = column;
@@ -370,6 +340,9 @@ final class PeopleList extends JPanel {
         private final JLabel formation = cell(CELL_FONT, TEXT_MUTED);
         private final JLabel experience = cell(CELL_FONT, TEXT);
         private final JLabel xp = cell(CELL_FONT, TEXT);
+        /** The two row borders, made once rather than on every paint: a selected row's, and anyone else's. */
+        private final Border selectedBorder = rowBorder(true);
+        private final Border unselectedBorder = rowBorder(false);
 
         PersonRowRenderer(Predicate<Person> isSelected, Function<Person, Integer> pendingCount,
               Function<Person, Integer> availableXp) {
@@ -387,6 +360,14 @@ final class PeopleList extends JPanel {
             }
         }
 
+        private static Border rowBorder(boolean selected) {
+            return BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+                  BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, selected ? ACCENT : SURFACE_DEEP),
+                        BorderFactory.createEmptyBorder(0, scaleForGUI(8), 0, scaleForGUI(10))));
+        }
+
         private static JLabel cell(Font font, Color color) {
             JLabel label = new JLabel();
             label.setFont(font);
@@ -399,16 +380,11 @@ final class PeopleList extends JPanel {
               int index, boolean selectedInList, boolean cellHasFocus) {
             Person person = entry.person();
             boolean selected = isSelected.test(person);
-            Color background = selected ? SURFACE : SURFACE_DEEP;
-            setBackground(background);
-            setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-                  BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, selected ? ACCENT : background),
-                        BorderFactory.createEmptyBorder(0, scaleForGUI(8), 0, scaleForGUI(10)))));
+            setBackground(selected ? SURFACE : SURFACE_DEEP);
+            setBorder(selected ? selectedBorder : unselectedBorder);
             checkBox.setSelected(selected);
 
-            name.setText(person.getFullTitle());
+            name.setText(entry.title());
 
             role.setText(entry.isPrisoner() ?
                                getFormattedTextAt(RESOURCE_BUNDLE, "people.prisoner", entry.roleName()) :

@@ -32,15 +32,9 @@
  */
 package mekhq.campaign.personnel.training;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
@@ -53,10 +47,10 @@ import mekhq.campaign.personnel.training.TrainingPricer.Quote;
  *
  * <p>Purchases are priced in the order they were staged, each against the person as the purchases before it left
  * them, so XP is never counted twice and a skill trained to level 4 can unlock an ability staged after it. Undoing or
- * removing a step prices everything after it again; anything that no longer fits is dropped.</p>
+ * removing a step prices everything after it again; a purchase that no longer fits is dropped.</p>
  *
- * <p>Training fees are all or nothing: a step is only staged if the campaign can pay the fees of every step staged so
- * far, including it.</p>
+ * <p>Training fees are all or nothing: a step is only staged, and only kept when everything is priced again, if the
+ * campaign can pay the fees of every step staged so far, including it.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -84,18 +78,12 @@ public final class TrainingPlan {
 
         /** @return the step's training fees */
         public Money fees() {
-            Money total = Money.zero();
-            for (StagedPurchase staged : purchases) {
-                total = total.plus(staged.quote().fee());
-            }
-            return total;
+            return feesOf(purchases);
         }
 
         /** @return how many different people the step trains */
         public int peopleCount() {
-            Set<UUID> people = new HashSet<>();
-            purchases.forEach(staged -> people.add(staged.purchase().person().getId()));
-            return people.size();
+            return TrainingPurchase.peopleCount(purchases.stream().map(StagedPurchase::purchase).toList());
         }
     }
 
@@ -119,12 +107,30 @@ public final class TrainingPlan {
         }
     }
 
+    /**
+     * What raising people one step at a time to a target would buy, priced against everything already staged.
+     *
+     * @param purchases the purchases, in order: each person's climb, one person after another
+     * @param people    how many people would be raised at least one step
+     * @param steps     how many steps would be bought
+     * @param xp        their XP cost
+     * @param fees      their training fees
+     * @param stopShort how many people would stop short of the target
+     */
+    public record Climb(List<TrainingPurchase> purchases, int people, int steps, int xp, Money fees,
+          int stopShort) {}
+
     private final TrainingContext context;
     private final Money funds;
     private final List<Step> steps = new ArrayList<>();
     private final Map<UUID, PersonProjection> projections = new HashMap<>();
+    /** The people with anything staged, in the order they were first trained. */
+    private final Set<UUID> changed = new LinkedHashSet<>();
     private int totalXp;
     private Money totalFees = Money.zero();
+    private int revision;
+    /** How many single purchases the last successful {@link #replayOnce()} dropped. */
+    private int droppedByLastReplay;
 
     /**
      * @param context the campaign settings that price the training
@@ -141,12 +147,44 @@ public final class TrainingPlan {
     }
 
     /**
+     * @return a number that changes whenever anything staged changes, so callers can tell when what they worked out
+     *       from the plan is out of date
+     */
+    public int revision() {
+        return revision;
+    }
+
+    /**
      * @param person a person
      *
      * @return the person as they will be once everything staged is applied
      */
     public PersonProjection projectionOf(Person person) {
         return projections.computeIfAbsent(person.getId(), id -> new PersonProjection(person));
+    }
+
+    /**
+     * As {@link #projectionOf(Person)}, without making a projection for someone the plan hasn't priced yet; for
+     * reading a whole roster without filling the plan with empty projections.
+     *
+     * @param person a person
+     *
+     * @return the person's projection, or {@code null} if nothing has priced anything for them
+     */
+    public @Nullable PersonProjection peek(Person person) {
+        return projections.get(person.getId());
+    }
+
+    /** @return the person's XP once everything staged for them is paid for */
+    public int availableXpOf(Person person) {
+        PersonProjection projection = peek(person);
+        return (projection == null) ? person.getXP() : projection.availableXp();
+    }
+
+    /** @return how many purchases are staged for the person */
+    public int purchaseCountOf(Person person) {
+        PersonProjection projection = peek(person);
+        return (projection == null) ? 0 : projection.purchaseCount();
     }
 
     /**
@@ -173,25 +211,32 @@ public final class TrainingPlan {
     public StageResult stage(String label, List<? extends TrainingPurchase> purchases) {
         Map<TrainingRefusal, Integer> refused = new EnumMap<>(TrainingRefusal.class);
         List<StagedPurchase> staged = new ArrayList<>();
-        Money batchFees = Money.zero();
+        // Each person's projection as it was before this batch, so a refused batch can be undone without pricing
+        // the whole plan again; null for someone who had none
+        Map<UUID, PersonProjection> before = new HashMap<>();
         for (TrainingPurchase purchase : purchases) {
+            UUID id = purchase.person().getId();
+            if (!before.containsKey(id)) {
+                PersonProjection existing = projections.get(id);
+                before.put(id, (existing == null) ? null : existing.copy());
+            }
             Quote quote = quote(purchase);
             if (!quote.isAllowed()) {
                 refused.merge(quote.refusal(), 1, Integer::sum);
                 continue;
             }
-            TrainingPricer.apply(projectionOf(purchase.person()), purchase, quote);
+            record(purchase, quote);
             staged.add(new StagedPurchase(purchase, quote));
-            batchFees = batchFees.plus(quote.fee());
         }
         if (staged.isEmpty()) {
+            restore(before);
             return new StageResult(null, refused, Money.zero());
         }
 
-        Money needed = totalFees.plus(batchFees);
+        Money needed = totalFees.plus(feesOf(staged));
         if (needed.isGreaterThan(funds)) {
             // Training is all or nothing: put the projections back as they were before this batch
-            replay();
+            restore(before);
             Map<TrainingRefusal, Integer> allRefused = new EnumMap<>(TrainingRefusal.class);
             allRefused.put(TrainingRefusal.NOT_ENOUGH_FUNDS, purchases.size());
             return new StageResult(null, allRefused, needed.minus(funds));
@@ -201,7 +246,47 @@ public final class TrainingPlan {
         steps.add(step);
         totalXp += step.xp();
         totalFees = needed;
+        revision++;
         return new StageResult(step, refused, Money.zero());
+    }
+
+    /**
+     * Stages, as one step, purchases a planner has already priced against this plan as it stands now, without
+     * pricing them again. Refused if the campaign can't pay their fees.
+     *
+     * @param label  what the step buys
+     * @param priced the purchases and their prices, in order
+     *
+     * @return {@code true} if they were staged
+     */
+    boolean stagePriced(String label, List<StagedPurchase> priced) {
+        if (priced.isEmpty() || totalFees.plus(feesOf(priced)).isGreaterThan(funds)) {
+            return false;
+        }
+        for (StagedPurchase staged : priced) {
+            record(staged.purchase(), staged.quote());
+        }
+        Step step = new Step(label, List.copyOf(priced));
+        steps.add(step);
+        totalXp += step.xp();
+        totalFees = totalFees.plus(step.fees());
+        revision++;
+        return true;
+    }
+
+    private void restore(Map<UUID, PersonProjection> before) {
+        for (Map.Entry<UUID, PersonProjection> entry : before.entrySet()) {
+            PersonProjection projection = entry.getValue();
+            if (projection == null) {
+                projections.remove(entry.getKey());
+                changed.remove(entry.getKey());
+            } else {
+                projections.put(entry.getKey(), projection);
+                if (projection.purchaseCount() == 0) {
+                    changed.remove(entry.getKey());
+                }
+            }
+        }
     }
 
     /**
@@ -237,36 +322,76 @@ public final class TrainingPlan {
     }
 
     /**
-     * Prices every step again from scratch, in order, dropping purchases that no longer fit and steps left empty.
+     * Prices every step again from scratch, in order. A purchase that no longer fits is dropped, and so is a step left
+     * empty. A step whose fees the campaign can no longer pay is dropped whole, as training fees are all or nothing.
      *
      * @return how many purchases were dropped
      */
     private int replay() {
+        int dropped = 0;
+        while (true) {
+            int unaffordable = replayOnce();
+            if (unaffordable < 0) {
+                break;
+            }
+            // Drop the step and price everything again, as the steps after it may now fit
+            dropped += steps.remove(unaffordable).purchases().size();
+        }
+        revision++;
+        return dropped + droppedByLastReplay;
+    }
+
+    /**
+     * @return the position of the first step whose fees can't be paid, in which case the steps are left as they were;
+     *       or {@code -1} once every step has been priced again and the steps replaced by what still fits
+     */
+    private int replayOnce() {
         projections.clear();
+        changed.clear();
         totalXp = 0;
         totalFees = Money.zero();
-        int dropped = 0;
+        droppedByLastReplay = 0;
         List<Step> kept = new ArrayList<>();
-        for (Step step : steps) {
+        for (int index = 0; index < steps.size(); index++) {
+            Step step = steps.get(index);
             List<StagedPurchase> purchases = new ArrayList<>();
             for (StagedPurchase staged : step.purchases()) {
                 Quote quote = quote(staged.purchase());
-                if (quote.isAllowed() && !totalFees.plus(quote.fee()).isGreaterThan(funds)) {
-                    TrainingPricer.apply(projectionOf(staged.purchase().person()), staged.purchase(), quote);
+                if (quote.isAllowed()) {
+                    record(staged.purchase(), quote);
                     purchases.add(new StagedPurchase(staged.purchase(), quote));
-                    totalXp += quote.xp();
-                    totalFees = totalFees.plus(quote.fee());
                 } else {
-                    dropped++;
+                    droppedByLastReplay++;
                 }
             }
+            Money stepFees = feesOf(purchases);
+            if (totalFees.plus(stepFees).isGreaterThan(funds)) {
+                return index;
+            }
             if (!purchases.isEmpty()) {
-                kept.add(new Step(step.label(), List.copyOf(purchases)));
+                Step repriced = new Step(step.label(), List.copyOf(purchases));
+                kept.add(repriced);
+                totalXp += repriced.xp();
+                totalFees = totalFees.plus(stepFees);
             }
         }
         steps.clear();
         steps.addAll(kept);
-        return dropped;
+        return -1;
+    }
+
+    /** Records an allowed purchase against the person, without touching the plan's totals. */
+    private void record(TrainingPurchase purchase, Quote quote) {
+        TrainingPricer.apply(projectionOf(purchase.person()), purchase, quote);
+        changed.add(purchase.person().getId());
+    }
+
+    private static Money feesOf(List<StagedPurchase> purchases) {
+        Money total = Money.zero();
+        for (StagedPurchase staged : purchases) {
+            total = total.plus(staged.quote().fee());
+        }
+        return total;
     }
 
     /** @return the staged steps, in order */
@@ -318,37 +443,100 @@ public final class TrainingPlan {
         return fees;
     }
 
-    /** @return the people with anything staged, as they will be */
-    public List<PersonProjection> changedPeople() {
-        return projections.values().stream().filter(projection -> projection.purchaseCount() > 0).toList();
+    /** @return how many people have anything staged */
+    public int changedPeopleCount() {
+        return changed.size();
     }
 
     /**
      * @return a copy of this plan, with the same steps staged, that can be changed without changing this one; used to
-     *       try out a plan before staging it
+     *       try out purchases before staging them
      */
     public TrainingPlan copy() {
         TrainingPlan copy = new TrainingPlan(context, funds);
         copy.steps.addAll(steps);
-        copy.replay();
+        for (Map.Entry<UUID, PersonProjection> entry : projections.entrySet()) {
+            copy.projections.put(entry.getKey(), entry.getValue().copy());
+        }
+        copy.changed.addAll(changed);
+        copy.totalXp = totalXp;
+        copy.totalFees = totalFees;
         return copy;
     }
 
     /**
-     * Stages one purchase on its own, without making it a step; for planners working on a {@link #copy()}.
+     * @param quote an allowed quote
+     *
+     * @return {@code true} if the campaign can pay its fee on top of everything already staged
+     */
+    boolean fits(Quote quote) {
+        return !totalFees.plus(quote.fee()).isGreaterThan(funds);
+    }
+
+    /**
+     * Records one purchase that has just been quoted against this plan and allowed, without making it a step; for
+     * planners trying purchases out on a {@link #copy()}.
      *
      * @param purchase the purchase
-     *
-     * @return its quote; if allowed, it has been recorded against the person
+     * @param quote    its allowed quote, which the caller has checked {@link #fits}
      */
-    Quote tryApply(TrainingPurchase purchase) {
-        Quote quote = quote(purchase);
-        if (quote.isAllowed() && !totalFees.plus(quote.fee()).isGreaterThan(funds)) {
-            TrainingPricer.apply(projectionOf(purchase.person()), purchase, quote);
-            totalXp += quote.xp();
-            totalFees = totalFees.plus(quote.fee());
-            return quote;
+    void applyQuoted(TrainingPurchase purchase, Quote quote) {
+        record(purchase, quote);
+        totalXp += quote.xp();
+        totalFees = totalFees.plus(quote.fee());
+        revision++;
+    }
+
+    /**
+     * Works out what raising people one step at a time to a target would buy, against everything already staged,
+     * without staging anything: each person is raised until they reach the target, run out of XP, hit a limit, or the
+     * fees can no longer be paid.
+     *
+     * @param people      the people to raise
+     * @param purchaseFor the purchase that raises a person one step
+     * @param level       how far a person has been raised, read from their projection
+     * @param target      the level to raise them to
+     *
+     * @return what would be bought
+     */
+    public Climb previewClimb(Collection<Person> people, Function<Person, ? extends TrainingPurchase> purchaseFor,
+          ToIntFunction<PersonProjection> level, int target) {
+        TrainingPlan trial = copy();
+        List<TrainingPurchase> purchases = new ArrayList<>();
+        int raised = 0;
+        int bought = 0;
+        int xp = 0;
+        Money fees = Money.zero();
+        int stopShort = 0;
+        for (Person person : people) {
+            PersonProjection projection = trial.projectionOf(person);
+            boolean isRaised = false;
+            int current = level.applyAsInt(projection);
+            while (current < target) {
+                TrainingPurchase purchase = purchaseFor.apply(person);
+                Quote quote = trial.quote(purchase);
+                if (!quote.isAllowed() || !trial.fits(quote)) {
+                    stopShort++;
+                    break;
+                }
+                trial.applyQuoted(purchase, quote);
+                int next = level.applyAsInt(projection);
+                if (next <= current) {
+                    // A purchase that doesn't raise the level would never reach the target
+                    stopShort++;
+                    break;
+                }
+                current = next;
+                purchases.add(purchase);
+                bought++;
+                xp += quote.xp();
+                fees = fees.plus(quote.fee());
+                isRaised = true;
+            }
+            if (isRaised) {
+                raised++;
+            }
         }
-        return quote.isAllowed() ? quote.refusedFor(TrainingRefusal.NOT_ENOUGH_FUNDS) : quote;
+        return new Climb(List.copyOf(purchases), raised, bought, xp, fees, stopShort);
     }
 }

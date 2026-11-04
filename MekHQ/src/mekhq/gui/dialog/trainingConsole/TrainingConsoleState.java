@@ -41,6 +41,7 @@ import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.training.AutoTrainSettings;
 
 /**
  * What the player has chosen in the Training Console: the page, the selection, the filters, and each page's own
@@ -120,7 +121,6 @@ final class TrainingConsoleState {
     String abilityQuery = "";
     @Nullable String openAbility;
     final Map<String, String> abilityChoices = new HashMap<>();
-    boolean isIncludePrerequisites;
 
     // Attributes & Traits page
     AttributeGroup attributeGroup = AttributeGroup.ATTRIBUTES;
@@ -131,6 +131,9 @@ final class TrainingConsoleState {
     final Map<String, Integer> attributeTargets = new HashMap<>();
 
     // Auto-train page
-    @Nullable AutoTrainPage.Draft autoTrain;
+    /** The auto-train settings being edited. */
+    @Nullable AutoTrainSettings.Builder autoTrain;
+    /** What the player has typed as a preset's name but not yet saved, kept across redraws. */
+    @Nullable String presetNameText;
     @Nullable Integer openStep;
 }

@@ -130,8 +130,7 @@ class SkillTrainingCostsTest {
     }
 
     private Money cost(Person person, boolean isRoleSkill) {
-        return SkillTrainingCosts.getSkillImprovementCost(campaign, person, SKILL_NAME, isRoleSkill,
-              skillModifierData);
+        return SkillTrainingCosts.getSkillImprovementCost(campaign, person, SKILL_NAME, isRoleSkill);
     }
 
     private static Money supportPoints(int supportPoints) {

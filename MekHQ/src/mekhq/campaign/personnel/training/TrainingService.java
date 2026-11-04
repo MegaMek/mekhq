@@ -39,14 +39,18 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.PerformanceLogger;
@@ -54,7 +58,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.training.TrainingPlan.StagedPurchase;
 import mekhq.campaign.personnel.training.TrainingPlan.Step;
@@ -69,12 +72,13 @@ import mekhq.campaign.personnel.training.TrainingPurchase.TraitChange;
 
 /**
  * Applies a {@link TrainingPlan} to the campaign: spends the XP, pays the training fees, and raises the skills,
- * abilities, attributes and traits, the same way the Spend XP menu does, logging each change in the person's log and
+ * abilities, attributes and traits, the same way the Spend XP menu did, logging each change in the person's log and
  * one line per step in the daily report.
  *
  * <p>Nothing is applied unless the campaign can pay every training fee in the plan. Each purchase is priced again as
  * it is applied, from the person as they are by then; a purchase that no longer fits, because something changed the
- * person since it was staged, is skipped and counted.</p>
+ * person since it was staged or its fee would take the campaign past its funds, is skipped and counted. Fees are paid
+ * as one transaction per step and fee category, rather than one per person.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -82,7 +86,6 @@ import mekhq.campaign.personnel.training.TrainingPurchase.TraitChange;
 public final class TrainingService {
     private static final MMLogger LOGGER = MMLogger.create(TrainingService.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TrainingConsole";
-    private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private TrainingService() {
     }
@@ -107,7 +110,8 @@ public final class TrainingService {
      * @return what was applied
      */
     public static CommitReport commit(Campaign campaign, TrainingPlan plan) {
-        Money balance = campaign.getPlayerForce().getFinances().getBalance();
+        Finances finances = campaign.getPlayerForce().getFinances();
+        Money balance = finances.getBalance();
         if (plan.totalFees().isGreaterThan(balance)) {
             campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "report.refusedFunds",
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
@@ -116,6 +120,7 @@ public final class TrainingService {
         }
 
         TrainingContext context = new TrainingContext(campaign);
+        LocalDate today = context.today();
         Set<Person> changed = new LinkedHashSet<>();
         int applied = 0;
         int skipped = 0;
@@ -123,23 +128,40 @@ public final class TrainingService {
         Money feesPaid = Money.zero();
         for (Step step : plan.steps()) {
             Set<Person> trainedThisStep = new HashSet<>();
+            Map<TrainingFeeCategory, Money> stepFees = new EnumMap<>(TrainingFeeCategory.class);
+            Money stepTotal = Money.zero();
             for (StagedPurchase staged : step.purchases()) {
                 TrainingPurchase purchase = staged.purchase();
                 Person person = purchase.person();
                 // The person is as earlier purchases left them, so a fresh projection prices this one correctly
                 Quote quote = TrainingPricer.quote(context, new PersonProjection(person), purchase);
-                if (!quote.isAllowed() || !applyPurchase(campaign, context, purchase, quote)) {
+                boolean isAffordable = !feesPaid.plus(stepTotal).plus(quote.fee()).isGreaterThan(balance);
+                if (!quote.isAllowed() || !isAffordable || !applyPurchase(campaign, context, purchase, quote)) {
                     LOGGER.info("Skipped training for {}: {} ({})", person.getFullName(), purchase,
-                          quote.isAllowed() ? "payment failed" : quote.refusal());
+                          !quote.isAllowed() ? quote.refusal() : (isAffordable ? "nothing to change" : "fees"));
                     skipped++;
                     continue;
                 }
                 applied++;
                 xpSpent += quote.xp();
-                feesPaid = feesPaid.plus(quote.fee());
+                if (!quote.fee().isZero()) {
+                    stepTotal = stepTotal.plus(quote.fee());
+                    stepFees.merge(Objects.requireNonNullElse(quote.feeCategory(), TrainingFeeCategory.OTHER),
+                          quote.fee(), Money::plus);
+                }
                 changed.add(person);
                 trainedThisStep.add(person);
             }
+            for (Map.Entry<TrainingFeeCategory, Money> fee : stepFees.entrySet()) {
+                // Never more than the balance checked above, so the debit goes through
+                if (!finances.debit(TransactionType.EDUCATION, today, fee.getValue(),
+                      getFormattedTextAt(RESOURCE_BUNDLE, "transaction.fees", step.label(),
+                            fee.getKey().getLabel()))) {
+                    LOGGER.error("Training fees of {} for {} could not be paid",
+                          fee.getValue().toAmountAndSymbolString(), step.label());
+                }
+            }
+            feesPaid = feesPaid.plus(stepTotal);
             if (!trainedThisStep.isEmpty()) {
                 campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "report.step", step.label(),
                       trainedThisStep.size()));
@@ -157,9 +179,10 @@ public final class TrainingService {
     }
 
     /**
-     * Applies one purchase that has just been priced and allowed.
+     * Applies one purchase that has just been priced and allowed. Its training fee is paid by the caller, with the
+     * rest of its step's.
      *
-     * @return {@code false} if the training fee couldn't be paid, in which case nothing changed
+     * @return {@code false} if there was nothing to change, in which case nothing changed
      */
     private static boolean applyPurchase(Campaign campaign, TrainingContext context, TrainingPurchase purchase,
           Quote quote) {
@@ -168,10 +191,6 @@ public final class TrainingService {
         switch (purchase) {
             case SkillImprovement improvement -> {
                 String skillName = improvement.skillName();
-                // Priced from the current level, so it is paid before the skill is improved
-                if (!SkillTrainingCosts.payForSkillImprovement(campaign, person, skillName, quote.fee())) {
-                    return false;
-                }
                 Skill skill = person.getSkill(skillName);
                 if (skill != null) {
                     // The progress already came off the price, so it's used up
@@ -195,18 +214,12 @@ public final class TrainingService {
                       aptitude.skillName());
             }
             case AbilityPurchase ability -> {
-                String displayName = abilityDisplayName(ability.abilityName(), ability.choice());
-                if (!quote.fee().isZero() && !campaign.getPlayerForce().getFinances()
-                                                      .debit(TransactionType.EDUCATION, today, quote.fee(),
-                                                            getFormattedTextAt(GUI_RESOURCE_BUNDLE,
-                                                                  "spaTraining.transaction", person.getFullTitle(),
-                                                                  displayName))) {
-                    return false;
-                }
+                // Abilities this one replaces are taken away with no XP back, as the projection priced it
                 Object value = (ability.choice() == null) ? Boolean.TRUE : ability.choice();
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ability.abilityName(), value);
                 person.spendXP(quote.xp());
-                PerformanceLogger.gainedSPA(campaign, person, today, displayName);
+                PerformanceLogger.gainedSPA(campaign, person, today,
+                      abilityDisplayName(ability.abilityName(), ability.choice()));
             }
             case FlawBuyOff buyOff -> {
                 IOption option = person.getOptions().getOption(buyOff.abilityName());
@@ -230,16 +243,8 @@ public final class TrainingService {
             }
             case TraitChange change -> {
                 int target = TrainingPricer.traitLevel(person, change.trait()) + change.delta();
-                switch (change.trait()) {
-                    case CONNECTIONS -> person.setConnections(target);
-                    case FAME -> person.setFame(target);
-                    case WEALTH -> person.setWealth(target);
-                    case EXTRA_INCOME -> person.setExtraIncomeFromTraitLevel(target);
-                    case UNLUCKY -> person.setUnlucky(target);
-                    case BLOODMARK -> person.setBloodmark(target);
-                    default -> {
-                        return false;
-                    }
+                if (!TrainingPricer.setTraitLevel(person, change.trait(), target)) {
+                    return false;
                 }
                 person.spendXP(quote.xp());
             }

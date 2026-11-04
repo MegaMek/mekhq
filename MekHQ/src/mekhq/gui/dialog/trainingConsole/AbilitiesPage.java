@@ -43,7 +43,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -54,11 +60,9 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import jakarta.annotation.Nullable;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.training.AbilityChoices;
-import mekhq.campaign.personnel.training.PersonProjection;
 import mekhq.campaign.personnel.training.TrainingPlan;
 import mekhq.campaign.personnel.training.TrainingPricer.Quote;
 import mekhq.campaign.personnel.training.TrainingPurchase;
@@ -90,21 +94,12 @@ final class AbilitiesPage {
 
     /** What the selection can do with one ability. */
     private static final class AbilityStats {
-        int ready;
-        int shortXp;
-        int held;
-        int xp;
-        int minXp = Integer.MAX_VALUE;
-        int maxXp = Integer.MIN_VALUE;
-        Money fees = Money.zero();
-        final List<Person> readyPeople = new ArrayList<>();
-        final List<Person> shortPeople = new ArrayList<>();
-        final List<Person> heldPeople = new ArrayList<>();
-        final Map<TrainingRefusal, List<Person>> blocked = new EnumMap<>(TrainingRefusal.class);
+        final QuoteTally tally = new QuoteTally();
+        /** The values the ability resolves to for those who can take it, with how many take each. */
         final Map<String, Integer> choices = new LinkedHashMap<>();
 
         int total() {
-            return ready + shortXp + held + blocked.values().stream().mapToInt(List::size).sum();
+            return tally.ready() + tally.cannotCount();
         }
     }
 
@@ -116,6 +111,7 @@ final class AbilitiesPage {
         String query = state.abilityQuery.trim().toLowerCase(Locale.ROOT);
         List<SpecialAbility> abilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
         abilities.sort(Comparator.comparing(SpecialAbility::getDisplayName));
+        boolean isBuyOff = state.abilityGroup == AbilityGroup.BUY_OFF;
 
         List<JComponent> cards = new ArrayList<>();
         for (SpecialAbility ability : abilities) {
@@ -123,16 +119,17 @@ final class AbilitiesPage {
                       || (!query.isEmpty() && !ability.getDisplayName().toLowerCase(Locale.ROOT).contains(query))) {
                 continue;
             }
-            AbilityStats stats = statsFor(console, ability, selection);
-            if ((state.abilityGroup == AbilityGroup.BUY_OFF) && (stats.total() == 0)) {
+            // What the tally holds depends on whether flaws are being bought off and on the chosen value
+            String key = "abilities.stats." + ability.getName() + '|' + isBuyOff + '|' + choiceSetting(state, ability);
+            AbilityStats stats = console.cached(key, () -> statsFor(console, ability, selection));
+            if (isBuyOff && (stats.total() == 0)) {
                 // Only flaws someone selected has can be bought off
                 continue;
             }
             cards.add(card(console, ability, stats, selection));
         }
         if (cards.isEmpty()) {
-            cards.add(Hud.notice(getTextAt(RESOURCE_BUNDLE, (state.abilityGroup == AbilityGroup.BUY_OFF) ?
-                                                                  "abilities.none.buyOff" : "abilities.none")));
+            cards.add(Hud.notice(getTextAt(RESOURCE_BUNDLE, isBuyOff ? "abilities.none.buyOff" : "abilities.none")));
         }
         return cards;
     }
@@ -181,30 +178,14 @@ final class AbilitiesPage {
         for (Person person : selection) {
             TrainingPurchase purchase = purchaseFor(console, ability, person);
             Quote quote = plan.quote(purchase);
-            if (quote.isAllowed()) {
-                stats.ready++;
-                stats.readyPeople.add(person);
-                stats.xp += quote.xp();
-                stats.minXp = Math.min(stats.minXp, quote.xp());
-                stats.maxXp = Math.max(stats.maxXp, quote.xp());
-                stats.fees = stats.fees.plus(quote.fee());
-                if ((purchase instanceof AbilityPurchase abilityPurchase) && (abilityPurchase.choice() != null)) {
-                    stats.choices.merge(abilityPurchase.choice(), 1, Integer::sum);
-                }
+            if (isBuyOff && (quote.refusal() == TrainingRefusal.NOT_HELD)) {
+                // Only those with the flaw are counted when buying it off
                 continue;
             }
-            TrainingRefusal refusal = quote.refusal();
-            if (isBuyOff && (refusal == TrainingRefusal.NOT_HELD)) {
-                continue;
-            }
-            if (refusal == TrainingRefusal.NOT_ENOUGH_XP) {
-                stats.shortXp++;
-                stats.shortPeople.add(person);
-            } else if (refusal == TrainingRefusal.ALREADY_HELD) {
-                stats.held++;
-                stats.heldPeople.add(person);
-            } else {
-                stats.blocked.computeIfAbsent(refusal, key -> new ArrayList<>()).add(person);
+            stats.tally.add(purchase, quote);
+            if (quote.isAllowed() && (purchase instanceof AbilityPurchase abilityPurchase)
+                      && (abilityPurchase.choice() != null)) {
+                stats.choices.merge(abilityPurchase.choice(), 1, Integer::sum);
             }
         }
         return stats;
@@ -213,6 +194,7 @@ final class AbilitiesPage {
     private static JComponent card(TrainingConsole console, SpecialAbility ability, AbilityStats stats,
           List<Person> selection) {
         TrainingConsoleState state = console.state();
+        QuoteTally tally = stats.tally;
         boolean isOpen = ability.getName().equals(state.openAbility);
         AbilityGroup group = state.abilityGroup;
         boolean isBuyOff = group == AbilityGroup.BUY_OFF;
@@ -230,39 +212,27 @@ final class AbilitiesPage {
         if (group == AbilityGroup.CHARACTER) {
             tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "abilities.tag.gm"), AMBER));
         }
-        if (!stats.fees.isZero()) {
+        if (!tally.fees().isZero()) {
             tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "skills.tag.fee"), AMBER));
         }
 
-        int blockedCount = stats.blocked.values().stream().mapToInt(List::size).sum();
+        int shortXp = tally.count(TrainingRefusal.NOT_ENOUGH_XP);
+        int held = tally.count(TrainingRefusal.ALREADY_HELD);
         List<Segment> segments = List.of(
-              new Segment(ConsoleWidgets.READY_COLOR, stats.ready, getTextAt(RESOURCE_BUNDLE,
+              new Segment(ConsoleWidgets.READY_COLOR, tally.ready(), getTextAt(RESOURCE_BUNDLE,
                     isBuyOff ? "abilities.legend.buyOff" : "abilities.legend.ready")),
-              new Segment(ConsoleWidgets.SHORT_COLOR, stats.shortXp, getTextAt(RESOURCE_BUNDLE,
-                    "skills.legend.short")),
-              new Segment(ConsoleWidgets.HELD_COLOR, stats.held, getTextAt(RESOURCE_BUNDLE,
-                    "abilities.legend.held")),
-              new Segment(ConsoleWidgets.BLOCKED_COLOR, blockedCount, getTextAt(RESOURCE_BUNDLE,
-                    "abilities.legend.blocked")));
+              new Segment(ConsoleWidgets.SHORT_COLOR, shortXp, getTextAt(RESOURCE_BUNDLE, "skills.legend.short")),
+              new Segment(ConsoleWidgets.HELD_COLOR, held, getTextAt(RESOURCE_BUNDLE, "abilities.legend.held")),
+              new Segment(ConsoleWidgets.BLOCKED_COLOR, tally.cannotCount() - shortXp - held,
+                    getTextAt(RESOURCE_BUNDLE, "abilities.legend.blocked")));
 
         String verbKey = isBuyOff ? "abilities.buyOff" : (isTakingFlaw ? "abilities.take" : "abilities.grant");
-        HudButton grant = new HudButton(ConsoleWidgets.countedLabel(verbKey + ".plain", verbKey, stats.ready)
-                                              .toUpperCase(Locale.ROOT), true, true);
-        boolean isAffordable = !stats.fees.isGreaterThan(console.plan().fundsLeft());
-        boolean canChainPrerequisites = state.isIncludePrerequisites
-                                              && stats.blocked.containsKey(TrainingRefusal.NOT_ELIGIBLE)
-                                              && !ability.getPrereqAbilities().isEmpty();
-        grant.setArmed(((stats.ready > 0) || canChainPrerequisites) && isAffordable);
+        boolean isAffordable = !tally.fees().isGreaterThan(console.plan().fundsLeft());
+        HudButton grant = ConsoleWidgets.button(ConsoleWidgets.countedLabel(verbKey + ".plain", verbKey,
+              tally.ready()), true, (tally.ready() > 0) && isAffordable, () -> stageAbility(console, ability, tally));
         grant.setToolTipText(isAffordable ? null : getTextAt(RESOURCE_BUNDLE, "fees.cannotAfford"));
-        grant.addActionListener(event -> stageAbility(console, ability, stats, selection));
-        String xpLine = "";
-        if (stats.ready > 0) {
-            xpLine = (stats.xp < 0) ?
-                           getFormattedTextAt(RESOURCE_BUNDLE, "xp.gained", -stats.xp) :
-                           getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", stats.xp);
-        }
-        JComponent action = ConsoleWidgets.actionColumn(grant, xpLine, ConsoleWidgets.money(stats.fees),
-              grant.isArmed() ? null : unavailableReason(stats, isAffordable));
+        JComponent action = ConsoleWidgets.actionColumn(grant, tally.xpLine(), ConsoleWidgets.money(tally.fees()),
+              tally.unavailableReason(isAffordable));
 
         CatalogCard card = new CatalogCard(ability.getDisplayName(), tags, "",
               new StackedBar(segments), action, isOpen, () -> {
@@ -285,72 +255,24 @@ final class AbilitiesPage {
         if (needsChoice) {
             card.addToBody(choicePicker(console, ability, stats, selection));
         }
-        if (stats.ready > 0) {
-            String cost = (stats.minXp == stats.maxXp) ?
-                                getFormattedTextAt(RESOURCE_BUNDLE, "abilities.cost.single", stats.minXp) :
-                                getFormattedTextAt(RESOURCE_BUNDLE, "abilities.cost.range", stats.minXp,
-                                      stats.maxXp);
-            card.addToBody(ConsoleWidgets.label(cost, 0.84f, TEXT_MUTED));
-            if (!stats.fees.isZero()) {
+        if (tally.ready() > 0) {
+            card.addToBody(ConsoleWidgets.label(tally.costText("abilities.cost.single", "abilities.cost.range"),
+                  0.84f, TEXT_MUTED));
+            if (!tally.fees().isZero()) {
                 card.addToBody(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.fees",
-                      stats.fees.toAmountAndSymbolString()), 0.84f, AMBER));
+                      tally.fees().toAmountAndSymbolString()), 0.84f, AMBER));
             }
-        }
-        if (stats.ready > 0) {
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE,
-                  isBuyOff ? "abilities.line.canBuyOff" : "abilities.line.can", stats.ready),
-                  getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(stats.readyPeople)));
+                  isBuyOff ? "abilities.line.canBuyOff" : "abilities.line.can", tally.ready()),
+                  getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(tally.readyPeople())));
         }
-        Map<TrainingRefusal, List<Person>> cannot = new EnumMap<>(stats.blocked);
-        cannot.put(TrainingRefusal.NOT_ENOUGH_XP, stats.shortPeople);
-        cannot.put(TrainingRefusal.ALREADY_HELD, stats.heldPeople);
-        ConsoleWidgets.cannotLines(cannot, console::toggle).forEach(card::addToBody);
+        ConsoleWidgets.cannotLines(tally.cannot(), console::toggle).forEach(card::addToBody);
         return card;
     }
 
-    /** @return why no one selected can take the ability: the most common reason, with how many it stops */
-    private static String unavailableReason(AbilityStats stats, boolean isAffordable) {
-        if (!isAffordable) {
-            return getTextAt(RESOURCE_BUNDLE, "fees.cannotAfford.short");
-        }
-        TrainingRefusal top = TrainingRefusal.NOT_ENOUGH_XP;
-        int most = stats.shortXp;
-        if (stats.held > most) {
-            top = TrainingRefusal.ALREADY_HELD;
-            most = stats.held;
-        }
-        for (Map.Entry<TrainingRefusal, List<Person>> entry : stats.blocked.entrySet()) {
-            if (entry.getValue().size() > most) {
-                top = entry.getKey();
-                most = entry.getValue().size();
-            }
-        }
-        return ConsoleWidgets.reason(most, top);
-    }
-
-    /** Stages the ability for everyone who can take it, and its missing prerequisites first if the player asked. */
-    private static void stageAbility(TrainingConsole console, SpecialAbility ability, AbilityStats stats,
-          List<Person> selection) {
+    /** Stages the ability for everyone who can take it. */
+    private static void stageAbility(TrainingConsole console, SpecialAbility ability, QuoteTally tally) {
         TrainingConsoleState state = console.state();
-        List<TrainingPurchase> purchases = new ArrayList<>();
-        Set<Person> people = new HashSet<>(stats.readyPeople);
-        Set<Person> needingPrerequisites = state.isIncludePrerequisites ?
-                                                 new HashSet<>(stats.blocked.getOrDefault(TrainingRefusal.NOT_ELIGIBLE,
-                                                       List.of())) :
-                                                 Set.of();
-        for (Person person : selection) {
-            if (people.contains(person)) {
-                purchases.add(purchaseFor(console, ability, person));
-            } else if (needingPrerequisites.contains(person)) {
-                PersonProjection projection = console.plan().projectionOf(person);
-                for (String required : ability.getPrereqAbilities()) {
-                    if (!projection.hasAbility(required)) {
-                        purchases.add(new AbilityPurchase(person, required, null));
-                    }
-                }
-                purchases.add(purchaseFor(console, ability, person));
-            }
-        }
         String summary = choiceSummary(state, ability);
         String name = (summary == null) ? ability.getDisplayName() :
                             getFormattedTextAt(RESOURCE_BUNDLE, "abilities.step.withChoice", ability.getDisplayName(),
@@ -360,7 +282,7 @@ final class AbilitiesPage {
             case FLAWS -> "abilities.step.take";
             default -> "abilities.step.grant";
         };
-        console.stage(getFormattedTextAt(RESOURCE_BUNDLE, key, name), purchases);
+        console.stage(getFormattedTextAt(RESOURCE_BUNDLE, key, name), tally.purchases());
     }
 
     private static @Nullable String choiceSummary(TrainingConsoleState state, SpecialAbility ability) {
@@ -379,7 +301,9 @@ final class AbilitiesPage {
         String current = choiceSetting(state, ability);
         JComboBox<String> picker = new JComboBox<>();
         picker.addItem(AbilityChoices.canChooseForEachPerson(ability) ? TrainingConsoleState.CHOOSE_FOR_EACH : "");
-        for (String choice : AbilityChoices.sharedChoices(ability, selection)) {
+        List<String> choices = console.cached("abilities.choices." + ability.getName(),
+              () -> AbilityChoices.sharedChoices(ability, selection));
+        for (String choice : choices) {
             picker.addItem(choice);
         }
         picker.setSelectedItem(current);

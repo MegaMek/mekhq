@@ -57,14 +57,18 @@ import mekhq.utilities.spaUtilities.SpaUtilities;
  */
 public final class PersonProjection {
     private final Person person;
-    /** Copies of every skill training has changed or added, at their staged levels. */
-    private final Map<String, Skill> skills = new HashMap<>();
-    private final Set<String> aptitudes = new HashSet<>();
+    /** Copies of every skill training has changed or added, at their staged levels. Never changed once stored. */
+    private final Map<String, Skill> skills;
+    private final Set<String> aptitudes;
     /** Abilities gained, with their chosen values ({@code ""} for an ability without one), in the order staged. */
-    private final Map<String, String> gainedAbilities = new LinkedHashMap<>();
-    private final Set<String> removedFlaws = new HashSet<>();
-    private final Map<SkillAttribute, Integer> attributeChanges = new EnumMap<>(SkillAttribute.class);
-    private final Map<ATOWTraits, Integer> traitChanges = new EnumMap<>(ATOWTraits.class);
+    private final Map<String, String> gainedAbilities;
+    /**
+     * Abilities training takes away: flaws bought off, and abilities a gained ability replaces. A replaced ability is
+     * simply lost, as it is when the ability is gained for real; its XP is not refunded.
+     */
+    private final Set<String> removedAbilities;
+    private final Map<SkillAttribute, Integer> attributeChanges;
+    private final Map<ATOWTraits, Integer> traitChanges;
     private boolean isEdgeRefilled;
     /** The skills at their staged levels, built when first asked for and rebuilt after a skill changes. */
     private @Nullable Skills projectedSkills;
@@ -73,6 +77,32 @@ public final class PersonProjection {
 
     PersonProjection(Person person) {
         this.person = person;
+        skills = new HashMap<>();
+        aptitudes = new HashSet<>();
+        gainedAbilities = new LinkedHashMap<>();
+        removedAbilities = new HashSet<>();
+        attributeChanges = new EnumMap<>(SkillAttribute.class);
+        traitChanges = new EnumMap<>(ATOWTraits.class);
+    }
+
+    private PersonProjection(PersonProjection other) {
+        person = other.person;
+        // The staged skills are never changed once stored, so the copies can share them
+        skills = new HashMap<>(other.skills);
+        aptitudes = new HashSet<>(other.aptitudes);
+        gainedAbilities = new LinkedHashMap<>(other.gainedAbilities);
+        removedAbilities = new HashSet<>(other.removedAbilities);
+        attributeChanges = new EnumMap<>(other.attributeChanges);
+        traitChanges = new EnumMap<>(other.traitChanges);
+        isEdgeRefilled = other.isEdgeRefilled;
+        projectedSkills = other.projectedSkills;
+        xpSpent = other.xpSpent;
+        purchaseCount = other.purchaseCount;
+    }
+
+    /** @return a copy that can be changed without changing this projection */
+    PersonProjection copy() {
+        return new PersonProjection(this);
     }
 
     public Person person() {
@@ -84,11 +114,6 @@ public final class PersonProjection {
      */
     public int availableXp() {
         return person.getXP() - xpSpent;
-    }
-
-    /** @return the XP everything staged for this person costs, less any it gives back */
-    public int xpSpent() {
-        return xpSpent;
     }
 
     /** @return how many purchases are staged for this person */
@@ -114,11 +139,6 @@ public final class PersonProjection {
     public int skillLevel(String skillName) {
         Skill skill = skill(skillName);
         return (skill == null) ? -1 : skill.getLevel();
-    }
-
-    /** @return {@code true} if training has changed or added this skill */
-    public boolean isSkillChanged(String skillName) {
-        return skills.containsKey(skillName);
     }
 
     /**
@@ -157,25 +177,17 @@ public final class PersonProjection {
      * @return {@code true} if the person has the ability and won't lose it, or will gain it
      */
     public boolean hasAbility(String abilityName) {
-        if (gainedAbilities.containsKey(abilityName)) {
-            return true;
-        }
-        return !removedFlaws.contains(abilityName) && person.getOptions().booleanOption(abilityName);
+        return gainedAbilities.containsKey(abilityName) || isKept(abilityName);
     }
 
-    /** @return {@code true} if the person has this flaw now and nothing staged removes it */
+    /** @return {@code true} if the person has this flaw now and nothing staged takes it away */
     public boolean hasFlawToBuyOff(String abilityName) {
-        return !removedFlaws.contains(abilityName) && person.getOptions().booleanOption(abilityName);
+        return isKept(abilityName);
     }
 
-    /** @return {@code true} if training will add this ability */
-    public boolean isAbilityGained(String abilityName) {
-        return gainedAbilities.containsKey(abilityName);
-    }
-
-    /** @return the abilities training will add, with their chosen values, in the order staged */
-    public Map<String, String> gainedAbilities() {
-        return gainedAbilities;
+    /** @return {@code true} if the person has this ability now and nothing staged takes it away */
+    private boolean isKept(String abilityName) {
+        return !removedAbilities.contains(abilityName) && person.getOptions().booleanOption(abilityName);
     }
 
     /**
@@ -184,13 +196,22 @@ public final class PersonProjection {
      */
     public int nonFlawAbilityCount() {
         int count = SpaUtilities.countNonFlawSpas(person);
+        for (String name : removedAbilities) {
+            if (isNonFlaw(name) && person.getOptions().booleanOption(name)) {
+                count--;
+            }
+        }
         for (String name : gainedAbilities.keySet()) {
-            SpecialAbility ability = SpecialAbility.getAbility(name);
-            if ((ability != null) && !SpaUtilities.isFlaw(ability)) {
+            if (isNonFlaw(name)) {
                 count++;
             }
         }
         return count;
+    }
+
+    private static boolean isNonFlaw(String abilityName) {
+        SpecialAbility ability = SpecialAbility.getAbility(abilityName);
+        return (ability != null) && !SpaUtilities.isFlaw(ability);
     }
 
     /** @return how much training will raise this attribute */
@@ -198,9 +219,20 @@ public final class PersonProjection {
         return attributeChanges.getOrDefault(attribute, 0);
     }
 
+    /** @return the attribute's score, Edge included, once training has raised it */
+    public int attributeScore(SkillAttribute attribute) {
+        int base = (attribute == SkillAttribute.EDGE) ? person.getEdge() : person.getAttributeScore(attribute);
+        return base + attributeChange(attribute);
+    }
+
     /** @return how much training will move this trait */
     public int traitChange(ATOWTraits trait) {
         return traitChanges.getOrDefault(trait, 0);
+    }
+
+    /** @return the trait's level once training has moved it; see {@link TrainingPricer#traitLevel} */
+    public int traitLevel(ATOWTraits trait) {
+        return TrainingPricer.traitLevel(person, trait) + traitChange(trait);
     }
 
     /** @return {@code true} if a refill of the person's spent Edge is staged */
@@ -221,13 +253,26 @@ public final class PersonProjection {
         spend(xp);
     }
 
+    /**
+     * Records a gained ability, and takes away the abilities it replaces, as gaining it for real does. The replaced
+     * abilities' XP is not given back.
+     */
     void gainAbility(String abilityName, @Nullable String choice, int xp) {
         gainedAbilities.put(abilityName, (choice == null) ? "" : choice);
+        SpecialAbility ability = SpecialAbility.getAbility(abilityName);
+        if (ability != null) {
+            for (String replaced : ability.getRemovedAbilities()) {
+                if (!replaced.equals(abilityName)) {
+                    gainedAbilities.remove(replaced);
+                    removedAbilities.add(replaced);
+                }
+            }
+        }
         spend(xp);
     }
 
     void removeFlaw(String abilityName, int xp) {
-        removedFlaws.add(abilityName);
+        removedAbilities.add(abilityName);
         spend(xp);
     }
 

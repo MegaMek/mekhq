@@ -33,7 +33,6 @@
 package mekhq.gui.dialog.trainingConsole;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
 import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
 import static mekhq.gui.baseComponents.hud.HudStyle.DANGER;
@@ -45,7 +44,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -53,13 +51,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
@@ -69,7 +65,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
 import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.finances.Money;
@@ -99,58 +94,12 @@ final class AutoTrainPage {
     private AutoTrainPage() {
     }
 
-    /** The settings being edited; a mutable copy of {@link AutoTrainSettings}. */
-    static final class Draft {
-        String name;
-        int targetLevel;
-        boolean isContinuous;
-        boolean isLevelArtillery;
-        boolean isLevelScouting;
-        boolean isLevelEscape;
-        boolean isLevelLeadership;
-        boolean isLevelTraining;
-        boolean isLevelOtherCommand;
-        @Nullable String specificSkill;
-        int reserveXp;
-        boolean isSkipTrainingFormations;
-        boolean isRespectExclusions;
-        boolean isSkipFeeImprovements;
-        Order order;
-        boolean isRunMonthly;
-
-        Draft(AutoTrainSettings settings) {
-            name = settings.name();
-            targetLevel = settings.targetLevel();
-            isContinuous = settings.isContinuous();
-            isLevelArtillery = settings.isLevelArtillery();
-            isLevelScouting = settings.isLevelScouting();
-            isLevelEscape = settings.isLevelEscape();
-            isLevelLeadership = settings.isLevelLeadership();
-            isLevelTraining = settings.isLevelTraining();
-            isLevelOtherCommand = settings.isLevelOtherCommand();
-            specificSkill = settings.specificSkill();
-            reserveXp = settings.reserveXp();
-            isSkipTrainingFormations = settings.isSkipTrainingFormations();
-            isRespectExclusions = settings.isRespectExclusions();
-            isSkipFeeImprovements = settings.isSkipFeeImprovements();
-            order = settings.order();
-            isRunMonthly = settings.isRunMonthly();
-        }
-
-        AutoTrainSettings toSettings() {
-            return new AutoTrainSettings(name, targetLevel, isContinuous, isLevelArtillery, isLevelScouting,
-                  isLevelEscape, isLevelLeadership, isLevelTraining, isLevelOtherCommand, specificSkill, reserveXp,
-                  isSkipTrainingFormations, isRespectExclusions, isSkipFeeImprovements, order, isRunMonthly);
-        }
-    }
-
     static List<JComponent> build(TrainingConsole console, List<Person> selection, List<Person> shown) {
         TrainingConsoleState state = console.state();
         if (state.autoTrain == null) {
-            state.autoTrain = new Draft(AutoTrainSettings.defaults("",
-                  console.campaign().getCampaignOptions()));
+            state.autoTrain = AutoTrainSettings.defaults("", console.campaign().getCampaignOptions()).toBuilder();
         }
-        Draft draft = state.autoTrain;
+        AutoTrainSettings.Builder draft = state.autoTrain;
         List<Person> scope = selection.isEmpty() ? shown : selection;
         List<JComponent> parts = new ArrayList<>();
 
@@ -163,38 +112,36 @@ final class AutoTrainPage {
               TEXT_MUTED)));
 
         // What to train: role skills as Quick Train did, or one skill for everyone who has it, as Mass Training did
-        TreeSet<String> heldSkills = new TreeSet<>();
-        for (Person person : scope) {
-            heldSkills.addAll(person.getSkills().getSkillNames());
-        }
+        TreeSet<String> heldSkills = console.cached(scopeKey(console, selection, "auto.heldSkills"), () -> {
+            TreeSet<String> skills = new TreeSet<>();
+            for (Person person : scope) {
+                skills.addAll(person.getSkills().getSkillNames());
+            }
+            return skills;
+        });
         JComboBox<String> skillPicker = new JComboBox<>();
         skillPicker.addItem("");
         heldSkills.forEach(skillPicker::addItem);
-        skillPicker.setSelectedItem((draft.specificSkill == null) ? "" : draft.specificSkill);
+        skillPicker.setSelectedItem((draft.getSpecificSkill() == null) ? "" : draft.getSpecificSkill());
         Hud.styleComboBox(skillPicker);
         skillPicker.setRenderer(labelled((String value) -> value.isEmpty() ?
                                                         getTextAt(RESOURCE_BUNDLE, "auto.train.roleSkills") :
                                                         value));
         skillPicker.addActionListener(event -> {
             String chosen = (String) skillPicker.getSelectedItem();
-            draft.specificSkill = ((chosen == null) || chosen.isEmpty()) ? null : chosen;
+            draft.setSpecificSkill(((chosen == null) || chosen.isEmpty()) ? null : chosen);
             console.refreshPanel();
         });
         JPanel train = field(getTextAt(RESOURCE_BUNDLE, "auto.train"), skillPicker);
-        if (draft.specificSkill == null) {
+        if (draft.getSpecificSkill() == null) {
             JPanel options = Hud.transparentPanel(new GridLayout(0, 2, scaleForGUI(8), scaleForGUI(2)));
-            options.add(check(console, "auto.option.leadership", draft.isLevelLeadership,
-                  value -> draft.isLevelLeadership = value));
-            options.add(check(console, "auto.option.training", draft.isLevelTraining,
-                  value -> draft.isLevelTraining = value));
-            options.add(check(console, "auto.option.command", draft.isLevelOtherCommand,
-                  value -> draft.isLevelOtherCommand = value));
-            options.add(check(console, "auto.option.artillery", draft.isLevelArtillery,
-                  value -> draft.isLevelArtillery = value));
-            options.add(check(console, "auto.option.scouting", draft.isLevelScouting,
-                  value -> draft.isLevelScouting = value));
-            options.add(check(console, "auto.option.escape", draft.isLevelEscape,
-                  value -> draft.isLevelEscape = value));
+            options.add(check(console, "auto.option.leadership", draft.isLevelLeadership(), draft::setLevelLeadership));
+            options.add(check(console, "auto.option.training", draft.isLevelTraining(), draft::setLevelTraining));
+            options.add(check(console, "auto.option.command", draft.isLevelOtherCommand(),
+                  draft::setLevelOtherCommand));
+            options.add(check(console, "auto.option.artillery", draft.isLevelArtillery(), draft::setLevelArtillery));
+            options.add(check(console, "auto.option.scouting", draft.isLevelScouting(), draft::setLevelScouting));
+            options.add(check(console, "auto.option.escape", draft.isLevelEscape(), draft::setLevelEscape));
             options.setAlignmentX(Component.LEFT_ALIGNMENT);
             train.add(Box.createVerticalStrut(scaleForGUI(4)));
             train.add(options);
@@ -208,36 +155,36 @@ final class AutoTrainPage {
         for (int level = 1; level <= MAX_LEVEL; level++) {
             targetPicker.addItem(level);
         }
-        targetPicker.setSelectedItem(draft.targetLevel);
+        targetPicker.setSelectedItem(draft.getTargetLevel());
         Hud.styleComboBox(targetPicker);
         targetPicker.setRenderer(labelled((Integer value) -> getFormattedTextAt(RESOURCE_BUNDLE,
               "auto.target.level", value)));
         targetPicker.addActionListener(event -> {
             if (targetPicker.getSelectedItem() instanceof Integer level) {
-                draft.targetLevel = level;
+                draft.setTargetLevel(level);
                 console.refreshPanel();
             }
         });
         parts.add(field(getTextAt(RESOURCE_BUNDLE, "auto.target"), targetPicker));
 
         parts.add(field(getTextAt(RESOURCE_BUNDLE, "auto.howFar"), chips(List.of(
-              chip(console, getTextAt(RESOURCE_BUNDLE, "auto.howFar.single"), !draft.isContinuous,
-                    () -> draft.isContinuous = false),
-              chip(console, getTextAt(RESOURCE_BUNDLE, "auto.howFar.continuous"), draft.isContinuous,
-                    () -> draft.isContinuous = true)))));
+              chip(console, getTextAt(RESOURCE_BUNDLE, "auto.howFar.single"), !draft.isContinuous(),
+                    () -> draft.setContinuous(false)),
+              chip(console, getTextAt(RESOURCE_BUNDLE, "auto.howFar.continuous"), draft.isContinuous(),
+                    () -> draft.setContinuous(true))))));
 
         List<JComponent> orderChips = new ArrayList<>();
         for (Order order : Order.values()) {
-            orderChips.add(chip(console, order.getLabel(), draft.order == order, () -> draft.order = order));
+            orderChips.add(chip(console, order.getLabel(), draft.getOrder() == order, () -> draft.setOrder(order)));
         }
         parts.add(field(getTextAt(RESOURCE_BUNDLE, "auto.order"), chips(orderChips)));
 
-        JTextField reserve = new JTextField(String.valueOf(draft.reserveXp), 6);
+        JTextField reserve = new JTextField(String.valueOf(draft.getReserveXp()), 6);
         Hud.styleField(reserve);
         Runnable readReserve = () -> {
-            int value = Math.max(0, MathUtility.parseInt(reserve.getText().trim(), draft.reserveXp));
-            if (value != draft.reserveXp) {
-                draft.reserveXp = value;
+            int value = Math.max(0, MathUtility.parseInt(reserve.getText().trim(), draft.getReserveXp()));
+            if (value != draft.getReserveXp()) {
+                draft.setReserveXp(value);
                 console.refreshPanel();
             }
         };
@@ -253,22 +200,22 @@ final class AutoTrainPage {
         parts.add(field(getTextAt(RESOURCE_BUNDLE, "auto.reserve"), reserveRow));
 
         JPanel guards = ConsoleWidgets.column();
-        guards.add(check(console, "auto.skipTraining", draft.isSkipTrainingFormations,
-              value -> draft.isSkipTrainingFormations = value));
-        guards.add(check(console, "auto.respectExclusions", draft.isRespectExclusions,
-              value -> draft.isRespectExclusions = value));
+        guards.add(check(console, "auto.skipTraining", draft.isSkipTrainingFormations(),
+              draft::setSkipTrainingFormations));
+        guards.add(check(console, "auto.respectExclusions", draft.isRespectExclusions(),
+              draft::setRespectExclusions));
         if (console.plan().context().isUseSkillTrainingCosts()) {
-            guards.add(check(console, "auto.skipFees", draft.isSkipFeeImprovements,
-                  value -> draft.isSkipFeeImprovements = value));
+            guards.add(check(console, "auto.skipFees", draft.isSkipFeeImprovements(),
+                  draft::setSkipFeeImprovements));
         }
         guards.setAlignmentX(Component.LEFT_ALIGNMENT);
         parts.add(guards);
 
-        parts.add(preview(console, scope, draft));
+        parts.add(preview(console, selection, scope, draft));
         return parts;
     }
 
-    private static JComponent presets(TrainingConsole console, Draft draft) {
+    private static JComponent presets(TrainingConsole console, AutoTrainSettings.Builder draft) {
         TrainingPresets presets = console.campaign().getTrainingPresets();
         JPanel holder = ConsoleWidgets.column();
         holder.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "auto.presets"))));
@@ -278,10 +225,11 @@ final class AutoTrainPage {
                                  getFormattedTextAt(RESOURCE_BUNDLE, "auto.preset.monthly", preset.name()) :
                                  preset.name();
             HudChip chip = new HudChip(label, () -> {
-                console.state().autoTrain = new Draft(preset);
+                console.state().autoTrain = preset.toBuilder();
+                console.state().presetNameText = null;
                 console.refreshPanel();
             });
-            chip.setActive(preset.name().equalsIgnoreCase(draft.name));
+            chip.setActive(preset.name().equalsIgnoreCase(draft.getName()));
             chips.add(chip);
         }
         if (chips.isEmpty()) {
@@ -291,36 +239,37 @@ final class AutoTrainPage {
             holder.add(chips(chips));
         }
 
-        JTextField name = new JTextField(draft.name, 14);
+        // What the player types is kept as they type it, so a redraw from another setting doesn't wipe a name that
+        // isn't saved yet
+        TrainingConsoleState state = console.state();
+        JTextField name = new JTextField((state.presetNameText == null) ? draft.getName() : state.presetNameText, 14);
         Hud.styleField(name);
         name.getAccessibleContext().setAccessibleName(getTextAt(RESOURCE_BUNDLE, "auto.preset.name"));
+        ConsoleWidgets.onTextChange(name, text -> state.presetNameText = text);
         HudCheckBox monthly = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "auto.preset.runMonthly"));
-        monthly.setSelected(draft.isRunMonthly);
+        monthly.setSelected(draft.isRunMonthly());
         monthly.setToolTipText(getTextAt(RESOURCE_BUNDLE, "auto.preset.runMonthly.toolTipText"));
-        monthly.addActionListener(event -> draft.isRunMonthly = monthly.isSelected());
-        HudButton save = new HudButton(getTextAt(RESOURCE_BUNDLE, "auto.preset.save").toUpperCase(Locale.ROOT),
-              false, true);
-        save.addActionListener(event -> {
+        monthly.addActionListener(event -> draft.setRunMonthly(monthly.isSelected()));
+        HudButton save = ConsoleWidgets.button(getTextAt(RESOURCE_BUNDLE, "auto.preset.save"), false, true, () -> {
             String chosen = name.getText().trim();
             if (chosen.isEmpty()) {
                 console.setMessage(getTextAt(RESOURCE_BUNDLE, "auto.preset.needsName"), true);
                 return;
             }
-            draft.name = chosen;
-            presets.save(draft.toSettings());
+            draft.setName(chosen);
+            state.presetNameText = null;
+            presets.save(draft.build());
             console.setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "auto.preset.saved", chosen), false);
         });
         JPanel saveRow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(3)));
         saveRow.add(name);
         saveRow.add(save);
-        if (presets.find(draft.name) != null) {
-            HudButton delete = new HudButton(getTextAt(RESOURCE_BUNDLE, "auto.preset.delete")
-                                                   .toUpperCase(Locale.ROOT), false, true);
-            delete.addActionListener(event -> {
-                presets.remove(draft.name);
-                console.setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "auto.preset.deleted", draft.name), false);
-            });
-            saveRow.add(delete);
+        String savedName = draft.getName();
+        if (presets.find(savedName) != null) {
+            saveRow.add(ConsoleWidgets.button(getTextAt(RESOURCE_BUNDLE, "auto.preset.delete"), false, true, () -> {
+                presets.remove(savedName);
+                console.setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "auto.preset.deleted", savedName), false);
+            }));
         }
         saveRow.add(monthly);
         saveRow.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -328,20 +277,24 @@ final class AutoTrainPage {
         return holder;
     }
 
-    private static JComponent preview(TrainingConsole console, List<Person> scope, Draft draft) {
-        AutoTrainPlanner.Plan plan = AutoTrainPlanner.plan(console.campaign(), console.plan(), scope,
-              draft.toSettings());
-        JPanel box = ConsoleWidgets.column();
-        box.setOpaque(true);
-        box.setBackground(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 14));
-        box.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 90),
-                    scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(10), scaleForGUI(10), scaleForGUI(10))));
+    /**
+     * @return a cache key for something worked out from the people auto-train would train: the selection, or when no
+     *       one is selected, everyone shown
+     */
+    private static String scopeKey(TrainingConsole console, List<Person> selection, String key) {
+        return selection.isEmpty() ? key + ".shown." + console.shownRevision() : key;
+    }
+
+    private static JComponent preview(TrainingConsole console, List<Person> selection, List<Person> scope,
+          AutoTrainSettings.Builder draft) {
+        AutoTrainSettings settings = draft.build();
+        AutoTrainPlanner.Plan plan = console.cached(scopeKey(console, selection, "auto.plan." + settings),
+              () -> AutoTrainPlanner.plan(console.campaign(), console.plan(), scope, settings));
+        JPanel box = ConsoleWidgets.previewBox();
         box.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "auto.preview"))));
         box.add(Box.createVerticalStrut(scaleForGUI(4)));
         box.add(leftAligned(ConsoleWidgets.bold(getFormattedTextAt(RESOURCE_BUNDLE, "auto.preview.summary",
-              plan.purchases().size(), plan.peopleCount()), 1.05f, ACCENT_BRIGHT)));
+              plan.staged().size(), plan.peopleCount()), 1.05f, ACCENT_BRIGHT)));
         box.add(leftAligned(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", plan.xp()), 0.88f,
               TEXT)));
         if (console.plan().context().isUseSkillTrainingCosts()) {
@@ -369,18 +322,11 @@ final class AutoTrainPage {
             box.add(leftAligned(ConsoleWidgets.wrapped(getFormattedTextAt(RESOURCE_BUNDLE, "auto.skipped",
                   String.join(", ", skipped)), TEXT_FAINT)));
         }
-        HudButton stage = new HudButton(getTextAt(RESOURCE_BUNDLE, "auto.stage").toUpperCase(Locale.ROOT), true,
-              true);
-        stage.setArmed(!plan.purchases().isEmpty());
-        stage.addActionListener(event -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE, "auto.step",
-              draft.targetLevel, (draft.specificSkill == null) ?
-                                       getTextAt(RESOURCE_BUNDLE, "auto.train.roleSkills") :
-                                       draft.specificSkill), plan.purchases()));
-        JPanel buttonRow = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(6)));
-        buttonRow.add(stage);
-        buttonRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(buttonRow);
-        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.add(ConsoleWidgets.buttonRow(ConsoleWidgets.button(getTextAt(RESOURCE_BUNDLE, "auto.stage"), true,
+              !plan.staged().isEmpty(), () -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE, "auto.step",
+                    settings.targetLevel(), (settings.specificSkill() == null) ?
+                                                  getTextAt(RESOURCE_BUNDLE, "auto.train.roleSkills") :
+                                                  settings.specificSkill()), plan.purchases()))));
         return box;
     }
 

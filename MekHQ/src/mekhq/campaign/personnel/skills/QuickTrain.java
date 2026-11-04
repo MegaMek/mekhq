@@ -490,13 +490,14 @@ public class QuickTrain {
             }
         }
 
-        // Sort the skills by their total skill level (lowest -> highest)
+        // Sort the skills by their trained level (lowest -> highest), as the Training Console's auto-train does;
+        // attributes and other modifiers don't change which skill is the weakest
         targetSkills.sort(
               Comparator.comparingInt(skillName -> {
                   Skill skill = person.getSkill(skillName);
                   return (skill == null) // The character doesn't have this skill
                                ? Integer.MIN_VALUE // Unknown skills should always be trained first
-                               : skill.getTotalSkillLevel(skillModifierData);
+                               : skill.getLevel();
               })
         );
     }

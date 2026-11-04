@@ -163,11 +163,12 @@ public final class TrainingPricer {
               type));
         int xp = (int) round(personCost * context.xpCostMultiplier());
 
+        // The training fee follows the skill's trained level alone; attributes and other modifiers don't change it
         Skill improved;
-        int totalLevel;
+        int trainedLevel;
         if (current == null) {
             improved = new Skill(type, 0, 0);
-            totalLevel = -1;
+            trainedLevel = -1;
         } else {
             // XP already put towards the skill comes off the price, and is used up by the improvement
             xp = max(0, xp - current.getXpProgress());
@@ -175,16 +176,16 @@ public final class TrainingPricer {
                   max(0, current.getXpProgress() - personCost), current.getHasNaturalAptitude(),
                   current.getNaturalAptitudeXpProgress());
             improved.improve();
-            totalLevel = current.getTotalSkillLevel(context.modifiersOf(person));
+            trainedLevel = current.getLevel();
         }
 
         boolean isRoleSkill = context.roleSkillsOf(person).contains(skillName);
-        Money fee = SkillTrainingCosts.getSkillImprovementCost(context.options(), type, isRoleSkill, totalLevel);
+        Money fee = SkillTrainingCosts.getSkillImprovementCost(context.options(), type, isRoleSkill, trainedLevel);
         TrainingFeeCategory category = null;
         int reachedLevel = -1;
         if (!fee.isZero()) {
             category = TrainingFeeCategory.of(SkillTrainingCategory.getCategory(isRoleSkill, type));
-            reachedLevel = type.getExperienceLevel(totalLevel + 1);
+            reachedLevel = type.getExperienceLevel(trainedLevel + 1);
         }
         return new Quote(null, xp, fee, category, reachedLevel, improved);
     }
@@ -314,14 +315,22 @@ public final class TrainingPricer {
         int baseCost = (int) round((isEdge ? context.edgeCost() : context.attributeCost())
                                          * context.xpCostMultiplier());
         int xp = (int) round(baseCost * person.getReasoningXpCostMultiplier(context.isUseReasoning()));
-        int current = (isEdge ? person.getEdge() : person.getAttributeScore(attribute))
-                            + projection.attributeChange(attribute);
-        int cap = isEdge ? min(person.getAttributeCap(attribute), context.maximumEdge()) :
-                        person.getAttributeCap(attribute);
-        if (current + 1 > cap) {
+        if (projection.attributeScore(attribute) + 1 > attributeCap(context, person, attribute)) {
             return Quote.refused(TrainingRefusal.AT_LIMIT);
         }
         return Quote.of(xp, Money.zero(), null);
+    }
+
+    /**
+     * @param context   the campaign settings, for the campaign's Edge limit
+     * @param person    a person
+     * @param attribute an attribute, Edge included
+     *
+     * @return the highest score training can raise the attribute to
+     */
+    public static int attributeCap(TrainingContext context, Person person, SkillAttribute attribute) {
+        int cap = person.getAttributeCap(attribute);
+        return (attribute == SkillAttribute.EDGE) ? min(cap, context.maximumEdge()) : cap;
     }
 
     /**
@@ -368,13 +377,37 @@ public final class TrainingPricer {
         };
     }
 
+    /**
+     * Sets a person's level in a trait the console offers.
+     *
+     * @param person a person
+     * @param trait  a trait the console offers
+     * @param level  the new level
+     *
+     * @return {@code false} if the console doesn't offer the trait, in which case nothing changed
+     */
+    public static boolean setTraitLevel(Person person, ATOWTraits trait, int level) {
+        switch (trait) {
+            case CONNECTIONS -> person.setConnections(level);
+            case FAME -> person.setFame(level);
+            case WEALTH -> person.setWealth(level);
+            case EXTRA_INCOME -> person.setExtraIncomeFromTraitLevel(level);
+            case UNLUCKY -> person.setUnlucky(level);
+            case BLOODMARK -> person.setBloodmark(level);
+            default -> {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static Quote quoteTrait(TrainingContext context, PersonProjection projection, ATOWTraits trait,
           int delta) {
         // Connections can only be bought, never sold back, as in the Spend XP menu
         if (!isTrainableTrait(trait) || (Math.abs(delta) != 1) || ((trait == ATOWTraits.CONNECTIONS) && (delta < 0))) {
             return Quote.refused(TrainingRefusal.DISABLED);
         }
-        int target = traitLevel(projection.person(), trait) + projection.traitChange(trait) + delta;
+        int target = projection.traitLevel(trait) + delta;
         if ((target < trait.getMinimum()) || (target > trait.getMaximum())) {
             return Quote.refused(TrainingRefusal.AT_LIMIT);
         }

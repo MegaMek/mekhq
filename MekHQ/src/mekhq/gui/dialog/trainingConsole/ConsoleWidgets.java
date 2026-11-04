@@ -46,12 +46,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
@@ -60,6 +66,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.training.TrainingRefusal;
 import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
 
 /**
  * Small pieces the Training Console's pages share: the eligibility bar, its legend, a catalog card, tags and labels.
@@ -72,6 +79,8 @@ final class ConsoleWidgets {
     static final Color SHORT_COLOR = AMBER;
     static final Color HELD_COLOR = ACCENT;
     static final Color BLOCKED_COLOR = new Color(58, 83, 97);
+    /** How long a search field waits after the last keystroke before searching, so typing stays smooth. */
+    private static final int SEARCH_DELAY_MILLIS = 150;
 
     private ConsoleWidgets() {
     }
@@ -204,6 +213,154 @@ final class ConsoleWidgets {
         JPanel panel = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(gap), scaleForGUI(3)));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         return panel;
+    }
+
+    /**
+     * Calls back with a text field's text every time it changes.
+     *
+     * @param field    the field
+     * @param onChange called with the new text
+     */
+    static void onTextChange(JTextField field, Consumer<String> onChange) {
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                onChange.accept(field.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                onChange.accept(field.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                onChange.accept(field.getText());
+            }
+        });
+    }
+
+    /**
+     * Calls back with a search field's text once the player pauses typing, rather than on every keystroke, as each
+     * search redraws a list that may hold thousands of people.
+     *
+     * @param field    the field
+     * @param onSearch called with the text
+     */
+    static void onTextSettled(JTextField field, Consumer<String> onSearch) {
+        Timer timer = new Timer(SEARCH_DELAY_MILLIS, event -> onSearch.accept(field.getText()));
+        timer.setRepeats(false);
+        onTextChange(field, text -> timer.restart());
+    }
+
+    /** @return XP as a cost, such as "120 XP", or as XP given back, such as "+40 XP back" */
+    static String xpText(int xp) {
+        return (xp < 0) ? getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "xp.gained", -xp) :
+                     getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "xp.amount", xp);
+    }
+
+    /**
+     * @param text      the button's text, shown in capitals
+     * @param isPrimary {@code true} for a card's main action, {@code false} for a secondary one
+     * @param isArmed   whether it can be used
+     * @param onClick   what it does
+     *
+     * @return a compact console button
+     */
+    static HudButton button(String text, boolean isPrimary, boolean isArmed, Runnable onClick) {
+        HudButton button = new HudButton(text.toUpperCase(Locale.ROOT), isPrimary, true);
+        button.setArmed(isArmed);
+        button.addActionListener(event -> onClick.run());
+        return button;
+    }
+
+    /** @return a row holding one button on the left, as under a preview */
+    static JComponent buttonRow(JComponent button) {
+        JPanel row = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(6)));
+        row.add(button);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return row;
+    }
+
+    /** @return a row with a muted label on the left and a control, such as a picker, filling the rest */
+    static JComponent labeledRow(String label, JComponent control) {
+        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+        row.add(label(label, 0.84f, TEXT_MUTED), BorderLayout.WEST);
+        row.add(control, BorderLayout.CENTER);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return row;
+    }
+
+    /** @return a lightly tinted, outlined column for a preview of what a button will stage */
+    static JPanel previewBox() {
+        JPanel box = column();
+        box.setOpaque(true);
+        box.setBackground(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 14));
+        box.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 90),
+                    scaleForGUI(1)),
+              BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(10), scaleForGUI(10), scaleForGUI(10))));
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return box;
+    }
+
+    /**
+     * A small bar chart of how many of the selection hold each value, such as each skill level or attribute score.
+     *
+     * @param heading     the chart's heading
+     * @param from        the first value shown
+     * @param to          the last value shown
+     * @param countAt     how many hold a value
+     * @param isThreshold which values to mark, such as where a new experience level starts; {@code null} for none
+     * @param footnote    a line under the chart, such as what the marks mean; {@code null} for none
+     *
+     * @return the chart with its heading
+     */
+    static JComponent spreadChart(String heading, int from, int to, IntUnaryOperator countAt,
+          @Nullable IntPredicate isThreshold, @Nullable String footnote) {
+        int columns = Math.max(1, (to - from) + 1);
+        int[] counts = new int[columns];
+        int most = 1;
+        for (int column = 0; column < columns; column++) {
+            counts[column] = countAt.applyAsInt(from + column);
+            most = Math.max(most, counts[column]);
+        }
+        final int highest = most;
+        Color barColor = new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 140);
+        Font font = label("", 0.7f, TEXT_FAINT).getFont();
+        JComponent chart = new JComponent() {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                int gap = scaleForGUI(3);
+                int width = Math.max(1, (getWidth() - (gap * (columns - 1))) / columns);
+                int barArea = getHeight() - scaleForGUI(12);
+                graphics.setFont(font);
+                for (int column = 0; column < columns; column++) {
+                    int count = counts[column];
+                    int x = column * (width + gap);
+                    int height = (count == 0) ? 0 :
+                                       Math.max(2, (int) Math.round((double) count / highest * (barArea - 2)));
+                    graphics.setColor(barColor);
+                    graphics.fillRect(x, barArea - height, width, height);
+                    int value = from + column;
+                    graphics.setColor(((isThreshold != null) && isThreshold.test(value)) ? AMBER : TEXT_FAINT);
+                    String text = String.valueOf(value);
+                    int textWidth = graphics.getFontMetrics().stringWidth(text);
+                    graphics.drawString(text, x + ((width - textWidth) / 2), getHeight() - 1);
+                }
+            }
+        };
+        chart.setPreferredSize(new Dimension(scaleForGUI(300), scaleForGUI(56)));
+        chart.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(56)));
+        chart.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel holder = column();
+        holder.add(leftAligned(Hud.eyebrow(heading)));
+        holder.add(Box.createVerticalStrut(scaleForGUI(4)));
+        holder.add(chart);
+        if (footnote != null) {
+            holder.add(leftAligned(label(footnote, 0.74f, TEXT_FAINT)));
+        }
+        return holder;
     }
 
     /** @return the money as the player reads it, or an empty string for zero */

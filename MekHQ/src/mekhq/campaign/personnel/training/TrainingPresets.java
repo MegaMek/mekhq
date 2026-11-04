@@ -48,7 +48,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.training.TrainingPlan.StageResult;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -123,15 +122,15 @@ public final class TrainingPresets {
             TrainingPlan plan = new TrainingPlan(new TrainingContext(campaign),
                   campaign.getPlayerForce().getFinances().getBalance());
             AutoTrainPlanner.Plan auto = AutoTrainPlanner.plan(campaign, plan, people, preset);
-            if (auto.purchases().isEmpty()) {
+            if (auto.staged().isEmpty()) {
                 continue;
             }
-            StageResult result = plan.stage(getFormattedTextAt(RESOURCE_BUNDLE, "report.monthlyPreset",
-                  preset.name()), auto.purchases());
-            if (result.step() == null) {
+            // Planned against this very plan, so its prices stand and needn't be worked out again before the commit
+            String label = getFormattedTextAt(RESOURCE_BUNDLE, "report.monthlyPreset", preset.name());
+            if (!plan.stagePriced(label, auto.staged())) {
                 campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "report.monthlyPresetUnaffordable",
                       spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, preset.name(),
-                      result.shortfall().toAmountAndSymbolString()));
+                      auto.fees().minus(plan.fundsLeft()).toAmountAndSymbolString()));
                 continue;
             }
             TrainingService.commit(campaign, plan);
