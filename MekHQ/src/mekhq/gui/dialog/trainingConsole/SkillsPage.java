@@ -77,7 +77,6 @@ import mekhq.campaign.personnel.training.TrainingPlan;
 import mekhq.campaign.personnel.training.TrainingPlan.Climb;
 import mekhq.campaign.personnel.training.TrainingPricer.Quote;
 import mekhq.campaign.personnel.training.TrainingPurchase;
-import mekhq.campaign.personnel.training.TrainingPurchase.NaturalAptitude;
 import mekhq.campaign.personnel.training.TrainingPurchase.SkillImprovement;
 import mekhq.campaign.personnel.training.TrainingRefusal;
 import mekhq.gui.baseComponents.hud.Hud;
@@ -115,8 +114,6 @@ final class SkillsPage {
         final QuoteTally improve = new QuoteTally();
         /** Learning the skill, for those who lack it. */
         final QuoteTally learn = new QuoteTally();
-        /** Buying a Natural Aptitude in it, for those who hold it. */
-        final QuoteTally aptitude = new QuoteTally();
         int levelSum;
         final int[] levels = new int[MAX_LEVEL + 1];
         /** Fees by the experience level the improvement reaches. */
@@ -187,7 +184,8 @@ final class SkillsPage {
         return cards;
     }
 
-    private static boolean isHeldByAnyone(TrainingPlan plan, String skillName, List<Person> selection) {
+    /** @return {@code true} if anyone selected knows the skill, staged learning included */
+    static boolean isHeldByAnyone(TrainingPlan plan, String skillName, List<Person> selection) {
         for (Person person : selection) {
             PersonProjection projection = plan.peek(person);
             if (((projection == null) ? person.getSkill(skillName) : projection.skill(skillName)) != null) {
@@ -197,7 +195,8 @@ final class SkillsPage {
         return false;
     }
 
-    private static boolean isInGroup(SkillType type, SkillGroup group) {
+    /** @return {@code true} if the skill belongs to the chip group; the Aptitudes page shares these groups */
+    static boolean isInGroup(SkillType type, SkillGroup group) {
         SkillSubType subType = type.getSubType();
         return switch (group) {
             case HELD, ALL -> true;
@@ -224,8 +223,6 @@ final class SkillsPage {
             stats.holderPeople.add(person);
             stats.levels[Math.min(level, MAX_LEVEL)]++;
             stats.levelSum += level;
-            NaturalAptitude aptitude = new NaturalAptitude(person, skillName);
-            stats.aptitude.add(aptitude, plan.quote(aptitude));
             stats.improve.add(purchase, quote);
             if (quote.isAllowed() && !quote.fee().isZero()) {
                 FeeLine line = stats.feesByLevel.computeIfAbsent(quote.reachedLevel(), key -> new FeeLine());
@@ -359,18 +356,6 @@ final class SkillsPage {
                   stats.learn.xp()), false, stats.learn.ready() > 0, () -> stageLearning(console, stats)),
                   BorderLayout.EAST);
             card.addToBody(learnLine);
-        }
-        if (stats.aptitude.ready() > 0) {
-            JPanel aptitudeLine = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
-            aptitudeLine.add(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "skills.aptitude",
-                  stats.aptitude.ready()), 0.84f, TEXT_MUTED), BorderLayout.CENTER);
-            aptitudeLine.add(ConsoleWidgets.button(getFormattedTextAt(RESOURCE_BUNDLE, "skills.aptitudeXp",
-                  stats.aptitude.xp()), false, true, () -> {
-                List<TrainingPurchase> purchases = new ArrayList<>();
-                stats.holderPeople.forEach(person -> purchases.add(new NaturalAptitude(person, stats.name)));
-                console.stage(getFormattedTextAt(RESOURCE_BUNDLE, "skills.step.aptitude", stats.name), purchases);
-            }), BorderLayout.EAST);
-            card.addToBody(aptitudeLine);
         }
         return card;
     }

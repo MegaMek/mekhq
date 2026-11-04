@@ -42,6 +42,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  */
 enum TrainingConsolePage {
     SKILLS,
+    APTITUDES,
     ABILITIES,
     ATTRIBUTES,
     AUTO_TRAIN,

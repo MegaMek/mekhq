@@ -175,6 +175,7 @@ public class TrainingConsole extends JDialog {
     private final Map<TrainingConsolePage, JComponent> toolsByPage = new EnumMap<>(TrainingConsolePage.class);
     private final JComponent noTools = Hud.transparentPanel(null);
     private final JPanel skillChips = ConsoleWidgets.row(6);
+    private final JPanel aptitudeChips = ConsoleWidgets.row(6);
     private final JPanel abilityChips = ConsoleWidgets.row(6);
     private final JPanel attributeChips = ConsoleWidgets.row(6);
     private final JPanel catalog = ConsoleWidgets.column();
@@ -411,6 +412,11 @@ public class TrainingConsole extends JDialog {
             state.skillQuery = text;
             refreshPanel();
         }, skillChips));
+        toolsByPage.put(TrainingConsolePage.APTITUDES, searchTools(getTextAt(RESOURCE_BUNDLE, "aptitudes.search"),
+              text -> {
+                  state.aptitudeQuery = text;
+                  refreshPanel();
+              }, aptitudeChips));
         toolsByPage.put(TrainingConsolePage.ABILITIES, searchTools(getTextAt(RESOURCE_BUNDLE, "abilities.search"),
               text -> {
                   state.abilityQuery = text;
@@ -639,6 +645,7 @@ public class TrainingConsole extends JDialog {
         catalog.removeAll();
         List<JComponent> parts = switch (state.page) {
             case SKILLS -> selection.isEmpty() ? List.of() : SkillsPage.build(this, selection);
+            case APTITUDES -> selection.isEmpty() ? List.of() : AptitudesPage.build(this, selection);
             case ABILITIES -> selection.isEmpty() ? List.of() : AbilitiesPage.build(this, selection);
             case ATTRIBUTES -> selection.isEmpty() ? List.of() : AttributesPage.build(this, selection);
             case AUTO_TRAIN -> AutoTrainPage.build(this, selection, shownPeople());
@@ -744,6 +751,18 @@ public class TrainingConsole extends JDialog {
         }
         skillChips.revalidate();
         skillChips.repaint();
+
+        aptitudeChips.removeAll();
+        for (SkillGroup group : SkillGroup.values()) {
+            HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()), () -> {
+                state.aptitudeGroup = group;
+                refreshPanel();
+            });
+            chip.setActive(state.aptitudeGroup == group);
+            aptitudeChips.add(chip);
+        }
+        aptitudeChips.revalidate();
+        aptitudeChips.repaint();
 
         abilityChips.removeAll();
         for (AbilityGroup group : AbilityGroup.values()) {

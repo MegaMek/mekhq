@@ -114,6 +114,11 @@ final class TrainingConsoleState {
     SkillGroup skillGroup = SkillGroup.HELD;
     String skillQuery = "";
     @Nullable String openSkill;
+
+    // Aptitudes page: the same skill groups as the Skills page, chosen separately
+    SkillGroup aptitudeGroup = SkillGroup.HELD;
+    String aptitudeQuery = "";
+    @Nullable String openAptitude;
     final Map<String, Integer> trainTo = new HashMap<>();
 
     // Abilities page
