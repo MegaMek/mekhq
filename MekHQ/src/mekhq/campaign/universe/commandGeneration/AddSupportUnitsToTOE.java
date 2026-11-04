@@ -183,11 +183,16 @@ public class AddSupportUnitsToTOE {
      * nothing in it is removed. Support carriers - the squads and platoons that carry the support staff - are never
      * moved.</p>
      *
+     * <p>Convoy, Salvage and Security describe the team doing the job, so they stay on the bottom-most formations
+     * only: once the group holds lances it becomes a Standard formation and each lance is a team of its own. See
+     * {@link #isLeafOnlyType}.</p>
+     *
      * @param campaign  the campaign that owns the TOE
      * @param group     the formation whose vehicles are arranged
      * @param lanceSize vehicles in a full lance; zero or less leaves the formation as it is
      * @param namer     the name of the lance at a given position, counting from one
-     * @param type      the formation type to give a new lance
+     * @param type      the formation type to give a new lance; a group already lanced as Convoy, Salvage or Security
+     *                  keeps its lances' type even when its own (now Standard) type is passed
      *
      * @return the lances created; empty when none were needed
      */
@@ -198,6 +203,16 @@ public class AddSupportUnitsToTOE {
             return created;
         }
         removeEmptyLances(campaign, group, namer);
+        // A group already split into lances has been reset to Standard, so on a top-up its own type no longer says
+        // what its lances are for; the lances themselves still do.
+        FormationType lanceType = isLeafOnlyType(type) ? type : existingLanceType(group, namer, type);
+        fileLooseVehiclesIntoLances(campaign, group, lanceSize, namer, lanceType, created);
+        settleLeafOnlyType(group, lanceType);
+        return created;
+    }
+
+    private static void fileLooseVehiclesIntoLances(Campaign campaign, Formation group, int lanceSize,
+          IntFunction<String> namer, FormationType type, List<Formation> created) {
 
         List<Unit> looseVehicles = new ArrayList<>();
         for (UUID unitId : group.getUnits()) {
@@ -214,7 +229,7 @@ public class AddSupportUnitsToTOE {
             }
         }
         if (looseVehicles.isEmpty() || (!hasLances && (looseVehicles.size() <= lanceSize))) {
-            return created;
+            return;
         }
 
         Set<Integer> before = new HashSet<>();
@@ -232,7 +247,53 @@ public class AddSupportUnitsToTOE {
         }
         LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
               looseVehicles.size(), lanceSize, created.size());
-        return created;
+    }
+
+    /**
+     * Whether a formation type describes the units doing the job - a convoy, a salvage team, a security detail - and so
+     * belongs only on the bottom-most formations. A company of three salvage lances is three salvage teams; marking the
+     * company Salvage as well makes it one team of every vehicle under it, and a Convoy company is treated as one
+     * convoy that is always intercepted.
+     *
+     * @param type the formation type
+     *
+     * @return {@code true} for Convoy, Salvage and Security
+     */
+    static boolean isLeafOnlyType(@Nullable FormationType type) {
+        return (type == FormationType.CONVOY) || (type == FormationType.SALVAGE) || (type == FormationType.SECURITY);
+    }
+
+    /**
+     * The leaf-only type the lances under {@code group} already carry, or {@code fallback} when it has none.
+     */
+    private static FormationType existingLanceType(Formation group, IntFunction<String> namer,
+          FormationType fallback) {
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer) && isLeafOnlyType(child.getFormationType())) {
+                return child.getFormationType();
+            }
+        }
+        return fallback;
+    }
+
+    /**
+     * Keeps a leaf-only type on the bottom-most formation: a group that now holds formations becomes Standard, while a
+     * group left holding only vehicles (its lances emptied and removed) is the team itself again and takes the type
+     * back. Does nothing when {@code leafType} is not a leaf-only type.
+     *
+     * @param group    the formation whose vehicles were arranged
+     * @param leafType the type its bottom-most formations carry
+     */
+    private static void settleLeafOnlyType(Formation group, FormationType leafType) {
+        if (!isLeafOnlyType(leafType)) {
+            return;
+        }
+        boolean holdsFormations = !group.getSubFormations().isEmpty();
+        if (holdsFormations && isLeafOnlyType(group.getFormationType())) {
+            group.setFormationType(FormationType.STANDARD, false);
+        } else if (!holdsFormations && group.getFormationType().isStandard() && !group.getUnits().isEmpty()) {
+            group.setFormationType(leafType, false);
+        }
     }
 
     /** Removes the lances under {@code group} that no longer hold anything. */

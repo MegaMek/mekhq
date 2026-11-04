@@ -303,6 +303,63 @@ class AddSupportUnitsToTOETest {
         assertEquals(FormationLevel.COMPANY, recovery.getFormationLevel(), "six vehicles in two lances is a company");
     }
 
+    @Test
+    void arrangeIntoLances_keepsConvoyOnTheLancesOnly() {
+        // A generated Logistics company was Convoy along with every lance in it, so the whole company was one convoy
+        // and was always intercepted. Only the bottom-most formations are convoys.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 8);
+        logistics.setFormationType(FormationType.CONVOY, false);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        assertEquals(FormationType.STANDARD, logistics.getFormationType(), "the company is not itself a convoy");
+        for (Formation lance : logistics.getSubFormations()) {
+            assertEquals(FormationType.CONVOY, lance.getFormationType(), "each lance is a convoy");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_topUpOfALancedSalvageGroupStillMakesSalvageLances() {
+        // Support Command passes the group's own type, which after the first split is Standard; new lances must still
+        // be salvage teams like the ones beside them.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation recovery = groupWithVehicles(campaign, "Recovery Company", 8);
+        recovery.setFormationType(FormationType.SALVAGE, false);
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, recovery, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SALVAGE);
+        int before = campaign.getUnits().size();
+        for (int index = 0; index < 2; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        List<Unit> all = new ArrayList<>(campaign.getUnits());
+        for (Unit vehicle : all.subList(before, all.size())) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, recovery.getId(), campaign);
+        }
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, recovery, 4, AddSupportUnitsToTOETest::lanceName,
+              recovery.getFormationType());
+
+        assertEquals(List.of(4, 4, 2), lanceSizes(recovery), "the new vehicles open a third lance");
+        assertEquals(FormationType.STANDARD, recovery.getFormationType());
+        for (Formation lance : recovery.getSubFormations()) {
+            assertEquals(FormationType.SALVAGE, lance.getFormationType(), "the new lance is a salvage team too");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_leavesAOneLanceSecurityGroupAsSecurity() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation security = groupWithVehicles(campaign, "Security", 3);
+        security.setFormationType(FormationType.SECURITY, false);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, security, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SECURITY);
+
+        assertEquals(FormationType.SECURITY, security.getFormationType(), "a group of one lance's worth is the team");
+    }
+
     private static String lanceName(int position) {
         return "Lance " + position;
     }
