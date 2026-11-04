@@ -198,7 +198,8 @@ final class PeopleList extends JPanel {
         header.setBackground(SURFACE_DEEP);
         header.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(10), scaleForGUI(6), scaleForGUI(12))));
+              // The same left and right padding as a row: its 2-pixel selection bar, then 8 pixels, and 10 on the right
+              BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(10), scaleForGUI(6), scaleForGUI(10))));
         setSortShown(Sort.NAME, true);
 
         list.setCellRenderer(new PersonRowRenderer(isSelected, pendingCount, availableXp));
@@ -239,20 +240,21 @@ final class PeopleList extends JPanel {
 
         JScrollPane scroll = new JScrollPane(list);
         Hud.styleScroll(scroll, SURFACE_DEEP, false);
-
-        JPanel table = new JPanel(new BorderLayout());
-        table.setOpaque(false);
-        table.add(header, BorderLayout.NORTH);
-        table.add(scroll, BorderLayout.CENTER);
+        // As the scroll pane's column header, the headers are exactly as wide as the rows, scroll bar or not, so the
+        // columns line up
+        scroll.setColumnHeaderView(header);
+        scroll.getColumnHeader().setBackground(SURFACE_DEEP);
 
         add(head, BorderLayout.NORTH);
-        add(table, BorderLayout.CENTER);
+        add(scroll, BorderLayout.CENTER);
     }
 
     /** Draws the column headers, marking the sorted one. */
     void setSortShown(Sort sort, boolean isAscending) {
         header.removeAll();
-        header.add(Box.createHorizontalStrut(scaleForGUI(26)), constraints(0, 0));
+        // A space as wide as a row's selection box, so each header starts where its column does
+        header.add(Box.createRigidArea(new Dimension(new HudCheckBox("").getPreferredSize().width, 0)),
+              constraints(0, 0));
         Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.EXPERIENCE, Sort.XP };
         for (int index = 0; index < columns.length; index++) {
             Sort column = columns[index];
