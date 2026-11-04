@@ -160,8 +160,10 @@ public class TrainingConsole extends JDialog {
     private final JPanel center = new JPanel(centerCards);
     private final PeopleList peopleList;
     private final JPanel basket = ConsoleWidgets.column();
-    private final CardLayout toolCards = new CardLayout();
-    private final JPanel tools = new JPanel(toolCards);
+    /** Holds only the current page's tools, so the area is as tall as they are rather than the tallest page's. */
+    private final JPanel tools = new JPanel(new BorderLayout());
+    private final Map<TrainingConsolePage, JComponent> toolsByPage = new EnumMap<>(TrainingConsolePage.class);
+    private final JComponent noTools = Hud.transparentPanel(null);
     private final JPanel skillChips = ConsoleWidgets.row(6);
     private final JPanel abilityChips = ConsoleWidgets.row(6);
     private final JPanel attributeChips = ConsoleWidgets.row(6);
@@ -398,24 +400,25 @@ public class TrainingConsole extends JDialog {
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), scaleForGUI(10), scaleForGUI(12))));
 
         tools.setOpaque(false);
-        tools.add(searchTools(getTextAt(RESOURCE_BUNDLE, "skills.search"), text -> {
+        toolsByPage.put(TrainingConsolePage.SKILLS, searchTools(getTextAt(RESOURCE_BUNDLE, "skills.search"), text -> {
             state.skillQuery = text;
             refreshPanel();
-        }, skillChips, null), TrainingConsolePage.SKILLS.name());
+        }, skillChips, null));
         includePrerequisites.setToolTipText(getTextAt(RESOURCE_BUNDLE, "abilities.includePrerequisites.toolTipText"));
         includePrerequisites.addActionListener(event -> {
             state.isIncludePrerequisites = includePrerequisites.isSelected();
             refreshPanel();
         });
-        tools.add(searchTools(getTextAt(RESOURCE_BUNDLE, "abilities.search"), text -> {
-            state.abilityQuery = text;
-            refreshPanel();
-        }, abilityChips, includePrerequisites), TrainingConsolePage.ABILITIES.name());
-        tools.add(searchTools(getTextAt(RESOURCE_BUNDLE, "attributes.search"), text -> {
+        toolsByPage.put(TrainingConsolePage.ABILITIES, searchTools(getTextAt(RESOURCE_BUNDLE, "abilities.search"),
+              text -> {
+                  state.abilityQuery = text;
+                  refreshPanel();
+              }, abilityChips, includePrerequisites));
+        toolsByPage.put(TrainingConsolePage.ATTRIBUTES, searchTools(getTextAt(RESOURCE_BUNDLE,
+              "attributes.search"), text -> {
             state.attributeQuery = text;
             refreshPanel();
-        }, attributeChips, null), TrainingConsolePage.ATTRIBUTES.name());
-        tools.add(Hud.transparentPanel(null), "none");
+        }, attributeChips, null));
 
         JPanel north = ConsoleWidgets.column();
         basket.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -723,12 +726,14 @@ public class TrainingConsole extends JDialog {
         basket.revalidate();
         basket.repaint();
 
-        toolCards.show(tools, switch (state.page) {
-            case SKILLS -> TrainingConsolePage.SKILLS.name();
-            case ABILITIES -> TrainingConsolePage.ABILITIES.name();
-            case ATTRIBUTES -> TrainingConsolePage.ATTRIBUTES.name();
-            default -> "none";
-        });
+        JComponent pageTools = toolsByPage.getOrDefault(state.page, noTools);
+        if ((tools.getComponentCount() == 0) || (tools.getComponent(0) != pageTools)) {
+            // Swapped rather than rebuilt, so a search field keeps its text and the keyboard when the page returns
+            tools.removeAll();
+            tools.add(pageTools, BorderLayout.CENTER);
+            tools.revalidate();
+            tools.repaint();
+        }
     }
 
     private void refreshChips() {
