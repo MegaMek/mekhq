@@ -216,11 +216,6 @@ public class TrainingConsole extends JDialog {
         }, this::onRow, this::selectShown, this::clearSelection, this::sortBy, state.selected::contains,
               person -> plan.projectionOf(person).purchaseCount(),
               person -> plan.projectionOf(person).availableXp());
-        peopleList.setLinkHandler((entry, link) -> {
-            if (link instanceof Person person) {
-                focus(person);
-            }
-        });
 
         for (Person person : people) {
             PersonEntry entry = roster.entryFor(person);
@@ -230,9 +225,6 @@ public class TrainingConsole extends JDialog {
                     state.isIncludePrisoners = true;
                 }
             }
-        }
-        if (state.selected.size() == 1) {
-            state.focused = state.selected.iterator().next();
         }
 
         TrainingConsolePreferences preferences = TrainingConsolePreferences.getInstance();
@@ -636,13 +628,6 @@ public class TrainingConsole extends JDialog {
 
         int scroll = catalogScroll.getVerticalScrollBar().getValue();
         catalog.removeAll();
-        if (state.focused != null) {
-            PersonEntry entry = roster.entryFor(state.focused);
-            if (entry != null) {
-                catalog.add(PersonDetail.build(this, entry));
-                catalog.add(Box.createVerticalStrut(scaleForGUI(10)));
-            }
-        }
         List<JComponent> parts = switch (state.page) {
             case SKILLS -> selection.isEmpty() ? List.of() : SkillsPage.build(this, selection);
             case ABILITIES -> selection.isEmpty() ? List.of() : AbilitiesPage.build(this, selection);
@@ -918,19 +903,6 @@ public class TrainingConsole extends JDialog {
         state.isAscending = (state.sort == sort) ? !state.isAscending : (sort != Sort.XP);
         state.sort = sort;
         refresh();
-    }
-
-    /**
-     * Shows a person's record above the purchases, or hides it.
-     *
-     * @param person the person, or {@code null} to hide the record
-     */
-    void focus(@Nullable Person person) {
-        state.focused = person;
-        refreshPanel();
-        if (person != null) {
-            SwingUtilities.invokeLater(() -> catalogScroll.getVerticalScrollBar().setValue(0));
-        }
     }
 
     // endregion Selection and rows

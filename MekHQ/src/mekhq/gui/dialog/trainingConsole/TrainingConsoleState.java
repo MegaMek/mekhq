@@ -94,8 +94,6 @@ final class TrainingConsoleState {
 
     /** The selected people, in the order they were selected. */
     final Set<Person> selected = new LinkedHashSet<>();
-    /** The person whose record is shown above the purchases, if any. */
-    @Nullable Person focused;
 
     // Filters
     String query = "";

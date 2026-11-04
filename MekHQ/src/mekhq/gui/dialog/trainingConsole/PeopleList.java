@@ -50,11 +50,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -299,10 +297,6 @@ final class PeopleList extends JPanel {
         list.repaint();
     }
 
-    void setLinkHandler(HudLinkList.LinkHandler<PersonEntry> handler) {
-        list.setLinkHandler(handler);
-    }
-
     void setCount(int shown, int selected, int hidden) {
         count.setText(hidden > 0 ?
                             getFormattedTextAt(RESOURCE_BUNDLE, "people.count.hidden", shown, selected, hidden) :
@@ -350,8 +344,6 @@ final class PeopleList extends JPanel {
     private static final class PersonRowRenderer extends JPanel implements ListCellRenderer<PersonEntry> {
         private static final Font NAME_FONT = hudFont(Font.BOLD, 0.92f, 0.0f);
         private static final Font CELL_FONT = hudFont(Font.PLAIN, 0.86f, 0.0f);
-        private static final Font LINK_HOVER_FONT = NAME_FONT.deriveFont(Map.of(TextAttribute.UNDERLINE,
-              TextAttribute.UNDERLINE_ON));
 
         private final Predicate<Person> isSelected;
         private final Function<Person, Integer> pendingCount;
@@ -400,12 +392,7 @@ final class PeopleList extends JPanel {
                         BorderFactory.createEmptyBorder(0, scaleForGUI(8), 0, scaleForGUI(10)))));
             checkBox.setSelected(selected);
 
-            // The name opens the person's record above the purchases
             name.setText(person.getFullTitle());
-            HudLinkList.markLink(name, person);
-            boolean hovered = HudLinkList.isLinkHovered(list, index, person);
-            name.setForeground(hovered ? ACCENT_BRIGHT : TEXT);
-            name.setFont(hovered ? LINK_HOVER_FONT : NAME_FONT);
 
             role.setText(entry.isPrisoner() ?
                                getFormattedTextAt(RESOURCE_BUNDLE, "people.prisoner", entry.roleName()) :
