@@ -54,6 +54,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
 import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
@@ -62,8 +64,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nullable;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -231,6 +236,34 @@ final class SkillsPage {
         return stats;
     }
 
+    /**
+     * @return the levels where improving into them charges a training fee for at least one of the people who hold the
+     *       skill, priced the way the console charges it
+     */
+    private static IntPredicate paidLevels(TrainingConsole console, SkillStats stats, @Nullable SkillType type) {
+        TrainingPlan plan = console.plan();
+        if ((type == null) || !plan.context().isUseSkillTrainingCosts()) {
+            return level -> false;
+        }
+        boolean hasRoleHolder = false;
+        boolean hasOtherHolder = false;
+        for (Person person : stats.holderPeople) {
+            if (plan.context().roleSkillsOf(person).contains(stats.name)) {
+                hasRoleHolder = true;
+            } else {
+                hasOtherHolder = true;
+            }
+        }
+        boolean isRole = hasRoleHolder;
+        boolean isOther = hasOtherHolder;
+        CampaignOptions options = plan.context().options();
+        return level -> (level > 0)
+                              && ((isRole && !SkillTrainingCosts.getSkillImprovementCost(options, type, true,
+                                    level - 1).isZero())
+                                        || (isOther && !SkillTrainingCosts.getSkillImprovementCost(options, type,
+                                    false, level - 1).isZero()));
+    }
+
     private static JComponent card(TrainingConsole console, SkillStats stats, boolean isRoleSkill) {
         TrainingConsoleState state = console.state();
         boolean isOpen = stats.name.equals(state.openSkill);
@@ -294,12 +327,14 @@ final class SkillsPage {
             card.addToBody(ConsoleWidgets.wrapped(type.getFlavorText(false, true), TEXT_MUTED));
         }
         if (stats.holders() > 0) {
-            // A level where a new experience level starts is marked, so the player can see where fees land
+            // A level is marked only where reaching it charges a training fee for someone selected: fees are on,
+            // it starts a priced experience level, and the skill's category multiplier isn't zero. Whether it is a
+            // role skill, which decides the category, can differ from person to person
+            IntPredicate isPaid = paidLevels(console, stats, type);
+            boolean hasPaidLevel = IntStream.rangeClosed(1, MAX_LEVEL).anyMatch(isPaid);
             card.addToBody(ConsoleWidgets.spreadChart(getTextAt(RESOURCE_BUNDLE, "skills.spread"), 0, MAX_LEVEL,
-                  level -> stats.levels[level],
-                  level -> (type != null) && (level > 0)
-                                 && (type.getExperienceLevel(level) > type.getExperienceLevel(level - 1)),
-                  getTextAt(RESOURCE_BUNDLE, "skills.spread.key")));
+                  level -> stats.levels[level], hasPaidLevel ? isPaid : null,
+                  hasPaidLevel ? getTextAt(RESOURCE_BUNDLE, "skills.spread.key") : null));
         }
         card.addToBody(ConsoleWidgets.legend(segments));
         if (improve.ready() > 0) {
