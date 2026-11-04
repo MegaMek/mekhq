@@ -214,7 +214,8 @@ public class TrainingConsole extends JDialog {
             state.query = text;
             refresh();
         }, this::onRow, this::selectShown, this::clearSelection, this::sortBy, state.selected::contains,
-              person -> plan.projectionOf(person).purchaseCount());
+              person -> plan.projectionOf(person).purchaseCount(),
+              person -> plan.projectionOf(person).availableXp());
         peopleList.setLinkHandler((entry, link) -> {
             if (link instanceof Person person) {
                 focus(person);
@@ -585,6 +586,7 @@ public class TrainingConsole extends JDialog {
             case ROLE -> Comparator.comparing(PersonEntry::roleName);
             case FORMATION -> Comparator.comparing(PersonEntry::formationName);
             case EXPERIENCE -> Comparator.comparing(PersonEntry::skillLevel);
+            case XP -> Comparator.comparingInt((PersonEntry entry) -> plan.projectionOf(entry.person()).availableXp());
         };
         if (!state.isAscending) {
             comparator = comparator.reversed();
@@ -912,7 +914,8 @@ public class TrainingConsole extends JDialog {
     }
 
     private void sortBy(Sort sort) {
-        state.isAscending = (state.sort != sort) || !state.isAscending;
+        // XP sorts most first, as the people with XP to spend are usually the ones wanted
+        state.isAscending = (state.sort == sort) ? !state.isAscending : (sort != Sort.XP);
         state.sort = sort;
         refresh();
     }

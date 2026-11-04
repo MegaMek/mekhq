@@ -55,7 +55,8 @@ final class TrainingConsoleState {
         NAME,
         ROLE,
         FORMATION,
-        EXPERIENCE
+        EXPERIENCE,
+        XP
     }
 
     /** Which skills the Skills page lists. */

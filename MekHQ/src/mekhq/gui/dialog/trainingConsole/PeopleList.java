@@ -71,7 +71,7 @@ import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
 
 /**
  * The Training Console's people list: a search field, a count line, sortable column headers, and one row per person
- * with four columns: name, role, formation and experience.
+ * with five columns: name, role, formation, experience and available XP.
  *
  * <p>The list keeps no selection of its own. A click or Space on a row is reported to the console, which keeps the
  * selection and redraws. Only the rows on screen are drawn, so the list holds thousands of people without slowing
@@ -83,8 +83,8 @@ import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
 final class PeopleList extends JPanel {
     private static final String RESOURCE_BUNDLE = TrainingConsole.RESOURCE_BUNDLE;
     private static final int ROW_HEIGHT = 32;
-    /** How the four columns share the width: name, role, formation, experience. */
-    private static final double[] COLUMN_WEIGHTS = { 0.32, 0.2, 0.32, 0.16 };
+    /** How the columns share the width: name, role, formation, experience, XP. */
+    private static final double[] COLUMN_WEIGHTS = { 0.3, 0.19, 0.3, 0.13, 0.08 };
 
     /** Reports a click or Space on a row. */
     @FunctionalInterface
@@ -138,9 +138,11 @@ final class PeopleList extends JPanel {
      * @param onSort        called with a column when the player clicks its header
      * @param isSelected    whether a person is selected
      * @param pendingCount  how many purchases are staged for a person
+     * @param availableXp   a person's XP once everything staged for them is paid for
      */
     PeopleList(Consumer<String> onSearch, RowAction onRow, Runnable onSelectShown, Runnable onClear,
-          Consumer<Sort> onSort, Predicate<Person> isSelected, Function<Person, Integer> pendingCount) {
+          Consumer<Sort> onSort, Predicate<Person> isSelected, Function<Person, Integer> pendingCount,
+          Function<Person, Integer> availableXp) {
         super(new BorderLayout());
         this.onSort = onSort;
         setOpaque(true);
@@ -199,7 +201,7 @@ final class PeopleList extends JPanel {
               BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(10), scaleForGUI(6), scaleForGUI(12))));
         setSortShown(Sort.NAME, true);
 
-        list.setCellRenderer(new PersonRowRenderer(isSelected, pendingCount));
+        list.setCellRenderer(new PersonRowRenderer(isSelected, pendingCount, availableXp));
         list.setFixedCellHeight(scaleForGUI(ROW_HEIGHT));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setBackground(SURFACE_DEEP);
@@ -251,7 +253,7 @@ final class PeopleList extends JPanel {
     void setSortShown(Sort sort, boolean isAscending) {
         header.removeAll();
         header.add(Box.createHorizontalStrut(scaleForGUI(26)), constraints(0, 0));
-        Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.EXPERIENCE };
+        Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.EXPERIENCE, Sort.XP };
         for (int index = 0; index < columns.length; index++) {
             Sort column = columns[index];
             String text = getTextAt(RESOURCE_BUNDLE, "people.column." + column.name()).toUpperCase(Locale.ROOT);
@@ -342,7 +344,7 @@ final class PeopleList extends JPanel {
         component.setMinimumSize(new Dimension(0, height));
     }
 
-    /** A person row: the selection box, then name, role, formation and experience. */
+    /** A person row: the selection box, then name, role, formation, experience and available XP. */
     private static final class PersonRowRenderer extends JPanel implements ListCellRenderer<PersonEntry> {
         private static final Font NAME_FONT = hudFont(Font.BOLD, 0.92f, 0.0f);
         private static final Font CELL_FONT = hudFont(Font.PLAIN, 0.86f, 0.0f);
@@ -351,20 +353,24 @@ final class PeopleList extends JPanel {
 
         private final Predicate<Person> isSelected;
         private final Function<Person, Integer> pendingCount;
+        private final Function<Person, Integer> availableXp;
         private final HudCheckBox checkBox = new HudCheckBox("");
         private final JLabel name = cell(NAME_FONT, TEXT);
         private final JLabel role = cell(CELL_FONT, TEXT_MUTED);
         private final JLabel formation = cell(CELL_FONT, TEXT_MUTED);
         private final JLabel experience = cell(CELL_FONT, TEXT);
+        private final JLabel xp = cell(CELL_FONT, TEXT);
 
-        PersonRowRenderer(Predicate<Person> isSelected, Function<Person, Integer> pendingCount) {
+        PersonRowRenderer(Predicate<Person> isSelected, Function<Person, Integer> pendingCount,
+              Function<Person, Integer> availableXp) {
             super(new GridBagLayout());
             this.isSelected = isSelected;
             this.pendingCount = pendingCount;
+            this.availableXp = availableXp;
             setOpaque(true);
             checkBox.setOpaque(false);
             add(checkBox, constraints(0, 0));
-            JLabel[] cells = { name, role, formation, experience };
+            JLabel[] cells = { name, role, formation, experience, xp };
             for (int index = 0; index < cells.length; index++) {
                 fixWidth(cells[index]);
                 add(cells[index], constraints(index + 1, COLUMN_WEIGHTS[index]));
@@ -416,6 +422,13 @@ final class PeopleList extends JPanel {
                 experience.setText(level);
                 experience.setForeground(ConsoleWidgets.levelColor(entry.skillLevel()));
             }
+
+            // XP left once everything staged for them is paid for, amber when staging has spent some of it
+            int available = availableXp.apply(person);
+            xp.setText(TrainingConsole.formatCount(available));
+            xp.setForeground((pending > 0) ? AMBER : ((available > 0) ? TEXT : TEXT_FAINT));
+            xp.setToolTipText((pending > 0) ?
+                                    getFormattedTextAt(RESOURCE_BUNDLE, "people.xp.staged", person.getXP()) : null);
             return this;
         }
     }
