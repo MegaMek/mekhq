@@ -2377,6 +2377,9 @@ class StratConRulesManagerTest {
               AbstractContract teamContract) {
             Formation formation = mock(Formation.class);
             when(formation.isDeployed()).thenReturn(isDeployed);
+            // A fighting unit, so the support-carrier check sees a formation that deploys something. Mockito returns
+            // null, not an empty Vector, for an unstubbed getAllUnits.
+            when(formation.getAllUnits(false)).thenReturn(new Vector<>(List.of(UUID.randomUUID())));
 
             CombatTeam combatTeam = mock(CombatTeam.class);
             when(combatTeam.getContract(campaign)).thenReturn(teamContract);
