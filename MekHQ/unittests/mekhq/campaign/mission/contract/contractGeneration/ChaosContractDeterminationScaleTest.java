@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link ChaosContractDeterminationScale#generateScaleForDetachment}. Scale is the detachment's combat Battle
- * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded up. Only STANDARD formations in a combat
- * role count.
+ * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded to the nearest whole number. Only
+ * STANDARD formations in a combat role count.
  */
 class ChaosContractDeterminationScaleTest {
     private static final double DELTA = 1e-9;
