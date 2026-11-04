@@ -244,7 +244,6 @@ final class ConsoleWidgets {
                 nameLine.add(bold(isOpen ? "\u25BE" : "\u25B8", 0.95f, ACCENT), BorderLayout.WEST);
             }
             JLabel name = bold(title, 0.95f, TEXT);
-            name.setToolTipText(title);
             // Without this the label would ask for its whole width, and the card would grow rather than shorten it
             name.setMinimumSize(new Dimension(0, name.getPreferredSize().height));
             name.setPreferredSize(new Dimension(0, name.getPreferredSize().height));
@@ -270,18 +269,6 @@ final class ConsoleWidgets {
                 barHolder.setAlignmentX(Component.LEFT_ALIGNMENT);
                 head.add(barHolder);
             }
-            if (onToggle != null) {
-                head.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                head.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseReleased(MouseEvent event) {
-                        if (head.contains(event.getPoint())) {
-                            onToggle.run();
-                        }
-                    }
-                });
-            }
-
             JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
             top.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(5), scaleForGUI(8),
                   scaleForGUI(10)));
@@ -290,6 +277,13 @@ final class ConsoleWidgets {
             actionHolder.add(actions, BorderLayout.NORTH);
             top.add(actionHolder, BorderLayout.EAST);
             add(top, BorderLayout.NORTH);
+            if (onToggle != null) {
+                // The whole header strip opens the card: clicks on the name, tags and bar fall through to the header,
+                // and clicks on the padding and the space around the action fall through to the strip. The action's
+                // own button keeps its clicks. Nothing in the header has a tooltip, which would take its clicks.
+                installToggle(top, onToggle);
+                installToggle(head, onToggle);
+            }
 
             body.setBorder(BorderFactory.createCompoundBorder(
                   BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, DIVIDER),
@@ -297,6 +291,18 @@ final class ConsoleWidgets {
                         scaleForGUI(10))));
             body.setVisible(isOpen);
             add(body, BorderLayout.CENTER);
+        }
+
+        private static void installToggle(Component component, Runnable onToggle) {
+            component.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            component.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent event) {
+                    if (component.contains(event.getPoint())) {
+                        onToggle.run();
+                    }
+                }
+            });
         }
 
         /** Adds a part to the card's body, with a gap above it. */
