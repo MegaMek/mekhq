@@ -359,7 +359,7 @@ final class ConsoleWidgets {
         return getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "reason.count", count, refusal.getLabel());
     }
 
-    /** @return a line with text on the left and a link on the right, such as "12 short on XP · Select them" */
+    /** @return a line with text on the left and a link on the right, such as "12 short on XP · Toggle them" */
     static JComponent reasonLine(String text, @Nullable String linkText, @Nullable Runnable onLink) {
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         line.add(label(text, 0.84f, TEXT_MUTED), BorderLayout.CENTER);

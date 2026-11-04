@@ -120,6 +120,8 @@ public class TrainingConsole extends JDialog {
     private final TrainingConsoleState state = new TrainingConsoleState();
     private List<PersonEntry> shown = List.of();
     private int lastRowIndex = -1;
+    /** The selection before a "Toggle them" link narrowed it, so a second click can bring it back. */
+    private @Nullable Set<Person> selectionBeforeToggle;
     private String message = "";
     private boolean isWarning;
     private boolean closeRequested;
@@ -877,18 +879,30 @@ public class TrainingConsole extends JDialog {
     }
 
     /**
-     * Makes these people the selection, for links such as "select the 12 short on XP".
+     * Toggles the selection to a group, for the "Toggle them" links such as the 12 short on XP: the first click
+     * narrows the selection to the group, and a second click on the narrowed selection brings back what was selected
+     * before.
      *
-     * @param people the people to select
+     * @param people the group
      */
-    void select(Collection<Person> people) {
-        state.selected.clear();
-        state.selected.addAll(people);
+    void toggle(Collection<Person> people) {
+        Set<Person> group = new LinkedHashSet<>(people);
         lastRowIndex = -1;
-        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.selected", people.size()), false);
+        if ((selectionBeforeToggle != null) && state.selected.equals(group)) {
+            state.selected.clear();
+            state.selected.addAll(selectionBeforeToggle);
+            selectionBeforeToggle = null;
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.toggleRestored", state.selected.size()), false);
+            return;
+        }
+        selectionBeforeToggle = new LinkedHashSet<>(state.selected);
+        state.selected.clear();
+        state.selected.addAll(group);
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.toggled", group.size()), false);
     }
 
     private void refreshAfterSelection() {
+        selectionBeforeToggle = null;
         int selectedShown = 0;
         Set<Person> shownSet = new HashSet<>(shownPeople());
         for (Person person : state.selected) {

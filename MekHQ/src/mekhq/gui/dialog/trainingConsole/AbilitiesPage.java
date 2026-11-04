@@ -76,8 +76,8 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 /**
  * The Abilities page's catalog: one card per special ability in the chosen group. Each card says how many of the
  * selected people can gain the ability now, how many are short on XP, how many already have it, and why the rest
- * can't, with a link to select each group. An ability that needs a choice, such as Weapon Specialist, can take each
- * person's own weapon, so a whole company can gain it in one go.
+ * can't, with a link that toggles the selection to each group. An ability that needs a choice, such as Weapon
+ * Specialist, can take each person's own weapon, so a whole company can gain it in one go.
  *
  * @author Illiani
  * @since 0.51.01
@@ -295,25 +295,34 @@ final class AbilitiesPage {
                 card.addToBody(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.fees",
                       stats.fees.toAmountAndSymbolString()), 0.84f, AMBER));
             }
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.reason.narrow",
-                  stats.ready), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(stats.readyPeople)));
+        }
+        if (stats.ready > 0) {
+            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE,
+                  isBuyOff ? "abilities.line.canBuyOff" : "abilities.line.can", stats.ready),
+                  getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(stats.readyPeople)));
+        }
+        List<Person> cannot = new ArrayList<>(stats.shortPeople);
+        cannot.addAll(stats.heldPeople);
+        stats.blocked.values().forEach(cannot::addAll);
+        if (!cannot.isEmpty()) {
+            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "line.cannot",
+                  cannot.size()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(cannot)));
         }
         if (stats.shortXp > 0) {
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.short",
-                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(stats.shortPeople)));
+                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
+                  () -> console.toggle(stats.shortPeople)));
         }
         if (stats.held > 0) {
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.reason.held",
-                  stats.held), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(stats.heldPeople)));
+                  stats.held), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
+                  () -> console.toggle(stats.heldPeople)));
         }
         for (Map.Entry<TrainingRefusal, List<Person>> entry : stats.blocked.entrySet()) {
             List<Person> people = entry.getValue();
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.reason.blocked",
-                  people.size(), entry.getKey().getLabel()), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(people)));
+                  people.size(), entry.getKey().getLabel()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
+                  () -> console.toggle(people)));
         }
         return card;
     }

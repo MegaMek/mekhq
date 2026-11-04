@@ -315,10 +315,21 @@ final class SkillsPage {
             card.addToBody(feeBreakdown(console, stats));
             card.addToBody(trainTo(console, stats));
         }
+        if (stats.ready > 0) {
+            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.line.can",
+                  stats.ready), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
+                  () -> console.toggle(stats.readyPeople)));
+        }
+        Set<Person> ready = new HashSet<>(stats.readyPeople);
+        List<Person> cannot = selection.stream().filter(person -> !ready.contains(person)).toList();
+        if (!cannot.isEmpty()) {
+            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "line.cannot",
+                  cannot.size()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(cannot)));
+        }
         if (stats.shortXp > 0) {
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.short",
-                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(stats.shortPeople)));
+                  stats.shortXp), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
+                  () -> console.toggle(stats.shortPeople)));
         }
         if (!stats.lackingPeople.isEmpty() && (stats.holders > 0)) {
             JPanel learnLine = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
@@ -345,11 +356,6 @@ final class SkillsPage {
             });
             aptitudeLine.add(aptitude, BorderLayout.EAST);
             card.addToBody(aptitudeLine);
-        }
-        if (stats.ready > 0) {
-            card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "skills.reason.narrow",
-                  stats.ready), getTextAt(RESOURCE_BUNDLE, "link.selectThem"),
-                  () -> console.select(stats.readyPeople)));
         }
         return card;
     }
