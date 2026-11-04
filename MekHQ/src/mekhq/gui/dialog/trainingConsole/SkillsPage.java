@@ -71,6 +71,7 @@ import javax.swing.JPanel;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.personnel.training.PersonProjection;
 import mekhq.campaign.personnel.training.TrainingPlan;
@@ -244,20 +245,28 @@ final class SkillsPage {
           boolean isRoleSkill) {
         TrainingConsoleState state = console.state();
         boolean isOpen = stats.name.equals(state.openSkill);
-        int total = selection.size();
 
+        // The skill's type and linked attributes, then whether it is a role skill and whether it costs C-bills
         List<JLabel> tags = new ArrayList<>();
+        SkillType skillType = SkillType.getType(stats.name);
+        if (skillType != null) {
+            SkillSubType subType = skillType.getSubType();
+            if (subType != SkillSubType.NONE) {
+                tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "skills.tag.type." + subType.name()),
+                      TEXT_FAINT));
+            }
+            for (SkillAttribute attribute : List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute())) {
+                if ((attribute != null) && !attribute.isNoAttribute()) {
+                    tags.add(ConsoleWidgets.tag(attribute.getLabel(), TEXT_MUTED));
+                }
+            }
+        }
         if (isRoleSkill) {
             tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "skills.tag.role"), ACCENT));
         }
         if (!stats.fees.isZero()) {
             tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "skills.tag.fee"), AMBER));
         }
-        String meta = (stats.holders == 0) ?
-                            getFormattedTextAt(RESOURCE_BUNDLE, "skills.meta.none", total) :
-                            getFormattedTextAt(RESOURCE_BUNDLE, "skills.meta", stats.holders, total, stats.minLevel,
-                                  stats.maxLevel, String.format(Locale.ROOT, "%.1f",
-                                        (double) stats.levelSum / stats.holders));
         List<Segment> segments = List.of(
               new Segment(ConsoleWidgets.READY_COLOR, stats.ready, getTextAt(RESOURCE_BUNDLE, "skills.legend.ready")),
               new Segment(ConsoleWidgets.SHORT_COLOR, stats.shortXp, getTextAt(RESOURCE_BUNDLE,
@@ -300,7 +309,7 @@ final class SkillsPage {
                             null);
         }
 
-        CatalogCard card = new CatalogCard(stats.name, tags, meta, new StackedBar(segments), action, isOpen, () -> {
+        CatalogCard card = new CatalogCard(stats.name, tags, "", new StackedBar(segments), action, isOpen, () -> {
             state.openSkill = isOpen ? null : stats.name;
             console.refreshPanel();
         });
