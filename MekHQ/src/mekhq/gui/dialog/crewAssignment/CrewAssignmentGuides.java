@@ -64,7 +64,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudRing;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
-import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * Builds the guide for each page of the {@link CrewAssignmentDialog}, from the {@code CrewGuide.<page>.} keys of its
@@ -151,7 +151,7 @@ final class CrewAssignmentGuides {
         links.add(leftAligned(Hud.eyebrow(text("CrewGuide.glossary"))));
         links.add(Box.createVerticalStrut(scaleForGUI(4)));
         for (GlossaryEntry entry : entries) {
-            links.add(leftAligned(Hud.link(entry.getTitle(), () -> new GlossaryEntryDialog(parent, entry))));
+            links.add(leftAligned(Hud.link(entry.getTitle(), () -> GlossaryConsole.showEntry(parent, entry))));
             links.add(Box.createVerticalStrut(scaleForGUI(3)));
         }
         return links;
