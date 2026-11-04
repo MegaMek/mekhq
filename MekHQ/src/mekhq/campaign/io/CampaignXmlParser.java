@@ -156,6 +156,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.training.TrainingPresets;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
@@ -2356,6 +2357,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campaign.getPlayerForce().setHumanResources(humanResources);
                 } else if (nodeName.equalsIgnoreCase("roleplay")) {
                     campaign.setRoleplay(Roleplay.generateInstanceFromXML(workingNode));
+                } else if (nodeName.equalsIgnoreCase("trainingPresets")) {
+                    campaign.setTrainingPresets(TrainingPresets.generateInstanceFromXML(workingNode,
+                          campaign.getCampaignOptions()));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {

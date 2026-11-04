@@ -124,7 +124,31 @@ public final class SkillTrainingCosts {
         // Use the level including modifiers, as shown to the player; improving the skill raises it by one
         Skill skill = person.getSkill(skillName);
         int currentLevel = skill == null ? -1 : skill.getTotalSkillLevel(skillModifierData);
-        int currentExperienceLevel = skill == null ? -1 : skillType.getExperienceLevel(currentLevel);
+        return getSkillImprovementCost(campaignOptions, skillType, isRoleSkill, currentLevel);
+    }
+
+    /**
+     * Gets the C-bill cost of raising a skill by one level from a given level, for callers that price improvements
+     * that haven't happened yet, such as the Training Console pricing the second of two staged improvements.
+     *
+     * @param campaignOptions the campaign's options
+     * @param skillType       the skill
+     * @param isRoleSkill     whether the skill is one of the person's role skills
+     * @param currentLevel    the skill's current total level, including modifiers, or {@code -1} if the person doesn't
+     *                        have the skill yet
+     *
+     * @return the cost, or zero if improvement costs are disabled or the improvement doesn't reach a new, priced
+     *       experience level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getSkillImprovementCost(CampaignOptions campaignOptions, SkillType skillType,
+          boolean isRoleSkill, int currentLevel) {
+        if (!campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
+            return Money.zero();
+        }
+        int currentExperienceLevel = currentLevel < 0 ? -1 : skillType.getExperienceLevel(currentLevel);
         int nextExperienceLevel = skillType.getExperienceLevel(currentLevel + 1);
 
         if (nextExperienceLevel <= currentExperienceLevel || nextExperienceLevel < EXP_REGULAR) {

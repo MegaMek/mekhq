@@ -563,4 +563,31 @@ class SkillTrainingCostsTest {
             verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(Money.of(1_234)), anyString());
         }
     }
+
+    /**
+     * The level-based overload, which the Training Console uses to price improvements that are staged but not yet
+     * applied, must price exactly as the person-based one does.
+     */
+    @Nested
+    class LevelBasedPricing {
+        @ParameterizedTest
+        @CsvSource({ "2, true", "3, true", "4, true", "5, false", "6, false" })
+        void matchesThePersonBasedPrice(int currentLevel, boolean isRoleSkill) {
+            assertEquals(cost(personWithSkillAt(currentLevel), isRoleSkill),
+                  SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, isRoleSkill, currentLevel));
+        }
+
+        @Test
+        void learningASkillIsFree() {
+            assertEquals(Money.zero(), SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, true,
+                  -1));
+        }
+
+        @Test
+        void freeWhenTheOptionIsOff() {
+            campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, false);
+            assertEquals(Money.zero(), SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, true,
+                  3));
+        }
+    }
 }
