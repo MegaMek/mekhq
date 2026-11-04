@@ -283,8 +283,8 @@ public class PartsStoreModel extends AbstractTableModel {
          */
         public FormattedValue<Money> getCost() {
             if (null == cost) {
-                Money actualValue = part.getActualValue();
-                cost = new FormattedValue<>(actualValue, actualValue.toAmountString());
+                Money purchaseCost = part.getPurchaseCost();
+                cost = new FormattedValue<>(purchaseCost, purchaseCost.toAmountString());
             }
             return cost;
         }

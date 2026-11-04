@@ -47,6 +47,7 @@ import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -132,6 +133,15 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quantity) {
         return Part.formatQuantityName(quantity, getName());
+    }
+
+    /**
+     * @return what the campaign pays for the ordered unit, acquisition multipliers included (see
+     *       {@link Unit#getPurchaseCost()})
+     */
+    @Override
+    public Money getBuyCost() {
+        return getPurchaseCost();
     }
 
     @Override

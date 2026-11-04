@@ -101,11 +101,6 @@ public class ProtoMekArmor extends Armor {
     }
 
     @Override
-    public Money getBuyCost() {
-        return getActualValue();
-    }
-
-    @Override
     public boolean isSamePartType(Part part) {
         return (part instanceof ProtoMekArmor protoMekArmor)
                      && isClanTechBase() == protoMekArmor.isClanTechBase()
