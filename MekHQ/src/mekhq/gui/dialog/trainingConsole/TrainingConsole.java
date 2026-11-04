@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.trainingConsole;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -109,6 +110,8 @@ public class TrainingConsole extends JDialog {
     static final String RESOURCE_BUNDLE = "mekhq.resources.TrainingConsole";
 
     private static final int RAIL_WIDTH = 260;
+    /** Characters per line for the rail's check boxes, which wrap rather than run past its edge. */
+    private static final int RAIL_WRAP = 30;
     private static final int PANEL_WIDTH = 470;
 
     private final Campaign campaign;
@@ -143,9 +146,12 @@ public class TrainingConsole extends JDialog {
         state.level = value;
         refresh();
     });
-    private final HudCheckBox includePrisoners = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "rail.prisoners"));
-    private final HudCheckBox onlyStaged = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "rail.onlyStaged"));
-    private final HudCheckBox hideExcluded = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "rail.hideExcluded"));
+    private final HudCheckBox includePrisoners = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE, "rail.prisoners"),
+          RAIL_WRAP));
+    private final HudCheckBox onlyStaged = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE, "rail.onlyStaged"),
+          RAIL_WRAP));
+    private final HudCheckBox hideExcluded = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE, "rail.hideExcluded"),
+          RAIL_WRAP));
 
     // Center
     private final CardLayout centerCards = new CardLayout();
