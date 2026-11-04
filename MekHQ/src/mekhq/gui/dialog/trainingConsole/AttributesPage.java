@@ -38,8 +38,10 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import javax.swing.BorderFactory;
@@ -48,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -59,6 +62,7 @@ import mekhq.campaign.personnel.training.TrainingPurchase;
 import mekhq.campaign.personnel.training.TrainingPurchase.AttributeIncrease;
 import mekhq.campaign.personnel.training.TrainingPurchase.EdgeRefill;
 import mekhq.campaign.personnel.training.TrainingPurchase.TraitChange;
+import mekhq.campaign.personnel.training.TrainingRefusal;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.dialog.trainingConsole.ConsoleWidgets.CatalogCard;
@@ -78,13 +82,24 @@ final class AttributesPage {
     }
 
     /** How many of the selection can make a purchase, and what it costs them. */
-    private record Tally(int ready, int xp, List<TrainingPurchase> purchases) {}
+    /**
+     * @param refusal the most common reason the rest can't, or {@code null} if nothing stops anyone
+     * @param refused how many that reason stops
+     */
+    private record Tally(int ready, int xp, List<TrainingPurchase> purchases, @Nullable TrainingRefusal refusal,
+          int refused) {
+        /** @return why no one can, for under a disabled button, or {@code null} if someone can */
+        @Nullable String reason() {
+            return ((ready > 0) || (refusal == null)) ? null : ConsoleWidgets.reason(refused, refusal);
+        }
+    }
 
     private static Tally tally(TrainingPlan plan, List<Person> selection,
           Function<Person, TrainingPurchase> purchaseFor) {
         int ready = 0;
         int xp = 0;
         List<TrainingPurchase> purchases = new ArrayList<>();
+        Map<TrainingRefusal, Integer> refusals = new EnumMap<>(TrainingRefusal.class);
         for (Person person : selection) {
             TrainingPurchase purchase = purchaseFor.apply(person);
             Quote quote = plan.quote(purchase);
@@ -92,9 +107,14 @@ final class AttributesPage {
                 ready++;
                 xp += quote.xp();
                 purchases.add(purchase);
+            } else {
+                refusals.merge(quote.refusal(), 1, Integer::sum);
             }
         }
-        return new Tally(ready, xp, purchases);
+        Map.Entry<TrainingRefusal, Integer> top = refusals.entrySet().stream().max(Map.Entry.comparingByValue())
+                                                         .orElse(null);
+        return new Tally(ready, xp, purchases, (top == null) ? null : top.getKey(),
+              (top == null) ? 0 : top.getValue());
     }
 
     static List<JComponent> build(TrainingConsole console, List<Person> selection) {
@@ -121,11 +141,13 @@ final class AttributesPage {
                 return base + projection.attributeChange(attribute);
             };
             Tally raise = tally(plan, selection, person -> new AttributeIncrease(person, attribute));
-            HudButton button = button(getFormattedTextAt(RESOURCE_BUNDLE, "attributes.raise", raise.ready()),
+            HudButton button = button(ConsoleWidgets.countedLabel("attributes.raise.plain", "attributes.raise",
+                        raise.ready()),
                   raise.ready() > 0, () -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE, "attributes.step.raise",
                         attribute.getLabel()), raise.purchases()));
             cards.add(new CatalogCard(attribute.getLabel(), List.of(), range(selection, current), null,
-                  ConsoleWidgets.actionColumn(button, xpLine(raise.xp(), raise.ready()), ""), false, null));
+                  ConsoleWidgets.actionColumn(button, xpLine(raise.xp(), raise.ready()), "", raise.reason()), false,
+                  null));
         }
 
         for (ATOWTraits trait : ATOWTraits.values()) {
@@ -142,14 +164,15 @@ final class AttributesPage {
                 }
                 Tally step = tally(plan, selection, person -> new TraitChange(person, trait, delta));
                 boolean isCostly = TrainingPricer.isCostlyDirection(trait, delta);
-                HudButton button = button(getFormattedTextAt(RESOURCE_BUNDLE,
-                            (delta > 0) ? "traits.raise" : "traits.lower", step.ready()), step.ready() > 0,
+                String key = (delta > 0) ? "traits.raise" : "traits.lower";
+                HudButton button = button(ConsoleWidgets.countedLabel(key + ".plain", key, step.ready()),
+                      step.ready() > 0,
                       () -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE,
                             (delta > 0) ? "traits.step.raise" : "traits.step.lower", trait.getDisplayName()),
                             step.purchases()));
                 button.setToolTipText(getTextAt(RESOURCE_BUNDLE, isCostly ? "traits.costs.toolTipText" :
                                                                        "traits.gives.toolTipText"));
-                buttons.add(ConsoleWidgets.actionColumn(button, xpLine(step.xp(), step.ready()), ""));
+                buttons.add(ConsoleWidgets.actionColumn(button, xpLine(step.xp(), step.ready()), "", step.reason()));
                 buttons.add(Box.createVerticalStrut(scaleForGUI(4)));
             }
             cards.add(new CatalogCard(trait.getDisplayName(), List.of(), range(selection, current), null, buttons,
@@ -159,12 +182,14 @@ final class AttributesPage {
         if ((group == AttributeGroup.EDGE) && matches(getTextAt(RESOURCE_BUNDLE, "edge.title"), query)) {
             Tally refill = tally(plan, selection, EdgeRefill::new);
             long spent = selection.stream().filter(person -> person.getUsedEdge() > 0).count();
-            HudButton button = button(getFormattedTextAt(RESOURCE_BUNDLE, "edge.refill", refill.ready()),
+            HudButton button = button(ConsoleWidgets.countedLabel("edge.refill.plain", "edge.refill",
+                        refill.ready()),
                   refill.ready() > 0, () -> console.stage(getTextAt(RESOURCE_BUNDLE, "edge.step"),
                         refill.purchases()));
             cards.add(new CatalogCard(getTextAt(RESOURCE_BUNDLE, "edge.title"), List.of(),
                   getFormattedTextAt(RESOURCE_BUNDLE, "edge.meta", spent), null,
-                  ConsoleWidgets.actionColumn(button, xpLine(refill.xp(), refill.ready()), ""), false, null));
+                  ConsoleWidgets.actionColumn(button, xpLine(refill.xp(), refill.ready()), "", refill.reason()), false,
+                  null));
         }
 
         if (cards.isEmpty()) {
@@ -181,7 +206,7 @@ final class AttributesPage {
     }
 
     private static HudButton button(String text, boolean isArmed, Runnable onClick) {
-        HudButton button = new HudButton(text.toUpperCase(Locale.ROOT), false, true);
+        HudButton button = new HudButton(text.toUpperCase(Locale.ROOT), true, true);
         button.setArmed(isArmed);
         button.addActionListener(event -> onClick.run());
         return button;

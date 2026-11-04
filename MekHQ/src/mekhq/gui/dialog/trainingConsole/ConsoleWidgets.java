@@ -34,6 +34,8 @@ package mekhq.gui.dialog.trainingConsole;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -51,6 +53,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.training.TrainingRefusal;
 import mekhq.gui.baseComponents.hud.Hud;
 
 /**
@@ -229,6 +232,10 @@ final class ConsoleWidgets {
 
             JPanel head = column();
             JPanel nameLine = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), 0));
+            if (onToggle != null) {
+                // An arrow shows the card opens for more detail, and which way it is now
+                nameLine.add(bold(isOpen ? "\u25BE" : "\u25B8", 0.95f, ACCENT));
+            }
             nameLine.add(bold(title, 0.95f, TEXT));
             tags.forEach(nameLine::add);
             nameLine.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -293,6 +300,15 @@ final class ConsoleWidgets {
      * @return a right-aligned column for a card's action: the button, then its cost lines
      */
     static JComponent actionColumn(JComponent button, String xpLine, String feeLine) {
+        return actionColumn(button, xpLine, feeLine, null);
+    }
+
+    /**
+     * @param reason why the button can't be used, shown under it, or {@code null} if it can be
+     *
+     * @return a right-aligned column for a card's action: the button, then its cost lines or why it is unavailable
+     */
+    static JComponent actionColumn(JComponent button, String xpLine, String feeLine, @Nullable String reason) {
         JPanel column = column();
         button.setAlignmentX(Component.RIGHT_ALIGNMENT);
         column.add(button);
@@ -307,7 +323,27 @@ final class ConsoleWidgets {
             fee.setAlignmentX(Component.RIGHT_ALIGNMENT);
             column.add(fee);
         }
+        if (reason != null) {
+            JLabel why = label(reason, 0.78f, TEXT_FAINT);
+            why.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            column.add(Box.createVerticalStrut(scaleForGUI(3)));
+            column.add(why);
+        }
         return column;
+    }
+
+    /**
+     * @return a button label with how many it applies to, such as "+1 level · 12", or the bare label when it applies
+     *       to no one, so a disabled button doesn't read "· 0"
+     */
+    static String countedLabel(String plainKey, String countKey, int count) {
+        return (count > 0) ? getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, countKey, count) :
+                     getTextAt(TrainingConsole.RESOURCE_BUNDLE, plainKey);
+    }
+
+    /** @return why a purchase is unavailable, such as "4 can’t: not enough XP" */
+    static String reason(int count, TrainingRefusal refusal) {
+        return getFormattedTextAt(TrainingConsole.RESOURCE_BUNDLE, "reason.count", count, refusal.getLabel());
     }
 
     /** @return a line with text on the left and a link on the right, such as "12 short on XP · Select them" */

@@ -261,25 +261,35 @@ final class SkillsPage {
 
         JComponent action;
         if (stats.holders > 0) {
-            HudButton raise = new HudButton(getFormattedTextAt(RESOURCE_BUNDLE, "skills.raise", stats.ready)
-                                                  .toUpperCase(Locale.ROOT), true, true);
+            HudButton raise = new HudButton(ConsoleWidgets.countedLabel("skills.raise.plain", "skills.raise",
+                  stats.ready).toUpperCase(Locale.ROOT), true, true);
             boolean isAffordable = !stats.fees.isGreaterThan(console.plan().fundsLeft());
             raise.setArmed((stats.ready > 0) && isAffordable);
             raise.setToolTipText(isAffordable ? null : getTextAt(RESOURCE_BUNDLE, "fees.cannotAfford"));
             raise.addActionListener(event -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE,
                   "skills.step.raise", stats.name), improvements(stats.readyPeople, stats.name, 1)));
+            String reason = null;
+            if (!isAffordable) {
+                reason = getTextAt(RESOURCE_BUNDLE, "fees.cannotAfford.short");
+            } else if (stats.ready == 0) {
+                reason = (stats.shortXp >= stats.atLimit) ?
+                               ConsoleWidgets.reason(stats.shortXp, TrainingRefusal.NOT_ENOUGH_XP) :
+                               ConsoleWidgets.reason(stats.atLimit, TrainingRefusal.AT_LIMIT);
+            }
             action = ConsoleWidgets.actionColumn(raise,
                   (stats.ready > 0) ? getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", stats.xp) : "",
-                  ConsoleWidgets.money(stats.fees));
+                  ConsoleWidgets.money(stats.fees), reason);
         } else {
-            HudButton learn = new HudButton(getFormattedTextAt(RESOURCE_BUNDLE, "skills.learn", stats.learnReady)
-                                                  .toUpperCase(Locale.ROOT), false, true);
+            HudButton learn = new HudButton(ConsoleWidgets.countedLabel("skills.learn.plain", "skills.learn",
+                  stats.learnReady).toUpperCase(Locale.ROOT), true, true);
             learn.setArmed(stats.learnReady > 0);
             learn.addActionListener(event -> console.stage(getFormattedTextAt(RESOURCE_BUNDLE,
                   "skills.step.learn", stats.name), improvements(stats.lackingPeople, stats.name, 1)));
+            int cannotLearn = stats.lackingPeople.size() - stats.learnReady;
             action = ConsoleWidgets.actionColumn(learn,
                   (stats.learnReady > 0) ? getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", stats.learnXp) : "",
-                  "");
+                  "", (stats.learnReady == 0) ? ConsoleWidgets.reason(cannotLearn, TrainingRefusal.NOT_ENOUGH_XP) :
+                            null);
         }
 
         CatalogCard card = new CatalogCard(stats.name, tags, meta, new StackedBar(segments), action, isOpen, () -> {

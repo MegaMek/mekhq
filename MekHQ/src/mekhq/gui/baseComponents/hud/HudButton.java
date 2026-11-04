@@ -36,6 +36,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -92,6 +93,8 @@ public class HudButton extends JPanel {
         int horizontal = UIUtil.scaleForGUI(compact ? 11 : 22);
         setBorder(BorderFactory.createEmptyBorder(vertical, horizontal, vertical, horizontal));
         setFocusable(true);
+        // A hand over a button that will act, so it reads as clickable; a disarmed button keeps the arrow
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         label = new JLabel(text);
         label.setFont(hudFont(Font.BOLD, compact ? 0.74f : 0.82f, 0.12f));
@@ -151,6 +154,7 @@ public class HudButton extends JPanel {
     /** Enables or disables the button (a disabled button dims and stops firing). */
     public void setArmed(boolean armed) {
         this.armed = armed;
+        setCursor(Cursor.getPredefinedCursor(armed ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
         refreshForeground();
         repaint();
     }

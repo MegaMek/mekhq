@@ -247,7 +247,7 @@ final class AbilitiesPage {
                     "abilities.legend.blocked")));
 
         String verbKey = isBuyOff ? "abilities.buyOff" : (isTakingFlaw ? "abilities.take" : "abilities.grant");
-        HudButton grant = new HudButton(getFormattedTextAt(RESOURCE_BUNDLE, verbKey, stats.ready)
+        HudButton grant = new HudButton(ConsoleWidgets.countedLabel(verbKey + ".plain", verbKey, stats.ready)
                                               .toUpperCase(Locale.ROOT), true, true);
         boolean isAffordable = !stats.fees.isGreaterThan(console.plan().fundsLeft());
         boolean canChainPrerequisites = state.isIncludePrerequisites
@@ -262,7 +262,8 @@ final class AbilitiesPage {
                            getFormattedTextAt(RESOURCE_BUNDLE, "xp.gained", -stats.xp) :
                            getFormattedTextAt(RESOURCE_BUNDLE, "xp.amount", stats.xp);
         }
-        JComponent action = ConsoleWidgets.actionColumn(grant, xpLine, ConsoleWidgets.money(stats.fees));
+        JComponent action = ConsoleWidgets.actionColumn(grant, xpLine, ConsoleWidgets.money(stats.fees),
+              grant.isArmed() ? null : unavailableReason(stats, isAffordable));
 
         CatalogCard card = new CatalogCard(ability.getDisplayName(), tags, shortDescription(ability),
               new StackedBar(segments), action, isOpen, () -> {
@@ -316,6 +317,26 @@ final class AbilitiesPage {
                   () -> console.select(people)));
         }
         return card;
+    }
+
+    /** @return why no one selected can take the ability: the most common reason, with how many it stops */
+    private static String unavailableReason(AbilityStats stats, boolean isAffordable) {
+        if (!isAffordable) {
+            return getTextAt(RESOURCE_BUNDLE, "fees.cannotAfford.short");
+        }
+        TrainingRefusal top = TrainingRefusal.NOT_ENOUGH_XP;
+        int most = stats.shortXp;
+        if (stats.held > most) {
+            top = TrainingRefusal.ALREADY_HELD;
+            most = stats.held;
+        }
+        for (Map.Entry<TrainingRefusal, List<Person>> entry : stats.blocked.entrySet()) {
+            if (entry.getValue().size() > most) {
+                top = entry.getKey();
+                most = entry.getValue().size();
+            }
+        }
+        return ConsoleWidgets.reason(most, top);
     }
 
     /** Stages the ability for everyone who can take it, and its missing prerequisites first if the player asked. */
