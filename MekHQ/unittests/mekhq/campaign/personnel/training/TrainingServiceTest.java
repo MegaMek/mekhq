@@ -41,12 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -57,7 +55,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import megamek.common.options.IOption;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -97,24 +94,6 @@ class TrainingServiceTest {
         fixture = new TrainingFixture();
     }
 
-    /**
-     * @return a person whose XP goes down as it is spent and whose skills really improve, so a commit can be checked
-     *       against the result
-     */
-    private Person livePerson(int startXp) {
-        Person person = fixture.person(startXp);
-        AtomicInteger xp = new AtomicInteger(startXp);
-        when(person.getXP()).thenAnswer(invocation -> xp.get());
-        doAnswer(invocation -> xp.addAndGet(-(int) invocation.getArgument(0))).when(person).spendXP(anyInt());
-        doAnswer(invocation -> xp.addAndGet(-(int) invocation.getArgument(1))).when(person)
-              .spendXPOnSkills(any(), anyInt());
-        doAnswer(invocation -> {
-            person.getSkill(invocation.getArgument(0)).improve();
-            return null;
-        }).when(person).improveSkill(anyString());
-        return person;
-    }
-
     private void verifyUpdated(Person person) {
         verify(fixture.campaign.getPlayerForce().getHumanResources()).personUpdated(fixture.campaign, person);
     }
@@ -123,7 +102,7 @@ class TrainingServiceTest {
     class Skills {
         @Test
         void improvesTheSkillAndSpendsItsXp() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             TrainingFixture.giveSkill(person, S_GUN_MEK, 3);
             TrainingPlan plan = fixture.plan();
             plan.stage("two levels", List.of(new SkillImprovement(person, S_GUN_MEK),
@@ -144,7 +123,7 @@ class TrainingServiceTest {
 
         @Test
         void skipsWhatNoLongerFits() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             TrainingFixture.giveSkill(person, S_GUN_MEK, 3);
             TrainingPlan plan = fixture.plan();
             plan.stage("level", List.of(new SkillImprovement(person, S_GUN_MEK)));
@@ -160,7 +139,7 @@ class TrainingServiceTest {
 
         @Test
         void naturalAptitudesAreGained() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             TrainingFixture.giveSkill(person, S_GUN_MEK, 3);
             when(person.getCostToGainNaturalAptitude(eq(S_GUN_MEK), anyBoolean())).thenReturn(200);
             TrainingPlan plan = fixture.plan();
@@ -194,7 +173,7 @@ class TrainingServiceTest {
         }
 
         private Person pricedGunner() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             TrainingFixture.giveSkill(person, S_GUN_MEK, pricedLevel);
             return person;
         }
@@ -231,7 +210,7 @@ class TrainingServiceTest {
     class AttributesTraitsAndEdge {
         @Test
         void attributesAreRaisedByOne() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             when(person.getAttributeScore(SkillAttribute.STRENGTH)).thenReturn(4);
             when(person.getAttributeCap(SkillAttribute.STRENGTH)).thenReturn(8);
             TrainingPlan plan = fixture.plan();
@@ -246,7 +225,7 @@ class TrainingServiceTest {
         @Test
         void edgeThatCantBeGainedIsSkippedAndNotPaidFor() {
             fixture.options.set(CampaignOption.MAXIMUM_EDGE, 7);
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             when(person.getEdge()).thenReturn(1);
             when(person.getAttributeCap(SkillAttribute.EDGE)).thenReturn(7);
             TrainingPlan plan = fixture.plan();
@@ -261,7 +240,7 @@ class TrainingServiceTest {
 
         @Test
         void traitsMoveOneStep() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             TrainingPlan plan = fixture.plan();
             plan.stage("fame", List.of(new TraitChange(person, ATOWTraits.FAME, 1)));
 
@@ -273,7 +252,7 @@ class TrainingServiceTest {
 
         @Test
         void spentEdgeIsRefilled() {
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             when(person.getUsedEdge()).thenReturn(2);
             TrainingPlan plan = fixture.plan();
             plan.stage("refill", List.of(new EdgeRefill(person)));
@@ -295,7 +274,7 @@ class TrainingServiceTest {
             when(flaw.getName()).thenReturn(FLAW);
             when(flaw.getCost()).thenReturn(-100);
             when(flaw.getRemovedAbilities()).thenReturn(new Vector<>());
-            Person person = livePerson(START_XP);
+            Person person = fixture.livePerson(START_XP);
             when(person.getOptions().booleanOption(FLAW)).thenReturn(true);
             IOption option = mock(IOption.class);
             when(option.getDefault()).thenReturn(Boolean.FALSE);

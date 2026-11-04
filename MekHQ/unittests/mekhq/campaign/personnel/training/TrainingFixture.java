@@ -34,7 +34,9 @@ package mekhq.campaign.personnel.training;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -42,6 +44,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -132,6 +135,26 @@ final class TrainingFixture {
         when(person.hasSkill(anyString())).thenAnswer(invocation -> skills.hasSkill(invocation.getArgument(0)));
         when(person.getTalentBasedXpCostMultiplier(anyBoolean(), any())).thenReturn(1.0);
         when(person.getReasoningXpCostMultiplier(anyBoolean())).thenReturn(1.0);
+        return person;
+    }
+
+    /**
+     * @param startXp the person's XP
+     *
+     * @return a person, as {@link #person(int)}, whose XP goes down as it is spent and whose skills really improve, so
+     *       a commit can be checked against the result
+     */
+    Person livePerson(int startXp) {
+        Person person = person(startXp);
+        AtomicInteger xp = new AtomicInteger(startXp);
+        when(person.getXP()).thenAnswer(invocation -> xp.get());
+        doAnswer(invocation -> xp.addAndGet(-(int) invocation.getArgument(0))).when(person).spendXP(anyInt());
+        doAnswer(invocation -> xp.addAndGet(-(int) invocation.getArgument(1))).when(person)
+              .spendXPOnSkills(any(), anyInt());
+        doAnswer(invocation -> {
+            person.getSkill(invocation.getArgument(0)).improve();
+            return null;
+        }).when(person).improveSkill(anyString());
         return person;
     }
 
