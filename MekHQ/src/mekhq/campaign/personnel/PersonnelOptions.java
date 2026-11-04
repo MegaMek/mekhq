@@ -34,7 +34,6 @@ package mekhq.campaign.personnel;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -501,25 +500,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_RECON_FAIL, false);
         addOption(edge, EDGE_TRAINING, true);
         addOption(edge, EDGE_RANDOM_EVENTS, false);
-
-        List<CustomOption> customs = CustomOption.getCustomAbilities();
-        for (CustomOption option : customs) {
-            switch (option.getGroup()) {
-                case PilotOptions.LVL3_ADVANTAGES:
-                    addOption(l3a, option.getName(), option.getType(), option.getDefault());
-                    break;
-                case PilotOptions.EDGE_ADVANTAGES:
-                    addOption(edge, option.getName(), option.getType(), option.getDefault());
-                    break;
-                case PilotOptions.MD_ADVANTAGES:
-                    addOption(md, option.getName(), option.getType(), option.getDefault());
-                    break;
-                default:
-                    throw new IllegalStateException(
-                          "Unexpected value in mekhq/campaign/personnel/PersonnelOptions.java/initialize: " +
-                                option.getGroup());
-            }
-        }
     }
 
     /*
