@@ -246,18 +246,14 @@ final class SkillsPage {
         TrainingConsoleState state = console.state();
         boolean isOpen = stats.name.equals(state.openSkill);
 
-        // The skill's type and linked attributes, then whether it is a role skill and whether it costs C-bills
+        // The skill's linked attributes, then whether it is a role skill and whether it costs C-bills
         List<JLabel> tags = new ArrayList<>();
         SkillType skillType = SkillType.getType(stats.name);
         if (skillType != null) {
-            SkillSubType subType = skillType.getSubType();
-            if (subType != SkillSubType.NONE) {
-                tags.add(ConsoleWidgets.tag(getTextAt(RESOURCE_BUNDLE, "skills.tag.type." + subType.name()),
-                      TEXT_FAINT));
-            }
             for (SkillAttribute attribute : List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute())) {
                 if ((attribute != null) && !attribute.isNoAttribute()) {
-                    tags.add(ConsoleWidgets.tag(attribute.getLabel(), TEXT_MUTED));
+                    // The short name, such as DEX, keeps the tags compact; the full name is in the skill's description
+                    tags.add(ConsoleWidgets.tag(attribute.getShortName(), TEXT_MUTED));
                 }
             }
         }
