@@ -231,12 +231,19 @@ final class ConsoleWidgets {
             setAlignmentX(Component.LEFT_ALIGNMENT);
 
             JPanel head = column();
-            JPanel nameLine = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), 0));
+            // One line: the name takes the width left beside the arrow, and a name too long for it ends in "..."
+            JPanel nameLine = Hud.transparentPanel(new BorderLayout(scaleForGUI(5), 0));
+            nameLine.setBorder(BorderFactory.createEmptyBorder(0, scaleForGUI(5), 0, 0));
             if (onToggle != null) {
                 // An arrow shows the card opens for more detail, and which way it is now
-                nameLine.add(bold(isOpen ? "\u25BE" : "\u25B8", 0.95f, ACCENT));
+                nameLine.add(bold(isOpen ? "\u25BE" : "\u25B8", 0.95f, ACCENT), BorderLayout.WEST);
             }
-            nameLine.add(bold(title, 0.95f, TEXT));
+            JLabel name = bold(title, 0.95f, TEXT);
+            name.setToolTipText(title);
+            // Without this the label would ask for its whole width, and the card would grow rather than shorten it
+            name.setMinimumSize(new Dimension(0, name.getPreferredSize().height));
+            name.setPreferredSize(new Dimension(0, name.getPreferredSize().height));
+            nameLine.add(name, BorderLayout.CENTER);
             nameLine.setAlignmentX(Component.LEFT_ALIGNMENT);
             head.add(nameLine);
             if (!tags.isEmpty()) {
