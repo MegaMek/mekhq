@@ -237,9 +237,15 @@ final class ConsoleWidgets {
                 nameLine.add(bold(isOpen ? "\u25BE" : "\u25B8", 0.95f, ACCENT));
             }
             nameLine.add(bold(title, 0.95f, TEXT));
-            tags.forEach(nameLine::add);
             nameLine.setAlignmentX(Component.LEFT_ALIGNMENT);
             head.add(nameLine);
+            if (!tags.isEmpty()) {
+                // Tags have their own line under the name, so a long name never pushes them onto a ragged wrap
+                JPanel tagLine = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(2)));
+                tags.forEach(tagLine::add);
+                tagLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+                head.add(tagLine);
+            }
             if (!meta.isEmpty()) {
                 JLabel metaLabel = label(meta, 0.8f, TEXT_FAINT);
                 metaLabel.setBorder(BorderFactory.createEmptyBorder(0, scaleForGUI(5), scaleForGUI(4), 0));

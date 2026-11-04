@@ -84,7 +84,6 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
  */
 final class AbilitiesPage {
     private static final String RESOURCE_BUNDLE = TrainingConsole.RESOURCE_BUNDLE;
-    private static final int META_LENGTH = 110;
 
     private AbilitiesPage() {
     }
@@ -265,7 +264,7 @@ final class AbilitiesPage {
         JComponent action = ConsoleWidgets.actionColumn(grant, xpLine, ConsoleWidgets.money(stats.fees),
               grant.isArmed() ? null : unavailableReason(stats, isAffordable));
 
-        CatalogCard card = new CatalogCard(ability.getDisplayName(), tags, shortDescription(ability),
+        CatalogCard card = new CatalogCard(ability.getDisplayName(), tags, "",
               new StackedBar(segments), action, isOpen, () -> {
                   state.openAbility = isOpen ? null : ability.getName();
                   console.refreshPanel();
@@ -437,15 +436,5 @@ final class AbilitiesPage {
             holder.add(leftAligned(resolved));
         }
         return holder;
-    }
-
-    /** @return the ability's description as one short line, without its markup */
-    private static String shortDescription(SpecialAbility ability) {
-        String description = ability.getDescription();
-        if (description == null) {
-            return "";
-        }
-        String plain = description.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim();
-        return (plain.length() <= META_LENGTH) ? plain : plain.substring(0, META_LENGTH - 1).trim() + '…';
     }
 }
