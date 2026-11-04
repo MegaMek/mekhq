@@ -80,6 +80,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AbilityGroup;
+import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AttributeGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.SkillGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.Sort;
 import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
@@ -155,6 +156,7 @@ public class TrainingConsole extends JDialog {
     private final JPanel tools = new JPanel(toolCards);
     private final JPanel skillChips = ConsoleWidgets.row(6);
     private final JPanel abilityChips = ConsoleWidgets.row(6);
+    private final JPanel attributeChips = ConsoleWidgets.row(6);
     private final HudCheckBox includePrerequisites = new HudCheckBox(getTextAt(RESOURCE_BUNDLE,
           "abilities.includePrerequisites"));
     private final JPanel catalog = ConsoleWidgets.column();
@@ -408,6 +410,10 @@ public class TrainingConsole extends JDialog {
             state.abilityQuery = text;
             refreshPanel();
         }, abilityChips, includePrerequisites), TrainingConsolePage.ABILITIES.name());
+        tools.add(searchTools(getTextAt(RESOURCE_BUNDLE, "attributes.search"), text -> {
+            state.attributeQuery = text;
+            refreshPanel();
+        }, attributeChips, null), TrainingConsolePage.ATTRIBUTES.name());
         tools.add(Hud.transparentPanel(null), "none");
 
         JPanel north = ConsoleWidgets.column();
@@ -723,6 +729,7 @@ public class TrainingConsole extends JDialog {
         toolCards.show(tools, switch (state.page) {
             case SKILLS -> TrainingConsolePage.SKILLS.name();
             case ABILITIES -> TrainingConsolePage.ABILITIES.name();
+            case ATTRIBUTES -> TrainingConsolePage.ATTRIBUTES.name();
             default -> "none";
         });
     }
@@ -751,6 +758,18 @@ public class TrainingConsole extends JDialog {
         }
         abilityChips.revalidate();
         abilityChips.repaint();
+
+        attributeChips.removeAll();
+        for (AttributeGroup group : AttributeGroup.values()) {
+            HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "AttributeGroup." + group.name()), () -> {
+                state.attributeGroup = group;
+                refreshPanel();
+            });
+            chip.setActive(state.attributeGroup == group);
+            attributeChips.add(chip);
+        }
+        attributeChips.revalidate();
+        attributeChips.repaint();
         includePrerequisites.setSelected(state.isIncludePrerequisites);
     }
 

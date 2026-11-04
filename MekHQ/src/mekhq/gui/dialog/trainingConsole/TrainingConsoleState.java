@@ -79,6 +79,13 @@ final class TrainingConsoleState {
         BUY_OFF
     }
 
+    /** Which purchases the Attributes &amp; Traits page lists. */
+    enum AttributeGroup {
+        ATTRIBUTES,
+        TRAITS,
+        EDGE
+    }
+
     /** The value of an ability choice that lets the console choose for each person. */
     static final String CHOOSE_FOR_EACH = "\u0000each";
 
@@ -112,6 +119,10 @@ final class TrainingConsoleState {
     @Nullable String openAbility;
     final Map<String, String> abilityChoices = new HashMap<>();
     boolean isIncludePrerequisites;
+
+    // Attributes & Traits page
+    AttributeGroup attributeGroup = AttributeGroup.ATTRIBUTES;
+    String attributeQuery = "";
 
     // Auto-train page
     @Nullable AutoTrainPage.Draft autoTrain;

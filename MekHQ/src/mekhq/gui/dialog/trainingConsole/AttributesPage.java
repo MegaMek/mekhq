@@ -62,6 +62,7 @@ import mekhq.campaign.personnel.training.TrainingPurchase.TraitChange;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.dialog.trainingConsole.ConsoleWidgets.CatalogCard;
+import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AttributeGroup;
 
 /**
  * The Attributes &amp; Traits page: raising attributes, moving traits up or down a step, and refilling spent Edge,
@@ -98,11 +99,19 @@ final class AttributesPage {
 
     static List<JComponent> build(TrainingConsole console, List<Person> selection) {
         TrainingPlan plan = console.plan();
+        TrainingConsoleState state = console.state();
+        AttributeGroup group = state.attributeGroup;
+        String query = state.attributeQuery.trim().toLowerCase(Locale.ROOT);
         List<JComponent> cards = new ArrayList<>();
+        if ((group == AttributeGroup.EDGE) && !plan.context().isUseEdge()) {
+            return List.of(Hud.notice(getTextAt(RESOURCE_BUNDLE, "edge.disabled")));
+        }
 
-        cards.add(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "attributes.heading")));
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNoAttribute() || ((attribute == SkillAttribute.EDGE) && !plan.context().isUseEdge())) {
+            // Edge is an attribute, but it is bought with the Edge refill, under its own group
+            boolean isEdge = attribute == SkillAttribute.EDGE;
+            if (attribute.isNoAttribute() || (isEdge != (group == AttributeGroup.EDGE))
+                      || (group == AttributeGroup.TRAITS) || !matches(attribute.getLabel(), query)) {
                 continue;
             }
             ToIntFunction<Person> current = person -> {
@@ -119,9 +128,9 @@ final class AttributesPage {
                   ConsoleWidgets.actionColumn(button, xpLine(raise.xp(), raise.ready()), ""), false, null));
         }
 
-        cards.add(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "traits.heading")));
         for (ATOWTraits trait : ATOWTraits.values()) {
-            if (!TrainingPricer.isTrainableTrait(trait)) {
+            if ((group != AttributeGroup.TRAITS) || !TrainingPricer.isTrainableTrait(trait)
+                      || !matches(trait.getDisplayName(), query)) {
                 continue;
             }
             ToIntFunction<Person> current = person -> TrainingPricer.traitLevel(person, trait)
@@ -147,8 +156,7 @@ final class AttributesPage {
                   false, null));
         }
 
-        if (plan.context().isUseEdge()) {
-            cards.add(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "edge.heading")));
+        if ((group == AttributeGroup.EDGE) && matches(getTextAt(RESOURCE_BUNDLE, "edge.title"), query)) {
             Tally refill = tally(plan, selection, EdgeRefill::new);
             long spent = selection.stream().filter(person -> person.getUsedEdge() > 0).count();
             HudButton button = button(getFormattedTextAt(RESOURCE_BUNDLE, "edge.refill", refill.ready()),
@@ -159,10 +167,17 @@ final class AttributesPage {
                   ConsoleWidgets.actionColumn(button, xpLine(refill.xp(), refill.ready()), ""), false, null));
         }
 
+        if (cards.isEmpty()) {
+            cards.add(Hud.notice(getTextAt(RESOURCE_BUNDLE, "attributes.none")));
+        }
         JLabel note = ConsoleWidgets.wrapped(getTextAt(RESOURCE_BUNDLE, "attributes.note"), TEXT_FAINT);
         note.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(4), 0, 0));
         cards.add(note);
         return cards;
+    }
+
+    private static boolean matches(String label, String query) {
+        return query.isEmpty() || label.toLowerCase(Locale.ROOT).contains(query);
     }
 
     private static HudButton button(String text, boolean isArmed, Runnable onClick) {
