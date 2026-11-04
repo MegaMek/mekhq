@@ -254,7 +254,7 @@ class TrainingAbilityCostsTest {
         assertNull(result.step());
         assertEquals(supportPoints(1), result.shortfall());
         assertTrue(plan.isEmpty());
-        assertFalse(plan.projectionOf(person).isAbilityGained(ABILITY_NAME));
+        assertFalse(plan.projectionOf(person).hasAbility(ABILITY_NAME));
     }
 
     @Test
