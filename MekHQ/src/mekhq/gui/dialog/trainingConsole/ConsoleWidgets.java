@@ -272,7 +272,11 @@ final class ConsoleWidgets {
             JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
             top.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(5), scaleForGUI(8),
                   scaleForGUI(10)));
-            top.add(head, BorderLayout.CENTER);
+            // Pinned to the top at its own height: a taller action column, such as a trait's two buttons, would
+            // otherwise stretch the header and the eligibility bar in it
+            JPanel headHolder = Hud.transparentPanel(new BorderLayout());
+            headHolder.add(head, BorderLayout.NORTH);
+            top.add(headHolder, BorderLayout.CENTER);
             JPanel actionHolder = Hud.transparentPanel(new BorderLayout());
             actionHolder.add(actions, BorderLayout.NORTH);
             top.add(actionHolder, BorderLayout.EAST);

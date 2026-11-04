@@ -125,6 +125,10 @@ final class TrainingConsoleState {
     // Attributes & Traits page
     AttributeGroup attributeGroup = AttributeGroup.ATTRIBUTES;
     String attributeQuery = "";
+    /** The open card: an attribute's or trait's enum name, or the Edge refill's key. */
+    @Nullable String openAttribute;
+    /** The score each attribute's "raise everyone to" is set to, by the attribute's enum name. */
+    final Map<String, Integer> attributeTargets = new HashMap<>();
 
     // Auto-train page
     @Nullable AutoTrainPage.Draft autoTrain;
