@@ -136,6 +136,7 @@ public class CommandGenerationOptions {
     // generate an augmented command.
     private boolean useImplants;
     private NeuralInterfaceMode neuralInterfaceMode;
+    private boolean applyAugmentationRules = true;
 
     // Random origin for the people this run generates. Applied to the campaign only for the length of the build;
     // the campaign's own Random Origin options are restored afterwards.
@@ -512,6 +513,14 @@ public class CommandGenerationOptions {
 
     public void setNeuralInterfaceMode(final NeuralInterfaceMode neuralInterfaceMode) {
         this.neuralInterfaceMode = neuralInterfaceMode;
+    }
+
+    public boolean shouldApplyAugmentationRules() {
+        return applyAugmentationRules;
+    }
+
+    public void setApplyAugmentationRules(final boolean applyAugmentationRules) {
+        this.applyAugmentationRules = applyAugmentationRules;
     }
 
     /**

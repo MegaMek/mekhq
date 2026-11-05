@@ -237,6 +237,11 @@ public class ForceGeneratorTab {
 
     public void setFactionChangeListener(@Nullable Consumer<FactionRecord> listener) {
         this.factionChangeListener = listener;
+        // The faction was seeded during initializeEngine, before the pane had a host listener. Registering again
+        // reports the current selection immediately so the host can apply its faction-driven defaults.
+        if (viewUi != null) {
+            viewUi.getOptionsView().setOnFactionChanged(this::factionChanged);
+        }
     }
 
     private void factionChanged(@Nullable FactionRecord faction) {

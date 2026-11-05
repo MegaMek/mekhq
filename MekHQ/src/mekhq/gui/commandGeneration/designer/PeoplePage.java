@@ -837,6 +837,7 @@ public final class PeoplePage {
         // Only written while the section is on screen. A player who set implants for a Shadow Division and then
         // switched to a faction that cannot be augmented would otherwise still have that choice written to the
         // campaign from a section they can no longer see.
+        options.setApplyAugmentationRules(augmentationVisible);
         if (augmentationVisible) {
             options.setUseImplants(implants.isSelected());
             NeuralInterfaceMode mode = neuralMode.getSelected();

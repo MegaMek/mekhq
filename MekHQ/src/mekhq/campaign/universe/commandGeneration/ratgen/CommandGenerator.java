@@ -1270,6 +1270,11 @@ public final class CommandGenerator {
      */
     // Package-private so the regression test can check the choice reaches the campaign.
     static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
+        if (!options.shouldApplyAugmentationRules()) {
+            LOGGER.info("[CompanyGen][Pipeline] Stage 7e2: augmentation rules are hidden for the selected faction;"
+                        + " leaving campaign settings unchanged");
+            return;
+        }
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean tracksImplants = options.isUseImplants();
         campaignOptions.set(CampaignOption.USE_IMPLANTS, tracksImplants);
