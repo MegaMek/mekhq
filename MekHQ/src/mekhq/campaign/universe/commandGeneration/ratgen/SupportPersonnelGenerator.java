@@ -257,7 +257,7 @@ public final class SupportPersonnelGenerator {
      *
      * @return the number of active personnel with that primary role
      */
-    static int countActiveByRole(Campaign campaign, PersonnelRole role) {
+    public static int countActiveByRole(Campaign campaign, PersonnelRole role) {
         int matches = 0;
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole() == role) {

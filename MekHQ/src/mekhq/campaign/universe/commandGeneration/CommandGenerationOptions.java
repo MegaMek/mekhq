@@ -75,7 +75,7 @@ public class CommandGenerationOptions {
 
     /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
-     * doctor, and administrators - matches the SetupTab spinner/dropdown layout.
+     * doctor, and administrators - matches the People page's support staff table.
      */
     private static final PersonnelRole[] SUPPORT_ROLES_FOR_COVERAGE = {
           PersonnelRole.MEK_TECH,
@@ -189,7 +189,7 @@ public class CommandGenerationOptions {
 
         // Support personnel: full canonical coverage for every support role, with skill level left at
         // the "Random" default (SkillLevel.NONE) so each generated person rolls their own level. The user opts
-        // into full coverage changes or a fixed skill level via the SetupTab.
+        // into full coverage changes or a fixed skill level on the People page.
         final Map<PersonnelRole, Integer> coveragePercents = new HashMap<>();
         final Map<PersonnelRole, SkillLevel> skillLevels = new HashMap<>();
         for (final PersonnelRole role : SUPPORT_ROLES_FOR_COVERAGE) {

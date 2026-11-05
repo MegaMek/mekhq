@@ -32,23 +32,20 @@
  */
 package mekhq.gui.commandGeneration;
 
-import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
 import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Insets;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -56,23 +53,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
-import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.enums.ValidationState;
-import megamek.client.ui.preferences.JSplitPanePreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -97,9 +90,13 @@ import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
 import mekhq.campaign.universe.commandGeneration.ratgen.RulesetEngineBootstrap;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
+import mekhq.gui.commandGeneration.designer.DesignerPage;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 
 /**
@@ -148,6 +145,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     private Campaign campaign;
     private CommandGenerationOptions commandGenerationOptions;
     private CommandGenerationPane pane;
+    private final JLabel footerSummary = new JLabel();
+    private final HudButton buildButton = new HudButton("", true);
 
     public CommandGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "CommandGenerationDialog", "CommandGenerationDialog.title");
@@ -187,103 +186,95 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
         pane = new CommandGenerationPane(getFrame(), getCampaign(), startingOptions);
 
-        // Populate every tab from the supplied options on first show.
-        pane.getSetupTab().loadValuesFromOptions(startingOptions);
-        pane.getForceGeneratorTab().loadValuesFromOptions(startingOptions);
-        pane.getSparesAndFinancesTab().loadValuesFromOptions(startingOptions);
-        pane.getForceGeneratorTab().setForceGeneratedListener(this::rememberSettingsAtGenerate);
+        // Populate every page from the supplied options on first show.
+        pane.loadValuesFromOptions(startingOptions);
+        pane.getEngine().addForceGeneratedListener(this::rememberSettingsAtGenerate);
+        pane.setReviewFacts(this::reviewWarnings, this::settingsChangedSinceRoll);
 
-        // Settings that follow from the faction are applied after the tabs are populated, not before.
+        // Settings that follow from the faction are applied after the pages are populated, not before.
         // Loading the options sets the naming method directly, so a Clan's Greek naming would
         // otherwise be applied while the pane is built and then overwritten a moment later.
         pane.applyFactionDrivenDefaults();
-
-        // Persistent design-stage banner so the player always knows this workspace is a draft: nothing
-        // reaches the campaign until "Accept & Build Command". Text-only with a bottom separator (no
-        // background fill) so it reads cleanly under both the light and Darcula look-and-feels.
-        JPanel content = new JPanel(new BorderLayout());
-        JLabel designBanner = new JLabel(resources.getString("CommandGenerationDialog.banner.text"));
-        Color separatorColor = UIManager.getColor("Separator.foreground");
-        if (separatorColor == null) {
-            separatorColor = Color.GRAY;
-        }
-        designBanner.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, separatorColor),
-              BorderFactory.createEmptyBorder(6, 10, 6, 10)));
-        content.add(designBanner, BorderLayout.NORTH);
-        // The tabbed pane is added directly rather than inside a scroll pane of its own: each tab
-        // already scrolls its own content, and a scroll pane wrapped around them gave the inner ones
-        // all the height they asked for. They then had nothing to scroll but still swallowed every
-        // mouse-wheel event, so the wheel did nothing anywhere in the dialog. Adding it directly
-        // bounds each tab's viewport to the dialog and puts the wheel back to work, and keeps the tab
-        // strip in place instead of letting it scroll off the top.
-        content.add(pane, BorderLayout.CENTER);
-        return content;
+        return pane;
     }
 
     @Override
     protected JPanel createButtonPanel() {
-        // Standard dialog button arrangement: destructive / reset actions on the far left,
-        // primary actions on the right with the default Generate button at the far right so
-        // Enter triggers it. Replaces the previous 2x2 grid where Cancel sat diagonally
-        // opposite Generate — that layout was awkward to scan.
-        final JPanel panel = new JPanel(new BorderLayout());
+        // The footer of the heads-up display: what the roll adds up to on the left, the dialog's actions on the
+        // right. Build is the one action that changes the campaign, and only from the Review page; elsewhere the
+        // same button takes the player there.
+        JPanel footer = new JPanel(new BorderLayout(UIUtil.scaleForGUI(16), 0));
+        footer.setOpaque(true);
+        footer.setBackground(HudStyle.SURFACE_DEEP);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, HudStyle.BORDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), UIUtil.scaleForGUI(18), UIUtil.scaleForGUI(10),
+                    UIUtil.scaleForGUI(18))));
 
-        JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        // The Force Generator's own Generate, its options and Clear Force belong on this bar rather than mid-tab:
-        // they are dialog-level actions like the ones either side of them, and the tab needs the vertical room for
-        // the formation mix. Adding them here re-parents them out of the tab.
-        pane.getForceGeneratorTab().getGenerateControls().forEach(control -> leftButtons.add(control));
-        // Restore Defaults sits after them: it undoes the settings those buttons act on, so it reads as the end of
-        // that group rather than as something to pass over on the way to Generate.
-        leftButtons.add(new MMButton("btnRestore", resources, "RestoreDefaults.text",
-              "CommandGenerationDialog.btnRestore.toolTipText", this::restoreDefaultsActionListener));
-        panel.add(leftButtons, BorderLayout.WEST);
+        footerSummary.setForeground(HudStyle.TEXT_MUTED);
+        footerSummary.setFont(HudStyle.hudFont(Font.PLAIN, 0.9f, 0.0f));
+        footer.add(footerSummary, BorderLayout.CENTER);
 
-        JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-        // "Close Without Building" rather than a generic Cancel: the dialog is a design workspace, so closing
-        // it throws away an uncommitted model rather than cancelling a settings edit.
-        rightButtons.add(new MMButton("btnCancel", resources, "CommandGenerationDialog.btnCancel.text",
-              "CommandGenerationDialog.btnCancel.toolTipText", this::cancelActionPerformed));
-        // The model is built on the Force Generator tab (its Generate button accumulates rolls);
-        // "Accept & Build Command" is the one action that commits the model to the campaign TOE.
-        setOkButton(new MMButton("btnAccept", resources, "CommandGenerationDialog.btnAccept.text",
-              "CommandGenerationDialog.btnAccept.toolTipText", this::confirmationActionListener));
-        rightButtons.add(getOkButton());
-        panel.add(rightButtons, BorderLayout.EAST);
+        HudButton restore = new HudButton(upper(resources.getString("RestoreDefaults.text")), false, true);
+        restore.setToolTipText(resources.getString("CommandGenerationDialog.btnRestore.toolTipText"));
+        restore.addActionListener(this::restoreDefaultsActionListener);
+        HudButton close = new HudButton(upper(resources.getString("CommandGenerationDialog.btnCancel.text")), false);
+        close.setToolTipText(resources.getString("CommandGenerationDialog.btnCancel.toolTipText"));
+        close.addActionListener(this::cancelActionPerformed);
+        buildButton.addActionListener(this::buildButtonPressed);
 
-        enlargeButtons(leftButtons);
-        enlargeButtons(rightButtons);
-        return panel;
+        JPanel buttons = Hud.transparentPanel(null);
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+        buttons.add(restore);
+        buttons.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(16)));
+        buttons.add(close);
+        buttons.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(10)));
+        buttons.add(buildButton);
+        footer.add(buttons, BorderLayout.EAST);
+
+        pane.addRefreshListener(this::refreshFooter);
+        pane.addPageListener(page -> refreshFooter());
+        refreshFooter();
+        return footer;
+    }
+
+    /** Brings the footer's summary and Build button up to date with the roll and the page on show. */
+    private void refreshFooter() {
+        footerSummary.setText(pane.getFooterSummary());
+        boolean onReview = pane.getCurrentPage() == DesignerPage.REVIEW;
+        buildButton.setText(upper(resources.getString(onReview ? "CommandGenerationDialog.btnAccept.text"
+              : "CommandGenerationDialog.btnReview.text")));
+        buildButton.setToolTipText(resources.getString(onReview ? "CommandGenerationDialog.btnAccept.toolTipText"
+              : "CommandGenerationDialog.btnReview.toolTipText"));
+        buildButton.setArmed(!onReview || pane.canBuild());
     }
 
     /**
-     * Gives every button on the bar more padding and a slightly larger face. At default size the bar reads as
-     * an afterthought under a dialog this large, and Accept &amp; Build is the one action that changes the
-     * campaign, so it should not be the smallest thing on screen.
-     *
-     * @param bar the button strip to enlarge; checkboxes and labels on it are left alone
+     * Takes the player to the Review page, or builds the command from it. Review lists what the build will do and
+     * anything worth a second look, so it is the commit gate.
      */
-    private static void enlargeButtons(JPanel bar) {
-        Insets padding = new Insets(UIUtil.scaleForGUI(6), UIUtil.scaleForGUI(14),
-              UIUtil.scaleForGUI(6), UIUtil.scaleForGUI(14));
-        for (Component component : bar.getComponents()) {
-            if (component instanceof JButton button) {
-                button.setMargin(padding);
-                setFontScaling(button, false, 1.1);
-            }
+    private void buildButtonPressed(final ActionEvent evt) {
+        if (pane.getCurrentPage() != DesignerPage.REVIEW) {
+            pane.showPage(DesignerPage.REVIEW);
+            return;
         }
+        confirmationActionListener(evt);
     }
 
+    /**
+     * Installs the guide drawer once the dialog is assembled, so Escape closes an open guide before it closes the
+     * dialog.
+     */
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
-        super.setCustomPreferences(preferences);
-        // Persist the Force Generator tab's options/TO&E divider so it reopens where the user left it.
-        JSplitPane forceGeneratorSplit = pane.getForceGeneratorTab().getSplitPane();
-        if (forceGeneratorSplit != null) {
-            preferences.manage(new JSplitPanePreference(forceGeneratorSplit));
-        }
+    protected void finalizeInitialization() throws Exception {
+        super.finalizeInitialization();
+        pane.installGuide(getRootPane(), () -> cancelActionPerformed(null));
     }
+
+    private static String upper(String text) {
+        return text.toUpperCase(Locale.ROOT);
+    }
+
 
     /**
      * Confirms and closes the designer only when {@link #okAction()} actually started a build.
@@ -330,12 +321,10 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void restoreDefaultsActionListener(final ActionEvent evt) {
         CommandGenerationOptions defaults = new CommandGenerationOptions();
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
-        pane.getSetupTab().loadValuesFromOptions(defaults);
-        pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
-        // The formation mix lives on the embedded MegaMek view rather than in CommandGenerationOptions, so loading
+        pane.loadValuesFromOptions(defaults);
+        // The formation mix lives on the force generator rather than in CommandGenerationOptions, so loading
         // defaults does not reach it and it has to be cleared explicitly.
-        pane.getForceGeneratorTab().clearFormationMix();
-        pane.getSparesAndFinancesTab().loadValuesFromOptions(defaults);
+        pane.getEngine().clearFormationMix();
         // As on first show: restoring defaults sets the naming method directly, so the faction's own
         // convention is re-applied afterwards rather than being overwritten by it.
         pane.applyFactionDrivenDefaults();
@@ -380,9 +369,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     private CommandGenerationOptions collectOptionsFromTabs(String caller) {
         CommandGenerationOptions options = new CommandGenerationOptions();
         seedSpecifiedFactionFromCampaign(options, caller);
-        pane.getSetupTab().writeValuesToOptions(options);
-        pane.getForceGeneratorTab().writeValuesToOptions(options);
-        pane.getSparesAndFinancesTab().writeValuesToOptions(options);
+        pane.writeValuesToOptions(options);
         return options;
     }
 
@@ -427,8 +414,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
         if (choice == 1) {
             LOGGER.info("[CompanyGen][Dialog][Settings] regenerating with the current settings");
-            pane.showForceGeneratorTab();
-            pane.getForceGeneratorTab().requestGenerate();
+            pane.showPage(DesignerPage.FORCE);
+            pane.getEngine().requestGenerate();
         } else {
             LOGGER.info("[CompanyGen][Dialog][Settings] build cancelled at the changed-settings prompt");
         }
@@ -442,13 +429,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         if (options == null) {
             return;
         }
-        // The spares spinners are campaign options; they take effect now, at the commit.
-        pane.getSparesAndFinancesTab().writeSparesToCampaignOptions();
+        // The spares percentages are campaign options; they take effect now, at the commit.
+        pane.writeSparesToCampaignOptions();
 
         // Accept commits the exact force the player previewed on the Force Generator tab (its Generate
         // button rolls the ForceDescriptor and fills the TO&E tree + Composition Summary). Require a
         // preview first so Accept never silently rolls something the player never saw.
-        ForceDescriptor previewedForce = pane.getForceGeneratorTab().getGeneratedForce();
+        ForceDescriptor previewedForce = pane.getEngine().getGeneratedForce();
         if (previewedForce == null) {
             JOptionPane.showMessageDialog(getFrame(),
                   resources.getString("CommandGenerationDialog.noPreview.text"),
@@ -457,22 +444,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
             return;
         }
 
-        // One commit gate: this is the moment the design model becomes real. The confirmation states
-        // what will be built and folds in any resource-cost warnings (long generation, high Person
-        // counts) so the player makes a single Build/Cancel decision.
-        //
-        // Plain text rather than HTML for the message: an HTML-bearing JOptionPane goes through
-        // BasicHTML / BasicTextUI / DefaultCaret on dismissal. When this modal disposes and the
-        // next modal (the GenerationProgressDialog) opens immediately afterward, the pending caret
-        // repaint event fires against a torn-down view and throws
-        // "Cannot invoke java.util.Vector.add(Object) because this.viewBuffer is null" (a
-        // long-standing Swing bug). Plain text routes through BasicLabelUI instead and avoids the
-        // FlowView code path entirely.
-        Integer chosenEchelon = options.getForceDescriptorSnapshot().getEchelon();
-        int combatUnitCount = countCombatUnits(previewedForce);
-        if (!confirmBuildCommand(options, chosenEchelon, combatUnitCount)) {
-            return;
-        }
+        // The Review page is the commit gate: it states what will be built and lists the resource-cost
+        // warnings, and Build is only pressed from there.
 
         // Build the command in two background phases behind a modal progress dialog (long
         // generations would otherwise look frozen). Phase one commits the model's combat force to
@@ -556,80 +529,6 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     /**
-     * Counts the included combat units in the design model - the leaves the commit walker will
-     * actually materialize. Mirrors {@code ForceDescriptorWalker}'s commit rule (a leaf is committed
-     * only when it is {@link ForceDescriptor#isIncluded()} and has an {@link ForceDescriptor#getEntity()
-     * entity}), so the confirmation count matches what ends up in the TOE, excluding units the player
-     * struck out in the preview.
-     *
-     * @param descriptor the model (or subtree) to count
-     *
-     * @return the number of included combat-unit leaves under {@code descriptor}
-     */
-    private static int countCombatUnits(ForceDescriptor descriptor) {
-        boolean hasChildren = (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
-              || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
-        if (!hasChildren) {
-            return (descriptor.isIncluded() && descriptor.getEntity() != null) ? 1 : 0;
-        }
-        int count = 0;
-        if (descriptor.getSubForces() != null) {
-            for (ForceDescriptor child : descriptor.getSubForces()) {
-                count += countCombatUnits(child);
-            }
-        }
-        if (descriptor.getAttached() != null) {
-            for (ForceDescriptor child : descriptor.getAttached()) {
-                count += countCombatUnits(child);
-            }
-        }
-        return count;
-    }
-
-    /**
-     * The commit confirmation - the single point at which the design model becomes part of the
-     * campaign. States what will be built ({@code combatUnitCount} combat units plus generated
-     * support) and appends any applicable resource-cost warnings, then offers a Build / Cancel
-     * choice.
-     *
-     * @param options         the generation options driving the build
-     * @param chosenEchelon   the model's top echelon, used to size the resource-cost warnings, or
-     *                        {@code null} if unknown
-     * @param combatUnitCount the number of combat units that will be committed
-     *
-     * @return {@code true} if the player chose Build, {@code false} if they cancelled
-     */
-    private boolean confirmBuildCommand(CommandGenerationOptions options, Integer chosenEchelon,
-          int combatUnitCount) {
-        StringBuilder message = new StringBuilder(
-              MessageFormat.format(resources.getString("CommandGenerationDialog.confirmBuild.text"),
-                    combatUnitCount));
-
-        List<String> warnings = collectPreGenerationWarnings(options, chosenEchelon);
-        if (!warnings.isEmpty()) {
-            message.append("\n\n").append(String.join("\n\n", warnings));
-        }
-
-        Object[] buttonLabels = { resources.getString("CommandGenerationDialog.confirmBuild.build"),
-                                   resources.getString("Cancel.text") };
-        int choice = JOptionPane.showOptionDialog(getFrame(),
-              message.toString(),
-              resources.getString("CommandGenerationDialog.confirmBuild.title"),
-              JOptionPane.OK_CANCEL_OPTION,
-              JOptionPane.QUESTION_MESSAGE,
-              null,
-              buttonLabels,
-              buttonLabels[0]);
-        boolean build = (choice == 0);
-        if (!build) {
-            LOGGER.info("[CompanyGen][Worker] user cancelled at build confirmation "
-                        + "(combatUnits={}, echelon={}, astechsAsPersonnel={}, medicsAsPersonnel={})",
-                  combatUnitCount, chosenEchelon, options.isAstechsAsPersonnel(), options.isMedicsAsPersonnel());
-        }
-        return build;
-    }
-
-    /**
      * Runs one generation phase on a background thread behind a modal progress dialog. Sets the
      * {@code bulkGenerationInProgress} guard for the duration (so event-driven tab refreshes do not read
      * the half-built campaign off the EDT), runs {@code work} with the phase's progress listener, and
@@ -708,19 +607,20 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         List<String> warnings = new ArrayList<>();
 
         if (chosenEchelon != null && chosenEchelon >= 7) {
-            warnings.add("Large force: estimated generation time "
-                  + estimateGenerationDuration(chosenEchelon) + ".");
+            warnings.add(MessageFormat.format(resources.getString("CommandGenerationDialog.warning.large"),
+                  estimateGenerationDuration(chosenEchelon)));
         }
 
         if (chosenEchelon != null && chosenEchelon >= 6) {
             boolean astechPersons = options.isGenerateAstechs() && options.isAstechsAsPersonnel();
             boolean medicPersons = options.isGenerateMedics() && options.isMedicsAsPersonnel();
             if (astechPersons || medicPersons) {
-                String who = astechPersons && medicPersons ? "astechs and medics"
-                      : (astechPersons ? "astechs" : "medics");
-                warnings.add("At this echelon, generating " + who + " as individual personnel can "
-                      + "create hundreds of Persons (6 astechs per tech, 4 medics per doctor). "
-                      + "Pool mode is faster and keeps the Personnel list manageable.");
+                String who = resources.getString(astechPersons && medicPersons
+                      ? "CommandGenerationDialog.warning.persons.both"
+                      : (astechPersons ? "CommandGenerationDialog.warning.persons.astechs"
+                              : "CommandGenerationDialog.warning.persons.medics"));
+                warnings.add(MessageFormat.format(resources.getString("CommandGenerationDialog.warning.persons"),
+                      who));
             }
         }
 
@@ -729,20 +629,33 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     /**
      * Returns a human-readable duration estimate for generating a force at the given ratgen echelon.
-     * Numbers come from empirical observation of generation runs on Phase 1 hardware; the engine's
-     * processRoot is roughly exponential in the echelon, and the per-leaf walker work is roughly
-     * 50ms per unit (RATGenerator selection + Entity construction + Person creation + Formation
-     * attachment). The estimate is intentionally rough — it just needs to convey "seconds" vs
-     * "minutes" vs "many minutes" so the user can decide whether to proceed.
+     * Numbers come from empirical observation of generation runs; the engine's processRoot is roughly
+     * exponential in the echelon, and the per-leaf walker work is roughly 50ms per unit. The estimate is
+     * intentionally rough - it just needs to convey "seconds" vs "minutes" vs "many minutes" so the player
+     * can decide whether to proceed.
      */
-    private static String estimateGenerationDuration(int echelon) {
-        return switch (echelon) {
-            case 7 -> "1-3 minutes (Brigade / Galaxy / Level V)";
-            case 8 -> "3-8 minutes (Division / Touman / Level VI)";
-            case 9 -> "10-20 minutes (Corps)";
-            case 10 -> "20+ minutes (Army)";
-            default -> "less than a minute";
+    private String estimateGenerationDuration(int echelon) {
+        String key = switch (echelon) {
+            case 7, 8, 9, 10 -> "CommandGenerationDialog.warning.duration." + echelon;
+            default -> "CommandGenerationDialog.warning.duration.short";
         };
+        return resources.getString(key);
+    }
+
+    /**
+     * @return the build's resource-cost warnings for the settings as the pages stand, for the Review page
+     */
+    private List<String> reviewWarnings() {
+        CommandGenerationOptions options = collectOptionsFromTabs("review");
+        return collectPreGenerationWarnings(options, options.getForceDescriptorSnapshot().getEchelon());
+    }
+
+    /**
+     * @return {@code true} if the settings differ from those the roll was made with, so the build would ask which to
+     *       use
+     */
+    private boolean settingsChangedSinceRoll() {
+        return (settingsAtLastGenerate != null) && !settingsAtLastGenerate.equals(collectOptionsFromTabs("review"));
     }
 
     /**
