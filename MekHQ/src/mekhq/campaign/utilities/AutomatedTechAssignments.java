@@ -50,7 +50,6 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -68,7 +67,7 @@ import mekhq.campaign.unit.Unit;
  *     <li><b>Bucket units</b> into unmaintained categories (Meks, Aero, Battle Armor, Vehicles) based on
  *     {@link Entity#getUnitType()}.</li>
  *     <li><b>Sort each unit bucket</b> by {@link Entity#calculateBattleValue()} (highest to lowest), so more
- *     valuable units are assigned first, or by a caller-supplied {@link Comparator} when one is given.</li>
+ *     valuable units are assigned first.</li>
  *     <li><b>Bucket techs</b> into role-based lists (Mek techs, Aero techs, BA techs, Mechanics), including only
  *     roles that have at least one unmaintained unit to assign. A person may qualify for multiple roles, but
  *     assignment to more than two roles is prevented.</li>
@@ -78,8 +77,7 @@ import mekhq.campaign.unit.Unit;
  *
  * <p><b>Sorting/selection rules</b></p>
  * <ul>
- *     <li><b>Unit ordering:</b> higher battle value units are assigned before lower battle value units, unless
- *     the caller supplied its own ordering.</li>
+ *     <li><b>Unit ordering:</b> higher battle value units are assigned before lower battle value units.</li>
  *     <li><b>Tech ordering:</b> techs are ordered by {@code person.getTechUnits().size()} ascending (least loaded
  *     first). If two techs have the same assigned-unit count, the tie is broken by
  *     {@link #getTechLevel(Person, String)} descending (higher skill level first).</li>
@@ -107,12 +105,6 @@ public class AutomatedTechAssignments {
     private List<Person> techBattleArmor;
     private List<Person> techMechanic;
 
-    /**
-     * The order units are offered a tech in, or {@code null} to use battle value descending. Supplied by callers that
-     * let the player choose the priority order, such as the Company Generator's Setup tab.
-     */
-    private final Comparator<Unit> unitPriorityOrder;
-
     final private List<String> reports = new ArrayList<>();
 
     public List<String> getReports() {
@@ -130,27 +122,6 @@ public class AutomatedTechAssignments {
      * @since 0.50.11
      */
     public AutomatedTechAssignments(List<Person> techs, Collection<Unit> units) {
-        this(techs, units, null);
-    }
-
-    /**
-     * Creates an assignment helper that offers units a tech in a caller-supplied order.
-     *
-     * <p>Everything else behaves as {@link #AutomatedTechAssignments(List, Collection)}: the same buckets, the same
-     * tech selection, and the same cap of two units per tech. Only the order in which units get first pick of the
-     * available techs changes, so a caller that has its own idea of which units matter most - the Company Generator
-     * lets the player rank them by pilot rank, unit weight and pilot skill - gets that order honoured without
-     * maintaining a second assigner.</p>
-     *
-     * @param techs             all available personnel to consider for assignment
-     * @param units             all units that may require a tech assignment
-     * @param unitPriorityOrder the order to offer units a tech in, or {@code null} for battle value descending
-     *
-     * @since 0.51.01
-     */
-    public AutomatedTechAssignments(List<Person> techs, Collection<Unit> units,
-          @Nullable Comparator<Unit> unitPriorityOrder) {
-        this.unitPriorityOrder = unitPriorityOrder;
         arrangeUnitsIntoBuckets(units);
         sortUnitBuckets();
         arrangeTechsIntoBuckets(techs);
@@ -349,35 +320,16 @@ public class AutomatedTechAssignments {
     }
 
     /**
-     * Sorts all unit buckets into the order units are offered a tech in.
-     *
-     * <p>That is the caller's {@code unitPriorityOrder} when one was supplied, and otherwise battle value highest to
-     * lowest via {@link #sortByBattleValue(List)}.</p>
+     * Sorts all unit buckets by battle value (highest to lowest) using {@link #sortByBattleValue(List)}.
      *
      * @author Illiani
      * @since 0.50.11
      */
     private void sortUnitBuckets() {
-        sortUnitBucket(unmaintainedMeks);
-        sortUnitBucket(unmaintainedAero);
-        sortUnitBucket(unmaintainedBattleArmor);
-        sortUnitBucket(unmaintainedVehicle);
-    }
-
-    /**
-     * Sorts one unit bucket by the caller's priority order, or by battle value descending when the caller supplied
-     * none.
-     *
-     * @param units the unit list to sort in-place
-     *
-     * @since 0.51.01
-     */
-    private void sortUnitBucket(List<Unit> units) {
-        if (unitPriorityOrder == null) {
-            sortByBattleValue(units);
-            return;
-        }
-        units.sort(unitPriorityOrder);
+        sortByBattleValue(unmaintainedMeks);
+        sortByBattleValue(unmaintainedAero);
+        sortByBattleValue(unmaintainedBattleArmor);
+        sortByBattleValue(unmaintainedVehicle);
     }
 
     /**

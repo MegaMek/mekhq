@@ -47,8 +47,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Every option in the Command Generator has help text in its bundle (MekHQ issue 9938).
  *
- * <p>The tabs build their controls from {@code lbl<name>.text} keys and read the matching
- * {@code lbl<name>.tooltip}; the two skill drop-downs and the tech assignment direction read a tooltip key of
+ * <p>The Command Designer's pages label their options from {@code lbl<name>.text} keys and read the matching
+ * {@code lbl<name>.tooltip}; the support steppers, skill drop-downs and starting-cash months read a tooltip key of
  * their own. This checks the bundle rather than the built dialog: every labelled entry carries a tooltip that is
  * not blank and not the bundle's missing-key placeholder, apart from the few labels that are headings or body
  * text rather than options.</p>
@@ -56,19 +56,13 @@ import org.junit.jupiter.api.Test;
 class CommandGenerationTooltipsTest {
 
     /** Labels that are not options: column headings and a paragraph of help, which explain nothing further. */
-    private static final Set<String> NOT_OPTIONS = Set.of(
-          "lblSupportPersonnelColumnRole",
-          "lblSupportPersonnelColumnPercent",
-          "lblSupportPersonnelColumnSkill",
-          "lblSparesHelpBody");
+    private static final Set<String> NOT_OPTIONS = Set.of();
 
     /** Tooltip keys read by controls that take their text from somewhere other than an {@code lbl} key. */
     private static final List<String> TOOLTIP_ONLY_KEYS = List.of(
-          "lblAstechSkillLevel.tooltip",
-          "lblMedicSkillLevel.tooltip",
-          "cmbTechAssignmentDirection.tooltip",
           "supportCoveragePercent.toolTipText",
-          "supportSkillLevel.toolTipText");
+          "supportSkillLevel.toolTipText",
+          "Designer.logistics.months.tooltip");
 
     private static ResourceBundle bundle() {
         return ResourceBundle.getBundle(CommandGenerationUtilities.getCommandGenerationResourceBundle());
