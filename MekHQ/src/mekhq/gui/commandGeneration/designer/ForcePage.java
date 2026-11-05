@@ -58,6 +58,7 @@ import javax.swing.SwingUtilities;
 import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.Picker;
@@ -65,7 +66,9 @@ import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.PickerChoi
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportShare;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
+import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
@@ -292,10 +295,16 @@ public final class ForcePage {
         for (Map.Entry<Picker, HudChoice<Object>> entry : pickers.entrySet()) {
             Picker picker = entry.getKey();
             List<HudChoice.Choice<Object>> choices = new ArrayList<>();
+            Object selection = view.getPickerSelection(picker);
             for (PickerChoice choice : view.getPickerChoices(picker)) {
+                // The aggregate and placeholder factions - All Clans, Inner Sphere, Periphery and the like - are
+                // not commands anyone founds. The one already selected is kept, so the picker never shows a blank.
+                if (isSpecialFaction(choice.value()) && (choice.value() != selection)) {
+                    continue;
+                }
                 choices.add(new HudChoice.Choice<>(choice.value(), choice.label()));
             }
-            entry.getValue().setChoices(choices, view.getPickerSelection(picker));
+            entry.getValue().setChoices(choices, selection);
             boolean worthShowing = switch (picker) {
                 // A list with nothing but its blank entry offers no choice.
                 case SUB_FACTION, FLAGS -> choices.size() > 1;
@@ -316,6 +325,21 @@ public final class ForcePage {
               : formatted("Designer.force.formationMix.request", request));
         root.revalidate();
         root.repaint();
+    }
+
+    /**
+     * @param value a picker value
+     *
+     * @return {@code true} if the value is a faction tagged {@link FactionTag#SPECIAL}, such as All Clans
+     */
+    private static boolean isSpecialFaction(@Nullable Object value) {
+        if (!(value instanceof FactionRecord record)) {
+            return false;
+        }
+        // Factions.getFaction never answers null, so membership is checked against the key list first.
+        Factions factions = Factions.getInstance();
+        return factions.getFactionList().contains(record.getKey())
+              && factions.getFaction(record.getKey()).is(FactionTag.SPECIAL);
     }
 
     // endregion Rail
