@@ -485,6 +485,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // Snapshot the hangar before the combat phase so the starting-cash stage after support can
         // price exactly the units this build creates (combat + support), not pre-existing ones.
         Set<UUID> preExistingUnitIds = CommandGenerator.snapshotHangarUnitIds(getCampaign());
+        // And the roster, so the founder flags, callsigns and hiring fees reach exactly the people this
+        // build hires: the support staff and the vehicle and ship crews as well as the combat crews.
+        Set<UUID> preExistingPersonIds = CommandGenerator.snapshotPersonnelIds(getCampaign());
         // Everyone the build creates, from the combat crews through the starting simulation's children to the
         // post-generation spares, is given an origin from the Setup tab's Random Origin choices.
         applyBuildRandomOrigin(options);
@@ -505,15 +508,35 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
             buildStarted = true;
             List<Person> generatedPersons = new ArrayList<>(combatResult.generatedPersons());
             runGenerationPhase("Generating support forces...",
-                  supportListener -> CommandGenerator.generateSupportFromToe(getCampaign(), options,
-                        supportListener),
-                  supportPersons -> {
-                      generatedPersons.addAll(supportPersons);
+                  supportListener -> {
+                      List<Person> supportPersons = CommandGenerator.generateSupportFromToe(getCampaign(), options,
+                            supportListener);
+                      // Spares, cargo lift and temporary crew run once the support vehicles exist, so they
+                      // are stocked, lifted and crewed like everything else.
+                      CommandGenerator.SpareCosts spareCosts = CommandGenerator.completeBuild(getCampaign(), options,
+                            supportListener);
+                      return new SupportPhaseResult(supportPersons, spareCosts);
+                  },
+                  supportResult -> {
+                      generatedPersons.addAll(supportResult.persons());
+                      // The medical reserve is part of the command as built: hired before the roster flags and
+                      // the starting cash so its spares are founders, pay the hiring fee, and count toward the
+                      // running costs the cash is measured in.
+                      generateMedicalReserve(options, generatedPersons);
+                      List<Person> hired = CommandGenerator.personsAddedSince(getCampaign(), preExistingPersonIds);
+                      CommandGenerator.applyRosterFlags(getCampaign(), options, hired);
                       CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
-                            generatedPersons, combatResult.spareCosts());
-                      runStartingSimulationThen(options, generatedPersons);
+                            hired, supportResult.spareCosts());
+                      runStartingSimulationThen(options, hired);
                   });
         });
+    }
+
+    /**
+     * What the support phase hands back: the support staff it hired and the value of the spares the build's
+     * stock-up added.
+     */
+    private record SupportPhaseResult(List<Person> persons, CommandGenerator.SpareCosts spareCosts) {
     }
 
     /**
@@ -786,7 +809,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         campaign.getPlayerForce().setCamOpsReputation(reputationController);
 
         LOGGER.info("[CompanyGen][PostGen] running processBonusUnitsBasedOnCampaignOptions");
-        processBonusUnitsBasedOnCampaignOptions(generatedPersons, options);
+        processBonusUnitsBasedOnCampaignOptions();
 
         AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         if ((currentLocation != null) && currentLocation.isOnPlanet()) {
@@ -798,21 +821,29 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);
     }
 
-    private void processBonusUnitsBasedOnCampaignOptions(List<Person> generatedPersons,
-          CommandGenerationOptions options) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        // Medical reserve: a generation-only option (independent of the campaign-wide Alternative
-        // Advanced Medical rule). Creates spare unassigned personnel as injury replacements for every
-        // combat role, each role's reserve sized as a percentage of the people generated in it.
-        if (options.isGenerateMedicalReserve()) {
-            Map<PersonnelRole, Integer> sparesByRole = getMedicalReserveSparesByRole(generatedPersons,
-                  options.getMedicalReservePercent());
-            for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
-                for (int i = 0; i < entry.getValue(); i++) {
-                    generateSparePersonnel(options, entry.getKey());
-                }
+    /**
+     * Medical reserve: a generation-only option (independent of the campaign-wide Alternative Advanced Medical
+     * rule). Creates spare unassigned personnel as injury replacements for every combat role, each role's reserve
+     * sized as a percentage of the people generated in it.
+     *
+     * @param options          the generation options carrying the reserve toggle and percentage
+     * @param generatedPersons the combat crews and support staff the build generated, counted per combat role
+     */
+    private void generateMedicalReserve(CommandGenerationOptions options, List<Person> generatedPersons) {
+        if (!options.isGenerateMedicalReserve()) {
+            return;
+        }
+        Map<PersonnelRole, Integer> sparesByRole = getMedicalReserveSparesByRole(generatedPersons,
+              options.getMedicalReservePercent());
+        for (Map.Entry<PersonnelRole, Integer> entry : sparesByRole.entrySet()) {
+            for (int i = 0; i < entry.getValue(); i++) {
+                generateSparePersonnel(options, entry.getKey());
             }
         }
+    }
+
+    private void processBonusUnitsBasedOnCampaignOptions() {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Support-vehicle generation (salvage, MASH, fatigue, StratCon convoy, security) is handled
         // during generation by SupportPersonnelToTOE and SupportUnitGenerator, so it is not repeated
