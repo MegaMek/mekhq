@@ -224,7 +224,7 @@ class SalvageOperationDraftTest {
         }
 
         @Test
-        void salvageFormationsNestedInSalvageFormationsAreListedAfterTheirParent() {
+        void salvageFormationsNestedInSalvageFormationsAreNotListedSeparately() {
             Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
             Formation secondChild = salvageTeam("Recovery II, Recovery", List.of(salvageUnit(List.of(), true)),
                   null);
@@ -238,25 +238,25 @@ class SalvageOperationDraftTest {
                 listed.add(option.formation());
             }
 
-            // Plain alphabetical order would put "Recovery I, Recovery" before its parent
-            assertEquals(List.of(parent, firstChild, secondChild, other), listed);
+            assertEquals(List.of(parent, other), listed);
         }
 
         @Test
-        void stagingANestedTeamUnstagesItsParent() {
+        void stagingASalvageParentIncludesItsNestedTeams() {
             Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
             Formation child = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
             when(child.getParentFormation()).thenReturn(parent);
             SalvageOperationDraft draft = draft();
-            draft.stage(option(draft, parent));
+            TeamOption parentOption = option(draft, parent);
 
-            assertTrue(draft.stage(option(draft, child)));
+            assertTrue(draft.stage(parentOption));
 
-            assertEquals(List.of(option(draft, child)), draft.getStagedTeams());
+            assertEquals(List.of(parentOption), draft.getStagedTeams());
+            assertFalse(draft.getTeamOptions().stream().anyMatch(team -> team.formation() == child));
         }
 
         @Test
-        void stagingAParentUnstagesItsNestedTeams() {
+        void stagingAParentDoesNotOfferNestedTeamsSeparately() {
             Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
             Formation firstChild = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
             when(firstChild.getParentFormation()).thenReturn(parent);
@@ -265,17 +265,18 @@ class SalvageOperationDraftTest {
             when(secondChild.getParentFormation()).thenReturn(parent);
             Formation other = salvageTeam("Other", List.of(salvageUnit(List.of(), true)), null);
             SalvageOperationDraft draft = draft();
-            draft.stage(option(draft, firstChild));
-            draft.stage(option(draft, secondChild));
-            draft.stage(option(draft, other));
+            TeamOption otherOption = option(draft, other);
 
+            assertTrue(draft.stage(otherOption));
             assertTrue(draft.stage(option(draft, parent)));
 
-            assertEquals(List.of(option(draft, other), option(draft, parent)), draft.getStagedTeams());
+            assertEquals(List.of(otherOption, option(draft, parent)), draft.getStagedTeams());
+            assertFalse(draft.getTeamOptions().stream().anyMatch(team ->
+                  (team.formation() == firstChild) || (team.formation() == secondChild)));
         }
 
         @Test
-        void siblingNestedTeamsCanBothBeStaged() {
+        void siblingNestedTeamsAreCoveredByTheirParent() {
             Formation parent = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
             Formation firstChild = salvageTeam("Recovery I, Recovery", List.of(salvageUnit(List.of(), true)), null);
             when(firstChild.getParentFormation()).thenReturn(parent);
@@ -284,10 +285,9 @@ class SalvageOperationDraftTest {
             when(secondChild.getParentFormation()).thenReturn(parent);
             SalvageOperationDraft draft = draft();
 
-            draft.stage(option(draft, firstChild));
-            draft.stage(option(draft, secondChild));
+            assertTrue(draft.stage(option(draft, parent)));
 
-            assertEquals(2, draft.getStagedTeams().size());
+            assertEquals(1, draft.getStagedTeams().size());
         }
 
         @Test
@@ -301,7 +301,7 @@ class SalvageOperationDraftTest {
             when(contract.getStratConCampaignState()).thenReturn(stratConState);
             when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
-            assertEquals(TeamAvailability.DEPLOYED, option(draft(), child).availability());
+            assertEquals(TeamAvailability.DEPLOYED, option(draft(), parent).availability());
         }
 
         @Test
@@ -316,7 +316,7 @@ class SalvageOperationDraftTest {
             when(campaign.getActiveContracts()).thenReturn(List.of(contract));
             scenarioFormations.add(parent.getId());
 
-            assertEquals(TeamAvailability.AVAILABLE, option(draft(), child).availability());
+            assertEquals(TeamAvailability.AVAILABLE, option(draft(), parent).availability());
         }
 
         @Test
