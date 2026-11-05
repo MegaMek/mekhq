@@ -36,6 +36,7 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDepl
 
 import java.util.*;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -212,8 +213,7 @@ public class SalvageOperationDraft {
      * Lists every formation that could be a salvage team: Salvage formations first, then combat teams, each
      * alphabetically. Formations that can't join are included, with the reason, so the player can see why.
      *
-     * <p>Salvage formations nested in other Salvage formations are listed too, each directly after its parent, so the
-     * player can send the whole formation or just part of it. {@link #stage(TeamOption)} stops both being staged.</p>
+     * <p>Salvage formations nested in another Salvage formation are part of that team and aren't listed separately.</p>
      */
     private List<TeamOption> buildTeamOptions() {
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
@@ -223,7 +223,7 @@ public class SalvageOperationDraft {
         List<Formation> salvageFormations = new ArrayList<>();
         Set<Integer> listedIds = new LinkedHashSet<>();
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            if (formation.getFormationType().isSalvage()) {
+            if (formation.getFormationType().isSalvage() && !hasSalvageAncestor(formation)) {
                 salvageFormations.add(formation);
                 listedIds.add(formation.getId());
             }
@@ -257,6 +257,16 @@ public class SalvageOperationDraft {
                   getAvailability(formation, hangar, activeContracts, alreadyAssignedFormations)));
         }
         return options;
+    }
+
+    /** Checks whether a formation is nested anywhere under another Salvage formation. */
+    private static boolean hasSalvageAncestor(Formation formation) {
+        for (Formation parent = formation.getParentFormation(); parent != null; parent = parent.getParentFormation()) {
+            if (parent.getFormationType().isSalvage()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -308,14 +318,16 @@ public class SalvageOperationDraft {
         return false;
     }
 
-    private TeamAvailability getAvailability(Formation formation, LocalHangar hangar,
+    private TeamAvailability getAvailability(@Nonnull Formation formation, LocalHangar hangar,
           List<AbstractContract> activeContracts, List<Integer> alreadyAssignedFormations) {
         if (formation.getSalvageUnitCount(hangar, isInSpace, salvageRules) <= 0) {
             return TeamAvailability.NO_SALVAGE_UNITS;
         }
 
         boolean isDeployedToStratCon = isDeployedToStratCon(formation, activeContracts, alreadyAssignedFormations);
-        if (!formation.isDeployed() && !isDeployedToStratCon) {
+        boolean isDeployed = formation.isDeployed() || formation.getAllSubFormations().stream()
+                                                                  .anyMatch(Formation::isDeployed);
+        if (!isDeployed && !isDeployedToStratCon) {
             return TeamAvailability.AVAILABLE;
         }
 
@@ -342,13 +354,24 @@ public class SalvageOperationDraft {
                 return true;
             }
         }
+        for (Formation descendant : formation.getAllSubFormations()) {
+            if (!alreadyAssignedFormations.contains(descendant.getId()) &&
+                      isForceDeployedToStratCon(activeContracts, descendant.getId())) {
+                return true;
+            }
+        }
         return false;
     }
 
-    /** Checks whether a formation, or any formation above it, is deployed to this scenario. */
+    /** Checks whether a formation, or any formation above or below it, is deployed to this scenario. */
     private boolean isDeployedToThisScenario(Formation formation) {
         for (Formation current = formation; current != null; current = current.getParentFormation()) {
             if (current.getScenarioId() == scenario.getId()) {
+                return true;
+            }
+        }
+        for (Formation descendant : formation.getAllSubFormations()) {
+            if (descendant.getScenarioId() == scenario.getId()) {
                 return true;
             }
         }
