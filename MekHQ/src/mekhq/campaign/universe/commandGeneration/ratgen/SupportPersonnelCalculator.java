@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.Collection;
 
+import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -137,53 +138,101 @@ public final class SupportPersonnelCalculator {
         if (campaign == null) {
             return new SupportDemand(0, 0, 0, 0, 0, 0);
         }
-
-        int mekCount = 0;
-        int vehicleCount = 0;
-        int aeroCount = 0;
-        int protoMekCrew = 0;
-        int baSuits = 0;
-
+        UnitTally tally = new UnitTally();
         Collection<Unit> units = campaign.getActiveUnits();
         if (units != null) {
             for (Unit unit : units) {
-                if (unit == null || unit.isMothballed()) {
+                if ((unit == null) || unit.isMothballed() || (unit.getEntity() == null)) {
                     continue;
                 }
-                Entity entity = unit.getEntity();
-                if (entity == null) {
-                    continue;
-                }
-
-                if (entity.isMek()) {
-                    mekCount++;
-                } else if (entity.isProtoMek()) {
-                    protoMekCrew += unit.getFullCrewSize();
-                } else if (entity.isVehicle()) {
-                    vehicleCount++;
-                } else if (entity.isAerospaceFighter()
-                      || entity.isConventionalFighter()
-                      || entity.isSmallCraft()) {
-                    aeroCount++;
-                } else if (entity.isBattleArmor()) {
-                    baSuits += unit.getFullCrewSize();
-                }
-                // DropShip / JumpShip / WarShip / SpaceStation intentionally skipped — their
-                // organic VESSEL_CREW carries S_TECH_VESSEL and acts as the ship's own tech.
+                tally.count(unit.getEntity(), unit.getFullCrewSize());
             }
         }
-
-        vehicleCount += Math.max(0, vehiclesStillToCome);
-
-        int mekTechs = mekCount + ceilDiv(protoMekCrew, PROTOMEK_POINT_SIZE);
-        int baTechs = ceilDiv(baSuits, BA_SQUAD_SIZE);
-
         int basePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false).size();
+        return demandFor(campaign, tally, vehiclesStillToCome, basePersonnel);
+    }
+
+    /**
+     * Estimates the demand a command will have once units that do not exist yet have joined it: the campaign's own
+     * units and people as {@link #compute(Campaign, int)} counts them, plus the planned units and the crews they will
+     * bring. Used to preview a command before it is built, when its people and units are still only a rolled
+     * design.
+     *
+     * @param campaign            the campaign the command is being built into; if {@code null}, returns an all-zero
+     *                            demand
+     * @param plannedEntities     the units the build will add, such as the included units of a rolled design
+     * @param vehiclesStillToCome support vehicles the build will add on top of those
+     *
+     * @return a non-{@code null} {@link SupportDemand}
+     */
+    public static SupportDemand estimate(Campaign campaign, Collection<Entity> plannedEntities,
+          int vehiclesStillToCome) {
+        if (campaign == null) {
+            return new SupportDemand(0, 0, 0, 0, 0, 0);
+        }
+        UnitTally tally = new UnitTally();
+        Collection<Unit> units = campaign.getActiveUnits();
+        if (units != null) {
+            for (Unit unit : units) {
+                if ((unit == null) || unit.isMothballed() || (unit.getEntity() == null)) {
+                    continue;
+                }
+                tally.count(unit.getEntity(), unit.getFullCrewSize());
+            }
+        }
+        int plannedCrew = 0;
+        for (Entity entity : plannedEntities) {
+            if (entity == null) {
+                continue;
+            }
+            int crew = Compute.getFullCrewSize(entity);
+            tally.count(entity, crew);
+            plannedCrew += crew;
+        }
+        int basePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false).size()
+              + plannedCrew;
+        return demandFor(campaign, tally, vehiclesStillToCome, basePersonnel);
+    }
+
+    /** Counts the units that need support staff, by the kind of tech they need. */
+    private static final class UnitTally {
+        private int mekCount;
+        private int vehicleCount;
+        private int aeroCount;
+        private int protoMekCrew;
+        private int baSuits;
+
+        private void count(Entity entity, int fullCrewSize) {
+            if (entity.isMek()) {
+                mekCount++;
+            } else if (entity.isProtoMek()) {
+                protoMekCrew += fullCrewSize;
+            } else if (entity.isVehicle()) {
+                vehicleCount++;
+            } else if (entity.isAerospaceFighter()
+                  || entity.isConventionalFighter()
+                  || entity.isSmallCraft()) {
+                aeroCount++;
+            } else if (entity.isBattleArmor()) {
+                baSuits += fullCrewSize;
+            }
+            // DropShip / JumpShip / WarShip / SpaceStation intentionally skipped — their
+            // organic VESSEL_CREW carries S_TECH_VESSEL and acts as the ship's own tech.
+        }
+    }
+
+    private static SupportDemand demandFor(Campaign campaign, UnitTally tally, int vehiclesStillToCome,
+          int basePersonnel) {
+        int vehicleCount = tally.vehicleCount + Math.max(0, vehiclesStillToCome);
+
+        int mekTechs = tally.mekCount + ceilDiv(tally.protoMekCrew, PROTOMEK_POINT_SIZE);
+        int baTechs = ceilDiv(tally.baSuits, BA_SQUAD_SIZE);
+
         // Doctor and admin demand reflect the post-generation roster, so add the techs we project
         // creating. Doctors and admins are not added back because including them would be circular
         // (admins counted in admin demand, doctors counted in doctor demand). This matches the
         // SupportRating convention.
-        int totalTechs = mekTechs + vehicleCount + aeroCount + baTechs;
+        int totalTechs = mekTechs + vehicleCount + tally.aeroCount + baTechs;
         int personnelForCalc = basePersonnel + totalTechs;
 
         int maxPatients = Math.max(1, campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_PATIENTS));
@@ -193,10 +242,10 @@ public final class SupportPersonnelCalculator {
         int adminDivisor = isIrregularFaction(faction) ? ADMIN_DIVISOR_IRREGULAR : ADMIN_DIVISOR_STANDARD;
         int admins = ceilDiv(personnelForCalc, adminDivisor);
 
-        SupportDemand demand = new SupportDemand(mekTechs, vehicleCount, aeroCount, baTechs, doctors, admins);
+        SupportDemand demand = new SupportDemand(mekTechs, vehicleCount, tally.aeroCount, baTechs, doctors, admins);
         LOGGER.debug(
               "SupportPersonnelCalculator: meks={} vehicles={} aero={} protoMekCrew={} baSuits={} basePersonnel={} -> {}",
-              mekCount, vehicleCount, aeroCount, protoMekCrew, baSuits, basePersonnel, demand);
+              tally.mekCount, vehicleCount, tally.aeroCount, tally.protoMekCrew, tally.baSuits, basePersonnel, demand);
         return demand;
     }
 
