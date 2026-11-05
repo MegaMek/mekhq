@@ -345,6 +345,12 @@ public class StratConRulesManager {
                 // otherwise, pick a random force from the avail
             } else {
                 Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
+                if (randomForceID == null) {
+                    // Reuse a deployed Maneuver/Frontline team only as a daily scenario seed. Keep busy teams out of
+                    // the available-force list, which also feeds reinforcement assignment.
+                    randomForceID = getRandomItem(getBusyCombatFormationIDs(campaign, contract,
+                          campaign.getPlayerForce().getCombatTeamsAsList(campaign)));
+                }
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -3187,6 +3193,12 @@ public class StratConRulesManager {
     static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+        return generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment, false);
+    }
+
+    static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment, boolean suppressReport) {
         StratConScenario scenario = new StratConScenario();
 
         if (forceID == null) {
@@ -3273,9 +3285,7 @@ public class StratConRulesManager {
         // maintained
         // registering the scenario with the campaign should be done after setting
         // dates, otherwise, the report messages for new scenarios look weird
-        // also, suppress the "new scenario" report if not generating a scenario
-        // for a specific force, as this indicates a contract initialization
-        campaign.addScenario(backingScenario, contract, forceID == FORMATION_NONE);
+        campaign.addScenario(backingScenario, contract, suppressReport);
         scenario.setBackingScenarioID(backingScenario.getId());
 
         if (forceID > FORMATION_NONE) {
@@ -3724,8 +3734,7 @@ public class StratConRulesManager {
      *       (unless role restrictions are bypassed).</li>
      * </ul>
      *
-     * <p>If no idle combat team qualifies, even with role restrictions relaxed, busy combat formations (Maneuver or
-     * Frontline combat teams already assigned to a scenario) are treated as available instead.</p>
+     * <p>Busy formations are never returned; callers that need a seed-only fallback must select one explicitly.</p>
      *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
      *                               statuses.
@@ -3785,20 +3794,9 @@ public class StratConRulesManager {
             }
         }
 
-        if (suitableForces.isEmpty()) {
-            if (!bypassRoleRestrictions) {
-                LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
-                suitableForces = getAvailableForceIDs(campaign, contract, true);
-            } else {
-                LOGGER.info("No idle combat teams found for contract {} despite relaxed restrictions. Treating busy" +
-                                  " combat formations as available", contract.getId());
-                suitableForces = getBusyCombatFormationIDs(campaign, contract, combatTeams);
-
-                if (suitableForces.isEmpty()) {
-                    LOGGER.info("No busy combat formations found for contract {} either. Scenario generation will" +
-                                      " likely be skipped.", contract.getId());
-                }
-            }
+        if (suitableForces.isEmpty() && !bypassRoleRestrictions) {
+            LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
+            suitableForces = getAvailableForceIDs(campaign, contract, true);
         }
 
         return suitableForces;
