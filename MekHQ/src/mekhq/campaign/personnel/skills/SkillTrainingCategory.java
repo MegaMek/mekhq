@@ -52,8 +52,8 @@ public enum SkillTrainingCategory {
 
     /**
      * Gets the category of a skill. A skill belonging to the person's primary or secondary role is always a profession
-     * skill, even if it is also a Utility skill. Any other skill that isn't a Utility skill is a Roleplay skill, as is
-     * a combat or support skill outside the person's roles.
+     * skill, even if it is also a Utility skill. A Roleplay skill outside the person's roles is priced as Roleplay; all
+     * other skills outside their roles, including Combat, Support, and Utility skills, are priced as Utility.
      *
      * @param isRoleSkill whether the skill belongs to the person's primary or secondary role
      * @param skillType   the skill's type
@@ -68,11 +68,11 @@ public enum SkillTrainingCategory {
             return PROFESSION;
         }
 
-        if (skillType.isUtilitySkill()) {
-            return UTILITY;
+        if (skillType.isRoleplaySkill()) {
+            return ROLEPLAY;
         }
 
-        return ROLEPLAY;
+        return UTILITY;
     }
 
     /**
