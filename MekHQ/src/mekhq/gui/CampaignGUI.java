@@ -33,6 +33,7 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -596,7 +597,7 @@ public class CampaignGUI extends JPanel {
         // regularly miss that they have to press something to get a starting force at all.
         btnCommandGenerator = new AccentRoundedJButton(resourceMap.getString("btnCommandGenerator.text"),
               Accent.CAUTION);
-        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.setToolTipText(wordWrap(resourceMap.getString("btnCommandGenerator.toolTipText")));
         btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
         btnCommandGenerator.addActionListener(event -> {
             new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true);
@@ -1725,6 +1726,18 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 Utilities.copyfile(backupFile, file);
                 backupFile.delete();
+            }
+        }
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // Tab backgrounds are not reset by a theme change, so recolor an active Command Center nag for the new theme
+        if (logNagActive && (tabMain != null) && (commandCenterTab != null)) {
+            int commandCenterIndex = tabMain.indexOfComponent(commandCenterTab);
+            if (commandCenterIndex >= 0) {
+                tabMain.setBackgroundAt(commandCenterIndex, UIUtil.uiDarkBlue());
             }
         }
     }

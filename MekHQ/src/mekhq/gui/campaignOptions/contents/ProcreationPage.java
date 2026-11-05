@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -48,11 +49,11 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -182,7 +183,7 @@ class ProcreationPage {
                     final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof BabySurnameStyle) {
-                    list.setToolTipText(((BabySurnameStyle) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((BabySurnameStyle) value).getToolTipText()));
                 }
                 return this;
             }
@@ -249,7 +250,7 @@ class ProcreationPage {
                     final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RandomProcreationMethod) {
-                    list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((RandomProcreationMethod) value).getToolTipText()));
                 }
                 return this;
             }
