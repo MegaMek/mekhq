@@ -731,7 +731,7 @@ public class MHQMorale {
                           getFormattedTextAt(RESOURCE_BUNDLE,
                                 key,
                                 campaign.getCommanderAddress(),
-                                FactionStandingUtilities.getFactionName(contract.getEnemyFaction(), today.getYear())),
+                                contract.getEnemyDisplayName()),
                           null,
                           null,
                           null,
