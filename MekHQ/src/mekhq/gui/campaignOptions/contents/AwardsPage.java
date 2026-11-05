@@ -56,11 +56,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -175,7 +175,7 @@ class AwardsPage {
                   final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AwardBonus) {
-                    list.setToolTipText(((AwardBonus) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((AwardBonus) value).getToolTipText()));
                 }
                 return this;
             }

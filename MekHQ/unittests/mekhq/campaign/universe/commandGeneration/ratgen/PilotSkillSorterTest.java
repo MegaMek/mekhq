@@ -85,6 +85,28 @@ class PilotSkillSorterTest {
     }
 
     @Test
+    void aLamKeepsItsLamPilotWhenMekWarriorsAreSorted() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation firstLance = lance(campaign, "First Lance");
+        Formation secondLance = lance(campaign, "Second Lance");
+        Unit lamSeat = lamIn(campaign, firstLance);
+        Unit mekSeat = mekIn(campaign, firstLance);
+        Unit secondLanceSeat = mekIn(campaign, secondLance);
+        Person lamPilot = lamPilot(campaign, lamSeat, 1);
+        Person green = pilot(campaign, mekSeat, 2);
+        Person veteran = pilot(campaign, secondLanceSeat, 5);
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        options.setAssignMostSkilledToPrimaryLances(true);
+
+        int moved = PilotSkillSorter.apply(campaign, options);
+
+        assertEquals(2, moved, "only the two MekWarriors swap; the LAM is sorted on its own");
+        assertSame(lamPilot, lamSeat.getCommander(), "a LAM seat is never handed to a MekWarrior");
+        assertSame(veteran, mekSeat.getCommander());
+        assertSame(green, secondLanceSeat.getCommander());
+    }
+
+    @Test
     void nothingMovesWhenTheOptionIsOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         Formation lance = lance(campaign, "Lance");
@@ -112,6 +134,25 @@ class PilotSkillSorterTest {
         Unit unit = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         campaign.getPlayerForce().addUnitToFormation(unit, lance.getId(), campaign);
         return unit;
+    }
+
+    private static Unit lamIn(Campaign campaign, Formation lance) {
+        Unit unit = campaign.addNewUnit(UnitTestUtilities.getWaspLAMMk1(), false, 0, PartQuality.QUALITY_D);
+        campaign.getPlayerForce().addUnitToFormation(unit, lance.getId(), campaign);
+        return unit;
+    }
+
+    /** A LAM pilot seated in the unit, with the given Mek and aerospace skill levels; higher is better. */
+    private static Person lamPilot(Campaign campaign, Unit unit, int skillLevel) {
+        Person person = new Person(campaign);
+        person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.LAM_PILOT);
+        person.addSkill(SkillType.S_GUN_MEK, skillLevel, 0);
+        person.addSkill(SkillType.S_PILOT_MEK, skillLevel, 0);
+        person.addSkill(SkillType.S_GUN_AERO, skillLevel, 0);
+        person.addSkill(SkillType.S_PILOT_AERO, skillLevel, 0);
+        campaign.importPerson(person);
+        unit.addPilotOrSoldier(person);
+        return person;
     }
 
     /** A MekWarrior seated in the unit, with the given gunnery and piloting skill level; higher is better. */
