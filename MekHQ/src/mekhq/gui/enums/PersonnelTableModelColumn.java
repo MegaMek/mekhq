@@ -50,6 +50,7 @@ import megamek.common.TargetRollModifier;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
@@ -670,6 +671,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         Unit unit = person.getUnit();
         if (unit != null && unit.getEntity() != null) {
             Entity entity = unit.getEntity();
+            if (entity instanceof LandAirMek) {
+                return getAggregateSkillDisplay(person, PersonnelRole.LAM_PILOT, skillValue,
+                      campaign.getCampaignOptions());
+            }
             return skillValue.apply(SkillType.getGunnerySkillFor(entity)) + "/" +
                          skillValue.apply(SkillType.getDrivingSkillFor(entity));
         }
