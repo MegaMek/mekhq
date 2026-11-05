@@ -133,6 +133,16 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         super.removeNotify();
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // The labels embed theme-dependent HTML colours, so rebuild them after a theme change. The campaign is still
+        // null when the superclass constructor first calls this.
+        if (campaign != null) {
+            refreshAll();
+        }
+    }
+
     /**
      * Fully recalculates and updates all metrics on the panel.
      */
