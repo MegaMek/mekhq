@@ -202,7 +202,8 @@ class StratConRulesManagerTest {
                         any(),
                         any(StratConCoords.class),
                         any(ScenarioTemplate.class),
-                        any()))
+                        any(),
+                        anyBoolean()))
                   .thenReturn(null);
 
             initializeObjectiveScenarios(campaign, contract, track, List.of("objective-template.xml"));
@@ -2477,7 +2478,7 @@ class StratConRulesManagerTest {
         }
 
         @Test
-        void noIdleCombatTeam_busyManeuverAndFrontlineFormationsAreAvailable() {
+        void noIdleCombatTeam_busyManeuverAndFrontlineFormationsAreNotAvailable() {
             setUp();
             addCombatTeam(1, CombatRole.MANEUVER, true, contract);
             addCombatTeam(2, CombatRole.FRONTLINE, true, contract);
@@ -2486,7 +2487,7 @@ class StratConRulesManagerTest {
             addCombatTeam(5, CombatRole.AUXILIARY, true, contract);
             addCombatTeam(6, CombatRole.RESERVE, true, contract);
 
-            assertEquals(List.of(1, 2), StratConRulesManager.getAvailableForceIDs(campaign, contract, false));
+            assertTrue(StratConRulesManager.getAvailableForceIDs(campaign, contract, false).isEmpty());
         }
 
         @Test
