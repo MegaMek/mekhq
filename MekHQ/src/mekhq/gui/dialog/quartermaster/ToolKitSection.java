@@ -102,6 +102,12 @@ public class ToolKitSection implements KitIssueSection {
     }
 
     @Override
+    public String getGuideKey() {
+        // Both slots work the same way, so they share one guide.
+        return KitIssueGuidePreferences.TOOLS_GUIDE;
+    }
+
+    @Override
     public JComponent getComponent() {
         JPanel tab = new JPanel(new BorderLayout(0, scaleForGUI(10)));
         tab.setOpaque(true);
