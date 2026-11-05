@@ -1653,7 +1653,7 @@ public class CampaignNewDayManager {
 
             // Accolade check
             FactionAccoladeLevel newAccoladeLevel = campaign.getPlayerForce().getFactionStandings().checkForAccolade(
-                  relevantFaction, today);
+                  relevantFaction, faction, today);
 
             if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
                 new FactionAccoladeEvent(campaign, relevantFaction, newAccoladeLevel,

@@ -52,12 +52,14 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+import javax.xml.parsers.DocumentBuilder;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.roleplay.JournalExporter.Format;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Saves a player's journal from a campaign save that can't be loaded. The journal is read straight out of the save's
@@ -161,8 +163,10 @@ public final class JournalRescue {
 
     private static @Nullable Roleplay parse(final String xml) {
         try {
-            final Node node = MHQXMLUtility.newSafeDocumentBuilder()
-                                    .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
+            final DocumentBuilder builder = MHQXMLUtility.newSafeDocumentBuilder();
+            // Broken pieces are expected here; without a handler the parser prints each one to stderr.
+            builder.setErrorHandler(new DefaultHandler());
+            final Node node = builder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                                     .getDocumentElement();
             return node.getNodeName().equals("roleplay") ? Roleplay.generateInstanceFromXML(node) : null;
         } catch (Exception unreadable) {

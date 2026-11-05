@@ -486,14 +486,14 @@ class ContractMarketPage {
 
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractEquipment.text"));
-        btnContractEquipment.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
-              "lblContractEquipment.tooltip"));
+        btnContractEquipment.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractEquipment.tooltip")));
         btnContractEquipment.addMouseListener(createTipPanelUpdater("ContractEquipment"));
 
         btnContractPersonnel = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
               "lblContractPersonnel.text"));
-        btnContractPersonnel.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
-              "lblContractPersonnel.tooltip"));
+        btnContractPersonnel.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblContractPersonnel.tooltip")));
         btnContractPersonnel.addMouseListener(createTipPanelUpdater("ContractPersonnel"));
 
         ButtonGroup contractGroup = new ButtonGroup();

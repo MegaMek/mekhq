@@ -1667,7 +1667,9 @@ public class ContractEditorDialog extends JDialog {
     /**
      * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
      * untouched. If the contract's scale, track count, dates, command rights, or employer changed, its StratCon schedule
-     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}).
+     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}). A market offer that has not been
+     * accepted has only its Essential scenario schedule rolled again (see
+     * {@link AbstractContractGeneration#rollScenarioSchedule}), and a newly created offer always has one rolled.
      *
      * @author Illiani
      * @since 0.51.01
@@ -1872,7 +1874,10 @@ public class ContractEditorDialog extends JDialog {
         ContractCharacteristics.syncNegotiatorTier(contract, campaign);
 
         // A running contract's schedule was rolled from what was just edited, so it is rolled again to match. A market
-        // offer has no StratCon state yet, and is scheduled from its edited values when accepted.
+        // offer has no StratCon state yet, but its Essential scenario schedule is still pre-rolled, as the generator
+        // does (AbstractContractGeneration#determineSchedule): it is what the offer's combat pay estimate counts, and
+        // what StratCon spawns the Essential scenarios from once the offer is accepted. A created offer has never had
+        // one rolled, so it is always rolled here; an edited offer is rolled again only when its inputs changed.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         boolean isScheduleChanged = (contract.getScale() != previousScale)
                                           || (contract.getTrackCount() != previousTrackCount)
@@ -1881,8 +1886,14 @@ public class ContractEditorDialog extends JDialog {
                                           || (contract.getLengthInMonths() != previousLengthInMonths)
                                           || (contract.getCommandRights() != previousCommandRights)
                                           || !Objects.equals(contract.getEmployerFactionCode(), previousEmployerCode);
-        if ((campaignState != null) && isScheduleChanged) {
-            StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
+        if (campaignState != null) {
+            if (isScheduleChanged) {
+                StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
+            }
+        } else if (createMode || isScheduleChanged) {
+            contract.setScenarioSchedule(AbstractContractGeneration.rollScenarioSchedule(campaign,
+                  contract,
+                  contract.getLengthInMonths()));
         }
 
         // The difficulty is worked out again from the saved opposition and forces, as the editor tells the GM it will

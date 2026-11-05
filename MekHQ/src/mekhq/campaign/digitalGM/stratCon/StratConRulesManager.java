@@ -167,6 +167,8 @@ import org.apache.commons.math3.util.Pair;
 public class StratConRulesManager {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
     public final static int BASE_LEADERSHIP_BUDGET = 500;
+    /** The Employer Support spent to recall a deployed formation before its return date. */
+    public static final int RECALL_FORMATION_SUPPORT_POINT_COST = 1;
 
     private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
 
@@ -4937,6 +4939,69 @@ public class StratConRulesManager {
         for (int forceID : forcesToUndeploy) {
             track.unassignFormation(forceID);
         }
+    }
+
+    /**
+     * Whether a deployed formation may be recalled from the Area of Operations early, at the cost of Employer Support.
+     *
+     * <p>A formation committed to a scenario must see it through, and one carrying out a facility order stays until
+     * that order is completed or lifted.</p>
+     *
+     * @param forceID       the deployed formation's ID
+     * @param track         the track it is deployed to
+     * @param campaignState the contract's StratCon state, which holds the Employer Support
+     * @param campaign      the current campaign
+     *
+     * @return {@code true} if the formation can be recalled now
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canRecallFormation(int forceID, StratConTrackState track,
+          StratConCampaignState campaignState, Campaign campaign) {
+        if (!track.getAssignedForceCoords().containsKey(forceID)) {
+            return false;
+        }
+
+        if (campaignState.getSupportPoints() < RECALL_FORMATION_SUPPORT_POINT_COST) {
+            return false;
+        }
+
+        if (track.getFacilityOrder(forceID) != null) {
+            return false;
+        }
+
+        Formation formation = campaign.getPlayerForce().getFormation(forceID);
+        return (formation != null) && !formation.isDeployed();
+    }
+
+    /**
+     * Spends Employer Support to have a deployed formation return from the Area of Operations at once, rather than
+     * waiting for its return date. Does nothing if {@link #canRecallFormation} does not allow it.
+     *
+     * @param forceID       the deployed formation's ID
+     * @param track         the track it is deployed to
+     * @param campaignState the contract's StratCon state, which pays the Employer Support
+     * @param campaign      the current campaign
+     *
+     * @return {@code true} if the formation was recalled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean recallFormation(int forceID, StratConTrackState track, StratConCampaignState campaignState,
+          Campaign campaign) {
+        if (!canRecallFormation(forceID, track, campaignState, campaign)) {
+            return false;
+        }
+
+        campaignState.changeSupportPoints(-RECALL_FORMATION_SUPPORT_POINT_COST);
+        // With no facility order holding it, this also clears any instruction to remain deployed
+        track.unassignFormation(forceID);
+
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.formationRecalled",
+              campaign.getPlayerForce().getFormation(forceID).getName(), RECALL_FORMATION_SUPPORT_POINT_COST));
+        return true;
     }
 
     /**
