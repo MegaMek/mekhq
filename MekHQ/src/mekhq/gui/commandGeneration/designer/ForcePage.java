@@ -36,13 +36,7 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.commandGeneration.designer.DesignerUi.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -173,6 +167,8 @@ public final class ForcePage {
         HudChoice<Object> formation = picker(Picker.FORMATION, 5);
         HudChoice<Object> rating = picker(Picker.RATING, 6);
         HudChoice<Object> experience = picker(Picker.EXPERIENCE, 5);
+        // Experience's Random entry is a label rather than a blank value, so it is marked to stand on its own row.
+        experience.setFirstIsRandom(true);
         HudChoice<Object> unitType = picker(Picker.UNIT_TYPE, 6);
         HudChoice<Object> weightClass = picker(Picker.WEIGHT_CLASS, 5);
         HudChoice<Object> infantryClass = picker(Picker.INFANTRY_CLASS, 0);
@@ -224,11 +220,26 @@ public final class ForcePage {
             }
         });
 
-        JPanel transportGrid = Hud.transparentPanel(new GridLayout(2, 2, scaleForGUI(10), scaleForGUI(8)));
-        transportGrid.add(field(text("Designer.force.dropShips"), transport.get(TransportShare.DROPSHIP)));
-        transportGrid.add(field(text("Designer.force.jumpShips"), transport.get(TransportShare.JUMPSHIP)));
-        transportGrid.add(field(text("Designer.force.warShips"), transport.get(TransportShare.WARSHIP)));
-        transportGrid.add(field(text("Designer.force.cargo"), transport.get(TransportShare.CARGO)));
+        // One share per row, its name beside its stepper: the rail is too narrow for two steppers side by side.
+        JPanel transportGrid = Hud.transparentPanel(new GridBagLayout());
+        GridBagConstraints cell = new GridBagConstraints();
+        cell.anchor = GridBagConstraints.WEST;
+        cell.insets = new Insets(0, 0, scaleForGUI(6), 0);
+        String[] shareKeys = { "Designer.force.dropShips", "Designer.force.jumpShips", "Designer.force.warShips",
+                               "Designer.force.cargo" };
+        TransportShare[] shares = { TransportShare.DROPSHIP, TransportShare.JUMPSHIP, TransportShare.WARSHIP,
+                                    TransportShare.CARGO };
+        for (int index = 0; index < shares.length; index++) {
+            cell.gridy = index;
+            cell.gridx = 0;
+            cell.weightx = 1.0;
+            cell.fill = GridBagConstraints.HORIZONTAL;
+            transportGrid.add(muted(text(shareKeys[index])), cell);
+            cell.gridx = 1;
+            cell.weightx = 0.0;
+            cell.fill = GridBagConstraints.NONE;
+            transportGrid.add(transport.get(shares[index]), cell);
+        }
 
         JPanel rail = stack(
               section(text("Designer.force.section.who"), null,
@@ -240,8 +251,7 @@ public final class ForcePage {
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
                     pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS),
                     commandLance, detachments, formationMixLink),
-              section(text("Designer.force.section.transport"), text("Designer.force.section.transport.aside"),
-                    transportGrid, fighterComplement));
+              section(text("Designer.force.section.transport"), null, transportGrid, fighterComplement));
         padded(rail, 12, 14, 18, 14);
         JComponent scroll = scroll(rail, SURFACE_DEEP);
         scroll.setPreferredSize(new Dimension(scaleForGUI(RAIL_WIDTH), scaleForGUI(400)));

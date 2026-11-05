@@ -33,6 +33,7 @@
 package mekhq.gui.commandGeneration.designer;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.BorderLayout;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -56,7 +58,8 @@ import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
  * One choice among a list that changes as other selections change, such as the sizes a faction fields. A short list is
  * shown as a segmented control, so every option is visible at once; a long one as a HUD drop-down. Segments that
  * would not fit side by side in the width the control is given wrap onto further rows, and a list whose labels are
- * too long for even two to a row is shown as a drop-down rather than cut off.
+ * too long for even two to a row is shown as a drop-down rather than cut off. When they wrap, a leading Random entry
+ * takes a row of its own across the full width, so the real choices sit together beneath it.
  *
  * <p>Values may be {@code null}, which pickers use for their Random or combined entry. Setting the choices or the
  * selection never tells the listener; only the player's choices do.</p>
@@ -97,7 +100,13 @@ public final class HudChoice<T> extends JPanel {
     private final int availableWidth;
     private final Consumer<T> onChoose;
     private final List<Choice<T>> choices = new ArrayList<>();
+    /** The leading Random entry, on a row of its own when the rest wrap; empty and hidden otherwise. */
+    private final HudSegmentedControl<Integer> lead;
     private final HudSegmentedControl<Integer> segments;
+    private final JPanel segmentStack = new JPanel(new BorderLayout());
+    private boolean leadOnOwnRow;
+    /** Whether the first entry is a Random entry even though its value is not {@code null}. */
+    private boolean firstIsRandom;
     private final JComboBox<Item> dropDown = new JComboBox<>();
     private boolean filling;
     private boolean showingSegments;
@@ -122,11 +131,19 @@ public final class HudChoice<T> extends JPanel {
         this.availableWidth = availableWidth;
         this.onChoose = onChoose;
         setOpaque(false);
+        lead = new HudSegmentedControl<>(index -> {
+            if (!filling) {
+                chosen(index);
+            }
+        });
         segments = new HudSegmentedControl<>(index -> {
             if (!filling) {
                 chosen(index);
             }
         });
+        segmentStack.setOpaque(false);
+        segmentStack.add(lead, BorderLayout.NORTH);
+        segmentStack.add(segments, BorderLayout.CENTER);
         Hud.styleComboBox(dropDown);
         dropDown.setRenderer(Hud.comboRenderer());
         dropDown.addActionListener(event -> {
@@ -138,9 +155,16 @@ public final class HudChoice<T> extends JPanel {
 
     private void chosen(int index) {
         if ((index >= 0) && (index < choices.size())) {
-            segments.setSelected(index);
+            selectSegment(index);
             onChoose.accept(choices.get(index).value());
         }
+    }
+
+    /** Selects a segment in whichever of the two rows holds it, clearing the other. */
+    private void selectSegment(int index) {
+        boolean inLead = leadOnOwnRow && (index == 0);
+        lead.setSelected(inLead ? 0 : null);
+        segments.setSelected((!inLead && (index >= 0)) ? index : null);
     }
 
     /**
@@ -155,18 +179,40 @@ public final class HudChoice<T> extends JPanel {
             choices.clear();
             choices.addAll(newChoices);
             int selectedIndex = indexOf(selected);
-            int perRow = segmentsPerRow();
+            int perRow = segmentsPerRow(choices);
             boolean useSegments = !choices.isEmpty() && (choices.size() <= maximumSegments) && (perRow > 0);
             if (useSegments) {
-                segments.setColumns((perRow >= choices.size()) ? 0 : perRow);
+                // Once the segments wrap, a leading Random entry reads better on a row of its own above the real
+                // choices than as one cell among them.
+                boolean wraps = perRow < choices.size();
+                leadOnOwnRow = wraps && (choices.size() > 2) && (firstIsRandom || (choices.get(0).value() == null));
+                int first = leadOnOwnRow ? 1 : 0;
+                int restPerRow = leadOnOwnRow ? segmentsPerRow(choices.subList(1, choices.size())) : perRow;
+                if (restPerRow <= 0) {
+                    restPerRow = perRow;
+                }
+                List<Segment<Integer>> leadList = new ArrayList<>();
+                if (leadOnOwnRow) {
+                    Choice<T> choice = choices.get(0);
+                    leadList.add(new Segment<>(0, choice.label(), choice.sub(), true));
+                }
+                lead.setSegments(leadList);
+                lead.setVisible(leadOnOwnRow);
+                int restCount = choices.size() - first;
+                segments.setColumns((restPerRow >= restCount) ? 0 : restPerRow);
                 List<Segment<Integer>> list = new ArrayList<>();
-                for (int index = 0; index < choices.size(); index++) {
+                for (int index = first; index < choices.size(); index++) {
                     Choice<T> choice = choices.get(index);
                     list.add(new Segment<>(index, choice.label(), choice.sub(), true));
                 }
                 segments.setSegments(list);
-                segments.setSelected((selectedIndex >= 0) ? selectedIndex : null);
+                // Stacked under the lead row, the rest share its bottom edge rather than drawing a second one.
+                segments.setBorder(leadOnOwnRow
+                      ? BorderFactory.createMatteBorder(0, scaleForGUI(1), scaleForGUI(1), scaleForGUI(1), BORDER)
+                      : BorderFactory.createLineBorder(BORDER, scaleForGUI(1)));
+                selectSegment(selectedIndex);
             } else {
+                leadOnOwnRow = false;
                 dropDown.removeAllItems();
                 for (int index = 0; index < choices.size(); index++) {
                     dropDown.addItem(new Item(index, choices.get(index).label()));
@@ -175,7 +221,7 @@ public final class HudChoice<T> extends JPanel {
             }
             if (useSegments != showingSegments || getComponentCount() == 0) {
                 removeAll();
-                add(useSegments ? segments : dropDown, BorderLayout.CENTER);
+                add(useSegments ? segmentStack : dropDown, BorderLayout.CENTER);
                 showingSegments = useSegments;
             }
             setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
@@ -193,14 +239,14 @@ public final class HudChoice<T> extends JPanel {
      *
      * @return the segments per row, or {@code 0} to use a drop-down instead
      */
-    private int segmentsPerRow() {
-        if (choices.isEmpty()) {
+    private int segmentsPerRow(List<Choice<T>> entries) {
+        if (entries.isEmpty()) {
             return 0;
         }
         FontMetrics titleMetrics = getFontMetrics(hudFont(Font.BOLD, SEGMENT_FONT_SCALE, SEGMENT_TRACKING));
         FontMetrics subMetrics = getFontMetrics(hudFont(Font.PLAIN, 0.74f, 0.0f));
         int widest = 0;
-        for (Choice<T> choice : choices) {
+        for (Choice<T> choice : entries) {
             // Letter tracking widens the title by about a tenth of the font size per character, which the plain
             // metrics do not count.
             String title = choice.label().toUpperCase(Locale.ROOT);
@@ -211,14 +257,25 @@ public final class HudChoice<T> extends JPanel {
         }
         int cellWidth = widest + scaleForGUI(SEGMENT_PADDING);
         int fit = Math.max(1, scaleForGUI(availableWidth) / Math.max(1, cellWidth));
-        if (fit >= choices.size()) {
-            return choices.size();
+        if (fit >= entries.size()) {
+            return entries.size();
         }
         if (fit < 2) {
-            return (choices.size() <= 1) ? 1 : 0;
+            return (entries.size() <= 1) ? 1 : 0;
         }
-        int rows = (choices.size() + fit - 1) / fit;
-        return (choices.size() + rows - 1) / rows;
+        int rows = (entries.size() + fit - 1) / fit;
+        return (entries.size() + rows - 1) / rows;
+    }
+
+    /**
+     * Marks the first entry as a Random entry, for a list whose Random entry carries a value of its own rather than
+     * {@code null}, so it takes a row of its own when the segments wrap. Takes effect at the next
+     * {@link #setChoices}.
+     *
+     * @param firstIsRandom {@code true} if the first entry is a Random entry
+     */
+    public void setFirstIsRandom(boolean firstIsRandom) {
+        this.firstIsRandom = firstIsRandom;
     }
 
     /** Selects a value without telling the listener; one that is not offered leaves nothing selected. */
@@ -227,7 +284,7 @@ public final class HudChoice<T> extends JPanel {
         try {
             int index = indexOf(value);
             if (showingSegments) {
-                segments.setSelected((index >= 0) ? index : null);
+                selectSegment(index);
             } else {
                 dropDown.setSelectedIndex(index);
             }
@@ -238,8 +295,14 @@ public final class HudChoice<T> extends JPanel {
 
     /** @return the selected value, or {@code null} for a Random entry or nothing selected */
     public @Nullable T getSelected() {
-        int index = showingSegments ? Objects.requireNonNullElse(segments.getSelected(), -1)
-              : dropDown.getSelectedIndex();
+        int index;
+        if (!showingSegments) {
+            index = dropDown.getSelectedIndex();
+        } else if (leadOnOwnRow && (lead.getSelected() != null)) {
+            index = 0;
+        } else {
+            index = Objects.requireNonNullElse(segments.getSelected(), -1);
+        }
         return ((index >= 0) && (index < choices.size())) ? choices.get(index).value() : null;
     }
 
@@ -262,8 +325,10 @@ public final class HudChoice<T> extends JPanel {
         super.setEnabled(enabled);
         dropDown.setEnabled(enabled);
         segments.setEnabled(enabled);
+        lead.setEnabled(enabled);
         for (int index = 0; index < choices.size(); index++) {
             segments.setSegmentEnabled(index, enabled);
+            lead.setSegmentEnabled(index, enabled);
         }
     }
 }
