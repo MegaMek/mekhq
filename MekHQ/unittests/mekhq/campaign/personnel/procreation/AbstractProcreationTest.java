@@ -956,29 +956,6 @@ public class AbstractProcreationTest {
         verify(mockPerson, never()).changeStatus(any(), any(), any());
     }
 
-    /**
-     * A mother still pregnant when play begins takes her maternity leave during the starting simulation, so the
-     * command starts with her on leave.
-     */
-    @Test
-    public void testProcessNewWeek_StartingSimulationKeepsLeaveRunningPastCampaignStart() {
-        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
-        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
-
-        final LocalDate campaignStart = LocalDate.ofYearDay(3025, 1);
-        when(mockCampaign.getLocalDate()).thenReturn(campaignStart);
-        final LocalDate simulatedWeek = campaignStart.minusWeeks(5);
-        final Person mockPerson = mock(Person.class);
-        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
-        when(mockPerson.isPregnant()).thenReturn(true);
-        when(mockPerson.getDueDate()).thenReturn(campaignStart.plusWeeks(5));
-        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-
-        mockProcreation.processNewWeek(mockCampaign, simulatedWeek, mockPerson, true);
-
-        verify(mockPerson, times(1)).changeStatus(mockCampaign, simulatedWeek, PersonnelStatus.ON_MATERNITY_LEAVE);
-    }
-
     //region Random Procreation
     @Test
     public void testRandomlyProcreates() {

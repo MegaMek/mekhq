@@ -781,8 +781,9 @@ public abstract class AbstractProcreation {
                 return;
             }
 
-            if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) && !person.isBlockMaternityLeave()
-                      && !isLeaveOverBeforeCampaignStart(campaign, person, isStartingSimulation)) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) &&
+                      !person.isBlockMaternityLeave() &&
+                      !isStartingSimulation) {
                 if (!person.isBusy()
                           && person.getStatus().isActive()
                           && person.getNonPermanentInjurySeverity() == 0
@@ -796,27 +797,6 @@ public abstract class AbstractProcreation {
 
         // Make the required checks for random procreation
         processRandomProcreationCheck(campaign, today, person, false);
-    }
-
-    /**
-     * Whether a simulated pregnancy's maternity leave would be over before the campaign starts.
-     *
-     * <p>Leave ends with the birth, so a mother due on or before the campaign's date would give birth within the
-     * simulated history and be back at work when play begins. Sending her on leave anyway would strip her unit and
-     * tech assignments, which the birth does not restore, leaving the generated command undercrewed. Only a mother
-     * still pregnant when play begins takes her leave during the simulation.</p>
-     *
-     * @param campaign             the campaign, whose date the starting simulation does not move
-     * @param person               the pregnant person
-     * @param isStartingSimulation true if this week is part of a new command's simulated history
-     *
-     * @return {@code true} if this is the starting simulation and the person is due on or before the campaign's date
-     *
-     * @since 0.51.01
-     */
-    private static boolean isLeaveOverBeforeCampaignStart(final Campaign campaign, final Person person,
-          final boolean isStartingSimulation) {
-        return isStartingSimulation && !person.getDueDate().isAfter(campaign.getLocalDate());
     }
 
     /**
