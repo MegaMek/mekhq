@@ -86,8 +86,11 @@ import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
  */
 public final class ForcePage {
     private static final int RAIL_WIDTH = 300;
-    private static final int READOUT_WIDTH = 320;
-    private static final int WRAP_WIDTH = 260;
+    private static final int READOUT_WIDTH = 400;
+    // The readout's text column: its width less its padding and scroll bar.
+    private static final int WRAP_WIDTH = READOUT_WIDTH - 70;
+    // The verdict banner's reason shares its row with the unit-count badge.
+    private static final int VERDICT_WRAP_WIDTH = WRAP_WIDTH - 140;
     // A board row's left padding, and how much further each echelon below the top one is indented.
     private static final int BOARD_ROW_PADDING = 12;
     private static final int BOARD_INDENT = 22;
@@ -676,16 +679,16 @@ public final class ForcePage {
     private void refreshReadout() {
         if (!summary.hasRoll()) {
             banner.setVerdict(text("Designer.force.verdict.none"),
-                  wrapHtml(text("Designer.force.verdict.none.reason"), WRAP_WIDTH - 40),
+                  wrapHtml(text("Designer.force.verdict.none.reason"), VERDICT_WRAP_WIDTH),
                   text("Designer.force.verdict.none.badge"), TEXT_FAINT);
         } else if (summary.getIncludedUnits() == 0) {
             banner.setVerdict(text("Designer.force.verdict.allStruck"),
-                  wrapHtml(text("Designer.force.verdict.allStruck.reason"), WRAP_WIDTH - 40),
+                  wrapHtml(text("Designer.force.verdict.allStruck.reason"), VERDICT_WRAP_WIDTH),
                   text("Designer.force.verdict.allStruck.badge"), DANGER);
         } else {
             banner.setVerdict(text("Designer.force.verdict.ready"),
                   wrapHtml(formatted("Designer.force.verdict.ready.reason", summary.getIncludedUnits(),
-                        summary.getStruckUnits()), WRAP_WIDTH - 40),
+                        summary.getStruckUnits()), VERDICT_WRAP_WIDTH),
                   formatted("Designer.force.verdict.ready.badge", summary.getIncludedUnits()), READY);
         }
 
