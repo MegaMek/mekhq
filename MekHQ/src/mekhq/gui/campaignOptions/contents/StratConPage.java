@@ -238,7 +238,7 @@ class StratConPage {
                       list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof StratConPlayType type) {
-                    label.setToolTipText(type.getTooltip());
+                    label.setToolTipText(wordWrap(type.getTooltip()));
                 }
 
                 return label;

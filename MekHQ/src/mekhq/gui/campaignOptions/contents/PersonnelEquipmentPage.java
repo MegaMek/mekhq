@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -294,7 +295,8 @@ class PersonnelEquipmentPage {
             boolean isNone = ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(value);
             Object display = isNone ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text") : value;
             super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
-            setToolTipText(armorKitMechanics((String) value));
+            String tooltip = armorKitMechanics((String) value);
+            setToolTipText(tooltip == null ? null : wordWrap(tooltip));
             return this;
         }
     }
@@ -313,7 +315,8 @@ class PersonnelEquipmentPage {
             boolean isNone = EquipmentKitCatalog.NO_DEFAULT_KIT.equals(value);
             Object display = isNone ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text") : value;
             super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
-            setToolTipText(kitTooltip(isNone ? "NoDefaultKit" : (String) value));
+            String tooltip = kitTooltip(isNone ? "NoDefaultKit" : (String) value);
+            setToolTipText(tooltip == null ? null : wordWrap(tooltip));
             return this;
         }
     }
