@@ -38,6 +38,8 @@ import java.util.function.IntFunction;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.universe.enums.Alphabet;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 
 /**
  * How a command groups its support vehicles, echelon by echelon: vehicles into lances, lances into companies,
@@ -114,10 +116,30 @@ public record SupportEchelons(List<Integer> sizes, List<IntFunction<String>> nam
             return 0;
         }
         String name = formation.getName();
+        Alphabet[] alphabet = Alphabet.values();
         for (int echelon = 1; echelon <= depth(); echelon++) {
             for (int position = 1; position <= MAXIMUM_POSITIONS; position++) {
-                if (name.equalsIgnoreCase(nameOf(echelon, position))) {
+                String expectedName = nameOf(echelon, position);
+                if (name.equalsIgnoreCase(expectedName)) {
                     return echelon;
+                }
+                if (position > alphabet.length) {
+                    continue;
+                }
+                // The echelon word is the localized pattern shared by every naming method; only its
+                // designator changes. Replace each possible source designator with the configured
+                // alternatives so later passes recognize formations made with any command convention.
+                for (ForceNamingMethod source : ForceNamingMethod.values()) {
+                    String sourceDesignator = source.getValue(alphabet[position - 1]);
+                    if (!expectedName.contains(sourceDesignator)) {
+                        continue;
+                    }
+                    for (ForceNamingMethod candidate : ForceNamingMethod.values()) {
+                        if (name.equalsIgnoreCase(expectedName.replace(sourceDesignator,
+                              candidate.getValue(alphabet[position - 1])))) {
+                            return echelon;
+                        }
+                    }
                 }
             }
         }

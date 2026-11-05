@@ -58,6 +58,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 
 /**
  * Organizes freshly generated support personnel into the campaign's TOE.
@@ -207,6 +208,11 @@ public final class SupportPersonnelToTOE {
      */
     public static void organize(Campaign campaign, List<Person> supportPersonnel, boolean useClanStructure,
           Faction faction) {
+        organize(campaign, supportPersonnel, useClanStructure, faction, null);
+    }
+
+    public static void organize(Campaign campaign, List<Person> supportPersonnel, boolean useClanStructure,
+          Faction faction, @Nullable ForceNamingMethod namingMethod) {
         if (campaign == null || supportPersonnel == null || supportPersonnel.isEmpty()) {
             return;
         }
@@ -299,9 +305,9 @@ public final class SupportPersonnelToTOE {
         fillShortCrews(campaign, supportCommand, faction);
 
         // A section's vehicles past one lance's worth are split into lances, so the TOE reads as a tree.
-        lanceSupportVehicles(campaign, supportCommand, faction);
+        lanceSupportVehicles(campaign, supportCommand, faction, namingMethod);
         collapseSingleChildLayers(campaign, supportCommand);
-        applyEchelonLevels(campaign, supportCommand, profile, useClanStructure);
+        applyEchelonLevels(campaign, supportCommand, profile, useClanStructure, faction, namingMethod);
 
         LOGGER.info("[CompanyGen][SupportTOE] organized support staff: maintenance={} medical={} command={} (clan={})",
               maintenance.size(), medical.size(), command.size(), useClanStructure);
@@ -329,8 +335,13 @@ public final class SupportPersonnelToTOE {
     static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
           boolean useClanStructure) {
         Faction faction = campaign.getPlayerForce().getFaction();
+        return applyEchelonLevels(campaign, node, profile, useClanStructure, faction, null);
+    }
+
+    static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
+          boolean useClanStructure, Faction faction, @Nullable ForceNamingMethod namingMethod) {
         return applyEchelonLevels(campaign, node, profile, useClanStructure,
-              SupportUnitGenerator.supportEchelons(faction, null), faction);
+              SupportUnitGenerator.supportEchelons(faction, namingMethod), faction);
     }
 
     private static int applyEchelonLevels(Campaign campaign, Formation node, EchelonProfile profile,
@@ -366,18 +377,23 @@ public final class SupportPersonnelToTOE {
      * @param campaign the campaign
      */
     static void resizeSupportEchelons(Campaign campaign) {
+        resizeSupportEchelons(campaign, campaign.getPlayerForce().getFaction(), null);
+    }
+
+    static void resizeSupportEchelons(Campaign campaign, Faction faction,
+          @Nullable ForceNamingMethod namingMethod) {
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         if (supportCommand == null) {
             return;
         }
-        boolean useClanStructure = campaign.getPlayerForce().isClanForce();
+        boolean useClanStructure = faction.isClan();
         // Vehicles added since the teams were last shaped - granted, or filed flat by an older save - go into lances.
         List<Formation> newLances = lanceSupportVehicles(campaign, supportCommand,
-              campaign.getPlayerForce().getFaction());
+              faction, namingMethod);
         applyEchelonLevels(campaign, supportCommand,
-              useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure);
+              useClanStructure ? clanProfile() : innerSphereProfile(), useClanStructure, faction, namingMethod);
         if (!newLances.isEmpty()) {
-            FormationIconBuilder.applyIconsToFormations(newLances, campaign.getPlayerForce().getFaction(),
+            FormationIconBuilder.applyIconsToFormations(newLances, faction,
                   campaign::getUnit, supportCommand);
         }
         // A new size needs a new echelon symbol, or a section that grew from one MASH truck to eleven still shows a
@@ -397,8 +413,13 @@ public final class SupportPersonnelToTOE {
      * @return the formations created
      */
     static List<Formation> lanceSupportVehicles(Campaign campaign, Formation root, Faction faction) {
+        return lanceSupportVehicles(campaign, root, faction, null);
+    }
+
+    static List<Formation> lanceSupportVehicles(Campaign campaign, Formation root, Faction faction,
+          @Nullable ForceNamingMethod namingMethod) {
         List<Formation> created = new ArrayList<>();
-        lanceSubtree(campaign, root, SupportUnitGenerator.supportEchelons(faction, null), created);
+        lanceSubtree(campaign, root, SupportUnitGenerator.supportEchelons(faction, namingMethod), created);
         return created;
     }
 
@@ -810,7 +831,7 @@ public final class SupportPersonnelToTOE {
             return 0;
         }
 
-        boolean useClanStructure = campaign.getPlayerForce().isClanForce();
+        boolean useClanStructure = faction.isClan();
         EchelonProfile profile = useClanStructure ? clanProfile() : innerSphereProfile();
         Formation sectionFormation = childNamed(supportCommand, sectionLabel(section));
         if (sectionFormation == null) {
@@ -843,7 +864,7 @@ public final class SupportPersonnelToTOE {
         if (isNewCompany && vehicleCompany.getAllUnits(false).isEmpty()) {
             campaign.getPlayerForce().removeFormation(vehicleCompany, campaign);
         }
-        resizeSupportEchelons(campaign);
+        resizeSupportEchelons(campaign, faction, null);
         LOGGER.info("[SupportTeams] {}: put {} owned vehicle(s) to use and built {} into '{}', crewed from {}",
               capability, putToUse, built, vehicleCompany.getName(), crewSource);
         return putToUse + built;

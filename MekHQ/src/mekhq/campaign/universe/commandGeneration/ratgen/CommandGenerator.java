@@ -698,7 +698,7 @@ public final class CommandGenerator {
         // on the roster instead of being organized into carriers.
         if (SupportCarrierReconciler.isEnabled(campaign)) {
             SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(),
-                  commandFaction.isClan(), commandFaction);
+                  commandFaction.isClan(), commandFaction, options.getForceNamingMethod());
         } else {
             LOGGER.info("[CompanyGen][SupportTOE] support teams are switched off; {} support person(s) stay unorganized",
                   supportResult.generatedPersons().size());
