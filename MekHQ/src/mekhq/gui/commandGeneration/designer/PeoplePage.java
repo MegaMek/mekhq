@@ -89,11 +89,16 @@ import mekhq.gui.utilities.SkillLevelPickerUtility;
  * names, ranks, origin and augmentation the people are generated with.</p>
  */
 public final class PeoplePage {
-    private static final int WRAP_WIDTH = 300;
+    /** Wrap width for notes in the narrow outer columns, before GUI scaling; fits inside their padding. */
+    private static final int WRAP_WIDTH = 270;
     private static final int COVERAGE_DEFAULT = 100;
     private static final int ASTECHS_PER_TECH = 6;
     private static final int MEDICS_PER_DOCTOR = 4;
     private static final int CHAIN_ROWS = 8;
+    /** Column widths before GUI scaling: the outer two fit their longest option, the middle takes what is left. */
+    private static final int LEADERSHIP_WIDTH = 400;
+    private static final int SUPPORT_WIDTH = 560;
+    private static final int NAMES_WIDTH = 330;
     private static final PersonnelRole[] SUPPORT_ROLES = {
           PersonnelRole.MEK_TECH, PersonnelRole.MECHANIC, PersonnelRole.AERO_TEK, PersonnelRole.BA_TECH,
           PersonnelRole.DOCTOR, PersonnelRole.ADMINISTRATOR };
@@ -222,15 +227,16 @@ public final class PeoplePage {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1.0;
         constraints.gridy = 0;
+        // The outer columns are sized to what they hold; the support table in the middle takes the rest.
         constraints.gridx = 0;
-        constraints.weightx = 1.0;
-        root.add(scrollingColumn(buildLeadership(), SURFACE_DEEP, false), constraints);
+        constraints.weightx = 0.0;
+        root.add(scrollingColumn(buildLeadership(), SURFACE_DEEP, false, LEADERSHIP_WIDTH), constraints);
         constraints.gridx = 1;
-        constraints.weightx = 1.3;
-        root.add(scrollingColumn(buildSupport(), GROUND, true), constraints);
-        constraints.gridx = 2;
         constraints.weightx = 1.0;
-        root.add(scrollingColumn(buildNamesAndOrigin(), SURFACE_DEEP, true), constraints);
+        root.add(scrollingColumn(buildSupport(), GROUND, true, SUPPORT_WIDTH), constraints);
+        constraints.gridx = 2;
+        constraints.weightx = 0.0;
+        root.add(scrollingColumn(buildNamesAndOrigin(), SURFACE_DEEP, true, NAMES_WIDTH), constraints);
 
         wireEnablement();
     }
@@ -239,10 +245,13 @@ public final class PeoplePage {
         return root;
     }
 
-    private static JComponent scrollingColumn(JPanel content, Color background, boolean ruleOnLeft) {
+    private static JComponent scrollingColumn(JPanel content, Color background, boolean ruleOnLeft, int width) {
         padded(content, 12, 16, 18, 16);
         JComponent scroll = scroll(content, background);
-        scroll.setPreferredSize(new Dimension(scaleForGUI(300), scaleForGUI(400)));
+        Dimension size = new Dimension(scaleForGUI(width), scaleForGUI(400));
+        scroll.setPreferredSize(size);
+        // The outer columns keep their width when the window is tight, rather than being squeezed with the rest.
+        scroll.setMinimumSize(new Dimension(scaleForGUI(Math.min(width, NAMES_WIDTH)), scaleForGUI(200)));
         scroll.setBorder(ruleOnLeft ? BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER)
               : BorderFactory.createEmptyBorder());
         return scroll;
@@ -264,7 +273,8 @@ public final class PeoplePage {
         cell.gridy = 0;
         cell.anchor = GridBagConstraints.WEST;
         cell.insets = new Insets(0, 0, scaleForGUI(6), scaleForGUI(10));
-        String[] headings = { "role", "coverage", "need", "hire", "skill", "rank" };
+        // The rank band rides on the role's second line: a column of its own ran off the edge of the page.
+        String[] headings = { "role", "coverage", "need", "hire", "skill" };
         for (int index = 0; index < headings.length; index++) {
             cell.gridx = index;
             table.add(caption(text("Designer.people.support.column." + headings[index])), cell);
@@ -287,14 +297,23 @@ public final class PeoplePage {
             hire.setFont(hudFont(Font.BOLD, 0.95f, 0.0f));
             hireLabels.put(role, hire);
 
-            JLabel roleLabel = new JLabel("<html><b>" + ForcePage.escape(role.getLabel(false)) + "</b><br><font color='"
-                  + hex(TEXT_FAINT) + "'>" + ForcePage.escape(text("Designer.people.support.basis." + role.name()))
-                  + "</font></html>");
-            roleLabel.setForeground(TEXT);
-            roleLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            // Plain labels rather than HTML: an HTML label reports almost no minimum width, so a crowded table
+            // squeezed the role names down to a letter or two.
+            JLabel roleName = new JLabel(role.getLabel(false));
+            roleName.setForeground(TEXT);
+            roleName.setFont(hudFont(Font.BOLD, 0.92f, 0.0f));
+            JLabel roleBasis = faint(formatted("Designer.people.support.roleLine",
+                  text("Designer.people.support.basis." + role.name()), rankBand(role)));
+            JPanel roleCell = column();
+            roleCell.add(leftAligned(roleName));
+            roleCell.add(leftAligned(roleBasis));
 
             cell.gridx = 0;
-            table.add(roleLabel, cell);
+            cell.weightx = 1.0;
+            cell.fill = GridBagConstraints.HORIZONTAL;
+            table.add(roleCell, cell);
+            cell.weightx = 0.0;
+            cell.fill = GridBagConstraints.NONE;
             cell.gridx = 1;
             table.add(stepper, cell);
             cell.gridx = 2;
@@ -303,8 +322,6 @@ public final class PeoplePage {
             table.add(hire, cell);
             cell.gridx = 4;
             table.add(skill, cell);
-            cell.gridx = 5;
-            table.add(faint(rankBand(role)), cell);
         }
 
         astechSkillRow = indented(field(text("Designer.people.assistants.skill"), astechSkill));
