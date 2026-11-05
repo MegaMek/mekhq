@@ -40,7 +40,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.swing.Box;
@@ -53,13 +52,10 @@ import javax.swing.SpinnerNumberModel;
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
@@ -79,9 +75,9 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
  *
  * <p><b>Right column</b> - the post-generation rule sections:</p>
  * <ol>
- *   <li><b>Finances</b> - Process Finances toggle plus the starting-cash percentage: the command
- *       is granted free, and starting cash is working capital sized as a percentage of the
- *       generated units' total purchase cost (default 10%)</li>
+ *   <li><b>Finances</b> - Process Finances toggle plus the starting-cash months: the command
+ *       is granted free, and starting cash is working capital sized as a number of months of the
+ *       built command's running costs (default 6)</li>
  *   <li><b>Starting Simulation</b> - Run Starting Simulation toggle plus duration spinner and the
  *       two random-event toggles (marriages, procreation)</li>
  * </ol>
@@ -150,7 +146,7 @@ public class SparesAndFinancesTab {
 
     // Finances
     private CommandGenerationCheckBox chkProcessFinances;
-    private JSpinner spnStartingCashPercent;
+    private JSpinner spnStartingCashMonths;
     private JLabel lblStartingCashPreviewValue;
     private CommandGenerationCheckBox chkRandomizeStartingCash;
     private JSpinner spnRandomStartingCashDiceCount;
@@ -278,10 +274,11 @@ public class SparesAndFinancesTab {
 
         chkProcessFinances = new CommandGenerationCheckBox("ProcessFinances");
         // Each spinner shares the tooltip of the label beside it, so the help shows whichever is hovered.
-        CommandGenerationLabel startingCashPercentLabel = new CommandGenerationLabel("StartingCashPercent");
-        spnStartingCashPercent = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
-        spnStartingCashPercent.setName("spnStartingCashPercent");
-        spnStartingCashPercent.setToolTipText(startingCashPercentLabel.getToolTipText());
+        CommandGenerationLabel startingCashMonthsLabel = new CommandGenerationLabel("StartingCashMonths");
+        spnStartingCashMonths = new JSpinner(new SpinnerNumberModel(
+              CommandGenerationOptions.DEFAULT_STARTING_CASH_MONTHS, 0, 120, 1));
+        spnStartingCashMonths.setName("spnStartingCashMonths");
+        spnStartingCashMonths.setToolTipText(startingCashMonthsLabel.getToolTipText());
         CommandGenerationLabel startingCashPreviewLabel = new CommandGenerationLabel("StartingCashPreview");
         lblStartingCashPreviewValue = new JLabel();
         lblStartingCashPreviewValue.setName("lblStartingCashPreviewValue");
@@ -302,7 +299,7 @@ public class SparesAndFinancesTab {
             refreshFinanceEnablement();
             refreshStartingCashPreview();
         });
-        spnStartingCashPercent.addChangeListener(event -> refreshStartingCashPreview());
+        spnStartingCashMonths.addChangeListener(event -> refreshStartingCashPreview());
 
         int row = 0;
         constraints.gridy = row++;
@@ -312,9 +309,9 @@ public class SparesAndFinancesTab {
         constraints.gridwidth = 1;
         constraints.gridy = row;
         constraints.gridx = 0;
-        section.add(startingCashPercentLabel, constraints);
+        section.add(startingCashMonthsLabel, constraints);
         constraints.gridx = 1;
-        section.add(spnStartingCashPercent, constraints);
+        section.add(spnStartingCashMonths, constraints);
         row++;
 
         constraints.gridy = row;
@@ -369,13 +366,13 @@ public class SparesAndFinancesTab {
 
     /**
      * Applies the Finances section's enable rules: Process Finances gates everything; Randomize
-     * swaps the percentage spinner for the dice count; the individual pay-for toggles are live only
+     * swaps the months spinner for the dice count; the individual pay-for toggles are live only
      * while Pay for Initial Setup is on.
      */
     private void refreshFinanceEnablement() {
         boolean finances = chkProcessFinances.isSelected();
         boolean randomize = chkRandomizeStartingCash.isSelected();
-        spnStartingCashPercent.setEnabled(finances && !randomize);
+        spnStartingCashMonths.setEnabled(finances && !randomize);
         chkRandomizeStartingCash.setEnabled(finances);
         spnRandomStartingCashDiceCount.setEnabled(finances && randomize);
         spnMinimumStartingFloat.setEnabled(finances);
@@ -387,10 +384,10 @@ public class SparesAndFinancesTab {
     }
 
     /**
-     * Recomputes the estimated starting cash from the Force Generator tab's current design model:
-     * the configured percentage of the rolled units' purchase value, which is what the build credits.
-     * Randomized cash shows the dice pool instead, and pay-for debits are not previewed (they depend
-     * on build-time costs).
+     * Describes the starting cash the build will credit. The running costs it is measured in only exist once the
+     * command's people and units do, so the figure is worked out at build; the preview names the months it will
+     * cover. Randomized cash shows the dice pool instead, and pay-for debits are not previewed (they depend on
+     * build-time costs).
      */
     public void refreshStartingCashPreview() {
         if (lblStartingCashPreviewValue == null) {
@@ -402,18 +399,13 @@ public class SparesAndFinancesTab {
             return;
         }
         ForceDescriptor model = (modelSupplier == null) ? null : modelSupplier.get();
-        List<Entity> entities = (model == null) ? List.of() : CommandGenerator.collectEntities(model);
-        if (entities.isEmpty() || campaign == null) {
+        if (model == null) {
             lblStartingCashPreviewValue.setText(getTextAt(getCommandGenerationResourceBundle(),
                   "startingCashPreview.empty"));
             return;
         }
-        int percent = (Integer) spnStartingCashPercent.getValue();
-        Money unitValue = CommandGenerator.estimateUnitValue(campaign, entities);
-        Money estimate = unitValue.multipliedBy(percent).dividedBy(100).round();
         lblStartingCashPreviewValue.setText(getFormattedTextAt(getCommandGenerationResourceBundle(),
-              "startingCashPreview.value", estimate.toAmountAndSymbolString(), percent,
-              unitValue.toAmountAndSymbolString()));
+              "startingCashPreview.value", (Integer) spnStartingCashMonths.getValue()));
     }
 
     private JPanel buildStartingSimulationSection() {
@@ -515,7 +507,7 @@ public class SparesAndFinancesTab {
         }
 
         chkProcessFinances.setSelected(sourceOptions.isProcessFinances());
-        spnStartingCashPercent.setValue(sourceOptions.getStartingCashPercent());
+        spnStartingCashMonths.setValue(sourceOptions.getStartingCashMonths());
         chkRandomizeStartingCash.setSelected(sourceOptions.isRandomizeStartingCash());
         spnRandomStartingCashDiceCount.setValue(sourceOptions.getRandomStartingCashDiceCount());
         spnMinimumStartingFloat.setValue(sourceOptions.getMinimumStartingFloat());
@@ -570,7 +562,7 @@ public class SparesAndFinancesTab {
         }
 
         targetOptions.setProcessFinances(chkProcessFinances.isSelected());
-        targetOptions.setStartingCashPercent((Integer) spnStartingCashPercent.getValue());
+        targetOptions.setStartingCashMonths((Integer) spnStartingCashMonths.getValue());
         targetOptions.setRandomizeStartingCash(chkRandomizeStartingCash.isSelected());
         targetOptions.setRandomStartingCashDiceCount((Integer) spnRandomStartingCashDiceCount.getValue());
         targetOptions.setMinimumStartingFloat(((Number) spnMinimumStartingFloat.getValue()).longValue());

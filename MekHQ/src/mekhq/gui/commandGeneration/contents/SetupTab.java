@@ -56,7 +56,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
@@ -103,44 +102,6 @@ public class SetupTab {
 
     private static final int COVERAGE_SPINNER_DEFAULT = 100;
 
-    /**
-     * Direction toggle for one slot of the Tech Assignment sort grid. Localized via the
-     * {@code lblTechAssignmentDirection.*} bundle keys; the assigner reads
-     * {@link #isDescending()} when building its comparator chain.
-     */
-    private enum SortDirection {
-        DESCENDING("lblTechAssignmentDirection.descending"),
-        ASCENDING("lblTechAssignmentDirection.ascending");
-
-        private final String bundleKey;
-
-        SortDirection(String bundleKey) {
-            this.bundleKey = bundleKey;
-        }
-
-        boolean isDescending() {
-            return this == DESCENDING;
-        }
-
-        static SortDirection of(boolean descending) {
-            return descending ? DESCENDING : ASCENDING;
-        }
-
-        @Override
-        public String toString() {
-            return getTextAt(getCommandGenerationResourceBundle(), bundleKey);
-        }
-    }
-
-    private static final SortDirection[] SORT_DIRECTIONS = { SortDirection.DESCENDING, SortDirection.ASCENDING };
-
-    private static final TechAssignmentSortFactor[] SORT_FACTORS = {
-          TechAssignmentSortFactor.NONE,
-          TechAssignmentSortFactor.PILOT_RANK,
-          TechAssignmentSortFactor.UNIT_WEIGHT,
-          TechAssignmentSortFactor.PILOT_SKILL
-    };
-
     private final Campaign campaign;
     private CommandGenerationOptions options;
 
@@ -165,17 +126,9 @@ public class SetupTab {
     private JRadioButton rdoMedicsAsPersonnel;
     private MMComboBox<SkillLevel> cmbMedicSkillLevel;
 
-    // Tech Assignment — three-slot sort grid + per-slot direction
+    // Medical reserve
     private CommandGenerationCheckBox chkGenerateMedicalReserve;
     private JSpinner spnMedicalReservePercent;
-
-    private CommandGenerationCheckBox chkAssignTechsToUnits;
-    private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentPrimary;
-    private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentSecondary;
-    private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentTertiary;
-    private MMComboBox<SortDirection> cmbTechAssignmentPrimaryDirection;
-    private MMComboBox<SortDirection> cmbTechAssignmentSecondaryDirection;
-    private MMComboBox<SortDirection> cmbTechAssignmentTertiaryDirection;
 
     // Officer selection
     private CommandGenerationCheckBox chkAssignBestCompanyCommander;
@@ -253,8 +206,6 @@ public class SetupTab {
         JPanel rightColumn = new JPanel();
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildRandomOriginSection());
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(buildTechAssignmentSection());
         // Held so the section and the gap above it can be hidden together; hiding the section alone
         // would leave the gap behind and the column would look like it had lost something.
         augmentationStrut = Box.createVerticalStrut(UIUtil.scaleForGUI(6));
@@ -456,82 +407,6 @@ public class SetupTab {
         rdoMedicsAsPool.setEnabled(parentOn);
         rdoMedicsAsPersonnel.setEnabled(parentOn);
         cmbMedicSkillLevel.setEnabled(parentOn && rdoMedicsAsPersonnel.isSelected());
-    }
-
-    private JPanel buildTechAssignmentSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "TechAssignment", true, "TechAssignment");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-
-        chkAssignTechsToUnits = new CommandGenerationCheckBox("AssignTechsToUnits");
-        cmbTechAssignmentPrimary = new MMComboBox<>("cmbTechAssignmentPrimary", SORT_FACTORS);
-        cmbTechAssignmentSecondary = new MMComboBox<>("cmbTechAssignmentSecondary", SORT_FACTORS);
-        cmbTechAssignmentTertiary = new MMComboBox<>("cmbTechAssignmentTertiary", SORT_FACTORS);
-        cmbTechAssignmentPrimaryDirection = new MMComboBox<>("cmbTechAssignmentPrimaryDirection", SORT_DIRECTIONS);
-        cmbTechAssignmentSecondaryDirection = new MMComboBox<>("cmbTechAssignmentSecondaryDirection", SORT_DIRECTIONS);
-        cmbTechAssignmentTertiaryDirection = new MMComboBox<>("cmbTechAssignmentTertiaryDirection", SORT_DIRECTIONS);
-
-        chkAssignTechsToUnits.addActionListener(event -> refreshTechAssignmentEnablement());
-        // Each factor combo toggles its own direction combo when set to NONE.
-        cmbTechAssignmentPrimary.addActionListener(event -> refreshTechAssignmentEnablement());
-        cmbTechAssignmentSecondary.addActionListener(event -> refreshTechAssignmentEnablement());
-        cmbTechAssignmentTertiary.addActionListener(event -> refreshTechAssignmentEnablement());
-
-        // Row 0: master enable checkbox spans all columns.
-        constraints.gridy = 0;
-        constraints.gridx = 0;
-        constraints.gridwidth = 3;
-        section.add(chkAssignTechsToUnits, constraints);
-        constraints.gridwidth = 1;
-
-        // Rows 1-3: three sort slots, each (label, factor combo, direction combo).
-        addTechSortRow(section, constraints, 1, "TechAssignmentPrimary",
-              cmbTechAssignmentPrimary, cmbTechAssignmentPrimaryDirection);
-        addTechSortRow(section, constraints, 2, "TechAssignmentSecondary",
-              cmbTechAssignmentSecondary, cmbTechAssignmentSecondaryDirection);
-        addTechSortRow(section, constraints, 3, "TechAssignmentTertiary",
-              cmbTechAssignmentTertiary, cmbTechAssignmentTertiaryDirection);
-
-        addLeftAlignFiller(section, 3);
-        return section;
-    }
-
-    private static void addTechSortRow(JPanel section, GridBagConstraints constraints, int row,
-          String labelName, MMComboBox<TechAssignmentSortFactor> factorCombo,
-          MMComboBox<SortDirection> directionCombo) {
-        CommandGenerationLabel label = new CommandGenerationLabel(labelName);
-        factorCombo.setToolTipText(label.getToolTipText());
-        directionCombo.setToolTipText(wrapTooltip(getTextAt(getCommandGenerationResourceBundle(),
-              "cmbTechAssignmentDirection.tooltip"), null));
-        indentAsSubOption(label);
-        constraints.gridy = row;
-        constraints.gridx = 0;
-        section.add(label, constraints);
-        constraints.gridx = 1;
-        section.add(factorCombo, constraints);
-        constraints.gridx = 2;
-        section.add(directionCombo, constraints);
-    }
-
-    /**
-     * Enables / disables the three sort dropdowns and their direction toggles based on the master
-     * checkbox. A direction combo is also greyed out when its factor combo is set to
-     * {@link TechAssignmentSortFactor#NONE} — direction is meaningless without a sort factor.
-     */
-    private void refreshTechAssignmentEnablement() {
-        boolean masterOn = chkAssignTechsToUnits.isSelected();
-        cmbTechAssignmentPrimary.setEnabled(masterOn);
-        cmbTechAssignmentSecondary.setEnabled(masterOn);
-        cmbTechAssignmentTertiary.setEnabled(masterOn);
-        cmbTechAssignmentPrimaryDirection.setEnabled(masterOn && !isNone(cmbTechAssignmentPrimary));
-        cmbTechAssignmentSecondaryDirection.setEnabled(masterOn && !isNone(cmbTechAssignmentSecondary));
-        cmbTechAssignmentTertiaryDirection.setEnabled(masterOn && !isNone(cmbTechAssignmentTertiary));
-    }
-
-    private static boolean isNone(MMComboBox<TechAssignmentSortFactor> combo) {
-        Object value = combo.getSelectedItem();
-        return !(value instanceof TechAssignmentSortFactor f) || f == TechAssignmentSortFactor.NONE;
     }
 
     private JPanel buildOfficerSelectionSection() {
@@ -912,6 +787,11 @@ public class SetupTab {
         comboForceNamingMethod.setSelectedItem(sourceOptions.getForceNamingMethod());
         chkAlwaysNumberRegiments.setSelected(sourceOptions.isAlwaysNumberRegiments());
 
+        // The panel lists the campaign's planetary systems, so it can only be filled with a campaign behind it.
+        if ((campaign != null) && (sourceOptions.getRandomOriginOptions() != null)) {
+            randomOriginOptionsPanel.setOptions(sourceOptions.getRandomOriginOptions());
+        }
+
         // Per-role coverage % and skill level
         for (Map.Entry<PersonnelRole, JSpinner> entry : spnSupportCoveragePercents.entrySet()) {
             Integer percent = sourceOptions.getSupportPersonnelCoveragePercents().get(entry.getKey());
@@ -944,25 +824,6 @@ public class SetupTab {
         chkGenerateMedicalReserve.setSelected(sourceOptions.isGenerateMedicalReserve());
         spnMedicalReservePercent.setValue(sourceOptions.getMedicalReservePercent());
         spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected());
-
-        // Tech Assignment
-        chkAssignTechsToUnits.setSelected(sourceOptions.isAssignTechsToUnits());
-        cmbTechAssignmentPrimary.setSelectedItem(
-              sourceOptions.getTechAssignmentPrimarySort() == null
-                    ? TechAssignmentSortFactor.PILOT_RANK : sourceOptions.getTechAssignmentPrimarySort());
-        cmbTechAssignmentPrimaryDirection.setSelectedItem(
-              SortDirection.of(sourceOptions.isTechAssignmentPrimaryDescending()));
-        cmbTechAssignmentSecondary.setSelectedItem(
-              sourceOptions.getTechAssignmentSecondarySort() == null
-                    ? TechAssignmentSortFactor.UNIT_WEIGHT : sourceOptions.getTechAssignmentSecondarySort());
-        cmbTechAssignmentSecondaryDirection.setSelectedItem(
-              SortDirection.of(sourceOptions.isTechAssignmentSecondaryDescending()));
-        cmbTechAssignmentTertiary.setSelectedItem(
-              sourceOptions.getTechAssignmentTertiarySort() == null
-                    ? TechAssignmentSortFactor.PILOT_SKILL : sourceOptions.getTechAssignmentTertiarySort());
-        cmbTechAssignmentTertiaryDirection.setSelectedItem(
-              SortDirection.of(sourceOptions.isTechAssignmentTertiaryDescending()));
-        refreshTechAssignmentEnablement();
 
         chkAssignBestCompanyCommander.setSelected(sourceOptions.isAssignBestCompanyCommander());
         chkPrioritizeCompanyCommanderCombatSkills.setSelected(sourceOptions.isPrioritizeCompanyCommanderCombatSkills());
@@ -1030,6 +891,11 @@ public class SetupTab {
         }
         targetOptions.setAlwaysNumberRegiments(chkAlwaysNumberRegiments.isSelected());
 
+        // Without a campaign the panel was never filled (see loadValuesFromOptions), so the defaults stand.
+        if (campaign != null) {
+            targetOptions.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+        }
+
         // Per-role coverage % and skill level
         Map<PersonnelRole, Integer> coverageMap = targetOptions.getSupportPersonnelCoveragePercents();
         for (Map.Entry<PersonnelRole, JSpinner> entry : spnSupportCoveragePercents.entrySet()) {
@@ -1051,27 +917,6 @@ public class SetupTab {
         targetOptions.setGenerateMedicalReserve(chkGenerateMedicalReserve.isSelected());
         targetOptions.setMedicalReservePercent((Integer) spnMedicalReservePercent.getValue());
         targetOptions.setMedicSkillLevel(cmbMedicSkillLevel.getSelectedItem());
-        // Tech Assignment
-        targetOptions.setAssignTechsToUnits(chkAssignTechsToUnits.isSelected());
-        if (cmbTechAssignmentPrimary.getSelectedItem() instanceof TechAssignmentSortFactor f) {
-            targetOptions.setTechAssignmentPrimarySort(f);
-        }
-        if (cmbTechAssignmentPrimaryDirection.getSelectedItem() instanceof SortDirection d) {
-            targetOptions.setTechAssignmentPrimaryDescending(d.isDescending());
-        }
-        if (cmbTechAssignmentSecondary.getSelectedItem() instanceof TechAssignmentSortFactor f) {
-            targetOptions.setTechAssignmentSecondarySort(f);
-        }
-        if (cmbTechAssignmentSecondaryDirection.getSelectedItem() instanceof SortDirection d) {
-            targetOptions.setTechAssignmentSecondaryDescending(d.isDescending());
-        }
-        if (cmbTechAssignmentTertiary.getSelectedItem() instanceof TechAssignmentSortFactor f) {
-            targetOptions.setTechAssignmentTertiarySort(f);
-        }
-        if (cmbTechAssignmentTertiaryDirection.getSelectedItem() instanceof SortDirection d) {
-            targetOptions.setTechAssignmentTertiaryDescending(d.isDescending());
-        }
-
         targetOptions.setAssignBestCompanyCommander(chkAssignBestCompanyCommander.isSelected());
         targetOptions.setPrioritizeCompanyCommanderCombatSkills(chkPrioritizeCompanyCommanderCombatSkills.isSelected());
         targetOptions.setAssignBestOfficers(chkAssignBestOfficers.isSelected());

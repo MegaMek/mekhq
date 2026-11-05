@@ -80,6 +80,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -137,6 +138,12 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * designer has nothing left to go back to.</p>
      */
     private boolean buildStarted;
+
+    /**
+     * The campaign's own Random Origin options, held while a build runs with the Setup tab's in their place, or
+     * {@code null} when no build is holding them.
+     */
+    private @Nullable RandomOriginOptions campaignRandomOriginOptions;
 
     private Campaign campaign;
     private CommandGenerationOptions commandGenerationOptions;
@@ -478,6 +485,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // Snapshot the hangar before the combat phase so the starting-cash stage after support can
         // price exactly the units this build creates (combat + support), not pre-existing ones.
         Set<UUID> preExistingUnitIds = CommandGenerator.snapshotHangarUnitIds(getCampaign());
+        // Everyone the build creates, from the combat crews through the starting simulation's children to the
+        // post-generation spares, is given an origin from the Setup tab's Random Origin choices.
+        applyBuildRandomOrigin(options);
         runGenerationPhase("Materializing combat forces...", listener -> {
             // RATGenerator init must not run on the EDT; ensureLoaded is idempotent.
             ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
@@ -486,6 +496,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }, combatResult -> {
             if (combatResult == null) {
                 LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support");
+                restoreCampaignRandomOrigin();
                 return;
             }
             // The commit point: the combat force is in the TOE, so this counts as a build even if a later
@@ -499,7 +510,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                   supportPersons -> {
                       generatedPersons.addAll(supportPersons);
                       CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
-                            combatResult.rolledUnitIds(), generatedPersons, combatResult.spareCosts());
+                            generatedPersons, combatResult.spareCosts());
                       runStartingSimulationThen(options, generatedPersons);
                   });
         });
@@ -634,12 +645,19 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                     // actually broke. Log the cause separately to get the failing frames.
                     Throwable cause = (exception instanceof ExecutionException) ? exception.getCause() : exception;
                     LOGGER.error(cause, "[CompanyGen][Worker] generation phase failed");
+                    // A failed phase ends the build, so the campaign gets its own origin options back.
+                    restoreCampaignRandomOrigin();
                     new ImmersiveDialogNotification(campaign,
                           "Force generation failed: "
                                 + ((cause == null) ? exception.getMessage() : cause.toString()), true);
                     return;
                 }
-                onSuccess.accept(result);
+                try {
+                    onSuccess.accept(result);
+                } catch (RuntimeException exception) {
+                    restoreCampaignRandomOrigin();
+                    throw exception;
+                }
             }
         };
         worker.execute();
@@ -710,6 +728,46 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
      */
     private void applyPostGenerationExtras(CommandGenerationOptions options, List<Person> generatedPersons) {
+        try {
+            runPostGenerationExtras(options, generatedPersons);
+        } finally {
+            // The last people the build creates (bonus-unit crews, spare personnel) are made above, so this is
+            // where the build's origin options give way to the campaign's again.
+            restoreCampaignRandomOrigin();
+        }
+    }
+
+    /**
+     * Puts the build's Random Origin options in place of the campaign's for the length of the build. Every person
+     * MekHQ creates takes their origin from the campaign option, so this is how the Setup tab's choices reach them
+     * without becoming the campaign's setting for later recruits.
+     *
+     * @param options the build's options, holding the Setup tab's Random Origin choices
+     */
+    private void applyBuildRandomOrigin(CommandGenerationOptions options) {
+        RandomOriginOptions buildOrigin = options.getRandomOriginOptions();
+        if ((buildOrigin == null) || (campaignRandomOriginOptions != null)) {
+            return;
+        }
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        campaignRandomOriginOptions = campaignOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
+        campaignOptions.set(CampaignOption.RANDOM_ORIGIN_OPTIONS, buildOrigin);
+        LOGGER.info("[CompanyGen][Origin] build origin applied (randomize={}, radius={}, extraRandom={})",
+              buildOrigin.isRandomizeOrigin(), buildOrigin.getOriginSearchRadius(),
+              buildOrigin.isExtraRandomOrigin());
+    }
+
+    /** Gives the campaign its own Random Origin options back once the build is over; safe to call twice. */
+    private void restoreCampaignRandomOrigin() {
+        if (campaignRandomOriginOptions == null) {
+            return;
+        }
+        getCampaign().getCampaignOptions().set(CampaignOption.RANDOM_ORIGIN_OPTIONS, campaignRandomOriginOptions);
+        campaignRandomOriginOptions = null;
+        LOGGER.info("[CompanyGen][Origin] campaign origin options restored");
+    }
+
+    private void runPostGenerationExtras(CommandGenerationOptions options, List<Person> generatedPersons) {
         long startNanos = System.nanoTime();
         LOGGER.info("[CompanyGen][PostGen] START (thread={}, generatedPersons={})",
               Thread.currentThread().getName(), generatedPersons.size());

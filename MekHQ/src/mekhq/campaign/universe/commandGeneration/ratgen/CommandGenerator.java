@@ -38,7 +38,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -67,6 +66,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
@@ -132,12 +132,9 @@ public final class CommandGenerator {
      *                         they were created (leaf order)
      * @param spareCosts       the value of the spare parts the build's warehouse stock-up added, for
      *                         the finance stage's pay-for debits
-     * @param rolledUnitIds    the ids of the units the rolls produced - the combat units and the ships rolled
-     *                         with them - which are the base of the percentage starting cash; what the build
-     *                         adds afterwards (support vehicles, staff carriers, top-up and cargo ships) is not
      */
     public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons,
-          SpareCosts spareCosts, Set<UUID> rolledUnitIds) {
+          SpareCosts spareCosts) {
     }
 
     /**
@@ -156,7 +153,7 @@ public final class CommandGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
 
-    /** C-Bills each die is worth when starting cash is rolled rather than taken as a percentage. */
+    /** C-Bills each die is worth when starting cash is rolled rather than taken as months of running costs. */
     private static final int RANDOM_STARTING_CASH_PER_DIE = 1_000_000;
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
@@ -498,11 +495,6 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7a: ship transport assignment");
         ShipTransportAssigner.assign(forceDescriptor, unitsByDescriptor);
 
-        // What the rolls produced, as the starting-cash stage prices it: the Spares and Finances tab shows the
-        // percentage of exactly these units, so the build credits the percentage of exactly these units.
-        Set<UUID> rolledUnitIds = snapshotHangarUnitIds(campaign);
-        rolledUnitIds.removeAll(preExistingUnitIds);
-
         // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
         // or the formation-icon image directory is unavailable.
@@ -624,12 +616,11 @@ public final class CommandGenerator {
         // Command Designer flow (generateSupport=false) instead snapshots before its combat phase
         // and calls processStartingCash itself after support generation.
         if (generateSupport) {
-            processStartingCash(campaign, options, preExistingUnitIds, rolledUnitIds, generatedPersons,
-                  spareCosts);
+            processStartingCash(campaign, options, preExistingUnitIds, generatedPersons, spareCosts);
         }
 
         LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
-        return new Result(forceDescriptor, generatedPersons, spareCosts, rolledUnitIds);
+        return new Result(forceDescriptor, generatedPersons, spareCosts);
     }
 
     /**
@@ -706,13 +697,11 @@ public final class CommandGenerator {
 
         grantStandaloneSupportVehicles(campaign, commandFaction, options.getForceNamingMethod());
 
-        // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
-        // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
-        // each with its own direction). Gated on isAssignTechsToUnits; drawn only from the techs
-        // SupportPersonnelGenerator just created, so a pre-existing campaign tech is never claimed. Runs once
-        // every vehicle exists, the support stage's own included, so the flatbeds and the recovery vehicles get
-        // their mechanics too.
-        assignTechsToGeneratedUnits(campaign, options, supportResult.generatedPersons());
+        // Assign techs to units through the same process as the Hangar's Quick Assign Maintenance Techs button.
+        // Runs once every vehicle exists, the support stage's own included, so the flatbeds and the recovery
+        // vehicles get their mechanics too.
+        LOGGER.info("[CompanyGen][Pipeline][Assign] quick-assigning maintenance techs");
+        AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(campaign, true);
 
         // Decorate the support formations created above with layered TOE icons. This must happen here
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
@@ -740,39 +729,6 @@ public final class CommandGenerator {
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
-    }
-
-    /**
-     * Stage 7e: hands the freshly generated techs to {@link AutomatedTechAssignments}, the assigner the rest of
-     * MekHQ uses, ordered by the Setup tab's sort grid.
-     *
-     * <p>Only the techs generated this run are offered, so a tech the campaign already had keeps the units they
-     * were already maintaining. Units are offered a tech in the player's chosen order; with every sort slot left
-     * unset the assigner uses its own battle value ordering.</p>
-     *
-     * @param campaign         the campaign whose units are being assigned techs
-     * @param options          the generation options holding the assignment toggle and the sort grid
-     * @param generatedPersons everyone this generation run produced; the techs among them form the pool
-     *
-     * @since 0.51.01
-     */
-    private static void assignTechsToGeneratedUnits(Campaign campaign, CommandGenerationOptions options,
-          Collection<Person> generatedPersons) {
-        if (!options.isAssignTechsToUnits()) {
-            LOGGER.info("[CompanyGen][Pipeline][Assign] disabled by isAssignTechsToUnits");
-            return;
-        }
-
-        List<Person> techs = TechAssignmentOrder.techsAmong(generatedPersons);
-        if (techs.isEmpty()) {
-            LOGGER.info("[CompanyGen][Pipeline][Assign] no support techs available to assign");
-            return;
-        }
-
-        AutomatedTechAssignments assignments = new AutomatedTechAssignments(techs, campaign.getUnits(),
-              TechAssignmentOrder.unitOrderFor(campaign, options));
-        LOGGER.info("[CompanyGen][Pipeline][Assign] {} tech(s) offered {} unit(s); assigner reported {} outcome(s)",
-              techs.size(), campaign.getUnits().size(), assignments.getReports().size());
     }
 
     /**
@@ -812,61 +768,65 @@ public final class CommandGenerator {
 
     /**
      * Stage 9 - starting cash. When Process Finances is on, the base starting cash is either
-     * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the rolled units' total
-     * purchase cost - the same units the Spares and Finances tab previews, so the build credits the
-     * figure the tab showed - or - with Randomize Starting Cash - a roll of the configured number of
-     * d6 in millions of C-Bills. If Pay for Initial Setup is on, the command's real generation costs
-     * (personnel hiring at twice salary, unit purchase, and the stocked spare parts / armour /
-     * ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum
-     * Starting Float, with the shortfall taken as a two-year 15% starting loan when Generate
-     * Starting Loan is on. The result is credited as starting capital and reported in the Finances
-     * daily log.
+     * {@link CommandGenerationOptions#getStartingCashMonths()} months of the command's running costs once it is
+     * built - salaries, maintenance, overhead, food and housing, and Hot Spots upkeep, each only while the campaign
+     * charges it (see {@link ContractExpenseProjection#getMonthlyOffContractExpenses}) - or, with Randomize Starting
+     * Cash, a roll of the configured number of d6 in millions of C-Bills. If Pay for Initial Setup is on, the
+     * command's real generation costs (personnel hiring at twice salary, unit purchase, and the stocked spare parts /
+     * armour / ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum Starting Float,
+     * with the shortfall taken as a two-year 15% starting loan when Generate Starting Loan is on. The result is
+     * credited as starting capital and reported in the Finances daily log.
      *
-     * <p>Units already in the hangar before the build (per {@code preExistingUnitIds}) are excluded
-     * from both the percentage base and the unit-purchase debit, so building an additional command
-     * into an existing campaign prices only the new units.</p>
+     * <p>The running costs are the whole campaign's, as they will be charged from the next day; in a new campaign
+     * that is exactly the command just built. Units already in the hangar before the build (per
+     * {@code preExistingUnitIds}) are excluded from the unit-purchase debit, so building an additional command into
+     * an existing campaign pays only for the new units.</p>
      *
      * @param campaign           the campaign to credit
      * @param options            the generation options carrying the finance toggles
      * @param preExistingUnitIds hangar unit IDs captured by {@link #snapshotHangarUnitIds} before
      *                           the build; units with these IDs are not priced
-     * @param rolledUnitIds      the units the rolls produced, the base of the percentage; the support
-     *                           vehicles, staff carriers and ships the build added afterwards are priced
-     *                           only in the pay-for-units debit
      * @param generatedPersons   every Person this build created, for the hiring-cost debit
      * @param spareCosts         the stocked spares' value by category, from the build's
      *                           {@link Result#spareCosts()}; {@code null} is treated as zero
      */
     public static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
-          Set<UUID> preExistingUnitIds, Set<UUID> rolledUnitIds, List<Person> generatedPersons,
-          @Nullable SpareCosts spareCosts) {
+          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts) {
+        // Only measured when it is used: a randomized or switched-off stage needs no projection.
+        Money monthlyExpenses = (options.isProcessFinances() && !options.isRandomizeStartingCash())
+                                      ? ContractExpenseProjection.getMonthlyOffContractExpenses(campaign)
+                                      : Money.zero();
+        processStartingCash(campaign, options, preExistingUnitIds, generatedPersons, spareCosts, monthlyExpenses);
+    }
+
+    /**
+     * As {@link #processStartingCash(Campaign, CommandGenerationOptions, Set, List, SpareCosts)}, with the command's
+     * monthly running costs supplied rather than projected, so the cash arithmetic can be checked against a known
+     * figure.
+     *
+     * @param monthlyExpenses the command's running costs in an average month; ignored when starting cash is
+     *                        randomized
+     */
+    static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
+          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts,
+          Money monthlyExpenses) {
         if (!options.isProcessFinances()) {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: finances disabled; no starting cash granted");
             return;
         }
         SpareCosts spares = (spareCosts == null) ? SpareCosts.zero() : spareCosts;
 
-        // Price the units this build created. The rolled units are the base of the percentage model, as
-        // the tab previewed; everything the build added after the rolls counts in the unit-purchase debit
-        // only, so a top-up JumpShip does not double the starting cash.
+        // Price the units this build created, for the unit-purchase debit.
         Money newUnitValue = Money.zero();
-        Money rolledUnitValue = Money.zero();
-        int pricedUnits = 0;
-        int rolledUnits = 0;
         for (Unit unit : campaign.getUnits()) {
-            if (preExistingUnitIds.contains(unit.getId())) {
-                continue;
-            }
-            newUnitValue = newUnitValue.plus(unit.getBuyCost());
-            pricedUnits++;
-            if (rolledUnitIds.contains(unit.getId())) {
-                rolledUnitValue = rolledUnitValue.plus(unit.getBuyCost());
-                rolledUnits++;
+            if (!preExistingUnitIds.contains(unit.getId())) {
+                newUnitValue = newUnitValue.plus(unit.getBuyCost());
             }
         }
 
-        // Base cash: percentage of unit value, or the dice roll when randomized.
-        int percent = options.getStartingCashPercent();
+        // Base cash: months of running costs, or the dice roll when randomized.
+        int months = options.getStartingCashMonths();
+        Money monthlyCosts = monthlyExpenses.round();
         Money startingCash;
         if (options.isRandomizeStartingCash()) {
             startingCash = Money.of(RANDOM_STARTING_CASH_PER_DIE)
@@ -874,12 +834,9 @@ public final class CommandGenerator {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: randomized starting cash {}d6 million -> {}",
                   options.getRandomStartingCashDiceCount(), startingCash.toAmountAndSymbolString());
         } else {
-            startingCash = rolledUnitValue.multipliedBy(percent).dividedBy(100).round();
-            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} rolled unit(s) worth {} -> {};"
-                        + " {} unit(s) worth {} added by the build after the rolls are priced for setup costs only",
-                  percent, rolledUnits, rolledUnitValue.toAmountAndSymbolString(),
-                  startingCash.toAmountAndSymbolString(), pricedUnits - rolledUnits,
-                  newUnitValue.minus(rolledUnitValue).toAmountAndSymbolString());
+            startingCash = monthlyCosts.multipliedBy(months).round();
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {} month(s) of {} running costs -> {}",
+                  months, monthlyCosts.toAmountAndSymbolString(), startingCash.toAmountAndSymbolString());
         }
 
         Money minimumStartingFloat = Money.of(options.getMinimumStartingFloat());
@@ -956,8 +913,8 @@ public final class CommandGenerator {
             String basis = options.isRandomizeStartingCash()
                                  ? getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.random",
                                        options.getRandomStartingCashDiceCount())
-                                 : getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.percent",
-                                       percent);
+                                 : getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.months",
+                                       months, monthlyCosts.toAmountAndSymbolString());
             if (deductedSetupCosts.isPositive()) {
                 campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
                       "CommandGenerator.startingCapital.reportLessSetup",
@@ -971,26 +928,6 @@ public final class CommandGenerator {
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 9: credited {} starting capital, loan {}",
               startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString());
-    }
-
-    /**
-     * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
-     * will price them once materialized (see {@link Unit#estimateBuyCost}), including Battle Value
-     * pricing when the {@link CampaignOption#UNIT_COST_MODEL} calls for it. Used by the Command
-     * Designer's starting-cash preview to price the design model before anything is committed.
-     *
-     * @param campaign the campaign supplying the pricing rules and multipliers
-     * @param entities the rolled entities to price (e.g. from {@link #collectEntities})
-     *
-     * @return the estimated total purchase value
-     */
-    public static Money estimateUnitValue(Campaign campaign, List<Entity> entities) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Money total = Money.zero();
-        for (Entity entity : entities) {
-            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));
-        }
-        return total;
     }
 
     /**

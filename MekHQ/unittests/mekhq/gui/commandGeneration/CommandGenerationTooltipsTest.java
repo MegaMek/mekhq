@@ -66,7 +66,6 @@ class CommandGenerationTooltipsTest {
     private static final List<String> TOOLTIP_ONLY_KEYS = List.of(
           "lblAstechSkillLevel.tooltip",
           "lblMedicSkillLevel.tooltip",
-          "cmbTechAssignmentDirection.tooltip",
           "supportCoveragePercent.toolTipText",
           "supportSkillLevel.toolTipText");
 
