@@ -77,7 +77,7 @@ class CommandGeneratorSupportVehiclesTest {
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction(),
-                  null);
+                  true, null);
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), eq(campaign),
                   any(), eq(true), any()));
@@ -92,7 +92,7 @@ class CommandGeneratorSupportVehiclesTest {
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction(),
-                  null);
+                  true, null);
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), eq(campaign),
                   any(), eq(true), any()));
@@ -108,7 +108,7 @@ class CommandGeneratorSupportVehiclesTest {
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction(),
-                  null);
+                  true, null);
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
                   any(Boolean.class), any()), never());
@@ -123,7 +123,7 @@ class CommandGeneratorSupportVehiclesTest {
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction(),
-                  null);
+                  true, null);
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
                   any(Boolean.class), any()), never());
