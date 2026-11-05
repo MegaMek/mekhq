@@ -49,6 +49,21 @@ import mekhq.gui.utilities.ComponentColors;
 public final class MHQOptions extends SuiteOptions {
     private static final MMLogger LOGGER = MMLogger.create(MHQOptions.class);
 
+    // Stock report font colours. The dark theme values are the long-standing defaults; the light theme values are
+    // deeper variants that stay readable on a light background.
+    private static final int DARK_THEME_NEGATIVE = 0xDF5341;
+    private static final int DARK_THEME_AMAZING = 0xC344C3;
+    private static final int DARK_THEME_POSITIVE = 0x7FCF43;
+    private static final int DARK_THEME_WARNING = 0xEE9A00;
+    private static final int DARK_THEME_SKILL_GREEN = 0xCFAB43;
+    private static final int DARK_THEME_SKILL_VETERAN = 0x5CE8E0;
+    private static final int LIGHT_THEME_NEGATIVE = 0xC0392B;
+    private static final int LIGHT_THEME_AMAZING = 0x9C27B0;
+    private static final int LIGHT_THEME_POSITIVE = 0x2E7D32;
+    private static final int LIGHT_THEME_WARNING = 0xB35C00;
+    private static final int LIGHT_THEME_SKILL_GREEN = 0x8A6D00;
+    private static final int LIGHT_THEME_SKILL_VETERAN = 0x00838F;
+
     // region Display Tab
     public String getDisplayDateFormat() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
@@ -877,8 +892,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorNegative() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_NEGATIVE, 0xDF5341));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_NEGATIVE, DARK_THEME_NEGATIVE, LIGHT_THEME_NEGATIVE);
     }
 
     /**
@@ -893,8 +907,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorAmazing() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_AMAZING, 0xC344C3));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_AMAZING, DARK_THEME_AMAZING, LIGHT_THEME_AMAZING);
     }
 
     public String getFontColorAmazingHexColor() {
@@ -906,8 +919,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorPositive() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_POSITIVE, 0x7FCF43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_POSITIVE, DARK_THEME_POSITIVE, LIGHT_THEME_POSITIVE);
     }
 
     /**
@@ -922,8 +934,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorWarning() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_WARNING, 0xEE9A00));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_WARNING, DARK_THEME_WARNING, LIGHT_THEME_WARNING);
     }
 
     /**
@@ -939,8 +950,7 @@ public final class MHQOptions extends SuiteOptions {
 
 
     public Color getFontColorSkillUltraGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, 0xDF5341));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, DARK_THEME_NEGATIVE, LIGHT_THEME_NEGATIVE);
     }
 
     /**
@@ -956,8 +966,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_GREEN, 0xCFAB43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_GREEN, DARK_THEME_SKILL_GREEN, LIGHT_THEME_SKILL_GREEN);
     }
 
     /**
@@ -972,8 +981,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillRegular() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR, 0x7FCF43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_REGULAR, DARK_THEME_POSITIVE, LIGHT_THEME_POSITIVE);
     }
 
     /**
@@ -988,8 +996,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillVeteran() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN, 0x5CE8E0));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_VETERAN, DARK_THEME_SKILL_VETERAN, LIGHT_THEME_SKILL_VETERAN);
     }
 
     /**
@@ -1004,8 +1011,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillElite() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_ELITE, 0xC344C3));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_ELITE, DARK_THEME_AMAZING, LIGHT_THEME_AMAZING);
     }
 
     /**
@@ -1019,6 +1025,30 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ELITE, value.getRGB());
     }
 
+
+    /**
+     * Returns a stored font colour, treating either stock default as "use the default for the current theme". The
+     * options dialog saves every colour, so the stock values end up stored; matching both of them keeps the colour
+     * following theme switches, while any custom colour the player picked is returned unchanged.
+     */
+    private Color getThemedFontColor(String key, int darkThemeDefault, int lightThemeDefault) {
+        int stored = userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(key, darkThemeDefault) & 0xFFFFFF;
+        if ((stored == darkThemeDefault) || (stored == lightThemeDefault)) {
+            return new Color(isDarkTheme() ? darkThemeDefault : lightThemeDefault);
+        }
+        return new Color(stored);
+    }
+
+    private static boolean isDarkTheme() {
+        Color background = UIManager.getColor("Panel.background");
+        if (background == null) {
+            return false;
+        }
+        double luminance = 0.2126 * background.getRed()
+                                 + 0.7152 * background.getGreen()
+                                 + 0.0722 * background.getBlue();
+        return luminance < 128;
+    }
 
     /**
      * Converts the font color to a hexadecimal color representation.

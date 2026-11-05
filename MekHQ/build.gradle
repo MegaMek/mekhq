@@ -332,6 +332,8 @@ jar {
                 .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
                 .collect { "lib/${it.name}" }.join(' '))
         attributes "Add-Opens": 'java.base/java.util java.base/java.util.concurrent'
+        // Tells the MegaMek Launcher to wait for the first window (see MegaMek's LauncherReadySignal)
+        attributes "MegaMek-Launcher-Ready": '1'
         attributes "Build-Date": LocalDateTime.now()
         attributes "Sealed": true
     }
