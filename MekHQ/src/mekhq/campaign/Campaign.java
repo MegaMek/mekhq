@@ -2189,16 +2189,73 @@ public class Campaign implements ITechManager {
             currentList = remainingItems;
         }
 
-        // no one who looked could reach the target number, so wait for the next period like any other failure
-        for (IAcquisitionWork shoppingItem : currentList) {
-            if (outOfReachItems.contains(shoppingItem) && (shoppingItem.getDaysToWait() <= 0)) {
+        // standard acquisition is not tied to a system, so the only place to look is "no system"
+        reportItemsOutOfReach(currentList, outOfReachItems, logisticsPersonnel, Collections.singletonList(null));
+
+        return new ForceShoppingList(currentList);
+    }
+
+    /**
+     * Reports each item that was out of reach of everyone who looked at it this period and that none of
+     * {@code logisticsPersonnel} can reach in any of {@code systems}, and starts its waiting period like any other
+     * failure.
+     *
+     * <p>Someone who could reach the item but ran out of acquisition attempts before getting to it (or before getting
+     * to the system where they could reach it) leaves it alone: the item stays due and is tried again the next day,
+     * like any other item nobody had time for.</p>
+     *
+     * @param remainingItems     the items still on the shopping list after this period's shopping
+     * @param outOfReachItems    the items someone looked at and could not reach, and nobody rolled for
+     * @param logisticsPersonnel everyone who could shop this period, sorted worst first
+     * @param systems            the systems shopped in; a {@code null} entry stands for shopping not tied to a system
+     */
+    private void reportItemsOutOfReach(List<IAcquisitionWork> remainingItems, Set<IAcquisitionWork> outOfReachItems,
+          List<Person> logisticsPersonnel, List<PlanetarySystem> systems) {
+        for (IAcquisitionWork shoppingItem : remainingItems) {
+            if (outOfReachItems.contains(shoppingItem) &&
+                      (shoppingItem.getDaysToWait() <= 0) &&
+                      !canAnyoneReach(shoppingItem, logisticsPersonnel, systems)) {
                 shoppingItem.resetDaysToWait();
-                addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE, "goShoppingStandard.outOfReach.format",
+                addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE, "goShopping.outOfReach.format",
                       ReportingUtilities.getNegativeColor(), shoppingItem.getAcquisitionName()));
             }
         }
+    }
 
-        return new ForceShoppingList(currentList);
+    /**
+     * @param acquisition        what is being acquired
+     * @param logisticsPersonnel the people who could shop for it, sorted worst first
+     * @param systems            the systems they could shop in; a {@code null} entry stands for shopping not tied to a
+     *                           system
+     *
+     * @return {@code true} if at least one of them has a target number some roll can reach in at least one system
+     */
+    private boolean canAnyoneReach(IAcquisitionWork acquisition, List<Person> logisticsPersonnel,
+          List<PlanetarySystem> systems) {
+        // the best procurer is the likeliest to reach it, so start with them
+        for (Person person : logisticsPersonnel.reversed()) {
+            for (PlanetarySystem system : systems) {
+                SkillCheck skillCheck = checkAcquisition(acquisition, person)
+                                              .withExternalModifiers(PlanetaryAcquisitionModifiers.forSystem(this,
+                                                    acquisition, system));
+                if (!skillCheck.getTargetNumber().cannotSucceed() && !isOutOfReach(skillCheck)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param skillCheck an acquisition check
+     *
+     * @return {@code true} if the check needs a roll but no roll of the dice can succeed, such as a 13 for a skill
+     *       rolled at or over the target number. This is the test
+     *       {@link mekhq.campaign.personnel.skills.ActionCheck#resolve} uses, so it also holds for skills that count
+     *       up.
+     */
+    private static boolean isOutOfReach(SkillCheck skillCheck) {
+        return skillCheck.getTargetNumber().needsRoll() && !skillCheck.getCheckTarget().canSucceed();
     }
 
     /**
@@ -2226,6 +2283,8 @@ public class Campaign implements ITechManager {
         // a list of items than can be taken out of the search and put back on the
         // shopping list
         List<IAcquisitionWork> shelvedItems = new ArrayList<>();
+        // items whose target number was out of someone's reach on some planet
+        Set<IAcquisitionWork> outOfReachItems = new HashSet<>();
 
         // find planets within a certain radius - the function will weed out dead
         // planets
@@ -2272,6 +2331,7 @@ public class Campaign implements ITechManager {
 
                             int requestedQuantity = shoppingItem.getQuantity();
                             int totalQuantity = 0;
+                            // the contact roll used this same target number, so it cannot be out of reach here
                             while (shoppingItem.getQuantity() > 0 &&
                                          canAcquireParts(person) &&
                                          acquireEquipment(shoppingItem, person, system, transitTime)) {
@@ -2296,6 +2356,9 @@ public class Campaign implements ITechManager {
                         } else if (result == PartAcquisitionResult.PartInherentFailure) {
                             shelvedItems.add(shoppingItem);
                             continue;
+                        } else if (result == PartAcquisitionResult.OutOfReach) {
+                            // leave the wait alone so a better procurer, or a better planet, can still try
+                            outOfReachItems.add(shoppingItem);
                         }
                     }
 
@@ -2326,6 +2389,9 @@ public class Campaign implements ITechManager {
                 }
             }
         }
+
+        // shelved items were impossible or unaffordable anyway, so they stay out of the out-of-reach report
+        reportItemsOutOfReach(currentList, outOfReachItems, logisticsPersonnel, systems);
 
         // add shelved items back to the current list
         currentList.addAll(shelvedItems);
@@ -2412,7 +2478,9 @@ public class Campaign implements ITechManager {
                          PartAcquisitionResult.PlanetSpecificFailure;
         }
 
-        ActionCheckResult result = skillCheck.resolve(false, null);
+        // no roll can reach the target number, so don't roll; the verbose report still shows the failure and its TN
+        boolean isOutOfReach = isOutOfReach(skillCheck);
+        boolean isSuccess = !isOutOfReach && skillCheck.resolve(false, null).isSuccess();
         if (getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -2420,8 +2488,8 @@ public class Campaign implements ITechManager {
             int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
             int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
 
-            String reportType = result.isSuccess() ? "acquisition.success" : "acquisition.failure";
-            String highlightColor = result.isSuccess() ? ReportingUtilities.getPositiveColor() :
+            String reportType = isSuccess ? "acquisition.success" : "acquisition.failure";
+            String highlightColor = isSuccess ? ReportingUtilities.getPositiveColor() :
                                           ReportingUtilities.getNegativeColor();
 
             addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, reportType,
@@ -2429,7 +2497,10 @@ public class Campaign implements ITechManager {
                   system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getValue(),
                   techBonus, industryBonus, outputsBonus));
         }
-        return result.isSuccess() ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
+        if (isOutOfReach) {
+            return PartAcquisitionResult.OutOfReach;
+        }
+        return isSuccess ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
     }
 
     /***
@@ -2478,8 +2549,8 @@ public class Campaign implements ITechManager {
         /** The roll failed, or nobody could acquire the item at all. */
         FAILED,
         /**
-         * The target number is above 12 for this person, so no roll was made and no acquisition attempt was spent.
-         * Nothing is reported; the caller decides whether someone else should try.
+         * No roll can reach this person's target number (a 13 or more for most skills), so no roll was made and no
+         * acquisition attempt was spent. Nothing is reported; the caller decides whether someone else should try.
          */
         OUT_OF_REACH
     }
@@ -2531,11 +2602,12 @@ public class Campaign implements ITechManager {
             return AcquisitionAttempt.FAILED;
         }
 
-        int targetValue = skillCheck.getTargetNumber().getValue();
         // no roll can reach this target, so don't spend an acquisition attempt on it
-        if (skillCheck.getTargetNumber().needsRoll() && (targetValue > 12)) {
+        if (isOutOfReach(skillCheck)) {
             return AcquisitionAttempt.OUT_OF_REACH;
         }
+
+        int targetValue = skillCheck.getTargetNumber().getValue();
 
         report += "  needs " + skillCheck.getTargetNumber().getValueAsString();
 
