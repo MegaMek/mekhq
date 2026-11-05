@@ -101,7 +101,8 @@ class PilotSkillSorterTest {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setAssignMostSkilledToPrimaryLances(true);
 
-        int moved = PilotSkillSorter.apply(campaign, options);
+        int moved = PilotSkillSorter.apply(campaign, options,
+              Set.of(lamSeat.getId(), mekSeat.getId(), secondLanceSeat.getId()));
 
         assertEquals(2, moved, "only the two MekWarriors swap; the LAM is sorted on its own");
         assertSame(lamPilot, lamSeat.getCommander(), "a LAM seat is never handed to a MekWarrior");
