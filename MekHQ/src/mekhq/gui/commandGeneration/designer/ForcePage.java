@@ -157,6 +157,12 @@ public final class ForcePage {
         return root;
     }
 
+    /** @return {@code true} if the roll is set to bring DropShips, so the command does not have to hire its lift */
+    public boolean isLiftRolled() {
+        ForceGeneratorOptionsView view = engine.getOptionsView();
+        return (view != null) && (view.getTransportPercent(TransportShare.DROPSHIP) > 0);
+    }
+
     /** @return what the rolled command adds up to */
     public ForceSummary getSummary() {
         return summary;

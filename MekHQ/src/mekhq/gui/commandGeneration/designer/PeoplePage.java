@@ -84,7 +84,8 @@ import mekhq.gui.utilities.SkillLevelPickerUtility;
 /**
  * The Command Designer's People page: who leads and supports the command.
  *
- * <p>Three columns: leadership, with a preview of the chain of command the roll designates; support staff, with the
+ * <p>Three columns: leadership, with a preview of the chain of command the roll designates and the history the
+ * command can be given before play; support staff, with the
  * Campaign Operations need for the rolled command beside each role's coverage and what that coverage hires; and the
  * names, ranks, origin and augmentation the people are generated with.</p>
  */
@@ -95,6 +96,8 @@ public final class PeoplePage {
     private static final int ASTECHS_PER_TECH = 6;
     private static final int MEDICS_PER_DOCTOR = 4;
     private static final int CHAIN_ROWS = 8;
+    private static final int MIN_SIMULATION_YEARS = 1;
+    private static final int MAX_SIMULATION_YEARS = 50;
     /** Column widths before GUI scaling: the outer two fit their longest option, the middle takes what is left. */
     private static final int LEADERSHIP_WIDTH = 400;
     private static final int SUPPORT_WIDTH = 560;
@@ -123,6 +126,12 @@ public final class PeoplePage {
     private final HudCheckBox captains = optionCheck("GenerateCaptains");
     private final HudCheckBox statBonus = optionCheck("ApplyOfficerStatBonusToWorstSkill");
     private final JPanel chain = column();
+
+    // History
+    private final HudCheckBox runSimulation = optionCheck("RunStartingSimulation");
+    private final HudStepper simulationYears;
+    private final HudCheckBox marriages = optionCheck("SimulateRandomMarriages");
+    private final HudCheckBox procreation = optionCheck("SimulateRandomProcreation");
 
     // Support staff
     private final Map<PersonnelRole, HudStepper> coverage = new EnumMap<>(PersonnelRole.class);
@@ -194,6 +203,8 @@ public final class PeoplePage {
         medicMode = assistantChoice();
         reservePercent = new HudStepper(0, 100, 5, value -> formatted("Designer.percent", value), 56,
               value -> changed());
+        simulationYears = new HudStepper(MIN_SIMULATION_YEARS, MAX_SIMULATION_YEARS, 1,
+              value -> formatted("Designer.people.history.years", value), 84, value -> changed());
         List<HudChoice.Choice<ForceNamingMethod>> namingChoices = new ArrayList<>();
         for (ForceNamingMethod method : ForceNamingMethod.values()) {
             namingChoices.add(new HudChoice.Choice<>(method, method.toString()));
@@ -264,7 +275,10 @@ public final class PeoplePage {
               section(text("Designer.people.section.leadership"), null,
                     bestCommander, indented(commanderCombat), bestOfficers, indented(officerCombat), mostSkilled,
                     captains, statBonus),
-              section(text("Designer.people.section.chain"), text("Designer.people.section.chain.aside"), chain));
+              section(text("Designer.people.section.chain"), text("Designer.people.section.chain.aside"), chain),
+              section(text("Designer.people.section.history"), text("Designer.people.section.history.aside"),
+                    runSimulation, indented(field(text("lblSimulationDuration.text"), simulationYears)),
+                    indented(marriages), indented(procreation)));
     }
 
     private JPanel buildSupport() {
@@ -403,6 +417,9 @@ public final class PeoplePage {
         randomizeOrigin.addActionListener(event -> refreshOrigin());
         aroundPlanet.addActionListener(event -> refreshOrigin());
         implants.addActionListener(event -> refreshEnablement());
+        for (HudCheckBox box : new HudCheckBox[] { runSimulation, marriages, procreation }) {
+            box.addActionListener(event -> changed());
+        }
         numberRegiments.addActionListener(event -> {
             if (namingChangeListener != null) {
                 namingChangeListener.run();
@@ -416,6 +433,10 @@ public final class PeoplePage {
         factionRanks.setEnabled(autoRanks.isSelected());
         reservePercent.setEnabled(reserve.isSelected());
         neuralMode.setEnabled(implants.isSelected());
+        boolean simulation = runSimulation.isSelected();
+        simulationYears.setEnabled(simulation);
+        marriages.setEnabled(simulation);
+        procreation.setEnabled(simulation);
     }
 
     private void refreshAssistants() {
@@ -606,6 +627,14 @@ public final class PeoplePage {
         return augmentationVisible;
     }
 
+    public boolean isRunStartingSimulation() {
+        return runSimulation.isSelected();
+    }
+
+    public int getSimulationYears() {
+        return simulationYears.getValue();
+    }
+
     /** @return {@code true} if origins are randomized within a radius of zero, so everyone comes from home */
     public boolean isOriginStuckAtHome() {
         return randomizeOrigin.isSelected() && !aroundPlanet.isSelected() && (radius.getValue() == 0);
@@ -694,6 +723,13 @@ public final class PeoplePage {
         reserve.setSelected(options.isGenerateMedicalReserve());
         reservePercent.setValue(options.getMedicalReservePercent());
 
+        runSimulation.setSelected(options.isRunStartingSimulation());
+        // Saved options may hold a value from when the duration was counted in months, or one past the range; the
+        // stepper keeps it within range.
+        simulationYears.setValue(options.getSimulationDuration());
+        marriages.setSelected(options.isSimulateRandomMarriages());
+        procreation.setSelected(options.isSimulateRandomProcreation());
+
         RandomOriginOptions origin = options.getRandomOriginOptions();
         if (origin != null) {
             randomizeOrigin.setSelected(origin.isRandomizeOrigin());
@@ -776,6 +812,11 @@ public final class PeoplePage {
         options.setMedicSkillLevel(skillOrRandom(medicSkill));
         options.setGenerateMedicalReserve(reserve.isSelected());
         options.setMedicalReservePercent(reservePercent.getValue());
+
+        options.setRunStartingSimulation(runSimulation.isSelected());
+        options.setSimulationDuration(simulationYears.getValue());
+        options.setSimulateRandomMarriages(marriages.isSelected());
+        options.setSimulateRandomProcreation(procreation.isSelected());
 
         RandomOriginOptions origin = new RandomOriginOptions(true);
         origin.setRandomizeOrigin(randomizeOrigin.isSelected());

@@ -76,6 +76,7 @@ public final class ReviewPage {
     private final Supplier<ForceSummary> summary;
     private final PeoplePage people;
     private final LogisticsPage logistics;
+    private final BooleanSupplier liftRolled;
     private final Consumer<DesignerPage> goTo;
     private Supplier<List<String>> buildWarnings = List::of;
     private BooleanSupplier settingsChangedSinceRoll = () -> false;
@@ -90,15 +91,17 @@ public final class ReviewPage {
 
     /**
      * @param summary   the rolled command, as the Force page sums it up
-     * @param people    the People page, for what the support stage will hire
-     * @param logistics the Logistics page, for the finance and history settings
-     * @param goTo      shows another page, when an issue's link is followed
+     * @param people     the People page, for what the support stage will hire and the history settings
+     * @param logistics  the Logistics page, for the finance settings
+     * @param liftRolled whether the roll is set to bring DropShips
+     * @param goTo       shows another page, when an issue's link is followed
      */
     public ReviewPage(Supplier<ForceSummary> summary, PeoplePage people, LogisticsPage logistics,
-          Consumer<DesignerPage> goTo) {
+          BooleanSupplier liftRolled, Consumer<DesignerPage> goTo) {
         this.summary = summary;
         this.people = people;
         this.logistics = logistics;
+        this.liftRolled = liftRolled;
         this.goTo = goTo;
 
         root.setOpaque(true);
@@ -203,7 +206,7 @@ public final class ReviewPage {
         steps.removeAll();
         int hires = people.getEstimatedSupportHires();
         boolean finances = logistics.isProcessFinances();
-        boolean simulation = logistics.isRunStartingSimulation();
+        boolean simulation = people.isRunStartingSimulation();
         int number = 1;
         addRows(steps,
               step(number++, text("Designer.review.step.commit"),
@@ -218,7 +221,7 @@ public final class ReviewPage {
               step(number++, text("Designer.review.step.techs"), text("Designer.review.step.techs.what"),
                     text("Designer.review.step.techs.tag"), true),
               step(number++, text("Designer.review.step.spares"), text("Designer.review.step.spares.what"),
-                    text(logistics.isLiftRolled() ? "Designer.review.step.spares.tag"
+                    text(liftRolled.getAsBoolean() ? "Designer.review.step.spares.tag"
                           : "Designer.review.step.spares.tag.hire"), true),
               step(number++, text("Designer.review.step.flags"),
                     formatted("Designer.review.step.flags.what", people.getEstimatedReserve()),
@@ -230,7 +233,7 @@ public final class ReviewPage {
                           : text("Designer.review.step.cash.off"),
                     text(finances ? "Designer.review.step.cash.tag" : "Designer.review.step.skipped"), finances),
               step(number, text("Designer.review.step.history"),
-                    simulation ? formatted("Designer.review.step.history.what", logistics.getSimulationYears())
+                    simulation ? formatted("Designer.review.step.history.what", people.getSimulationYears())
                           : text("Designer.review.step.history.off"),
                     text(simulation ? "Designer.review.step.history.tag" : "Designer.review.step.skipped"),
                     simulation));
@@ -249,9 +252,9 @@ public final class ReviewPage {
             found.add(new Issue(text("Designer.review.issue.origin"), text("Designer.review.issue.origin.detail"),
                   AMBER, DesignerPage.PEOPLE));
         }
-        if (rolled.hasRoll() && !logistics.isLiftRolled()) {
+        if (rolled.hasRoll() && !liftRolled.getAsBoolean()) {
             found.add(new Issue(text("Designer.review.issue.lift"), text("Designer.review.issue.lift.detail"),
-                  AMBER, DesignerPage.LOGISTICS));
+                  AMBER, DesignerPage.FORCE));
         }
         if (!logistics.isProcessFinances()) {
             found.add(new Issue(text("Designer.review.issue.finances"),

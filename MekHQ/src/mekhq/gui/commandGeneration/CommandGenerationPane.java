@@ -146,8 +146,8 @@ public class CommandGenerationPane extends JPanel {
         forcePage = new ForcePage(campaign, engine, this::scheduleRefresh);
         Supplier<ForceSummary> summary = forcePage::getSummary;
         peoplePage = new PeoplePage(campaign, summary, engine::previewName, this::scheduleRefresh);
-        logisticsPage = new LogisticsPage(campaign, engine, summary, this::scheduleRefresh);
-        reviewPage = new ReviewPage(summary, peoplePage, logisticsPage, this::showPage);
+        logisticsPage = new LogisticsPage(campaign, this::scheduleRefresh);
+        reviewPage = new ReviewPage(summary, peoplePage, logisticsPage, forcePage::isLiftRolled, this::showPage);
 
         // The board shows the names the committed TO&E will use, which follow the People page's naming choices:
         // read them live, and redraw when they change.
@@ -398,7 +398,7 @@ public class CommandGenerationPane extends JPanel {
             cashTile.setMeter(months / (double) TRACKED_MONTHS, ACCENT, null);
         }
 
-        if (!logisticsPage.isLiftRolled()) {
+        if (!forcePage.isLiftRolled()) {
             liftTile.setValue(text("Designer.tile.lift.hire"), AMBER);
             liftTile.setSub(text("Designer.tile.lift.hire.sub"));
         } else {

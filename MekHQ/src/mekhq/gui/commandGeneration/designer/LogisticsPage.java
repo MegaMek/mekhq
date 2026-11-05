@@ -41,42 +41,34 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Supplier;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jakarta.annotation.Nullable;
-import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
-import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportShare;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
-import mekhq.gui.baseComponents.hud.HudVerdictBanner;
-import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
 
 /**
  * The Command Designer's Logistics page: what the command owns and starts with.
  *
- * <p>The spare parts it is stocked with, which are the campaign's own AutoLogistics restock percentages; the cash it
- * starts with, counted in months of the running costs the campaign charges; the lift the roll brings; and whether it
- * arrives with a history.</p>
+ * <p>The spare parts it is stocked with, which are the campaign's own AutoLogistics restock percentages, and the cash
+ * it starts with, counted in months of the running costs the campaign charges. The lift the roll brings is set on the
+ * Force page with the rest of the transport, and the starting simulation on the People page.</p>
  */
 public final class LogisticsPage {
     private static final int RAIL_WIDTH = 300;
-    private static final int READOUT_WIDTH = 330;
     private static final int WRAP_WIDTH = 280;
     private static final int MAX_SPARES_PERCENT = 10000;
     /** Where a spares meter reads full: twice a full restock. */
     private static final int SPARES_METER_FULL = 200;
     private static final int MAX_MONTHS = 120;
     private static final int TRACK_MONTHS = 12;
-    private static final int MIN_SIMULATION_YEARS = 1;
-    private static final int MAX_SIMULATION_YEARS = 50;
 
     /**
      * The restock categories the Spares section offers, each paired with the campaign option it reads and writes.
@@ -122,8 +114,6 @@ public final class LogisticsPage {
     }
 
     private final Campaign campaign;
-    private final ForceGeneratorTab engine;
-    private final Supplier<ForceSummary> summary;
     private final Runnable onChanged;
     private final JPanel root = new JPanel(new BorderLayout());
 
@@ -133,7 +123,8 @@ public final class LogisticsPage {
 
     // Starting cash
     private final JLabel monthsBig = new JLabel();
-    private final HudStepper months;
+    /** The months of running costs the starting cash is set to, chosen on the month track. */
+    private int months;
     private final MonthTrack monthTrack = new MonthTrack();
     private final JPanel ledger = column();
     private final HudCheckBox processFinances = optionCheck("ProcessFinances");
@@ -149,45 +140,29 @@ public final class LogisticsPage {
     private final HudStepper minimumFloat;
 
     // Lift and history
-    private final HudVerdictBanner liftBanner = new HudVerdictBanner();
-    private final JPanel liftFacts = column();
-    private final HudCheckBox runSimulation = optionCheck("RunStartingSimulation");
-    private final HudStepper simulationYears;
-    private final HudCheckBox marriages = optionCheck("SimulateRandomMarriages");
-    private final HudCheckBox procreation = optionCheck("SimulateRandomProcreation");
 
     /**
      * @param campaign  the campaign the command is built into
-     * @param engine    the force generator, for the transport shares the roll was asked for
-     * @param summary   the rolled command, as the Force page sums it up
      * @param onChanged told when a choice here changes what the tiles or Review show
      */
-    public LogisticsPage(Campaign campaign, ForceGeneratorTab engine, Supplier<ForceSummary> summary,
-          Runnable onChanged) {
+    public LogisticsPage(Campaign campaign, Runnable onChanged) {
         this.campaign = campaign;
-        this.engine = engine;
-        this.summary = summary;
         this.onChanged = onChanged;
 
-        months = new HudStepper(0, MAX_MONTHS, 1, value -> formatted("Designer.logistics.months.value", value), 72,
-              value -> changed());
         diceCount = new HudStepper(1, 100, 1, value -> formatted("Designer.logistics.dice.value", value), 64,
               value -> changed());
         minimumFloat = new HudStepper(0, 100_000_000, 500_000, ForcePage::formatNumber, 110, value -> changed());
-        simulationYears = new HudStepper(MIN_SIMULATION_YEARS, MAX_SIMULATION_YEARS, 1,
-              value -> formatted("Designer.logistics.years.value", value), 64, value -> changed());
-        months.setToolTipText(text("Designer.logistics.months.tooltip"));
+        monthTrack.setToolTipText(text("Designer.logistics.months.tooltip"));
         monthsBig.setToolTipText(text("Designer.logistics.months.tooltip"));
 
         root.setOpaque(true);
         root.setBackground(GROUND);
         root.add(buildSpares(), BorderLayout.WEST);
         root.add(buildCash(), BorderLayout.CENTER);
-        root.add(buildLiftAndHistory(), BorderLayout.EAST);
 
         for (HudCheckBox box : new HudCheckBox[] { processFinances, randomizeCash, payForSetup, payForPersonnel,
                                                   payForUnits, payForParts, payForArmour, payForAmmunition,
-                                                  startingLoan, runSimulation, marriages, procreation }) {
+                                                  startingLoan }) {
             box.addActionListener(event -> changed());
         }
     }
@@ -255,7 +230,7 @@ public final class LogisticsPage {
         monthsRow.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(12),
               scaleForGUI(12)));
         JPanel trackColumn = column();
-        addRows(trackColumn, monthTrack, months);
+        addRows(trackColumn, monthTrack);
         monthsRow.add(monthsBig, BorderLayout.WEST);
         monthsRow.add(trackColumn, BorderLayout.CENTER);
         monthsRow.setMaximumSize(new Dimension(Short.MAX_VALUE, monthsRow.getPreferredSize().height));
@@ -289,19 +264,6 @@ public final class LogisticsPage {
         return scroll(content, GROUND);
     }
 
-    private JComponent buildLiftAndHistory() {
-        JPanel content = stack(
-              section(text("Designer.logistics.section.lift"), null, liftBanner, liftFacts),
-              section(text("Designer.logistics.section.history"), null, runSimulation,
-                    indented(field(text("lblSimulationDuration.text"), simulationYears)), indented(marriages),
-                    indented(procreation)));
-        padded(content, 12, 14, 18, 14);
-        JComponent scroll = scroll(content, SURFACE_DEEP);
-        scroll.setPreferredSize(new Dimension(scaleForGUI(READOUT_WIDTH), scaleForGUI(400)));
-        scroll.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
-        return scroll;
-    }
-
     // endregion Layout
 
     // region Refresh
@@ -320,11 +282,10 @@ public final class LogisticsPage {
         for (SparesCategory category : SparesCategory.values()) {
             refreshSparesMeter(category);
         }
-        monthsBig.setText(formatted("Designer.logistics.months.big", months.getValue()));
-        monthTrack.setMonths(months.getValue());
+        monthsBig.setText(formatted("Designer.logistics.months.big", months));
+        monthTrack.setMonths(months);
         refreshEnablement();
         refreshLedger();
-        refreshLift();
         root.revalidate();
         root.repaint();
     }
@@ -332,7 +293,6 @@ public final class LogisticsPage {
     private void refreshEnablement() {
         boolean finances = processFinances.isSelected();
         boolean randomize = randomizeCash.isSelected();
-        months.setEnabled(finances && !randomize);
         monthTrack.setEnabled(finances && !randomize);
         randomizeCash.setEnabled(finances);
         diceCount.setEnabled(finances && randomize);
@@ -344,10 +304,6 @@ public final class LogisticsPage {
                                                   payForAmmunition }) {
             box.setEnabled(paySetup);
         }
-        boolean simulation = runSimulation.isSelected();
-        simulationYears.setEnabled(simulation);
-        marriages.setEnabled(simulation);
-        procreation.setEnabled(simulation);
     }
 
     /** Lists which running costs the cash is measured in, as this campaign charges them, and how it is settled. */
@@ -371,7 +327,7 @@ public final class LogisticsPage {
                   costRow("Housing", options.get(CampaignOption.PAY_FOR_HOUSING)),
                   costRow("HotSpots", options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)),
                   ledgerRow(text("Designer.logistics.ledger.months"),
-                        formatted("Designer.logistics.ledger.months.value", months.getValue()), TEXT, true));
+                        formatted("Designer.logistics.ledger.months.value", months), TEXT, true));
         }
         addRows(ledger,
               ledgerRow(text("Designer.logistics.ledger.setup"), text(payForSetup.isSelected()
@@ -409,49 +365,13 @@ public final class LogisticsPage {
         return row;
     }
 
-    private void refreshLift() {
-        ForceSummary rolled = summary.get();
-        ForceGeneratorOptionsView view = engine.getOptionsView();
-        double dropShipShare = (view == null) ? 0 : view.getTransportPercent(TransportShare.DROPSHIP);
-        double jumpShipShare = (view == null) ? 0 : view.getTransportPercent(TransportShare.JUMPSHIP);
-        double cargoShare = (view == null) ? 0 : view.getTransportPercent(TransportShare.CARGO);
-        if (dropShipShare <= 0) {
-            liftBanner.setVerdict(text("Designer.logistics.lift.hire"),
-                  wrapHtml(text("Designer.logistics.lift.hire.reason"), READOUT_WIDTH - 90),
-                  text("Designer.logistics.lift.hire.badge"), AMBER);
-        } else {
-            liftBanner.setVerdict(text("Designer.logistics.lift.sized"),
-                  wrapHtml(text("Designer.logistics.lift.sized.reason"), READOUT_WIDTH - 90),
-                  formatted("Designer.logistics.lift.sized.badge", rolled.getDropShips()), READY);
-        }
-        liftFacts.removeAll();
-        addRows(liftFacts,
-              fact(text("Designer.logistics.lift.dropShips"), Integer.toString(rolled.getDropShips())),
-              fact(text("Designer.logistics.lift.jumpShips"), Integer.toString(rolled.getJumpShips())),
-              fact(text("Designer.logistics.lift.warShips"), Integer.toString(rolled.getWarShips())),
-              fact(text("Designer.logistics.lift.shares"), formatted("Designer.logistics.lift.shares.value",
-                    Math.round(dropShipShare), Math.round(jumpShipShare), Math.round(cargoShare))),
-              wrapped(text("Designer.logistics.lift.note"), READOUT_WIDTH - 40));
-    }
-
-    private static JComponent fact(String key, String value) {
-        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
-        row.add(muted(key), BorderLayout.CENTER);
-        JLabel valueLabel = new JLabel(value, JLabel.RIGHT);
-        valueLabel.setForeground(TEXT);
-        valueLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-        row.add(valueLabel, BorderLayout.EAST);
-        row.setMaximumSize(new Dimension(Short.MAX_VALUE, row.getPreferredSize().height));
-        return row;
-    }
-
     // endregion Refresh
 
     // region Options
 
     /** @return the months of running costs the starting cash is set to */
     public int getStartingCashMonths() {
-        return months.getValue();
+        return months;
     }
 
     public boolean isProcessFinances() {
@@ -466,20 +386,6 @@ public final class LogisticsPage {
         return diceCount.getValue();
     }
 
-    public boolean isRunStartingSimulation() {
-        return runSimulation.isSelected();
-    }
-
-    public int getSimulationYears() {
-        return simulationYears.getValue();
-    }
-
-    /** @return {@code true} if the roll is set to bring DropShips, so the command does not have to hire its lift */
-    public boolean isLiftRolled() {
-        ForceGeneratorOptionsView view = engine.getOptionsView();
-        return (view != null) && (view.getTransportPercent(TransportShare.DROPSHIP) > 0);
-    }
-
     public void loadValuesFromOptions(@Nullable CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         for (SparesCategory category : SparesCategory.values()) {
@@ -487,7 +393,7 @@ public final class LogisticsPage {
         }
         if (options != null) {
             processFinances.setSelected(options.isProcessFinances());
-            months.setValue(options.getStartingCashMonths());
+            months = Math.clamp(options.getStartingCashMonths(), 0, MAX_MONTHS);
             randomizeCash.setSelected(options.isRandomizeStartingCash());
             diceCount.setValue(options.getRandomStartingCashDiceCount());
             minimumFloat.setValue((int) Math.min(Integer.MAX_VALUE, options.getMinimumStartingFloat()));
@@ -498,11 +404,6 @@ public final class LogisticsPage {
             payForParts.setSelected(options.isPayForParts());
             payForArmour.setSelected(options.isPayForArmour());
             payForAmmunition.setSelected(options.isPayForAmmunition());
-            runSimulation.setSelected(options.isRunStartingSimulation());
-            // Saved options may hold a value from when the duration was counted in months, or one past the range.
-            simulationYears.setValue(options.getSimulationDuration());
-            marriages.setSelected(options.isSimulateRandomMarriages());
-            procreation.setSelected(options.isSimulateRandomProcreation());
         }
         refresh();
     }
@@ -514,7 +415,7 @@ public final class LogisticsPage {
             return;
         }
         options.setProcessFinances(processFinances.isSelected());
-        options.setStartingCashMonths(months.getValue());
+        options.setStartingCashMonths(months);
         options.setRandomizeStartingCash(randomizeCash.isSelected());
         options.setRandomStartingCashDiceCount(diceCount.getValue());
         options.setMinimumStartingFloat(minimumFloat.getValue());
@@ -525,10 +426,6 @@ public final class LogisticsPage {
         options.setPayForParts(payForParts.isSelected());
         options.setPayForArmour(payForArmour.isSelected());
         options.setPayForAmmunition(payForAmmunition.isSelected());
-        options.setRunStartingSimulation(runSimulation.isSelected());
-        options.setSimulationDuration(simulationYears.getValue());
-        options.setSimulateRandomMarriages(marriages.isSelected());
-        options.setSimulateRandomProcreation(procreation.isSelected());
     }
 
     /** Writes the spares percentages to the campaign's AutoLogistics options; called when the command is built. */
@@ -549,7 +446,6 @@ public final class LogisticsPage {
             setPreferredSize(new Dimension(scaleForGUI(260), scaleForGUI(20)));
             setMaximumSize(new Dimension(Short.MAX_VALUE, scaleForGUI(20)));
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setToolTipText(text("Designer.logistics.months.track.tooltip"));
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseReleased(MouseEvent event) {
@@ -558,14 +454,14 @@ public final class LogisticsPage {
                     }
                     int cell = Math.clamp(event.getX() * TRACK_MONTHS / Math.max(1, getWidth()), 0,
                           TRACK_MONTHS - 1);
-                    months.setValue(cell + 1);
+                    months = cell + 1;
                     changed();
                 }
             });
         }
 
-        void setMonths(int months) {
-            filled = months;
+        void setMonths(int count) {
+            filled = count;
             repaint();
         }
 
