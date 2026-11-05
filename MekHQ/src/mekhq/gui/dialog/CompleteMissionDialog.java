@@ -36,6 +36,7 @@ import static megamek.client.ratgenerator.RATGenerator.getFactionLogo;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -43,21 +44,35 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.util.UIUtil;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.utilities.ContractDebriefStatistics;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * Contract debrief dialog shown when the player completes a mission.
@@ -67,10 +82,15 @@ import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
  * performance implies, the combat record and objective/ledger statistics, and a segmented outcome selector the player
  * uses to confirm - or override - the recommended {@link MissionStatus}.</p>
  *
+ * <p>A guide slides over the dialog to explain the debrief, opened by its button or by itself the first time the
+ * dialog opens, as the Oracle Console's guides do.</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
 public class CompleteMissionDialog extends AbstractButtonDialog {
+    private static final MMLogger LOGGER = MMLogger.create(CompleteMissionDialog.class);
+
     // region Palette (mirrors the interstellar-map tab)
     private static final Color GROUND = new Color(5, 13, 23);
     private static final Color SURFACE = new Color(15, 30, 43);
@@ -99,6 +119,13 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
     private static final double MAX_VIEWPORT_SCREEN_FRACTION = 0.85;
     private static final int SCROLLBAR_WIDTH = 10;
 
+    private static final String GUIDE_PREFIX = "completeMission.guide.";
+    private static final String CLOSE_GUIDE_OR_CANCEL = "closeGuideOrCancel";
+    /** The glossary entries the guide links to, after its terms. */
+    private static final List<GlossaryEntry> GUIDE_GLOSSARY_ENTRIES = List.of(GlossaryEntry.MISSION_CONCLUSION_HELP,
+          GlossaryEntry.CONTRACT_VICTORY_POINTS, GlossaryEntry.STRATEGIC_OBJECTIVES, GlossaryEntry.COMMAND_RIGHTS,
+          GlossaryEntry.MORALE);
+
     // The completion statuses the player may record - the completed set of MissionStatus, in debrief order.
     private static final MissionStatus[] OUTCOME_OPTIONS = { MissionStatus.SUCCESS, MissionStatus.PARTIAL,
                                                              MissionStatus.FAILED, MissionStatus.BREACH };
@@ -115,6 +142,8 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
     private JLabel verdictReason;
     private JLabel verdictBadge;
     private OutcomeSelector outcomeSelector;
+
+    private HudGuideDrawer guideDrawer;
 
     /**
      * Creates the contract debrief dialog.
@@ -204,11 +233,15 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
               BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(12), UIUtil.scaleForGUI(18),
                     UIUtil.scaleForGUI(12), UIUtil.scaleForGUI(18))));
 
-        GridBagConstraints spacer = new GridBagConstraints();
-        spacer.gridx = 0;
-        spacer.weightx = 1.0;
-        spacer.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(Box.createHorizontalGlue(), spacer);
+        // The guide button sits on the left, pushing Cancel and Confirm to the right.
+        GridBagConstraints guideConstraints = new GridBagConstraints();
+        guideConstraints.gridx = 0;
+        guideConstraints.weightx = 1.0;
+        guideConstraints.anchor = GridBagConstraints.LINE_START;
+        HudButton guideButton = new HudButton("?  " + getText(GUIDE_PREFIX + "button"), false);
+        guideButton.setToolTipText(getText(GUIDE_PREFIX + "button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+        panel.add(guideButton, guideConstraints);
 
         GridBagConstraints buttonConstraints = new GridBagConstraints();
         buttonConstraints.gridx = 1;
@@ -257,8 +290,114 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
             setSize(target);
             fitAndCenter();
         }
+
+        buildGuide();
     }
     // endregion Initialization
+
+    // region Guide
+
+    /**
+     * Builds the guide drawer, which floats over the dialog above a scrim, and opens it by itself when the dialog first
+     * appears if the player hasn't seen it yet. Escape closes the guide while it is open, and cancels the dialog
+     * otherwise.
+     */
+    private void buildGuide() {
+        CompleteMissionGuidePreferences preferences = CompleteMissionGuidePreferences.getInstance();
+        HudCheckBox alwaysOpen = new HudCheckBox(getText(GUIDE_PREFIX + "alwaysOpen"));
+        alwaysOpen.setSelected(preferences.isGuideAlwaysOpen());
+        alwaysOpen.addActionListener(event -> preferences.setGuideAlwaysOpen(alwaysOpen.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(getText(GUIDE_PREFIX + "tab.steps"),
+              getText(GUIDE_PREFIX + "tab.example"), getText(GUIDE_PREFIX + "tab.terms")), alwaysOpen,
+              getText(GUIDE_PREFIX + "close"), this::closeGuide);
+        guideDrawer.install(getRootPane());
+
+        // The drawer takes over Escape; give it back to Cancel whenever the guide is closed.
+        KeyStroke escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escape, CLOSE_GUIDE_OR_CANCEL);
+        getRootPane().getActionMap().put(CLOSE_GUIDE_OR_CANCEL, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (guideDrawer.isVisible()) {
+                    closeGuide();
+                } else {
+                    cancelActionPerformed(event);
+                }
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
+        });
+    }
+
+    /** Opens the guide if the player hasn't seen it yet, or has asked to see it every time. */
+    private void maybeOpenGuide() {
+        CompleteMissionGuidePreferences preferences = CompleteMissionGuidePreferences.getInstance();
+        if (!preferences.isGuideSeen() || preferences.isGuideAlwaysOpen()) {
+            openGuide();
+        }
+    }
+
+    private void openGuide() {
+        CompleteMissionGuidePreferences.getInstance().setGuideSeen(true);
+        guideDrawer.open(createGuide());
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds the guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code completeMission.guide.step.1.title}, {@code .step.2.title}, ...), read until the next number is missing,
+     * so text can be added or reworded without code changes.
+     *
+     * @return the guide
+     */
+    private Guide createGuide() {
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(getText(GUIDE_PREFIX + "step." + number + ".title")); number++) {
+            steps.add(new Step(getText(GUIDE_PREFIX + "step." + number + ".title"),
+                  getText(GUIDE_PREFIX + "step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(getText(GUIDE_PREFIX + "example." + number + ".who")); number++) {
+            example.add(new ExampleLine(getText(GUIDE_PREFIX + "example." + number + ".who"),
+                  getText(GUIDE_PREFIX + "example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(getText(GUIDE_PREFIX + "term." + number + ".name")); number++) {
+            terms.add(new Term(getText(GUIDE_PREFIX + "term." + number + ".name"),
+                  getText(GUIDE_PREFIX + "term." + number + ".text")));
+        }
+
+        JPanel glossary = new JPanel();
+        glossary.setOpaque(false);
+        glossary.setLayout(new BoxLayout(glossary, BoxLayout.Y_AXIS));
+        glossary.add(leftAligned(Hud.eyebrow(getText(GUIDE_PREFIX + "glossary"))));
+        glossary.add(Box.createVerticalStrut(UIUtil.scaleForGUI(4)));
+        for (GlossaryEntry entry : GUIDE_GLOSSARY_ENTRIES) {
+            glossary.add(leftAligned(Hud.link(entry.getTitle(), () -> openGlossaryEntry(entry))));
+            glossary.add(Box.createVerticalStrut(UIUtil.scaleForGUI(3)));
+        }
+
+        return new Guide(getText(GUIDE_PREFIX + "eyebrow"), getText(GUIDE_PREFIX + "title"), steps, null,
+              getText(GUIDE_PREFIX + "exampleIntro"), example, terms, glossary);
+    }
+
+    private void openGlossaryEntry(GlossaryEntry entry) {
+        try {
+            GlossaryConsole.showEntry(this, entry);
+        } catch (Exception ex) {
+            LOGGER.error("Failed to open Glossary Entry", ex);
+        }
+    }
+
+    // endregion Guide
 
     // region Briefing Header
     private JComponent createBriefingHeader() {

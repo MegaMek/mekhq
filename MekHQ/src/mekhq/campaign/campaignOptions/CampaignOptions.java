@@ -46,8 +46,6 @@ import megamek.common.TechConstants;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.GameOptions;
-import megamek.common.preference.ClientPreferences;
-import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.finances.Money;
@@ -68,7 +66,6 @@ import mekhq.service.mrms.MRMSOption;
  */
 public class CampaignOptions {
     private static final MMLogger LOGGER = MMLogger.create(CampaignOptions.class);
-    private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
@@ -226,8 +223,6 @@ public class CampaignOptions {
         set(CampaignOption.USE_PORTRAIT_FOR_ROLE, new boolean[personnelRoles.length]);
         Arrays.fill(get(CampaignOption.USE_PORTRAIT_FOR_ROLE), false);
         get(CampaignOption.USE_PORTRAIT_FOR_ROLE)[PersonnelRole.MEKWARRIOR.ordinal()] = true;
-
-        set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, "gbc green.theme");
 
         set(CampaignOption.ATB_BATTLE_CHANCE, new int[CombatRole.values().length - 1]);
         get(CampaignOption.ATB_BATTLE_CHANCE)[CombatRole.MANEUVER.ordinal()] = 40;
@@ -529,7 +524,7 @@ public class CampaignOptions {
 
     /**
      * Pushes the options that MegaMek holds globally rather than per campaign into MegaMek: the gender generator's
-     * percent female, the name generator's faction and the strategic view minimap theme. Call this whenever these
+     * percent female and the name generator's faction. Call this whenever these
      * options become the active campaign's options (loading a campaign, applying the options dialog), and never for
      * options that only belong to a preset.
      *
@@ -539,7 +534,6 @@ public class CampaignOptions {
     public void applyGlobalSettings() {
         RandomGenderGenerator.setPercentFemale(get(CampaignOption.PERCENT_FEMALE));
         RandomNameGenerator.getInstance().setChosenFaction(get(CampaignOption.NAME_GENERATOR_FACTION));
-        CLIENT_PREFERENCES.setStrategicViewTheme(get(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME));
     }
 
     /**

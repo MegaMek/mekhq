@@ -52,9 +52,7 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import megamek.common.enums.SkillLevel;
@@ -159,9 +157,7 @@ class StratConPage {
 
     private JLabel lblAutoResolveMethod;
     private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
-    private MMComboBox<String> minimapThemeSelector;
     private JCheckBox chkAutoResolveVictoryChanceEnabled;
-    private JLabel lblMinimapTheme;
     private JCheckBox chkAutoResolveExperimentalPacarGuiEnabled;
     private JLabel lblAutoResolveNumberOfScenarios;
     private JSpinner spnAutoResolveNumberOfScenarios;
@@ -207,8 +203,6 @@ class StratConPage {
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
               AutoResolveMethod.values());
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
-        minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
-              new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
         comboStratConSectorCountMethod = new MMComboBox<>("StratConSectorCountMethod",
               StratConSectorCountMethod.values());
         comboStratConSectorCountMethod.setRenderer(new DefaultListCellRenderer() {
@@ -244,7 +238,7 @@ class StratConPage {
                       list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof StratConPlayType type) {
-                    label.setToolTipText(type.getTooltip());
+                    label.setToolTipText(wordWrap(type.getTooltip()));
                 }
 
                 return label;
@@ -266,8 +260,6 @@ class StratConPage {
         // to wait until now to add the mouse listeners. It's awkward, but it works.
         lblAutoResolveMethod.addMouseListener(createTipPanelUpdater("AutoResolveMethod"));
         comboAutoResolveMethod.addMouseListener(createTipPanelUpdater("AutoResolveMethod"));
-        lblMinimapTheme.addMouseListener(createTipPanelUpdater("MinimapTheme"));
-        minimapThemeSelector.addMouseListener(createTipPanelUpdater("MinimapTheme"));
         lblAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
         spnAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
         chkAutoResolveVictoryChanceEnabled.addMouseListener(createTipPanelUpdater("AutoResolveVictoryChanceEnabled"));
@@ -516,8 +508,6 @@ class StratConPage {
               250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox(
               "AutoResolveExperimentalPacarGuiEnabled");
     }
@@ -647,7 +637,6 @@ class StratConPage {
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkAutoResolveVictoryChanceEnabled,
               chkAutoResolveExperimentalPacarGuiEnabled);
-        panel.addRow(lblMinimapTheme, minimapThemeSelector);
         panel.addRow(lblAutoResolveNumberOfScenarios, spnAutoResolveNumberOfScenarios);
 
         return panel;
@@ -697,7 +686,6 @@ class StratConPage {
         spnMoraleDefeat.setValue(model.moraleDefeatEffect);
         spnMoraleDecisiveDefeat.setValue(model.moraleDecisiveDefeatEffect);
         comboAutoResolveMethod.setSelectedItem(model.autoResolveMethod);
-        minimapThemeSelector.setSelectedItem(model.strategicViewTheme);
         chkAutoResolveVictoryChanceEnabled.setSelected(model.autoResolveVictoryChanceEnabled);
         chkAutoResolveExperimentalPacarGuiEnabled.setSelected(model.autoResolveExperimentalPacarGuiEnabled);
         spnAutoResolveNumberOfScenarios.setValue(model.autoResolveNumberOfScenarios);
@@ -762,7 +750,6 @@ class StratConPage {
         model.moraleDefeatEffect = (int) spnMoraleDefeat.getValue();
         model.moraleDecisiveDefeatEffect = (int) spnMoraleDecisiveDefeat.getValue();
         model.autoResolveMethod = comboAutoResolveMethod.getSelectedItem();
-        model.strategicViewTheme = minimapThemeSelector.getSelectedItem();
         model.autoResolveVictoryChanceEnabled = chkAutoResolveVictoryChanceEnabled.isSelected();
         model.autoResolveExperimentalPacarGuiEnabled = chkAutoResolveExperimentalPacarGuiEnabled.isSelected();
         model.autoResolveNumberOfScenarios = (int) spnAutoResolveNumberOfScenarios.getValue();

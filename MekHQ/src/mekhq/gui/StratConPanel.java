@@ -156,6 +156,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE = "StickyForce";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
+    private static final String RIGHT_CLICK_COMMAND_RECALL_FORCE = "RecallForce";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
     private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
@@ -729,6 +730,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                 stickyForceItem.addActionListener(this);
                 stickyForceItem.setSelected(currentTrack.getStickyForces().contains(forceID));
                 rightClickMenu.add(stickyForceItem);
+
+                if (campaignState != null) {
+                    rightClickMenu.add(buildRecallFormationItem(forceID, forceName));
+                }
             }
         }
 
@@ -820,6 +825,45 @@ public class StratConPanel extends JPanel implements ActionListener {
                 rightClickMenu.add(resetDeploymentItem);
             }
         }
+    }
+
+    /**
+     * Builds the item that spends Employer Support to recall a deployed formation early. It is disabled, with a tooltip
+     * saying why, when the formation can't be recalled.
+     *
+     * @param forceID   the deployed formation's ID
+     * @param forceName the deployed formation's name
+     *
+     * @return the menu item
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenuItem buildRecallFormationItem(int forceID, String forceName) {
+        JMenuItem recallItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.recall",
+              forceName,
+              StratConRulesManager.RECALL_FORMATION_SUPPORT_POINT_COST));
+        recallItem.setActionCommand(RIGHT_CLICK_COMMAND_RECALL_FORCE);
+        recallItem.putClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID, forceID);
+        recallItem.addActionListener(this);
+
+        if (!StratConRulesManager.canRecallFormation(forceID, currentTrack, campaignState, campaign)) {
+            recallItem.setEnabled(false);
+
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            String reasonKey;
+            if ((formation != null) && formation.isDeployed()) {
+                reasonKey = "stratConTab.contextMenu.recall.inScenario";
+            } else if (currentTrack.getFacilityOrder(forceID) != null) {
+                reasonKey = "stratConTab.contextMenu.recall.facilityOrder";
+            } else {
+                reasonKey = "stratConTab.contextMenu.recall.noSupport";
+            }
+            recallItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, reasonKey));
+        }
+
+        return recallItem;
     }
 
     /**
@@ -3004,6 +3048,7 @@ public class StratConPanel extends JPanel implements ActionListener {
      *       {@link #openDeploymentWizard}, on the Primary page (bare hex or unresolved scenario) or the Reinforce page
      *       (committed scenario) as appropriate.</li>
      *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
+     *   <li>{@code RECALL_FORCE} - spends Employer Support to have a force return from the track at once.</li>
      *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
      *       removing a facility recomputes roads; capturing deliberately does not.</li>
      *   <li>{@code ADD_CITY} / {@code REMOVE_CITY} - GM city edits, each recomputing roads.</li>
@@ -3045,6 +3090,14 @@ public class StratConPanel extends JPanel implements ActionListener {
                     currentTrack.removeStickyForce(forceID);
                 }
 
+                break;
+            case RIGHT_CLICK_COMMAND_RECALL_FORCE:
+                int recalledForceID = (int) ((JMenuItem) evt.getSource())
+                      .getClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID);
+                if (StratConRulesManager.recallFormation(recalledForceID, currentTrack, campaignState, campaign)) {
+                    infoArea.setText(buildSelectedHexInfo(campaign));
+                    isContractViewStale = true;
+                }
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);

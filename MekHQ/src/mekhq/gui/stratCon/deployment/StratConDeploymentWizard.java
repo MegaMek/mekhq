@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -85,7 +86,16 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
@@ -95,6 +105,7 @@ import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog.ReinforcementDialogResponseType;
 import mekhq.gui.dialog.StratConSinglesReinforcementsDialog;
 import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.stratCon.ScenarioWizardLanceModel;
 
 /**
@@ -106,6 +117,9 @@ import mekhq.gui.stratCon.ScenarioWizardLanceModel;
  * deploy, reinforcement roll, auxiliaries, utility - with one finalize and one staying-home summary. The wizard keeps
  * only the dialogs; the state changes live in the non-GUI {@link StratConDeploymentService}, and the deployment
  * arithmetic in {@link DeploymentEvaluator}.</p>
+ *
+ * <p>Each page has a guide that slides over the wizard, opened by the guide button or by itself the first time the
+ * player reaches the page, as the Oracle Console's guides do.</p>
  *
  * <p>The right-click deployment entry points ({@code StratConPanel}) and the GM mapless flow
  * ({@code MaplessStratCon}) open this wizard. It replaces the former {@code StratConScenarioWizard} and
@@ -183,6 +197,10 @@ public class StratConDeploymentWizard extends JDialog {
 
     private final transient DeploymentInspectorPanel inspector;
 
+    private final HudButton guideButton = new HudButton("", false, true);
+    private final HudCheckBox autoOpenGuides = new HudCheckBox(guideText("autoOpen"));
+    private final HudGuideDrawer guideDrawer;
+
     public StratConDeploymentWizard(StratConPanel owner, Campaign campaign) {
         super((java.awt.Frame) null, false);
         this.owner = owner;
@@ -197,6 +215,13 @@ public class StratConDeploymentWizard extends JDialog {
 
         wireBoard();
         wireInspector();
+
+        autoOpenGuides.addActionListener(event -> DeploymentWizardGuidePreferences.getInstance()
+                                                        .setGuideAutoOpen(autoOpenGuides.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(guideText("tab.steps"), guideText("tab.example"),
+              guideText("tab.terms")), autoOpenGuides, guideText("close"), this::closeGuide);
+        // The guide drawer and its scrim float over the pages; Escape closes the guide.
+        guideDrawer.install(getRootPane());
 
         setResizable(true);
         setSize(new Dimension(960, 640));
@@ -241,6 +266,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         setPreferences(); // Must be before setVisible
         setVisible(true);
+        maybeOpenGuide();
     }
 
     /**
@@ -306,6 +332,8 @@ public class StratConDeploymentWizard extends JDialog {
      */
     private void enterMode() {
         instructionsLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.instructions." + mode.name()));
+        closeGuide();
+        guideButton.setText("?  " + guideText(guideKey(mode) + ".button").toUpperCase(Locale.ROOT));
 
         // The role filter only applies to formation pages; hide it (and drop any stale selection) on the unit pages.
         boolean showRoleFilter = !mode.isUnitTier();
@@ -322,6 +350,7 @@ public class StratConDeploymentWizard extends JDialog {
         updateBudget();
         refreshCommitEnabled();
         updateTabLocks();
+        maybeOpenGuide();
     }
 
     private void clearStaged() {
@@ -351,7 +380,14 @@ public class StratConDeploymentWizard extends JDialog {
         instructionsLabel.setForeground(HudStyle.TEXT_MUTED);
         instructionsLabel.setFont(HudStyle.hudFont(Font.PLAIN, 0.9f, 0.0f));
 
-        commandBar.add(title, BorderLayout.NORTH);
+        guideButton.setToolTipText(guideText("button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+        JPanel titleRow = new JPanel(new BorderLayout(UIUtil.scaleForGUI(16), 0));
+        titleRow.setOpaque(false);
+        titleRow.add(title, BorderLayout.WEST);
+        titleRow.add(guideButton, BorderLayout.EAST);
+
+        commandBar.add(titleRow, BorderLayout.NORTH);
         commandBar.add(modeSelector, BorderLayout.CENTER);
         commandBar.add(instructionsLabel, BorderLayout.SOUTH);
         return commandBar;
@@ -1401,6 +1437,93 @@ public class StratConDeploymentWizard extends JDialog {
     private void finishCommit() {
         owner.repaint();
         dispose();
+    }
+
+    // endregion
+
+    // region guides
+
+    /** Opens the page's guide by itself the first time the player sees the page, unless they turned that off. */
+    private void maybeOpenGuide() {
+        DeploymentWizardGuidePreferences preferences = DeploymentWizardGuidePreferences.getInstance();
+        if (isShowing() && preferences.isGuideAutoOpen() && !preferences.isGuideSeen(mode)) {
+            openGuide();
+        }
+    }
+
+    /** Opens the guide for the page on screen, marking it seen so it does not open by itself again. */
+    private void openGuide() {
+        DeploymentWizardGuidePreferences preferences = DeploymentWizardGuidePreferences.getInstance();
+        preferences.setGuideSeen(mode, true);
+        autoOpenGuides.setSelected(preferences.isGuideAutoOpen());
+        guideDrawer.open(buildGuide(mode));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds a page's guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code deploymentWizard.guide.primary.step.1.title}, {@code .step.2.title}, ...), read until the next number is
+     * missing, so text can be added or reworded without code changes.
+     *
+     * @param guideMode the page
+     *
+     * @return the page's guide
+     */
+    private Guide buildGuide(DeploymentMode guideMode) {
+        String prefix = guideKey(guideMode) + ".";
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "step." + number + ".title")); number++) {
+            steps.add(new Step(guideText(prefix + "step." + number + ".title"),
+                  guideText(prefix + "step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "example." + number + ".who")); number++) {
+            example.add(new ExampleLine(guideText(prefix + "example." + number + ".who"),
+                  guideText(prefix + "example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "term." + number + ".name")); number++) {
+            terms.add(new Term(guideText(prefix + "term." + number + ".name"),
+                  guideText(prefix + "term." + number + ".text")));
+        }
+
+        JPanel glossary = new JPanel();
+        glossary.setOpaque(false);
+        glossary.setLayout(new BoxLayout(glossary, BoxLayout.Y_AXIS));
+        glossary.add(HudStyle.leftAligned(Hud.eyebrow(guideText("glossary"))));
+        glossary.add(Box.createVerticalStrut(UIUtil.scaleForGUI(4)));
+        for (GlossaryEntry entry : glossaryEntriesFor(guideMode)) {
+            glossary.add(HudStyle.leftAligned(Hud.link(entry.getTitle(),
+                  () -> GlossaryConsole.showEntry(this, entry))));
+            glossary.add(Box.createVerticalStrut(UIUtil.scaleForGUI(3)));
+        }
+
+        return new Guide(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.guide.eyebrow", guideMode.getLabel()),
+              guideText(prefix + "title"), steps, null, guideText("exampleIntro"), example, terms, glossary);
+    }
+
+    private static List<GlossaryEntry> glossaryEntriesFor(DeploymentMode guideMode) {
+        return switch (guideMode) {
+            case PRIMARY -> List.of(GlossaryEntry.HOW_TO_DEPLOY, GlossaryEntry.COMBAT_TEAMS,
+                  GlossaryEntry.COMBAT_ROLES, GlossaryEntry.DEPLOYMENT_ORDERS);
+            case REINFORCE -> List.of(GlossaryEntry.HOW_TO_REINFORCE, GlossaryEntry.EMPLOYER_SUPPORT,
+                  GlossaryEntry.COMBAT_ROLES, GlossaryEntry.BATCHALL);
+            case AUXILIARIES -> List.of(GlossaryEntry.LEADERSHIP_UNITS, GlossaryEntry.COMBAT_ROLES);
+            case UTILITY -> List.of(GlossaryEntry.HOW_TO_DEPLOY, GlossaryEntry.COMBAT_ROLES);
+        };
+    }
+
+    /** @return the key a page's guide is read under, such as {@code "primary"} */
+    private static String guideKey(DeploymentMode guideMode) {
+        return guideMode.name().toLowerCase(Locale.ROOT);
+    }
+
+    /** @return the guide text under {@code deploymentWizard.guide.}, which every guide's keys share */
+    private static String guideText(String key) {
+        return getTextAt(RESOURCE_BUNDLE, "deploymentWizard.guide." + key);
     }
 
     // endregion

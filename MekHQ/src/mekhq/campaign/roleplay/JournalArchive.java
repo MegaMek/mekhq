@@ -47,12 +47,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import javax.xml.parsers.DocumentBuilder;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Reads journals back in from exported Markdown files.
@@ -191,8 +193,10 @@ public final class JournalArchive {
             if (xml.length > MAXIMUM_DATA_BYTES) {
                 throw new IOException("journal data is too large");
             }
-            final Node root = MHQXMLUtility.newSafeDocumentBuilder()
-                                    .parse(new ByteArrayInputStream(xml)).getDocumentElement();
+            final DocumentBuilder builder = MHQXMLUtility.newSafeDocumentBuilder();
+            // The failure is logged below; without a handler the parser also prints it to stderr.
+            builder.setErrorHandler(new DefaultHandler());
+            final Node root = builder.parse(new ByteArrayInputStream(xml)).getDocumentElement();
             final List<JournalEntry> entries = new ArrayList<>();
             final Map<UUID, String> threads = new LinkedHashMap<>();
             final Map<UUID, String> characters = new LinkedHashMap<>();
