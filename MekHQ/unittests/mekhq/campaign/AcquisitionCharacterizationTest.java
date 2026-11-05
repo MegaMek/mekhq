@@ -63,6 +63,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.TestSystems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.PlanetaryAcquisitionModifiers;
 import org.junit.jupiter.api.AfterEach;
@@ -156,8 +157,16 @@ class AcquisitionCharacterizationTest {
 
     /**
      * Shops by planet, in the current system only, without the per-planet report.
+     *
+     * <p>The test campaign's systems are loaded without being indexed by location, so the search would find no
+     * system at all; they are indexed here first.</p>
      */
     private void shopByPlanetInTheCurrentSystem() {
+        TestSystems systems = TestSystems.getInstance();
+        assertTrue(systems.getSystems().containsValue(campaign.getCurrentSystem()),
+              "the test campaign's systems are the TestSystems instance");
+        systems.indexLoadedSystems();
+
         CampaignOptions options = campaign.getCampaignOptions();
         options.set(CampaignOption.USE_PLANETARY_ACQUISITION, true);
         options.set(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION, 0);
