@@ -573,8 +573,8 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
             body = getFormattedText("completeMission.reason.victoryPoints.partial.objectivesFailed",
                   statistics.getContractScore(), statistics.getRequiredVictoryPoints(),
                   statistics.getObjectivesFailed());
-        } else if ((selectedStatus == MissionStatus.PARTIAL) && statistics.isVictoryPointTargetMet()
-                         && statistics.isMissingCompletedStrategicObjective()) {
+        } else if ((selectedStatus == MissionStatus.PARTIAL) && statistics.hasVictoryPointTarget()
+                         && statistics.isVictoryPointTargetMet() && statistics.isMissingCompletedStrategicObjective()) {
             // The target was met, but without a secured strategic objective the contract cannot be a Perfect Success.
             body = getFormattedText("completeMission.reason.victoryPoints.partial.noObjectivesCompleted",
                   statistics.getContractScore(), statistics.getRequiredVictoryPoints());

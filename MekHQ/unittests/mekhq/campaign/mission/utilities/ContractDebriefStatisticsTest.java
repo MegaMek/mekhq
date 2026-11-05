@@ -33,7 +33,7 @@
 package mekhq.campaign.mission.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -148,8 +148,9 @@ class ContractDebriefStatisticsTest {
     }
 
     @Test
-    void recommendsPartialWhenTargetMetWithoutAnyStrategicObjectives() {
-        // Victory points alone can earn a Success, but not a Perfect Success.
+    void recommendsSuccessWhenTargetMetOnContractWithoutStrategicObjectives() {
+        // Mapless mode and objective-less contract types (a Retainer, say) never get a strategic objective; they must
+        // still be able to earn a Perfect Success on victory points alone.
         StratConCampaignState state = stratConWith(5, new ArrayList<>());
         AbstractContract contract = baseContract(new ArrayList<>());
         when(contract.getRequiredVictoryPoints()).thenReturn(3);
@@ -157,8 +158,8 @@ class ContractDebriefStatisticsTest {
 
         ContractDebriefStatistics statistics = from(contract);
 
-        assertTrue(statistics.isMissingCompletedStrategicObjective());
-        assertEquals(MissionStatus.PARTIAL, statistics.getRecommendedStatus());
+        assertFalse(statistics.isMissingCompletedStrategicObjective());
+        assertEquals(MissionStatus.SUCCESS, statistics.getRecommendedStatus());
     }
 
     @Test
