@@ -234,7 +234,7 @@ public final class TrainingPlan {
         }
 
         Money needed = totalFees.plus(feesOf(staged));
-        if (needed.isGreaterThan(funds)) {
+        if (needed.isPositive() && needed.isGreaterThan(funds)) {
             // Training is all or nothing: put the projections back as they were before this batch
             restore(before);
             Map<TrainingRefusal, Integer> allRefused = new EnumMap<>(TrainingRefusal.class);
@@ -260,7 +260,8 @@ public final class TrainingPlan {
      * @return {@code true} if they were staged
      */
     boolean stagePriced(String label, List<StagedPurchase> priced) {
-        if (priced.isEmpty() || totalFees.plus(feesOf(priced)).isGreaterThan(funds)) {
+        Money needed = totalFees.plus(feesOf(priced));
+        if (priced.isEmpty() || (needed.isPositive() && needed.isGreaterThan(funds))) {
             return false;
         }
         for (StagedPurchase staged : priced) {
@@ -365,7 +366,8 @@ public final class TrainingPlan {
                 }
             }
             Money stepFees = feesOf(purchases);
-            if (totalFees.plus(stepFees).isGreaterThan(funds)) {
+            Money needed = totalFees.plus(stepFees);
+            if (needed.isPositive() && needed.isGreaterThan(funds)) {
                 return index;
             }
             if (!purchases.isEmpty()) {
@@ -470,7 +472,8 @@ public final class TrainingPlan {
      * @return {@code true} if the campaign can pay its fee on top of everything already staged
      */
     boolean fits(Quote quote) {
-        return !totalFees.plus(quote.fee()).isGreaterThan(funds);
+        Money needed = totalFees.plus(quote.fee());
+        return !needed.isPositive() || !needed.isGreaterThan(funds);
     }
 
     /**

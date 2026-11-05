@@ -112,7 +112,7 @@ public final class TrainingService {
     public static CommitReport commit(Campaign campaign, TrainingPlan plan) {
         Finances finances = campaign.getPlayerForce().getFinances();
         Money balance = finances.getBalance();
-        if (plan.totalFees().isGreaterThan(balance)) {
+        if (plan.totalFees().isPositive() && plan.totalFees().isGreaterThan(balance)) {
             campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "report.refusedFunds",
                   spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
                   plan.totalFees().toAmountAndSymbolString(), balance.toAmountAndSymbolString()));
@@ -135,7 +135,8 @@ public final class TrainingService {
                 Person person = purchase.person();
                 // The person is as earlier purchases left them, so a fresh projection prices this one correctly
                 Quote quote = TrainingPricer.quote(context, new PersonProjection(person), purchase);
-                boolean isAffordable = !feesPaid.plus(stepTotal).plus(quote.fee()).isGreaterThan(balance);
+                Money feesDue = feesPaid.plus(stepTotal).plus(quote.fee());
+                boolean isAffordable = !feesDue.isPositive() || !feesDue.isGreaterThan(balance);
                 if (!quote.isAllowed() || !isAffordable || !applyPurchase(campaign, context, purchase, quote)) {
                     LOGGER.info("Skipped training for {}: {} ({})", person.getFullName(), purchase,
                           !quote.isAllowed() ? quote.refusal() : (isAffordable ? "nothing to change" : "fees"));
