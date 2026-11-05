@@ -42,6 +42,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -250,7 +251,9 @@ public class Loot {
 
             if (isResupply) {
                 if (cargo - partWeight < 0) {
-                    abandonedParts.add("<br>- " + part.getName() + " (" + partWeight + " tons)");
+                    abandonedParts.add(String.format(resources.getString("looted.part"),
+                          part.getName(),
+                          formatTonnage(partWeight)));
                     continue;
                 } else {
                     cargo -= partWeight;
@@ -259,7 +262,8 @@ public class Loot {
 
             LOGGER.debug("Looting part: {}", part.getName());
 
-            lootedParts.add("<br>- " + part.getName() + " (" + partWeight + " tons)");
+            lootedParts.add(String.format(resources.getString("looted.part"),
+                  part.getName(), formatTonnage(partWeight)));
             campaign.getQuartermaster().addPart(part, 0, true);
 
             LOGGER.debug("Looting parts complete");
@@ -415,5 +419,17 @@ public class Loot {
         }
 
         return retVal;
+    }
+
+    /**
+     * Formats a part weight for display, rounding away floating-point noise (e.g. {@code 0.35000000000000003} becomes
+     * {@code 0.35}) and dropping trailing zeros.
+     *
+     * @param tonnage the weight in tons
+     *
+     * @return the weight rounded to at most three decimal places
+     */
+    private static String formatTonnage(double tonnage) {
+        return new DecimalFormat("#,##0.###").format(tonnage);
     }
 }
