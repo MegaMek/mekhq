@@ -41,6 +41,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -269,6 +271,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         pane.installGuide(getRootPane(), () -> cancelActionPerformed(null));
+        // The first page's guide waits for the dialog to be on screen, as the drawer floats over it.
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                pane.maybeOpenGuide();
+            }
+        });
     }
 
     private static String upper(String text) {

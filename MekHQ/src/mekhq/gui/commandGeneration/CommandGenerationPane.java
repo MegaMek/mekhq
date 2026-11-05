@@ -73,6 +73,7 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
@@ -125,6 +126,7 @@ public class CommandGenerationPane extends JPanel {
     private final HudStatTile liftTile;
     private final HudButton guideButton = new HudButton("", false, true);
     private final HudGuideDrawer guideDrawer;
+    private final CommandDesignerGuidePreferences guidePreferences = CommandDesignerGuidePreferences.getInstance();
 
     private final List<Runnable> refreshListeners = new ArrayList<>();
     private final List<Consumer<DesignerPage>> pageListeners = new ArrayList<>();
@@ -177,8 +179,11 @@ public class CommandGenerationPane extends JPanel {
         cashTile.setToolTipText(text("Designer.tile.cash.tooltip"));
         liftTile.setToolTipText(text("Designer.tile.lift.tooltip"));
 
+        HudCheckBox autoOpenGuides = new HudCheckBox(text("Designer.guide.autoOpen"));
+        autoOpenGuides.setSelected(guidePreferences.isGuideAutoOpen());
+        autoOpenGuides.addActionListener(event -> guidePreferences.setGuideAutoOpen(autoOpenGuides.isSelected()));
         guideDrawer = new HudGuideDrawer(List.of(text("Designer.guide.tab.steps"), text("Designer.guide.tab.example"),
-              text("Designer.guide.tab.terms")), null, text("Designer.guide.close"), this::closeGuide);
+              text("Designer.guide.tab.terms")), autoOpenGuides, text("Designer.guide.close"), this::closeGuide);
         guideButton.addActionListener(event -> openGuide(currentPage));
 
         buildUi();
@@ -288,6 +293,17 @@ public class CommandGenerationPane extends JPanel {
         for (Consumer<DesignerPage> listener : List.copyOf(pageListeners)) {
             listener.accept(page);
         }
+        maybeOpenGuide();
+    }
+
+    /**
+     * Opens the current page's guide if the player has not seen it yet and has not turned first-visit guides off. Does
+     * nothing until the designer is on screen, so the dialog calls this again once it opens.
+     */
+    public void maybeOpenGuide() {
+        if (isShowing() && !guidePreferences.isGuideSeen(currentPage) && guidePreferences.isGuideAutoOpen()) {
+            openGuide(currentPage);
+        }
     }
 
     public DesignerPage getCurrentPage() {
@@ -300,6 +316,7 @@ public class CommandGenerationPane extends JPanel {
     }
 
     private void openGuide(DesignerPage page) {
+        guidePreferences.setGuideSeen(page, true);
         String prefix = "Designer.guide." + page.name() + ".";
         List<Step> steps = new ArrayList<>();
         for (int number = 1; isResourceKeyValid(text(prefix + "step." + number + ".title")); number++) {
