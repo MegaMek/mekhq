@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -222,7 +223,8 @@ class ReputationPage {
     private JButton createResetCriminalRecordButton() {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnResetCriminalRecord.text"));
         button.setName("btnResetCriminalRecord");
-        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblResetCriminalRecord.tooltip"));
+        button.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblResetCriminalRecord.tooltip")));
         setSmallSizeVariant(button);
         button.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
         button.addActionListener(event -> {

@@ -142,7 +142,7 @@ jobs:
         run: |
           echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
-      # MegaMek and MegaMekLab tests run in their own repos' CI, and the nightly still runs testAll.
+      # MegaMek and MegaMekLab tests run in their own repos' CI.
       - name: Test and Build
         working-directory: mekhq
         run: ./gradlew build --no-parallel --stacktrace --scan -i --continue -x checkstyleMain -x checkstyleTest -PextraVersion="PR-${{ github.event.number }}-${{ env.COMMIT_SHORT_SHA }}"
