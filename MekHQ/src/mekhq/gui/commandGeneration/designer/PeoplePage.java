@@ -91,7 +91,7 @@ import mekhq.gui.utilities.SkillLevelPickerUtility;
  */
 public final class PeoplePage {
     /** Wrap width for notes in the narrow outer columns, before GUI scaling; fits inside their padding. */
-    private static final int WRAP_WIDTH = 270;
+    private static final int WRAP_WIDTH = 230;
     private static final int COVERAGE_DEFAULT = 100;
     private static final int ASTECHS_PER_TECH = 6;
     private static final int MEDICS_PER_DOCTOR = 4;

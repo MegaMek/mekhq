@@ -235,31 +235,36 @@ public final class LogisticsPage {
         monthsRow.add(trackColumn, BorderLayout.CENTER);
         monthsRow.setMaximumSize(new Dimension(Short.MAX_VALUE, monthsRow.getPreferredSize().height));
 
+        // Three even columns, one per decision: where the cash comes from, what the build is charged, and what
+        // happens if that leaves too little.
+        JPanel cashColumn = column();
+        addRows(cashColumn, caption(text("Designer.logistics.paying.cash")), processFinances, randomizeCash,
+              indented(field(text("lblRandomStartingCashDiceCount.text"), diceCount)));
+        JPanel setupColumn = column();
+        addRows(setupColumn, caption(text("Designer.logistics.paying.setup")), payForSetup, indented(payForPersonnel),
+              indented(payForUnits), indented(payForParts), indented(payForArmour), indented(payForAmmunition));
+        JPanel shortfallColumn = column();
+        addRows(shortfallColumn, caption(text("Designer.logistics.paying.shortfall")),
+              field(text("lblMinimumStartingFloat.text"), minimumFloat), startingLoan);
+
         JPanel paying = Hud.transparentPanel(new GridBagLayout());
         GridBagConstraints cell = new GridBagConstraints();
         cell.anchor = GridBagConstraints.NORTHWEST;
         cell.fill = GridBagConstraints.HORIZONTAL;
         cell.weightx = 1.0;
-        cell.insets = new Insets(0, 0, scaleForGUI(4), scaleForGUI(16));
-        JComponent[][] grid = {
-              { processFinances, startingLoan },
-              { randomizeCash, indented(field(text("lblRandomStartingCashDiceCount.text"), diceCount)) },
-              { payForSetup, indented(payForPersonnel) },
-              { indented(payForUnits), indented(payForParts) },
-              { indented(payForArmour), indented(payForAmmunition) } };
-        for (int row = 0; row < grid.length; row++) {
-            for (int column = 0; column < grid[row].length; column++) {
-                cell.gridx = column;
-                cell.gridy = row;
-                paying.add(grid[row][column], cell);
-            }
+        cell.weighty = 0.0;
+        cell.gridy = 0;
+        cell.insets = new Insets(0, 0, 0, scaleForGUI(16));
+        JPanel[] columns = { cashColumn, setupColumn, shortfallColumn };
+        for (int index = 0; index < columns.length; index++) {
+            cell.gridx = index;
+            paying.add(columns[index], cell);
         }
 
         JPanel content = stack(
               section(text("Designer.logistics.section.cash"), text("Designer.logistics.section.cash.aside"),
                     monthsRow, ledger),
-              section(text("Designer.logistics.section.paying"), null, paying,
-                    field(text("lblMinimumStartingFloat.text"), minimumFloat)));
+              section(text("Designer.logistics.section.paying"), null, paying));
         padded(content, 12, 16, 18, 16);
         return scroll(content, GROUND);
     }
