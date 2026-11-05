@@ -567,6 +567,17 @@ public class AtBDynamicScenarioFactory {
             return 0;
         }
 
+        // Fixed MULs carry no environmental kit, so dress their infantry for the battlefield the same way randomly
+        // generated infantry are: temperature always applies, pressure and taint only with planetary modifiers.
+        boolean usePlanetaryModifiers = campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS);
+        for (Entity entity : generatedEntities) {
+            if (usePlanetaryModifiers) {
+                updateArmorKits(scenario, entity, campaign.getCampaignOptions());
+            } else if (entity instanceof ConvInfantry infantry) {
+                changeInfantryKit(infantry, false, false, getBattleTemperature(scenario, campaign.getCampaignOptions()));
+            }
+        }
+
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
