@@ -88,6 +88,9 @@ public final class ForcePage {
     private static final int RAIL_WIDTH = 300;
     private static final int READOUT_WIDTH = 320;
     private static final int WRAP_WIDTH = 260;
+    // A board row's left padding, and how much further each echelon below the top one is indented.
+    private static final int BOARD_ROW_PADDING = 12;
+    private static final int BOARD_INDENT = 22;
     /** Weight-split colours, light to assault: the accent in four strengths. */
     private static final Color[] WEIGHT_COLORS = {
           new Color(46, 143, 154), ACCENT, ACCENT_BRIGHT, new Color(201, 243, 246) };
@@ -410,7 +413,7 @@ public final class ForcePage {
             boardMeta.setText(text("Designer.force.board.meta.empty"));
         } else {
             for (ForceDescriptor child : childrenOf(modelRoot)) {
-                addNode(child, null, true);
+                addNode(child, null, true, 0);
             }
             String top = (summary.getTopCommand() == null) ? "" : nameOf(summary.getTopCommand());
             boardMeta.setText("<html>" + formatted("Designer.force.board.meta", escape(top),
@@ -428,20 +431,34 @@ public final class ForcePage {
         return children;
     }
 
-    private void addNode(ForceDescriptor node, @Nullable ForceDescriptor formation, boolean ancestorsIncluded) {
+    /**
+     * Adds a node's row and, unless it is collapsed, its children's rows below it, each indented one step further than
+     * its parent so the board reads as the chain of command.
+     *
+     * @param depth how many echelons sit above the node on the board, {@code 0} for the top formation
+     */
+    private void addNode(ForceDescriptor node, @Nullable ForceDescriptor formation, boolean ancestorsIncluded,
+          int depth) {
         boolean included = ancestorsIncluded && node.isIncluded();
         List<ForceDescriptor> children = childrenOf(node);
+        int childDepth = depth;
         if (node.getEntity() != null) {
-            boardRows.add(leftAligned(unitRow(node, formation, included)));
+            boardRows.add(leftAligned(unitRow(node, formation, included, depth)));
         } else if (!children.isEmpty()) {
-            boardRows.add(leftAligned(formationRow(node, included)));
+            boardRows.add(leftAligned(formationRow(node, included, depth)));
             if (collapsed.contains(node)) {
                 return;
             }
+            childDepth = depth + 1;
         }
         for (ForceDescriptor child : children) {
-            addNode(child, node, included);
+            addNode(child, node, included, childDepth);
         }
+    }
+
+    /** @return the left padding of a board row at the given depth, before GUI scaling */
+    private static int indentFor(int depth) {
+        return BOARD_ROW_PADDING + (depth * BOARD_INDENT);
     }
 
     private String nameOf(ForceDescriptor formation) {
@@ -449,7 +466,7 @@ public final class ForcePage {
         return ((preview != null) && !preview.isBlank()) ? preview : formation.parseName();
     }
 
-    private JComponent formationRow(ForceDescriptor node, boolean included) {
+    private JComponent formationRow(ForceDescriptor node, boolean included, int depth) {
         Tally tally = new Tally();
         tally.add(node, true);
         boolean isCollapsed = collapsed.contains(node);
@@ -468,7 +485,8 @@ public final class ForcePage {
         row.setBackground((node == selected) ? SURFACE : GROUND);
         row.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, DIVIDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), scaleForGUI(5), scaleForGUI(14))));
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(indentFor(depth)), scaleForGUI(5),
+                    scaleForGUI(14))));
         row.add(ring(node, included, false), BorderLayout.WEST);
         row.add(name, BorderLayout.CENTER);
         row.add(stats, BorderLayout.EAST);
@@ -490,7 +508,8 @@ public final class ForcePage {
         return row;
     }
 
-    private JComponent unitRow(ForceDescriptor node, @Nullable ForceDescriptor formation, boolean included) {
+    private JComponent unitRow(ForceDescriptor node, @Nullable ForceDescriptor formation, boolean included,
+          int depth) {
         Entity entity = node.getEntity();
         CrewDescriptor pilot = node.getCo();
         boolean isCommander = (formation != null) && (pilot != null) && (formation.getCo() == pilot);
@@ -539,12 +558,16 @@ public final class ForcePage {
         JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
         row.setOpaque(true);
         row.setBackground(isSelected ? SURFACE : GROUND);
+        // The selection bar sits at the row's indent, beside the unit it marks.
         row.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                    BorderFactory.createEmptyBorder(scaleForGUI(7), scaleForGUI(isSelected ? 9 : 12),
-                          scaleForGUI(7), scaleForGUI(14)))));
+                    BorderFactory.createEmptyBorder(0, scaleForGUI(depth * BOARD_INDENT), 0, 0),
+                    BorderFactory.createCompoundBorder(
+                          BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                          BorderFactory.createEmptyBorder(scaleForGUI(7),
+                                scaleForGUI(BOARD_ROW_PADDING - (isSelected ? 3 : 0)), scaleForGUI(7),
+                                scaleForGUI(14))))));
         row.add(ring(node, included, isCommander), BorderLayout.WEST);
         row.add(text, BorderLayout.CENTER);
         row.add(figures, BorderLayout.EAST);
