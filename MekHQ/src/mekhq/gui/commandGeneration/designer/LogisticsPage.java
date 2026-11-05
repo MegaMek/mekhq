@@ -225,6 +225,13 @@ public final class LogisticsPage {
                 graphics.setColor(BORDER);
                 graphics.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
             }
+
+            // Follows the row's current height: the big month count is only filled in on the first refresh, so a
+            // cap taken now would be too short and the column would take the difference out of the ledger below.
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Short.MAX_VALUE, getPreferredSize().height);
+            }
         };
         monthsRow.setOpaque(false);
         monthsRow.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(12),
@@ -233,7 +240,6 @@ public final class LogisticsPage {
         addRows(trackColumn, monthTrack);
         monthsRow.add(monthsBig, BorderLayout.WEST);
         monthsRow.add(trackColumn, BorderLayout.CENTER);
-        monthsRow.setMaximumSize(new Dimension(Short.MAX_VALUE, monthsRow.getPreferredSize().height));
 
         // Three even columns, one per decision: where the cash comes from, what the build is charged, and what
         // happens if that leaves too little.
