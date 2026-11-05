@@ -1729,6 +1729,18 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // Tab backgrounds are not reset by a theme change, so recolor an active Command Center nag for the new theme
+        if (logNagActive && (tabMain != null) && (commandCenterTab != null)) {
+            int commandCenterIndex = tabMain.indexOfComponent(commandCenterTab);
+            if (commandCenterIndex >= 0) {
+                tabMain.setBackgroundAt(commandCenterIndex, UIUtil.uiDarkBlue());
+            }
+        }
+    }
+
     /**
      * Checks if the user should be prompted (nagged) to view the daily log and highlights the Command Center tab if
      * needed.

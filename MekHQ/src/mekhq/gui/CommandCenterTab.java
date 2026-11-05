@@ -794,6 +794,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // Tab backgrounds are not reset by a theme change, so recolor active nags for the new theme
+        if (tabLogs != null) {
+            for (DailyReportType type : DailyReportType.values()) {
+                if (isLogNagActive(type)) {
+                    nagLogTab(type);
+                }
+            }
+        }
+    }
+
     /**
      * Initialize the panel for displaying procurement information
      */
