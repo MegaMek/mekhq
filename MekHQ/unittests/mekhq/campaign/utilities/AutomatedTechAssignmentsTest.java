@@ -41,12 +41,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
@@ -508,6 +513,87 @@ class AutomatedTechAssignmentsTest {
         assertNotNull(highest.getTech(), "Highest battle value should be offered a tech first");
         assertNotNull(middle.getTech());
         assertNull(lowest.getTech(), "Lowest battle value should be the one left over");
+    }
+
+    @Test
+    void constructor_withOrderSupplied_offersUnitsInThatOrderInstead() {
+        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        wireSetTechToUpdateTechUnits(lowest);
+        wireSetTechToUpdateTechUnits(middle);
+        wireSetTechToUpdateTechUnits(highest);
+
+        Comparator<Unit> lowestBattleValueFirst =
+              Comparator.comparingInt(unit -> unit.getEntity().calculateBattleValue());
+
+        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
+              new ArrayList<>(List.of(lowest, middle, highest)), lowestBattleValueFirst);
+
+        assertNotNull(lowest.getTech(), "Caller order puts the lowest battle value first");
+        assertNotNull(middle.getTech());
+        assertNull(highest.getTech(), "Highest battle value is the one left over under the caller's order");
+    }
+
+    @Test
+    void constructor_withNullOrder_behavesLikeTheTwoArgumentConstructor() {
+        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        wireSetTechToUpdateTechUnits(lowest);
+        wireSetTechToUpdateTechUnits(middle);
+        wireSetTechToUpdateTechUnits(highest);
+
+        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
+              new ArrayList<>(List.of(lowest, middle, highest)), null);
+
+        assertNotNull(highest.getTech());
+        assertNotNull(middle.getTech());
+        assertNull(lowest.getTech());
+    }
+
+    // --- Caller-supplied rules (the seam the Crew Assignment dialog uses to stage instead of assign) ---
+
+    @Test
+    void constructor_withRulesSupplied_actsOnChoicesThroughThem_andOffersATechTurnedAwayTheNextUnit() {
+        Unit first = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        Unit second = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Person picky = mekTech();
+        stubTechLevel(picky, 9);
+        Person other = mekTech();
+        Map<Person, Integer> counts = new HashMap<>();
+
+        AutomatedTechAssignments.Rules rules = new AutomatedTechAssignments.Rules() {
+            @Override
+            public boolean needsTech(Unit unit) {
+                return true;
+            }
+
+            @Override
+            public int unitCount(Person tech) {
+                return counts.getOrDefault(tech, 0);
+            }
+
+            @Override
+            public boolean canTakeOn(Person tech, Unit unit) {
+                return (tech != picky) || (unit != first);
+            }
+
+            @Override
+            public void assign(Unit unit, Person tech) {
+                counts.merge(tech, 1, Integer::sum);
+            }
+        };
+
+        AutomatedTechAssignments assignments = new AutomatedTechAssignments(new ArrayList<>(List.of(picky, other)),
+              List.of(first, second), null, rules);
+
+        // The better tech is turned away from the first unit, so it goes to the other; the better tech takes the next
+        assertEquals(List.of(new AutomatedTechAssignments.Assignment(first, other),
+              new AutomatedTechAssignments.Assignment(second, picky)), assignments.getAssignments());
+        // The rules acted on the choices, so the units themselves were never changed
+        verify(first, never()).setTech(any());
+        verify(second, never()).setTech(any());
     }
 
     /** A Mek tech with an empty workload, eligible for the Mek bucket. */

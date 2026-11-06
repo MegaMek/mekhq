@@ -7126,15 +7126,37 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean canTakeNavigator() {
-        return entity instanceof Jumpship && !(entity instanceof SpaceStation) && (navigator == null);
+        return hasNavigatorSeat() && (navigator == null);
+    }
+
+    /**
+     * @return {@code true} if this unit has a navigator seat, filled or not: a JumpShip or WarShip, but not a space
+     *       station
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasNavigatorSeat() {
+        return entity instanceof Jumpship && !(entity instanceof SpaceStation);
     }
 
     public boolean canTakeTechOfficer() {
-        return (techOfficer == null) && (entity.getCrew().getCrewType().getTechPos() >= 0
-                                               // Use techOfficer field for secondary commander
-                                               ||
-                                               (entity instanceof Tank &&
-                                                      entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
+        return (techOfficer == null) && hasTechOfficerSeat();
+    }
+
+    /**
+     * Whether this unit has a seat held in the {@code techOfficer} field, filled or not. That is a cockpit tech
+     * officer position, or, on a vehicle with a working command console, the console's secondary commander.
+     *
+     * @return {@code true} if this unit has a tech officer or console commander seat
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasTechOfficerSeat() {
+        return (entity.getCrew().getCrewType().getTechPos() >= 0)
+                     // Use techOfficer field for secondary commander
+                     || ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE));
     }
 
     public boolean canTakeTech() {
@@ -7502,7 +7524,8 @@ public class Unit implements ITechnology, ILocatable {
             return;
         }
         ensurePersonIsRegistered(person);
-        final boolean hadFreeSeat = hasFreeSeatFor(getDriverRole());
+        final PersonnelRole seatRole = getDriverRole();
+        final boolean hadFreeSeat = hasFreeSeatFor(seatRole);
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
         if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
@@ -7510,8 +7533,10 @@ public class Unit implements ITechnology, ILocatable {
         }
         person.setUnit(this);
 
-        // Replace one temp crew member only if the real Person took a seat that was already filled
-        releaseTempCrewForAssignedRole(person.getPrimaryRole(), hadFreeSeat);
+        // Replace one temp crew member only if the real Person took a seat that was already filled. The temp crew
+        // released are those of the seat, not of the person's primary role: someone who serves here through their
+        // secondary role still replaces one of this unit's temp crew.
+        releaseTempCrewForAssignedRole(seatRole, hadFreeSeat);
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());

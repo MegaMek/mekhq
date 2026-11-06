@@ -111,7 +111,6 @@ import mekhq.campaign.parts.RefitPartOrders;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.BombUnloader;
@@ -139,12 +138,12 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
 import mekhq.gui.menus.AssignUnitToForceMenu;
-import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.menus.TransportAssignmentMenus;
@@ -189,8 +188,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_EDIT_REPAIR_LOG = "EDIT_REPAIR_LOG";
 
     public static final String COMMAND_HIRE_FULL = "HIRE_FULL";
-    public static final String COMMAND_FILL_TEMP_CREW = "FILL_TEMP_CREW";
-    public static final String COMMAND_REMOVE_TEMP_CREW = "REMOVE_TEMP_CREW";
     public static final String COMMAND_DISBAND = "DISBAND";
     public static final String COMMAND_SELL = "SELL";
     public static final String COMMAND_LOSS = "LOSS";
@@ -538,58 +535,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               person.getPrimaryRole(),
                               skillLevel,
                               checkVeterancyEligibility);
-                    }
-                }
-            }
-        } else if (command.equals(COMMAND_FILL_TEMP_CREW)) {
-            // Only works on single selected unit
-            if (units.length == 1) {
-                Unit unit = units[0];
-                int currentCrew = unit.getActiveCrew().size();
-                int fullCrew = unit.getFullCrewSize();
-
-                // Can't add temp crew if no real Person exists
-                if (currentCrew == 0) {
-                    return;
-                }
-
-                // Maximum temp crew for this unit is (fullCrewSize - currentCrew)
-                // This ensures the unit is at full strength
-                int maxTempCrewForUnit = fullCrew - currentCrew;
-
-                // Determine the appropriate crew role for this unit
-                PersonnelRole crewRole = unit.getDriverRole();
-
-                if (crewRole != null) {
-                    mekhq.campaign.Campaign campaign = gui.getCampaign();
-                    if (campaign.getPlayerForce()
-                              .getHumanResources()
-                              .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())) {
-                        int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
-                        int needed = maxTempCrewForUnit - currentTempCrew;
-
-                        if (needed > 0) {
-                            // Check available pool for this crew type
-                            Campaign campaign1 = gui.getCampaign();
-                            int availableInPool = campaign1.getPlayerForce()
-                                                        .getHumanResources()
-                                                        .getAvailableTempCrewPool(campaign1, crewRole);
-                            int toAssign = Math.min(needed, availableInPool);
-
-                            if (toAssign > 0) {
-                                unit.setTempCrew(crewRole, currentTempCrew + toAssign);
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (command.equals(COMMAND_REMOVE_TEMP_CREW)) {
-            // Remove all temp crew from selected unit(s)
-            for (Unit unit : units) {
-                // Clear all temp crew by iterating through all personnel roles
-                for (PersonnelRole role : PersonnelRole.values()) {
-                    if (unit.getTempCrewByPersonnelRole(role) > 0) {
-                        unit.setTempCrew(role, 0);
                     }
                 }
             }
@@ -1130,7 +1075,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
+            menuItem = new JMenuItem(resources.getString("crewAssignment.text"));
+            menuItem.setToolTipText(resources.getString("crewAssignment.toolTipText"));
+            menuItem.addActionListener(evt -> CrewAssignmentDialog.showFor(gui.getFrame(), gui.getCampaign(),
+                  List.of(units), List.of()));
+            popup.add(menuItem);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
@@ -1312,55 +1261,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
-            }
-
-            // fill with temp crew (blob crew)
-            if (oneSelected && canUnitUseTempCrew(unit)) {
-                int currentCrew = unit.getActiveCrew().size();
-                int currentTempCrew = unit.getTotalTempCrew();
-                int fullCrew = unit.getFullCrewSize();
-
-                // Determine why filling might not be possible
-                String fillDisabledReason = null;
-                if (currentCrew == 0) {
-                    fillDisabledReason = getText("tempCrew.fillWithTempCrew.noCommander");
-                } else if (currentCrew + currentTempCrew >= fullCrew) {
-                    fillDisabledReason = getText("tempCrew.fillWithTempCrew.atFullStrength");
-                } else {
-                    PersonnelRole crewRole = unit.getDriverRole();
-                    mekhq.campaign.Campaign campaign = gui.getCampaign();
-                    Campaign campaign1 = gui.getCampaign();
-                    boolean hasPool = crewRole != null
-                                            &&
-                                            campaign.getPlayerForce()
-                                                  .getHumanResources()
-                                                  .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())
-                                            &&
-                                            campaign1.getPlayerForce()
-                                                  .getHumanResources()
-                                                  .getAvailableTempCrewPool(campaign1, crewRole) > 0;
-                    if (!hasPool) {
-                        fillDisabledReason = getText("tempCrew.fillWithTempCrew.noPoolAvailable");
-                    }
-                }
-
-                menuItem = new JMenuItem(getText("tempCrew.fillWithTempCrew"));
-                menuItem.setActionCommand(COMMAND_FILL_TEMP_CREW);
-                menuItem.addActionListener(this);
-                if (fillDisabledReason != null) {
-                    menuItem.setEnabled(false);
-                    menuItem.setToolTipText(fillDisabledReason);
-                }
-                popup.add(menuItem);
-
-                menuItem = new JMenuItem(getText("tempCrew.removeTempCrew"));
-                menuItem.setActionCommand(COMMAND_REMOVE_TEMP_CREW);
-                menuItem.addActionListener(this);
-                if (currentTempCrew == 0) {
-                    menuItem.setEnabled(false);
-                    menuItem.setToolTipText(getText("tempCrew.removeTempCrew.noTempCrew"));
-                }
-                popup.add(menuItem);
             }
 
             if (Stream.of(units).allMatch(u -> u.getCamouflage().equals(units[0].getCamouflage()))) {
@@ -1646,50 +1546,4 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         MekSummaryCache.refreshUnitData(false);
     }
 
-    /**
-     * Determines if the specified unit can use temporary crew based on its type and campaign settings.
-     *
-     * @param unit the unit to check
-     *
-     * @return true if the unit can use temp crew, false otherwise
-     */
-    private boolean canUnitUseTempCrew(Unit unit) {
-        if (unit == null || unit.getEntity() == null) {
-            return false;
-        }
-
-        PersonnelRole driverRole = unit.getDriverRole();
-        PersonnelRole gunnerRole = unit.getGunnerRole();
-
-        // Check if driver role is enabled
-        if (driverRole != null) {
-            mekhq.campaign.Campaign campaign = gui.getCampaign();
-            if (campaign.getPlayerForce()
-                      .getHumanResources()
-                      .isBlobCrewEnabled(driverRole, campaign.getCampaignOptions())) {
-                return true;
-            }
-        }
-
-        // Check if gunner role is enabled (and different from driver)
-        if (gunnerRole != null && !gunnerRole.equals(driverRole)) {
-            mekhq.campaign.Campaign campaign = gui.getCampaign();
-            if (campaign.getPlayerForce()
-                      .getHumanResources()
-                      .isBlobCrewEnabled(gunnerRole, campaign.getCampaignOptions())) {
-                return true;
-            }
-        }
-
-        // For vessels, also check vessel crew
-        if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
-            mekhq.campaign.Campaign campaign = gui.getCampaign();
-            return campaign.getPlayerForce()
-                         .getHumanResources()
-                         .isBlobCrewEnabled(mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_CREW,
-                               campaign.getCampaignOptions());
-        }
-
-        return false;
-    }
 }
