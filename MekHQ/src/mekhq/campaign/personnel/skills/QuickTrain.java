@@ -194,7 +194,55 @@ public class QuickTrain {
         }
     }
 
-    static boolean isInTrainingFormation(Person person, Campaign campaign) {
+    /**
+     * Works out which skills Quick Train would level for a person, in the order it would level them: their role
+     * skills, then any optional skills the options turn on, weakest first. Only skills the person already has are
+     * returned, apart from role skills they lack, which come first.
+     *
+     * <p>This is the skill choice {@link #processQuickTraining} makes, without spending anything, so other trainers
+     * (such as the Training Console's auto-train) level the same skills.</p>
+     *
+     * @param campaign the campaign, for its skill and procurement options
+     * @param person   the person to train
+     * @param options  which optional skills to include
+     *
+     * @return the skills to train, in training order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<String> getTargetSkills(Campaign campaign, Person person, QuickTrainOptions options) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        List<String> targetSkills = new ArrayList<>();
+        SkillModifierData skillModifierData = person.getSkillModifierData(
+              campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(), true);
+        processSkills(person,
+              campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION),
+              campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION),
+              campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION),
+              campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY),
+              options.isLevelArtillery(),
+              campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY),
+              campaignOptions.isUseStratCon() && options.isLevelScoutingSkills(),
+              options.isLevelEscapeSkills(),
+              campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL),
+              campaignOptions.get(CampaignOption.ACQUISITION_PERSONNEL_CATEGORY),
+              options.isLevelLeadership(),
+              options.isLevelTraining(),
+              options.isLevelOtherCommandSkills(),
+              targetSkills,
+              skillModifierData);
+        return targetSkills;
+    }
+
+    /**
+     * @param person   a person
+     * @param campaign the campaign
+     *
+     * @return {@code true} if the person's unit is in a formation, or under a formation, whose combat role is training
+     */
+    public static boolean isInTrainingFormation(Person person, Campaign campaign) {
         Formation formation = campaign.getPlayerForce().getFormationFor(person.getUnit());
         if (formation == null) {
             return false;
@@ -442,13 +490,14 @@ public class QuickTrain {
             }
         }
 
-        // Sort the skills by their total skill level (lowest -> highest)
+        // Sort the skills by their trained level (lowest -> highest), as the Training Console's auto-train does;
+        // attributes and other modifiers don't change which skill is the weakest
         targetSkills.sort(
               Comparator.comparingInt(skillName -> {
                   Skill skill = person.getSkill(skillName);
                   return (skill == null) // The character doesn't have this skill
                                ? Integer.MIN_VALUE // Unknown skills should always be trained first
-                               : skill.getTotalSkillLevel(skillModifierData);
+                               : skill.getLevel();
               })
         );
     }

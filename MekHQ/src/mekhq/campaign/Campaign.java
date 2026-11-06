@@ -219,6 +219,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.training.TrainingPresets;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
@@ -343,6 +344,7 @@ public class Campaign implements ITechManager {
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private Roleplay roleplay = new Roleplay();
+    private TrainingPresets trainingPresets = new TrainingPresets();
     private CampaignGUI gui;
 
     private AbstractUnitMarket unitMarket;
@@ -4082,6 +4084,8 @@ public class Campaign implements ITechManager {
 
         roleplay.writeToXML(writer, indent);
 
+        trainingPresets.writeToXML(writer, indent);
+
         // the formations structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Formation
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "formations");
@@ -5500,6 +5504,17 @@ public class Campaign implements ITechManager {
 
     public void setRoleplay(final Roleplay roleplay) {
         this.roleplay = roleplay;
+    }
+
+    /**
+     * @return the campaign's saved auto-train presets, used by the Training Console and run monthly if marked to
+     */
+    public TrainingPresets getTrainingPresets() {
+        return trainingPresets;
+    }
+
+    public void setTrainingPresets(final TrainingPresets trainingPresets) {
+        this.trainingPresets = trainingPresets;
     }
 
     /**
