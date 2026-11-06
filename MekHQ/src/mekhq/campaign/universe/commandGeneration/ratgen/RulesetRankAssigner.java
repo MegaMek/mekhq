@@ -798,8 +798,10 @@ public final class RulesetRankAssigner {
      *
      * <p>Which band a role sits in follows real practice rather than canon, because canon does not
      * define separate medical or technical rank ladders - factions publish one ladder and MekHQ renders
-     * it through each profession's column. Physicians and administrators are commissioned and sit in
-     * the officer band; technicians and medics are enlisted and top out at the senior NCO ranks.</p>
+     * it through each profession's column. Physicians are commissioned and sit in the officer band;
+     * technicians and medics are enlisted and top out at the senior NCO ranks. Administrators are all
+     * Corporals whatever their skill; the chief administrator is raised above them by the appointment
+     * pass.</p>
      *
      * <p>Commissioned staff top out at Captain. Rank follows position rather than competence: mapping
      * skill straight onto seniority made every doctor in a command generated at Veteran a Major, and
@@ -828,18 +830,19 @@ public final class RulesetRankAssigner {
         if ((faction != null) && (faction.isComStarOrWoB() || faction.isClan())) {
             return supportRankForFaction(faction);
         }
+        if (role == PersonnelRole.ADMINISTRATOR) {
+            return RANK_CORPORAL;
+        }
         return isCommissionedSupportRole(role) ? commissionedRank(skill) : enlistedSupportRank(skill);
     }
 
     /**
-     * Whether a support role is commissioned. Physicians and administrators hold commissions in the
-     * services this ladder is modelled on; technicians, astechs and medics do not.
+     * Whether a support role is commissioned. Physicians hold commissions in the services this ladder is
+     * modelled on; technicians, astechs and medics do not. Administrators are handled before this, as a
+     * flat Corporal.
      */
     private static boolean isCommissionedSupportRole(PersonnelRole role) {
-        return switch (role) {
-            case DOCTOR, ADMINISTRATOR -> true;
-            default -> false;
-        };
+        return role == PersonnelRole.DOCTOR;
     }
 
     private static int commissionedRank(SkillLevel skill) {
