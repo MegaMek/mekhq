@@ -91,6 +91,8 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -239,6 +241,7 @@ class CamOpsSalvageResolutionTest {
         private final AbstractContract contract = mock(AbstractContract.class);
         private final Scenario scenario = mock(Scenario.class);
         private final List<Unit> addedUnits = new ArrayList<>();
+        private final List<Part> addedUnitParts = new ArrayList<>();
         // Salvage delivered on the day it is resolved is present; salvage still in transit is not
         private boolean isAddedUnitPresent = true;
 
@@ -255,6 +258,7 @@ class CamOpsSalvageResolutionTest {
                 Unit unit = mock(Unit.class);
                 when(unit.getEntity()).thenReturn(entity);
                 when(unit.isPresent()).thenReturn(isAddedUnitPresent);
+                when(unit.getParts()).thenReturn(addedUnitParts);
                 addedUnits.add(unit);
                 return unit;
             });
@@ -339,6 +343,32 @@ class CamOpsSalvageResolutionTest {
             resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
 
             verify(wreck.getEntity(), never()).setCamouflage(any());
+        }
+
+        @Test
+        void salvageQualityIsKeptByDefault() {
+            Part part = mock(Part.class);
+            addedUnitParts.add(part);
+
+            resolve(new CappedSalvageSettlement(0.5), List.of(wreck(1000)), List.of(), List.of());
+
+            verify(part, never()).reduceQuality();
+        }
+
+        @Test
+        void salvageQualityIsReducedWhenEnabled() {
+            options.set(CampaignOption.IS_REDUCE_SALVAGE_QUALITY, true);
+            Part part = mock(Part.class);
+            Part otherPart = mock(Part.class);
+            MissingPart missingPart = mock(MissingPart.class);
+            addedUnitParts.addAll(List.of(part, otherPart, missingPart));
+
+            resolve(new CappedSalvageSettlement(0.5), List.of(wreck(1000)), List.of(), List.of());
+
+            verify(part).reduceQuality();
+            verify(otherPart).reduceQuality();
+            // Missing parts have no quality to reduce
+            verify(missingPart, never()).reduceQuality();
         }
 
         @Test
