@@ -50,6 +50,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -179,6 +180,7 @@ public class AutomatedTechAssignments {
     private List<Person> techMechanic;
 
     private final Rules rules;
+    private final @Nullable Comparator<Unit> unitPriorityOrder;
 
     final private List<String> reports = new ArrayList<>();
 
@@ -459,10 +461,18 @@ public class AutomatedTechAssignments {
      * @since 0.50.11
      */
     private void sortUnitBuckets() {
-        sortByBattleValue(unmaintainedMeks);
-        sortByBattleValue(unmaintainedAero);
-        sortByBattleValue(unmaintainedBattleArmor);
-        sortByBattleValue(unmaintainedVehicle);
+        sortUnitBucket(unmaintainedMeks);
+        sortUnitBucket(unmaintainedAero);
+        sortUnitBucket(unmaintainedBattleArmor);
+        sortUnitBucket(unmaintainedVehicle);
+    }
+
+    private void sortUnitBucket(List<Unit> units) {
+        if (unitPriorityOrder == null) {
+            sortByBattleValue(units);
+        } else {
+            units.sort(unitPriorityOrder);
+        }
     }
 
     /**
