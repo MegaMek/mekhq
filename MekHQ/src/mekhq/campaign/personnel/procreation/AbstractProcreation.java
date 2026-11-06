@@ -781,7 +781,9 @@ public abstract class AbstractProcreation {
                 return;
             }
 
-            if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) && !person.isBlockMaternityLeave()) {
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_MATERNITY_LEAVE) &&
+                      !person.isBlockMaternityLeave() &&
+                      !isStartingSimulation) {
                 if (!person.isBusy()
                           && person.getStatus().isActive()
                           && person.getNonPermanentInjurySeverity() == 0

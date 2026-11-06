@@ -66,6 +66,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -923,6 +924,34 @@ public class AbstractProcreationTest {
         when(mockPerson.getStatus()).thenReturn(status);
 
         mockProcreation.processNewWeek(mockCampaign, today, mockPerson);
+
+        verify(mockPerson, never()).changeStatus(any(), any(), any());
+    }
+
+    /**
+     * Regression test for issue 10851: during a new command's starting simulation, a mother due on or before the
+     * campaign's date gives birth within the simulated history, so her leave would be over before play begins. Sending
+     * her on leave anyway stripped her unit and tech assignments, which the birth never restored.
+     *
+     * @param weeksFromCampaignStart the due date relative to the campaign's date: before it, or on it
+     */
+    @ParameterizedTest
+    @ValueSource(ints = { -10, 0 })
+    public void testProcessNewWeek_StartingSimulationSkipsLeaveEndingBeforeCampaignStart(int weeksFromCampaignStart) {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any(), anyBoolean());
+        when(mockCampaignOptions.get(CampaignOption.USE_MATERNITY_LEAVE)).thenReturn(true);
+
+        final LocalDate campaignStart = LocalDate.ofYearDay(3025, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(campaignStart);
+        final LocalDate dueDate = campaignStart.plusWeeks(weeksFromCampaignStart);
+        final LocalDate simulatedWeek = dueDate.minusWeeks(10);
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(dueDate);
+        lenient().when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        mockProcreation.processNewWeek(mockCampaign, simulatedWeek, mockPerson, true);
 
         verify(mockPerson, never()).changeStatus(any(), any(), any());
     }
