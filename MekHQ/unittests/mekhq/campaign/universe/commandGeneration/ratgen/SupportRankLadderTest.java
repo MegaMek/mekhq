@@ -51,8 +51,8 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
-import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Verifies the skill-linked rank ladder for generated support staff.
@@ -127,9 +127,17 @@ class SupportRankLadderTest {
     }
 
     @Test
-    void administratorsAreCommissionedAndTechniciansAreNot() {
-        assertTrue(rankFor(PersonnelRole.ADMINISTRATOR, SkillLevel.REGULAR) >= Rank.RO_MIN,
-              "administrators should be commissioned");
+    void administratorsAreCorporalsWhateverTheirSkill() {
+        // Administrators are all Corporals; the chief administrator is raised above them by the appointment pass.
+        for (SkillLevel skill : new SkillLevel[] { SkillLevel.GREEN, SkillLevel.REGULAR, SkillLevel.VETERAN,
+                                                   SkillLevel.ELITE, SkillLevel.LEGENDARY }) {
+            assertEquals(8, rankFor(PersonnelRole.ADMINISTRATOR, skill), skill + " administrators should be Corporals");
+        }
+        assertEquals(8, rankFor(PersonnelRole.ADMINISTRATOR, null), "an administrator with no level is a Corporal");
+    }
+
+    @Test
+    void techniciansStayEnlisted() {
         for (PersonnelRole role : new PersonnelRole[] { PersonnelRole.MEK_TECH, PersonnelRole.MECHANIC,
                                                         PersonnelRole.AERO_TEK, PersonnelRole.BA_TECH,
                                                         PersonnelRole.ASTECH, PersonnelRole.MEDIC }) {
