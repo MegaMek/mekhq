@@ -98,7 +98,7 @@ class SkillTrainingCostsTest {
         campaign = mockCampaign();
         campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
-        // Skills outside the role are Roleplay skills, which are free by default; price them so they can be tested
+        // Price Utility and Roleplay skills alike so their category-specific calculations are easy to compare.
         campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getLocalDate()).thenReturn(TODAY);
@@ -170,14 +170,14 @@ class SkillTrainingCostsTest {
             assertEquals(supportPoints(200), cost(personWithSkillAt(3), false));
         }
 
-        /** A combat or support skill outside the person's roles is priced as a Roleplay skill. */
+        /** A combat or support skill outside the person's roles is priced as a Utility skill. */
         @Test
-        void combatSkillsOutsideTheRoleArePricedAsRoleplaySkills() {
+        void combatSkillsOutsideTheRoleArePricedAsUtilitySkills() {
             when(skillType.isUtilitySkill()).thenReturn(false);
             when(skillType.isRoleplaySkill()).thenReturn(false);
             campaignOptions.set(CampaignOption.PROFESSION_SKILL_TRAINING_COST_MULTIPLIER, 5.0);
-            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 5.0);
-            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.25);
 
             // Regular to Veteran: 200 x 0.5
             assertEquals(supportPoints(100), cost(personWithSkillAt(3), false));
@@ -229,7 +229,8 @@ class SkillTrainingCostsTest {
         }
 
         @Test
-        void combatSkillsOutsideTheRoleAreFreeWhenRoleplaySkillsAre() {
+        void roleplaySkillsOutsideTheRoleAreFreeWhenRoleplayCostsAreZero() {
+            when(skillType.isRoleplaySkill()).thenReturn(true);
             campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.0);
 
             assertEquals(Money.zero(), cost(personWithSkillAt(3), false));
@@ -374,6 +375,7 @@ class SkillTrainingCostsTest {
         @ParameterizedTest
         @CsvSource({ "0, 0", "2, 0", "3, 100", "4, 300", "5, 1000", "6, 2200", "7, 3400", "12, 3400" })
         void skillsOutsideTheRoleAddUpEveryLevelReachedAsRoleplaySkills(int level, int expectedSupportPoints) {
+            when(skillType.isRoleplaySkill()).thenReturn(true);
             holdsSkills(SkillType.S_TACTICS, String.valueOf(level));
 
             assertEquals(supportPoints(expectedSupportPoints), accumulated(SkillTrainingCategory.ROLEPLAY));
@@ -417,6 +419,7 @@ class SkillTrainingCostsTest {
         @Test
         void everySkillIsSummedIntoItsCategory() {
             // Veteran role skill (300) + Elite off-role skill (1000) + Green skill (0)
+            when(skillType.isRoleplaySkill()).thenReturn(true);
             holdsSkills(SkillType.S_GUN_MEK, "4", SkillType.S_TACTICS, "5", SkillType.S_LEADER, "2");
 
             assertEquals(supportPoints(300), accumulated(SkillTrainingCategory.PROFESSION));
@@ -477,10 +480,11 @@ class SkillTrainingCostsTest {
             return person;
         }
 
-        /** Price Roleplay skills below profession skills, so the two can be told apart. */
+        /** Price Utility and Roleplay skills below profession skills, so the categories can be told apart. */
         @BeforeEach
-        void halveRoleplayCosts() {
-            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+        void lowerNonProfessionCosts() {
+            campaignOptions.set(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 0.25);
         }
 
         @Test
@@ -500,7 +504,7 @@ class SkillTrainingCostsTest {
         }
 
         @Test
-        void skillOutsideBothRolesIsNotAProfessionSkill() {
+        void skillOutsideBothRolesUsesUtilityPricing() {
             Person person = mekWarrior(PersonnelRole.MEKWARRIOR, PersonnelRole.NONE, SkillType.S_TACTICS);
 
             assertEquals(supportPoints(100),
