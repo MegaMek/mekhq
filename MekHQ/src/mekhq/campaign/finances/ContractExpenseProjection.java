@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
@@ -179,6 +180,54 @@ public final class ContractExpenseProjection {
      */
     public static Money getMonthlyTransitFood(Campaign campaign) {
         return Accountant.getMonthlyFoodAndHousingExpenses(campaign, getPersonnel(campaign), false, null, List.of());
+    }
+
+    /**
+     * The force's running costs in an average month off contract, where it stands now: salaries, unit maintenance,
+     * overhead, food and housing, and Hot Spots upkeep. Each is only included while the campaign actually charges it,
+     * as {@link mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationPay} does for the costs
+     * Base Pay covers; unlike Base Pay, overhead and food and housing are included, as no contract is paying them
+     * back.
+     *
+     * <p>Maintenance is projected off contract and not travelling (see
+     * {@link Maintenance#getProjectedDailyMaintenanceCost}). Food and housing are charged where the force is; with no
+     * location, only food is counted.</p>
+     *
+     * @param campaign the campaign
+     *
+     * @return the projected monthly running costs, in C-bills
+     *
+     * @since 0.51.01
+     */
+    public static Money getMonthlyOffContractExpenses(Campaign campaign) {
+        Accountant accountant = campaign.getAccountant();
+
+        // Gated on PAY_FOR_SALARIES inside the Accountant
+        Money expenses = accountant.getPayRoll();
+
+        if (campaign.getCampaignOptions().isChargingMaintenance()) {
+            Money dailyMaintenance = Money.zero();
+            for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+                dailyMaintenance = dailyMaintenance.plus(Maintenance.getProjectedDailyMaintenanceCost(campaign,
+                      unit,
+                      false,
+                      false,
+                      false));
+            }
+            expenses = expenses.plus(dailyMaintenance.multipliedBy(DAYS_PER_MONTH));
+        }
+
+        // Each of these is zero unless its option is enabled
+        expenses = expenses.plus(accountant.getOverheadExpenses());
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        expenses = expenses.plus((location == null)
+                                       ? getMonthlyTransitFood(campaign)
+                                       : Accountant.getMonthlyFoodAndHousingExpenses(campaign,
+                                             getPersonnel(campaign),
+                                             location));
+        expenses = expenses.plus(accountant.getHotSpotsUpkeepCosts());
+
+        return expenses;
     }
 
     private static List<Person> getPersonnel(Campaign campaign) {

@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.commandGeneration.contents;
+package mekhq.gui.commandGeneration.designer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,7 +44,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab.SparesCategory;
+import mekhq.gui.commandGeneration.designer.LogisticsPage.SparesCategory;
 import org.junit.jupiter.api.Test;
 
 /**
