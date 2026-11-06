@@ -2723,7 +2723,8 @@ public class StratConContractInitializer {
                   Formation.FORMATION_NONE,
                   coords,
                   template,
-                  null);
+                  null,
+                  true);
 
             if (scenario != null) {
                 if (facility != null) {
