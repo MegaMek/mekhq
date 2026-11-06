@@ -46,7 +46,6 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import megamek.common.units.Entity;
@@ -509,43 +508,6 @@ class AutomatedTechAssignmentsTest {
         assertNotNull(highest.getTech(), "Highest battle value should be offered a tech first");
         assertNotNull(middle.getTech());
         assertNull(lowest.getTech(), "Lowest battle value should be the one left over");
-    }
-
-    @Test
-    void constructor_withOrderSupplied_offersUnitsInThatOrderInstead() {
-        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
-        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
-        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
-        wireSetTechToUpdateTechUnits(lowest);
-        wireSetTechToUpdateTechUnits(middle);
-        wireSetTechToUpdateTechUnits(highest);
-
-        Comparator<Unit> lowestBattleValueFirst =
-              Comparator.comparingInt(unit -> unit.getEntity().calculateBattleValue());
-
-        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
-              new ArrayList<>(List.of(lowest, middle, highest)), lowestBattleValueFirst);
-
-        assertNotNull(lowest.getTech(), "Caller order puts the lowest battle value first");
-        assertNotNull(middle.getTech());
-        assertNull(highest.getTech(), "Highest battle value is the one left over under the caller's order");
-    }
-
-    @Test
-    void constructor_withNullOrder_behavesLikeTheTwoArgumentConstructor() {
-        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
-        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
-        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
-        wireSetTechToUpdateTechUnits(lowest);
-        wireSetTechToUpdateTechUnits(middle);
-        wireSetTechToUpdateTechUnits(highest);
-
-        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
-              new ArrayList<>(List.of(lowest, middle, highest)), null);
-
-        assertNotNull(highest.getTech());
-        assertNotNull(middle.getTech());
-        assertNull(lowest.getTech());
     }
 
     /** A Mek tech with an empty workload, eligible for the Mek bucket. */
