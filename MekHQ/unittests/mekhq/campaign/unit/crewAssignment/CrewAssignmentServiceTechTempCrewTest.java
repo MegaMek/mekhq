@@ -149,6 +149,8 @@ class CrewAssignmentServiceTechTempCrewTest {
         PartsScenario scenario = PartsScenario.create();
         Campaign campaign = scenario.getCampaign();
         Unit vehicle = scenario.withUnit(UnitFixture.VEDETTE_MEDIUM_TANK);
+        vehicle.getEntity().setWeight(70); // A 70-ton tank requires five crew.
+        assertEquals(5, vehicle.getFullCrewSize());
         PersonnelRole role = PersonnelRole.VEHICLE_CREW_GROUND;
         Person existing = new Person("Existing", "Crew", campaign);
         existing.setPrimaryRoleDirect(role);
