@@ -76,6 +76,8 @@ public record ForceQuartermaster(Campaign campaign) {
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
+        /** No roll can reach this person's target number on this planet, so no contact roll was made. */
+        OutOfReach,
         Success
     }
 
