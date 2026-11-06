@@ -2107,7 +2107,7 @@ public class ContractEditorDialog extends JDialog {
      */
     private static JSpinner scaleSpinner(double exactScale, boolean useFractionalScale) {
         if (!useFractionalScale) {
-            return intSpinner(ChaosContractDeterminationScale.roundUpScale(exactScale), 1);
+            return intSpinner(ChaosContractDeterminationScale.roundScale(exactScale), 1);
         }
 
         double minimumScale = ChaosContractDeterminationScale.MINIMUM_FRACTIONAL_SCALE;

@@ -760,12 +760,12 @@ public abstract class AbstractContract {
     }
 
     /**
-     * @return the contract's Scale rounded up to a whole number, as Hot Spots: Draconis Reach uses it. Anything Scale
-     *       counts (facilities, track rolls, negotiation steps, support points) reads this, whatever the
-     *       {@link CampaignOption#USE_FRACTIONAL_SCALE} option says.
+     * @return the contract's Scale rounded to the nearest whole number. Anything Scale counts (facilities, track rolls,
+     *       negotiation steps, support points) reads this, whatever the {@link CampaignOption#USE_FRACTIONAL_SCALE}
+     *       option says.
      */
     public int getScale() {
-        return ChaosContractDeterminationScale.roundUpScale(intensityData.scale());
+        return ChaosContractDeterminationScale.roundScale(intensityData.scale());
     }
 
     /**

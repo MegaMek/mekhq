@@ -186,8 +186,9 @@ public class ContractDebriefStatistics {
      * <ul>
      *   <li>ending the contract <em>early</em> is a {@link MissionStatus#BREACH} unless StratCon allows the early end -
      *   otherwise its terms were abandoned before they were fulfilled, however well the fighting went;</li>
-     *   <li>otherwise, meeting the target is a {@link MissionStatus#SUCCESS} - a Complete Success - so long as no
-     *   strategic objective was failed; with one failed, it is only a {@link MissionStatus#PARTIAL};</li>
+     *   <li>otherwise, meeting the target is a {@link MissionStatus#SUCCESS} - a Perfect Success - so long as no
+     *   strategic objective was failed and, where the contract had strategic objectives, at least one was secured; with
+     *   one failed, or with objectives present but none secured, it is only a {@link MissionStatus#PARTIAL};</li>
      *   <li>falling short, whether at term or after an allowed early end, is a {@link MissionStatus#PARTIAL} where
      *   there was some progress (a positive score or at least one strategic objective secured), otherwise a
      *   {@link MissionStatus#FAILED}.</li>
@@ -215,8 +216,10 @@ public class ContractDebriefStatistics {
         }
 
         if (meetsTarget) {
-            // A failed strategic objective - a lapsed Deployment Order, say - costs the contract its Complete Success.
-            return (objectivesFailed > 0) ? MissionStatus.PARTIAL : MissionStatus.SUCCESS;
+            // A failed strategic objective - a lapsed Deployment Order, say - costs the contract its Perfect Success, as
+            // does meeting the victory point target without securing any of the contract's strategic objectives.
+            boolean missedPerfectSuccess = (objectivesFailed > 0) || isMissingCompletedStrategicObjective();
+            return missedPerfectSuccess ? MissionStatus.PARTIAL : MissionStatus.SUCCESS;
         }
 
         boolean anyProgress = (contractScore > 0) || (hasStratConObjectives && (objectivesCompleted > 0));
@@ -263,6 +266,20 @@ public class ContractDebriefStatistics {
 
     public boolean hasStratConObjectives() {
         return hasStratConObjectives;
+    }
+
+    /**
+     * Whether the contract had strategic objectives but secured none of them, which keeps it from a Perfect Success
+     * however many victory points were earned.
+     *
+     * <p>A contract that never had a strategic objective - any contract in StratCon mapless mode, or a contract type
+     * such as a Retainer whose objectives depend on what happens to spawn - is not held to this rule: its outcome
+     * should reflect how the player performed, not settings or contract type.</p>
+     *
+     * @return {@code true} if at least one strategic objective existed and none was secured
+     */
+    public boolean isMissingCompletedStrategicObjective() {
+        return hasStratConObjectives && (objectivesCompleted == 0);
     }
 
     public int getObjectivesCompleted() {

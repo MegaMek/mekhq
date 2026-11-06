@@ -87,7 +87,6 @@ class SkillTrainingCostsTest {
     private SkillType skillType;
     private Campaign campaign;
     private CampaignOptions campaignOptions;
-    private SkillModifierData skillModifierData;
 
     @BeforeEach
     void setUp() {
@@ -102,8 +101,6 @@ class SkillTrainingCostsTest {
         campaignOptions.set(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER, 1.0);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getLocalDate()).thenReturn(TODAY);
-
-        skillModifierData = mock(SkillModifierData.class);
     }
 
     @AfterEach
@@ -121,9 +118,10 @@ class SkillTrainingCostsTest {
         return ladder;
     }
 
-    private Person personWithSkillAt(int totalLevel) {
+    /** @return a person with the skill trained to this level; improvement costs follow the trained level alone */
+    private Person personWithSkillAt(int trainedLevel) {
         Skill skill = mock(Skill.class);
-        when(skill.getTotalSkillLevel(any())).thenReturn(totalLevel);
+        when(skill.getLevel()).thenReturn(trainedLevel);
         Person person = mock(Person.class);
         when(person.getSkill(SKILL_NAME)).thenReturn(skill);
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.NONE);
@@ -132,8 +130,7 @@ class SkillTrainingCostsTest {
     }
 
     private Money cost(Person person, boolean isRoleSkill) {
-        return SkillTrainingCosts.getSkillImprovementCost(campaign, person, SKILL_NAME, isRoleSkill,
-              skillModifierData);
+        return SkillTrainingCosts.getSkillImprovementCost(campaign, person, SKILL_NAME, isRoleSkill);
     }
 
     private static Money supportPoints(int supportPoints) {
@@ -306,18 +303,21 @@ class SkillTrainingCostsTest {
 
     @Nested
     class SkillModifiers {
-        /** The experience level shown to the player includes modifiers, so pricing must use the total level. */
+        /**
+         * Attributes, abilities, injuries and other modifiers change how well the person uses the skill, not what
+         * training it costs, so pricing follows the trained level alone.
+         */
         @Test
-        void totalSkillLevelIsPricedNotTheBaseLevel() {
+        void trainedLevelIsPricedNotTheTotalLevel() {
             Skill skill = mock(Skill.class);
-            when(skill.getLevel()).thenReturn(1);
-            when(skill.getTotalSkillLevel(skillModifierData)).thenReturn(3);
+            when(skill.getLevel()).thenReturn(3);
+            when(skill.getTotalSkillLevel(any())).thenReturn(1);
             Person person = mock(Person.class);
             when(person.getSkill(SKILL_NAME)).thenReturn(skill);
 
-            // Total 3 -> 4 is Regular to Veteran
+            // Trained 3 -> 4 is Regular to Veteran; the total level would have been free
             assertEquals(supportPoints(200), cost(person, false));
-            verify(skill).getTotalSkillLevel(skillModifierData);
+            verify(skill, never()).getTotalSkillLevel(any());
         }
     }
 
@@ -472,7 +472,7 @@ class SkillTrainingCostsTest {
     class RoleDetection {
         private Person mekWarrior(PersonnelRole primaryRole, PersonnelRole secondaryRole, String skillName) {
             Skill skill = mock(Skill.class);
-            when(skill.getTotalSkillLevel(any())).thenReturn(3);
+            when(skill.getLevel()).thenReturn(3);
             Person person = mock(Person.class);
             when(person.getSkill(skillName)).thenReturn(skill);
             when(person.getPrimaryRole()).thenReturn(primaryRole);
@@ -574,6 +574,33 @@ class SkillTrainingCostsTest {
 
             assertTrue(SkillTrainingCosts.payForSkillImprovement(campaign, person, SKILL_NAME, Money.of(1_234)));
             verify(finances).debit(eq(TransactionType.EDUCATION), eq(TODAY), eq(Money.of(1_234)), anyString());
+        }
+    }
+
+    /**
+     * The level-based overload, which the Training Console uses to price improvements that are staged but not yet
+     * applied, must price exactly as the person-based one does.
+     */
+    @Nested
+    class LevelBasedPricing {
+        @ParameterizedTest
+        @CsvSource({ "2, true", "3, true", "4, true", "5, false", "6, false" })
+        void matchesThePersonBasedPrice(int currentLevel, boolean isRoleSkill) {
+            assertEquals(cost(personWithSkillAt(currentLevel), isRoleSkill),
+                  SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, isRoleSkill, currentLevel));
+        }
+
+        @Test
+        void learningASkillIsFree() {
+            assertEquals(Money.zero(), SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, true,
+                  -1));
+        }
+
+        @Test
+        void freeWhenTheOptionIsOff() {
+            campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, false);
+            assertEquals(Money.zero(), SkillTrainingCosts.getSkillImprovementCost(campaignOptions, skillType, true,
+                  3));
         }
     }
 }

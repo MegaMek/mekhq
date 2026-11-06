@@ -82,14 +82,12 @@ import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.tables.MHQTable;
-import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.FamilyTreeDialog;
-import mekhq.gui.dialog.QuickTrainDialog;
+import mekhq.gui.dialog.trainingConsole.TrainingConsole;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
@@ -286,35 +284,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
-        // Action buttons: Quick, and Mass training
-        RoundedJButton btnQuickTrain = new RoundedJButton(resourceMap.getString("btnQuickTrain.text"));
-        btnQuickTrain.setToolTipText(resourceMap.getString("btnQuickTrain.toolTipText"));
-        btnQuickTrain.addActionListener(e -> {
-            List<Person> selectedPersons = getSelectedPersons();
-            QuickTrain.QuickTrainOptions options = QuickTrain.QuickTrainOptions.buildQuickTrainOptions(
-                  getCampaignOptions());
-            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty(), options);
-            if (!dialog.isCancel()) {
-                int targetSkillLevel = dialog.getSpinnerValue();
-                options = dialog.getSelectedOptions();
-
-                QuickTrain.processQuickTraining(selectedPersons,
-                      targetSkillLevel,
-                      getCampaign(),
-                      options,
-                      dialog.isContinuousTraining());
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(btnQuickTrain, gridBagConstraints);
-
         btnFamilyTree = new RoundedJButton(resourceMap.getString("btnFamilyTree.text"));
         btnFamilyTree.setToolTipText(resourceMap.getString("btnFamilyTree.toolTipText"));
         btnFamilyTree.setEnabled(false);
@@ -337,9 +306,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(btnFamilyTree, gridBagConstraints);
 
-        RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
-        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
-        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        // The Training Console: every way to spend XP, for any number of people, with the selection carried in
+        RoundedJButton btnTrainingConsole = new RoundedJButton(resourceMap.getString("btnTrainingConsole.text"));
+        btnTrainingConsole.setToolTipText(resourceMap.getString("btnTrainingConsole.toolTipText"));
+        btnTrainingConsole.addActionListener(e -> TrainingConsole.showFor(getFrame(), getCampaign(),
+              getSelectedPersons()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 9;
         gridBagConstraints.gridy = 0;
@@ -348,7 +319,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(btnMassTraining, gridBagConstraints);
+        add(btnTrainingConsole, gridBagConstraints);
 
         personnelTable = new MHQTable<>(new PersonnelTableModel(getCampaign()));
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

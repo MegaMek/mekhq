@@ -461,7 +461,11 @@ public class Systems {
                      || normalized.equals("connector_systems");      // ... at the path root
     }
 
-    private void cleanupSystems() {
+    /**
+     * Drops systems with unusable data and indexes the rest by location, so nearby-system lookups can find them.
+     * {@link #load(String)} alone does neither. Package-private so test registries can index what they load.
+     */
+    void cleanupSystems() {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {

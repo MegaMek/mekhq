@@ -1160,6 +1160,11 @@ public class CampaignNewDayManager {
                   quickTrainOptions,
                   true);
         }
+
+        // Auto-train presets the player marked to run at the start of each month, in the Training Console
+        if (today.getDayOfMonth() == 1) {
+            campaign.getTrainingPresets().runMonthly(campaign);
+        }
     }
 
     /**

@@ -243,8 +243,6 @@ ext {
     // MekHQ runs MegaMek's client and its 3D board in this JVM, so these match MegaMek's mmJvmOptions.
     mhqJvmOptions = [
             '-Xmx4096m',
-            '-XX:+UseZGC',
-            '-XX:+ZGenerational',
             '--add-opens',
             'java.base/java.util=ALL-UNNAMED',
             '--add-opens',

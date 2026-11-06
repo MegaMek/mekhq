@@ -415,7 +415,7 @@ class ContractXmlCodecTest {
         AbstractContract reloaded = reparse(write(contract));
 
         assertEquals(3.456789, reloaded.getExactScale(), 1e-12);
-        assertEquals(4, reloaded.getScale(), "the rules-as-written Scale still rounds up");
+        assertEquals(3, reloaded.getScale(), "the whole Scale still rounds to the nearest whole number");
     }
 
     @Test
