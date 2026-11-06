@@ -52,7 +52,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -61,6 +65,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations.DiseaseScanResult;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -70,6 +76,7 @@ public class InoculationsTest {
     private static final String DISEASE_NAME = "Test Disease";
     private static final String CURE_KEY = "test_cure";
     private static final String PLANET_ID = "Test Planet";
+    private static final String SYSTEM_ID = "Test System";
 
     @Test
     @DisplayName("Permanent disease carriers do not contribute their disease to the unit-wide spread set")
@@ -306,10 +313,76 @@ public class InoculationsTest {
               "Combatants and civilians assigned as crew or tech should be classified as military");
     }
 
+    @Test
+    @DisplayName("Enabling diseases on-planet grants the same coverage as a paid program, galaxy-wide cures included")
+    void inoculateAllForNewlyEnabledDiseases_onPlanetIncludesGalaxyWideCures() {
+        Planet planet = planet();
+        AbstractLocation location = mock(AbstractLocation.class);
+        when(location.isOnPlanet()).thenReturn(true);
+        when(location.getPlanet()).thenReturn(planet);
+        Person person = mock(Person.class);
+        Campaign campaign = campaignAt(location, person);
+        InjuryType cure = cure();
+
+        try (MockedStatic<MedicalLogger> ignored = mockStatic(MedicalLogger.class);
+              MockedStatic<CanonicalDiseaseType> canonicalDiseaseType = mockStatic(CanonicalDiseaseType.class)) {
+            // Non-strict lookups include diseases that are not tied to any specific system
+            canonicalDiseaseType.when(() -> CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures(SYSTEM_ID,
+                  TODAY, false)).thenReturn(Set.of(cure));
+
+            Inoculations.inoculateAllForNewlyEnabledDiseases(campaign);
+
+            verify(person).addPlanetaryInoculation(PLANET_ID);
+            verify(person).addCanonDiseaseInoculation(CURE_KEY);
+        }
+    }
+
+    @Test
+    @DisplayName("Enabling diseases in transit still inoculates personnel for their origin planet")
+    void inoculateAllForNewlyEnabledDiseases_inTransitInoculatesOriginOnly() {
+        Planet origin = planet();
+        AbstractLocation location = mock(AbstractLocation.class);
+        when(location.isOnPlanet()).thenReturn(false);
+        Person person = mock(Person.class);
+        when(person.getOriginPlanet()).thenReturn(origin);
+        Campaign campaign = campaignAt(location, person);
+
+        try (MockedStatic<MedicalLogger> ignored = mockStatic(MedicalLogger.class)) {
+            Inoculations.inoculateAllForNewlyEnabledDiseases(campaign);
+
+            verify(person).addPlanetaryInoculation(PLANET_ID);
+            verify(location, never()).getPlanet();
+        }
+    }
+
     private static Campaign campaign() {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(TODAY);
         return campaign;
+    }
+
+    private static Campaign campaignAt(AbstractLocation location, Person... personnel) {
+        Detachment detachment = mock(Detachment.class);
+        when(detachment.getCurrentLocation()).thenReturn(location);
+        ForceHumanResources humanResources = mock(ForceHumanResources.class);
+        when(humanResources.getPersonnel()).thenReturn(List.of(personnel));
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(playerForce.getForceDetachment()).thenReturn(detachment);
+        when(playerForce.getHumanResources()).thenReturn(humanResources);
+
+        Campaign campaign = campaign();
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        return campaign;
+    }
+
+    private static Planet planet() {
+        PlanetarySystem system = mock(PlanetarySystem.class);
+        when(system.getId()).thenReturn(SYSTEM_ID);
+        Planet planet = mock(Planet.class);
+        when(planet.getId()).thenReturn(PLANET_ID);
+        when(planet.getName(TODAY)).thenReturn(PLANET_ID);
+        when(planet.getParentSystem()).thenReturn(system);
+        return planet;
     }
 
     private static Injury injury(InjuryType type, InjurySubType subType, boolean permanent) {

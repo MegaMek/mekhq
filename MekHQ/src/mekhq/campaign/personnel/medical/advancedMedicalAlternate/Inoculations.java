@@ -248,6 +248,54 @@ public class Inoculations {
         inoculatePersonnel(today, personnel, currentPlanet);
     }
 
+    /**
+     * Inoculates all campaign personnel when Random Diseases is switched on in a campaign that previously ran without
+     * it. No cost is charged.
+     *
+     * <p>The current planet (if the campaign is not in transit) receives the same coverage as a paid vaccination
+     * program, including any galaxy-wide canonical diseases with an available cure. Otherwise, personnel would be left
+     * exposed to diseases the infirmary would immediately tell the player to vaccinate against.</p>
+     *
+     * <p>Personnel are also assumed to hold prior inoculations for their origin planet.</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.02
+     */
+    public static void inoculateAllForNewlyEnabledDiseases(Campaign campaign) {
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        LocalDate today = campaign.getLocalDate();
+        Set<Person> personnel = new HashSet<>(campaign.getPlayerForce().getHumanResources().getPersonnel());
+
+        if (location != null && location.isOnPlanet()) {
+            inoculatePersonnel(today, personnel, location.getPlanet());
+        }
+
+        Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
+        for (Person person : personnel) {
+            Planet origin = person.getOriginPlanet();
+            if (origin == null) {
+                continue;
+            }
+
+            String originId = origin.getId();
+            if (!person.hasPlanetaryInoculation(originId)) {
+                person.addPlanetaryInoculation(originId);
+                MedicalLogger.inoculation(person, today, origin.getName(today));
+            }
+
+            Set<InjuryType> originCures = curesBySystem.computeIfAbsent(origin.getParentSystem().getId(),
+                  systemId -> getAllSystemSpecificDiseasesWithCures(systemId, today, true));
+            for (InjuryType injuryType : originCures) {
+                if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
+                    person.addCanonDiseaseInoculation(injuryType.getKey());
+                    MedicalLogger.specificInoculation(person, today, injuryType.getSimpleName());
+                }
+            }
+        }
+    }
+
     static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
           Collection<Person> allPersonnel,
           Map<String, Set<Person>> civilianPersonnelInNeedOfCanonInoculation,
