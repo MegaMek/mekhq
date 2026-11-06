@@ -109,10 +109,12 @@ import megamek.common.loaders.EntitySavingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.options.BasicOption;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Crew;
@@ -388,6 +390,14 @@ public class Campaign implements ITechManager {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
     private static final String ACTION_CHECK_BUNDLE = "mekhq.resources.ActionCheck";
     private static final String TERRA_ID = "Terra";
+
+    /**
+     * MegaMek options that every scenario launched from MekHQ uses, whatever the campaign's own game options say. They
+     * are applied only to the copy sent to the server by {@link #getGameOptionsVector()}, never to the stored options.
+     */
+    private static final Map<String, Object> FORCED_SCENARIO_GAME_OPTIONS = Map.of(
+          OptionsConstants.ALLOWED_ALLOW_ILLEGAL_UNITS, true,
+          OptionsConstants.BASE_EXCLUSIVE_DB_DEPLOYMENT, false);
 
     /**
      * This is used to determine if the player has an active AtB Contract, and is recalculated on load
@@ -5357,7 +5367,9 @@ public class Campaign implements ITechManager {
             IOptionGroup group = i.nextElement();
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
                 IOption option = j.nextElement();
-                options.add(option);
+                Object forcedValue = FORCED_SCENARIO_GAME_OPTIONS.get(option.getName());
+                // Send a copy for forced options so the campaign's stored game options are left untouched
+                options.add((forcedValue == null) ? option : new BasicOption(option.getName(), forcedValue));
             }
         }
         return options;
