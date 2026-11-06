@@ -36,9 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,10 +52,13 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 class CampaignPresetTest {
     private String originalUserDirectory;
@@ -170,6 +175,58 @@ class CampaignPresetTest {
         assertEquals(73, source.getCampaignOptions().get(CampaignOption.PERCENT_FEMALE));
         assertEquals(42, source.getRandomSkillPreferences().getOverallRecruitBonus());
         assertEquals(sourceTarget, source.getSkills().get(skillName).getTarget());
+    }
+
+    /**
+     * An empty {@code <gameOptions/>} must not become a full set of default options, or applying the preset would
+     * reset every MegaMek option the player has set.
+     */
+    @Test
+    void parseFromXML_emptyGameOptionsElementMeansNoGameOptions() throws Exception {
+        final CampaignPreset preset = parsePreset("<gameOptions/>");
+
+        assertNotNull(preset);
+        assertNull(preset.getGameOptions());
+    }
+
+    @Test
+    void parseFromXML_whitespaceOnlyGameOptionsElementMeansNoGameOptions() throws Exception {
+        final CampaignPreset preset = parsePreset("<gameOptions>\n    </gameOptions>");
+
+        assertNotNull(preset);
+        assertNull(preset.getGameOptions());
+    }
+
+    @Test
+    void parseFromXML_missingGameOptionsElementMeansNoGameOptions() throws Exception {
+        final CampaignPreset preset = parsePreset("");
+
+        assertNotNull(preset);
+        assertNull(preset.getGameOptions());
+    }
+
+    @Test
+    void parseFromXML_populatedGameOptionsElementIsLoaded() throws Exception {
+        final CampaignPreset preset = parsePreset("""
+              <gameOptions>
+                  <gameOption>
+                      <name>%s</name>
+                      <value>true</value>
+                  </gameOption>
+              </gameOptions>
+              """.formatted(OptionsConstants.RPG_COMBAT_SUITS));
+
+        assertNotNull(preset);
+        assertNotNull(preset.getGameOptions());
+        assertTrue(preset.getGameOptions().booleanOption(OptionsConstants.RPG_COMBAT_SUITS));
+    }
+
+    private static CampaignPreset parsePreset(final String body) throws Exception {
+        final String xml = "<campaignPreset><title>Parse Test</title>" + body + "</campaignPreset>";
+        final Element element = MHQXMLUtility.newSafeDocumentBuilder()
+                                      .parse(new InputSource(new StringReader(xml)))
+                                      .getDocumentElement();
+        return CampaignPreset.parseFromXML(element.getChildNodes(), MHQConstants.VERSION);
     }
 
     private static CampaignPreset createPopulatedPreset() {
