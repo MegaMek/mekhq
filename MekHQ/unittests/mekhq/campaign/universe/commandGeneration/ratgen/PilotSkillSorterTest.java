@@ -35,6 +35,8 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.util.Set;
+
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -74,7 +76,8 @@ class PilotSkillSorterTest {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setAssignMostSkilledToPrimaryLances(true);
 
-        int moved = PilotSkillSorter.apply(campaign, options);
+        int moved = PilotSkillSorter.apply(campaign, options,
+              Set.of(firstSeat.getId(), secondSeat.getId(), thirdSeat.getId()));
 
         assertEquals(2, moved, "the veteran and the green pilot swap seats");
         assertSame(veteran, firstSeat.getCommander());
@@ -98,7 +101,8 @@ class PilotSkillSorterTest {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setAssignMostSkilledToPrimaryLances(true);
 
-        int moved = PilotSkillSorter.apply(campaign, options);
+        int moved = PilotSkillSorter.apply(campaign, options,
+              Set.of(lamSeat.getId(), mekSeat.getId(), secondLanceSeat.getId()));
 
         assertEquals(2, moved, "only the two MekWarriors swap; the LAM is sorted on its own");
         assertSame(lamPilot, lamSeat.getCommander(), "a LAM seat is never handed to a MekWarrior");
@@ -118,10 +122,29 @@ class PilotSkillSorterTest {
         CommandGenerationOptions off = new CommandGenerationOptions();
         off.setAssignMostSkilledToPrimaryLances(false);
 
-        int moved = PilotSkillSorter.apply(campaign, off);
+        int moved = PilotSkillSorter.apply(campaign, off, Set.of(firstSeat.getId(), secondSeat.getId()));
 
         assertEquals(0, moved);
         assertSame(green, firstSeat.getCommander());
+    }
+
+    @Test
+    void pilotsOfUnitsTheBuildDidNotCreateStayPut() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation existingLance = lance(campaign, "Existing Lance");
+        Formation builtLance = lance(campaign, "Built Lance");
+        Unit existingSeat = mekIn(campaign, existingLance);
+        Unit builtSeat = mekIn(campaign, builtLance);
+        Person existingGreen = pilot(campaign, existingSeat, 1);
+        Person builtVeteran = pilot(campaign, builtSeat, 5);
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        options.setAssignMostSkilledToPrimaryLances(true);
+
+        int moved = PilotSkillSorter.apply(campaign, options, Set.of(builtSeat.getId()));
+
+        assertEquals(0, moved, "a pilot the campaign already had is not traded into the new command");
+        assertSame(existingGreen, existingSeat.getCommander());
+        assertSame(builtVeteran, builtSeat.getCommander());
     }
 
     private static Formation lance(Campaign campaign, String name) {
