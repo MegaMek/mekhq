@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link ChaosContractDeterminationScale#generateScaleForDetachment}. Scale is the detachment's combat Battle
- * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded up. Only STANDARD formations in a combat
- * role count.
+ * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded to the nearest whole number. Only
+ * STANDARD formations in a combat role count.
  */
 class ChaosContractDeterminationScaleTest {
     private static final double DELTA = 1e-9;
@@ -84,7 +84,7 @@ class ChaosContractDeterminationScaleTest {
     }
 
     private int scaleFor(final Unit... units) {
-        return ChaosContractDeterminationScale.roundUpScale(exactScaleFor(units));
+        return ChaosContractDeterminationScale.roundScale(exactScaleFor(units));
     }
 
     private double exactScaleFor(final Unit... units) {
@@ -94,11 +94,14 @@ class ChaosContractDeterminationScaleTest {
     }
 
     @Test
-    void battleValueIsDividedByThePerScaleFigureAndRoundedUp() {
+    void battleValueIsDividedByThePerScaleFigureAndRoundedToTheNearestScale() {
         assertEquals(1, scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE)),
               "exactly one scale's worth of BV is one scale");
-        assertEquals(2, scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + 1)),
-              "one BV over the boundary rounds up to the next scale");
+        assertEquals(1, scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + 1)),
+              "one BV over the boundary rounds down to the same scale");
+        assertEquals(2,
+              scaleFor(unit(1, CombatRole.MANEUVER, true, BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2))),
+              "half a scale's worth of BV over the boundary rounds up to the next scale");
         assertEquals(1, scaleFor(unit(1, CombatRole.MANEUVER, true, 100)),
               "any positive combat BV is at least one scale");
     }
@@ -111,9 +114,11 @@ class ChaosContractDeterminationScaleTest {
     }
 
     @Test
-    void oneBattleValueOverABoundaryStillRoundsUpAfterCleaning() {
+    void oneBattleValueUnderTheHalfwayPointStillRoundsDownAfterCleaning() {
         // 1 BV in 20,500 is 0.0000488 of a Scale - the precision cleaning must not swallow it
-        assertEquals(3, scaleFor(unit(1, CombatRole.MANEUVER, true, (BATTLE_VALUE_PER_SCALE * 2) + 1)));
+        int halfwayBattleValue = (BATTLE_VALUE_PER_SCALE * 2) + (BATTLE_VALUE_PER_SCALE / 2);
+        assertEquals(2, scaleFor(unit(1, CombatRole.MANEUVER, true, halfwayBattleValue - 1)));
+        assertEquals(3, scaleFor(unit(1, CombatRole.MANEUVER, true, halfwayBattleValue)));
     }
 
     @Test
@@ -139,16 +144,24 @@ class ChaosContractDeterminationScaleTest {
     }
 
     @Test
-    void roundUpScaleRoundsPartScalesUpButLeavesWholeScales() {
-        assertEquals(3, ChaosContractDeterminationScale.roundUpScale(2.01));
-        assertEquals(2, ChaosContractDeterminationScale.roundUpScale(2.0));
-        assertEquals(2, ChaosContractDeterminationScale.roundUpScale(2.0000000001),
-              "floating-point noise must not round a whole Scale up a point");
+    void roundScaleRoundsPartScalesToTheNearestWholeScale() {
+        assertEquals(2, ChaosContractDeterminationScale.roundScale(2.02));
+        assertEquals(2, ChaosContractDeterminationScale.roundScale(2.49));
+        assertEquals(3, ChaosContractDeterminationScale.roundScale(2.5));
+        assertEquals(2, ChaosContractDeterminationScale.roundScale(2.0));
+        assertEquals(2, ChaosContractDeterminationScale.roundScale(2.0000000001),
+              "floating-point noise must not move a whole Scale");
+    }
+
+    @Test
+    void roundScaleIsAtLeastOneForAnyForce() {
+        assertEquals(1, ChaosContractDeterminationScale.roundScale(0.2));
+        assertEquals(0, ChaosContractDeterminationScale.roundScale(0.0), "no force at all is still Scale 0");
     }
 
     @Test
     void economicScaleIsWholeWithoutFractionalScale() {
-        assertEquals(3.0, ChaosContractDeterminationScale.getEconomicScale(2.3, false), DELTA);
+        assertEquals(2.0, ChaosContractDeterminationScale.getEconomicScale(2.3, false), DELTA);
     }
 
     @Test
@@ -172,6 +185,6 @@ class ChaosContractDeterminationScaleTest {
 
     @Test
     void scaleIsDisplayedAsAWholeNumberWithoutFractionalScale() {
-        assertEquals("4", ChaosContractDeterminationScale.formatScale(3.456789, false));
+        assertEquals("3", ChaosContractDeterminationScale.formatScale(3.456789, false));
     }
 }

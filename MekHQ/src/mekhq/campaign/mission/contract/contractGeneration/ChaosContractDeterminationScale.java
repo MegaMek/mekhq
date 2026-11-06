@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import static java.lang.Math.ceil;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.lang.ref.WeakReference;
@@ -177,8 +176,8 @@ public class ChaosContractDeterminationScale {
     }
 
     /**
-     * Converts a Battle Value total into exact, unrounded Scale. Rules as written round it up; see
-     * {@link #roundUpScale(double)}.
+     * Converts a Battle Value total into exact, unrounded Scale. It is rounded to a whole Scale by
+     * {@link #roundScale(double)}.
      *
      * @param battleValue                       the Battle Value to convert
      * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
@@ -200,7 +199,7 @@ public class ChaosContractDeterminationScale {
     }
 
     /**
-     * Strips floating-point noise from an exact Scale, so a value that should be whole is not rounded up a full point.
+     * Strips floating-point noise from an exact Scale, so a value that should be whole is not rounded a full point.
      *
      * @param exactScale the exact Scale
      *
@@ -214,17 +213,19 @@ public class ChaosContractDeterminationScale {
     }
 
     /**
-     * Rounds an exact Scale up to a whole number, as Hot Spots: Draconis Reach uses it.
+     * Rounds an exact Scale to the nearest whole number. Any force at all is at least Scale 1, while no force at all
+     * stays Scale 0.
      *
      * @param exactScale the exact Scale
      *
-     * @return the Scale rounded up
+     * @return the Scale rounded to the nearest whole number
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int roundUpScale(double exactScale) {
-        return (int) ceil(cleanExactScale(exactScale));
+    public static int roundScale(double exactScale) {
+        double cleanedScale = cleanExactScale(exactScale);
+        return cleanedScale <= 0 ? 0 : Math.max(1, (int) Math.round(cleanedScale));
     }
 
     /**
@@ -246,7 +247,7 @@ public class ChaosContractDeterminationScale {
             double cleanedScale = cleanExactScale(exactScale);
             return cleanedScale <= 0 ? 0 : Math.max(MINIMUM_FRACTIONAL_SCALE, cleanedScale);
         }
-        return roundUpScale(exactScale);
+        return roundScale(exactScale);
     }
 
     /**
@@ -265,6 +266,6 @@ public class ChaosContractDeterminationScale {
         if (useFractionalScale) {
             return new DecimalFormat("0.00").format(getEconomicScale(exactScale, true));
         }
-        return String.valueOf(roundUpScale(exactScale));
+        return String.valueOf(roundScale(exactScale));
     }
 }
