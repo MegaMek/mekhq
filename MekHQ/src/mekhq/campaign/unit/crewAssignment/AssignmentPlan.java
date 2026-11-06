@@ -300,6 +300,15 @@ public class AssignmentPlan {
         return 0;
     }
 
+    private boolean hasOpenSeat(final List<Unit> units, final SeatType type) {
+        for (Unit unit : units) {
+            if (openSeats(unit, type) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param unit the unit
      *
@@ -648,7 +657,7 @@ public class AssignmentPlan {
         final List<Runnable> reverts = new ArrayList<>();
         final List<StagedAssignment> staged = new ArrayList<>();
         for (Person person : people) {
-            if (units.stream().noneMatch(unit -> openSeats(unit, type) > 0)) {
+            if (!hasOpenSeat(units, type)) {
                 break;
             }
             for (Unit unit : units) {

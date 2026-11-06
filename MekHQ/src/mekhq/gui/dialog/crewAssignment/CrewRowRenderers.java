@@ -414,7 +414,7 @@ final class CrewRowRenderers {
             if ((entry.fatigue() != null) && (entry.fatigue() > 0)) {
                 parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.fatigue", entry.fatigue()));
             }
-            condition.setText(String.join("  \u00b7  ", parts));
+            condition.setText(String.join("  |  ", parts));
             condition.setForeground((entry.hits() > 0) ? hitsColor(entry.hits()) :
                                           fatigueColor((entry.fatigue() == null) ? 0 : entry.fatigue()));
 

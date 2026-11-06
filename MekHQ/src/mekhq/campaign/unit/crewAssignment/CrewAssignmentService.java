@@ -137,6 +137,14 @@ public final class CrewAssignmentService {
         // Checked now, before anything changes, as they were staged against the campaign as it is now
         final List<TechProblem> techsSkipped = new ArrayList<>(plan.validateTechs());
         final List<TempCrewProblem> tempCrewSkipped = new ArrayList<>(plan.validateTempCrew());
+        final Set<StagedTech> blockedTechChanges = new HashSet<>();
+        for (TechProblem problem : techsSkipped) {
+            blockedTechChanges.add(problem.change());
+        }
+        final Set<StagedTempCrew> blockedTempCrewChanges = new HashSet<>();
+        for (TempCrewProblem problem : tempCrewSkipped) {
+            blockedTempCrewChanges.add(problem.change());
+        }
 
         // 1. Everyone leaves their old seat first. Only a move to another unit counts as a transfer: leaving a unit
         // altogether is always logged as a removal
@@ -153,7 +161,7 @@ public final class CrewAssignmentService {
         // 2. Temporary crew
         final List<StagedTempCrew> tempCrewApplied = new ArrayList<>();
         for (StagedTempCrew change : plan.tempCrewChanges()) {
-            if (tempCrewSkipped.stream().noneMatch(problem -> problem.change().equals(change))) {
+            if (!blockedTempCrewChanges.contains(change)) {
                 change.after().forEach((role, count) -> change.unit().setTempCrew(role, count));
                 tempCrewApplied.add(change);
             }
@@ -195,7 +203,7 @@ public final class CrewAssignmentService {
         // 4. Techs
         final List<StagedTech> techsApplied = new ArrayList<>();
         for (StagedTech change : plan.techChanges()) {
-            if (techsSkipped.stream().anyMatch(problem -> problem.change().equals(change))) {
+            if (blockedTechChanges.contains(change)) {
                 continue;
             }
             if (applyTech(change)) {

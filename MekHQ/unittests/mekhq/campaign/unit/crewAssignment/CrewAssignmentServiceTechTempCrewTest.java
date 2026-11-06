@@ -44,6 +44,7 @@ import java.util.List;
 
 import megamek.common.units.Infantry;
 import megamek.common.units.Mek;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -51,6 +52,8 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import testUtilities.parts.PartsScenario;
+import testUtilities.parts.UnitFixture;
 
 /** Applying unassignments, tech changes and temporary crew changes with {@link CrewAssignmentService}. */
 class CrewAssignmentServiceTechTempCrewTest {
@@ -139,6 +142,35 @@ class CrewAssignmentServiceTechTempCrewTest {
         order.verify(platoon.unit).remove(leaving, true);
         order.verify(platoon.unit).setTempCrew(PersonnelRole.SOLDIER, 9);
         order.verify(platoon.unit).addPilotOrSoldier(arriving, null, false);
+    }
+
+    @Test
+    void committingArrivalAndTempCrewFillLeavesRealVehicleAtFullStrength() {
+        PartsScenario scenario = PartsScenario.create();
+        Campaign campaign = scenario.getCampaign();
+        Unit vehicle = scenario.withUnit(UnitFixture.VEDETTE_MEDIUM_TANK);
+        PersonnelRole role = PersonnelRole.VEHICLE_CREW_GROUND;
+        Person existing = new Person("Existing", "Crew", campaign);
+        existing.setPrimaryRoleDirect(role);
+        campaign.importPerson(existing);
+        vehicle.addDriver(existing);
+        Person arriving = new Person("Arriving", "Crew", campaign);
+        arriving.setPrimaryRoleDirect(role);
+        campaign.importPerson(arriving);
+        AssignmentPlan realPlan = new AssignmentPlan(false, false);
+
+        assertTrue(realPlan.stage(arriving, vehicle, SeatType.DRIVER));
+        assertEquals(1, realPlan.fillTempCrew(List.of(vehicle), ignored -> 20).staged().size());
+
+        CommitReport report = CrewAssignmentService.commit(realPlan, false, TODAY);
+
+        assertEquals(1, report.applied().size());
+        assertEquals(1, report.tempCrewApplied().size());
+        assertEquals(0, report.tempCrewSkipped().size());
+        assertEquals(2, vehicle.getCrew().size());
+        assertEquals(3, vehicle.getTempCrewByPersonnelRole(role));
+        assertEquals(5, vehicle.getTotalCrewSize());
+        assertTrue(vehicle.isFullyCrewed());
     }
 
     @Test
