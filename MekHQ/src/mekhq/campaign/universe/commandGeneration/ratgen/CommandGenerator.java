@@ -67,6 +67,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
@@ -123,21 +124,20 @@ public final class CommandGenerator {
     /**
      * Result of a generation run: the engine's descriptor tree plus the flat list of {@link Person}s
      * the pipeline created during materialization. The list is used by post-generation steps that
-     * need to iterate every fresh hire — e.g. setting the founder flag, generating callsigns, or
-     * counting combatants for the alt-medical spare-personnel top-up.
+     * count the force's own people - e.g. the medical reserve, which is sized per combat role. Steps
+     * that apply to everyone the build hired (founder flags, callsigns, hiring fees) use
+     * {@link #personsAddedSince} instead, which also catches vehicle and ship crews.
      *
      * @param descriptor       the descriptor tree returned by {@link Ruleset#processRoot}, or
      *                         {@code null} if the engine layer failed
-     * @param generatedPersons every Person added to the campaign by this generation, in the order
-     *                         they were created (leaf order)
+     * @param generatedPersons the combat crews (and, in a single-shot build, the support staff) this
+     *                         generation created, in the order they were created (leaf order)
      * @param spareCosts       the value of the spare parts the build's warehouse stock-up added, for
-     *                         the finance stage's pay-for debits
-     * @param rolledUnitIds    the ids of the units the rolls produced - the combat units and the ships rolled
-     *                         with them - which are the base of the percentage starting cash; what the build
-     *                         adds afterwards (support vehicles, staff carriers, top-up and cargo ships) is not
+     *                         the finance stage's pay-for debits; zero for a combat-only commit, whose
+     *                         caller stocks the warehouse with {@link #completeBuild} after support
      */
     public record Result(@Nullable ForceDescriptor descriptor, List<Person> generatedPersons,
-          SpareCosts spareCosts, Set<UUID> rolledUnitIds) {
+          SpareCosts spareCosts) {
     }
 
     /**
@@ -156,7 +156,7 @@ public final class CommandGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
 
-    /** C-Bills each die is worth when starting cash is rolled rather than taken as a percentage. */
+    /** C-Bills each die is worth when starting cash is rolled rather than taken as months of running costs. */
     private static final int RANDOM_STARTING_CASH_PER_DIE = 1_000_000;
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
@@ -347,9 +347,11 @@ public final class CommandGenerator {
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor forceDescriptor, Ruleset.ProgressListener listener, boolean generateSupport) {
-        // Snapshot the hangar before any unit is created so the starting-cash stage can price only
-        // the units this build adds (see processStartingCash).
+        // Snapshot the hangar and roster before anything is created so the late stages can tell what
+        // this build added: the starting-cash stage prices only its units, and the founder flags go to
+        // only its people.
         Set<UUID> preExistingUnitIds = snapshotHangarUnitIds(campaign);
+        Set<UUID> preExistingPersonIds = snapshotPersonnelIds(campaign);
 
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
@@ -397,11 +399,11 @@ public final class CommandGenerator {
             }
             String entityChassis = entity.getChassis();
             String entityModel = entity.getModel();
-            LOGGER.info("[CompanyGen][Leaf] ENTER chassis='{}' model='{}' unitType={} weight={} parent={} thread={}",
+            LOGGER.debug("[CompanyGen][Leaf] ENTER chassis='{}' model='{}' unitType={} weight={} parent={} thread={}",
                   entityChassis, entityModel, entity.getUnitType(), entity.getWeight(),
                   parentInfo, Thread.currentThread().getName());
 
-            LOGGER.info("[CompanyGen][Leaf][AddUnit] BEFORE campaign.addNewUnit chassis='{}' model='{}'",
+            LOGGER.debug("[CompanyGen][Leaf][AddUnit] BEFORE campaign.addNewUnit chassis='{}' model='{}'",
                   entityChassis, entityModel);
             long addUnitStart = System.nanoTime();
             ScheduledFuture<?> watchdogTask = WATCHDOG.schedule(
@@ -416,7 +418,7 @@ public final class CommandGenerator {
             }
             long afterAddUnitNanos = System.nanoTime();
             long addUnitMs = (afterAddUnitNanos - addUnitStart) / 1_000_000;
-            LOGGER.info("[CompanyGen][Leaf][AddUnit] AFTER campaign.addNewUnit unit={} elapsed={}ms",
+            LOGGER.debug("[CompanyGen][Leaf][AddUnit] AFTER campaign.addNewUnit unit={} elapsed={}ms",
                   unit == null ? "null" : unit.getId(), addUnitMs);
             if (unit == null) {
                 LOGGER.warn("[CompanyGen][Leaf] SKIPPED (addNewUnit failed): chassis='{}' model='{}'",
@@ -425,24 +427,24 @@ public final class CommandGenerator {
                 return;
             }
 
-            LOGGER.info("[CompanyGen][Leaf][CrewAssemble] BEFORE MultiCrewAssembler.assemble unit={} crewDescriptor={}",
+            LOGGER.debug("[CompanyGen][Leaf][CrewAssemble] BEFORE MultiCrewAssembler.assemble unit={} crewDescriptor={}",
                   unit.getId(), leaf.getCo() == null ? "null" : "present");
             long assembleStart = System.nanoTime();
             List<Person> crew = MultiCrewAssembler.assemble(unit, leaf.getCo(), campaign,
                   /* overrideName */ true);
             long afterAssembleNanos = System.nanoTime();
             long assembleMs = (afterAssembleNanos - assembleStart) / 1_000_000;
-            LOGGER.info("[CompanyGen][Leaf][CrewAssemble] AFTER MultiCrewAssembler.assemble crewSize={} elapsed={}ms",
+            LOGGER.debug("[CompanyGen][Leaf][CrewAssemble] AFTER MultiCrewAssembler.assemble crewSize={} elapsed={}ms",
                   crew.size(), assembleMs);
             generatedPersons.addAll(crew);
 
             if (!crew.isEmpty()) {
-                LOGGER.info("[CompanyGen][Leaf][Rank] BEFORE RankAssigner.apply commander='{}'",
+                LOGGER.debug("[CompanyGen][Leaf][Rank] BEFORE RankAssigner.apply commander='{}'",
                       crew.get(0).getFullName());
                 long rankStart = System.nanoTime();
                 RankAssigner.apply(leaf.getCo(), crew.get(0));
                 long rankMs = (System.nanoTime() - rankStart) / 1_000_000;
-                LOGGER.info("[CompanyGen][Leaf][Rank] AFTER RankAssigner.apply elapsed={}ms", rankMs);
+                LOGGER.debug("[CompanyGen][Leaf][Rank] AFTER RankAssigner.apply elapsed={}ms", rankMs);
             }
 
             // Use the canonical Campaign API instead of parent.addUnit(uuid). The bare addUnit(uuid)
@@ -452,7 +454,7 @@ public final class CommandGenerator {
             // unit.setFormationId(id), pushes the assignment through AssignmentLogger, and fires
             // OrganizationChangedEvent — its subscribers (BriefingTab, TOETab) only do
             // ActionScheduler.schedule() which wraps Timer.restart() and is thread-safe.
-            LOGGER.info("[CompanyGen][Leaf] BEFORE addUnitToFormation parent={} unit={}", parentInfo, unit.getId());
+            LOGGER.debug("[CompanyGen][Leaf] BEFORE addUnitToFormation parent={} unit={}", parentInfo, unit.getId());
             // A leaf with no parent formation is a force of one unit with no structure above it. It is
             // filed under the root formation rather than dropped or left to throw.
             Formation targetFormation = parent;
@@ -462,7 +464,7 @@ public final class CommandGenerator {
                 targetFormation = root;
             }
             campaign.getPlayerForce().addUnitToFormation(unit, targetFormation.getId(), campaign);
-            LOGGER.info("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
+            LOGGER.debug("[CompanyGen][Leaf] AFTER addUnitToFormation unit.formationId={}", unit.getFormationId());
             unitsByDescriptor.put(leaf, unit);
             leafCount[0]++;
             long leafTotalMs = (System.nanoTime() - leafStart) / 1_000_000;
@@ -478,14 +480,14 @@ public final class CommandGenerator {
             // would only get one mid-progress update, looking frozen to the user.
             if (listener != null && leafCount[0] % 5 == 0) {
                 long elapsedSec = (System.nanoTime() - stageStartNanos[0]) / 1_000_000_000;
-                LOGGER.info("[CompanyGen][Leaf][Progress] BEFORE listener.updateProgress count={} elapsedSec={}",
+                LOGGER.debug("[CompanyGen][Leaf][Progress] BEFORE listener.updateProgress count={} elapsedSec={}",
                       leafCount[0], elapsedSec);
                 listener.updateProgress(0.0,
                       String.format("Materializing units and crews... (%d created, %ds elapsed)",
                             leafCount[0], elapsedSec));
-                LOGGER.info("[CompanyGen][Leaf][Progress] AFTER listener.updateProgress");
+                LOGGER.debug("[CompanyGen][Leaf][Progress] AFTER listener.updateProgress");
             }
-            LOGGER.info("[CompanyGen][Leaf] EXIT leaf #{} chassis='{}' model='{}' crew={} parent={} totalMs={}",
+            LOGGER.debug("[CompanyGen][Leaf] EXIT leaf #{} chassis='{}' model='{}' crew={} parent={} totalMs={}",
                   leafCount[0], entityChassis, entityModel, crew.size(), parentInfo, leafTotalMs);
         }, (descriptor, formation) -> descriptorsByFormation.put(formation, descriptor));
 
@@ -497,11 +499,6 @@ public final class CommandGenerator {
         // scenario launcher loads it in game.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7a: ship transport assignment");
         ShipTransportAssigner.assign(forceDescriptor, unitsByDescriptor);
-
-        // What the rolls produced, as the starting-cash stage prices it: the Spares and Finances tab shows the
-        // percentage of exactly these units, so the build credits the percentage of exactly these units.
-        Set<UUID> rolledUnitIds = snapshotHangarUnitIds(campaign);
-        rolledUnitIds.removeAll(preExistingUnitIds);
 
         // 7b. Apply layered formation icons to every node in the campaign's Formation tree. Honors
         // the four formation-icon toggles on the options; bails cleanly if generation is disabled
@@ -517,7 +514,7 @@ public final class CommandGenerator {
         // 7b2. The most skilled pilots take the seats in the leading lances, when asked. Before ranks,
         // so the commanders chosen next are chosen from where the pilots will actually sit.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7b2: seating the most skilled pilots in the leading lances");
-        PilotSkillSorter.apply(campaign, options);
+        PilotSkillSorter.apply(campaign, options, unitIdsOf(unitsByDescriptor.values()));
 
         // 7b3. Bloodnames, for the Clan warriors who earn one. Before the ranks, so the picks that follow can
         // put the Bloodnamed in command; the roll carries the force's calibre but no rank bonus, since nobody
@@ -553,18 +550,14 @@ public final class CommandGenerator {
             generatedPersons.addAll(generateSupportFromToe(campaign, options, listener));
         }
 
-        // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
-        // officer, founder flag on every fresh hire (combat + support after the 7e merge above),
-        // and random callsigns for non-Clan MekWarriors (support staff don't have the MEKWARRIOR
-        // primary role so they're naturally skipped). These are pure Person-state mutations with
-        // no algorithmic logic, so they live in the pipeline rather than in a dedicated helper.
-        // Clan campaigns skip callsigns because their warriors carry a bloodname instead, which
-        // assignBloodnames below awards.
-        LOGGER.info("[CompanyGen][Pipeline]Stage 7d: personnel flags");
+        // 7d. Command flags: commander flag on the top-formation officer and the second-in-command below
+        // them. The roster-wide flags (founder, callsigns) wait for the end of the build, when every
+        // person it hires - support staff, vehicle and ship crews included - exists.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7d: command flags");
         if (listener != null) {
             listener.updateProgress(0.0, "Applying personnel flags...");
         }
-        applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
+        applyCommandFlags(campaign, options, generatedPersons, rootCommander);
 
         // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
         // the same reason as bloodnames: implant availability is read off the person's rank.
@@ -594,16 +587,44 @@ public final class CommandGenerator {
         C3NetworkConfigurator.configure(forceDescriptor);
         campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
-        // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
-        // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
-        // user's ongoing stocking policy: each part type's stocking percentage comes from the
-        // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into. Contract
-        // polish remains deferred.
+        // 8-9. The build's tail - temporary crew, spares, cargo lift, roster flags and starting cash -
+        // has to see everything the build adds, support included. The single-shot path has its support by
+        // now; the two-phase Command Designer flow (generateSupport=false) runs the tail itself once its
+        // support phase is done.
+        SpareCosts spareCosts = SpareCosts.zero();
+        if (generateSupport) {
+            spareCosts = completeBuild(campaign, options, listener);
+            List<Person> hired = personsAddedSince(campaign, preExistingPersonIds);
+            applyRosterFlags(campaign, options, hired);
+            processStartingCash(campaign, options, preExistingUnitIds, hired, spareCosts);
+        }
+
+        LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
+        return new Result(forceDescriptor, generatedPersons, spareCosts);
+    }
+
+    /**
+     * The build's tail, run once every unit it creates exists: tops up the temporary crew pools, stocks
+     * the spare-parts warehouse and provisions the cargo lift to haul it. Run after support generation,
+     * so the support vehicles get their spares and the cargo ships are sized for them too.
+     *
+     * @param campaign the campaign being built into
+     * @param options  the generation options, read for the cargo settings
+     * @param listener optional progress listener; may be {@code null}
+     *
+     * @return the value of the spare parts the stock-up added, for the finance stage's pay-for debits
+     */
+    public static SpareCosts completeBuild(Campaign campaign, CommandGenerationOptions options,
+          @Nullable Ruleset.ProgressListener listener) {
         // 7f. Temporary crew. The assembler left the seats of any temporary-crew role empty behind a
         // single named crew member, so the pool has to be topped up to cover them or the generated
         // units arrive undercrewed.
         topUpTemporaryCrewPools(campaign);
 
+        // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
+        // and ongoing auto-logistics rely on, so the starting inventory is consistent with the
+        // user's ongoing stocking policy: each part type's stocking percentage comes from the
+        // CampaignOptions.getAutoLogistics*() values that the Spares tab writes into.
         LOGGER.info("[CompanyGen][Pipeline]Stage 8: spare-parts warehouse stock-up");
         if (listener != null) {
             listener.updateProgress(0.0, "Stocking spare parts warehouse...");
@@ -611,25 +632,57 @@ public final class CommandGenerator {
         SpareCosts spareCosts = stockSpareParts(campaign);
 
         // 8b. Cargo lift. Runs after the warehouse is stocked, because the tonnage the ships have to
-        // haul is exactly what stocking just put in it, and before starting cash below so the hulls are
+        // haul is exactly what stocking just put in it, and before starting cash so the hulls are
         // priced along with everything else the build produced rather than arriving free.
         LOGGER.info("[CompanyGen][Pipeline]Stage 8b: cargo lift");
         if (listener != null) {
             listener.updateProgress(0.0, "Provisioning cargo lift...");
         }
         generateCargoLift(campaign, options);
+        return spareCosts;
+    }
 
-        // 9. Starting cash - single-shot path only: every unit the build created is new relative to
-        // the pre-walk hangar snapshot, so this prices exactly this build's units. The two-phase
-        // Command Designer flow (generateSupport=false) instead snapshots before its combat phase
-        // and calls processStartingCash itself after support generation.
-        if (generateSupport) {
-            processStartingCash(campaign, options, preExistingUnitIds, rolledUnitIds, generatedPersons,
-                  spareCosts);
+    /**
+     * Captures the IDs of everyone currently on the campaign's books. Take this snapshot before a build
+     * starts so {@link #personsAddedSince} can find exactly the people that build hired.
+     *
+     * @param campaign the campaign whose roster is snapshotted
+     *
+     * @return the IDs of the people present before the build
+     */
+    public static Set<UUID> snapshotPersonnelIds(Campaign campaign) {
+        Set<UUID> personIds = new HashSet<>();
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            personIds.add(person.getId());
         }
+        return personIds;
+    }
 
-        LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
-        return new Result(forceDescriptor, generatedPersons, spareCosts, rolledUnitIds);
+    /**
+     * Everyone on the books who was not there when {@code preExistingPersonIds} was taken: the combat
+     * crews, the support staff, the support-vehicle and ship crews, and any spares a build hired.
+     *
+     * @param campaign             the campaign being built into
+     * @param preExistingPersonIds the snapshot from {@link #snapshotPersonnelIds}, taken before the build
+     *
+     * @return the people the build added, in roster order
+     */
+    public static List<Person> personsAddedSince(Campaign campaign, Set<UUID> preExistingPersonIds) {
+        List<Person> added = new ArrayList<>();
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            if (!preExistingPersonIds.contains(person.getId())) {
+                added.add(person);
+            }
+        }
+        return added;
+    }
+
+    private static Set<UUID> unitIdsOf(Collection<Unit> units) {
+        Set<UUID> unitIds = new HashSet<>();
+        for (Unit unit : units) {
+            unitIds.add(unit.getId());
+        }
+        return unitIds;
     }
 
     /**
@@ -642,10 +695,11 @@ public final class CommandGenerator {
      * @param campaign       the campaign the vehicles are granted to
      * @param supportFaction the faction the command is organised as, which during generation is the faction
      *                       it is generated for rather than the campaign's own
+     * @param autoAssignRanks whether the crews are given ranks, per Automatically Assign Ranks
      * @param namingMethod   the convention the command's formations are named with, so its support formations
      *                       read the same way its combat formations do
      */
-    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction,
+    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction, boolean autoAssignRanks,
           @Nullable ForceNamingMethod namingMethod) {
         for (SupportCapability capability : SupportCapability.values()) {
             if (!capability.isEnabled(campaign)) {
@@ -658,7 +712,7 @@ public final class CommandGenerator {
                 continue;
             }
             LOGGER.info("[CompanyGen][SupportUnits] {}: generated standalone with its own crew", capability);
-            SupportUnitGenerator.generate(capability, campaign, supportFaction, true, namingMethod);
+            SupportUnitGenerator.generate(capability, campaign, supportFaction, autoAssignRanks, namingMethod);
         }
     }
 
@@ -704,15 +758,14 @@ public final class CommandGenerator {
                   supportResult.generatedPersons().size());
         }
 
-        grantStandaloneSupportVehicles(campaign, commandFaction, options.getForceNamingMethod());
+        grantStandaloneSupportVehicles(campaign, commandFaction, options.isAutomaticallyAssignRanks(),
+              options.getForceNamingMethod());
 
-        // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
-        // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
-        // each with its own direction). Gated on isAssignTechsToUnits; drawn only from the techs
-        // SupportPersonnelGenerator just created, so a pre-existing campaign tech is never claimed. Runs once
-        // every vehicle exists, the support stage's own included, so the flatbeds and the recovery vehicles get
-        // their mechanics too.
-        assignTechsToGeneratedUnits(campaign, options, supportResult.generatedPersons());
+        // Assign techs to units through the same process as the Hangar's Quick Assign Maintenance Techs button.
+        // Runs once every vehicle exists, the support stage's own included, so the flatbeds and the recovery
+        // vehicles get their mechanics too.
+        LOGGER.info("[CompanyGen][Pipeline][Assign] quick-assigning maintenance techs");
+        AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(campaign, true);
 
         // Decorate the support formations created above with layered TOE icons. This must happen here
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
@@ -723,7 +776,8 @@ public final class CommandGenerator {
         // generated above, and because the two-phase Command Designer flow reaches this method
         // directly; anywhere else and a design-then-generate-support build would commit with the posts
         // vacant.
-        SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons());
+        SeniorAppointmentAssigner.assign(campaign, supportResult.generatedPersons(),
+              options.isAutomaticallyAssignRanks());
 
         // 7e2. The support sections are platoons and squads that need bays like any other unit, and no ship was
         // sized for them. Size lift for what this stage added, against the bays the hangar has free. Combat
@@ -740,39 +794,6 @@ public final class CommandGenerator {
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
-    }
-
-    /**
-     * Stage 7e: hands the freshly generated techs to {@link AutomatedTechAssignments}, the assigner the rest of
-     * MekHQ uses, ordered by the Setup tab's sort grid.
-     *
-     * <p>Only the techs generated this run are offered, so a tech the campaign already had keeps the units they
-     * were already maintaining. Units are offered a tech in the player's chosen order; with every sort slot left
-     * unset the assigner uses its own battle value ordering.</p>
-     *
-     * @param campaign         the campaign whose units are being assigned techs
-     * @param options          the generation options holding the assignment toggle and the sort grid
-     * @param generatedPersons everyone this generation run produced; the techs among them form the pool
-     *
-     * @since 0.51.01
-     */
-    private static void assignTechsToGeneratedUnits(Campaign campaign, CommandGenerationOptions options,
-          Collection<Person> generatedPersons) {
-        if (!options.isAssignTechsToUnits()) {
-            LOGGER.info("[CompanyGen][Pipeline][Assign] disabled by isAssignTechsToUnits");
-            return;
-        }
-
-        List<Person> techs = TechAssignmentOrder.techsAmong(generatedPersons);
-        if (techs.isEmpty()) {
-            LOGGER.info("[CompanyGen][Pipeline][Assign] no support techs available to assign");
-            return;
-        }
-
-        AutomatedTechAssignments assignments = new AutomatedTechAssignments(techs, campaign.getUnits(),
-              TechAssignmentOrder.unitOrderFor(campaign, options));
-        LOGGER.info("[CompanyGen][Pipeline][Assign] {} tech(s) offered {} unit(s); assigner reported {} outcome(s)",
-              techs.size(), campaign.getUnits().size(), assignments.getReports().size());
     }
 
     /**
@@ -812,61 +833,65 @@ public final class CommandGenerator {
 
     /**
      * Stage 9 - starting cash. When Process Finances is on, the base starting cash is either
-     * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the rolled units' total
-     * purchase cost - the same units the Spares and Finances tab previews, so the build credits the
-     * figure the tab showed - or - with Randomize Starting Cash - a roll of the configured number of
-     * d6 in millions of C-Bills. If Pay for Initial Setup is on, the command's real generation costs
-     * (personnel hiring at twice salary, unit purchase, and the stocked spare parts / armour /
-     * ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum
-     * Starting Float, with the shortfall taken as a two-year 15% starting loan when Generate
-     * Starting Loan is on. The result is credited as starting capital and reported in the Finances
-     * daily log.
+     * {@link CommandGenerationOptions#getStartingCashMonths()} months of the command's running costs once it is
+     * built - salaries, maintenance, overhead, food and housing, and Hot Spots upkeep, each only while the campaign
+     * charges it (see {@link ContractExpenseProjection#getMonthlyOffContractExpenses}) - or, with Randomize Starting
+     * Cash, a roll of the configured number of d6 in millions of C-Bills. If Pay for Initial Setup is on, the
+     * command's real generation costs (personnel hiring at twice salary, unit purchase, and the stocked spare parts /
+     * armour / ammunition, each gated by its own toggle) are then debited; cash floors at the Minimum Starting Float,
+     * with the shortfall taken as a two-year 15% starting loan when Generate Starting Loan is on. The result is
+     * credited as starting capital and reported in the Finances daily log.
      *
-     * <p>Units already in the hangar before the build (per {@code preExistingUnitIds}) are excluded
-     * from both the percentage base and the unit-purchase debit, so building an additional command
-     * into an existing campaign prices only the new units.</p>
+     * <p>The running costs are the whole campaign's, as they will be charged from the next day; in a new campaign
+     * that is exactly the command just built. Units already in the hangar before the build (per
+     * {@code preExistingUnitIds}) are excluded from the unit-purchase debit, so building an additional command into
+     * an existing campaign pays only for the new units.</p>
      *
      * @param campaign           the campaign to credit
      * @param options            the generation options carrying the finance toggles
      * @param preExistingUnitIds hangar unit IDs captured by {@link #snapshotHangarUnitIds} before
      *                           the build; units with these IDs are not priced
-     * @param rolledUnitIds      the units the rolls produced, the base of the percentage; the support
-     *                           vehicles, staff carriers and ships the build added afterwards are priced
-     *                           only in the pay-for-units debit
      * @param generatedPersons   every Person this build created, for the hiring-cost debit
      * @param spareCosts         the stocked spares' value by category, from the build's
      *                           {@link Result#spareCosts()}; {@code null} is treated as zero
      */
     public static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
-          Set<UUID> preExistingUnitIds, Set<UUID> rolledUnitIds, List<Person> generatedPersons,
-          @Nullable SpareCosts spareCosts) {
+          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts) {
+        // Only measured when it is used: a randomized or switched-off stage needs no projection.
+        Money monthlyExpenses = (options.isProcessFinances() && !options.isRandomizeStartingCash())
+                                      ? ContractExpenseProjection.getMonthlyOffContractExpenses(campaign)
+                                      : Money.zero();
+        processStartingCash(campaign, options, preExistingUnitIds, generatedPersons, spareCosts, monthlyExpenses);
+    }
+
+    /**
+     * As {@link #processStartingCash(Campaign, CommandGenerationOptions, Set, List, SpareCosts)}, with the command's
+     * monthly running costs supplied rather than projected, so the cash arithmetic can be checked against a known
+     * figure.
+     *
+     * @param monthlyExpenses the command's running costs in an average month; ignored when starting cash is
+     *                        randomized
+     */
+    static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
+          Set<UUID> preExistingUnitIds, List<Person> generatedPersons, @Nullable SpareCosts spareCosts,
+          Money monthlyExpenses) {
         if (!options.isProcessFinances()) {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: finances disabled; no starting cash granted");
             return;
         }
         SpareCosts spares = (spareCosts == null) ? SpareCosts.zero() : spareCosts;
 
-        // Price the units this build created. The rolled units are the base of the percentage model, as
-        // the tab previewed; everything the build added after the rolls counts in the unit-purchase debit
-        // only, so a top-up JumpShip does not double the starting cash.
+        // Price the units this build created, for the unit-purchase debit.
         Money newUnitValue = Money.zero();
-        Money rolledUnitValue = Money.zero();
-        int pricedUnits = 0;
-        int rolledUnits = 0;
         for (Unit unit : campaign.getUnits()) {
-            if (preExistingUnitIds.contains(unit.getId())) {
-                continue;
-            }
-            newUnitValue = newUnitValue.plus(unit.getBuyCost());
-            pricedUnits++;
-            if (rolledUnitIds.contains(unit.getId())) {
-                rolledUnitValue = rolledUnitValue.plus(unit.getBuyCost());
-                rolledUnits++;
+            if (!preExistingUnitIds.contains(unit.getId())) {
+                newUnitValue = newUnitValue.plus(unit.getBuyCost());
             }
         }
 
-        // Base cash: percentage of unit value, or the dice roll when randomized.
-        int percent = options.getStartingCashPercent();
+        // Base cash: months of running costs, or the dice roll when randomized.
+        int months = options.getStartingCashMonths();
+        Money monthlyCosts = monthlyExpenses.round();
         Money startingCash;
         if (options.isRandomizeStartingCash()) {
             startingCash = Money.of(RANDOM_STARTING_CASH_PER_DIE)
@@ -874,12 +899,9 @@ public final class CommandGenerator {
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: randomized starting cash {}d6 million -> {}",
                   options.getRandomStartingCashDiceCount(), startingCash.toAmountAndSymbolString());
         } else {
-            startingCash = rolledUnitValue.multipliedBy(percent).dividedBy(100).round();
-            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} rolled unit(s) worth {} -> {};"
-                        + " {} unit(s) worth {} added by the build after the rolls are priced for setup costs only",
-                  percent, rolledUnits, rolledUnitValue.toAmountAndSymbolString(),
-                  startingCash.toAmountAndSymbolString(), pricedUnits - rolledUnits,
-                  newUnitValue.minus(rolledUnitValue).toAmountAndSymbolString());
+            startingCash = monthlyCosts.multipliedBy(months).round();
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {} month(s) of {} running costs -> {}",
+                  months, monthlyCosts.toAmountAndSymbolString(), startingCash.toAmountAndSymbolString());
         }
 
         Money minimumStartingFloat = Money.of(options.getMinimumStartingFloat());
@@ -956,8 +978,8 @@ public final class CommandGenerator {
             String basis = options.isRandomizeStartingCash()
                                  ? getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.random",
                                        options.getRandomStartingCashDiceCount())
-                                 : getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.percent",
-                                       percent);
+                                 : getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.months",
+                                       months, monthlyCosts.toAmountAndSymbolString());
             if (deductedSetupCosts.isPositive()) {
                 campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
                       "CommandGenerator.startingCapital.reportLessSetup",
@@ -971,26 +993,6 @@ public final class CommandGenerator {
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 9: credited {} starting capital, loan {}",
               startingCash.toAmountAndSymbolString(), loan.toAmountAndSymbolString());
-    }
-
-    /**
-     * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
-     * will price them once materialized (see {@link Unit#estimateBuyCost}), including Battle Value
-     * pricing when the {@link CampaignOption#UNIT_COST_MODEL} calls for it. Used by the Command
-     * Designer's starting-cash preview to price the design model before anything is committed.
-     *
-     * @param campaign the campaign supplying the pricing rules and multipliers
-     * @param entities the rolled entities to price (e.g. from {@link #collectEntities})
-     *
-     * @return the estimated total purchase value
-     */
-    public static Money estimateUnitValue(Campaign campaign, List<Entity> entities) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Money total = Money.zero();
-        for (Entity entity : entities) {
-            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));
-        }
-        return total;
     }
 
     /**
@@ -1038,48 +1040,60 @@ public final class CommandGenerator {
     }
 
     /**
-     * Stage 7d: applies the Setup tab's personnel-flag toggles to the generation result.
-     *
-     * <ul>
-     *   <li>{@code isAssignCompanyCommanderFlag} → {@link Person#setCommander(boolean)} on the
-     *       commander {@link RulesetRankAssigner} promoted at the campaign-root formation.</li>
-     *   <li>{@code isAssignFounderFlag} → {@link Person#setFounder(boolean)} on every Person this
-     *       generation created. Where the campaign also has {@code USE_FOUNDER_PLOT_ARMOR} set, each
-     *       founder gains a point of Edge, matching what newborn founders receive in
-     *       {@code AbstractProcreation}.</li>
-     *   <li>{@code isAssignMekWarriorsCallSigns} → {@link Person#setCallsign(String)} from
-     *       {@link RandomCallsignGenerator} for every primary-role MekWarrior, skipped in Clan
-     *       campaigns (Clan MekWarriors get their bloodname instead of a fixed-wing-style callsign).</li>
-     * </ul>
+     * Stage 7d: flags the command's leadership. With {@code isAssignCompanyCommanderFlag} on, the
+     * commander {@link RulesetRankAssigner} promoted at the campaign-root formation gets
+     * {@link Person#setCommander(boolean)}, and the next in line the second-in-command flag.
      */
-    private static void applyPersonnelFlags(Campaign campaign, CommandGenerationOptions options,
+    private static void applyCommandFlags(Campaign campaign, CommandGenerationOptions options,
           List<Person> generatedPersons, @Nullable Person rootCommander) {
         if (options.isAssignCompanyCommanderFlag() && rootCommander != null) {
             rootCommander.setCommander(true);
             LOGGER.info("[CompanyGen][Pipeline][Flags] commander flag set on '{}'", rootCommander.getFullName());
             assignSecondInCommand(campaign, generatedPersons);
         }
+    }
+
+    /**
+     * Applies the Setup tab's roster-wide toggles to everyone a build hired. Run once the build is
+     * complete, so the support staff, the vehicle and ship crews and any medical reserve are included.
+     *
+     * <ul>
+     *   <li>{@code isAssignFounderFlag} → {@link Person#setFounder(boolean)} on every person. Where the
+     *       campaign also has {@code USE_FOUNDER_PLOT_ARMOR} set, each founder gains a point of Edge,
+     *       matching what newborn founders receive in {@code AbstractProcreation}.</li>
+     *   <li>{@code isAssignMekWarriorsCallSigns} → {@link Person#setCallsign(String)} from
+     *       {@link RandomCallsignGenerator} for every primary-role MekWarrior who is not Clan
+     *       personnel (Clan warriors carry a bloodname instead of a callsign). Judged per person rather
+     *       than by the campaign's faction, so a Clan command built into a Mercenary campaign gets none.</li>
+     * </ul>
+     *
+     * @param campaign the campaign being built into
+     * @param options  the generation options carrying the toggles
+     * @param hired    everyone the build hired, from {@link #personsAddedSince}
+     */
+    public static void applyRosterFlags(Campaign campaign, CommandGenerationOptions options, List<Person> hired) {
         int founderCount = 0;
         int callsignCount = 0;
         boolean applyFounder = options.isAssignFounderFlag();
-        boolean applyCallsigns = options.isAssignMekWarriorsCallSigns() && !campaign.getPlayerForce().isClanForce();
+        boolean applyCallsigns = options.isAssignMekWarriorsCallSigns();
         boolean applyFounderPlotArmor = campaign.getCampaignOptions().get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         RandomCallsignGenerator callsigns = applyCallsigns ? RandomCallsignGenerator.getInstance() : null;
-        for (Person person : generatedPersons) {
-            if (applyFounder) {
+        for (Person person : hired) {
+            if (applyFounder && !person.isFounder()) {
                 person.setFounder(true);
                 founderCount++;
                 if (applyFounderPlotArmor) {
                     person.changeAttributeScore(SkillAttribute.EDGE, 1);
                 }
             }
-            if (applyCallsigns && person.getPrimaryRole() == PersonnelRole.MEKWARRIOR) {
+            if (applyCallsigns && (person.getPrimaryRole() == PersonnelRole.MEKWARRIOR)
+                      && !person.isClanPersonnel()) {
                 person.setCallsign(callsigns.generate());
                 callsignCount++;
             }
         }
-        LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} (clanCampaign={}, founderPlotArmor={})",
-              founderCount, callsignCount, campaign.getPlayerForce().isClanForce(), applyFounderPlotArmor);
+        LOGGER.info("[CompanyGen][Pipeline][Flags] founder={} callsigns={} across {} hired (founderPlotArmor={})",
+              founderCount, callsignCount, hired.size(), applyFounderPlotArmor);
     }
 
     /**
@@ -1256,6 +1270,11 @@ public final class CommandGenerator {
      */
     // Package-private so the regression test can check the choice reaches the campaign.
     static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
+        if (!options.shouldApplyAugmentationRules()) {
+            LOGGER.info("[CompanyGen][Pipeline] Stage 7e2: augmentation rules are hidden for the selected faction;"
+                        + " leaving campaign settings unchanged");
+            return;
+        }
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean tracksImplants = options.isUseImplants();
         campaignOptions.set(CampaignOption.USE_IMPLANTS, tracksImplants);
