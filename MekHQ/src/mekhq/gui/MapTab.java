@@ -144,6 +144,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private JScrollPane routeView;
     private JPanel contextWorkspace;
     private JPanel collapsedContextRail;
+    // No initializer: initTab() runs from the superclass constructor, before field initializers would reset it
+    private Runnable showRouteContextCard;
     private JSplitPane splitMap;
     private FramedCommandButton btnCalculateJumpPath;
     private FramedCommandButton btnQuickPlotCourse;
@@ -529,11 +531,13 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             updateContextTabStyle(systemTab);
             updateContextTabStyle(routeTab);
         });
-        routeTab.addActionListener(event -> {
+        showRouteContextCard = () -> {
+            routeTab.setSelected(true);
             contextCardLayout.show(contextCards, "route");
             updateContextTabStyle(systemTab);
             updateContextTabStyle(routeTab);
-        });
+        };
+        routeTab.addActionListener(event -> showRouteContextCard.run());
 
         JPanel contextHeader = createContextHeader(systemTab, routeTab, collapseButton);
 
@@ -621,6 +625,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private void toggleContextInspector() {
         layoutState.toggleContextInspector();
         applyLayoutState();
+    }
+
+    /** Opens the route tab, expanding the inspector if needed, so a freshly planned route is visible. */
+    private void revealRouteContext() {
+        if (showRouteContextCard != null) {
+            showRouteContextCard.run();
+        }
+        if (!layoutState.isContextInspectorExpanded()) {
+            layoutState.revealContextInspector();
+            applyLayoutState();
+        }
     }
 
     static JButton createInspectorToggleButton(boolean expanded, String toolTipText, String accessibleName) {
@@ -1453,6 +1468,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         setRouteFieldSystem(suggestRouteDestination,
               requestedStops.isEmpty() ? selection : requestedStops.getLast());
         refreshPlanetView();
+        revealRouteContext();
     }
 
     private void adoptRouteAlternative(Course course) {

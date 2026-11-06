@@ -792,6 +792,38 @@ class InterstellarMapPanelRenderLayerCacheTest {
         graphics.dispose();
     }
 
+    @Test
+    void alignToDevicePixelsShiftsFullAndPartialRepaintsByTheSameSubPixelOffset() {
+        BufferedImage target = new BufferedImage(4, 4, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = target.createGraphics();
+        // Swing paints the whole panel and a small repaint region at these origins at 150% scaling
+        double[] repaintOrigins = { 7.5, -35.5, 0.5 };
+        for (double origin : repaintOrigins) {
+            graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 1.5, origin, origin));
+
+            InterstellarMapPanel.alignToDevicePixels(graphics);
+
+            assertEquals(origin + 0.5, graphics.getTransform().getTranslateX());
+            assertEquals(origin + 0.5, graphics.getTransform().getTranslateY());
+        }
+        graphics.dispose();
+    }
+
+    @Test
+    void prepareLayerBlitShiftsFullAndPartialRepaintsByTheSameSubPixelOffset() {
+        BufferedImage target = new BufferedImage(4, 4, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = target.createGraphics();
+        double[] repaintOrigins = { 7.5, -35.5, 0.5 };
+        for (double origin : repaintOrigins) {
+            graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 1.5, origin, origin));
+
+            InterstellarMapPanel.prepareLayerBlit(graphics, 1.5);
+
+            assertEquals(AffineTransform.getTranslateInstance(origin + 0.5, origin + 0.5), graphics.getTransform());
+        }
+        graphics.dispose();
+    }
+
     private static InterstellarMapPanel.RenderViewKey hiDpiView(double centerX, double devicePixelsPerMapUnit,
           double pixelScale) {
         return InterstellarMapPanel.RenderViewKey.create(100, 80,
