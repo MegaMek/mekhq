@@ -32,10 +32,6 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
-import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
-
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,10 +39,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.ExistingLift;
@@ -54,7 +47,6 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -67,55 +59,44 @@ import mekhq.campaign.universe.commandGeneration.ratgen.DraftBloodnames;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorWalker;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 
 /**
- * Wraps the embedded {@link ForceGeneratorOptionsView} from MegaMek. The faction / echelon / unit
- * type / weight class / rating / experience / augmentation / transport-percent / mission-role pickers
- * the user actually drives at generation time.
+ * The force-rolling engine behind the Command Designer's Force page.
  *
- * <p>The view's own Generate / Export MUL / Clear buttons are hidden — the dialog's OK button drives
- * the pipeline. The year field is locked to the campaign year because {@code CommandGenerator}'s
- * Stage 0 re-anchors year from the campaign regardless of what the panel shows; locking the field
- * keeps the displayed value honest.</p>
+ * <p>MegaMek's {@link ForceGeneratorViewUi} does the work - which factions, unit types, sizes and ratings a selection
+ * offers, rolling the force, accumulating several rolls into one command - and this keeps one alive without showing
+ * it. The Force page draws its own heads-up controls over the view's {@link ForceGeneratorOptionsView} through that
+ * view's host-control API, and its own board over the rolled tree this exposes.</p>
  *
- * <p>The dialog reads the user's selections on OK via {@link #getOptionsView()} →
- * {@link ForceGeneratorOptionsView#buildForceDescriptor()}, then feeds the result into
- * {@code CommandGenerationOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd)}.</p>
+ * <p>The year is locked to the campaign year because {@code CommandGenerator}'s Stage 0 re-anchors year from the
+ * campaign regardless. The dialog reads the selections on Accept via {@link #writeValuesToOptions}.</p>
  */
 public class ForceGeneratorTab {
-
     private static final MMLogger LOGGER = MMLogger.create(ForceGeneratorTab.class);
-
-    /** Component name for the options/TO&amp;E divider, used to persist its position across dialog opens. */
-    private static final String FORCE_GENERATOR_SPLIT_NAME = "forceGeneratorSplitPane";
 
     private final JFrame frame;
     private final Campaign campaign;
     private CommandGenerationOptions options;
     private ForceGeneratorViewUi viewUi;
-    private JSplitPane splitPane;
 
     // Final TOE names for the previewed formations, keyed by descriptor identity. Rebuilt lazily by
-    // previewNameFor after every model change (Generate, Include/Exclude, naming-method switch) so the
-    // preview tree always shows the callsigns the committed TOE will use.
+    // previewName after every model change (roll, include/exclude, naming-method switch) so the
+    // board always shows the names the committed TOE will use.
     private Map<ForceDescriptor, String> previewNameCache;
-
-    // Live source of the Setup tab's Formation Naming Method combo. The options object only receives
-    // the combo's value on OK, so the preview must read the control itself to stay in sync mid-dialog.
+    // Live source of the People page's Formation Names choice. The options object only receives
+    // the choice on Accept, so the preview must read the control itself to stay in sync mid-dialog.
     private Supplier<ForceNamingMethod> namingMethodSupplier;
-    /**
-     * Echelon the formation combo opens on, numbered as the force generator numbers them
-     * (constants.txt: COMPANY 4, TRINARY 5). A command is designed from the bottom up, so the dialog opens on a
-     * manageable formation rather than on the faction ruleset's own default, which is a regiment for most of the
-     * Great Houses and a division for the Federated Suns.
-     */
+    private BooleanSupplier numberRegimentsSupplier;
+
     private static final int PREFERRED_ECHELON_INNER_SPHERE = 4;
     private static final int PREFERRED_ECHELON_CLAN = 5;
 
     private Consumer<FactionRecord> factionChangeListener;
-    private BooleanSupplier numberRegimentsSupplier;
-    private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
+    private final List<Consumer<ForceDescriptor>> forceGeneratedListeners = new ArrayList<>();
+    private final List<Runnable> modelChangeListeners = new ArrayList<>();
+
+    /** "Generate Company Command Lance": a campaign-layer option that changes what a roll produces. */
+    private boolean generateCompanyCommandLance;
 
     public ForceGeneratorTab(JFrame frame, Campaign campaign, CommandGenerationOptions options) {
         this.frame = frame;
@@ -124,12 +105,48 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * The free bays and docking collars on the ships already in the hangar, less what the hangar's other units still
-     * need carried. Ship assignments are not consulted: a unit assigned to a ship in the TO&amp;E counts as needing a
-     * berth and its ship's bay as free, which comes to the same thing.
-     *
-     * @return the lift the campaign already owns; none without a campaign
+     * Builds the force generator view and seeds it from the campaign. Constructed lazily so the RATGenerator /
+     * Ruleset / MekSummaryCache init cost is only paid when the designer is actually shown.
      */
+    public void initializeEngine() {
+        viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
+        // A command built in layers starts each roll from the ships the campaign already owns, so a
+        // second session's armour company rides in the spare bays of the first session's DropShips
+        // rather than drawing its own.
+        viewUi.setHostLiftSupplier(this::liftAlreadyInHangar);
+        viewUi.setToeExclusionMode(true);
+        // Each roll accumulates into one command, so the player can mix and match several rolls before
+        // committing.
+        viewUi.setAccumulateModel(true);
+        viewUi.setToeChangeListener(this::modelChanged);
+        viewUi.setFormationNameProvider(this::previewName);
+        viewUi.setForceGeneratedListener(this::forceGenerated);
+
+        ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
+        optionsView.setOnFactionChanged(this::factionChanged);
+        optionsView.setExportMULButtonVisible(false);
+        // The role filters restrict every draw in the tree to units that can fill the ticked role, which
+        // suits picking a lance of artillery carriers and not designing a command; the formation mix is
+        // the tool for shaping a command.
+        optionsView.setMissionRoleFiltersVisible(false);
+        optionsView.setYearFieldEditable(false);
+        if (campaign != null) {
+            // Before setCurrentYear, which populates the pickers: the preference decides what they open on.
+            applyPreferredEchelon(campaign.getPlayerForce().isClanForce());
+            optionsView.setCurrentYear(campaign.getGameYear());
+            // Seed the faction from the campaign so the designer opens aligned to the campaign's faction
+            // rather than the view's built-in "IS" default. Must run after setCurrentYear, which would
+            // otherwise reset the selection.
+            Faction campaignFaction = campaign.getPlayerForce().getFaction();
+            if (campaignFaction != null) {
+                String code = campaignFaction.getShortName();
+                boolean seeded = optionsView.setSelectedFaction(code);
+                LOGGER.info("[CompanyGen][ForceGenTab][Faction] seed faction picker with campaign faction '{}': {}",
+                      code, seeded ? "applied" : "skipped (no matching FactionRecord in RATGenerator)");
+            }
+        }
+    }
+
     private ExistingLift liftAlreadyInHangar() {
         if (campaign == null) {
             return ExistingLift.NONE;
@@ -143,128 +160,69 @@ public class ForceGeneratorTab {
         return ExistingLift.of(entities);
     }
 
-    public JPanel createTab() {
-        // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&amp;E tree
-        // (right). The view's own Generate button rolls a preview and fills the TO&amp;E tree and the
-        // Composition Summary; the dialog's Accept button then commits the rolled ForceDescriptor.
-        // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
-        // when the dialog is actually shown.
-        viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
-        // A command built in layers starts each roll from the ships the campaign already owns, so a
-        // second session's armour company rides in the spare bays of the first session's DropShips
-        // rather than drawing its own.
-        viewUi.setHostLiftSupplier(this::liftAlreadyInHangar);
-        // The dialog commits the previewed tree into the campaign TOE, so let the user right-click to
-        // include/exclude nodes; excluded units are struck out here and skipped by ForceDescriptorWalker.
-        viewUi.setToeExclusionMode(true);
-        // Command Designer: each Generate accumulates into a Model so the player can mix-and-match
-        // several rolls into one command before committing.
-        viewUi.setAccumulateModel(true);
-        // Show the final TOE callsigns ("Able Company", "Able-1 Battle Lance") on the preview's
-        // formation nodes instead of the engine's per-parent names, recomputed whenever the model
-        // changes so the tree always matches what Accept will commit.
-        viewUi.setToeChangeListener(this::invalidatePreviewNames);
-        viewUi.setFormationNameProvider(this::previewNameFor);
-        viewUi.setForceGeneratedListener(this::awardDraftBloodnames);
-        // The chosen-units table below the controls is a Random Army concept - it collects units to add to a running
-        // game - and the Command Designer never reads it, committing the preview tree instead. That inert panel
-        // holds the formation mix editor here, so once a force has been generated the mix is on screen rather
-        // than behind a dialog.
-        viewUi.setFormationMixEditorVisible(true);
-
-        ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
-        // "Generate Company Command Lance" is a campaign-layer option, so it cannot live in the
-        // MegaMek view's own controls - but it modifies what Generate produces, so it belongs beside
-        // the other Generate options rather than on the Setup tab.
-        chkGenerateMercenaryCompanyCommandLance =
-              new CommandGenerationCheckBox("GenerateMercenaryCompanyCommandLance");
-        optionsView.setOnFactionChanged(this::factionChanged);
-        optionsView.addGenerateOption(chkGenerateMercenaryCompanyCommandLance);
-        optionsView.setExportMULButtonVisible(false);
-        // The role filters restrict every draw in the tree to units that can fill the ticked role, which
-        // suits picking a lance of artillery carriers and not designing a command; the formation palette
-        // is the tool for shaping a command. Hidden here, kept for the Random Army dialog.
-        optionsView.setMissionRoleFiltersVisible(false);
-        // The model here is a set of accumulated rolls, so the button that empties it says so.
-        optionsView.setClearButtonLabel(
-              getTextAt(getCommandGenerationResourceBundle(), "btnClearRolls.text"),
-              getTextAt(getCommandGenerationResourceBundle(), "btnClearRolls.tooltip"));
-        optionsView.setYearFieldEditable(false);
-        if (campaign != null) {
-            // Before setCurrentYear, which populates the combos: the preference decides what they open on.
-            applyPreferredEchelon(campaign.getPlayerForce().isClanForce());
-            optionsView.setCurrentYear(campaign.getGameYear());
-            // Seed the faction picker from the campaign so the Force Generator opens pre-aligned to
-            // the user's New Campaign choice instead of the megamek view's built-in "IS" default.
-            // Must run AFTER setCurrentYear (which calls yearUpdated -> refreshFactions and would
-            // otherwise reset our selection). On Accept, writeValuesToOptions reads the picker back
-            // as an override on CommandGenerationOptions.specifiedFaction so ranks follow.
-            Faction campaignFaction = campaign.getPlayerForce().getFaction();
-            if (campaignFaction != null) {
-                String code = campaignFaction.getShortName();
-                boolean seeded = optionsView.setSelectedFaction(code);
-                LOGGER.info("[CompanyGen][ForceGenTab][Faction] seed cbFaction with campaign faction '{}': {}",
-                      code, seeded ? "applied" : "skipped (no matching FactionRecord in RATGenerator)");
-            }
-        }
-
-        // Named so the dialog can register a JSplitPanePreference that persists the divider position.
-        // The saved location (if any) is restored when the dialog manages the preference, overriding
-        // this default; on first run the default below applies.
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-              viewUi.getLeftPanel(), viewUi.getRightPanel());
-        splitPane.setName(FORCE_GENERATOR_SPLIT_NAME);
-        splitPane.setResizeWeight(0.55);
-        // 1000 is the divider position that shows the full options column without clipping - taken
-        // from a saved JSplitPanePreference after dragging it to fit. Restored from that preference on
-        // subsequent opens; this default applies on first run.
-        splitPane.setDividerLocation(UIUtil.scaleForGUI(1000));
-
-        JPanel host = new JPanel(new BorderLayout());
-        host.setName("pnlForceGeneratorTab");
-        host.add(splitPane, BorderLayout.CENTER);
-        return host;
-    }
-
     /**
-     * The options/TO&amp;E divider, or {@code null} if {@link #createTab()} hasn't run yet. The dialog
-     * registers this with a {@code JSplitPanePreference} so its position persists across opens.
-     *
-     * @return the tab's split pane, or {@code null} if not yet built
+     * @return the accumulated command the player has rolled, wrapped in the view's model root, or {@code null} if
+     *       nothing has been rolled yet; Accept commits exactly this
      */
-    public @Nullable JSplitPane getSplitPane() {
-        return splitPane;
-    }
-
-    /**
-     * The force rolled by the view's most recent Generate, or {@code null} if the player hasn't
-     * previewed yet. The dialog's Accept button commits exactly this descriptor.
-     */
-    public ForceDescriptor getGeneratedForce() {
+    public @Nullable ForceDescriptor getGeneratedForce() {
         return viewUi == null ? null : viewUi.getGeneratedForce();
     }
 
-    /**
-     * Registers a callback for Generate and Clear Force on the embedded view.
-     *
-     * @param listener given the rolled force, or {@code null} on Clear Force
-     */
-    public void setForceGeneratedListener(Consumer<ForceDescriptor> listener) {
+    /** Rolls another force into the command, as the view's own Generate button does. */
+    public void requestGenerate() {
         if (viewUi != null) {
-            viewUi.setForceGeneratedListener(rolled -> {
-                awardDraftBloodnames(rolled);
-                if (listener != null) {
-                    listener.accept(rolled);
-                }
-            });
+            viewUi.getOptionsView().requestGenerate();
+        }
+    }
+
+    /** Discards everything rolled so far, so the next roll starts a fresh command. */
+    public void clearRolls() {
+        if (viewUi != null) {
+            viewUi.clearForce();
         }
     }
 
     /**
-     * Gives a rolled Clan force its Bloodnames as soon as it is rolled, so the draft shows the warriors who carry
-     * one and the build keeps them. Clear Force hands {@code null} and there is nothing to do.
+     * Registers a listener told after each roll, with the rolled force, and after the rolls are cleared, with
+     * {@code null}.
      *
-     * @param rolled the force just rolled, or {@code null} on Clear Force
+     * @param listener the listener
+     */
+    public void addForceGeneratedListener(Consumer<ForceDescriptor> listener) {
+        forceGeneratedListeners.add(listener);
+    }
+
+    /**
+     * Registers a listener told after anything that changes what a commit would produce: a roll, clearing the rolls,
+     * or a unit struck out or brought back.
+     *
+     * @param listener the listener
+     */
+    public void addModelChangeListener(Runnable listener) {
+        modelChangeListeners.add(listener);
+    }
+
+    private void forceGenerated(@Nullable ForceDescriptor rolled) {
+        awardDraftBloodnames(rolled);
+        for (Consumer<ForceDescriptor> listener : List.copyOf(forceGeneratedListeners)) {
+            listener.accept(rolled);
+        }
+    }
+
+    /**
+     * Tells the engine that what a commit would produce has changed outside the view, such as a unit struck out on
+     * the board, so the preview names are recomputed and the listeners told.
+     */
+    public void modelChanged() {
+        invalidatePreviewNames();
+        for (Runnable listener : List.copyOf(modelChangeListeners)) {
+            listener.run();
+        }
+    }
+
+    /**
+     * Gives a freshly rolled Clan force its share of Bloodnames, on the crews the board shows. The award has to land
+     * on the descriptor's crews before the build, so the board can show them and the build can see them.
      */
     private void awardDraftBloodnames(@Nullable ForceDescriptor rolled) {
         if ((rolled == null) || (campaign == null) || (rolled.getFaction() == null)) {
@@ -277,40 +235,15 @@ public class ForceGeneratorTab {
         }
     }
 
-    /** Rolls a force as pressing Generate does. */
-    public void requestGenerate() {
-        if (viewUi != null) {
-            viewUi.getOptionsView().requestGenerate();
-        }
-    }
-
-    /**
-     * Wires the live source of the Setup tab's Formation Naming Method combo into the preview naming,
-     * and is invoked by the pane during construction.
-     *
-     * @param supplier reads the combo's current selection; {@code null} falls back to the options value
-     */
-    /**
-     * Registers a listener notified when the Force Generator panel's faction selection changes, so the
-     * dialog can adjust settings that depend on it.
-     *
-     * @param listener the listener to notify, or {@code null} to stop notifying
-     */
     public void setFactionChangeListener(@Nullable Consumer<FactionRecord> listener) {
         this.factionChangeListener = listener;
+        // The faction was seeded during initializeEngine, before the pane had a host listener. Registering again
+        // reports the current selection immediately so the host can apply its faction-driven defaults.
         if (viewUi != null) {
             viewUi.getOptionsView().setOnFactionChanged(this::factionChanged);
         }
     }
 
-    /**
-     * Keeps the opening formation size in step with the faction, then passes the change on to the dialog.
-     *
-     * <p>The two ladders are numbered alike, so the same preference reads as a company for an Inner Sphere command
-     * and a trinary for a Clan one. A faction that fields neither keeps its own default.</p>
-     *
-     * @param faction the faction now selected in the Force Generator panel, or {@code null}
-     */
     private void factionChanged(@Nullable FactionRecord faction) {
         applyPreferredEchelon((faction != null) && faction.isClan());
         if (factionChangeListener != null) {
@@ -318,14 +251,17 @@ public class ForceGeneratorTab {
         }
     }
 
-    /** Points the formation combo at a company, or a trinary for a Clan command. */
+    /**
+     * Opens the size picker on a company for an Inner Sphere faction and a Trinary-equivalent for a Clan, the sizes a
+     * new command most often starts at.
+     */
     private void applyPreferredEchelon(boolean isClanFaction) {
         if (viewUi == null) {
             return;
         }
         int echelon = isClanFaction ? PREFERRED_ECHELON_CLAN : PREFERRED_ECHELON_INNER_SPHERE;
         viewUi.getOptionsView().setPreferredEchelon(echelon);
-        LOGGER.info("[CompanyGen][ForceGenTab][Echelon] formation combo opens on echelon {} (clan={})", echelon,
+        LOGGER.info("[CompanyGen][ForceGenTab][Echelon] size picker opens on echelon {} (clan={})", echelon,
               isClanFaction);
     }
 
@@ -333,20 +269,10 @@ public class ForceGeneratorTab {
         this.namingMethodSupplier = supplier;
     }
 
-    /**
-     * Wires the live source of the Setup tab's "Always number regiments" checkbox into the preview
-     * naming, and is invoked by the pane during construction.
-     *
-     * @param supplier reads the checkbox's current state; {@code null} falls back to the options value
-     */
     public void setNumberRegimentsSupplier(@Nullable BooleanSupplier supplier) {
         this.numberRegimentsSupplier = supplier;
     }
 
-    /**
-     * @return whether the build would number regiments right now: the Setup tab's live checkbox when
-     *       wired, otherwise the value already on the options
-     */
     private boolean currentNumberRegiments() {
         if (numberRegimentsSupplier != null) {
             return numberRegimentsSupplier.getAsBoolean();
@@ -354,10 +280,7 @@ public class ForceGeneratorTab {
         return (options != null) && options.isAlwaysNumberRegiments();
     }
 
-    /**
-     * Drops the cached preview names and repaints the tree. Called by the view after each Generate and
-     * Include/Exclude toggle, and by the pane when the Setup tab's naming method changes.
-     */
+    /** Drops the cached preview names, so the next read recomputes them from the current model and naming. */
     public void invalidatePreviewNames() {
         previewNameCache = null;
         if (viewUi != null) {
@@ -366,14 +289,11 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * The final TOE name for {@code descriptor}, from a cache rebuilt on demand by running the same
-     * naming traversal the build uses over the currently previewed tree.
+     * @param descriptor a formation in the rolled command
      *
-     * @param descriptor the formation node being rendered
-     * @return the callsign the committed TOE will use, or {@code null} for nodes the walker does not
-     *       name (the tree falls back to the engine name)
+     * @return the name the committed TO&amp;E will give it, or {@code null} if it gets none of its own
      */
-    private @Nullable String previewNameFor(ForceDescriptor descriptor) {
+    public @Nullable String previewName(ForceDescriptor descriptor) {
         if (previewNameCache == null) {
             List<String> existingFormationNames = campaign == null
                   ? List.of()
@@ -387,12 +307,6 @@ public class ForceGeneratorTab {
         return previewNameCache.get(descriptor);
     }
 
-    /**
-     * The naming method the build would use right now: the Setup tab's live combo selection when wired,
-     * otherwise the value already on the options.
-     *
-     * @return the current naming method, or {@code null} for the namer's default
-     */
     private @Nullable ForceNamingMethod currentNamingMethod() {
         if (namingMethodSupplier != null) {
             return namingMethodSupplier.get();
@@ -400,91 +314,75 @@ public class ForceGeneratorTab {
         return options == null ? null : options.getForceNamingMethod();
     }
 
-    /**
-     * Returns the embedded {@link ForceGeneratorOptionsView}, or {@code null} if {@link #createTab()}
-     * hasn't run yet. The Company Generation dialog calls this on OK to read the user's selections.
-     */
-    public ForceGeneratorOptionsView getOptionsView() {
+    /** @return the view whose pickers the Force page drives, or {@code null} before {@link #initializeEngine()} */
+    public @Nullable ForceGeneratorOptionsView getOptionsView() {
         return viewUi == null ? null : viewUi.getOptionsView();
     }
 
-    /**
-     * Convenience: builds the {@link ForceDescriptor} from the current view state. Equivalent to
-     * {@code getOptionsView().buildForceDescriptor()} with a null-guard.
-     */
     public ForceDescriptor buildForceDescriptor() {
         ForceGeneratorOptionsView optionsView = getOptionsView();
         return optionsView == null ? null : optionsView.buildForceDescriptor();
     }
 
-    /**
-     * The view's current state is the source of truth — there's nothing to push from the options here
-     * because the snapshot the dialog persists is generated from the view's controls on OK rather than
-     * driving them. If a future preset round-trip needs to set the view's controls from saved values,
-     * that goes here.
-     */
-    /**
-     * The Force Generator's own action controls, so the dialog can host them in its button bar rather than leaving a
-     * second row of buttons in the middle of the tab.
-     *
-     * @return Generate, its options, and Clear Rolls, or an empty list before the tab is built
-     */
-    public List<JComponent> getGenerateControls() {
-        return (viewUi == null) ? List.of() : viewUi.getOptionsView().getGenerateControls();
-    }
-
-    /**
-     * Clears the picked formation, so Restore Defaults resets it along with everything else. The selection lives on
-     * the embedded MegaMek view rather than in {@code CommandGenerationOptions}, so it is not covered by loading
-     * default options.
-     */
+    /** Forgets the formation the mix asks for, so a restored set of defaults asks for none. */
     public void clearFormationMix() {
         if (viewUi != null) {
             viewUi.getOptionsView().clearFormationSelection();
         }
     }
 
-    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
-        this.options = sourceOptions;
-        if ((sourceOptions != null) && (chkGenerateMercenaryCompanyCommandLance != null)) {
-            chkGenerateMercenaryCompanyCommandLance.setSelected(
-                  sourceOptions.isGenerateMercenaryCompanyCommandLance());
+    /**
+     * Points the formation mix at a formation on the board, so its editor offers that formation's options rather than
+     * the settings'.
+     *
+     * @param node the formation, or {@code null} to hand the mix back to the settings
+     */
+    public void setFormationMixContext(@Nullable ForceDescriptor node) {
+        if (viewUi != null) {
+            viewUi.getOptionsView().setFormationMixContext(node);
         }
     }
 
-    /**
-     * Reads the user's force-shape picks back into the options' snapshot. The dialog can call this on
-     * OK as an alternative to going through {@link #getOptionsView()} directly.
-     */
+    public boolean isGenerateCompanyCommandLance() {
+        return generateCompanyCommandLance;
+    }
+
+    public void setGenerateCompanyCommandLance(boolean generateCompanyCommandLance) {
+        this.generateCompanyCommandLance = generateCompanyCommandLance;
+    }
+
+    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
+        this.options = sourceOptions;
+        if (sourceOptions != null) {
+            generateCompanyCommandLance = sourceOptions.isGenerateMercenaryCompanyCommandLance();
+        }
+    }
+
     public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
         ForceGeneratorOptionsView optionsView = getOptionsView();
         if (targetOptions == null || optionsView == null) {
             return;
         }
-        if (chkGenerateMercenaryCompanyCommandLance != null) {
-            targetOptions.setGenerateMercenaryCompanyCommandLance(
-                  chkGenerateMercenaryCompanyCommandLance.isSelected());
-        }
+        targetOptions.setGenerateMercenaryCompanyCommandLance(generateCompanyCommandLance);
         ForceDescriptor fd = optionsView.buildForceDescriptor();
         if (fd != null) {
             targetOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
-            // Override the rank-authority faction with whatever the user picked in the Force Gen
-            // panel's faction selector. CommandGenerationDialog seeded both inputs from
-            // campaign.getPlayerForce().getFaction() at dialog open (this tab into cbFaction via createTab,
-            // CommandGenerationOptions.specifiedFaction via seedSpecifiedFactionFromCampaign).
-            // If the user changed cbFaction here mid-dialog, that becomes the final authority for
-            // rank assignment so the rank picker and the unit picker stay aligned.
+            // Override the rank-authority faction with whatever the player picked on the Force page.
+            // CommandGenerationDialog seeded both inputs from campaign.getPlayerForce().getFaction() at
+            // dialog open (the picker via initializeEngine, CommandGenerationOptions.specifiedFaction via
+            // seedSpecifiedFactionFromCampaign). If the player changed the faction mid-dialog, that becomes
+            // the final authority for rank assignment so the rank picker and the unit picker stay aligned.
             String snapshotFactionCode = fd.getFaction();
             if (snapshotFactionCode != null && !snapshotFactionCode.isBlank()) {
                 Faction override = resolveRankAuthority(snapshotFactionCode);
                 if (override != null) {
                     Faction previous = targetOptions.getSpecifiedFaction();
                     targetOptions.setSpecifiedFaction(override);
-                    LOGGER.info("[CompanyGen][ForceGenTab][Faction] override specifiedFaction: '{}' -> '{}' (sourced from cbFaction in Force Gen panel)",
+                    LOGGER.info("[CompanyGen][ForceGenTab][Faction] override specifiedFaction: '{}' -> '{}' (sourced from the Force page's faction picker)",
                           previous == null ? "null" : previous.getShortName(),
                           override.getShortName());
                 } else {
-                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] cbFaction code '{}' has no matching mekhq.campaign.universe.Faction, nor does any parent of it; leaving specifiedFaction='{}' unchanged",
+                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] faction code '{}' has no matching mekhq.campaign.universe.Faction, nor does any parent of it; leaving specifiedFaction='{}' unchanged",
                           snapshotFactionCode,
                           targetOptions.getSpecifiedFaction() == null
                                 ? "null"
