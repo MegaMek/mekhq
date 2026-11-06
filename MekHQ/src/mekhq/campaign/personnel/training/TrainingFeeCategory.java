@@ -62,7 +62,6 @@ public enum TrainingFeeCategory {
             case PROFESSION -> PROFESSION;
             case UTILITY -> UTILITY;
             case ROLEPLAY -> ROLEPLAY;
-            case OTHER -> OTHER;
         };
     }
 
