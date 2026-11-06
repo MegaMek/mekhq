@@ -64,11 +64,6 @@ public final class SkillTrainingCosts {
     private static final int[] PROFESSION_COSTS_IN_SUPPORT_POINTS = { 0, 0, 100, 200, 700, 1200, 1200 };
 
     /**
-     * Costs for all other skills, indexed by experience level.
-     */
-    private static final int[] NON_PROFESSION_COSTS_IN_SUPPORT_POINTS = { 0, 0, 100, 300, 700, 1200, 2200 };
-
-    /**
      * Gets the C-bill cost of improving a person's skill by one level.
      *
      * @param campaign  the campaign, for the profession skill and skill modifier options
@@ -152,10 +147,10 @@ public final class SkillTrainingCosts {
         }
 
         SkillTrainingCategory category = SkillTrainingCategory.getCategory(isRoleSkill, skillType);
-        int[] costTable = getCostTable(category);
         int cappedExperienceLevel = Math.min(nextExperienceLevel, EXP_LEGENDARY);
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(costTable[cappedExperienceLevel])
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(
+                    PROFESSION_COSTS_IN_SUPPORT_POINTS[cappedExperienceLevel])
                      .multipliedBy(category.getTrainingCostMultiplier(campaignOptions));
     }
 
@@ -240,12 +235,11 @@ public final class SkillTrainingCosts {
 
             SkillTrainingCategory category = SkillTrainingCategory.getCategory(roleSkills.contains(skillName),
                   skillType);
-            int[] costTable = getCostTable(category);
             int experienceLevel = Math.min(
                   skillType.getExperienceLevel(skill.getTotalSkillLevel(skillModifierData)), EXP_LEGENDARY);
             long skillSupportPoints = 0;
             for (int level = EXP_REGULAR; level <= experienceLevel; level++) {
-                skillSupportPoints += costTable[level];
+                skillSupportPoints += PROFESSION_COSTS_IN_SUPPORT_POINTS[level];
             }
             supportPointsByCategory.put(category, supportPointsByCategory.get(category) + skillSupportPoints);
         }
@@ -257,16 +251,6 @@ public final class SkillTrainingCosts {
                   Money.of((double) entry.getValue() * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION));
         }
         return costsByCategory;
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static int[] getCostTable(SkillTrainingCategory category) {
-        return category.isUsingProfessionCostTable()
-                     ? PROFESSION_COSTS_IN_SUPPORT_POINTS
-                     : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
     }
 
     /**

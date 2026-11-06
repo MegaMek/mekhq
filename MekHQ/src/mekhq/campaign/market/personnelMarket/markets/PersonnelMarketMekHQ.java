@@ -58,6 +58,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -497,17 +498,24 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
     @Override
     public Money getHiringCost(Person applicant) {
+        return getHiringCostBreakdown(applicant).total();
+    }
+
+    @Override
+    public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
         // Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
         // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
         // we increase 1 to 2.
         int hiringCostMultiplier = isWasOfferingGoldenHello() ? GOLDEN_HELLO_SALARY_MONTHS : SALARY_MONTHS;
         Money salary = applicant.getSalary(getCampaign());
+        Money goldenHelloExtra = salary.multipliedBy(hiringCostMultiplier - SALARY_MONTHS);
         if (!RecruitmentCosts.isUsingTrainingBasedCost(getCampaign().getCampaignOptions())) {
-            return salary.multipliedBy(hiringCostMultiplier);
+            return new HiringCostBreakdown(salary.multipliedBy(SALARY_MONTHS), null, goldenHelloExtra);
         }
 
         // Training-based pricing replaces the normal hiring cost; a Golden Hello still adds its extra salary on top
-        Money goldenHelloExtra = salary.multipliedBy(hiringCostMultiplier - SALARY_MONTHS);
-        return RecruitmentCosts.getTrainingBasedCost(getCampaign(), applicant).plus(goldenHelloExtra);
+        return new HiringCostBreakdown(Money.zero(),
+              RecruitmentCosts.getTrainingBasedCostBreakdown(getCampaign(), applicant),
+              goldenHelloExtra);
     }
 }
