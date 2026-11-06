@@ -159,7 +159,7 @@ class CrewAssignmentServiceTechTempCrewTest {
         campaign.importPerson(arriving);
         AssignmentPlan realPlan = new AssignmentPlan(false, false);
 
-        assertTrue(realPlan.stage(arriving, vehicle, SeatType.DRIVER));
+        assertTrue(realPlan.stage(arriving, vehicle, SeatType.GUNNER));
         assertEquals(1, realPlan.fillTempCrew(List.of(vehicle), ignored -> 20).staged().size());
 
         CommitReport report = CrewAssignmentService.commit(realPlan, false, TODAY);
