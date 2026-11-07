@@ -37,6 +37,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -196,5 +197,29 @@ class UnitMarketOfferAlternateCostTest {
         when(summary.getBV()).thenReturn(1_500_000);
 
         assertEquals(Money.of(15_000_000_000.0), offer(100).getPrice());
+    }
+
+    /** The market table prices every row it paints or sorts, so pricing must not load the unit file each time. */
+    @Test
+    void repeatedPricingLoadsTheUnitOnce() {
+        UnitMarketOffer offer = offer(100);
+
+        offer.getPrice();
+        offer.getPrice();
+        offer.getPrice();
+
+        verify(offer, times(1)).getEntity();
+    }
+
+    @Test
+    void changingTheUnitReloadsItsPriceTraits() {
+        UnitMarketOffer offer = offer(100);
+        offer.getPrice();
+
+        offer.setUnit(summary);
+        when(entity.isClan()).thenReturn(true);
+
+        assertEquals(Money.of(12_000_000), offer.getPrice());
+        verify(offer, times(2)).getEntity();
     }
 }
