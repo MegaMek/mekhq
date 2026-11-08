@@ -202,7 +202,7 @@ public class SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog extend
      * @param campaign the campaign whose technicians are updated
      */
     public static void addMissingSpecialistSkills(Campaign campaign) {
-        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+        for (Person person : campaign.getPlayerForce().allPersonnel()) {
             TechnicianSkills.addMissingSkills(person);
             MekHQ.triggerEvent(new PersonChangedEvent(person));
         }

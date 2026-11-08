@@ -34,23 +34,31 @@ package mekhq.campaign.force;
 
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link PlayerForce#getPurchaseCostMultiplier}: the {@code DOUBLE_ALL_COSTS} special rule that doubles unit and
- * part purchase costs while an active contract carries it.
+ * part purchase costs while an active contract carries it; and the force-wide helpers of {@link AbstractForce}, which
+ * must see every detachment of a split force.
  */
 class PlayerForceTest {
 
@@ -104,5 +112,48 @@ class PlayerForceTest {
               contractUsingDoubleAllCosts(false));
 
         assertEquals(2.0, playerForce.getPurchaseCostMultiplier(contracts));
+    }
+
+    private static Unit unitWithId() {
+        Unit unit = mock(Unit.class);
+        when(unit.getId()).thenReturn(UUID.randomUUID());
+        return unit;
+    }
+
+    /** A force split across the two given detachments. */
+    private static PlayerForce splitForce(Detachment first, Detachment second) {
+        PlayerForce playerForce = spy(playerForce());
+        doReturn(List.of(first, second)).when(playerForce).getDetachments();
+        return playerForce;
+    }
+
+    @Test
+    void forceWideHelpersSeeEveryDetachment() {
+        Detachment first = new Detachment();
+        Detachment second = new Detachment();
+        Unit firstUnit = unitWithId();
+        Unit secondUnit = unitWithId();
+        first.getHangar().addUnit(firstUnit);
+        second.getHangar().addUnit(secondUnit);
+
+        PlayerForce playerForce = splitForce(first, second);
+
+        assertEquals(2, playerForce.allUnits().size());
+        assertTrue(playerForce.allUnits().containsAll(List.of(firstUnit, secondUnit)));
+        assertSame(firstUnit, playerForce.findUnit(firstUnit.getId()));
+        assertSame(secondUnit, playerForce.findUnit(secondUnit.getId()));
+        assertNull(playerForce.findUnit(UUID.randomUUID()));
+        assertEquals(List.of(first.getWarehouse(), second.getWarehouse()), playerForce.allWarehouses());
+    }
+
+    @Test
+    void forceWideHelpersMatchTheSingleDetachmentWhenNotSplit() {
+        PlayerForce playerForce = playerForce();
+        Unit unit = unitWithId();
+        playerForce.getHangar().addUnit(unit);
+
+        assertEquals(List.of(unit), List.copyOf(playerForce.allUnits()));
+        assertSame(unit, playerForce.findUnit(unit.getId()));
+        assertEquals(List.of(playerForce.getWarehouse()), playerForce.allWarehouses());
     }
 }

@@ -41,10 +41,10 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson
@@ -73,7 +73,7 @@ public class PersonnelReport extends AbstractReport {
         int countTrueborn = 0;
         Money salary = Money.zero();
 
-        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().allPersonnel()) {
             if ((!person.getPrimaryRole().isCombat()) || (!person.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
@@ -208,7 +208,7 @@ public class PersonnelReport extends AbstractReport {
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
-        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().allPersonnel()) {
             if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
                 campFollowers++;
                 continue;
@@ -345,7 +345,7 @@ public class PersonnelReport extends AbstractReport {
     public String getSecondarySupportPersonnelDetails() {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
         int countSecondary = 0;
-        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().allPersonnel()) {
             // Add them to the total count
             final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
 
@@ -376,7 +376,7 @@ public class PersonnelReport extends AbstractReport {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
 
         int countSecondary = 0;
-        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().allPersonnel()) {
             // Add them to the total count
             final boolean secondaryCombat = person.getSecondaryRole().isCombat();
 

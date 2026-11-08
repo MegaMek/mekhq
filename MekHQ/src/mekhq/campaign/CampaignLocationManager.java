@@ -47,6 +47,7 @@ import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationDispatch;
@@ -417,11 +418,13 @@ public class CampaignLocationManager {
         for (PlayerBase base : playerBases) {
             base.processArrivals(campaign);
         }
-        campaign.getPlayerForce().getDetachmentLocationManager().processArrivals(campaign);
+        for (Detachment detachment : campaign.getPlayerForce().getDetachments()) {
+            detachment.getDetachmentLocationManager().processArrivals(campaign);
+        }
     }
 
     /**
-     * Finds a part in the campaign warehouse or any base warehouse by its campaign-wide identity.
+     * Finds a part in any detachment or base warehouse by its campaign-wide identity.
      *
      * @param campaign the campaign
      * @param uniqueId the part's identity
@@ -434,7 +437,7 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Finds the warehouse whose stock holds this exact part: the campaign warehouse or a base's. This is where the
+     * Finds the warehouse whose stock holds this exact part: a detachment's warehouse or a base's. This is where the
      * part is kept, which can differ from where its unit is.
      *
      * @param campaign the campaign
@@ -449,9 +452,10 @@ public class CampaignLocationManager {
     }
 
     private @Nullable LocalWarehouse warehouseContaining(Campaign campaign, UUID uniqueId) {
-        LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
-        if (mainWarehouse.getPart(uniqueId) != null) {
-            return mainWarehouse;
+        for (LocalWarehouse forceWarehouse : campaign.getPlayerForce().allWarehouses()) {
+            if (forceWarehouse.getPart(uniqueId) != null) {
+                return forceWarehouse;
+            }
         }
         for (PlayerBase base : playerBases) {
             if (base.getBaseWarehouse().getPart(uniqueId) != null) {
@@ -463,7 +467,7 @@ public class CampaignLocationManager {
 
     /**
      * Finds a part named by its number in an older save, which did not say which warehouse the number belongs to.
-     * The campaign warehouse is searched first, then each base's; when more than one warehouse has a part with that
+     * Detachment warehouses are searched first, then each base's; when more than one warehouse has a part with that
      * number the choice is logged, because it may be the wrong part.
      *
      * @param campaign     the campaign
@@ -473,7 +477,12 @@ public class CampaignLocationManager {
      */
     public @Nullable Part findPartByLegacyNumber(Campaign campaign, int legacyNumber) {
         Part part = findPartAnywhere(campaign, legacyNumber);
-        int warehousesWithThatNumber = (campaign.getPlayerForce().getWarehouse().getPart(legacyNumber) == null) ? 0 : 1;
+        int warehousesWithThatNumber = 0;
+        for (LocalWarehouse forceWarehouse : campaign.getPlayerForce().allWarehouses()) {
+            if (forceWarehouse.getPart(legacyNumber) != null) {
+                warehousesWithThatNumber++;
+            }
+        }
         for (PlayerBase base : playerBases) {
             if (base.getBaseWarehouse().getPart(legacyNumber) != null) {
                 warehousesWithThatNumber++;
@@ -487,13 +496,15 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Searches the campaign warehouse then all base warehouses for a part by number. Numbers repeat between
+     * Searches the detachment warehouses then all base warehouses for a part by number. Numbers repeat between
      * warehouses, so this can find the wrong part; prefer {@link #findPartAnywhere(Campaign, UUID)}.
      */
     public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
-        Part part = campaign.getPlayerForce().getWarehouse().getPart(partId);
-        if (part != null) {
-            return part;
+        for (LocalWarehouse forceWarehouse : campaign.getPlayerForce().allWarehouses()) {
+            Part part = forceWarehouse.getPart(partId);
+            if (part != null) {
+                return part;
+            }
         }
         for (PlayerBase base : playerBases) {
             Part basePart = base.getBaseWarehouse().getPart(partId);

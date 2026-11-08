@@ -111,7 +111,7 @@ public final class UnitPartsTransfer {
     private static List<Part> findRefitKit(Campaign campaign, Unit unit) {
         List<Part> refitKit = new ArrayList<>();
         List<LocalWarehouse> warehouses = new ArrayList<>();
-        warehouses.add(campaign.getPlayerForce().getWarehouse());
+        warehouses.addAll(campaign.getPlayerForce().allWarehouses());
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             warehouses.add(base.getBaseWarehouse());
         }

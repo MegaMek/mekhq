@@ -102,7 +102,7 @@ public final class TechJobs {
             }
         }
         List<LocalWarehouse> warehouses = new ArrayList<>();
-        warehouses.add(campaign.getPlayerForce().getWarehouse());
+        warehouses.addAll(campaign.getPlayerForce().allWarehouses());
         for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
             warehouses.add(playerBase.getBaseWarehouse());
         }

@@ -585,7 +585,7 @@ public class RetirementDefectionDialog extends JDialog {
         // This and the below code is not referenced outside of this method and neither variables are used outside
         //  adding units to the list.
         ArrayList<UUID> availableUnits = new ArrayList<>();
-        hqView.getCampaign().getPlayerForce().getHangar().forEachUnit(u -> {
+        hqView.getCampaign().getPlayerForce().allUnits().forEach(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
                 return;
             }

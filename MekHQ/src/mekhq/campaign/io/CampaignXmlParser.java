@@ -458,7 +458,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Phase 1: scan for persons that need migration. All per-person logging here is DEBUG
         // so post-refactor saves (where everyone is skipped) produce no INFO noise.
         List<Person> toMigrate = new ArrayList<>();
-        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+        for (Person person : campaign.getPlayerForce().allPersonnel()) {
             EducationStage stage = person.getEduEducationStage();
             if (stage != EducationStage.JOURNEY_TO_CAMPUS
                       && stage != EducationStage.JOURNEY_FROM_CAMPUS
@@ -1124,7 +1124,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     /** Searches campaign hangar then all base hangars for a unit by UUID. */
     private static @Nullable Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
-        Unit unit = campaign.getPlayerForce().getHangar().getUnit(unitId);
+        Unit unit = campaign.getPlayerForce().findUnit(unitId);
         if (unit != null) {
             return unit;
         }
@@ -2114,7 +2114,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Cleanup problems with techs and units
         for (Person tech : retVal.getPlayerForce()
                                  .getHumanResources()
-                                 .getTechs(retVal.getPlayerForce().getHangar().getUnits(),
+                                 .getTechs(retVal.getPlayerForce().allUnits(),
                                        retVal.getCampaignOptions(),
                                        retVal.getPlayerForce().isClanForce(),
                                        retVal.getLocalDate())) {
@@ -2513,7 +2513,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
+        campaign.getPlayerForce().allUnits().forEach(unit -> {
             // Also, the unit should have its campaign set.
             unit.setCampaign(campaign);
             unit.fixReferences(campaign);
@@ -2620,7 +2620,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             resolveRolePerformability(person, campaign);
         }
 
-        campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
+        campaign.getPlayerForce().allUnits().forEach(unit -> {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
             // should
             // correct that by setting a new C3UUID
@@ -2647,7 +2647,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // ok, once we are sure that campaign has been set for all units, we can
         // now go through and initializeParts and run diagnostics
         List<Unit> removeUnits = new ArrayList<>();
-        campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
+        campaign.getPlayerForce().allUnits().forEach(unit -> {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)
             unit.initializeParts(true);

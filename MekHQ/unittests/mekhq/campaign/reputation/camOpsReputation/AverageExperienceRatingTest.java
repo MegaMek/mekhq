@@ -63,7 +63,6 @@ class AverageExperienceRatingTest {
     @Test
     void returnsNoCampaignExperience_whenNoCombatTeams() throws Exception {
         Campaign campaign = mockCampaign();
-        when(campaign.getPlayerForce().getHangar()).thenReturn(mock(mekhq.campaign.LocalHangar.class));
         when(campaign.getPlayerForce().getCombatTeamsAsList(campaign)).thenReturn(new ArrayList<>());
 
         assertEquals(7, invokeCalculateAverageExperienceRating(campaign, false));
@@ -73,8 +72,6 @@ class AverageExperienceRatingTest {
     @Test
     void returnsNoCampaignExperience_whenAllCombatTeamsReturnNullForce() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(null);
@@ -88,8 +85,6 @@ class AverageExperienceRatingTest {
     @Test
     void returnsNoCampaignExperience_whenAllForcesAreTraining() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation trainingFormation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(trainingFormation.getCombatRoleInMemory().isTraining()).thenReturn(true);
@@ -105,8 +100,6 @@ class AverageExperienceRatingTest {
     @Test
     void returnsNoCampaignExperience_whenUnitsAreUncrewed() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
         Unit unit = mock(Unit.class);
@@ -115,7 +108,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -128,8 +121,6 @@ class AverageExperienceRatingTest {
     @Test
     void ignoresJumpships_entirely() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Jumpship jumpship = mock(Jumpship.class); // instanceof Jumpship => must be skipped
         Unit unit = mock(Unit.class);
@@ -137,7 +128,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -154,8 +145,6 @@ class AverageExperienceRatingTest {
     @Test
     void ignoresSupportCarriers_evenWhenCrewed() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Unit supportCarrier = mock(Unit.class);
         when(supportCarrier.isCarrier()).thenReturn(true);
@@ -164,7 +153,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(supportCarrier));
+        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(supportCarrier));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -179,8 +168,6 @@ class AverageExperienceRatingTest {
         // One unit: piloting=4, gunnery=3 => totalExperience=7
         // unitCount=1 => divisor=2 => rawAverage=3.5 => fractional==0.5 => round DOWN => 3
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 
@@ -206,7 +193,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -223,8 +210,6 @@ class AverageExperienceRatingTest {
         // Unit B: piloting=3, gunnery=5 => 8
         // totalExperience=15, units=2 => divisor=4 => rawAverage=3.75 => fractional>0.5 => ceil => 4
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Entity entityA = mock(Entity.class);
         Entity entityB = mock(Entity.class);
@@ -266,7 +251,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unitA, unitB));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unitA, unitB));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -282,8 +267,6 @@ class AverageExperienceRatingTest {
         // If the person lacks the skill, code uses SkillType.getType(skillName).getTarget() + 1
         // Set target=5 => returns 6 for driving and 6 for gunnery => total=12 => divisor=2 => avg=6
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 
@@ -310,7 +293,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -328,8 +311,6 @@ class AverageExperienceRatingTest {
         // Gunners (2): 3 and 3 => avg=3.0 => round => 3
         // totalExperience=8 => divisor=2 => avg=4
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         SmallCraft smallCraft = mock(SmallCraft.class);
 
@@ -371,7 +352,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -388,8 +369,6 @@ class AverageExperienceRatingTest {
         // In the SmallCraft branch, hasAtLeastOneCrew is only set true when a role has > 1 person.
         // So (1 driver, 1 gunner) leaves hasAtLeastOneCrew false and should return NO_CAMPAIGN_EXPERIENCE.
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         SmallCraft smallCraft = mock(SmallCraft.class);
 
@@ -418,7 +397,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -432,8 +411,6 @@ class AverageExperienceRatingTest {
     @Test
     void logFlag_doesNotChangeComputedResult() throws Exception {
         Campaign campaign = mockCampaign();
-        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 
@@ -458,7 +435,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(unit));
+            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);

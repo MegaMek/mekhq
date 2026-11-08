@@ -1957,7 +1957,7 @@ public class Campaign implements ITechManager {
     }
 
     public Unit getUnit(UUID id) {
-        Unit unit = getPlayerForce().getHangar().getUnit(id);
+        Unit unit = getPlayerForce().findUnit(id);
         if (unit != null) {
             return unit;
         }
@@ -3697,7 +3697,7 @@ public class Campaign implements ITechManager {
      */
     public void cleanUp() {
         // Cleans non-existing spouses
-        for (Person person : getPlayerForce().getPersonnel().values()) {
+        for (Person person : getPlayerForce().allPersonnel()) {
             if (person.getGenealogy().hasSpouse()) {
                 final UUID id1 = person.getGenealogy().getSpouse().getId();
                 if (getPlayerForce().getHumanResources().getPerson(id1) == null) {
@@ -3712,7 +3712,7 @@ public class Campaign implements ITechManager {
             List<UUID> orphanFormationUnitIDs = new ArrayList<>();
 
             for (UUID unitID : formation.getUnits()) {
-                if (getPlayerForce().getHangar().getUnit(unitID) == null) {
+                if (getPlayerForce().findUnit(unitID) == null) {
                     orphanFormationUnitIDs.add(unitID);
                 }
             }
@@ -4193,7 +4193,7 @@ public class Campaign implements ITechManager {
      * is turning a unit into, so that a save carries everything needed to load it on another machine.
      */
     private Set<String> collectDesignNamesOfAllUnits() {
-        List<Unit> units = new ArrayList<>(getPlayerForce().getHangar().getUnits());
+        List<Unit> units = new ArrayList<>(getPlayerForce().allUnits());
         for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
             units.addAll(base.getBaseHangar().getUnits());
         }
@@ -6003,7 +6003,7 @@ public class Campaign implements ITechManager {
              * the unit was founded.
              */
             LocalDate founding = null;
-            for (Person person : getPlayerForce().getPersonnel().values()) {
+            for (Person person : getPlayerForce().allPersonnel()) {
                 for (LogEntry logEntry : person.getPersonalLog()) {
                     if ((founding == null) || logEntry.getDate().isBefore(founding)) {
                         founding = logEntry.getDate();
@@ -6015,7 +6015,7 @@ public class Campaign implements ITechManager {
              * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
              * they joined came with that `Mek (which is a less certain assumption)
              */
-            for (Person person : getPlayerForce().getPersonnel().values()) {
+            for (Person person : getPlayerForce().allPersonnel()) {
                 LocalDate join = person.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))
@@ -6370,7 +6370,7 @@ public class Campaign implements ITechManager {
             int id1 = combatTeam.getFormationId();
             Formation formation = getPlayerForce().getFormation(id1);
             if (formation != null) {
-                for (Unit unit : formation.getAllUnitsAsUnits(getPlayerForce().getHangar(), true)) {
+                for (Unit unit : formation.getAllForceUnitsAsUnits(getPlayerForce(), true)) {
                     Entity entity = unit.getEntity();
                     if (entity != null) {
                         units.add(entity);

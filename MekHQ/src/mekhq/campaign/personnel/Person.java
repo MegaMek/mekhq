@@ -123,6 +123,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -7469,7 +7470,7 @@ public class Person implements ILocatable {
     // endregion Chassis Familiarity
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
+        for (Unit u : campaign.getPlayerForce().allUnits()) {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -7483,12 +7484,13 @@ public class Person implements ILocatable {
                     podSpace.cancelAssignment(true);
                 }
             }
-        });
+        }
 
-        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
-        for (final Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
-            if (equals(part.getTech())) {
-                part.cancelAssignment(true);
+        for (LocalWarehouse warehouse : campaign.getPlayerForce().allWarehouses()) {
+            for (final Part part : warehouse.getParts()) {
+                if (equals(part.getTech())) {
+                    part.cancelAssignment(true);
+                }
             }
         }
 

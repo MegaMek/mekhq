@@ -52,6 +52,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.parts.Part;
@@ -59,7 +60,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 class CampaignLocationManagerTest {
 
@@ -182,6 +182,7 @@ class CampaignLocationManagerTest {
     void gmTeleport_dispatchesThenProcessesArrivals() {
         CampaignLocationManager manager = new CampaignLocationManager();
         Campaign campaign = mockCampaign();
+        DetachmentLocationManager detachmentLocationManager = stubSingleDetachment(campaign);
         Unit unit = mock(Unit.class);
         ILocation destination = mock(ILocation.class);
 
@@ -189,13 +190,14 @@ class CampaignLocationManagerTest {
             manager.gmTeleport(campaign, List.of(unit), destination);
             dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), destination, campaign));
         }
-        Mockito.verify(campaign.getPlayerForce().getDetachmentLocationManager()).processArrivals(campaign);
+        verify(detachmentLocationManager).processArrivals(campaign);
     }
 
     @Test
     void gmCompleteTravel_startsQueuedItemToItsDestination() {
         CampaignLocationManager manager = new CampaignLocationManager();
         Campaign campaign = mockCampaign();
+        DetachmentLocationManager detachmentLocationManager = stubSingleDetachment(campaign);
         Unit unit = mock(Unit.class);
 
         // Queue the unit to travel to a destination ILocation (the main force, in production).
@@ -207,26 +209,28 @@ class CampaignLocationManagerTest {
             dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), destination, campaign));
         }
         assertFalse(manager.isQueuedForTravel(unit));
-        Mockito.verify(campaign.getPlayerForce().getDetachmentLocationManager()).processArrivals(campaign);
+        verify(detachmentLocationManager).processArrivals(campaign);
     }
 
     @Test
     void gmCompleteTravel_noopWhenNothingTravelingOrQueued() {
         CampaignLocationManager manager = new CampaignLocationManager();
         Campaign campaign = mockCampaign();
+        DetachmentLocationManager detachmentLocationManager = stubSingleDetachment(campaign);
         Unit unit = mock(Unit.class);
 
         try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
             manager.gmCompleteTravel(campaign, List.of(unit));
             dispatch.verifyNoInteractions();
         }
-        Mockito.verify(campaign.getPlayerForce().getDetachmentLocationManager()).processArrivals(campaign);
+        verify(detachmentLocationManager).processArrivals(campaign);
     }
 
     @Test
     void gmCompleteTravel_forcesInTransitNodeToArrive() {
         CampaignLocationManager manager = new CampaignLocationManager();
         Campaign campaign = mockCampaign();
+        DetachmentLocationManager detachmentLocationManager = stubSingleDetachment(campaign);
         Unit unit = mock(Unit.class);
         CurrentLocation travelNode = mock(CurrentLocation.class);
         when(unit.getCurrentLocation()).thenReturn(travelNode);
@@ -238,7 +242,7 @@ class CampaignLocationManagerTest {
 
         verify(travelNode).setTransitTime(0);
         verify(travelNode).setJumpPath(null);
-        Mockito.verify(campaign.getPlayerForce().getDetachmentLocationManager()).processArrivals(campaign);
+        verify(detachmentLocationManager).processArrivals(campaign);
     }
 
     @Test
@@ -284,5 +288,14 @@ class CampaignLocationManagerTest {
         Unit unit = mock(Unit.class);
 
         assertEquals(0, manager.countUnselectedCoTravelers(List.of(unit)));
+    }
+
+    /** Gives the mocked campaign's force a single detachment and returns that detachment's location manager. */
+    private static DetachmentLocationManager stubSingleDetachment(Campaign campaign) {
+        Detachment detachment = mock(Detachment.class);
+        DetachmentLocationManager detachmentLocationManager = mock(DetachmentLocationManager.class);
+        when(detachment.getDetachmentLocationManager()).thenReturn(detachmentLocationManager);
+        when(campaign.getPlayerForce().getDetachments()).thenReturn(List.of(detachment));
+        return detachmentLocationManager;
     }
 }

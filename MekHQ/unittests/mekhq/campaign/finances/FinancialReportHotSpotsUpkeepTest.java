@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -87,11 +86,10 @@ class FinancialReportHotSpotsUpkeepTest {
         when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
         when(campaign.getTotalRentFeesExcludingBays()).thenReturn(Money.zero());
 
-        LocalHangar hangar = mock(LocalHangar.class);
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().allUnits()).thenReturn(List.of());
         LocalWarehouse warehouse = mock(LocalWarehouse.class);
         when(warehouse.streamSpareParts()).thenAnswer(invocation -> Stream.<Part>empty());
-        when(campaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        when(campaign.getPlayerForce().allWarehouses()).thenReturn(List.of(warehouse));
         List<AbstractContract> noContracts = List.of();
         when(campaign.getActiveContracts()).thenReturn(noContracts);
 

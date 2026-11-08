@@ -63,6 +63,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -182,7 +183,8 @@ public abstract class AbstractForce {
     public Collection<Unit> allUnits() {
         List<Unit> units = new ArrayList<>();
         for (Detachment detachment : getDetachments()) {
-            units.addAll(detachment.getHangar().getUnits());
+            // forEachUnit snapshots the hangar under its lock, so this is safe while units are added elsewhere
+            detachment.getHangar().forEachUnit((Unit unit) -> units.add(unit));
         }
         return units;
     }
@@ -194,6 +196,32 @@ public abstract class AbstractForce {
             personnel.addAll(detachment.getPersonnel().values());
         }
         return personnel;
+    }
+
+    /** The warehouse of every {@link Detachment} of this force. Multi-detachment-safe. */
+    public List<LocalWarehouse> allWarehouses() {
+        List<LocalWarehouse> warehouses = new ArrayList<>();
+        for (Detachment detachment : getDetachments()) {
+            warehouses.add(detachment.getWarehouse());
+        }
+        return warehouses;
+    }
+
+    /**
+     * Finds a unit by id in any {@link Detachment} of this force. Multi-detachment-safe.
+     *
+     * @param unitId the unit's id
+     *
+     * @return the unit, or {@code null} if no detachment of this force holds it
+     */
+    public @Nullable Unit findUnit(UUID unitId) {
+        for (Detachment detachment : getDetachments()) {
+            Unit unit = detachment.getHangar().getUnit(unitId);
+            if (unit != null) {
+                return unit;
+            }
+        }
+        return null;
     }
 
     /**
