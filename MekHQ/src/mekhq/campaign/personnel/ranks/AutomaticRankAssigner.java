@@ -37,8 +37,6 @@ import static mekhq.campaign.personnel.ranks.Rank.RE_MIN;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MAX;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -65,9 +63,8 @@ import mekhq.campaign.universe.Faction;
  * <p>Only crew members who do not already hold a rank are affected; existing ranks
  * are always preserved.</p>
  *
- * <p>Everyone this class gives a rank to is first put on the faction's rank system. A rank is an index into a
- * table, and the table is the person's own, so a Draconis Combine crew left on a mercenary campaign's default table
- * would read index 12 as "Sergeant" where the Combine's table says "Gunsho".</p>
+ * <p>Crew keep their own rank system, which for generated crew is the one the player chose in Campaign Options. The
+ * faction only picks which rank indices are used.</p>
  *
  * @author Illiani
  * @since 0.51.0
@@ -132,8 +129,6 @@ public final class AutomaticRankAssigner {
             }
         }
 
-        putRankedCrewOnFactionRankSystem(unit, crew, unitCommander, faction);
-
         if (unitCommander != null) {
             unitCommander.setRank(COMMANDER_RANK_INDEX);
         }
@@ -174,55 +169,6 @@ public final class AutomaticRankAssigner {
             // Everyone else
             cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
-    }
-
-    /**
-     * Puts everyone about to be ranked on the faction's rank system, so the indices assigned below are read from the
-     * faction's table. Crew who already hold a rank are not about to be ranked and keep their own system.
-     *
-     * @param unit          the unit being ranked, named in the log
-     * @param crew          the unit's crew
-     * @param unitCommander the crew member who is given the commander's rank whether ranked already or not, or
-     *                      {@code null} when the faction gives no commander's rank
-     * @param faction       the faction whose rank system the crew adopt
-     */
-    private static void putRankedCrewOnFactionRankSystem(Unit unit, List<Person> crew, @Nullable Person unitCommander,
-          Faction faction) {
-        List<Person> aboutToBeRanked = new ArrayList<>();
-        for (Person person : crew) {
-            if ((person == unitCommander) || hasNoRank(person)) {
-                aboutToBeRanked.add(person);
-            }
-        }
-        int moved = putOnFactionRankSystem(aboutToBeRanked, faction);
-        LOGGER.debug("[AutoRank] unit '{}': {} of the {} crew about to be ranked moved to the rank system of {}",
-              unit.getName(), moved, aboutToBeRanked.size(), faction.getShortName());
-    }
-
-    /**
-     * Puts people on the faction's rank system, as the Command Generator does for everyone it creates, so the rank
-     * system the roster offers for them is the same as for the rest of the command. Nobody is given a rank; a person's
-     * existing rank index is kept and read from the new table.
-     *
-     * @param people  the people to move
-     * @param faction the faction whose rank system they adopt, or {@code null} to leave them as they are
-     *
-     * @return how many people changed rank system; {@code 0} when they were on it already, no faction was given or
-     *       the faction's rank system is missing or invalid, which is logged
-     */
-    public static int putOnFactionRankSystem(Collection<Person> people, @Nullable Faction faction) {
-        RankValidator rankValidator = new RankValidator();
-        RankSystem rankSystem = usableRankSystemOf(faction, rankValidator);
-        if (rankSystem == null) {
-            return 0;
-        }
-        int moved = 0;
-        for (Person person : people) {
-            if (adoptRankSystem(person, rankSystem, rankValidator)) {
-                moved++;
-            }
-        }
-        return moved;
     }
 
     /**

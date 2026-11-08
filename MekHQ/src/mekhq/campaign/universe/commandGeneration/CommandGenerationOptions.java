@@ -125,7 +125,6 @@ public class CommandGenerationOptions {
     private boolean prioritizeOfficerCombatSkills;
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
-    private boolean useSpecifiedFactionToAssignRanks;
     private boolean assignMekWarriorsCallSigns;
     private boolean assignFounderFlag;
 
@@ -221,7 +220,6 @@ public class CommandGenerationOptions {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(true);
         setAutomaticallyAssignRanks(true);
-        setUseSpecifiedFactionToAssignRanks(false);
         setAssignMekWarriorsCallSigns(true);
         setAssignFounderFlag(true);
 
@@ -465,14 +463,6 @@ public class CommandGenerationOptions {
 
     public void setAutomaticallyAssignRanks(final boolean automaticallyAssignRanks) {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
-    }
-
-    public boolean isUseSpecifiedFactionToAssignRanks() {
-        return useSpecifiedFactionToAssignRanks;
-    }
-
-    public void setUseSpecifiedFactionToAssignRanks(final boolean useSpecifiedFactionToAssignRanks) {
-        this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
     }
 
     public boolean isAssignMekWarriorsCallSigns() {
@@ -773,7 +763,6 @@ public class CommandGenerationOptions {
               && (prioritizeOfficerCombatSkills == other.prioritizeOfficerCombatSkills)
               && (assignMostSkilledToPrimaryLances == other.assignMostSkilledToPrimaryLances)
               && (automaticallyAssignRanks == other.automaticallyAssignRanks)
-              && (useSpecifiedFactionToAssignRanks == other.useSpecifiedFactionToAssignRanks)
               && (assignMekWarriorsCallSigns == other.assignMekWarriorsCallSigns)
               && (assignFounderFlag == other.assignFounderFlag)
               && (useImplants == other.useImplants)
@@ -861,7 +850,6 @@ public class CommandGenerationOptions {
               prioritizeOfficerCombatSkills,
               assignMostSkilledToPrimaryLances,
               automaticallyAssignRanks,
-              useSpecifiedFactionToAssignRanks,
               assignMekWarriorsCallSigns,
               assignFounderFlag,
               useImplants,

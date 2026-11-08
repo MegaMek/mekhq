@@ -156,7 +156,6 @@ public final class PeoplePage {
     private final HudChoice<ForceNamingMethod> naming;
     private final HudCheckBox numberRegiments = optionCheck("AlwaysNumberRegiments");
     private final HudCheckBox autoRanks = optionCheck("AutomaticallyAssignRanks");
-    private final HudCheckBox factionRanks = optionCheck("UseSpecifiedFactionToAssignRanks");
     private final HudCheckBox callsigns = optionCheck("AssignMekWarriorsCallSigns");
     private final HudCheckBox founders = optionCheck("AssignFounderFlag");
     private final HudCheckBox commanderFlag = optionCheck("AssignCompanyCommanderFlag");
@@ -372,7 +371,7 @@ public final class PeoplePage {
         return stack(
               section(text("Designer.people.section.names"), null,
                     field(text("lblForceNamingMethod.text"), naming), numberRegiments, autoRanks,
-                    indented(factionRanks), callsigns, founders, commanderFlag),
+                    callsigns, founders, commanderFlag),
               section(text("Designer.people.section.origin"), text("Designer.people.section.origin.aside"),
                     randomizeOrigin, indented(dependents), indented(extraRandom), indented(clanOrigins),
                     indented(aroundPlanet), indented(specifiedSystem.getComponent()), scaleRow, radiusNote),
@@ -430,7 +429,6 @@ public final class PeoplePage {
     private void refreshEnablement() {
         commanderCombat.setEnabled(bestCommander.isSelected());
         officerCombat.setEnabled(bestOfficers.isSelected());
-        factionRanks.setEnabled(autoRanks.isSelected());
         reservePercent.setEnabled(reserve.isSelected());
         neuralMode.setEnabled(implants.isSelected());
         boolean simulation = runSimulation.isSelected();
@@ -696,7 +694,6 @@ public final class PeoplePage {
         naming.setSelected(options.getForceNamingMethod());
         numberRegiments.setSelected(options.isAlwaysNumberRegiments());
         autoRanks.setSelected(options.isAutomaticallyAssignRanks());
-        factionRanks.setSelected(options.isUseSpecifiedFactionToAssignRanks());
         callsigns.setSelected(options.isAssignMekWarriorsCallSigns());
         founders.setSelected(options.isAssignFounderFlag());
         commanderFlag.setSelected(options.isAssignCompanyCommanderFlag());
@@ -783,7 +780,6 @@ public final class PeoplePage {
         }
         options.setAlwaysNumberRegiments(numberRegiments.isSelected());
         options.setAutomaticallyAssignRanks(autoRanks.isSelected());
-        options.setUseSpecifiedFactionToAssignRanks(factionRanks.isSelected());
         options.setAssignMekWarriorsCallSigns(callsigns.isSelected());
         options.setAssignFounderFlag(founders.isSelected());
         options.setAssignCompanyCommanderFlag(commanderFlag.isSelected());

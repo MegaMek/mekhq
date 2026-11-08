@@ -826,9 +826,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         reRollAdvantages(campaign, person, actualSkillLevel);
 
         if (options.isAutomaticallyAssignRanks()) {
-            final Faction faction = options.isUseSpecifiedFactionToAssignRanks()
-                                          ? options.getSpecifiedFaction()
-                                          : campaign.getPlayerForce().getFaction();
+            final Faction faction = campaign.getPlayerForce().getFaction();
             person.setRank((faction.isComStarOrWoB() || faction.isClan())
                                  ? 4
                                  : 12);

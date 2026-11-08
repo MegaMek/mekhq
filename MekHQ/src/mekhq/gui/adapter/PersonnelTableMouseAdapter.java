@@ -401,7 +401,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANK_SYSTEM: {
-                final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
+                final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1],
+                      getCampaign().getPlayerForce().getRankSystem());
                 final RankValidator rankValidator = new RankValidator();
                 for (final Person person : people) {
                     person.setRankSystem(rankValidator, rankSystem);
@@ -2054,7 +2055,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu changeRankSystemMenu = new JMenu(resources.getString("changeRankSystem.text"));
         final RankSystem campaignRankSystem = getCampaign().getPlayerForce().getRankSystem();
         // First allow them to revert to the campaign system
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("useCampaignRankSystem.text"));
+        cbMenuItem = new JCheckBoxMenuItem(getFormattedTextAt("mekhq.resources.GUI", "useCampaignRankSystem.text",
+              campaignRankSystem.toString()));
         cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
         cbMenuItem.setActionCommand(makeCommand(CMD_RANK_SYSTEM, campaignRankSystem.getCode()));
         cbMenuItem.addActionListener(this);

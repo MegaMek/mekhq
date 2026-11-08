@@ -87,12 +87,11 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  * latter cannot be trusted at this point in the pipeline.</p>
  *
  * <p>Non-officer combat crew get an enlisted Sergeant rank (E12 IS, E4 Clan/CS); support staff get
- * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The campaign's
- * rank system (loaded from {@code data/universe/ranks.xml} per faction) maps the integer index to the
- * faction-appropriate display name.</p>
+ * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The rank system
+ * the player chose in Campaign Options maps the integer index to the display name; the campaign's
+ * faction picks the IS or Clan/CS slot layout.</p>
  *
- * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}. Honors
- * {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} for the faction picker.</p>
+ * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}.</p>
  */
 public final class RulesetRankAssigner {
 
@@ -186,17 +185,10 @@ public final class RulesetRankAssigner {
             return Result.none();
         }
 
-        Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getPlayerForce().getFaction();
-        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
-        Faction faction = useSpecified ? specifiedFaction : campaignFaction;
-        if (faction == null) {
-            faction = campaignFaction;
-        }
-        LOGGER.info("[CompanyGen][RankAssign][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
-              useSpecified,
-              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
-              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+        // Campaign Options is the single source of truth for ranks: the campaign's faction picks the rank-slot
+        // layout below, and the campaign's rank system names the slots.
+        Faction faction = campaign.getPlayerForce().getFaction();
+        LOGGER.info("[CompanyGen][RankAssign][Faction] campaign faction={} (isClan={} isComStarOrWoB={} isMercenary={})",
               faction == null ? "null" : faction.getShortName(),
               faction != null && faction.isClan(),
               faction != null && faction.isComStarOrWoB(),
@@ -209,11 +201,10 @@ public final class RulesetRankAssigner {
               faction != null && (faction.isClan() || faction.isComStarOrWoB()),
               faction == null || (!faction.isClan() && !faction.isComStarOrWoB()));
 
-        // The Person's rank-name lookup uses its OWN rank system, not the campaign's. So an IS
-        // campaign generating a Clan force would render Clan-targeted rank indices through the
-        // campaign's IS rank table ("Lieutenant" instead of "Nova Commander"). Resolve the target
-        // faction's rank system here and apply it to every Person we rank below.
-        RankSystem targetRankSystem = faction.getRankSystem();
+        // The Person's rank-name lookup uses its OWN rank system. Everyone we rank below is put on the
+        // rank system the player chose in Campaign Options, so the whole command reads its ranks from
+        // one table and the generator never overrides the player's choice.
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
         RankValidator rankValidator = new RankValidator();
 
         LOGGER.info("[CompanyGen][RankAssign] START faction={} rankSystem={} enlistedRank={} supportRank={} root='{}' guidedLevels={} engineCommanders={} thread={}",
@@ -871,15 +862,13 @@ public final class RulesetRankAssigner {
     }
 
     /**
-     * Switches the Person's rank system to the target faction's, then assigns the preferred rank
-     * index — walking DOWN the rank table if that index has no name for the Person's profession.
+     * Puts the Person on the target rank system (the campaign's, from Campaign Options), then assigns
+     * the preferred rank index, walking DOWN the rank table if that index has no name for the
+     * Person's profession.
      *
-     * <p>Two-step assignment is necessary because a Person's rank-name lookup goes through its
-     * own {@code RankSystem} instance, not the campaign's. If a Mercenary campaign generates a
-     * Clan force, the freshly-created Persons inherit the Mercenary rank system on construction;
-     * setting their rank index to 33 then renders as "Lieutenant" (the IS slot 33 name) instead
-     * of "Nova Commander" (the Clan slot 33 name). Swapping the rank system first ensures the
-     * index resolves through the correct table.</p>
+     * <p>A Person's rank-name lookup goes through its own {@code RankSystem} instance. Freshly
+     * created Persons already start on the campaign's system; the swap only moves someone who was
+     * on a different one, so the whole command reads its ranks from the table the player chose.</p>
      *
      * <p>{@link Profession#getProfessionFromBase(RankSystem, Rank)} already walks alternate
      * profession columns; this method handles the case where every profession in that walk

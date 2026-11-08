@@ -44,6 +44,8 @@ import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -56,7 +58,8 @@ import testUtilities.MHQTestUtilities;
 
 /**
  * Covers who the rank pass promotes when Assign Best Company Commander and Assign Best Officers are on: the best
- * person leads the command wherever the roll seated them, and each lance is led by the best of what is left.
+ * person leads the command wherever the roll seated them, and each lance is led by the best of what is left. Also
+ * covers which rank system they are ranked on: always the one set in Campaign Options.
  */
 class RulesetRankAssignerSelectionTest {
 
@@ -163,6 +166,29 @@ class RulesetRankAssignerSelectionTest {
         assertSame(first, result.rootCommander(), "the company's commander commands, the root has no rank");
         assertEquals(FormationLevel.COMPANY, result.officers().get(first));
         assertEquals(1, result.officers().size(), "the company commander leads its only lance too");
+    }
+
+    @Test
+    void everyoneRankedStaysOnTheCampaignsCustomRankSystem() {
+        // Issue 10867: the rank pass moved everyone it ranked onto the faction's rank system, overriding the custom
+        // one the player had chosen in Campaign Options.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        RankSystem custom = new RankSystem(Ranks.getRankSystemFromCode("DCMS"));
+        custom.setCode("MYMERC");
+        custom.setName("My Mercenaries");
+        custom.setType(RankSystemType.CAMPAIGN);
+        campaign.getPlayerForce().setRankSystem(custom);
+        assertSame(custom, campaign.getPlayerForce().getRankSystem(), "the campaign is on the custom system");
+        Formation firstLance = lance(campaign, "First Lance");
+        Person commander = pilot(campaign, mekIn(campaign, firstLance), 5);
+        Person lancemate = pilot(campaign, mekIn(campaign, firstLance), 3);
+
+        RulesetRankAssigner.applyAndReport(campaign, companyOptions());
+
+        for (Person person : java.util.List.of(commander, lancemate)) {
+            assertSame(custom, person.getRankSystem(), person.getFullName() + " is ranked on the custom system");
+            assertTrue(person.getRankNumeric() > 0, person.getFullName() + " is given a rank");
+        }
     }
 
     private static CommandGenerationOptions companyOptions() {
