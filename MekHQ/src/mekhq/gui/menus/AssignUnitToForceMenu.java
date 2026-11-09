@@ -46,6 +46,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.gui.utilities.StaticChecks;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -60,8 +61,9 @@ import mekhq.utilities.MHQInternationalization;
  * </ul>
  *
  * <p>The menu is built only when all selected units are valid for assignment. Invalid inputs—such as unavailable
- * units, units with {@code null} entities, or units with unsupported entity types—cause the menu to short-circuit
- * and display nothing.</p>
+ * units, units with {@code null} entities, units with unsupported entity types, or units deployed to a scenario or
+ * StratCon track—cause the menu to short-circuit and display nothing. Deployed formations are listed but disabled, as
+ * their membership is frozen until they return.</p>
  *
  * @author Illiani
  * @since 0.50.10
@@ -99,11 +101,17 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
         // 2) Any unit is unavailable
         // 3) Any entity is null
         // 4) Any entity is unsupported (such as turrets)
+        // 5) Any unit is deployed, including through a formation deployed to a StratCon track
         if (units.length == 0 ||
                   Arrays.stream(units).anyMatch(unit -> !unit.isAvailable() ||
                                                               unit.getEntity() == null ||
                                                               isUnsupportedEntity(unit.getEntity()))) {
             return;
+        }
+        for (Unit unit : units) {
+            if (StaticChecks.isUnitLockedByDeployment(unit)) {
+                return;
+            }
         }
 
         setText(MHQInternationalization.getText("AssignUnitToForceMenu.title"));
@@ -151,6 +159,14 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
      * @since 0.50.10
      */
     private void addForceMenu(JComponent parent, final Campaign campaign, final Unit[] units, final Formation formation) {
+        // A deployed formation (and so every formation below it) can't take on new units until it returns
+        if (StaticChecks.isFormationLockedByDeployment(campaign, formation)) {
+            JMenuItem deployedFormation = new JMenuItem(formation.getName());
+            deployedFormation.setEnabled(false);
+            parent.add(deployedFormation);
+            return;
+        }
+
         // A submenu for this force
         JMenu forceMenu = new JMenu(formation.getName());
         forceMenu.addActionListener(ev -> addToForce(campaign, units, formation));

@@ -45,15 +45,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -376,7 +368,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains(TOEMouseAdapter.ADD_UNIT)) {
-            if (null != singleFormation) {
+            if ((null != singleFormation) &&
+                      !StaticChecks.isFormationLockedByDeployment(gui.getCampaign(), singleFormation)) {
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
                 if (null != u) {
                     Campaign campaign = gui.getCampaign();
@@ -583,6 +576,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Formation formation : formations) {
                 if (null != formation && null != formation.getParentFormation()) {
+                    // Deleting a formation that holds deployed units would bring them home early
+                    List<Unit> unitsInFormation = new ArrayList<>();
+                    for (UUID unitId : formation.getAllUnits(false)) {
+                        Unit unitInFormation = gui.getCampaign().getUnit(unitId);
+                        if (unitInFormation != null) {
+                            unitsInFormation.add(unitInFormation);
+                        }
+                    }
+                    if (StaticChecks.areAnyFormationsHoldingDeployments(gui.getCampaign(),
+                          List.of(formation),
+                          unitsInFormation)) {
+                        continue;
+                    }
+
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(null,
                                     getFormattedTextAt(RESOURCE_BUNDLE,
@@ -635,7 +642,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains(TOEMouseAdapter.REMOVE_UNIT)) {
             Campaign campaign = gui.getCampaign();
             for (Unit unit : units) {
-                if (null != unit) {
+                // A deployed unit stays with its formation until the formation returns
+                if ((null != unit) && !StaticChecks.isUnitLockedByDeployment(unit)) {
                     Formation parentFormation = campaign.getPlayerForce().getFormationFor(unit);
                     if (null != parentFormation) {
                         campaign.getPlayerForce().removeUnitFromFormation(unit, campaign);
@@ -1211,6 +1219,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, unsorted);
+                // A deployed formation can't take on new units until it returns
+                menu.setEnabled(!StaticChecks.isFormationLockedByDeployment(gui.getCampaign(), formation));
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
                 // still in the multiple selection block
@@ -1389,8 +1399,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeForce.text"));
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(formations) &&
-                                      !StaticChecks.areAnyUnitsDeployed(unitsInForces));
+            menuItem.setEnabled(!StaticChecks.areAnyFormationsHoldingDeployments(gui.getCampaign(),
+                  formations,
+                  unitsInForces));
             popup.add(menuItem);
 
             // Attempt to Assign all units in the selected force(s) to a transport ship.
@@ -1653,7 +1664,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.removeUnit.text"));
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_UNIT + unitIds);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
+            menuItem.setEnabled(!StaticChecks.areAnyUnitsLockedByDeployment(units));
             popup.add(menuItem);
             if (StaticChecks.areAllUnitsAvailable(units)) {
                 // Deploy unit to a scenario - includes submenus for scenario selection
