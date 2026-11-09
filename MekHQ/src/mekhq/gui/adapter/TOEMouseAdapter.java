@@ -1397,7 +1397,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // This checks to see if the ship is in a basic state that can accept units.
             // Capacity gets checked once the action is submitted.
             if (!unitsInForces.isEmpty()) {
-                TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(), unitsInForces);
+                TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(), unitsInForces,
+                      true);
             }
         } else if (unitsSelected) {
             Unit unit = units.getFirst();
@@ -1702,7 +1703,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(), units);
+            TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(), units, false);
 
             if (!multipleSelection) {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
