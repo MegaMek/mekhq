@@ -300,7 +300,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        // Tall enough for a tech's name, skills, repair abilities and day
+        // The minimum row height; the renderer grows a row when its tech's description needs more lines
         techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
