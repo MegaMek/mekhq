@@ -2757,8 +2757,22 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Build a new, clean warehouse from the current parts
         LocalWarehouse warehouse = new LocalWarehouse();
+        // Only spares merge, and only into spares, but every merge scans the whole warehouse for a match. Adding the
+        // spares first, in their usual order, keeps each scan to the spares added so far instead of every part fitted
+        // to a unit as well, which on a large campaign cut minutes of quadratic work from loading. The fitted parts
+        // are added afterwards, where they never merge.
+        List<Part> partsInMergeOrder = new ArrayList<>();
+        List<Part> fittedParts = new ArrayList<>();
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         for (Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
+            if (part.isSpare()) {
+                partsInMergeOrder.add(part);
+            } else {
+                fittedParts.add(part);
+            }
+        }
+        partsInMergeOrder.addAll(fittedParts);
+        for (Part part : partsInMergeOrder) {
             // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
             if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
                 LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
