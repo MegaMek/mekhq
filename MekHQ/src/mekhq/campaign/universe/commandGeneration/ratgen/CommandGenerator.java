@@ -693,8 +693,7 @@ public final class CommandGenerator {
      * built, so those vehicles are granted here too.
      *
      * @param campaign       the campaign the vehicles are granted to
-     * @param supportFaction the faction the command is organised as, which during generation is the faction
-     *                       it is generated for rather than the campaign's own
+     * @param supportFaction the faction the command is organised as: the campaign's own
      * @param autoAssignRanks whether the crews are given ranks, per Automatically Assign Ranks
      * @param namingMethod   the convention the command's formations are named with, so its support formations
      *                       read the same way its combat formations do
@@ -739,7 +738,7 @@ public final class CommandGenerator {
         Set<UUID> unitsBeforeSupport = snapshotHangarUnitIds(campaign);
         // The stage's own vehicles - flatbeds, canteens, recovery and MASH trucks - are generated below, after
         // the staff, but they need mechanics like any other vehicle. Count them into the demand now.
-        Faction commandFaction = SupportPersonnelGenerator.resolveFaction(campaign, options);
+        Faction commandFaction = SupportPersonnelGenerator.resolveFaction(campaign);
         int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign, commandFaction);
         SupportPersonnelGenerator.Result supportResult =
               SupportPersonnelGenerator.generate(campaign, options, vehiclesStillToCome);

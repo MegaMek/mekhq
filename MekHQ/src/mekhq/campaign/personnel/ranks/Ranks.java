@@ -104,6 +104,27 @@ public class Ranks {
         final RankSystem ranks = getRankSystems().get(code);
         return (ranks == null) ? getRankSystems().get(DEFAULT_SYSTEM_CODE) : ranks;
     }
+
+    /**
+     * Finds a rank system by code, checking the campaign's own rank system first.
+     *
+     * <p>A rank system imported through Campaign Options is stored only on the campaign, never in the global list
+     * that {@link #getRankSystemFromCode(String)} searches. Looked up there, its code misses and falls back to the
+     * default system, so a person told to use the campaign's custom system would land on the default one instead.</p>
+     *
+     * @param code               the rank system code to find
+     * @param campaignRankSystem the campaign's rank system, or {@code null} to search only the global list
+     *
+     * @return the campaign's rank system when the code is its code; otherwise the global system with that code, or
+     *       the default system when no global system has it
+     */
+    public static @Nullable RankSystem getRankSystemFromCode(final String code,
+          final @Nullable RankSystem campaignRankSystem) {
+        if ((campaignRankSystem != null) && campaignRankSystem.getCode().equals(code)) {
+            return campaignRankSystem;
+        }
+        return getRankSystemFromCode(code);
+    }
     // endregion Getters/Setters
 
     // region File I/O

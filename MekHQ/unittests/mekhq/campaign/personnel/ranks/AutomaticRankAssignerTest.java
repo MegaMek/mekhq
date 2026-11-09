@@ -54,14 +54,12 @@ import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Covers issue 10756: the Command Generator ranked the crews of its support vehicles on whatever rank table they
- * were created with, the campaign's default, while every other person it generated had been put on the faction's
- * table. In a Draconis Combine company the recovery vehicle crews came out as Sergeants beside the Gunsho everyone
- * else was.
+ * Covers issue 10867: the Command Generator ranks its support vehicle crews on the rank system the player chose in
+ * Campaign Options, never on the faction's. Moving them to the faction's table overrode the player's choice and left
+ * them on a system the right-click menu could not move them off when the campaign's was a custom one.
  */
 class AutomaticRankAssignerTest {
     private static final String COMBINE_RANK_SYSTEM = "DCMS";
-    private static final String COMBINE_SERGEANT = "Gunsho";
     private static final int CORPORAL_INDEX = 8;
     private static final int SERGEANT_INDEX = 12;
 
@@ -72,23 +70,20 @@ class AutomaticRankAssignerTest {
     }
 
     @Test
-    void anUnrankedCrewIsRankedOnTheFactionsRankSystem() {
+    void anUnrankedCrewIsRankedOnTheCampaignsRankSystemNotTheFactions() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         Unit vehicle = crewedVehicle(campaign);
-        assertNotEquals(COMBINE_RANK_SYSTEM, campaign.getPlayerForce().getRankSystem().getCode(),
+        RankSystem campaignRankSystem = campaign.getPlayerForce().getRankSystem();
+        assertNotEquals(COMBINE_RANK_SYSTEM, campaignRankSystem.getCode(),
               "this test is only meaningful while the campaign is not on the Combine's rank table");
 
         AutomaticRankAssigner.assignRanks(campaign, vehicle, combine());
 
         for (Person person : vehicle.getCrew()) {
-            assertEquals(COMBINE_RANK_SYSTEM, person.getRankSystem().getCode(),
-                  person.getFullName() + " is ranked on the Combine's table like the rest of the command");
+            assertEquals(campaignRankSystem, person.getRankSystem(),
+                  person.getFullName() + " is ranked on the rank system set in Campaign Options");
             assertFalse(hasNoRank(person), person.getFullName() + " holds a rank");
         }
-        Person commander = vehicle.getCommander();
-        assertNotNull(commander);
-        assertEquals(COMBINE_SERGEANT, commander.getRankName(),
-              "the commander's rank index reads from the Combine's table, not as Sergeant");
     }
 
     @Test
@@ -109,9 +104,8 @@ class AutomaticRankAssignerTest {
 
         assertEquals(rankSystemBefore, veteran.getRankSystem(), "an existing rank is read from the table it was given on");
         assertEquals(rankBefore, veteran.getRankName(), "and the rank itself is preserved");
-        assertEquals(COMBINE_RANK_SYSTEM, commander.getRankSystem().getCode(),
-              "the commander, who is always given the commander's rank, reads it from the faction's table");
-        assertEquals(COMBINE_SERGEANT, commander.getRankName());
+        assertEquals(rankSystemBefore, commander.getRankSystem(),
+              "the commander, who is always given the commander's rank, stays on the campaign's table");
     }
 
     @Test

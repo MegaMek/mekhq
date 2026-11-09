@@ -165,11 +165,10 @@ public final class SupportPersonnelGenerator {
             LOGGER.info("[CompanyGen][Pipeline][Support] {} support vehicle(s) the stage will add are counted"
                         + " toward the mechanics", vehiclesStillToCome);
         }
-        Faction faction = resolveFaction(campaign, options);
-        // Resolve the rank system once so every Person we create renders rank names through the
-        // target faction's table — a Clan-generated tech needs to read as a Clan "Warrior" tech,
-        // not an IS "Corporal", even when generated into a Mercenary campaign.
-        RankSystem targetRankSystem = faction.getRankSystem();
+        Faction faction = resolveFaction(campaign);
+        // Every Person we create reads rank names from the rank system the player chose in Campaign
+        // Options, the same table as the rest of the command.
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
         RankValidator rankValidator = new RankValidator();
 
         List<Person> generated = new ArrayList<>();
@@ -407,22 +406,12 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * Picks the rank-authority faction the same way {@link RulesetRankAssigner#apply} does:
-     * honors {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
-     * to the campaign's faction.
+     * Picks the faction the support staff are organised and ranked as, the same way
+     * {@link RulesetRankAssigner#apply} does: the campaign's faction, set in Campaign Options.
      */
-    static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
-        Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getPlayerForce().getFaction();
-        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
-        Faction resolved = useSpecified ? specifiedFaction : campaignFaction;
-        if (resolved == null) {
-            resolved = campaignFaction;
-        }
-        LOGGER.info("[CompanyGen][Support][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
-              useSpecified,
-              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
-              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+    static Faction resolveFaction(Campaign campaign) {
+        Faction resolved = campaign.getPlayerForce().getFaction();
+        LOGGER.info("[CompanyGen][Support][Faction] campaign faction={} (isClan={} isComStarOrWoB={} isMercenary={})",
               resolved == null ? "null" : resolved.getShortName(),
               resolved != null && resolved.isClan(),
               resolved != null && resolved.isComStarOrWoB(),

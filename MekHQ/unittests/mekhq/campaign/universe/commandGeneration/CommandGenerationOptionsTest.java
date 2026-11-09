@@ -99,7 +99,6 @@ class CommandGenerationOptionsTest {
 
         // Rank assignment and personnel flags.
         assertTrue(options.isAutomaticallyAssignRanks());
-        assertFalse(options.isUseSpecifiedFactionToAssignRanks());
         assertTrue(options.isAssignCompanyCommanderFlag());
         assertTrue(options.isAssignMekWarriorsCallSigns());
         assertTrue(options.isAssignFounderFlag());
