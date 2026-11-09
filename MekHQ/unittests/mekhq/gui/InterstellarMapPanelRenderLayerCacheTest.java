@@ -65,6 +65,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,23 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertTrue(InterstellarMapPanel.shouldRenderSystem(true, true, false, true));
         assertTrue(InterstellarMapPanel.shouldRenderSystem(true, false, false, false));
         assertFalse(InterstellarMapPanel.shouldRenderSystem(false, false, true, true));
+    }
+
+    @Test
+    void systemsOnProposedOrActiveRouteCountAsRouteSystems() {
+        PlanetarySystem proposedStop = mock(PlanetarySystem.class);
+        PlanetarySystem activeStop = mock(PlanetarySystem.class);
+        PlanetarySystem offRoute = mock(PlanetarySystem.class);
+        JumpPath proposedPath = new JumpPath();
+        proposedPath.addSystem(proposedStop);
+        JumpPath activePath = new JumpPath();
+        activePath.addSystem(activeStop);
+
+        assertTrue(InterstellarMapPanel.isOnRoute(proposedStop, proposedPath, activePath));
+        assertTrue(InterstellarMapPanel.isOnRoute(activeStop, proposedPath, activePath));
+        assertTrue(InterstellarMapPanel.isOnRoute(activeStop, null, activePath));
+        assertFalse(InterstellarMapPanel.isOnRoute(offRoute, proposedPath, activePath));
+        assertFalse(InterstellarMapPanel.isOnRoute(proposedStop, null, null));
     }
 
     @Test

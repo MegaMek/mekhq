@@ -9577,10 +9577,18 @@ public class InterstellarMapPanel extends JPanel {
             return false;
         }
         if (hideEmpty) {
-            // Filter out "empty" systems
-            return (renderData != null) && !renderData.empty();
+            // Empty systems stay selectable while on a route, since the map still draws them as waypoints
+            boolean systemEmpty = (renderData == null) || renderData.empty();
+            return shouldRenderSystem(true, systemEmpty, false,
+                  isOnRoute(system, jumpPath, getActiveJumpPath()));
         }
         return true;
+    }
+
+    static boolean isOnRoute(PlanetarySystem system, @Nullable JumpPath proposedPath,
+          @Nullable JumpPath activePath) {
+        return ((proposedPath != null) && proposedPath.contains(system))
+              || ((activePath != null) && activePath.contains(system));
     }
 
     /**
