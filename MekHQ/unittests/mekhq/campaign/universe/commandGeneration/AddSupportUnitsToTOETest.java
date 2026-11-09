@@ -625,10 +625,15 @@ class AddSupportUnitsToTOETest {
               "the Troopship Command is a Support formation");
         Formation transportCommand = troopshipCommand.getParentFormation();
         assertNotNull(transportCommand);
+        Formation jumpShipCommand = null;
         for (Formation child : transportCommand.getSubFormations()) {
-            assertFalse(child.isFormationType(FormationType.CONVOY),
-                  "'" + child.getName() + "' must not be a Convoy, or Resupply sends it out as a supply run");
+            if (child.getName().equalsIgnoreCase(SupportTOEFormationTypes.JUMPSHIP_COMMAND.getLabel())) {
+                jumpShipCommand = child;
+            }
         }
+        assertNotNull(jumpShipCommand, "the JumpShip Command is filed under the Transport Command");
+        assertEquals(FormationType.SUPPORT, jumpShipCommand.getFormationType(),
+              "the JumpShip Command is a Support formation");
     }
 
     @Test
