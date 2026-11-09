@@ -805,12 +805,32 @@ public final class CommandGenerator {
             return;
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e2: lift top-up for the support sections");
+        Set<UUID> unitIdsBefore = snapshotHangarUnitIds(campaign);
         try {
             LiftTopUp.topUp(campaign, snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
                   snapshot.getDropshipPct(), snapshot.getJumpshipPct(), newUnitIds);
         } catch (Exception exception) {
             LOGGER.error(exception, "[CompanyGen][LiftTopUp] lift top-up failed; the command keeps the ships it had");
         }
+        rankShipsAddedSince(campaign, options, unitIdsBefore);
+    }
+
+    /**
+     * Ranks the crews of the ships a stage added after the main rank pass (Stage 7c) has already run.
+     *
+     * @param campaign      the campaign the ships were added to
+     * @param options       the generation options
+     * @param unitIdsBefore the hangar's unit ids from before the stage ran
+     */
+    private static void rankShipsAddedSince(Campaign campaign, CommandGenerationOptions options,
+          Set<UUID> unitIdsBefore) {
+        List<Unit> added = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (!unitIdsBefore.contains(unit.getId())) {
+                added.add(unit);
+            }
+        }
+        RulesetRankAssigner.rankLateShipCrews(campaign, options, added);
     }
 
     /**
@@ -1244,6 +1264,7 @@ public final class CommandGenerator {
                   snapshot.getDropshipPct(), snapshot.getCargoPct());
             return;
         }
+        Set<UUID> unitIdsBefore = snapshotHangarUnitIds(campaign);
         try {
             CargoShipGenerator.Result result = CargoShipGenerator.generate(campaign,
                   snapshot.getFaction(), snapshot.getYear(), snapshot.getRating(),
@@ -1256,6 +1277,7 @@ public final class CommandGenerator {
             LOGGER.error(exception, "[CompanyGen][Cargo] cargo lift generation failed;"
                         + " the command keeps whatever cargo capacity it already had");
         }
+        rankShipsAddedSince(campaign, options, unitIdsBefore);
     }
 
     /**

@@ -673,6 +673,80 @@ public final class RulesetRankAssigner {
     }
 
     /**
+     * The rank a ship's captain gets when the ship is added after the main rank pass: the company commander's slot,
+     * read as Captain, Star Captain or Demi-Precentor depending on the rank system.
+     */
+    static final int LATE_SHIP_CAPTAIN_RANK_INDEX = Rank.RWO_MAX + 4;
+
+    /**
+     * Ranks the crews of ships added after the main rank pass has run.
+     *
+     * <p>The lift top-up and the cargo lift add their DropShips and JumpShips once the support sections exist, which
+     * is after the main pass. Without this their crews arrive with no rank at all. Each captain gets
+     * {@link #LATE_SHIP_CAPTAIN_RANK_INDEX}. The rest of the crew get the same enlisted or support rank the main
+     * pass gives everyone else.</p>
+     *
+     * @param campaign the campaign the ships belong to
+     * @param options  the generation options; nothing is ranked when automatic ranks are off
+     * @param ships    the ships whose crews are ranked; anything that is not a large craft is skipped
+     *
+     * @return how many people were given a rank
+     */
+    public static int rankLateShipCrews(Campaign campaign, CommandGenerationOptions options, List<Unit> ships) {
+        if ((campaign == null) || (options == null) || ships.isEmpty()) {
+            return 0;
+        }
+        if (!options.isAutomaticallyAssignRanks()) {
+            LOGGER.info("[CompanyGen][RankAssign][LateShips] {} ship(s) left unranked: automatic ranks are off",
+                  ships.size());
+            return 0;
+        }
+        Faction faction = campaign.getPlayerForce().getFaction();
+        if (faction == null) {
+            LOGGER.warn("[CompanyGen][RankAssign][LateShips] {} ship(s) left unranked: the campaign has no faction",
+                  ships.size());
+            return 0;
+        }
+        int enlistedRank = enlistedRankForFaction(faction);
+        int supportRank = supportRankForFaction(faction);
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
+        RankValidator rankValidator = new RankValidator();
+
+        int ranked = 0;
+        for (Unit ship : ships) {
+            if ((ship == null) || (ship.getEntity() == null) || !ship.getEntity().isLargeCraft()) {
+                continue;
+            }
+            Set<UUID> done = new HashSet<>();
+            Person captain = ship.getCommander();
+            if (captain != null) {
+                setRankWithFallback(captain, LATE_SHIP_CAPTAIN_RANK_INDEX, targetRankSystem, rankValidator);
+                done.add(captain.getId());
+                ranked++;
+            }
+            int enlisted = 0;
+            int support = 0;
+            for (Person person : unitCrew(ship)) {
+                if ((person == null) || !done.add(person.getId())) {
+                    continue;
+                }
+                if (person.isSupport()) {
+                    setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
+                    support++;
+                } else if (person.isCombat()) {
+                    setRankWithFallback(person, enlistedRank, targetRankSystem, rankValidator);
+                    enlisted++;
+                }
+            }
+            ranked += enlisted + support;
+            LOGGER.info("[CompanyGen][RankAssign][LateShips] '{}': captain={} ({}), {} enlisted, {} support",
+                  ship.getName(), (captain == null) ? "none" : captain.getFullName(),
+                  (captain == null) ? "-" : captain.getRankName(), enlisted, support);
+        }
+        return ranked;
+    }
+
+    /**
      * Returns every Person attached to a unit — drivers + gunners + vessel crew + navigator. We
      * collect manually instead of using {@code getActiveCrew()} because the latter filters out
      * wounded Tank / Infantry pilots, and at generation time we want to count every assigned slot.
