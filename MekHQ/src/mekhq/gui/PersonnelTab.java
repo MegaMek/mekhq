@@ -70,9 +70,9 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -551,7 +551,7 @@ public final class PersonnelTab extends CampaignGuiTab {
      */
     public void refreshPersonnelList() {
         // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
-        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // worker grows it throws ConcurrentModificationException. The BulkGenerationCompletedEvent fired when the
         // generation completes reschedules this refresh against the finished campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
@@ -662,7 +662,7 @@ public final class PersonnelTab extends CampaignGuiTab {
      * @since 0.51.01
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         personnelListScheduler.schedule();
     }
 

@@ -66,7 +66,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -650,7 +650,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     private void refreshTechsList() {
         // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
-        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        // BulkGenerationCompletedEvent fired when it completes reschedules this refresh.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
         }
@@ -711,7 +711,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // replace, which reads the part's owning unit. The worker is concurrently detaching parts
         // from units, so a part could pass its own "do I have a unit" check here and have lost it a
         // moment later, throwing NullPointerException out of the modal progress dialog's event pump.
-        // The generation fires an OrganizationChangedEvent when it completes, which reschedules this
+        // The generation fires an BulkGenerationCompletedEvent when it completes, which reschedules this
         // refresh against the finished, consistent campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] warehouse refresh skipped - bulk generation in progress");
@@ -875,7 +875,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * skipped during generation in the same way, so it is rescheduled here too.
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         partsScheduler.schedule();
         techsScheduler.schedule();
     }

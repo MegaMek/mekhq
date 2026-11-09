@@ -2008,11 +2008,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processUnitNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Unit Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of units
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -2037,12 +2036,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPartNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Part Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of parts
         List<Part> parts = new ArrayList<>();
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {

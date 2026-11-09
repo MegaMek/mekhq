@@ -68,14 +68,14 @@ public class LocalWarehouse implements ILocation {
 
     private final LocationNode locationNode = new LocationNode(this);
     // ConcurrentSkipListMap rather than TreeMap so the value iterators are weakly consistent and
-    // never throw ConcurrentModificationException. The earlier snapshot helpers (forEachPart,
-    // streamSpareParts, etc.) call `new ArrayList<>(parts.values())` whose ArrayList(Collection)
-    // constructor internally iterates via toArray() — if the worker thread's addPart fires while
-    // the EDT is mid-copy, TreeMap's fail-fast iterator throws. Force Generator's SwingWorker
-    // mutates parts while the EDT keeps reading (UnitTableModel.getValueAt -> AmmoBin ->
-    // getAmmoAvailable -> streamSpareParts; HangarTab.filterUnits -> DefaultRowSorter), so the
-    // race is reachable in normal play. Same NavigableMap API; the snapshot helpers stay in
-    // place for deterministic per-call views but no longer trip during construction.
+    // never throw ConcurrentModificationException. Force Generator's SwingWorker mutates parts while
+    // the EDT keeps reading (UnitTableModel.getValueAt -> AmmoBin -> getAmmoAvailable ->
+    // streamSpareParts; HangarTab.filterUnits -> DefaultRowSorter), so the race is reachable in normal
+    // play. The read-only lookups (findSparePart, streamSpareParts, getSparePartsCount and the like)
+    // therefore walk the live view: copying every part first made each lookup cost a full copy of the
+    // warehouse, which on a campaign with ~100k parts turned target numbers, spare counts and the
+    // load-time spare merge into seconds of work. Only forEachPart and forEachSparePart keep a
+    // snapshot, because their consumers may add parts and must not then visit them.
     private final ConcurrentSkipListMap<Integer, Part> parts = new ConcurrentSkipListMap<>();
     // the same parts by their campaign-wide identity
     private final Map<UUID, Part> partsByUniqueId = new ConcurrentHashMap<>();
@@ -422,16 +422,15 @@ public class LocalWarehouse implements ILocation {
     /**
      * Gets a list of spare parts in the warehouse.
      *
-     * <p>Streams over a snapshot of the underlying parts collection so this is safe to call while
-     * another thread is mutating the warehouse (Force Generator's SwingWorker adds installed and
-     * spare parts during generation; the EDT calls this from
-     * {@code CampaignSummary.updateInformation}). The result is a fresh list either way, so callers
-     * see no behavior change beyond the absence of {@link java.util.ConcurrentModificationException}.</p>
+     * <p>Walks the live, weakly consistent parts view, so this is safe to call while another thread
+     * is mutating the warehouse (Force Generator's SwingWorker adds installed and spare parts during
+     * generation; the EDT calls this from {@code CampaignSummary.updateInformation}). The result is a
+     * fresh list.</p>
      *
      * @return A list of spare parts in the warehouse.
      */
     public List<Part> getSpareParts() {
-        return getSpareParts(new ArrayList<>(getParts()));
+        return getSpareParts(getParts());
     }
 
     public static List<Part> getSpareParts(Collection<Part> parts) {
@@ -447,15 +446,14 @@ public class LocalWarehouse implements ILocation {
      * @return a fresh list of the held parts
      */
     public List<Part> getHeldParts() {
-        return new ArrayList<>(getParts()).stream()
+        return getParts().stream()
                      .filter(part -> (part.getUnit() == null) && !part.hasParentPart())
                      .collect(Collectors.toList());
     }
 
     public int getSparePartsCount(Part targetPart) {
         int count = 0;
-        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
-        for (Part warehousePart : new ArrayList<>(getParts())) {
+        for (Part warehousePart : getParts()) {
             if (warehousePart.isSamePartType(targetPart)) {
                 count += getPartQuantity(warehousePart, true);
             }
@@ -499,7 +497,7 @@ public class LocalWarehouse implements ILocation {
      * @param consumer The method to apply to each spare part in the warehouse.
      */
     public void forEachSparePart(Consumer<Part> consumer) {
-        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
+        // Snapshot, because a consumer may add parts (splitting a stack, for example) and must not then visit them
         for (Part part : new ArrayList<>(getParts())) {
             if (part.isSpare()) {
                 consumer.accept(part);
@@ -515,8 +513,8 @@ public class LocalWarehouse implements ILocation {
      * @return A matching spare {@link Part} or {@code null} if no suitable match was found.
      */
     public @Nullable Part findSparePart(Predicate<Part> predicate) {
-        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration.
-        for (Part part : new ArrayList<>(getParts())) {
+        // The live view never throws ConcurrentModificationException, and the predicate only reads
+        for (Part part : getParts()) {
             if (part.isSpare() && predicate.test(part)) {
                 return part;
             }
@@ -530,9 +528,9 @@ public class LocalWarehouse implements ILocation {
      * @return A stream of spare parts in the campaign.
      */
     public Stream<Part> streamSpareParts() {
-        // Snapshot to avoid CME if another thread mutates the warehouse mid-iteration
-        // (Force Generator's SwingWorker adds parts while UI refreshers read this from the EDT).
-        return new ArrayList<>(getParts()).stream().filter(Part::isSpare);
+        // The live view never throws ConcurrentModificationException when Force Generator's SwingWorker adds parts
+        // while UI refreshers read this from the EDT, and every caller only reads the stream
+        return getParts().stream().filter(Part::isSpare);
     }
 
     /**

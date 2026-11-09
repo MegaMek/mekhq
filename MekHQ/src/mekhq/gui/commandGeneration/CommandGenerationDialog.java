@@ -78,7 +78,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -716,8 +716,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         long startNanos = System.nanoTime();
         LOGGER.info("[CompanyGen][PostGen] START (thread={}, generatedPersons={})",
               Thread.currentThread().getName(), generatedPersons.size());
-        LOGGER.info("[CompanyGen][PostGen] firing OrganizationChangedEvent");
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getPlayerForce().getFormations()));
+        LOGGER.info("[CompanyGen][PostGen] firing BulkGenerationCompletedEvent");
+        MekHQ.triggerEvent(new BulkGenerationCompletedEvent(getCampaign(),
+              getCampaign().getPlayerForce().getFormations()));
 
         if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
             LOGGER.info("[CompanyGen][PostGen] running AutoAwardsController");

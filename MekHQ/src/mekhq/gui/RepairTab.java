@@ -72,8 +72,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.RepairStatusChangedEvent;
@@ -859,7 +859,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the serviceable check
         // iterates every unit's part list, which the worker is concurrently appending to - reading it here threw
         // ConcurrentModificationException from the modal progress dialog's event pump. The generation fires an
-        // OrganizationChangedEvent when it completes, which reschedules this refresh against the finished campaign.
+        // BulkGenerationCompletedEvent when it completes, which reschedules this refresh against the finished campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] repair serviced unit refresh skipped - bulk generation in progress");
             return;
@@ -973,7 +973,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     private void refreshTechsList() {
         // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
-        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        // BulkGenerationCompletedEvent fired when it completes reschedules this refresh.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
         }
@@ -1050,7 +1050,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
         // Rebuilding walks every unit's parts, which a bulk generation is mutating off the EDT; the
-        // OrganizationChangedEvent fired when it completes triggers the rebuild instead.
+        // BulkGenerationCompletedEvent fired when it completes triggers the rebuild instead.
         if (rebuildPartsList && getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] repair parts acquisition refresh skipped - bulk generation in progress");
             return;
@@ -1088,7 +1088,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @since 0.51.01
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         servicedUnitListScheduler.schedule();
         techsScheduler.schedule();
     }
