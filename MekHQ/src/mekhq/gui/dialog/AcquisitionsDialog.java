@@ -82,6 +82,10 @@ public class AcquisitionsDialog extends JDialog {
         super(parent, modal);
         this.campaignGUI = campaignGUI;
 
+        // The Repair tab holds its rebuild of the list while it is hidden, and this dialog lays out its rows from the
+        // list before its summary refreshes it, so bring it up to date first
+        campaignGUI.getRepairBayTab().ensurePartsAcquisitionCurrent();
+
         initComponents();
 
         setLocationRelativeTo(parent);

@@ -117,6 +117,7 @@ import mekhq.service.mrms.MRMSService;
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(RepairTab.class);
+    private static final String PARTS_ACQUISITION_REFRESH = "RepairTab.partsAcquisition";
 
     private JTable servicedUnitTable;
     private JTable taskTable;
@@ -664,8 +665,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (ignoreUnitTable || evt.getValueIsAdjusting()) {
             return;
         }
+        // The parts acquisition list covers every serviceable unit, whichever is selected, so it is not rebuilt here
         refreshTaskList();
-        refreshPartsAcquisition();
         int selected = servicedUnitTable.getSelectedRow();
         txtServicedUnitView.setText("");
         if (selected > -1) {
@@ -1044,8 +1045,24 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
 
+    /**
+     * Rebuilds the parts acquisition list behind the Parts Acquisition button. The rebuild checks the stock and the
+     * acquisition target of every part every serviceable unit is missing, which takes most of a second on a large
+     * campaign, so while this tab is hidden it waits until the tab is shown.
+     */
     public void refreshPartsAcquisition() {
-        refreshPartsAcquisitionService(true);
+        refreshWhenShown(PARTS_ACQUISITION_REFRESH, () -> refreshPartsAcquisitionService(true));
+    }
+
+    /**
+     * Brings the parts acquisition list up to date for a caller that reads it while this tab may be hidden, such as
+     * the Acquisitions dialog opened from the Command Center.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void ensurePartsAcquisitionCurrent() {
+        runHeldRefresh(PARTS_ACQUISITION_REFRESH);
     }
 
     public void refreshPartsAcquisitionService(boolean rebuildPartsList) {

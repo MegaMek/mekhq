@@ -984,7 +984,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
         // computation walks the campaign's hangar and location tree, which the worker is concurrently
         // mutating - reading it here threw ConcurrentModificationException from the modal progress
-        // dialog's event pump. The generation fires an BulkGenerationCompletedEvent when it completes,
+        // dialog's event pump. The generation fires a BulkGenerationCompletedEvent when it completes,
         // which reschedules this refresh against the finished, consistent campaign.
         if (campaign.isBulkGenerationInProgress()) {
             return;
