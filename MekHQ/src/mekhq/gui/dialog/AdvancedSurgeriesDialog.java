@@ -1943,35 +1943,40 @@ public class AdvancedSurgeriesDialog extends JDialog {
     // region Surgeons
 
     /**
-     * Determines the senior surgeon at the given location, based on doctor status and rank/skill tiebreakers.
+     * Determines the best surgeon at the given location: the active doctor with the highest Surgery skill, with rank
+     * (and then experience) used to break ties.
      *
      * @param currentLocation the current location
      *
-     * @return the most senior surgeon, or {@code null} if none are available
+     * @return the best surgeon, or {@code null} if none are available
      *
      * @author Illiani
      * @since 0.50.10
      */
     private @Nullable Person getSurgeon(AbstractLocation currentLocation) {
-        Person seniorSurgeon = null;
+        Person bestSurgeon = null;
+        int bestSurgeryLevel = -1;
 
         for (Person person : currentLocation.fetchPersonnelAtLocation()) {
             if (person.isActive() && person.isDoctor()) {
-                if (seniorSurgeon == null) {
-                    seniorSurgeon = person;
+                int surgeryLevel = getSurgeryLevel(person);
+                if (bestSurgeon == null || surgeryLevel > bestSurgeryLevel) {
+                    bestSurgeon = person;
+                    bestSurgeryLevel = surgeryLevel;
                     continue;
                 }
 
-                if (person.outRanksUsingSkillTiebreaker(campaignOptions,
-                      campaign.getPlayerForce().isClanForce(),
-                      campaign.getLocalDate(),
-                      seniorSurgeon)) {
-                    seniorSurgeon = person;
+                if (surgeryLevel == bestSurgeryLevel &&
+                          person.outRanksUsingSkillTiebreaker(campaignOptions,
+                                campaign.getPlayerForce().isClanForce(),
+                                campaign.getLocalDate(),
+                                bestSurgeon)) {
+                    bestSurgeon = person;
                 }
             }
         }
 
-        return seniorSurgeon;
+        return bestSurgeon;
     }
 
     private static int getSurgeryLevel(Person person) {

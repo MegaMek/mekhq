@@ -32,6 +32,8 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
+
 import java.util.List;
 
 import mekhq.MekHQ;
@@ -39,6 +41,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 
 /**
  * Handles the optimization of doctor-to-patient assignments.
@@ -49,7 +53,7 @@ import mekhq.campaign.personnel.Person;
  *
  * <p>Key features of this class include:</p>
  * <ul>
- *   <li>Sorting doctors by their experience level to ensure the most skilled doctors are utilized first.</li>
+ *   <li>Sorting doctors by their Surgery skill to ensure the most skilled doctors are utilized first.</li>
  *   <li>Sorting patients by the severity of their medical needs, prioritizing critically injured individuals
  *       and deprioritizing prisoners.</li>
  *   <li>Assigning doctors to patients based on the sorted lists, ensuring capacity limits are adhered to
@@ -87,7 +91,7 @@ public class OptimizeInfirmaryAssignments {
         final int maximumPatients = campaignOptions.get(CampaignOption.MAXIMUM_PATIENTS);
         final int healingWaitingPeriod = campaignOptions.get(CampaignOption.HEAL_WAITING_PERIOD);
 
-        // First, order the doctors based on experience level, highest to lowest
+        // First, order the doctors based on Surgery skill, highest to lowest
         organizeDoctors();
 
         // Then, order the patients based on severity of injuries,
@@ -175,15 +179,44 @@ public class OptimizeInfirmaryAssignments {
     }
 
     /**
-     * Organizes the list of doctors in descending order of experience level.
+     * Organizes the list of doctors so the best surgeons are assigned first.
      *
-     * <p>This method sorts the doctors within the campaign, prioritizing those with the highest
-     * experience levels so that the most skilled doctors are assigned first.</p>
+     * <p>Doctors are ranked by their Surgery skill, highest first. Doctors with equal Surgery skill are then ranked by
+     * their doctor experience level. Administration is not used to rank doctors, as it only affects how many
+     * patients a doctor can take, not how well they treat them.</p>
      */
     private void organizeDoctors() {
         doctors = campaign.getPlayerForce().getHumanResources().getDoctors();
-        doctors.sort((doctor1, doctor2) -> Integer.compare(getDoctorExperienceLevel(doctor2),
-              getDoctorExperienceLevel(doctor1)));
+        doctors.sort((doctor1, doctor2) -> {
+            int surgeryComparison = Integer.compare(getSurgerySkillLevel(doctor2), getSurgerySkillLevel(doctor1));
+            if (surgeryComparison != 0) {
+                return surgeryComparison;
+            }
+            return Integer.compare(getDoctorExperienceLevel(doctor2), getDoctorExperienceLevel(doctor1));
+        });
+    }
+
+    /**
+     * Returns the doctor's total Surgery skill level, including attribute, aging, and injury modifiers.
+     *
+     * @param doctor the {@link Person} acting as the doctor
+     *
+     * @return the total Surgery skill level, or {@code -1} if the doctor has no Surgery skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int getSurgerySkillLevel(Person doctor) {
+        Skill surgerySkill = doctor.getSkill(S_SURGERY);
+        if (surgerySkill == null) {
+            return -1;
+        }
+
+        SkillModifierData skillModifierData = doctor.getSkillModifierData(
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
+        return surgerySkill.getTotalSkillLevel(skillModifierData);
     }
 
     /**
