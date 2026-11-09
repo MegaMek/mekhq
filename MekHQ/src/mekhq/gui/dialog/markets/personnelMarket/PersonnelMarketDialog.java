@@ -79,6 +79,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
+import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AdvanceDaysDialog;
@@ -129,7 +130,7 @@ public class PersonnelMarketDialog extends JDialog {
     private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
 
     private final int PADDING = scaleForGUI(5);
-    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(700, 500);
+    private final Dimension PERSON_VIEW_MINIMUM_SIZE = scaleForGUI(PersonnelTab.PERSON_VIEW_MIN_WIDTH, 500);
 
     private final NewPersonnelMarket market;
     private final JFrame parent;
