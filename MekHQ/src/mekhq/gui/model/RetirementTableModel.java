@@ -290,7 +290,7 @@ public class RetirementTableModel extends AbstractTableModel {
                                  campaign.getCampaignOptions().get(CampaignOption.TRACK_ORIGINAL_UNIT) &&
                                  Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
                                  null != campaign.getUnit(unitAssignments.get(person.getId())))) {
-                    payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getUndamagedBuyCost());
+                    payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
                 }
 
                 if (isBreakingContract(person,

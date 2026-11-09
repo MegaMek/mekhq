@@ -1162,7 +1162,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // The cost is equal to 10 percent of the units base value (not modified for
         // quality). (SO p189)
-        cost = oldUnit.getUndamagedBuyCost().multipliedBy(0.1);
+        cost = oldUnit.getBuyCost().multipliedBy(0.1);
     }
 
     /**

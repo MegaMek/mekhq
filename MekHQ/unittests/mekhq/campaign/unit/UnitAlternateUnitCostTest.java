@@ -116,6 +116,7 @@ class UnitAlternateUnitCostTest {
             designSummary = mock(MekSummary.class);
             when(designSummary.getBV()).thenReturn(BASE_BATTLE_VALUE);
             summaryCache = mock(MekSummaryCache.class);
+            when(summaryCache.isInitialized()).thenReturn(true);
             when(summaryCache.getMek(DESIGN_NAME)).thenReturn(designSummary);
             mockedSummaryCache = mockStatic(MekSummaryCache.class);
             mockedSummaryCache.when(MekSummaryCache::getInstance).thenReturn(summaryCache);
@@ -167,53 +168,18 @@ class UnitAlternateUnitCostTest {
         }
 
         /**
-         * Buying ignores damage but selling does not: a damaged unit costs the same to buy and sells for less.
+         * Damage lowers neither value: a damaged unit costs and sells exactly as an undamaged one.
          *
          * @author Illiani
          * @since 0.51.01
          */
         @Test
-        void damageLowersTheSellValueButNotTheBuyCost() {
+        void damageLowersNeitherTheBuyCostNorTheSellValue() {
             when(entity.getTotalArmor()).thenReturn(40);
             when(entity.calculateBattleValue(true, true, true)).thenReturn(DAMAGED_BATTLE_VALUE);
 
             assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
-            assertEquals(unit.getBuyCost(), unit.getUndamagedBuyCost());
-            assertEquals(Money.of(DAMAGED_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSellValue());
-        }
-
-        /**
-         * A wreck is worth half its undamaged buy price as salvage, however damaged it is.
-         *
-         * @author Illiani
-         * @since 0.51.01
-         */
-        @Test
-        void salvageValueIsHalfTheUndamagedBuyCost() {
-            when(entity.getTotalArmor()).thenReturn(0);
-            when(entity.calculateBattleValue(true, true, true)).thenReturn(DAMAGED_BATTLE_VALUE);
-
-            assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSalvageValue());
-            assertEquals(unit.getUndamagedBuyCost().multipliedBy(0.5), unit.getSalvageValue());
-        }
-
-        /**
-         * Maintenance is charged on the undamaged buy price, even when the sale value option is on and the unit is
-         * damaged.
-         *
-         * @author Illiani
-         * @since 0.51.01
-         */
-        @Test
-        void maintenanceUsesTheUndamagedBuyCost() {
-            campaignOptions.set(CampaignOption.USE_PERCENTAGE_MAINTENANCE, true);
-            campaignOptions.set(CampaignOption.EQUIPMENT_CONTRACT_SALE_VALUE, true);
-            when(entity.getTotalArmor()).thenReturn(40);
-            when(entity.calculateBattleValue(true, true, true)).thenReturn(DAMAGED_BATTLE_VALUE);
-
-            // 'Meks are maintained at 2% of their value per week
-            assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS * 0.02),
-                  unit.getWeeklyMaintenanceCost());
+            assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSellValue());
         }
 
         @Test
@@ -227,7 +193,7 @@ class UnitAlternateUnitCostTest {
         @Test
         void oddBattleValueSellsForAnExactHalf() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
-            when(entity.calculateBattleValue(true, true, true)).thenReturn(501);
+            when(designSummary.getBV()).thenReturn(501);
 
             assertEquals(Money.of(250.5), unit.getSellValue());
         }
@@ -235,14 +201,13 @@ class UnitAlternateUnitCostTest {
         @Test
         void zeroBattleValueIsWorthNothing() {
             when(designSummary.getBV()).thenReturn(0);
-            when(entity.calculateBattleValue(true, true, true)).thenReturn(0);
 
             assertEquals(Money.zero(), unit.getBuyCost());
             assertEquals(Money.zero(), unit.getSellValue());
         }
 
         /**
-         * The buy cost comes from the design's base Battle Value, never the unit's own calculation, which damage
+         * Buy and sell values come from the design's base Battle Value, never the unit's own calculation, which damage
          * lowers.
          *
          * @author Illiani
@@ -251,6 +216,7 @@ class UnitAlternateUnitCostTest {
         @Test
         void valueUsesTheDesignBattleValue() {
             unit.getBuyCost();
+            unit.getSellValue();
 
             verify(summaryCache).getMek(DESIGN_NAME);
             verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
@@ -271,6 +237,42 @@ class UnitAlternateUnitCostTest {
 
             assertEquals(Money.of(DAMAGED_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
             verify(entity).calculateBattleValue(true, true, true);
+        }
+
+        /**
+         * A fallback value is not kept, so the design's base Battle Value is used once its summary can be found.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void fallbackIsNotCachedOnceTheDesignIsFound() {
+            when(summaryCache.getMek(DESIGN_NAME)).thenReturn(null);
+            when(entity.calculateBattleValue(true, true, true)).thenReturn(DAMAGED_BATTLE_VALUE);
+            unit.getBuyCost();
+
+            when(summaryCache.getMek(DESIGN_NAME)).thenReturn(designSummary);
+
+            assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+        }
+
+        /**
+         * While the unit summaries are (re)loading, the unit is valued without waiting for them, so the caller (often
+         * the UI) never freezes; the base Battle Value is used once loading finishes.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        @Test
+        void loadingSummariesAreNotWaitedFor() {
+            when(summaryCache.isInitialized()).thenReturn(false);
+            when(entity.calculateBattleValue(true, true, true)).thenReturn(DAMAGED_BATTLE_VALUE);
+
+            assertEquals(Money.of(DAMAGED_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            verify(summaryCache, never()).getMek(anyString());
+
+            when(summaryCache.isInitialized()).thenReturn(true);
+            assertEquals(Money.of(BASE_BATTLE_VALUE * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
         }
 
         @Test
@@ -372,34 +374,6 @@ class UnitAlternateUnitCostTest {
             assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
         }
 
-        /**
-         * @author Illiani
-         * @since 0.51.01
-         */
-        @Test
-        void mekHQValuesOrdinaryUnitsByBattleValue() {
-            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-
-            assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
-            assertEquals(Money.of(2_500_000), unit.getSellValue());
-        }
-
-        /**
-         * MekHQ keeps large craft at their construction cost, both as units and when estimated.
-         *
-         * @author Illiani
-         * @since 0.51.01
-         */
-        @Test
-        void mekHQKeepsLargeCraftAtTheirConstructionCost() {
-            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-            when(entity.isLargeCraft()).thenReturn(true);
-
-            assertEquals(Money.of(3_000_000), unit.getBuyCost());
-            assertEquals(unit.getBuyCost(), Unit.estimateBuyCost(entity, campaignOptions));
-            verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
-        }
-
         /** A WarShip's BV times 10,000 is well past the range of an int. */
         @Test
         void largeVesselValuesDoNotOverflow() {
@@ -442,6 +416,7 @@ class UnitAlternateUnitCostTest {
 
                 assertEquals(undamaged, unit.getBuyCost());
                 assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(250 * SUPPORT_POINTS_TO_C_BILLS), unit.getSellValue());
                 verify(entity, never()).calculateBattleValue(anyBoolean(), anyBoolean(), anyBoolean());
             }
 
@@ -463,84 +438,6 @@ class UnitAlternateUnitCostTest {
                 assertEquals(Money.of(650 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
             }
 
-            /**
-             * The sell value's current Battle Value is only recalculated when the unit's condition changes.
-             *
-             * @author Illiani
-             * @since 0.51.01
-             */
-            @Test
-            void unchangedUnitReusesItsCurrentBattleValue() {
-                unit.getSellValue();
-                unit.getSellValue();
-                unit.getSellValue();
-
-                verify(entity, times(1)).calculateBattleValue(true, true, true);
-            }
-
-            /**
-             * @author Illiani
-             * @since 0.51.01
-             */
-            @Test
-            void armorDamageRecalculatesTheSellValue() {
-                unit.getSellValue();
-                when(entity.getTotalArmor()).thenReturn(60);
-                when(entity.calculateBattleValue(true, true, true)).thenReturn(400);
-
-                assertEquals(Money.of(400 * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSellValue());
-            }
-
-            /**
-             * @author Illiani
-             * @since 0.51.01
-             */
-            @Test
-            void structureDamageRecalculatesTheSellValue() {
-                unit.getSellValue();
-                when(entity.getTotalInternal()).thenReturn(30);
-                when(entity.calculateBattleValue(true, true, true)).thenReturn(350);
-
-                assertEquals(Money.of(350 * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSellValue());
-            }
-
-            /**
-             * @author Illiani
-             * @since 0.51.01
-             */
-            @ParameterizedTest
-            @ValueSource(strings = { "destroyed", "hit", "missing" })
-            void damagedEquipmentRecalculatesTheSellValue(String damage) {
-                Mounted<?> weapon = addEquipment();
-                unit.getSellValue();
-                switch (damage) {
-                    case "destroyed" -> when(weapon.isDestroyed()).thenReturn(true);
-                    case "hit" -> when(weapon.isHit()).thenReturn(true);
-                    default -> when(weapon.isMissing()).thenReturn(true);
-                }
-                when(entity.calculateBattleValue(true, true, true)).thenReturn(420);
-
-                assertEquals(Money.of(420 * SUPPORT_POINTS_TO_C_BILLS * 0.5), unit.getSellValue());
-            }
-
-            /**
-             * @author Illiani
-             * @since 0.51.01
-             */
-            @Test
-            void repairsRestoreTheSellValue() {
-                Mounted<?> weapon = addEquipment();
-                assertEquals(Money.of(2_500_000), unit.getSellValue());
-
-                when(weapon.isDestroyed()).thenReturn(true);
-                when(entity.calculateBattleValue(true, true, true)).thenReturn(420);
-                assertEquals(Money.of(2_100_000), unit.getSellValue());
-
-                when(weapon.isDestroyed()).thenReturn(false);
-                when(entity.calculateBattleValue(true, true, true)).thenReturn(BASE_BATTLE_VALUE);
-                assertEquals(Money.of(2_500_000), unit.getSellValue());
-            }
-
             /** The multipliers and conversion are read live; only the Battle Value is cached. */
             @Test
             void optionChangesApplyImmediately() {
@@ -558,7 +455,6 @@ class UnitAlternateUnitCostTest {
                 String breakdown = unit.getSellValueBreakdown();
 
                 assertTrue(breakdown.contains("Base Battle Value: 500"), breakdown);
-                assertTrue(breakdown.contains("Battle Value (current condition): 500"), breakdown);
                 assertTrue(breakdown.contains("Sold at: x" + String.format("%.2f", 0.5)), breakdown);
                 assertTrue(breakdown.contains(unit.getSellValue().toAmountString()), breakdown);
             }
@@ -802,30 +698,6 @@ class UnitAlternateUnitCostTest {
          * @author Illiani
          * @since 0.51.01
          */
-        @Test
-        void mekHQPricesOrdinarySummariesByBattleValue() {
-            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-
-            assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), Unit.estimateBuyCost(summary, campaignOptions));
-        }
-
-        /**
-         * @author Illiani
-         * @since 0.51.01
-         */
-        @ParameterizedTest
-        @ValueSource(ints = { UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
-        void mekHQPricesLargeCraftSummariesByTheirConstructionCost(int unitType) {
-            campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
-
-            assertEquals(Money.of(3_300_000), Unit.estimateBuyCost(summary, campaignOptions));
-        }
-
-        /**
-         * @author Illiani
-         * @since 0.51.01
-         */
         @ParameterizedTest
         @ValueSource(ints = { UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
         void chaosCampaignPricesLargeCraftSummariesByBattleValue(int unitType) {
@@ -851,8 +723,8 @@ class UnitAlternateUnitCostTest {
     }
 
     /**
-     * Against a real Locust, to show damage that lowers MegaMek's Battle Value lowers the unit's sell value but not its
-     * buy cost, and that Total Warfare buy costs do include damage.
+     * Against a real Locust, to show that damage which lowers MegaMek's Battle Value lowers neither Chaos Campaign
+     * value, while a Total Warfare sell value still falls with damaged parts.
      */
     @Nested
     class WithRealEntity {
@@ -873,6 +745,7 @@ class UnitAlternateUnitCostTest {
             MekSummary locustSummary = mock(MekSummary.class);
             when(locustSummary.getBV()).thenReturn(baseBattleValue);
             MekSummaryCache summaryCache = mock(MekSummaryCache.class);
+            when(summaryCache.isInitialized()).thenReturn(true);
             when(summaryCache.getMek(anyString())).thenReturn(locustSummary);
             mockedSummaryCache = mockStatic(MekSummaryCache.class);
             mockedSummaryCache.when(MekSummaryCache::getInstance).thenReturn(summaryCache);
@@ -898,8 +771,9 @@ class UnitAlternateUnitCostTest {
          * @since 0.51.01
          */
         @Test
-        void armorDamageLowersOnlyTheSellValue() {
-            Money undamaged = unit.getBuyCost();
+        void armorDamageLowersNeitherValue() {
+            Money buyCost = unit.getBuyCost();
+            Money sellValue = unit.getSellValue();
 
             Entity entity = unit.getEntity();
             for (int location = 0; location < entity.locations(); location++) {
@@ -908,10 +782,8 @@ class UnitAlternateUnitCostTest {
 
             assertTrue(entity.calculateBattleValue(true, true, true) < baseBattleValue,
                   "stripping all armor must lower the unit's own Battle Value");
-            assertEquals(undamaged, unit.getBuyCost());
-            assertEquals(undamaged, unit.getUndamagedBuyCost());
-            assertTrue(unit.getSellValue().isLessThan(undamaged.multipliedBy(0.5)),
-                  "stripping all armor must lower the sell value");
+            assertEquals(buyCost, unit.getBuyCost());
+            assertEquals(sellValue, unit.getSellValue());
         }
 
         /**
@@ -919,8 +791,9 @@ class UnitAlternateUnitCostTest {
          * @since 0.51.01
          */
         @Test
-        void destroyedWeaponsLowerOnlyTheSellValue() {
-            Money undamaged = unit.getBuyCost();
+        void destroyedWeaponsLowerNeitherValue() {
+            Money buyCost = unit.getBuyCost();
+            Money sellValue = unit.getSellValue();
 
             for (Mounted<?> weapon : unit.getEntity().getWeaponList()) {
                 weapon.setDestroyed(true);
@@ -928,23 +801,21 @@ class UnitAlternateUnitCostTest {
 
             assertTrue(unit.getEntity().calculateBattleValue(true, true, true) < baseBattleValue,
                   "destroying every weapon must lower the unit's own Battle Value");
-            assertEquals(undamaged, unit.getBuyCost());
-            assertTrue(unit.getSellValue().isLessThan(undamaged.multipliedBy(0.5)),
-                  "destroying every weapon must lower the sell value");
+            assertEquals(buyCost, unit.getBuyCost());
+            assertEquals(sellValue, unit.getSellValue());
         }
 
         /**
-         * Under Total Warfare, damaged parts lower the buy cost, but not the undamaged buy cost used for salvage,
-         * maintenance, and the like.
+         * Under Total Warfare, damaged parts lower the sell value but the buy cost stays the construction cost.
          *
          * @author Illiani
          * @since 0.51.01
          */
         @Test
-        void totalWarfareBuyCostIncludesDamage() {
+        void totalWarfareDamageLowersOnlyTheSellValue() {
             campaign.getCampaignOptions().set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.TOTAL_WARFARE);
             Money constructionCost = Money.of(unit.getEntity().getCost(false));
-            assertEquals(constructionCost, unit.getBuyCost());
+            Money undamagedSellValue = unit.getSellValue();
 
             for (Part part : unit.getParts()) {
                 if (part instanceof EquipmentPart equipmentPart) {
@@ -952,10 +823,8 @@ class UnitAlternateUnitCostTest {
                 }
             }
 
-            assertTrue(unit.getBuyCost().isLessThan(constructionCost), "damaged parts must lower the buy cost");
-            assertTrue(unit.getBuyCost().isPositive());
-            assertEquals(constructionCost, unit.getUndamagedBuyCost());
-            assertEquals(constructionCost.multipliedBy(0.5), unit.getSalvageValue());
+            assertEquals(constructionCost, unit.getBuyCost());
+            assertTrue(unit.getSellValue().isLessThan(undamagedSellValue), "damaged parts must lower the sell value");
         }
 
         @Test

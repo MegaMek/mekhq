@@ -260,17 +260,17 @@ class CamOpsSalvageResolutionTest {
             });
         }
 
-        private static TestUnit wreck(double salvageValue, Camouflage camouflage) {
+        private static TestUnit wreck(double sellValue, Camouflage camouflage) {
             Entity entity = mock(Mek.class);
             when(entity.getCamouflage()).thenReturn(camouflage);
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(entity);
-            when(wreck.getSalvageValue()).thenReturn(Money.of(salvageValue));
+            when(wreck.getSellValue()).thenReturn(Money.of(sellValue));
             return wreck;
         }
 
-        private static TestUnit wreck(double salvageValue) {
-            return wreck(salvageValue, new Camouflage());
+        private static TestUnit wreck(double sellValue) {
+            return wreck(sellValue, new Camouflage());
         }
 
         private void resolve(SalvageSettlement settlement, List<TestUnit> kept, List<TestUnit> sold,
@@ -347,7 +347,7 @@ class CamOpsSalvageResolutionTest {
             when(aero.getCamouflage()).thenReturn(new Camouflage());
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(aero);
-            when(wreck.getSalvageValue()).thenReturn(Money.of(1000));
+            when(wreck.getSellValue()).thenReturn(Money.of(1000));
             Aero freshCopy = mock(AeroSpaceFighter.class);
             when(freshCopy.getFuel()).thenReturn(400);
 
@@ -367,7 +367,7 @@ class CamOpsSalvageResolutionTest {
             when(aero.getFuel()).thenReturn(300);
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(aero);
-            when(wreck.getSalvageValue()).thenReturn(Money.of(1000));
+            when(wreck.getSellValue()).thenReturn(Money.of(1000));
 
             // The unit's file couldn't be found, so it is refuelled to its own capacity
             try (MockedConstruction<ResolveScenarioTracker.UnitStatus> ignored =

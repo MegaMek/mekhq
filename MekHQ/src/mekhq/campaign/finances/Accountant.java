@@ -1138,14 +1138,20 @@ public record Accountant(Campaign campaign) {
      *
      * @param campaignOptions the campaign options containing the contract percentages for each unit category
      * @param unit            the unit to evaluate
-     * @param useSaleValue    no longer used: the unit is always valued at its undamaged buy price (see
-     *                        {@link Unit#getUndamagedBuyCost()}), so damage does not lower its contract value
+     * @param useSaleValue    if {@code true}, the unit's sell value is used as the base; otherwise its buy cost is
+     *                        used
      *
      * @return the {@link Money} contract value of the unit
      */
     public static Money getEquipmentContractValue(CampaignOptions campaignOptions, Unit unit, boolean useSaleValue) {
-        Money value = unit.getUndamagedBuyCost();
+        Money value;
         Money percentValue;
+
+        if (useSaleValue) {
+            value = unit.getSellValue();
+        } else {
+            value = unit.getBuyCost();
+        }
 
         if (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
             percentValue = value.multipliedBy(campaignOptions.get(CampaignOption.DROP_SHIP_CONTRACT_PERCENT)).dividedBy(100);

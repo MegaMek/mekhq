@@ -115,6 +115,19 @@ class UnitCostModelPersistenceTest {
         assertEquals(UnitCostModel.TOTAL_WARFARE, loaded.get(CampaignOption.UNIT_COST_MODEL));
     }
 
+    /**
+     * Saves made with the removed MekHQ unit cost model load as Total Warfare.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void removedMekHQModelLoadsAsTotalWarfare() throws Exception {
+        CampaignOptions loaded = unmarshalTags("<unitCostModel>MEKHQ</unitCostModel>");
+
+        assertEquals(UnitCostModel.TOTAL_WARFARE, loaded.get(CampaignOption.UNIT_COST_MODEL));
+    }
+
     @Test
     void saveWithoutAnyUnitCostTagDefaultsToTotalWarfare() throws Exception {
         assertEquals(UnitCostModel.TOTAL_WARFARE, unmarshalTags("").get(CampaignOption.UNIT_COST_MODEL));

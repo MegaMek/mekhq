@@ -71,6 +71,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.UIManager;
@@ -188,8 +189,6 @@ import org.w3c.dom.NodeList;
 public class Unit implements ITechnology, ILocatable {
     /** Under Alternate Unit Cost, units always sell for this fraction of their value */
     static final double ALTERNATE_UNIT_COST_SELL_FRACTION = 0.5;
-    /** The share of a wreck's undamaged buy price it is worth as salvage. */
-    static final double SALVAGE_VALUE_FRACTION = 0.5;
     private static final double GOOD_REPUTATION_1_PRICE_MULTIPLIER = 1.1;
     private static final double GOOD_REPUTATION_2_PRICE_MULTIPLIER = 1.25;
 
@@ -2114,14 +2113,11 @@ public class Unit implements ITechnology, ILocatable {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         if (isUseAlternateUnitCost()) {
-            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.baseBattleValue",
-                  getUnitBaseBattleValue())).append("<br>");
-            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
-                  getAlternateUnitCost().toAmountAndSymbolString())).append("<br>");
+            Money alternateUnitCost = getAlternateUnitCost();
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.battleValue",
-                  getUnitCurrentBattleValue())).append("<br>");
-            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.currentValue",
-                  getCurrentConditionAlternateUnitCost().toAmountAndSymbolString())).append("<br>");
+                  getUnitBattleValue())).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
+                  alternateUnitCost.toAmountAndSymbolString())).append("<br>");
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.half",
                   String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<br>");
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
@@ -2140,7 +2136,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         // Get the "buy new" price
-        Money buyNewPrice = getUndamagedBuyCost();
+        Money buyNewPrice = getBuyCost();
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
               buyNewPrice.toAmountAndSymbolString())).append("<br>");
 
@@ -3252,88 +3248,12 @@ public class Unit implements ITechnology, ILocatable {
     }
     // End Transport Assignments
 
-    /**
-     * Gets the unit's purchase price. Under the Chaos Campaign and MekHQ {@link CampaignOption#UNIT_COST_MODEL}s this
-     * is the unit's base Battle Value-based value, which ignores damage. Under Total Warfare it is the construction
-     * cost, reduced in proportion to the damage to the unit's parts (see {@link #getPartsConditionMultiplier()}).
-     *
-     * @return the unit's purchase price
-     *
-     * @see #getUndamagedBuyCost()
-     */
     public Money getBuyCost() {
         if (isUseAlternateUnitCost()) {
             return getAlternateUnitCost();
         }
 
-        return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions())
-                     .multipliedBy(getPartsConditionMultiplier());
-    }
-
-    /**
-     * Gets the unit's purchase price as if it were undamaged, under any {@link CampaignOption#UNIT_COST_MODEL}. Used
-     * wherever damage must not affect the unit's value: salvage, maintenance, equipment contract value, retirement
-     * payouts, refits, and refunds for cancelled orders.
-     *
-     * @return the unit's undamaged purchase price
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public Money getUndamagedBuyCost() {
-        if (isUseAlternateUnitCost()) {
-            return getAlternateUnitCost();
-        }
-
         return getTraditionalBuyCost(getEntity(), getCampaign().getCampaignOptions());
-    }
-
-    /**
-     * Gets what the unit is worth as salvage: half its undamaged buy price (see {@link #getUndamagedBuyCost()}), so
-     * damage does not lower it.
-     *
-     * @return the unit's salvage value
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public Money getSalvageValue() {
-        return getUndamagedBuyCost().multipliedBy(SALVAGE_VALUE_FRACTION);
-    }
-
-    /**
-     * Gets how much damage reduces a Total Warfare purchase price: the unit's parts value as they are, over their value
-     * if every part were undamaged and nothing were missing. Damaged parts count at the Damaged (or Unrepairable)
-     * Parts Value Multiplier, as they do for the unit's sell value, and missing parts count for nothing.
-     *
-     * @return the multiplier, from 0 to 1; 1 for an undamaged unit or one without parts
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    double getPartsConditionMultiplier() {
-        Money currentPartsValue = Money.zero();
-        Money undamagedPartsValue = Money.zero();
-        for (Part part : parts) {
-            int quantity = part.getQuantity();
-            currentPartsValue = currentPartsValue.plus(part.getActualValue().multipliedBy(quantity));
-            if (part instanceof MissingPart missingPart) {
-                Part replacement = missingPart.getNewPart();
-                if (replacement != null) {
-                    undamagedPartsValue = undamagedPartsValue.plus(replacement.getUndamagedValue()
-                                                                         .multipliedBy(quantity));
-                }
-            } else {
-                undamagedPartsValue = undamagedPartsValue.plus(part.getUndamagedValue().multipliedBy(quantity));
-            }
-        }
-
-        if (!undamagedPartsValue.isPositive()) {
-            return 1.0;
-        }
-
-        double multiplier = currentPartsValue.getAmount().doubleValue() / undamagedPartsValue.getAmount().doubleValue();
-        return Math.max(0.0, Math.min(1.0, multiplier));
     }
 
     /**
@@ -3482,13 +3402,16 @@ public class Unit implements ITechnology, ILocatable {
 
     private transient DesignBattleValue cachedDesignBattleValue;
 
+    /** Designs already reported as missing from the unit summaries, so each is only logged once. */
+    private static final Set<String> DESIGNS_MISSING_SUMMARIES = ConcurrentHashMap.newKeySet();
+
     /**
-     * @return the unit's base Battle Value: that of its design, undamaged, excluding pilot skill, C3, and TAG
+     * @return the unit's base Battle Value (see {@link #getBaseBattleValue(Entity)})
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private int getUnitBaseBattleValue() {
+    private int getUnitBattleValue() {
         Entity unitEntity = getEntity();
         String designName = unitEntity.getShortNameRaw();
         DesignBattleValue cached = cachedDesignBattleValue;
@@ -3496,9 +3419,14 @@ public class Unit implements ITechnology, ILocatable {
             return cached.battleValue();
         }
 
-        int battleValue = getBaseBattleValue(unitEntity);
-        cachedDesignBattleValue = new DesignBattleValue(designName, battleValue);
-        return battleValue;
+        MekSummary summary = findDesignSummary(designName);
+        if (summary == null) {
+            // Not cached, so the base Battle Value is used as soon as the design's summary can be found
+            return unitEntity.calculateBattleValue(true, true, true);
+        }
+
+        cachedDesignBattleValue = new DesignBattleValue(designName, summary.getBV());
+        return summary.getBV();
     }
 
     /**
@@ -3506,8 +3434,8 @@ public class Unit implements ITechnology, ILocatable {
      * equipment do not lower it. Pilot skill and C3 are excluded. This is the same Battle Value the Purchase Unit
      * dialog and the unit market price units by.
      *
-     * <p>If the design cannot be found in the {@link MekSummaryCache}, the entity's Battle Value is calculated from
-     * its current state instead.</p>
+     * <p>If the design's summary is unavailable (see {@link #findDesignSummary(String)}), the entity's Battle Value is
+     * calculated from its current state instead.</p>
      *
      * @param unitEntity the entity to value
      *
@@ -3517,14 +3445,33 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     static int getBaseBattleValue(Entity unitEntity) {
-        MekSummary summary = MekSummaryCache.getInstance().getMek(unitEntity.getShortNameRaw());
-        if (summary != null) {
-            return summary.getBV();
+        MekSummary summary = findDesignSummary(unitEntity.getShortNameRaw());
+        return (summary == null) ? unitEntity.calculateBattleValue(true, true, true) : summary.getBV();
+    }
+
+    /**
+     * Finds a design's summary without waiting for the {@link MekSummaryCache}: while the cache is loading (at startup,
+     * or reloading after a refit or a MegaMekLab save), waiting would freeze the caller, which is often the UI.
+     *
+     * @param designName the design's raw short name
+     *
+     * @return the design's summary, or {@code null} if the cache is still loading or does not hold the design
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable MekSummary findDesignSummary(String designName) {
+        MekSummaryCache summaryCache = MekSummaryCache.getInstance();
+        if (!summaryCache.isInitialized()) {
+            return null;
         }
 
-        LOGGER.warn("No unit summary found for {}; valuing it by its current Battle Value instead of its base Battle "
-                          + "Value.", unitEntity.getShortNameRaw());
-        return unitEntity.calculateBattleValue(true, true, true);
+        MekSummary summary = summaryCache.getMek(designName);
+        if ((summary == null) && DESIGNS_MISSING_SUMMARIES.add(designName)) {
+            LOGGER.warn("No unit summary found for {}; valuing it by its current Battle Value instead of its base "
+                              + "Battle Value.", designName);
+        }
+        return summary;
     }
 
     /**
@@ -3545,70 +3492,8 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getAlternateUnitCost() {
-        return calculateAlternateUnitCost(getUnitBaseBattleValue(), getUnitPriceMultiplier(),
+        return calculateAlternateUnitCost(getUnitBattleValue(), getUnitPriceMultiplier(),
               getQuirkPriceMultiplier(getEntity()), getCampaign().getCampaignOptions());
-    }
-
-    /**
-     * Gets the unit's value under {@link CampaignOption#UNIT_COST_MODEL} in its current condition: as
-     * {@link #getAlternateUnitCost()}, but from the unit's current Battle Value, so damage, lost armor, and destroyed
-     * equipment lower it. Used for the unit's sell value.
-     *
-     * @return the unit's Battle Value-based value in its current condition
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    Money getCurrentConditionAlternateUnitCost() {
-        return calculateAlternateUnitCost(getUnitCurrentBattleValue(), getUnitPriceMultiplier(),
-              getQuirkPriceMultiplier(getEntity()), getCampaign().getCampaignOptions());
-    }
-
-    /**
-     * The unit's condition when its current Battle Value was last calculated. Battle Value is expensive to work out and
-     * the sell value is read constantly (unit tables, finances), so it is only recalculated when the condition
-     * changes.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private record BattleValueCondition(int totalArmor, int totalInternal, int damagedEquipment, int equipmentCount,
-          int battleValue) {}
-
-    private transient BattleValueCondition cachedBattleValueCondition;
-
-    /**
-     * @return the unit's Battle Value in its current condition, excluding pilot skill, C3, and TAG
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private int getUnitCurrentBattleValue() {
-        Entity unitEntity = getEntity();
-        int totalArmor = unitEntity.getTotalArmor();
-        int totalInternal = unitEntity.getTotalInternal();
-        int damagedEquipment = 0;
-        int equipmentCount = 0;
-        for (Mounted<?> mounted : unitEntity.getEquipment()) {
-            equipmentCount++;
-            if (mounted.isDestroyed() || mounted.isHit() || mounted.isMissing()) {
-                damagedEquipment++;
-            }
-        }
-
-        BattleValueCondition cached = cachedBattleValueCondition;
-        if ((cached != null)
-                  && (cached.totalArmor() == totalArmor)
-                  && (cached.totalInternal() == totalInternal)
-                  && (cached.damagedEquipment() == damagedEquipment)
-                  && (cached.equipmentCount() == equipmentCount)) {
-            return cached.battleValue();
-        }
-
-        int battleValue = unitEntity.calculateBattleValue(true, true, true);
-        cachedBattleValueCondition = new BattleValueCondition(totalArmor, totalInternal, damagedEquipment,
-              equipmentCount, battleValue);
-        return battleValue;
     }
 
     /**
@@ -3661,10 +3546,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Gets the unit's sell value under {@link CampaignOption#UNIT_COST_MODEL}: half its value in its current condition
-     * ({@link #getCurrentConditionAlternateUnitCost()}, so damage lowers it), adjusted for the unit's quality (see
-     * {@link #getAlternateQualityMultiplier()}), then reduced further by the obsolete quirk resale modifier as a
-     * traditionally priced unit would be.
+     * Gets the unit's sell value under {@link CampaignOption#UNIT_COST_MODEL}: half its
+     * {@link #getAlternateUnitCost()}, adjusted for the unit's quality (see {@link #getAlternateQualityMultiplier()}),
+     * then reduced further by the obsolete quirk resale modifier as a traditionally priced unit would be.
      *
      * @return the unit's Battle Value-based sell value
      *
@@ -3672,7 +3556,7 @@ public class Unit implements ITechnology, ILocatable {
      * @since 0.51.01
      */
     Money getAlternateSellValue() {
-        Money sellValue = getCurrentConditionAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION)
+        Money sellValue = getAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION)
                                 .multipliedBy(getAlternateQualityMultiplier());
         double obsoleteMultiplier = getEntity().getObsoleteResaleModifier(getCampaign().getGameYear());
         if (obsoleteMultiplier < 1.0) {
@@ -4271,8 +4155,14 @@ public class Unit implements ITechnology, ILocatable {
     public Money getWeeklyMaintenanceCost() {
         Entity en = getEntity();
         Money mCost = Money.zero();
-        // Maintenance is charged on the unit's undamaged value, so damage never makes a unit cheaper to maintain
-        Money value = getUndamagedBuyCost();
+        Money value;
+
+        // we will assume sale value for now, but make this customizable
+        if (getCampaign().getCampaignOptions().get(CampaignOption.EQUIPMENT_CONTRACT_SALE_VALUE)) {
+            value = getSellValue();
+        } else {
+            value = getBuyCost();
+        }
 
         if (getCampaign().getCampaignOptions().get(CampaignOption.USE_PERCENTAGE_MAINTENANCE)) {
             if (en instanceof Mek) {
