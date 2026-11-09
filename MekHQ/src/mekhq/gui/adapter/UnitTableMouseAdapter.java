@@ -1353,7 +1353,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             // transport assignment (ship / tactical / tow), same actions as the TO&E tab
             TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(),
-                  Arrays.asList(units));
+                  Arrays.asList(units), false);
 
             // sell unit
             if (!allDeployed && gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS)) {
