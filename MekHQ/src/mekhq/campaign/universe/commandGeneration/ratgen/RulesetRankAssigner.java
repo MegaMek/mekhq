@@ -688,12 +688,14 @@ public final class RulesetRankAssigner {
      *
      * @param campaign the campaign the ships belong to
      * @param options  the generation options; nothing is ranked when automatic ranks are off
-     * @param ships    the ships whose crews are ranked; anything that is not a large craft is skipped
+     * @param ships    the ships whose crews are ranked; anything that is not a large craft is skipped, and
+     *                 {@code null} is treated as an empty list
      *
      * @return how many people were given a rank
      */
-    public static int rankLateShipCrews(Campaign campaign, CommandGenerationOptions options, List<Unit> ships) {
-        if ((campaign == null) || (options == null) || ships.isEmpty()) {
+    public static int rankLateShipCrews(Campaign campaign, CommandGenerationOptions options,
+          @Nullable List<Unit> ships) {
+        if ((campaign == null) || (options == null) || (ships == null) || ships.isEmpty()) {
             return 0;
         }
         if (!options.isAutomaticallyAssignRanks()) {
@@ -726,7 +728,8 @@ public final class RulesetRankAssigner {
             }
             int enlisted = 0;
             int support = 0;
-            for (Person person : unitCrew(ship)) {
+            // getCrew rather than unitCrew: it also holds the tech officer, who is crew aboard a ship.
+            for (Person person : ship.getCrew()) {
                 if ((person == null) || !done.add(person.getId())) {
                     continue;
                 }

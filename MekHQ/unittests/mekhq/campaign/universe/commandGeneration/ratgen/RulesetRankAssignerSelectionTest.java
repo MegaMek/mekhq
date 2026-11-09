@@ -234,6 +234,13 @@ class RulesetRankAssignerSelectionTest {
         }
     }
 
+    @Test
+    void aNullShipListRanksNobody() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        assertEquals(0, RulesetRankAssigner.rankLateShipCrews(campaign, companyOptions(), null));
+    }
+
     /** A Union DropShip added and crewed the way the generator's lift stages add theirs. */
     private static Unit crewedDropShip(Campaign campaign) {
         MekSummary union = MekSummaryCache.getInstance().getMek("Union (2708)");
