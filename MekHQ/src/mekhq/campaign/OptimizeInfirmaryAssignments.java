@@ -32,8 +32,6 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
-
 import java.util.List;
 
 import mekhq.MekHQ;
@@ -41,8 +39,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.medical.SurgeonRanking;
 
 /**
  * Handles the optimization of doctor-to-patient assignments.
@@ -188,35 +185,13 @@ public class OptimizeInfirmaryAssignments {
     private void organizeDoctors() {
         doctors = campaign.getPlayerForce().getHumanResources().getDoctors();
         doctors.sort((doctor1, doctor2) -> {
-            int surgeryComparison = Integer.compare(getSurgerySkillLevel(doctor2), getSurgerySkillLevel(doctor1));
+            int surgeryComparison = Integer.compare(SurgeonRanking.getSurgerySkillLevel(doctor2),
+                  SurgeonRanking.getSurgerySkillLevel(doctor1));
             if (surgeryComparison != 0) {
                 return surgeryComparison;
             }
             return Integer.compare(getDoctorExperienceLevel(doctor2), getDoctorExperienceLevel(doctor1));
         });
-    }
-
-    /**
-     * Returns the doctor's total Surgery skill level, including attribute, aging, and injury modifiers.
-     *
-     * @param doctor the {@link Person} acting as the doctor
-     *
-     * @return the total Surgery skill level, or {@code -1} if the doctor has no Surgery skill
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private int getSurgerySkillLevel(Person doctor) {
-        Skill surgerySkill = doctor.getSkill(S_SURGERY);
-        if (surgerySkill == null) {
-            return -1;
-        }
-
-        SkillModifierData skillModifierData = doctor.getSkillModifierData(
-              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
-              campaign.getPlayerForce().isClanForce(),
-              campaign.getLocalDate());
-        return surgerySkill.getTotalSkillLevel(skillModifierData);
     }
 
     /**

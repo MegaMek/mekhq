@@ -99,6 +99,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.SurgeonRanking;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
@@ -106,7 +107,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalc
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.Risk;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.SurgeryOdds;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.roleplay.CheckOdds;
 import mekhq.campaign.roleplay.CheckTarget;
 import mekhq.campaign.universe.Faction;
@@ -1954,34 +1954,14 @@ public class AdvancedSurgeriesDialog extends JDialog {
      * @since 0.50.10
      */
     private @Nullable Person getSurgeon(AbstractLocation currentLocation) {
-        Person bestSurgeon = null;
-        int bestSurgeryLevel = -1;
-
-        for (Person person : currentLocation.fetchPersonnelAtLocation()) {
-            if (person.isActive() && person.isDoctor()) {
-                int surgeryLevel = getSurgeryLevel(person);
-                if (bestSurgeon == null || surgeryLevel > bestSurgeryLevel) {
-                    bestSurgeon = person;
-                    bestSurgeryLevel = surgeryLevel;
-                    continue;
-                }
-
-                if (surgeryLevel == bestSurgeryLevel &&
-                          person.outRanksUsingSkillTiebreaker(campaignOptions,
-                                campaign.getPlayerForce().isClanForce(),
-                                campaign.getLocalDate(),
-                                bestSurgeon)) {
-                    bestSurgeon = person;
-                }
-            }
-        }
-
-        return bestSurgeon;
+        return SurgeonRanking.getBestSurgeon(currentLocation.fetchPersonnelAtLocation(),
+              campaignOptions,
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
     }
 
     private static int getSurgeryLevel(Person person) {
-        Skill skill = person.getSkill(S_SURGERY);
-        return skill == null ? -1 : skill.getTotalSkillLevel(person.getSkillModifierData());
+        return SurgeonRanking.getSurgerySkillLevel(person);
     }
 
     /** @return {@code true} if the campaign's surgeon can't perform surgery of this level, so a local is hired */
