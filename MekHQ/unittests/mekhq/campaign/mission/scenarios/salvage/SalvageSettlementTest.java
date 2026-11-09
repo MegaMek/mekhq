@@ -83,13 +83,13 @@ class SalvageSettlementTest {
         return contract;
     }
 
-    private static TestUnit wreck(double sellValue, boolean isClan, boolean isMixedTech) {
+    private static TestUnit wreck(double salvageValue, boolean isClan, boolean isMixedTech) {
         Entity entity = mock(Mek.class);
         when(entity.isClan()).thenReturn(isClan);
         when(entity.isMixedTech()).thenReturn(isMixedTech);
         TestUnit wreck = mock(TestUnit.class);
         when(wreck.getEntity()).thenReturn(entity);
-        when(wreck.getSellValue()).thenReturn(Money.of(sellValue));
+        when(wreck.getSalvageValue()).thenReturn(Money.of(salvageValue));
         return wreck;
     }
 

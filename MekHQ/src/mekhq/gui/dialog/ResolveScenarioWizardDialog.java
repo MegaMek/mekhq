@@ -1872,9 +1872,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             // Set up the values
             if (salvageBoxes.get(i).isSelected() || soldUnitBoxes.get(i).isSelected()) {
-                salvageUnit = salvageUnit.plus(salvageableUnites.get(i).getSellValue());
+                salvageUnit = salvageUnit.plus(salvageableUnites.get(i).getSalvageValue());
             } else {
-                salvageEmployer = salvageEmployer.plus(salvageableUnites.get(i).getSellValue());
+                salvageEmployer = salvageEmployer.plus(salvageableUnites.get(i).getSalvageValue());
             }
         }
 

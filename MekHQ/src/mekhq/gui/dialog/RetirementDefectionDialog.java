@@ -607,7 +607,7 @@ public class RetirementDefectionDialog extends JDialog {
                 if (hqView.getCampaign().getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM)) {
                     Money temp = rdTracker.getPayout(id)
                                        .getPayoutAmount()
-                                       .minus(hqView.getCampaign().getUnit(person.getOriginalUnitId()).getBuyCost());
+                                       .minus(hqView.getCampaign().getUnit(person.getOriginalUnitId()).getUndamagedBuyCost());
 
                     if (temp.isNegative()) {
                         temp = Money.zero();
@@ -729,7 +729,7 @@ public class RetirementDefectionDialog extends JDialog {
             if ((rdTracker.getPayout(id).getWeightClass() == 0) &&
                       (unitAssignments.get(id) != null) &&
                       (hqView.getCampaign().getUnit(unitAssignments.get(id)) != null)) {
-                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getSellValue());
+                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getUndamagedBuyCost());
             }
 
             // If the person is still under contract, we don't care that they're owed a unit

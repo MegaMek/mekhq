@@ -61,14 +61,14 @@ import org.junit.jupiter.api.Test;
 class SalvageRecoverySessionTest {
     private final Map<UUID, RecoveryTimeData> recoveryTimes = new HashMap<>();
 
-    private TestUnit wreck(double weight, double sellValue, int recoveryMinutes) {
+    private TestUnit wreck(double weight, double salvageValue, int recoveryMinutes) {
         Entity entity = mock(Mek.class);
         when(entity.getWeight()).thenReturn(weight);
         TestUnit wreck = mock(TestUnit.class);
         UUID id = UUID.randomUUID();
         when(wreck.getId()).thenReturn(id);
         when(wreck.getEntity()).thenReturn(entity);
-        when(wreck.getSellValue()).thenReturn(Money.of(sellValue));
+        when(wreck.getSalvageValue()).thenReturn(Money.of(salvageValue));
         recoveryTimes.put(id, new RecoveryTimeData(0, 0, 0, 0, 0, 0, recoveryMinutes, recoveryMinutes));
         return wreck;
     }

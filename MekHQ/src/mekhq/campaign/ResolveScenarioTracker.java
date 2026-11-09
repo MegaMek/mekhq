@@ -704,8 +704,9 @@ public class ResolveScenarioTracker {
     }
 
     /**
-     * Pays the DropShip Bonus Percent of the given DropShip's sell value into the scenario's DropShip bonus, in place
-     * of offering the DropShip as salvage. Does nothing if the bonus percent is 0.
+     * Pays the DropShip Bonus Percent of the given DropShip's salvage value (see {@link Unit#getSalvageValue()}) into
+     * the scenario's DropShip bonus, in place of offering the DropShip as salvage. Does nothing if the bonus percent is
+     * 0.
      *
      * @param dropShip the enemy DropShip being converted into a bounty
      */
@@ -714,7 +715,7 @@ public class ResolveScenarioTracker {
                                                         .get(CampaignOption.DROP_SHIP_BONUS_PERCENTAGE) / 100;
 
         if (dropShipBonusPercentage > 0) {
-            dropShipBonus = dropShipBonus.plus(generateNewTestUnit(dropShip).getSellValue()
+            dropShipBonus = dropShipBonus.plus(generateNewTestUnit(dropShip).getSalvageValue()
                                                      .multipliedBy(dropShipBonusPercentage));
         }
     }
@@ -2815,7 +2816,7 @@ public class ResolveScenarioTracker {
             return getDesc(false);
         }
 
-        public String getDesc(boolean printSellValue) {
+        public String getDesc(boolean printSalvageValue) {
             if (null == entity) {
                 return "Whoops, No Entity";
             }
@@ -2837,11 +2838,11 @@ public class ResolveScenarioTracker {
                 };
             }
 
-            if (printSellValue) {
+            if (printSalvageValue) {
                 return "<html><b>" +
                              getName() +
                              "</b><br> (" +
-                             unit.getSellValue().toAmountAndSymbolString() +
+                             unit.getSalvageValue().toAmountAndSymbolString() +
                              ") <font color='" +
                              color +
                              "'>" +

@@ -148,8 +148,9 @@ public abstract sealed class SalvageSettlement
     }
 
     /**
-     * Gets what a wreck is worth for the purposes of this settlement: its sell value, doubled for Clan and mixed tech
-     * units while the special Clan salvage clause is in effect.
+     * Gets what a wreck is worth for the purposes of this settlement: its salvage value (half its undamaged buy price,
+     * see {@link TestUnit#getSalvageValue()}), doubled for Clan and mixed tech units while the special Clan salvage
+     * clause is in effect.
      *
      * @param wreck the wreck to value
      *
@@ -159,14 +160,14 @@ public abstract sealed class SalvageSettlement
      * @since 0.51.01
      */
     public Money getSalvageValue(TestUnit wreck) {
-        Money sellValue = wreck.getSellValue();
+        Money salvageValue = wreck.getSalvageValue();
         if (!isClanSalvageClause) {
-            return sellValue;
+            return salvageValue;
         }
 
         Entity entity = wreck.getEntity();
         boolean isClanOrMixedTech = (entity != null) && (entity.isClan() || entity.isMixedTech());
-        return isClanOrMixedTech ? sellValue.multipliedBy(CLAN_SALVAGE_CLAUSE_VALUE_MULTIPLIER) : sellValue;
+        return isClanOrMixedTech ? salvageValue.multipliedBy(CLAN_SALVAGE_CLAUSE_VALUE_MULTIPLIER) : salvageValue;
     }
 
     /**

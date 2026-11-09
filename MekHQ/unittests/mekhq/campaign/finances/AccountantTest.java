@@ -1922,7 +1922,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(unit.isConventionalInfantry()).thenReturn(false);
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
@@ -1995,7 +1995,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.isWarShip()).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
             Formation formation = mock(Formation.class);
@@ -2016,7 +2016,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.isWarShip()).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
             Formation formation = mock(Formation.class);
@@ -2037,7 +2037,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.isJumpShip()).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
             Formation formation = mock(Formation.class);
@@ -2058,7 +2058,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.isJumpShip()).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
             Formation formation = mock(Formation.class);
@@ -2084,7 +2084,7 @@ public class AccountantTest {
                 Unit unit = mock(Unit.class);
                 Entity entity = mock(Entity.class);
                 when(unit.getEntity()).thenReturn(entity);
-                when(unit.getBuyCost()).thenReturn(Money.of(1000));
+                when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
                 when(mockHangar.getUnit(unitId)).thenReturn(unit);
                 unitIds.add(unitId);
             }
@@ -2161,7 +2161,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, false);
 
@@ -2176,25 +2176,32 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.hasETypeFlag(Entity.ETYPE_DROPSHIP)).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, false);
 
             assertEquals(Money.of(200), actual);
         }
 
+        /**
+         * Contract value always uses the undamaged buy price, so neither damage nor the sale value option lowers it.
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
         @Test
-        void testGetEquipmentContractValue_useSaleValueUsesSellValue() {
+        void testGetEquipmentContractValue_useSaleValueStillUsesUndamagedBuyCost() {
             when(campaignOptions.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT)).thenReturn(100.0);
 
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(unit.getSellValue()).thenReturn(Money.of(750));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, true);
 
-            assertEquals(Money.of(750), actual);
+            assertEquals(Money.of(1000), actual);
         }
 
         @Test
@@ -2205,7 +2212,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.hasETypeFlag(Entity.ETYPE_WARSHIP)).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, false);
 
@@ -2220,7 +2227,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, false);
 
@@ -2235,7 +2242,7 @@ public class AccountantTest {
             Entity entity = mock(Entity.class);
             when(entity.hasETypeFlag(Entity.ETYPE_SPACE_STATION)).thenReturn(true);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = getEquipmentContractValue(campaignOptions, unit, false);
 
@@ -2285,7 +2292,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(2000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(2000));
             when(unit.isConventionalInfantry()).thenReturn(false);
 
             LocalHangar mockHangar = mock(LocalHangar.class);
@@ -2385,7 +2392,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(unit.getSparePartsCost()).thenReturn(Money.of(10));
             when(unit.getAmmoCost()).thenReturn(Money.of(5));
             when(unit.getFuelCost(anyInt())).thenReturn(Money.zero());
@@ -2558,7 +2565,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
             when(unit.isConventionalInfantry()).thenReturn(false);
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
 
@@ -2594,7 +2601,7 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             Entity entity = mock(Entity.class);
             when(unit.getEntity()).thenReturn(entity);
-            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getUndamagedBuyCost()).thenReturn(Money.of(1000));
 
             Money actual = accountant.getEquipmentContractValue(unit, false);
 
