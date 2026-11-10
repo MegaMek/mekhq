@@ -320,7 +320,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), scaleForGUI(8)));
         footer.setOpaque(true);
         footer.setBackground(SURFACE_DEEP);
         footer.setBorder(BorderFactory.createCompoundBorder(
@@ -386,8 +386,15 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
         actions.add(close);
 
-        footer.add(options, BorderLayout.WEST);
-        footer.add(actions, BorderLayout.EAST);
+        // The on-accepting choices get their own row above the action buttons, so neither row is squeezed on narrow
+        // windows.
+        JPanel optionsRow = Hud.transparentPanel(new BorderLayout());
+        optionsRow.add(options, BorderLayout.WEST);
+        JPanel actionsRow = Hud.transparentPanel(new BorderLayout());
+        actionsRow.add(actions, BorderLayout.EAST);
+
+        footer.add(optionsRow, BorderLayout.NORTH);
+        footer.add(actionsRow, BorderLayout.SOUTH);
         return footer;
     }
 
