@@ -71,6 +71,17 @@ final class CrewAssignmentState {
         UNASSIGNED, ASSIGNED, EVERYONE
     }
 
+    /**
+     * Which people the Personnel page shows, by their health: fit for duty, wounded (any injury severity, counting
+     * advanced medical injuries), or pregnant. A wounded, pregnant person counts as both, and is not fit for duty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum Condition {
+        ANY, FIT, WOUNDED, PREGNANT
+    }
+
     /** A seat type on one unit, used to show only the people who qualify for it. */
     record SeatFilter(Unit unit, SeatType seat) {}
 
@@ -89,6 +100,7 @@ final class CrewAssignmentState {
     // Personnel page
     Assignment assignment = Assignment.UNASSIGNED;
     @Nullable PersonnelRole role;
+    Condition condition = Condition.ANY;
     String peopleQuery = "";
     /** When set, the Personnel page shows only people who could take this seat, even if it is full now. */
     @Nullable SeatFilter qualifiedFor;
@@ -180,6 +192,9 @@ final class CrewAssignmentState {
         if ((role != null) && !person.hasRole(role)) {
             return false;
         }
+        if (!matches(entry, condition)) {
+            return false;
+        }
         if ((qualifiedFor != null) && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
                   && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
             return false;
@@ -208,6 +223,26 @@ final class CrewAssignmentState {
             case NEEDS_TECH -> true;
             case FULLY_CREWED -> (crewing == Crewing.FULL) || (crewing == Crewing.TEMP);
             case ALL -> true;
+        };
+    }
+
+    /**
+     * @param entry     a person, whose hits are their {@link Person#getTotalInjurySeverity()}
+     * @param condition the Personnel page's condition filter
+     *
+     * @return {@code true} if the person matches the condition filter
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean matches(PersonEntry entry, Condition condition) {
+        boolean isWounded = entry.hits() > 0;
+        boolean isPregnant = entry.person().isPregnant();
+        return switch (condition) {
+            case ANY -> true;
+            case FIT -> !isWounded && !isPregnant;
+            case WOUNDED -> isWounded;
+            case PREGNANT -> isPregnant;
         };
     }
 

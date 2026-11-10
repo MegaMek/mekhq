@@ -43,15 +43,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import javax.swing.*;
 
@@ -86,6 +78,7 @@ import mekhq.gui.baseComponents.hud.HudFilterList.Item;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.UnitStatus;
@@ -152,6 +145,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     });
     private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
+        refresh();
+    });
+    private final HudFilterList<Condition> conditionFilter = new HudFilterList<>(value -> {
+        state.condition = value;
         refresh();
     });
 
@@ -421,6 +418,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
         peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
         peopleRail.add(leftAligned(roleFilter));
+        peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
+        peopleRail.add(leftAligned(conditionFilter));
 
         railHolder.setOpaque(false);
         railHolder.add(railScroll(unitRail), CrewAssignmentPage.UNITS.name());
@@ -582,6 +582,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         Map<PersonnelRole, Integer> byRole = new TreeMap<>();
         int unassigned = 0;
         int roleTotal = 0;
+        Map<Condition, Integer> byCondition = new EnumMap<>(Condition.class);
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
@@ -594,6 +595,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
                     if (role.isCombat()) {
                         byRole.merge(role, 1, Integer::sum);
+                    }
+                }
+                for (Condition condition : Condition.values()) {
+                    if (CrewAssignmentState.matches(entry, condition)) {
+                        byCondition.merge(condition, 1, Integer::sum);
                     }
                 }
             }
@@ -616,6 +622,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         byRole.forEach((role, count) -> roles.add(new Item<>(role, role.getLabel(false), count)));
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
+        List<Item<Condition>> conditions = new ArrayList<>();
+        for (Condition condition : Condition.values()) {
+            conditions.add(new Item<>(condition, getTextAt(RESOURCE_BUNDLE, "Condition." + condition.name()),
+                  byCondition.getOrDefault(condition, 0)));
+        }
+        conditionFilter.setItems(conditions);
+        conditionFilter.setSelected(state.condition);
 
         List<JComponent> chips = new ArrayList<>();
         if (state.qualifiedFor != null) {
