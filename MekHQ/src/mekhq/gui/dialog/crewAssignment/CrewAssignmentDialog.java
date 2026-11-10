@@ -83,7 +83,10 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleFilter;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleGroup;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.UnitStatus;
 import mekhq.gui.model.LocationFilterItem;
 
@@ -146,7 +149,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.assignment = value;
         refresh();
     });
-    private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
+    private final HudFilterList<RoleFilter> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
         refresh();
     });
@@ -608,6 +611,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private void refreshPersonnelPage(AssignmentPlan plan) {
         List<PersonEntry> shown = new ArrayList<>();
         Map<PersonnelRole, Integer> byRole = new TreeMap<>();
+        Map<RoleGroup, Integer> byRoleGroup = new EnumMap<>(RoleGroup.class);
         int unassigned = 0;
         int roleTotal = 0;
         Map<Condition, Integer> byCondition = new EnumMap<>(Condition.class);
@@ -617,15 +621,21 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
-            boolean isAssigned = plan.plannedUnitOf(person) != null;
+            // Counted the way the list filters, so the rail's counts match the rows shown
+            boolean isAssigned = CrewAssignmentState.isAssigned(person, plan);
             if (!isAssigned) {
                 unassigned++;
             }
             if ((state.assignment == Assignment.EVERYONE) || ((state.assignment == Assignment.ASSIGNED) == isAssigned)) {
                 roleTotal++;
                 for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
-                    if (role.isCombat()) {
+                    if (CrewAssignmentState.isFilterableRole(role)) {
                         byRole.merge(role, 1, Integer::sum);
+                    }
+                }
+                for (RoleGroup group : RoleGroup.values()) {
+                    if (CrewAssignmentState.matches(person, group)) {
+                        byRoleGroup.merge(group, 1, Integer::sum);
                     }
                 }
                 for (Condition condition : Condition.values()) {
@@ -656,9 +666,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                     people.size() - unassigned),
               new Item<>(Assignment.EVERYONE, getTextAt(RESOURCE_BUNDLE, "Assignment.EVERYONE"), people.size())));
         assignmentFilter.setSelected(state.assignment);
-        List<Item<PersonnelRole>> roles = new ArrayList<>();
+        List<Item<RoleFilter>> roles = new ArrayList<>();
         roles.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allRoles"), roleTotal));
-        byRole.forEach((role, count) -> roles.add(new Item<>(role, role.getLabel(false), count)));
+        // The groups are always offered, so the player can see there are none rather than wonder where they went
+        for (RoleGroup group : RoleGroup.values()) {
+            roles.add(new Item<>(group, getTextAt(RESOURCE_BUNDLE, "RoleGroup." + group.name()),
+                  byRoleGroup.getOrDefault(group, 0)));
+        }
+        byRole.forEach((role, count) -> roles.add(new Item<>(new SingleRole(role), role.getLabel(false), count)));
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
         List<Item<Condition>> conditions = new ArrayList<>();
@@ -774,7 +789,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private void refreshTiles(AssignmentPlan plan) {
         int unassigned = 0;
         for (PersonEntry entry : data.people()) {
-            if (plan.plannedUnitOf(entry.person()) == null) {
+            // The tile counts combat personnel only, not the techs and other staff the page also lists
+            Person person = entry.person();
+            boolean isCombat = person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat();
+            if (isCombat && (plan.plannedUnitOf(person) == null)) {
                 unassigned++;
             }
         }
@@ -938,7 +956,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     @Override
     public void autoFill() {
-        List<Person> candidates = data.people().stream().map(PersonEntry::person).toList();
+        List<Person> candidates = new ArrayList<>();
+        for (PersonEntry entry : data.people()) {
+            if (CrewAssignmentData.isAutoFillCandidate(entry.person())) {
+                candidates.add(entry.person());
+            }
+        }
         if (state.targetTech) {
             TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates);
             reportStaged(result.staged().size(), 0);

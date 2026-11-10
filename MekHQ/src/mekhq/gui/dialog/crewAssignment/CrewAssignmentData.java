@@ -156,10 +156,42 @@ final class CrewAssignmentData {
         unitEntries.forEach(entry -> units.put(entry.unit().getId(), entry));
     }
 
-    /** Someone is listed if they are active and either have a combat role or are a tech; other support staff are not. */
-    private static boolean isShown(Person person) {
+    /**
+     * Whether someone is listed on the Personnel page. They must be active and employed by the campaign, so camp
+     * followers are never listed, and have a combat role, be a tech, or have a profession that can take a vehicle's
+     * crew seat. Other support staff are not listed.
+     *
+     * @param person a person
+     *
+     * @return {@code true} if the person is listed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isShown(Person person) {
         return person.getStatus().isActive()
-                     && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech());
+                     && person.isEmployed()
+                     && (isListedRole(person.getPrimaryRole()) || isListedRole(person.getSecondaryRole())
+                               || person.isTech());
+    }
+
+    private static boolean isListedRole(PersonnelRole role) {
+        return role.isCombat() || role.isVehicleCrewExtended();
+    }
+
+    /**
+     * Whether auto-fill may choose someone. Only combat personnel and techs are chosen, so auto-fill never takes a
+     * doctor, administrator or other staff member away from their duties; the player places them by hand.
+     *
+     * @param person a listed person
+     *
+     * @return {@code true} if auto-fill may choose the person
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAutoFillCandidate(Person person) {
+        return person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech();
     }
 
     private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {

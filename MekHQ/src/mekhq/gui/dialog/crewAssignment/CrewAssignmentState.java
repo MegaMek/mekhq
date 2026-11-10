@@ -105,6 +105,56 @@ final class CrewAssignmentState {
         }
     }
 
+    /**
+     * One entry in the Personnel page's Role filter: a single role, or a {@link RoleGroup}. A person matches if their
+     * primary or secondary role does.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    sealed interface RoleFilter {
+        /**
+         * @param role a personnel role
+         *
+         * @return {@code true} if someone with this role should be shown under this filter
+         */
+        boolean matches(PersonnelRole role);
+    }
+
+    /**
+     * A single role in the Role filter.
+     *
+     * @param role the role
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record SingleRole(PersonnelRole role) implements RoleFilter {
+        @Override
+        public boolean matches(PersonnelRole candidate) {
+            return role == candidate;
+        }
+    }
+
+    /**
+     * A group of roles in the Role filter, covering the non-combat professions that can take a vehicle's crew seat:
+     * the techs, and everyone else (medical, administrative, communications, sensor and catering staff).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum RoleGroup implements RoleFilter {
+        ALL_TECHS, OTHER_PROFESSIONS;
+
+        @Override
+        public boolean matches(PersonnelRole role) {
+            return switch (this) {
+                case ALL_TECHS -> isVehicleTech(role);
+                case OTHER_PROFESSIONS -> isOtherVehicleProfession(role);
+            };
+        }
+    }
+
     /** A seat type on one unit, used to show only the people who qualify for it. */
     record SeatFilter(Unit unit, SeatType seat) {}
 
@@ -122,7 +172,7 @@ final class CrewAssignmentState {
 
     // Personnel page
     Assignment assignment = Assignment.UNASSIGNED;
-    @Nullable PersonnelRole role;
+    @Nullable RoleFilter role;
     Condition condition = Condition.ANY;
     /** Stays {@link FamiliarityBand#ANY} while chassis familiarity is off, as the filter is not offered then. */
     FamiliarityBand familiarity = FamiliarityBand.ANY;
@@ -200,6 +250,80 @@ final class CrewAssignmentState {
     }
 
     /**
+     * Whether someone counts as assigned on the Personnel page. A tech is assigned while they maintain any unit, even
+     * though they crew none.
+     *
+     * @param person a person
+     * @param plan   the staged plan, whose changes count toward whether the person crews or maintains a unit
+     *
+     * @return {@code true} if the person crews a unit, or is a tech who maintains one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAssigned(Person person, AssignmentPlan plan) {
+        return (plan.plannedUnitOf(person) != null)
+                     || (person.isTech() && !plan.plannedTechUnits(person).isEmpty());
+    }
+
+    /**
+     * Whether the Personnel page's Role filter offers a role: the combat roles, and the tech roles (MekTech, Mechanic,
+     * AeroTek and BA Tech), so techs can be found when picking someone to maintain a unit.
+     *
+     * @param role a personnel role
+     *
+     * @return {@code true} if the role has an entry in the Role filter
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFilterableRole(PersonnelRole role) {
+        return role.isCombat() || role.isTechSecondary();
+    }
+
+    /**
+     * Whether a role is a tech who can take a vehicle's crew seat: MekTech, Mechanic, AeroTek, BA Tech or AsTech.
+     *
+     * @param role a personnel role
+     *
+     * @return {@code true} if the role belongs to {@link RoleGroup#ALL_TECHS}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isVehicleTech(PersonnelRole role) {
+        return role.isVehicleCrewExtended() && (role.isTechSecondary() || role.isAstech());
+    }
+
+    /**
+     * Whether a role is a non-combat, non-tech profession that can take a vehicle's crew seat, such as a doctor,
+     * administrator, comms operator or chef.
+     *
+     * @param role a personnel role
+     *
+     * @return {@code true} if the role belongs to {@link RoleGroup#OTHER_PROFESSIONS}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isOtherVehicleProfession(PersonnelRole role) {
+        return role.isVehicleCrewExtended() && !role.isCombat() && !isVehicleTech(role);
+    }
+
+    /**
+     * @param person a person
+     * @param filter a Role filter entry
+     *
+     * @return {@code true} if the person's primary or secondary role matches the filter
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean matches(Person person, RoleFilter filter) {
+        return filter.matches(person.getPrimaryRole()) || filter.matches(person.getSecondaryRole());
+    }
+
+    /**
      * @param entry a person
      * @param plan  the staged plan, whose changes count toward whether the person crews a unit
      *
@@ -207,14 +331,12 @@ final class CrewAssignmentState {
      */
     boolean shows(PersonEntry entry, AssignmentPlan plan) {
         Person person = entry.person();
-        // A tech is assigned while they maintain any unit, even though they crew none
-        boolean isAssigned = (plan.plannedUnitOf(person) != null)
-                                   || (person.isTech() && !plan.plannedTechUnits(person).isEmpty());
+        boolean isAssigned = isAssigned(person, plan);
         if (((assignment == Assignment.UNASSIGNED) && isAssigned)
                   || ((assignment == Assignment.ASSIGNED) && !isAssigned)) {
             return false;
         }
-        if ((role != null) && !person.hasRole(role)) {
+        if ((role != null) && !matches(person, role)) {
             return false;
         }
         if (!matches(entry, condition)) {
