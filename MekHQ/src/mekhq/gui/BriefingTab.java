@@ -56,7 +56,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -599,15 +598,16 @@ public final class BriefingTab extends CampaignGuiTab {
 
     /**
      * Widens the date column so that its sorted header and a date in the player's chosen display format fit without
-     * truncation. Dates are measured in bold because priority scenarios render bold, and every month is measured
-     * because formats that spell out the month vary in width.
+     * truncation. Dates are measured in bold because priority scenarios render bold, and every day of the year is
+     * measured because formats that spell out the month or weekday vary in width.
      */
     private static void fitScenarioDateColumn(JTable table) {
         TableColumn column = table.getColumnModel().getColumn(ScenarioTableModel.COL_DATE);
         FontMetrics metrics = table.getFontMetrics(table.getFont().deriveFont(Font.BOLD));
         int contentWidth = 0;
-        for (Month month : Month.values()) {
-            String text = MekHQ.getMHQOptions().getDisplayFormattedDate(LocalDate.of(3000, month, 28));
+        LocalDate endDate = LocalDate.of(3001, 1, 1);
+        for (LocalDate date = LocalDate.of(3000, 1, 1); date.isBefore(endDate); date = date.plusDays(1)) {
+            String text = MekHQ.getMHQOptions().getDisplayFormattedDate(date);
             contentWidth = Math.max(contentWidth, metrics.stringWidth(text));
         }
 
