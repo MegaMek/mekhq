@@ -608,6 +608,35 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void addSupportUnitsToTOE_filesTheLiftAsSupportNotConvoy() {
+        // Issue 10899: the Troopship Command was a Convoy formation, so Resupply sent its DropShips out as a supply
+        // run and the player got a Convoy Rescue mission for two Overlords and a Condor. The JumpShips had the same
+        // type. Both now file as Support, under a Transport Command that stays Standard.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit troopship = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(troopship),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.TROOPSHIP_COMMAND);
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.JUMPSHIP_COMMAND);
+
+        Formation troopshipCommand = formationOf(campaign, troopship);
+        assertEquals(FormationType.SUPPORT, troopshipCommand.getFormationType(),
+              "the Troopship Command is a Support formation");
+        Formation transportCommand = troopshipCommand.getParentFormation();
+        assertNotNull(transportCommand);
+        Formation jumpShipCommand = null;
+        for (Formation child : transportCommand.getSubFormations()) {
+            if (child.getName().equalsIgnoreCase(SupportTOEFormationTypes.JUMPSHIP_COMMAND.getLabel())) {
+                jumpShipCommand = child;
+            }
+        }
+        assertNotNull(jumpShipCommand, "the JumpShip Command is filed under the Transport Command");
+        assertEquals(FormationType.SUPPORT, jumpShipCommand.getFormationType(),
+              "the JumpShip Command is a Support formation");
+    }
+
+    @Test
     void vehiclesStillNeeded_freshCampaignGetsTheFullCount() {
         // A newly generated command owns no capability vehicles, so generation is unchanged: it builds them all.
         Campaign campaign = MHQTestUtilities.getTestCampaign();
