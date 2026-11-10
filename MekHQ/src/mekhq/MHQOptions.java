@@ -881,6 +881,46 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, value);
     }
 
+    /**
+     * @return whether the StratCon map shows the Sector Environment box in its top-right corner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getShowStratConSectorEnvironment() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.SHOW_STRAT_CON_SECTOR_ENVIRONMENT, true);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setShowStratConSectorEnvironment(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.SHOW_STRAT_CON_SECTOR_ENVIRONMENT, value);
+    }
+
+    /**
+     * @return whether the StratCon map shows the Facility Effects box in its top-right corner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getShowStratConFacilityEffects() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.SHOW_STRAT_CON_FACILITY_EFFECTS, true);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setShowStratConFacilityEffects(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.SHOW_STRAT_CON_FACILITY_EFFECTS, value);
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
