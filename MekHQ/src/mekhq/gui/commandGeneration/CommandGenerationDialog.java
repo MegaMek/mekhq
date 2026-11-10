@@ -464,10 +464,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // post-gen extras on the EDT.
         LOGGER.info("[CompanyGen][Worker] okAction: starting combat-commit phase (thread={})",
               Thread.currentThread().getName());
-        // Snapshot the hangar before the combat phase so the starting-cash stage after support can
-        // price exactly the units this build creates (combat + support), not pre-existing ones.
-        Set<UUID> preExistingUnitIds = CommandGenerator.snapshotHangarUnitIds(getCampaign());
-        // And the roster, so the founder flags, callsigns and hiring fees reach exactly the people this
+        // Snapshot the roster, so the founder flags and callsigns reach exactly the people this
         // build hires: the support staff and the vehicle and ship crews as well as the combat crews.
         Set<UUID> preExistingPersonIds = CommandGenerator.snapshotPersonnelIds(getCampaign());
         // Everyone the build creates, from the combat crews through the starting simulation's children to the
@@ -495,30 +492,21 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                             supportListener);
                       // Spares, cargo lift and temporary crew run once the support vehicles exist, so they
                       // are stocked, lifted and crewed like everything else.
-                      CommandGenerator.SpareCosts spareCosts = CommandGenerator.completeBuild(getCampaign(), options,
-                            supportListener);
-                      return new SupportPhaseResult(supportPersons, spareCosts);
+                      CommandGenerator.completeBuild(getCampaign(), options, supportListener);
+                      return supportPersons;
                   },
-                  supportResult -> {
-                      generatedPersons.addAll(supportResult.persons());
+                  supportPersons -> {
+                      generatedPersons.addAll(supportPersons);
                       // The medical reserve is part of the command as built: hired before the roster flags and
-                      // the starting cash so its spares are founders, pay the hiring fee, and count toward the
+                      // the starting cash so its spares are founders and count toward the
                       // running costs the cash is measured in.
                       generateMedicalReserve(options, generatedPersons);
                       List<Person> hired = CommandGenerator.personsAddedSince(getCampaign(), preExistingPersonIds);
                       CommandGenerator.applyRosterFlags(getCampaign(), options, hired);
-                      CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
-                            hired, supportResult.spareCosts());
+                      CommandGenerator.processStartingCash(getCampaign(), options);
                       runStartingSimulationThen(options, hired);
                   });
         });
-    }
-
-    /**
-     * What the support phase hands back: the support staff it hired and the value of the spares the build's
-     * stock-up added.
-     */
-    private record SupportPhaseResult(List<Person> persons, CommandGenerator.SpareCosts spareCosts) {
     }
 
     /**

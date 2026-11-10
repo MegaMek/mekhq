@@ -105,7 +105,7 @@ public class CommandGenerationPane extends JPanel {
     private static final String BUNDLE = CommandGenerationUtilities.getCommandGenerationResourceBundle();
     // ComStar and the Word of Blake name their formations with the Greek alphabet, as the Clans do.
     private static final List<String> GREEK_NAMED_FACTION_KEYS = List.of("CS", "WOB");
-    private static final int TRACKED_MONTHS = 12;
+    private static final int TRACKED_MONTHS = 24;
 
     private final Campaign campaign;
     private final ForceGeneratorTab engine;
@@ -399,21 +399,10 @@ public class CommandGenerationPane extends JPanel {
             personnelTile.setSub(text("Designer.tile.personnel.empty"));
         }
 
-        if (!logisticsPage.isProcessFinances()) {
-            cashTile.setValue(text("Designer.tile.cash.off"), TEXT_FAINT);
-            cashTile.setSub(text("Designer.tile.cash.off.sub"));
-            cashTile.hideMeter();
-        } else if (logisticsPage.isRandomizeStartingCash()) {
-            cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.random", logisticsPage.getDiceCount()),
-                  ACCENT_BRIGHT);
-            cashTile.setSub(text("Designer.tile.cash.random.sub"));
-            cashTile.hideMeter();
-        } else {
-            int months = logisticsPage.getStartingCashMonths();
-            cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.months", months), ACCENT_BRIGHT);
-            cashTile.setSub(text("Designer.tile.cash.months.sub"));
-            cashTile.setMeter(months / (double) TRACKED_MONTHS, ACCENT, null);
-        }
+        int months = logisticsPage.getStartingCashMonths();
+        cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.months", months), ACCENT_BRIGHT);
+        cashTile.setSub(text("Designer.tile.cash.months.sub"));
+        cashTile.setMeter(months / (double) TRACKED_MONTHS, ACCENT, null);
 
         if (!forcePage.isLiftRolled()) {
             liftTile.setValue(text("Designer.tile.lift.hire"), AMBER);

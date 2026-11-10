@@ -51,8 +51,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.gui.baseComponents.hud.Hud;
-import mekhq.gui.baseComponents.hud.HudCheckBox;
 
 /**
  * The Command Designer's Logistics page: what the command owns and starts with.
@@ -127,17 +127,6 @@ public final class LogisticsPage {
     private int months;
     private final MonthTrack monthTrack = new MonthTrack();
     private final JPanel ledger = column();
-    private final HudCheckBox processFinances = optionCheck("ProcessFinances");
-    private final HudCheckBox randomizeCash = optionCheck("RandomizeStartingCash");
-    private final HudStepper diceCount;
-    private final HudCheckBox payForSetup = optionCheck("PayForSetup");
-    private final HudCheckBox payForPersonnel = optionCheck("PayForPersonnel");
-    private final HudCheckBox payForUnits = optionCheck("PayForUnits");
-    private final HudCheckBox payForParts = optionCheck("PayForParts");
-    private final HudCheckBox payForArmour = optionCheck("PayForArmour");
-    private final HudCheckBox payForAmmunition = optionCheck("PayForAmmunition");
-    private final HudCheckBox startingLoan = optionCheck("StartingLoan");
-    private final HudStepper minimumFloat;
 
     // Lift and history
 
@@ -149,9 +138,6 @@ public final class LogisticsPage {
         this.campaign = campaign;
         this.onChanged = onChanged;
 
-        diceCount = new HudStepper(1, 100, 1, value -> formatted("Designer.logistics.dice.value", value), 64,
-              value -> changed());
-        minimumFloat = new HudStepper(0, 100_000_000, 500_000, ForcePage::formatNumber, 110, value -> changed());
         monthTrack.setToolTipText(text("Designer.logistics.months.tooltip"));
         monthsBig.setToolTipText(text("Designer.logistics.months.tooltip"));
 
@@ -159,12 +145,6 @@ public final class LogisticsPage {
         root.setBackground(GROUND);
         root.add(buildSpares(), BorderLayout.WEST);
         root.add(buildCash(), BorderLayout.CENTER);
-
-        for (HudCheckBox box : new HudCheckBox[] { processFinances, randomizeCash, payForSetup, payForPersonnel,
-                                                  payForUnits, payForParts, payForArmour, payForAmmunition,
-                                                  startingLoan }) {
-            box.addActionListener(event -> changed());
-        }
     }
 
     public JComponent getComponent() {
@@ -241,36 +221,9 @@ public final class LogisticsPage {
         monthsRow.add(monthsBig, BorderLayout.WEST);
         monthsRow.add(trackColumn, BorderLayout.CENTER);
 
-        // Three even columns, one per decision: where the cash comes from, what the build is charged, and what
-        // happens if that leaves too little.
-        JPanel cashColumn = column();
-        addRows(cashColumn, caption(text("Designer.logistics.paying.cash")), processFinances, randomizeCash,
-              indented(field(text("lblRandomStartingCashDiceCount.text"), diceCount)));
-        JPanel setupColumn = column();
-        addRows(setupColumn, caption(text("Designer.logistics.paying.setup")), payForSetup, indented(payForPersonnel),
-              indented(payForUnits), indented(payForParts), indented(payForArmour), indented(payForAmmunition));
-        JPanel shortfallColumn = column();
-        addRows(shortfallColumn, caption(text("Designer.logistics.paying.shortfall")),
-              field(text("lblMinimumStartingFloat.text"), minimumFloat), startingLoan);
-
-        JPanel paying = Hud.transparentPanel(new GridBagLayout());
-        GridBagConstraints cell = new GridBagConstraints();
-        cell.anchor = GridBagConstraints.NORTHWEST;
-        cell.fill = GridBagConstraints.HORIZONTAL;
-        cell.weightx = 1.0;
-        cell.weighty = 0.0;
-        cell.gridy = 0;
-        cell.insets = new Insets(0, 0, 0, scaleForGUI(16));
-        JPanel[] columns = { cashColumn, setupColumn, shortfallColumn };
-        for (int index = 0; index < columns.length; index++) {
-            cell.gridx = index;
-            paying.add(columns[index], cell);
-        }
-
         JPanel content = stack(
               section(text("Designer.logistics.section.cash"), text("Designer.logistics.section.cash.aside"),
-                    monthsRow, ledger),
-              section(text("Designer.logistics.section.paying"), null, paying));
+                    monthsRow, ledger));
         padded(content, 12, 16, 18, 16);
         return scroll(content, GROUND);
     }
@@ -295,59 +248,27 @@ public final class LogisticsPage {
         }
         monthsBig.setText(formatted("Designer.logistics.months.big", months));
         monthTrack.setMonths(months);
-        refreshEnablement();
         refreshLedger();
         root.revalidate();
         root.repaint();
     }
 
-    private void refreshEnablement() {
-        boolean finances = processFinances.isSelected();
-        boolean randomize = randomizeCash.isSelected();
-        monthTrack.setEnabled(finances && !randomize);
-        randomizeCash.setEnabled(finances);
-        diceCount.setEnabled(finances && randomize);
-        minimumFloat.setEnabled(finances);
-        startingLoan.setEnabled(finances);
-        payForSetup.setEnabled(finances);
-        boolean paySetup = finances && payForSetup.isSelected();
-        for (HudCheckBox box : new HudCheckBox[] { payForPersonnel, payForUnits, payForParts, payForArmour,
-                                                  payForAmmunition }) {
-            box.setEnabled(paySetup);
-        }
-    }
-
-    /** Lists which running costs the cash is measured in, as this campaign charges them, and how it is settled. */
+    /** Lists which running costs the cash is measured in, as this campaign charges them, and its floor. */
     private void refreshLedger() {
         ledger.removeAll();
         CampaignOptions options = campaign.getCampaignOptions();
-        if (!processFinances.isSelected()) {
-            addRows(ledger, ledgerRow(text("Designer.logistics.ledger.off"), "", TEXT_FAINT, false));
-            return;
-        }
-        if (randomizeCash.isSelected()) {
-            addRows(ledger,
-                  ledgerRow(text("Designer.logistics.ledger.random"),
-                        formatted("Designer.logistics.dice.value", diceCount.getValue()), TEXT, true));
-        } else {
-            addRows(ledger,
-                  costRow("Salaries", options.get(CampaignOption.PAY_FOR_SALARIES)),
-                  costRow("Maintenance", options.isChargingMaintenance()),
-                  costRow("Overhead", options.isChargingOverhead()),
-                  costRow("Food", options.get(CampaignOption.PAY_FOR_FOOD)),
-                  costRow("Housing", options.get(CampaignOption.PAY_FOR_HOUSING)),
-                  costRow("HotSpots", options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)),
-                  ledgerRow(text("Designer.logistics.ledger.months"),
-                        formatted("Designer.logistics.ledger.months.value", months), TEXT, true));
-        }
         addRows(ledger,
-              ledgerRow(text("Designer.logistics.ledger.setup"), text(payForSetup.isSelected()
-                    ? "Designer.logistics.ledger.setup.on" : "Designer.logistics.ledger.setup.off"),
-                    payForSetup.isSelected() ? AMBER : TEXT_FAINT, false),
-              ledgerRow(text("Designer.logistics.ledger.float"), ForcePage.formatNumber(minimumFloat.getValue()),
-                    TEXT, false),
-              ledgerRow(text("Designer.logistics.ledger.total"), text(randomizeCash.isSelected()
-                    ? "Designer.logistics.ledger.total.random" : "Designer.logistics.ledger.total.months"),
+              costRow("Salaries", options.get(CampaignOption.PAY_FOR_SALARIES)),
+              costRow("Maintenance", options.isChargingMaintenance()),
+              costRow("Overhead", options.isChargingOverhead()),
+              costRow("Food", options.get(CampaignOption.PAY_FOR_FOOD)),
+              costRow("Housing", options.get(CampaignOption.PAY_FOR_HOUSING)),
+              costRow("HotSpots", options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)),
+              ledgerRow(text("Designer.logistics.ledger.months"),
+                    formatted("Designer.logistics.ledger.months.value", months), TEXT, true),
+              ledgerRow(text("Designer.logistics.ledger.float"),
+                    ForcePage.formatNumber(CommandGenerator.MINIMUM_STARTING_FLOAT), TEXT, false),
+              ledgerRow(text("Designer.logistics.ledger.total"), text("Designer.logistics.ledger.total.months"),
                     ACCENT_BRIGHT, true));
     }
 
@@ -385,36 +306,13 @@ public final class LogisticsPage {
         return months;
     }
 
-    public boolean isProcessFinances() {
-        return processFinances.isSelected();
-    }
-
-    public boolean isRandomizeStartingCash() {
-        return randomizeCash.isSelected();
-    }
-
-    public int getDiceCount() {
-        return diceCount.getValue();
-    }
-
     public void loadValuesFromOptions(@Nullable CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         for (SparesCategory category : SparesCategory.values()) {
             spares.get(category).setValue(campaignOptions.get(category.getCampaignOption()));
         }
         if (options != null) {
-            processFinances.setSelected(options.isProcessFinances());
             months = Math.clamp(options.getStartingCashMonths(), 0, MAX_MONTHS);
-            randomizeCash.setSelected(options.isRandomizeStartingCash());
-            diceCount.setValue(options.getRandomStartingCashDiceCount());
-            minimumFloat.setValue((int) Math.min(Integer.MAX_VALUE, options.getMinimumStartingFloat()));
-            startingLoan.setSelected(options.isStartingLoan());
-            payForSetup.setSelected(options.isPayForSetup());
-            payForPersonnel.setSelected(options.isPayForPersonnel());
-            payForUnits.setSelected(options.isPayForUnits());
-            payForParts.setSelected(options.isPayForParts());
-            payForArmour.setSelected(options.isPayForArmour());
-            payForAmmunition.setSelected(options.isPayForAmmunition());
         }
         refresh();
     }
@@ -425,18 +323,7 @@ public final class LogisticsPage {
         if (options == null) {
             return;
         }
-        options.setProcessFinances(processFinances.isSelected());
         options.setStartingCashMonths(months);
-        options.setRandomizeStartingCash(randomizeCash.isSelected());
-        options.setRandomStartingCashDiceCount(diceCount.getValue());
-        options.setMinimumStartingFloat(minimumFloat.getValue());
-        options.setStartingLoan(startingLoan.isSelected());
-        options.setPayForSetup(payForSetup.isSelected());
-        options.setPayForPersonnel(payForPersonnel.isSelected());
-        options.setPayForUnits(payForUnits.isSelected());
-        options.setPayForParts(payForParts.isSelected());
-        options.setPayForArmour(payForArmour.isSelected());
-        options.setPayForAmmunition(payForAmmunition.isSelected());
     }
 
     /** Writes the spares percentages to the campaign's AutoLogistics options; called when the command is built. */

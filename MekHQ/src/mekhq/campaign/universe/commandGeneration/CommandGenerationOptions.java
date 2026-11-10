@@ -63,14 +63,7 @@ import mekhq.campaign.universe.enums.ForceNamingMethod;
  */
 public class CommandGenerationOptions {
 
-    /**
-     * Working capital the command is guaranteed to keep once the pay-for toggles have taken their
-     * cut, in C-bills. A command that starts broke cannot pay its first month's wages, so generation
-     * floors the float here and takes a loan for the shortfall when one is allowed.
-     */
-    private static final long DEFAULT_MINIMUM_STARTING_FLOAT = 10_000_000L;
-
-    /** Half a year of running costs: enough to reach and see out a first contract before its pay arrives. */
+    /** A year of running costs: enough to reach and see out a first contract before its pay arrives. */
     public static final int DEFAULT_STARTING_CASH_MONTHS = 12;
 
     /**
@@ -159,22 +152,8 @@ public class CommandGenerationOptions {
     private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
-    // Finances. Starting cash is working capital sized as a number of months of the command's running
-    // costs (or a dice roll when randomized); the pay-for toggles then debit the
-    // command's real generation costs, flooring at the minimum float with an optional loan for the
-    // shortfall.
-    private boolean processFinances;
+    // Finances. Starting cash is working capital sized as a number of months of the command's running costs.
     private int startingCashMonths;
-    private boolean randomizeStartingCash;
-    private int randomStartingCashDiceCount;
-    private long minimumStartingFloat;
-    private boolean startingLoan;
-    private boolean payForSetup;
-    private boolean payForPersonnel;
-    private boolean payForUnits;
-    private boolean payForParts;
-    private boolean payForArmour;
-    private boolean payForAmmunition;
     // endregion Variable Declarations
 
     // region Constructors
@@ -260,23 +239,8 @@ public class CommandGenerationOptions {
         setSelectStartingContract(true);
         setStartCourseToContractPlanet(true);
 
-        // Finances. Pay for Initial Setup defaults OFF: a few months of running costs is far less than
-        // the units cost to buy, so paying for them would floor every default build into a maximum
-        // loan. Out of the box the command is granted free with its working capital; players opt into
-        // the pay-for accounting. The minimum float leaves the command able to pay its first month's
-        // wages rather than starting broke when the campaign charges little or nothing.
-        setProcessFinances(true);
+        // Finances. The command is granted free, with its working capital.
         setStartingCashMonths(DEFAULT_STARTING_CASH_MONTHS);
-        setRandomizeStartingCash(false);
-        setRandomStartingCashDiceCount(18);
-        setMinimumStartingFloat(DEFAULT_MINIMUM_STARTING_FLOAT);
-        setStartingLoan(false);
-        setPayForSetup(false);
-        setPayForPersonnel(true);
-        setPayForUnits(true);
-        setPayForParts(true);
-        setPayForArmour(true);
-        setPayForAmmunition(true);
     }
     // endregion Constructors
 
@@ -625,18 +589,10 @@ public class CommandGenerationOptions {
         this.startCourseToContractPlanet = startCourseToContractPlanet;
     }
 
-    public boolean isProcessFinances() {
-        return processFinances;
-    }
-
-    public void setProcessFinances(final boolean processFinances) {
-        this.processFinances = processFinances;
-    }
-
     /**
      * Starting cash as a number of months of the built command's running costs: salaries, maintenance,
      * overhead, food and housing, and Hot Spots upkeep, each counted only while the campaign charges it.
-     * {@code 6} grants working capital to run the command for half a year without income.
+     * {@code 12} grants working capital to run the command for a year without income.
      *
      * @return the number of months of running costs granted as starting cash
      */
@@ -646,86 +602,6 @@ public class CommandGenerationOptions {
 
     public void setStartingCashMonths(final int startingCashMonths) {
         this.startingCashMonths = startingCashMonths;
-    }
-
-    public boolean isRandomizeStartingCash() {
-        return randomizeStartingCash;
-    }
-
-    public void setRandomizeStartingCash(final boolean randomizeStartingCash) {
-        this.randomizeStartingCash = randomizeStartingCash;
-    }
-
-    public int getRandomStartingCashDiceCount() {
-        return randomStartingCashDiceCount;
-    }
-
-    public void setRandomStartingCashDiceCount(final int randomStartingCashDiceCount) {
-        this.randomStartingCashDiceCount = randomStartingCashDiceCount;
-    }
-
-    public long getMinimumStartingFloat() {
-        return minimumStartingFloat;
-    }
-
-    public void setMinimumStartingFloat(final long minimumStartingFloat) {
-        this.minimumStartingFloat = minimumStartingFloat;
-    }
-
-    public boolean isStartingLoan() {
-        return startingLoan;
-    }
-
-    public void setStartingLoan(final boolean startingLoan) {
-        this.startingLoan = startingLoan;
-    }
-
-    public boolean isPayForSetup() {
-        return payForSetup;
-    }
-
-    public void setPayForSetup(final boolean payForSetup) {
-        this.payForSetup = payForSetup;
-    }
-
-    public boolean isPayForPersonnel() {
-        return payForPersonnel;
-    }
-
-    public void setPayForPersonnel(final boolean payForPersonnel) {
-        this.payForPersonnel = payForPersonnel;
-    }
-
-    public boolean isPayForUnits() {
-        return payForUnits;
-    }
-
-    public void setPayForUnits(final boolean payForUnits) {
-        this.payForUnits = payForUnits;
-    }
-
-    public boolean isPayForParts() {
-        return payForParts;
-    }
-
-    public void setPayForParts(final boolean payForParts) {
-        this.payForParts = payForParts;
-    }
-
-    public boolean isPayForArmour() {
-        return payForArmour;
-    }
-
-    public void setPayForArmour(final boolean payForArmour) {
-        this.payForArmour = payForArmour;
-    }
-
-    public boolean isPayForAmmunition() {
-        return payForAmmunition;
-    }
-
-    public void setPayForAmmunition(final boolean payForAmmunition) {
-        this.payForAmmunition = payForAmmunition;
     }
     // endregion Getters/Setters
 
@@ -780,18 +656,7 @@ public class CommandGenerationOptions {
               && (simulateRandomProcreation == other.simulateRandomProcreation)
               && (selectStartingContract == other.selectStartingContract)
               && (startCourseToContractPlanet == other.startCourseToContractPlanet)
-              && (processFinances == other.processFinances)
-              && (startingCashMonths == other.startingCashMonths)
-              && (randomizeStartingCash == other.randomizeStartingCash)
-              && (randomStartingCashDiceCount == other.randomStartingCashDiceCount)
-              && (minimumStartingFloat == other.minimumStartingFloat)
-              && (startingLoan == other.startingLoan)
-              && (payForSetup == other.payForSetup)
-              && (payForPersonnel == other.payForPersonnel)
-              && (payForUnits == other.payForUnits)
-              && (payForParts == other.payForParts)
-              && (payForArmour == other.payForArmour)
-              && (payForAmmunition == other.payForAmmunition);
+              && (startingCashMonths == other.startingCashMonths);
     }
 
     /**
@@ -867,17 +732,6 @@ public class CommandGenerationOptions {
               simulateRandomProcreation,
               selectStartingContract,
               startCourseToContractPlanet,
-              processFinances,
-              startingCashMonths,
-              randomizeStartingCash,
-              randomStartingCashDiceCount,
-              minimumStartingFloat,
-              startingLoan,
-              payForSetup,
-              payForPersonnel,
-              payForUnits,
-              payForParts,
-              payForArmour,
-              payForAmmunition);
+              startingCashMonths);
     }
 }
