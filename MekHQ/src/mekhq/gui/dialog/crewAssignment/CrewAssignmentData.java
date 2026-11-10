@@ -59,6 +59,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
@@ -105,6 +106,7 @@ final class CrewAssignmentData {
     private final ToIntFunction<PersonnelRole> tempCrewPool;
     private final Comparator<Person> ranking;
     private final boolean useTransfers;
+    private final Familiarity familiarityMode;
     private final LocalDate today;
     private final String locationName;
 
@@ -116,6 +118,7 @@ final class CrewAssignmentData {
         CampaignOptions options = campaign.getCampaignOptions();
         today = campaign.getLocalDate();
         useTransfers = options.get(CampaignOption.USE_TRANSFERS);
+        familiarityMode = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
               options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
@@ -224,6 +227,16 @@ final class CrewAssignmentData {
 
     boolean isUseTransfers() {
         return useTransfers;
+    }
+
+    /**
+     * @return the campaign's chassis familiarity mode; the familiarity filter is only offered while it is enabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Familiarity familiarityMode() {
+        return familiarityMode;
     }
 
     LocalDate today() {

@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
+import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -82,6 +83,28 @@ final class CrewAssignmentState {
         ANY, FIT, WOUNDED, PREGNANT
     }
 
+    /**
+     * Which people the Personnel page shows, by their chassis familiarity: the familiarity steps where its bonuses
+     * change. Only offered while chassis familiarity is in use.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum FamiliarityBand {
+        ANY(0), UNDER_100(0), AT_LEAST_100(100), AT_LEAST_200(200), AT_LEAST_300(300);
+
+        private final int threshold;
+
+        FamiliarityBand(int threshold) {
+            this.threshold = threshold;
+        }
+
+        /** @return the lowest familiarity this band asks for, which bands above the mode's cap could never reach */
+        int getThreshold() {
+            return threshold;
+        }
+    }
+
     /** A seat type on one unit, used to show only the people who qualify for it. */
     record SeatFilter(Unit unit, SeatType seat) {}
 
@@ -101,6 +124,8 @@ final class CrewAssignmentState {
     Assignment assignment = Assignment.UNASSIGNED;
     @Nullable PersonnelRole role;
     Condition condition = Condition.ANY;
+    /** Stays {@link FamiliarityBand#ANY} while chassis familiarity is off, as the filter is not offered then. */
+    FamiliarityBand familiarity = FamiliarityBand.ANY;
     String peopleQuery = "";
     /** When set, the Personnel page shows only people who could take this seat, even if it is full now. */
     @Nullable SeatFilter qualifiedFor;
@@ -195,6 +220,10 @@ final class CrewAssignmentState {
         if (!matches(entry, condition)) {
             return false;
         }
+        if ((familiarity != FamiliarityBand.ANY)
+                  && !matches(familiarityScore(person, familiarityChassis()), familiarity)) {
+            return false;
+        }
         if ((qualifiedFor != null) && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
                   && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
             return false;
@@ -243,6 +272,78 @@ final class CrewAssignmentState {
             case FIT -> !isWounded && !isPregnant;
             case WOUNDED -> isWounded;
             case PREGNANT -> isPregnant;
+        };
+    }
+
+    /**
+     * The unit whose chassis the familiarity filter measures against: the unit a seat or tech is being found for, or
+     * else the one unit selected. With none of those, or several units selected, there is no one chassis to measure.
+     *
+     * @return the unit, or {@code null} to measure each person's best familiarity with any chassis
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nullable Unit familiarityUnit() {
+        if (qualifiedFor != null) {
+            return qualifiedFor.unit();
+        }
+        if (techFor != null) {
+            return techFor;
+        }
+        if (selectedUnits.size() == 1) {
+            return selectedUnits.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * @return the chassis of {@link #familiarityUnit()}, or {@code null} to measure each person's best familiarity
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nullable String familiarityChassis() {
+        Unit unit = familiarityUnit();
+        Entity entity = (unit == null) ? null : unit.getEntity();
+        return (entity == null) ? null : entity.getChassis();
+    }
+
+    /**
+     * @param person  a person
+     * @param chassis the chassis to measure against, or {@code null} for the person's best familiarity with any
+     *                chassis
+     *
+     * @return the person's familiarity with the chassis, 0 if they have none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int familiarityScore(Person person, @Nullable String chassis) {
+        if (chassis != null) {
+            return person.getChassisFamiliarity(chassis);
+        }
+        int best = 0;
+        for (int score : person.getChassisFamiliarity().values()) {
+            best = Math.max(best, score);
+        }
+        return best;
+    }
+
+    /**
+     * @param score a person's familiarity
+     * @param band  the Personnel page's familiarity filter
+     *
+     * @return {@code true} if the score falls in the band
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean matches(int score, FamiliarityBand band) {
+        return switch (band) {
+            case ANY -> true;
+            case UNDER_100 -> score < FamiliarityBand.AT_LEAST_100.getThreshold();
+            case AT_LEAST_100, AT_LEAST_200, AT_LEAST_300 -> score >= band.getThreshold();
         };
     }
 

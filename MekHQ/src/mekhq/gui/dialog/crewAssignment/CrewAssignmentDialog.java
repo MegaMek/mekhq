@@ -47,6 +47,7 @@ import java.util.*;
 import java.util.function.Function;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
@@ -58,6 +59,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
@@ -80,6 +82,7 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.UnitStatus;
 import mekhq.gui.model.LocationFilterItem;
@@ -151,6 +154,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.condition = value;
         refresh();
     });
+    private final HudFilterList<FamiliarityBand> familiarityFilter = new HudFilterList<>(value -> {
+        state.familiarity = value;
+        refresh();
+    });
+    /** Names the chassis the familiarity filter measures against. */
+    private final JLabel familiarityBasis = new JLabel();
 
     private final CardLayout pageCards = new CardLayout();
     private final JPanel pageHolder = new JPanel(pageCards);
@@ -421,6 +430,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
         peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
         peopleRail.add(leftAligned(conditionFilter));
+        if (data.familiarityMode().isEnabled()) {
+            familiarityBasis.setForeground(TEXT_MUTED);
+            familiarityBasis.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
+            peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
+            peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.familiarity"))));
+            peopleRail.add(leftAligned(familiarityBasis));
+            peopleRail.add(Box.createVerticalStrut(scaleForGUI(4)));
+            peopleRail.add(leftAligned(familiarityFilter));
+        }
 
         railHolder.setOpaque(false);
         railHolder.add(railScroll(unitRail), CrewAssignmentPage.UNITS.name());
@@ -583,6 +601,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         int unassigned = 0;
         int roleTotal = 0;
         Map<Condition, Integer> byCondition = new EnumMap<>(Condition.class);
+        Map<FamiliarityBand, Integer> byFamiliarity = new EnumMap<>(FamiliarityBand.class);
+        Familiarity familiarityMode = data.familiarityMode();
+        String familiarityChassis = state.familiarityChassis();
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
@@ -600,6 +621,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 for (Condition condition : Condition.values()) {
                     if (CrewAssignmentState.matches(entry, condition)) {
                         byCondition.merge(condition, 1, Integer::sum);
+                    }
+                }
+                if (familiarityMode.isEnabled()) {
+                    int score = CrewAssignmentState.familiarityScore(person, familiarityChassis);
+                    for (FamiliarityBand band : FamiliarityBand.values()) {
+                        if (CrewAssignmentState.matches(score, band)) {
+                            byFamiliarity.merge(band, 1, Integer::sum);
+                        }
                     }
                 }
             }
@@ -629,6 +658,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         }
         conditionFilter.setItems(conditions);
         conditionFilter.setSelected(state.condition);
+        if (familiarityMode.isEnabled()) {
+            refreshFamiliarityFilter(familiarityMode, familiarityChassis, byFamiliarity);
+        }
 
         List<JComponent> chips = new ArrayList<>();
         if (state.qualifiedFor != null) {
@@ -651,6 +683,30 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             chips.add(chip);
         }
         peoplePage.setChips(chips);
+    }
+
+    /**
+     * Fills the familiarity filter, offering only the bands the mode's cap can reach, and names the chassis it
+     * measures against.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void refreshFamiliarityFilter(Familiarity familiarityMode, @Nullable String familiarityChassis,
+          Map<FamiliarityBand, Integer> byFamiliarity) {
+        familiarityBasis.setText((familiarityChassis == null) ?
+                                       getTextAt(RESOURCE_BUNDLE, "rail.familiarity.best") :
+                                       getFormattedTextAt(RESOURCE_BUNDLE, "rail.familiarity.chassis",
+                                             familiarityChassis));
+        List<Item<FamiliarityBand>> bands = new ArrayList<>();
+        for (FamiliarityBand band : FamiliarityBand.values()) {
+            if (band.getThreshold() <= familiarityMode.getFamiliarityCap()) {
+                bands.add(new Item<>(band, getTextAt(RESOURCE_BUNDLE, "FamiliarityBand." + band.name()),
+                      byFamiliarity.getOrDefault(band, 0)));
+            }
+        }
+        familiarityFilter.setItems(bands);
+        familiarityFilter.setSelected(state.familiarity);
     }
 
     private void refreshReviewPage(AssignmentPlan plan) {
@@ -1121,6 +1177,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.unitType = null;
         state.formation = null;
         state.role = null;
+        state.condition = Condition.ANY;
+        state.familiarity = FamiliarityBand.ANY;
         lastUnitIndex = -1;
         lastPersonIndex = -1;
         // The row renderers hold the plan they draw from, so they are given the new one
