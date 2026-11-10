@@ -844,12 +844,16 @@ public class Finances {
             return new ArrayList<>();
         }
 
-        final NodeList nl = wn.getChildNodes();
-        return IntStream.range(0, nl.getLength())
-                     .mapToObj(nl::item)
-                     .filter(node -> "transaction".equals(node.getNodeName()))
-                     .map(Transaction::generateInstanceFromXML)
-                     .collect(Collectors.toList());
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of transactions
+        List<Transaction> transactions = new ArrayList<>();
+        for (Node node = wn.getFirstChild(); node != null; node = node.getNextSibling()) {
+            if ("transaction".equals(node.getNodeName())) {
+                transactions.add(Transaction.generateInstanceFromXML(node));
+            }
+        }
+        return transactions;
     }
 
     private static List<Loan> parseLoansFromXML(final Node wn) {

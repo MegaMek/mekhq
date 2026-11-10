@@ -2008,11 +2008,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processUnitNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Unit Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of units
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -2037,12 +2036,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPartNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Part Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of parts
         List<Part> parts = new ArrayList<>();
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -2759,8 +2757,22 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Build a new, clean warehouse from the current parts
         LocalWarehouse warehouse = new LocalWarehouse();
+        // Only spares merge, and only into spares, but every merge scans the whole warehouse for a match. Adding the
+        // spares first, in their usual order, keeps each scan to the spares added so far instead of every part fitted
+        // to a unit as well, which on a large campaign cut minutes of quadratic work from loading. The fitted parts
+        // are added afterwards, where they never merge.
+        List<Part> partsInMergeOrder = new ArrayList<>();
+        List<Part> fittedParts = new ArrayList<>();
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         for (Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
+            if (part.isSpare()) {
+                partsInMergeOrder.add(part);
+            } else {
+                fittedParts.add(part);
+            }
+        }
+        partsInMergeOrder.addAll(fittedParts);
+        for (Part part : partsInMergeOrder) {
             // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
             if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
                 LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
