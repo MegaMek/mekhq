@@ -265,6 +265,8 @@ public final class ForcePage {
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
                     pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
               section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION),
+                    // The rail's width less its padding and the note's own.
+                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 64),
                     commandLance, detachments, formationMixLink),
               section(text("Designer.force.section.quality"), null,
                     pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),

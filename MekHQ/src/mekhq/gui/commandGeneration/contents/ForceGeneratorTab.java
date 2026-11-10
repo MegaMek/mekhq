@@ -88,8 +88,8 @@ public class ForceGeneratorTab {
     private Supplier<ForceNamingMethod> namingMethodSupplier;
     private BooleanSupplier numberRegimentsSupplier;
 
-    private static final int PREFERRED_ECHELON_INNER_SPHERE = 4;
-    private static final int PREFERRED_ECHELON_CLAN = 5;
+    /** A Lance, a Star or a Level II: every ruleset numbers these echelon 3. */
+    private static final int PREFERRED_ECHELON = 3;
 
     private Consumer<FactionRecord> factionChangeListener;
     private final List<Consumer<ForceDescriptor>> forceGeneratedListeners = new ArrayList<>();
@@ -252,14 +252,14 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * Opens the size picker on a company for an Inner Sphere faction and a Trinary-equivalent for a Clan, the sizes a
-     * new command most often starts at.
+     * Opens the size picker on a Lance, Star or Level II. A new campaign is best started with three of those (two
+     * Level IIs), rolled one at a time.
      */
     private void applyPreferredEchelon(boolean isClanFaction) {
         if (viewUi == null) {
             return;
         }
-        int echelon = isClanFaction ? PREFERRED_ECHELON_CLAN : PREFERRED_ECHELON_INNER_SPHERE;
+        int echelon = PREFERRED_ECHELON;
         viewUi.getOptionsView().setPreferredEchelon(echelon);
         LOGGER.info("[CompanyGen][ForceGenTab][Echelon] size picker opens on echelon {} (clan={})", echelon,
               isClanFaction);
