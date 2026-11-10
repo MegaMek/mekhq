@@ -66,7 +66,9 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.ContractExpenseProjection;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
@@ -131,11 +133,10 @@ public final class CommandGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
 
-    /**
-     * The least starting cash a command is founded with, in C-bills, so one whose campaign charges little or nothing
-     * can still pay its first month's wages.
-     */
-    public static final long MINIMUM_STARTING_FLOAT = 10_000_000L;
+    /** A starting loan's terms: interest rate in percent, length in years, and collateral in percent. */
+    private static final int STARTING_LOAN_RATE = 15;
+    private static final int STARTING_LOAN_YEARS = 2;
+    private static final int STARTING_LOAN_COLLATERAL = 100;
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
     /** How many undercrewed units the diagnostic names before it summarises the rest. */
@@ -824,14 +825,17 @@ public final class CommandGenerator {
      * Stage 9 - starting cash: {@link CommandGenerationOptions#getStartingCashMonths()} months of the command's
      * running costs once it is built - salaries, maintenance, overhead, food and housing, and Hot Spots upkeep, each
      * only while the campaign charges it (see {@link ContractExpenseProjection#getMonthlyOffContractExpenses}) - and
-     * never less than {@link #MINIMUM_STARTING_FLOAT}. The command itself is granted free. The cash is credited as
-     * starting capital and reported in the Finances daily log.
+     * never less than {@link CommandGenerationOptions#getMinimumStartingCash()}. The command itself is granted free.
+     * The cash is credited as starting capital and reported in the Finances daily log.
+     *
+     * <p>With {@link CommandGenerationOptions#isStartingLoan()}, the starting cash is doubled: the command also takes
+     * out a loan for the same amount, which it has to repay.</p>
      *
      * <p>The running costs are the whole campaign's, as they will be charged from the next day; in a new campaign
      * that is exactly the command just built.</p>
      *
      * @param campaign the campaign to credit
-     * @param options  the generation options carrying the number of months
+     * @param options  the generation options carrying the finance settings
      */
     public static void processStartingCash(Campaign campaign, CommandGenerationOptions options) {
         processStartingCash(campaign, options, ContractExpenseProjection.getMonthlyOffContractExpenses(campaign));
@@ -850,19 +854,21 @@ public final class CommandGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {} month(s) of {} running costs -> {}",
               months, monthlyCosts.toAmountAndSymbolString(), startingCash.toAmountAndSymbolString());
 
-        Money minimumStartingFloat = Money.of(MINIMUM_STARTING_FLOAT);
-        boolean isFlooredToMinimumFloat = !startingCash.isGreaterOrEqualThan(minimumStartingFloat);
-        if (isFlooredToMinimumFloat) {
-            startingCash = minimumStartingFloat;
+        Money minimumStartingCash = Money.of(Math.max(0, options.getMinimumStartingCash()));
+        boolean isFlooredToMinimum = !startingCash.isGreaterOrEqualThan(minimumStartingCash);
+        if (isFlooredToMinimum) {
+            startingCash = minimumStartingCash;
         }
 
-        campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
-              campaign.getLocalDate(), startingCash,
-              getTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.reason"));
+        if (startingCash.isPositive()) {
+            campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
+                  campaign.getLocalDate(), startingCash,
+                  getTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.reason"));
+        }
 
-        if (isFlooredToMinimumFloat) {
+        if (isFlooredToMinimum) {
             campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "CommandGenerator.startingCapital.reportMinimumFloat",
+                  "CommandGenerator.startingCapital.reportMinimum",
                   startingCash.toAmountAndSymbolString()));
         } else {
             String basis = getFormattedTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.basis.months",
@@ -873,6 +879,14 @@ public final class CommandGenerator {
         }
         LOGGER.info("[CompanyGen][Pipeline]Stage 9: credited {} starting capital",
               startingCash.toAmountAndSymbolString());
+
+        if (options.isStartingLoan() && startingCash.isPositive()) {
+            // Campaign.addLoan credits the principal and reports the loan, so the cash doubles.
+            campaign.addLoan(new Loan(startingCash, STARTING_LOAN_RATE, STARTING_LOAN_YEARS, FinancialTerm.MONTHLY,
+                  STARTING_LOAN_COLLATERAL, campaign.getLocalDate()));
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting loan of {} doubles the starting cash",
+                  startingCash.toAmountAndSymbolString());
+        }
     }
 
     /**

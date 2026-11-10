@@ -67,6 +67,12 @@ public class CommandGenerationOptions {
     public static final int DEFAULT_STARTING_CASH_MONTHS = 12;
 
     /**
+     * The least starting cash a command is founded with by default, in C-bills, so one whose campaign charges little or
+     * nothing can still pay its first month's wages.
+     */
+    public static final long DEFAULT_MINIMUM_STARTING_CASH = 10_000_000L;
+
+    /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
      * doctor, and administrators - matches the People page's support staff table.
      */
@@ -152,8 +158,11 @@ public class CommandGenerationOptions {
     private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
-    // Finances. Starting cash is working capital sized as a number of months of the command's running costs.
+    // Finances. Starting cash is working capital sized as a number of months of the command's running costs, never
+    // less than the minimum. The optional starting loan is a debt against the equipment the build creates.
     private int startingCashMonths;
+    private long minimumStartingCash;
+    private boolean startingLoan;
     // endregion Variable Declarations
 
     // region Constructors
@@ -239,8 +248,10 @@ public class CommandGenerationOptions {
         setSelectStartingContract(true);
         setStartCourseToContractPlanet(true);
 
-        // Finances. The command is granted free, with its working capital.
+        // Finances. The command is granted free, with its working capital and no debt.
         setStartingCashMonths(DEFAULT_STARTING_CASH_MONTHS);
+        setMinimumStartingCash(DEFAULT_MINIMUM_STARTING_CASH);
+        setStartingLoan(false);
     }
     // endregion Constructors
 
@@ -603,6 +614,47 @@ public class CommandGenerationOptions {
     public void setStartingCashMonths(final int startingCashMonths) {
         this.startingCashMonths = startingCashMonths;
     }
+
+    /**
+     * @return the least starting cash the command is founded with, in C-bills, whatever its running costs come to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public long getMinimumStartingCash() {
+        return minimumStartingCash;
+    }
+
+    /**
+     * @param minimumStartingCash the least starting cash the command is founded with, in C-bills
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setMinimumStartingCash(final long minimumStartingCash) {
+        this.minimumStartingCash = minimumStartingCash;
+    }
+
+    /**
+     * @return {@code true} if the command is founded owing a loan worth a tenth of what its equipment would cost to
+     *       buy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isStartingLoan() {
+        return startingLoan;
+    }
+
+    /**
+     * @param startingLoan {@code true} to found the command owing a loan worth a tenth of its equipment's buy cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setStartingLoan(final boolean startingLoan) {
+        this.startingLoan = startingLoan;
+    }
     // endregion Getters/Setters
 
     /**
@@ -656,7 +708,9 @@ public class CommandGenerationOptions {
               && (simulateRandomProcreation == other.simulateRandomProcreation)
               && (selectStartingContract == other.selectStartingContract)
               && (startCourseToContractPlanet == other.startCourseToContractPlanet)
-              && (startingCashMonths == other.startingCashMonths);
+              && (startingCashMonths == other.startingCashMonths)
+              && (minimumStartingCash == other.minimumStartingCash)
+              && (startingLoan == other.startingLoan);
     }
 
     /**
@@ -732,6 +786,8 @@ public class CommandGenerationOptions {
               simulateRandomProcreation,
               selectStartingContract,
               startCourseToContractPlanet,
-              startingCashMonths);
+              startingCashMonths,
+              minimumStartingCash,
+              startingLoan);
     }
 }

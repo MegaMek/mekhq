@@ -114,8 +114,10 @@ class CommandGenerationOptionsTest {
         assertFalse(options.isUseOriginNodeFormationIconLogo());
 
         // Finances: the command is granted free, with working capital defaulting to twelve months of its running
-        // costs.
+        // costs and never less than ten million, and no starting loan.
         assertEquals(12, options.getStartingCashMonths());
+        assertEquals(10_000_000L, options.getMinimumStartingCash());
+        assertFalse(options.isStartingLoan());
     }
 
     /**

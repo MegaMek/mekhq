@@ -51,8 +51,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
 
 /**
  * The Command Designer's Logistics page: what the command owns and starts with.
@@ -64,8 +64,8 @@ import mekhq.gui.baseComponents.hud.Hud;
 public final class LogisticsPage {
     private static final int RAIL_WIDTH = 300;
     private static final int WRAP_WIDTH = 280;
-    /** The width the starting-cash explanation wraps at: readable lines in the wide cash column. */
-    private static final int EXPLANATION_WIDTH = 620;
+    /** The width the starting-loan warning wraps at. */
+    private static final int LOAN_WARNING_WIDTH = 520;
     private static final int MAX_SPARES_PERCENT = 10000;
     /** Where a spares meter reads full: twice a full restock. */
     private static final int SPARES_METER_FULL = 200;
@@ -129,6 +129,10 @@ public final class LogisticsPage {
     private int months;
     private final MonthTrack monthTrack = new MonthTrack();
     private final JPanel ledger = column();
+    private final HudStepper minimumCash;
+    private final HudCheckBox startingLoan = optionCheck("StartingLoan");
+    /** Holds the starting-loan warning while the loan is ticked; empty otherwise. */
+    private final JPanel loanWarning = column();
 
     // Lift and history
 
@@ -140,6 +144,9 @@ public final class LogisticsPage {
         this.campaign = campaign;
         this.onChanged = onChanged;
 
+        minimumCash = new HudStepper(0, 1_000_000_000, 500_000, ForcePage::formatNumber, 110, value -> changed());
+        minimumCash.setToolTipText(text("Designer.logistics.minimumCash.tooltip"));
+        startingLoan.addActionListener(event -> changed());
         monthTrack.setToolTipText(text("Designer.logistics.months.tooltip"));
         monthsBig.setToolTipText(text("Designer.logistics.months.tooltip"));
 
@@ -223,15 +230,10 @@ public final class LogisticsPage {
         monthsRow.add(monthsBig, BorderLayout.WEST);
         monthsRow.add(trackColumn, BorderLayout.CENTER);
 
-        String minimumFloat = ForcePage.formatNumber(CommandGenerator.MINIMUM_STARTING_FLOAT);
         JPanel content = stack(
               section(text("Designer.logistics.section.cash"), text("Designer.logistics.section.cash.aside"),
-                    monthsRow, ledger),
-              section(text("Designer.logistics.section.howCash"), null,
-                    wrapped(text("Designer.logistics.howCash.measure"), EXPLANATION_WIDTH),
-                    wrapped(text("Designer.logistics.howCash.months"), EXPLANATION_WIDTH),
-                    wrapped(formatted("Designer.logistics.howCash.floor", minimumFloat), EXPLANATION_WIDTH),
-                    wrapped(text("Designer.logistics.howCash.free"), EXPLANATION_WIDTH)));
+                    monthsRow, ledger, field(text("Designer.logistics.minimumCash"), minimumCash), startingLoan,
+                    loanWarning));
         padded(content, 12, 16, 18, 16);
         return scroll(content, GROUND);
     }
@@ -257,6 +259,7 @@ public final class LogisticsPage {
         monthsBig.setText(formatted("Designer.logistics.months.big", months));
         monthTrack.setMonths(months);
         refreshLedger();
+        refreshLoanWarning();
         root.revalidate();
         root.repaint();
     }
@@ -274,10 +277,21 @@ public final class LogisticsPage {
               costRow("HotSpots", options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)),
               ledgerRow(text("Designer.logistics.ledger.months"),
                     formatted("Designer.logistics.ledger.months.value", months), TEXT, true),
-              ledgerRow(text("Designer.logistics.ledger.float"),
-                    ForcePage.formatNumber(CommandGenerator.MINIMUM_STARTING_FLOAT), TEXT, false),
-              ledgerRow(text("Designer.logistics.ledger.total"), text("Designer.logistics.ledger.total.months"),
-                    ACCENT_BRIGHT, true));
+              ledgerRow(text("Designer.logistics.ledger.float"), ForcePage.formatNumber(minimumCash.getValue()),
+                    TEXT, false));
+        if (startingLoan.isSelected()) {
+            addRows(ledger, ledgerRow(text("Designer.logistics.ledger.loan"),
+                  text("Designer.logistics.ledger.loan.value"), AMBER, false));
+        }
+        addRows(ledger, ledgerRow(text("Designer.logistics.ledger.total"),
+              text("Designer.logistics.ledger.total.months"), ACCENT_BRIGHT, true));
+    }
+
+    private void refreshLoanWarning() {
+        loanWarning.removeAll();
+        if (startingLoan.isSelected()) {
+            addRows(loanWarning, note(text("Designer.logistics.loan.warning"), AMBER, LOAN_WARNING_WIDTH));
+        }
     }
 
     private JComponent costRow(String key, boolean charged) {
@@ -321,6 +335,8 @@ public final class LogisticsPage {
         }
         if (options != null) {
             months = Math.clamp(options.getStartingCashMonths(), 0, MAX_MONTHS);
+            minimumCash.setValue((int) Math.clamp(options.getMinimumStartingCash(), 0, Integer.MAX_VALUE));
+            startingLoan.setSelected(options.isStartingLoan());
         }
         refresh();
     }
@@ -332,6 +348,8 @@ public final class LogisticsPage {
             return;
         }
         options.setStartingCashMonths(months);
+        options.setMinimumStartingCash(minimumCash.getValue());
+        options.setStartingLoan(startingLoan.isSelected());
     }
 
     /** Writes the spares percentages to the campaign's AutoLogistics options; called when the command is built. */
