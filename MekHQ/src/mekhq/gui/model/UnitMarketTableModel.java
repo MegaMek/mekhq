@@ -33,6 +33,8 @@
  */
 package mekhq.gui.model;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.Component;
 import java.util.List;
 import java.util.Optional;
@@ -76,13 +78,19 @@ public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
     }
     //endregion Constructors
 
+    /**
+     * Returns the starting width of a column. The table fits its columns to the available space, so these act as
+     * relative proportions; they are sized so that headers and typical values are not truncated.
+     */
     public int getColumnWidth(final int column) {
         return switch (column) {
-            case COL_MARKET, COL_PRICE -> 90;
-            case COL_UNIT_TYPE -> 15;
-            case COL_UNIT -> 175;
-            case COL_WEIGHT_CLASS -> 50;
-            default -> 20;
+            case COL_MARKET -> scaleForGUI(110);
+            case COL_UNIT_TYPE -> scaleForGUI(45);
+            case COL_WEIGHT_CLASS -> scaleForGUI(85);
+            case COL_UNIT -> scaleForGUI(175);
+            case COL_PRICE -> scaleForGUI(115);
+            case COL_PERCENT, COL_DELIVERY -> scaleForGUI(60);
+            default -> scaleForGUI(50);
         };
     }
 
