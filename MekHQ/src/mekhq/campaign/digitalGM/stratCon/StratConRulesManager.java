@@ -681,7 +681,9 @@ public class StratConRulesManager {
         StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
-        if (!autoAssignLances && !scenario.overrideForceAutoAssignment()) {
+        // The player always picks the one formation that answers an Official Challenge, so it never takes a
+        // formation on its own - whatever the caller asked for.
+        if (isCombatChallenge || (!autoAssignLances && !scenario.overrideForceAutoAssignment())) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
                 backingScenario.removeFormation(forceID);
             }
@@ -1127,6 +1129,12 @@ public class StratConRulesManager {
                 if (scenario == null) {
                     return null;
                 }
+
+                // An Official Challenge is moved off the hex these forces hold and answered by one formation of the
+                // player's choosing, so none of the other forces here are drawn into it.
+                if (scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+                    break;
+                }
             } else {
                 scenario.incrementRequiredPlayerLances();
                 scenario.addPrimaryForce(forceID);
@@ -1348,7 +1356,11 @@ public class StratConRulesManager {
             if (scenario != null) {
                 finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
 
-                if (isAmbushed) {
+                // An Official Challenge never lands on the deployed hex, so the deploying force was not caught by it.
+                boolean isOfficialChallenge = scenario.getBackingScenario()
+                                                    .getStratConScenarioType()
+                                                    .isOfficialChallenge();
+                if (isAmbushed && !isOfficialChallenge) {
                     // Ambushes are always Crisis scenarios, this stop
                     scenario.getBackingScenario().setIsCrisis(true);
                     scenario.setTurningPoint(false);
@@ -1774,9 +1786,15 @@ public class StratConRulesManager {
             return null;
         }
 
+        // A sortie is fought where the besiegers stand, so it can never be an Official Challenge - those never spawn
+        // on an occupied hex.
         ScenarioTemplate template = isSortie ?
-                                          null :
+                                          getRandomNonChallengeScenario(campaign, track, formationId) :
                                           StratConScenarioFactory.getSpecificScenario(SIEGE_RELIEF_SCENARIO_TEMPLATE);
+        if (isSortie && (template == null)) {
+            return null;
+        }
+
         StratConScenario scenario = (template == null) ?
                                           generateScenario(campaign, contract, track, formationId, formationCoords,
                                                 null) :
@@ -3030,6 +3048,38 @@ public class StratConRulesManager {
     }
 
     /**
+     * Selects a random, non-ambush scenario template for a formation, as {@link #getFleetAppropriateRandomScenario}
+     * does, but never an Official Challenge. For fights that must happen on the formation's own hex.
+     *
+     * @param campaign    the current {@link Campaign}
+     * @param track       the track the scenario is for
+     * @param formationId the ID of the formation the scenario is for
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none other than an Official Challenge was rolled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable ScenarioTemplate getRandomNonChallengeScenario(Campaign campaign,
+          StratConTrackState track, int formationId) {
+        int unitType = MEK;
+        Formation formation = campaign.getPlayerForce().getFormation(formationId);
+        if (formation != null) {
+            unitType = formation.getPrimaryUnitType(campaign);
+        }
+
+        final int maximumAttempts = 20;
+        for (int attempt = 0; attempt < maximumAttempts; attempt++) {
+            ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, track, unitType);
+            if ((template != null) && !template.getStratConScenarioType().isOfficialChallenge()) {
+                return template;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Selects a random scenario template for the given unit type that is allowed on the given track: a track holding a
      * facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()}) never gets an air or
      * space template. Unlike {@link #getFleetAppropriateRandomScenario}, this does not apply the fleet-capability
@@ -3222,6 +3272,21 @@ public class StratConRulesManager {
             return null;
         }
 
+        // An Official Challenge is issued through official channels, not stumbled into: it never spawns on a hex that
+        // is already taken - by a deployed formation, a scenario, a facility, or an occupying point of interest. Move
+        // it to a free hex instead, where the player chooses which formation answers it.
+        if (template.getStratConScenarioType().isOfficialChallenge() && isOccupiedForOfficialChallenge(track, coords)) {
+            StratConCoords freeCoords = StratConGMs.opForDeployment(campaign.getCampaignOptions())
+                                              .getUnoccupiedCoords(track);
+            if (freeCoords == null) {
+                LOGGER.warn("No free hex for an Official Challenge on track {}; skipping scenario generation.",
+                      track.getDisplayableName());
+                return null;
+            }
+
+            coords = freeCoords;
+        }
+
         AtBDynamicScenario backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template,
               contract,
               campaign);
@@ -3293,6 +3358,28 @@ public class StratConRulesManager {
         }
 
         return scenario;
+    }
+
+    /**
+     * Whether a hex is unfit for an Official Challenge: something already takes it up (a scenario, a facility, or an
+     * occupying point of interest - see {@link StratConTrackState#isHexOccupied}), or a player formation is deployed
+     * there.
+     *
+     * @param track  the track the challenge would be placed on, or {@code null} if it has none
+     * @param coords the hex to test, or {@code null} if the scenario has no position
+     *
+     * @return {@code true} if the challenge must be placed elsewhere
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isOccupiedForOfficialChallenge(@Nullable StratConTrackState track,
+          @Nullable StratConCoords coords) {
+        if ((track == null) || (coords == null)) {
+            return false;
+        }
+
+        return track.isHexOccupied(coords) || track.getAssignedForceCoords().containsValue(coords);
     }
 
     /**
