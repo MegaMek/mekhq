@@ -276,6 +276,49 @@ final class CrewAssignmentState {
     }
 
     /**
+     * Counts the filters on a page's side rail set away from where the page starts, for when the rail is hidden.
+     * Starting choices, such as Unassigned on the Personnel page, are not counted.
+     *
+     * @param page the page whose rail filters to count
+     *
+     * @return how many of that page's rail filters are set
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    int activeRailFilters(CrewAssignmentPage page) {
+        int active = 0;
+        switch (page) {
+            case UNITS -> {
+                if (unitType != null) {
+                    active++;
+                }
+                if (formation != null) {
+                    active++;
+                }
+            }
+            case PERSONNEL -> {
+                if (assignment != Assignment.UNASSIGNED) {
+                    active++;
+                }
+                if (role != null) {
+                    active++;
+                }
+                if (condition != Condition.ANY) {
+                    active++;
+                }
+                if (familiarity != FamiliarityBand.ANY) {
+                    active++;
+                }
+            }
+            case REVIEW -> {
+                // The Review page's rail has no filters
+            }
+        }
+        return active;
+    }
+
+    /**
      * The unit whose chassis the familiarity filter measures against: the unit a seat or tech is being found for, or
      * else the one unit selected. With none of those, or several units selected, there is no one chassis to measure.
      *

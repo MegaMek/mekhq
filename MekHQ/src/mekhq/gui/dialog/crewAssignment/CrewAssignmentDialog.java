@@ -173,6 +173,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private final HudCheckBox autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "guide.autoOpen"));
     private final HudGuideDrawer guideDrawer;
     private final HudButton guideButton = new HudButton("", false, true);
+    /** Hides or shows the filter rail on every page, for more room for the lists. */
+    private final HudButton filtersButton = new HudButton("", false, true);
     /** The page whose guide was last offered, so moving to another page offers that page's guide once. */
     private CrewAssignmentPage guideOfferedFor;
 
@@ -259,6 +261,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
               autoOpenGuides, getTextAt(RESOURCE_BUNDLE, "guide.close"), this::closeGuide);
         guideButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "guide.button.toolTipText"));
         guideButton.addActionListener(event -> openGuide(state.page));
+        filtersButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "filters.button.toolTipText"));
+        filtersButton.addActionListener(event -> {
+            guidePreferences.setFiltersHidden(railHolder.isVisible());
+            refresh();
+        });
 
         preselect(units, people);
         buildUI();
@@ -405,7 +412,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         bar.add(topRow, BorderLayout.CENTER);
         JPanel modesRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         modesRow.add(modeSelector, BorderLayout.CENTER);
-        modesRow.add(guideButton, BorderLayout.EAST);
+        JPanel modeButtons = Hud.transparentPanel(null);
+        modeButtons.setLayout(new BoxLayout(modeButtons, BoxLayout.X_AXIS));
+        modeButtons.add(filtersButton);
+        modeButtons.add(Box.createHorizontalStrut(scaleForGUI(8)));
+        modeButtons.add(guideButton);
+        modesRow.add(modeButtons, BorderLayout.EAST);
         bar.add(modesRow, BorderLayout.SOUTH);
         return bar;
     }
@@ -526,6 +538,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                                              .toUpperCase(Locale.ROOT));
         pageCards.show(pageHolder, state.page.name());
         railCards.show(railHolder, state.page.name());
+        refreshFiltersButton();
         subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", data.locationName(),
               campaign.getLocalDate()));
 
@@ -683,6 +696,31 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             chips.add(chip);
         }
         peoplePage.setChips(chips);
+    }
+
+    /**
+     * Shows or hides the filter rail as the player last chose. While it is hidden, the button counts the page's rail
+     * filters still narrowing the list, so a hidden filter cannot quietly leave someone out.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void refreshFiltersButton() {
+        boolean isHidden = CrewAssignmentGuidePreferences.getInstance().isFiltersHidden();
+        if (railHolder.isVisible() == isHidden) {
+            railHolder.setVisible(!isHidden);
+            getContentPane().revalidate();
+            getContentPane().repaint();
+        }
+        String text;
+        if (!isHidden) {
+            text = getTextAt(RESOURCE_BUNDLE, "filters.hide");
+        } else {
+            int active = state.activeRailFilters(state.page);
+            text = (active == 0) ? getTextAt(RESOURCE_BUNDLE, "filters.show") :
+                         getFormattedTextAt(RESOURCE_BUNDLE, "filters.show.active", active);
+        }
+        filtersButton.setText(text.toUpperCase(Locale.ROOT));
     }
 
     /**
