@@ -9760,26 +9760,43 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean canSalvage(boolean isInSpace) {
+        return isEquippedToSalvage(isInSpace) && isFullyCrewed();
+    }
+
+    /**
+     * Checks whether this unit has what it needs to salvage in the given environment, leaving its crew aside: the
+     * entity must be able to perform salvage operations there, and a unit other than a 'Mek also needs cargo space, a
+     * naval tug adaptor (in space) or the means to tow (on the ground).
+     *
+     * <p>{@link #canSalvage(boolean)} also requires the unit to be fully crewed.</p>
+     *
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit is equipped to salvage in this environment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isEquippedToSalvage(boolean isInSpace) {
         if (entity == null) {
             return false;
         }
 
-        boolean canSalvage = isInSpace ?
-                                   entity.canPerformSpaceSalvageOperations() :
-                                   entity.canPerformGroundSalvageOperations();
-        if (!canSalvage) {
+        boolean canPerformSalvage = isInSpace ?
+                                          entity.canPerformSpaceSalvageOperations() :
+                                          entity.canPerformGroundSalvageOperations();
+        if (!canPerformSalvage) {
             return false;
         }
 
-        boolean isMek = entity instanceof Mek;
-        if (!isMek) {
-            boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
-            boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
-            boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
-            canSalvage = hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
+        if (entity instanceof Mek) {
+            return true;
         }
 
-        return canSalvage && isFullyCrewed();
+        boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
+        boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
+        boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
+        return hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
     }
 
     /**
