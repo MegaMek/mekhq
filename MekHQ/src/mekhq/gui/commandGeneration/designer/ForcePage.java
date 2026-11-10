@@ -259,13 +259,13 @@ public final class ForcePage {
         JPanel rail = stack(
               section(text("Designer.force.section.who"), null,
                     pickerRows.get(Picker.FACTION), pickerRows.get(Picker.SUB_FACTION), yearLabel),
-              section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION)),
-              section(text("Designer.force.section.quality"), null,
-                    pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
               section(text("Designer.force.section.shape"), null,
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
-                    pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS),
+                    pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
+              section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION),
                     commandLance, detachments, formationMixLink),
+              section(text("Designer.force.section.quality"), null,
+                    pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
               section(text("Designer.force.section.transport"), null, transportGrid, fighterComplement));
         padded(rail, 12, 14, 18, 14);
         JComponent scroll = scroll(rail, SURFACE_DEEP);
