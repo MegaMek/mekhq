@@ -64,6 +64,8 @@ import mekhq.gui.baseComponents.hud.Hud;
 public final class LogisticsPage {
     private static final int RAIL_WIDTH = 300;
     private static final int WRAP_WIDTH = 280;
+    /** The width the starting-cash explanation wraps at: readable lines in the wide cash column. */
+    private static final int EXPLANATION_WIDTH = 620;
     private static final int MAX_SPARES_PERCENT = 10000;
     /** Where a spares meter reads full: twice a full restock. */
     private static final int SPARES_METER_FULL = 200;
@@ -221,9 +223,15 @@ public final class LogisticsPage {
         monthsRow.add(monthsBig, BorderLayout.WEST);
         monthsRow.add(trackColumn, BorderLayout.CENTER);
 
+        String minimumFloat = ForcePage.formatNumber(CommandGenerator.MINIMUM_STARTING_FLOAT);
         JPanel content = stack(
               section(text("Designer.logistics.section.cash"), text("Designer.logistics.section.cash.aside"),
-                    monthsRow, ledger));
+                    monthsRow, ledger),
+              section(text("Designer.logistics.section.howCash"), null,
+                    wrapped(text("Designer.logistics.howCash.measure"), EXPLANATION_WIDTH),
+                    wrapped(text("Designer.logistics.howCash.months"), EXPLANATION_WIDTH),
+                    wrapped(formatted("Designer.logistics.howCash.floor", minimumFloat), EXPLANATION_WIDTH),
+                    wrapped(text("Designer.logistics.howCash.free"), EXPLANATION_WIDTH)));
         padded(content, 12, 16, 18, 16);
         return scroll(content, GROUND);
     }
