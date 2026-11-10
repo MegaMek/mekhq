@@ -150,7 +150,7 @@ class CommandGenerationOptionsTest {
         assertTrue(origin.isRandomizeOrigin());
         assertTrue(origin.isRandomizeDependentOrigin());
         assertFalse(origin.isRandomizeAroundSpecifiedPlanet());
-        assertEquals(0, origin.getOriginSearchRadius());
+        assertEquals(45, origin.getOriginSearchRadius());
         assertEquals(0.6, origin.getOriginDistanceScale(), 0.0001);
         assertFalse(origin.isAllowClanOrigins());
         assertTrue(origin.isExtraRandomOrigin());

@@ -213,7 +213,7 @@ public class CommandGenerationOptions {
         origin.setRandomizeOrigin(true);
         origin.setRandomizeDependentOrigin(true);
         origin.setRandomizeAroundSpecifiedPlanet(false);
-        origin.setOriginSearchRadius(0);
+        origin.setOriginSearchRadius(45);
         origin.setOriginDistanceScale(0.6);
         origin.setAllowClanOrigins(false);
         origin.setExtraRandomOrigin(true);
