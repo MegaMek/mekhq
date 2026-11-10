@@ -224,6 +224,8 @@ public final class PeoplePage {
               value -> refreshOrigin());
         distanceScale = new HudStepper(1, 20, 1, value -> formatted("Designer.people.origin.scale.value",
               value / 10.0), 56, value -> { });
+        // Shown in tenths, so a typed "1.5" means 15.
+        distanceScale.setTypedValueDivisor(10);
         List<HudChoice.Choice<NeuralInterfaceMode>> neuralChoices = new ArrayList<>();
         for (NeuralInterfaceMode mode : NeuralInterfaceMode.values()) {
             neuralChoices.add(new HudChoice.Choice<>(mode, mode.optionValue()));
