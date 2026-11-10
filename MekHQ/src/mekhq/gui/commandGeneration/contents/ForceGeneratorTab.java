@@ -128,6 +128,9 @@ public class ForceGeneratorTab {
         // The role filters restrict every draw in the tree to units that can fill the ticked role, which
         // suits picking a lance of artillery carriers and not designing a command.
         optionsView.setMissionRoleFiltersVisible(false);
+        // A command is meant to read as a varied force, not a roll of the same top-weighted units: repeats within a
+        // lance, and across the command's rolls, are made less likely. MegaMek's own generator leaves this off.
+        optionsView.setUnitVarietyBias(true);
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
             // Before setCurrentYear, which populates the pickers: the preference decides what they open on.
