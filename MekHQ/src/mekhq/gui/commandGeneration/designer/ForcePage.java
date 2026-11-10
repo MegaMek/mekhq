@@ -51,6 +51,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -64,6 +65,7 @@ import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.Picker;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.PickerChoice;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportShare;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.universe.FactionTag;
@@ -726,6 +728,8 @@ public final class ForcePage {
                   : "Designer.force.include")), false, true);
             ForceDescriptor node = selected;
             toggle.addActionListener(event -> toggleIncluded(node));
+            HudButton viewReadout = new HudButton(upper(text("Designer.force.viewReadout")), false, true);
+            viewReadout.addActionListener(event -> showReadout(entity));
             addRows(detail,
                   title(entity.getShortName()),
                   keyValue(text("Designer.force.readout.role"),
@@ -737,6 +741,7 @@ public final class ForcePage {
                   keyValue(text("Designer.force.readout.bv"), formatNumber(cache.battleValue(entity))),
                   keyValue(text("Designer.force.readout.price"),
                         cache.price(entity, campaign.getCampaignOptions()).toAmountAndSymbolString()),
+                  viewReadout,
                   toggle);
         } else {
             Tally tally = new Tally();
@@ -755,6 +760,31 @@ public final class ForcePage {
         totals.revalidate();
         detail.revalidate();
         root.repaint();
+    }
+
+    /**
+     * Opens the unit's technical readout over the designer. It is modal so it stays usable above the modal Command
+     * Generator.
+     *
+     * @param entity the unit to show
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void showReadout(Entity entity) {
+        new EntityReadoutDialog(owningFrame(), true, entity).setVisible(true);
+    }
+
+    /** @return the frame the designer's window belongs to, or {@code null} when it has none */
+    private @Nullable JFrame owningFrame() {
+        Window window = SwingUtilities.getWindowAncestor(root);
+        while (window != null) {
+            if (window instanceof JFrame frame) {
+                return frame;
+            }
+            window = window.getOwner();
+        }
+        return null;
     }
 
     private static JComponent title(String text) {
