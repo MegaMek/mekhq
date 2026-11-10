@@ -305,11 +305,9 @@ public class StratConRulesManager {
                 track = getRandomItem(tracks);
             }
 
-            final int deploymentDelay = track.getDeploymentTime();
-            final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
             final LocalDate contractEnd = campaignState.getContract().getEndingDate();
 
-            if ((contractEnd != null) && !scenarioTargetDate.isBefore(contractEnd)) {
+            if ((contractEnd != null) && !campaign.getLocalDate().isBefore(contractEnd)) {
                 LOGGER.info("Skipping scenario because it is on or after the contract end date.");
                 return;
             }
@@ -477,7 +475,7 @@ public class StratConRulesManager {
      * @param emphasizeStrategicTargets A {@code boolean} that increases the likelihood of selecting strategic targets,
      *                                  such as <b>PLAYER</b>-held facilities, for scenario placement.
      * @param daysTilDeployment         An {@link Integer} specifying the number of days until the scenario occurs, or
-     *                                  {@code null} to select a random date within the next 7 days.
+     *                                  {@code null} for today.
      *
      * @return A newly created {@link StratConScenario}, or {@code null} if scenario generation fails due to invalid
      *       configurations, insufficient forces, or a lack of valid coordinates.
@@ -1101,8 +1099,7 @@ public class StratConRulesManager {
      * @param track             The relevant StratCon track.
      * @param template          A specific {@link ScenarioTemplate} to use, or {@code null} to select a random
      *                          template.
-     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
-     *                          within the next 7 days.
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} for today.
      *
      * @return The newly generated {@link StratConScenario}.
      */
@@ -1518,8 +1515,7 @@ public class StratConRulesManager {
      * @param template          A specific {@link ScenarioTemplate} to use for scenario setup, or {@code null} to select
      *                          the scenario template randomly.
      * @param ignoreFacilities  Whether we should ignore any facilities at the selected location
-     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
-     *                          within the next 7 days.
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} for today.
      *
      * @return The newly set up {@link StratConScenario}.
      */
@@ -3130,8 +3126,8 @@ public class StratConRulesManager {
      * @param track             the {@link StratConTrackState} where the scenario is placed
      * @param forceID           the ID of the force for which the scenario is generated
      * @param scenarioCoords    the {@link StratConCoords} specifying where the scenario will be generated
-     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, deployment dates are
-     *                          determined dynamically
+     * @param daysTilDeployment the number of days until the scenario takes place, or {@code null} for
+     *                          today
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
@@ -3166,7 +3162,7 @@ public class StratConRulesManager {
      * <p>The generated scenario is configured as follows:
      * <ul>
      *     <li>If no template is provided, a random template is chosen based on the unit type of the given force.</li>
-     *     <li>If provided, deployment dates are explicitly set. Otherwise, dates are determined dynamically.</li>
+     *     <li>The battle takes place {@code daysTilDeployment} days from today, or today if it is {@code null}.</li>
      *     <li>Global modifiers, facility modifiers, attached unit modifiers, and allied force modifiers
      *         are applied as appropriate.</li>
      *     <li>The scenario is marked as unresolved and is registered with the campaign and track.</li>
@@ -3185,8 +3181,8 @@ public class StratConRulesManager {
      * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
      * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
      *                          one is selected
-     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, dates will be
-     *                          dynamically set
+     * @param daysTilDeployment the number of days until the scenario takes place, or {@code null} for
+     *                          today
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
@@ -3273,11 +3269,7 @@ public class StratConRulesManager {
               restrictAlliedModifiers, restrictEnemyModifiers);
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
 
-        if (daysTilDeployment == null) {
-            setScenarioDates(track, campaign, scenario);
-        } else {
-            setScenarioDates(daysTilDeployment, track, campaign, scenario);
-        }
+        setScenarioDates((daysTilDeployment == null) ? 0 : daysTilDeployment, track, campaign, scenario);
 
         // the backing scenario ID must be updated after registering the backing
         // scenario
@@ -3677,28 +3669,19 @@ public class StratConRulesManager {
     }
 
     /**
-     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
-     * campaign date
+     * Worker function that sets a scenario's deployment, battle, and return dates. The battle takes place
+     * {@code daysUntilBattle} days from the campaign's current date - there is no lead time between deploying and the
+     * battle - and the deployed forces return to base the track's deployment time after the battle.
+     *
+     * @param daysUntilBattle how many days from today the battle takes place
+     * @param track           the track the scenario sits on, which supplies the deployment time
+     * @param campaign        the current campaign
+     * @param scenario        the scenario to date
      */
-    private static void setScenarioDates(StratConTrackState track, Campaign campaign, StratConScenario scenario) {
-        int deploymentDay = track.getDeploymentTime() < 7 ? randomInt(7 - track.getDeploymentTime()) : 0;
-        setScenarioDates(deploymentDay, track, campaign, scenario);
-    }
-
-    /**
-     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
-     * campaign date. Takes a fixed deployment day of X days from campaign's today date.
-     */
-    private static void setScenarioDates(int deploymentDelay, StratConTrackState track, Campaign campaign,
+    private static void setScenarioDates(int daysUntilBattle, StratConTrackState track, Campaign campaign,
           StratConScenario scenario) {
-        // set up deployment day, battle day, return day here
-        // safety code to prevent attempts to generate random int with upper bound of 0
-        // which is apparently illegal
-        int battleDay = deploymentDelay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
-        int returnDay = deploymentDelay + track.getDeploymentTime();
-
-        LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
-        LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
+        LocalDate battleDate = campaign.getLocalDate().plusDays(daysUntilBattle);
+        LocalDate returnDate = battleDate.plusDays(track.getDeploymentTime());
 
         scenario.setDeploymentDate(battleDate);
         scenario.setActionDate(battleDate);

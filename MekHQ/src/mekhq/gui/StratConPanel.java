@@ -2955,12 +2955,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             String statusText = switch (pointOfInterest.getStatus()) {
                 case RESOLVED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.resolved");
                 case EXPIRED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.expired");
-                case ACTIVE -> (pointOfInterest.getExpiryDate() == null) ?
+                // Shown as the last day it can still be acted on: it lapses at the start of its expiry date.
+                case ACTIVE -> (pointOfInterest.getLastActiveDate() == null) ?
                                      null :
                                      getFormattedTextAt(RESOURCE_BUNDLE,
                                            "stratConTab.hexInfo.pointOfInterest.expires",
                                            MekHQ.getMHQOptions()
-                                                 .getDisplayFormattedDate(pointOfInterest.getExpiryDate()));
+                                                 .getDisplayFormattedDate(pointOfInterest.getLastActiveDate()));
             };
             if (statusText != null) {
                 infoBuilder.append("<br/>").append(statusText);
