@@ -362,17 +362,22 @@ public class CommandGenerationPane extends JPanel {
 
     /** Refreshes the tiles, the subtitle and every page from the current roll and settings. */
     public void refreshAll() {
+        long start = System.nanoTime();
+        // People is refreshed whatever is on show: the tiles read the hires it works out.
         peoplePage.refresh();
-        logisticsPage.refresh();
-        // Review asks the dialog to read every page back, which is too much work to repeat on every change while it
-        // is not on screen; it is brought up to date when it is shown.
-        if (currentPage == DesignerPage.REVIEW) {
+        // Logistics and Review only change what they show, so they are brought up to date when they are on screen;
+        // showing a page refreshes it. Review in particular reads every page back, too much to repeat on each change.
+        if (currentPage == DesignerPage.LOGISTICS) {
+            logisticsPage.refresh();
+        } else if (currentPage == DesignerPage.REVIEW) {
             reviewPage.refresh();
         }
         refreshTiles();
         for (Runnable listener : List.copyOf(refreshListeners)) {
             listener.run();
         }
+        LOGGER.debug("[CommandDesigner][Perf] refreshed the {} page and tiles in {}ms", currentPage,
+              (System.nanoTime() - start) / 1_000_000);
     }
 
     private void refreshTiles() {

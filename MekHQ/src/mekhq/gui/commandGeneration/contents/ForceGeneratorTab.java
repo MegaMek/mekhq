@@ -91,6 +91,9 @@ public class ForceGeneratorTab {
     /** A Lance, a Star or a Level II: every ruleset numbers these echelon 3. */
     private static final int PREFERRED_ECHELON = 3;
 
+    /** The lift the campaign's hangar already holds, measured on first use; see {@link #liftAlreadyInHangar()}. */
+    private @Nullable ExistingLift hangarLift;
+
     private Consumer<FactionRecord> factionChangeListener;
     private final List<Consumer<ForceDescriptor>> forceGeneratedListeners = new ArrayList<>();
     private final List<Runnable> modelChangeListeners = new ArrayList<>();
@@ -176,13 +179,18 @@ public class ForceGeneratorTab {
         if (campaign == null) {
             return ExistingLift.NONE;
         }
-        List<Entity> entities = new ArrayList<>();
-        for (Unit unit : campaign.getUnits()) {
-            if (unit.getEntity() != null) {
-                entities.add(unit.getEntity());
+        // The force generator asks every time the settings are read, which Review does on each refresh. The hangar
+        // cannot change while the designer is open, so its ships are measured once.
+        if (hangarLift == null) {
+            List<Entity> entities = new ArrayList<>();
+            for (Unit unit : campaign.getUnits()) {
+                if (unit.getEntity() != null) {
+                    entities.add(unit.getEntity());
+                }
             }
+            hangarLift = ExistingLift.of(entities);
         }
-        return ExistingLift.of(entities);
+        return hangarLift;
     }
 
     /**

@@ -47,6 +47,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -55,6 +56,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
@@ -67,6 +69,7 @@ import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportS
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
@@ -84,6 +87,7 @@ import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
  * readout on the right sums the command up and shows the unit selected on the board.</p>
  */
 public final class ForcePage {
+    private static final MMLogger LOGGER = MMLogger.create(ForcePage.class);
     private static final int RAIL_WIDTH = 300;
     private static final int READOUT_WIDTH = 400;
     // The readout's text column: its width less its padding and scroll bar.
@@ -121,6 +125,8 @@ public final class ForcePage {
     private final JPanel boardRows = column();
     private final JLabel boardMeta = muted("");
     private final Set<ForceDescriptor> collapsed = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** Restyles each board row for whether it is selected, so a click moves the highlight without a rebuild. */
+    private final Map<ForceDescriptor, Consumer<Boolean>> rowSelectionStylers = new IdentityHashMap<>();
     private @Nullable ForceDescriptor selected;
     private boolean boardRefreshPending;
 
@@ -368,10 +374,12 @@ public final class ForcePage {
 
     /** Rebuilds the board, the readout and the summary from the rolled command. */
     void refreshBoard() {
+        long start = System.nanoTime();
         ForceDescriptor modelRoot = engine.getGeneratedForce();
         summary = ForceSummary.of(modelRoot, campaign.getCampaignOptions(), cache);
 
         boardRows.removeAll();
+        rowSelectionStylers.clear();
         if (modelRoot == null) {
             selected = null;
             JLabel empty = Hud.notice(wrapHtml(text("Designer.force.board.empty"), 420));
@@ -388,6 +396,8 @@ public final class ForcePage {
         boardRows.revalidate();
         boardRows.repaint();
         refreshReadout();
+        LOGGER.debug("[CommandDesigner][Perf] board rebuilt: {} row(s), {} unit(s) in {}ms",
+              rowSelectionStylers.size(), summary.getRolledUnits(), (System.nanoTime() - start) / 1_000_000);
         onSummaryChanged.run();
     }
 
@@ -448,7 +458,9 @@ public final class ForcePage {
 
         JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
         row.setOpaque(true);
-        row.setBackground((node == selected) ? SURFACE : GROUND);
+        Consumer<Boolean> styler = isSelected -> row.setBackground(isSelected ? SURFACE : GROUND);
+        styler.accept(node == selected);
+        rowSelectionStylers.put(node, styler);
         row.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, DIVIDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(indentFor(depth)), scaleForGUI(5),
@@ -468,7 +480,9 @@ public final class ForcePage {
                 if (!collapsed.remove(node)) {
                     collapsed.add(node);
                 }
-                select(node);
+                // Folding changes which rows exist, so this one redraws the board rather than moving the highlight.
+                selected = node;
+                scheduleBoardRefresh();
             }
         });
         return row;
@@ -520,20 +534,14 @@ public final class ForcePage {
         figures.add(figure(formatNumber(cache.battleValue(entity)), text("Designer.force.bv"), included));
         figures.add(figure(formatNumber(Math.round(entity.getWeight())), text("Designer.force.tons"), included));
 
-        boolean isSelected = node == selected;
         JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
         row.setOpaque(true);
-        row.setBackground(isSelected ? SURFACE : GROUND);
-        // The selection bar sits at the row's indent, beside the unit it marks.
-        row.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-              BorderFactory.createCompoundBorder(
-                    BorderFactory.createEmptyBorder(0, scaleForGUI(depth * BOARD_INDENT), 0, 0),
-                    BorderFactory.createCompoundBorder(
-                          BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                          BorderFactory.createEmptyBorder(scaleForGUI(7),
-                                scaleForGUI(BOARD_ROW_PADDING - (isSelected ? 3 : 0)), scaleForGUI(7),
-                                scaleForGUI(14))))));
+        Consumer<Boolean> styler = isSelected -> {
+            row.setBackground(isSelected ? SURFACE : GROUND);
+            row.setBorder(unitRowBorder(depth, isSelected));
+        };
+        styler.accept(node == selected);
+        rowSelectionStylers.put(node, styler);
         row.add(ring(node, included, isCommander), BorderLayout.WEST);
         row.add(text, BorderLayout.CENTER);
         row.add(figures, BorderLayout.EAST);
@@ -547,6 +555,25 @@ public final class ForcePage {
             }
         });
         return row;
+    }
+
+    /**
+     * The border of a unit row. The selection bar sits at the row's indent, beside the unit it marks, and takes its
+     * width out of the padding so a row does not shift when it is selected.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Border unitRowBorder(int depth, boolean isSelected) {
+        return BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+              BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(0, scaleForGUI(depth * BOARD_INDENT), 0, 0),
+                    BorderFactory.createCompoundBorder(
+                          BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                          BorderFactory.createEmptyBorder(scaleForGUI(7),
+                                scaleForGUI(BOARD_ROW_PADDING - (isSelected ? 3 : 0)), scaleForGUI(7),
+                                scaleForGUI(14)))));
     }
 
     private static String pilotLine(CrewDescriptor pilot) {
@@ -607,9 +634,28 @@ public final class ForcePage {
         engine.modelChanged();
     }
 
+    /**
+     * Selects a row. Only the highlight and the readout change, so the two rows involved are restyled in place: a
+     * full rebuild of a regiment's board on every click was most of the time a click took.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     private void select(ForceDescriptor node) {
+        ForceDescriptor previous = selected;
         selected = node;
-        scheduleBoardRefresh();
+        Consumer<Boolean> previousStyler = (previous == null) ? null : rowSelectionStylers.get(previous);
+        Consumer<Boolean> styler = rowSelectionStylers.get(node);
+        if (styler == null) {
+            scheduleBoardRefresh();
+            return;
+        }
+        if ((previousStyler != null) && (previous != node)) {
+            previousStyler.accept(false);
+        }
+        styler.accept(true);
+        refreshReadout();
+        boardRows.repaint();
     }
 
     // endregion Board

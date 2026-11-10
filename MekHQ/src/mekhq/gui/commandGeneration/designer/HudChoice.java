@@ -114,6 +114,9 @@ public final class HudChoice<T> extends JPanel {
     private boolean firstIsRandom;
     private final JComboBox<Item> dropDown = new JComboBox<>();
     private boolean filling;
+    /** Whether the entries have been laid out at least once, and the Random setting they were laid out with. */
+    private boolean showingBuilt;
+    private boolean builtFirstIsRandom;
     private boolean showingSegments;
 
     /**
@@ -179,6 +182,12 @@ public final class HudChoice<T> extends JPanel {
      * @param selected   the value to select; one that is not offered leaves nothing selected
      */
     public void setChoices(List<Choice<T>> newChoices, @Nullable T selected) {
+        // The Force page re-reads every picker on each selection event, and most of those leave the entries as they
+        // were. Rebuilding the segments for nothing was much of what a click on the rail cost.
+        if (showingBuilt && newChoices.equals(choices) && (builtFirstIsRandom == firstIsRandom)) {
+            setSelected(selected);
+            return;
+        }
         filling = true;
         try {
             choices.clear();
@@ -230,6 +239,8 @@ public final class HudChoice<T> extends JPanel {
                 showingSegments = useSegments;
             }
             setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
+            showingBuilt = true;
+            builtFirstIsRandom = firstIsRandom;
             revalidate();
             repaint();
         } finally {

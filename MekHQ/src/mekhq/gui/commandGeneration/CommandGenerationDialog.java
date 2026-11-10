@@ -61,6 +61,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import jakarta.annotation.Nullable;
@@ -122,6 +123,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * command that differs from the one previewed.
      */
     private CommandGenerationOptions settingsAtLastGenerate;
+    /** The settings {@link #reviewOptions()} read for the refresh under way, or {@code null} between refreshes. */
+    private @Nullable CommandGenerationOptions reviewOptionsCache;
 
     /**
      * Whether the last press of Accept &amp; Build actually started a build.
@@ -638,7 +641,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * @return the build's resource-cost warnings for the settings as the pages stand, for the Review page
      */
     private List<String> reviewWarnings() {
-        CommandGenerationOptions options = collectOptionsFromTabs("review");
+        CommandGenerationOptions options = reviewOptions();
         return collectPreGenerationWarnings(options, options.getForceDescriptorSnapshot().getEchelon());
     }
 
@@ -647,7 +650,23 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      *       use
      */
     private boolean settingsChangedSinceRoll() {
-        return (settingsAtLastGenerate != null) && !settingsAtLastGenerate.equals(collectOptionsFromTabs("review"));
+        return (settingsAtLastGenerate != null) && !settingsAtLastGenerate.equals(reviewOptions());
+    }
+
+    /**
+     * The settings as the pages stand, for Review. Review asks for them twice in one refresh, once for its warnings and
+     * once to compare with the roll, and reading every page back is the costly part, so they are read once and kept
+     * until the refresh is over.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private CommandGenerationOptions reviewOptions() {
+        if (reviewOptionsCache == null) {
+            reviewOptionsCache = collectOptionsFromTabs("review");
+            SwingUtilities.invokeLater(() -> reviewOptionsCache = null);
+        }
+        return reviewOptionsCache;
     }
 
     /**

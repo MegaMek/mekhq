@@ -112,6 +112,11 @@ public final class PeoplePage {
     }
 
     private final Campaign campaign;
+    /** The estimate {@link #demandFor} last made, and the roll it was made for. */
+    private @Nullable SupportDemand cachedDemand;
+    private @Nullable ForceSummary cachedDemandSummary;
+    private @Nullable Integer vehiclesStillToCome;
+    private final Map<PersonnelRole, Integer> activeStaffByRole = new EnumMap<>(PersonnelRole.class);
     private final Supplier<ForceSummary> summary;
     private final Function<ForceDescriptor, String> formationNamer;
     private final Runnable onChanged;
@@ -475,16 +480,13 @@ public final class PeoplePage {
     /** Recomputes everything this page shows that depends on the rolled command or on other choices here. */
     public void refresh() {
         ForceSummary rolled = summary.get();
-        Faction faction = campaign.getPlayerForce().getFaction();
-        int vehiclesToCome = (faction == null) ? 0 : SupportUnitGenerator.vehiclesStillToGenerate(campaign, faction);
-        SupportDemand demand = SupportPersonnelCalculator.estimate(campaign, rolled.getIncludedEntities(),
-              vehiclesToCome);
+        SupportDemand demand = demandFor(rolled);
         int techHires = 0;
         int doctorHires = 0;
         for (PersonnelRole role : SUPPORT_ROLES) {
             int need = needFor(demand, role);
             int target = SupportPersonnelCalculator.applyPercent(need, coverage.get(role).getValue());
-            int hire = Math.max(0, target - SupportPersonnelGenerator.countActiveByRole(campaign, role));
+            int hire = Math.max(0, target - activeStaff(role));
             hires.put(role, hire);
             needLabels.get(role).setText(Integer.toString(need));
             hireLabels.get(role).setText(Integer.toString(hire));
@@ -513,6 +515,49 @@ public final class PeoplePage {
         refreshAssistants();
         root.revalidate();
         root.repaint();
+    }
+
+    /**
+     * The support staff the rolled command needs, estimated once per roll. Every click on the page refreshes it, and
+     * the estimate walks the campaign's units and personnel, but it changes only when the roll does: the summary is
+     * a new object each time the board is rebuilt.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private SupportDemand demandFor(ForceSummary rolled) {
+        if ((cachedDemand == null) || (cachedDemandSummary != rolled)) {
+            cachedDemand = SupportPersonnelCalculator.estimate(campaign, rolled.getIncludedEntities(),
+                  vehiclesStillToCome());
+            cachedDemandSummary = rolled;
+        }
+        return cachedDemand;
+    }
+
+    /**
+     * The support vehicles the build will still add. Read from the campaign alone, which cannot change while the
+     * designer is open, so it is worked out once.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int vehiclesStillToCome() {
+        if (vehiclesStillToCome == null) {
+            Faction faction = campaign.getPlayerForce().getFaction();
+            vehiclesStillToCome = (faction == null) ? 0 : SupportUnitGenerator.vehiclesStillToGenerate(campaign, faction);
+        }
+        return vehiclesStillToCome;
+    }
+
+    /**
+     * @return the campaign's active staff in a role, counted once for the same reason as the vehicles above
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int activeStaff(PersonnelRole role) {
+        return activeStaffByRole.computeIfAbsent(role,
+              key -> SupportPersonnelGenerator.countActiveByRole(campaign, key));
     }
 
     private static int needFor(SupportDemand demand, PersonnelRole role) {
