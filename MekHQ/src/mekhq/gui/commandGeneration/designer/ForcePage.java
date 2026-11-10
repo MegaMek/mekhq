@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.commandGeneration.designer.DesignerUi.*;
 
 import java.awt.*;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -127,6 +128,8 @@ public final class ForcePage {
     private final Set<ForceDescriptor> collapsed = Collections.newSetFromMap(new IdentityHashMap<>());
     /** Restyles each board row for whether it is selected, so a click moves the highlight without a rebuild. */
     private final Map<ForceDescriptor, Consumer<Boolean>> rowSelectionStylers = new IdentityHashMap<>();
+    /** Whether the model changed while the board was off screen, so it must be rebuilt when next shown. */
+    private boolean boardStale;
     private @Nullable ForceDescriptor selected;
     private boolean boardRefreshPending;
 
@@ -158,6 +161,13 @@ public final class ForcePage {
             view.addSelectionListener(this::scheduleRailRefresh);
         }
         engine.addModelChangeListener(this::scheduleBoardRefresh);
+        // A board left stale while another page was on show is rebuilt as it comes back into view.
+        root.addHierarchyListener(event -> {
+            if (((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) && root.isShowing()
+                      && boardStale) {
+                scheduleBoardRefresh();
+            }
+        });
         refreshRail();
         refreshBoard();
     }
@@ -362,6 +372,17 @@ public final class ForcePage {
     }
 
     private void scheduleBoardRefresh() {
+        // Off screen the board is only marked stale. What changes the model while another page is on show is the
+        // People page's naming choices, which alter the board's names and not the totals the tiles read, and
+        // rebuilding a large command's board there made every such click lag.
+        if (!root.isShowing()) {
+            boardStale = true;
+            // The totals are still brought up to date, cheaply, in case a roll finished after the player moved on.
+            if (updateSummary()) {
+                onSummaryChanged.run();
+            }
+            return;
+        }
         if (boardRefreshPending) {
             return;
         }
@@ -375,8 +396,9 @@ public final class ForcePage {
     /** Rebuilds the board, the readout and the summary from the rolled command. */
     void refreshBoard() {
         long start = System.nanoTime();
+        boardStale = false;
         ForceDescriptor modelRoot = engine.getGeneratedForce();
-        summary = ForceSummary.of(modelRoot, campaign.getCampaignOptions(), cache);
+        updateSummary();
 
         boardRows.removeAll();
         rowSelectionStylers.clear();
@@ -399,6 +421,23 @@ public final class ForcePage {
         LOGGER.debug("[CommandDesigner][Perf] board rebuilt: {} row(s), {} unit(s) in {}ms",
               rowSelectionStylers.size(), summary.getRolledUnits(), (System.nanoTime() - start) / 1_000_000);
         onSummaryChanged.run();
+    }
+
+    /**
+     * Recounts the rolled command, keeping the current summary when the units are the same ones.
+     *
+     * @return {@code true} if the summary changed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean updateSummary() {
+        ForceSummary recounted = ForceSummary.of(engine.getGeneratedForce(), campaign.getCampaignOptions(), cache);
+        if ((recounted == summary) || recounted.hasSameUnits(summary)) {
+            return false;
+        }
+        summary = recounted;
+        return true;
     }
 
     private static List<ForceDescriptor> childrenOf(ForceDescriptor node) {

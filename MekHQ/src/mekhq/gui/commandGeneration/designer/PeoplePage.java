@@ -473,7 +473,8 @@ public final class PeoplePage {
     // region Refresh
 
     private void changed() {
-        refresh();
+        // The designer's refresh, which runs once however many changes arrive, refreshes this page along with the
+        // tiles. Refreshing here as well did the page's work twice for every click.
         onChanged.run();
     }
 
