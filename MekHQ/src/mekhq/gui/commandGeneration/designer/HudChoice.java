@@ -278,6 +278,20 @@ public final class HudChoice<T> extends JPanel {
         this.firstIsRandom = firstIsRandom;
     }
 
+    /**
+     * Shows a short note, such as a warning, in the empty space left at the end of the segments' last row when they
+     * wrap. Takes effect at the next {@link #setChoices}.
+     *
+     * @param note    the note, or {@code null} for none
+     * @param tooltip the note's tooltip, or {@code null} for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setFillerNote(@Nullable String note, @Nullable String tooltip) {
+        segments.setFillerNote(note, tooltip);
+    }
+
     /** Selects a value without telling the listener; one that is not offered leaves nothing selected. */
     public void setSelected(@Nullable T value) {
         filling = true;

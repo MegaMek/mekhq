@@ -386,6 +386,9 @@ public final class PeoplePage {
             refreshAssistants();
             changed();
         });
+        // Sits under People in the wrapped row beside None.
+        choice.setFillerNote(text("Designer.people.assistants.people.warning"),
+              text("Designer.people.assistants.people.warning.tooltip"));
         choice.setChoices(List.of(
               new HudChoice.Choice<>(AssistantMode.POOL, text("Designer.people.assistants.pool"),
                     text("Designer.people.assistants.pool.sub")),
