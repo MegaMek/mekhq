@@ -155,6 +155,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final int BRIEFING_SPLIT_DIVIDER_SIZE = 10;
     private static final int SCENARIO_TABLE_ROW_HEIGHT = 24;
     private static final int SCENARIO_TABLE_CELL_PADDING = 12;
+    private static final String LAST_SCENARIO_COLUMN_CHOSEN_WIDTH = "mekhq.briefing.lastScenarioColumnChosenWidth";
 
     private final MekHQ app;
 
@@ -737,11 +738,28 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         });
         if (table.getTableHeader() != null) {
-            // The fit is skipped while a column is being dragged, so re-fit once the drag ends. Deferred so it runs
-            // after the header UI has cleared its resizing column.
+            // The fit is skipped while a column is being dragged, so re-fit once the drag ends. The press is captured
+            // after the header UI has picked the column to resize; the re-fit is deferred so it runs after the header
+            // UI has cleared that column on release.
             table.getTableHeader().addMouseListener(new MouseAdapter() {
+                private TableColumn resizedColumn;
+                private int widthAtPress;
+
+                @Override
+                public void mousePressed(MouseEvent evt) {
+                    resizedColumn = table.getTableHeader().getResizingColumn();
+                    widthAtPress = (resizedColumn == null) ? 0 : resizedColumn.getWidth();
+                }
+
                 @Override
                 public void mouseReleased(MouseEvent evt) {
+                    int lastColumnIndex = table.getColumnCount() - 1;
+                    if ((resizedColumn != null) && (lastColumnIndex >= 0)
+                          && (resizedColumn == table.getColumnModel().getColumn(lastColumnIndex))
+                          && (resizedColumn.getWidth() != widthAtPress)) {
+                        table.putClientProperty(LAST_SCENARIO_COLUMN_CHOSEN_WIDTH, resizedColumn.getWidth());
+                    }
+                    resizedColumn = null;
                     SwingUtilities.invokeLater(() -> updateLastScenarioColumnWidth(table, tableScrollPane));
                 }
             });
@@ -769,7 +787,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
         TableColumn lastColumn = table.getColumnModel().getColumn(lastColumnIndex);
         int availableWidth = tableScrollPane.getViewport().getExtentSize().width - fixedWidth;
-        int preferredWidth = Math.max(lastColumn.getMinWidth(), availableWidth);
+        // Fill any leftover space, but keep a width the player dragged the last column to, even when that needs a
+        // horizontal scrollbar.
+        int chosenWidth = (table.getClientProperty(LAST_SCENARIO_COLUMN_CHOSEN_WIDTH) instanceof Integer width)
+              ? width
+              : 0;
+        int preferredWidth = Math.max(lastColumn.getMinWidth(), Math.max(chosenWidth, availableWidth));
         if (lastColumn.getPreferredWidth() != preferredWidth) {
             lastColumn.setPreferredWidth(preferredWidth);
             table.revalidate();
