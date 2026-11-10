@@ -412,12 +412,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         bar.add(topRow, BorderLayout.CENTER);
         JPanel modesRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         modesRow.add(modeSelector, BorderLayout.CENTER);
-        JPanel modeButtons = Hud.transparentPanel(null);
-        modeButtons.setLayout(new BoxLayout(modeButtons, BoxLayout.X_AXIS));
-        modeButtons.add(filtersButton);
-        modeButtons.add(Box.createHorizontalStrut(scaleForGUI(8)));
-        modeButtons.add(guideButton);
-        modesRow.add(modeButtons, BorderLayout.EAST);
+        // Far left, above the filter rail it hides
+        modesRow.add(filtersButton, BorderLayout.WEST);
+        modesRow.add(guideButton, BorderLayout.EAST);
         bar.add(modesRow, BorderLayout.SOUTH);
         return bar;
     }
