@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -75,9 +76,13 @@ public final class HudChoice<T> extends JPanel {
      * @param label the text shown for it
      * @param sub   a short line under the label when shown as a segment, or {@code null}
      */
-    public record Choice<T>(@Nullable T value, String label, @Nullable String sub) {
+    public record Choice<T>(@Nullable T value, String label, @Nullable String sub, @Nullable Color subColor) {
         public Choice(@Nullable T value, String label) {
-            this(value, label, null);
+            this(value, label, null, null);
+        }
+
+        public Choice(@Nullable T value, String label, @Nullable String sub) {
+            this(value, label, sub, null);
         }
     }
 
@@ -194,7 +199,7 @@ public final class HudChoice<T> extends JPanel {
                 List<Segment<Integer>> leadList = new ArrayList<>();
                 if (leadOnOwnRow) {
                     Choice<T> choice = choices.get(0);
-                    leadList.add(new Segment<>(0, choice.label(), choice.sub(), true));
+                    leadList.add(new Segment<>(0, choice.label(), choice.sub(), true, choice.subColor()));
                 }
                 lead.setSegments(leadList);
                 lead.setVisible(leadOnOwnRow);
@@ -203,7 +208,7 @@ public final class HudChoice<T> extends JPanel {
                 List<Segment<Integer>> list = new ArrayList<>();
                 for (int index = first; index < choices.size(); index++) {
                     Choice<T> choice = choices.get(index);
-                    list.add(new Segment<>(index, choice.label(), choice.sub(), true));
+                    list.add(new Segment<>(index, choice.label(), choice.sub(), true, choice.subColor()));
                 }
                 segments.setSegments(list);
                 // Stacked under the lead row, the rest share its bottom edge rather than drawing a second one.
@@ -276,20 +281,6 @@ public final class HudChoice<T> extends JPanel {
      */
     public void setFirstIsRandom(boolean firstIsRandom) {
         this.firstIsRandom = firstIsRandom;
-    }
-
-    /**
-     * Shows a short note, such as a warning, in the empty space left at the end of the segments' last row when they
-     * wrap. Takes effect at the next {@link #setChoices}.
-     *
-     * @param note    the note, or {@code null} for none
-     * @param tooltip the note's tooltip, or {@code null} for none
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public void setFillerNote(@Nullable String note, @Nullable String tooltip) {
-        segments.setFillerNote(note, tooltip);
     }
 
     /** Selects a value without telling the listener; one that is not offered leaves nothing selected. */

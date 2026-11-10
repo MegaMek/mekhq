@@ -108,7 +108,7 @@ public final class PeoplePage {
 
     /** How assistants are generated. */
     enum AssistantMode {
-        POOL, PEOPLE, NONE
+        POOL, PEOPLE
     }
 
     private final Campaign campaign;
@@ -386,15 +386,12 @@ public final class PeoplePage {
             refreshAssistants();
             changed();
         });
-        // Sits under People in the wrapped row beside None.
-        choice.setFillerNote(text("Designer.people.assistants.people.warning"),
-              text("Designer.people.assistants.people.warning.tooltip"));
         choice.setChoices(List.of(
               new HudChoice.Choice<>(AssistantMode.POOL, text("Designer.people.assistants.pool"),
                     text("Designer.people.assistants.pool.sub")),
+              // Named assistants are full personnel records, and a large command can have hundreds of them.
               new HudChoice.Choice<>(AssistantMode.PEOPLE, text("Designer.people.assistants.people"),
-                    text("Designer.people.assistants.people.sub")),
-              new HudChoice.Choice<>(AssistantMode.NONE, text("Designer.people.assistants.none"), null)),
+                    text("Designer.people.assistants.people.warning"), CAUTION)),
               AssistantMode.POOL);
         return choice;
     }
@@ -718,9 +715,9 @@ public final class PeoplePage {
             SkillLevel level = options.getSupportPersonnelSkillLevels().get(role);
             skills.get(role).setSelected((level == null) ? SkillLevel.NONE : level);
         }
-        astechMode.setSelected(assistantMode(options.isGenerateAstechs(), options.isAstechsAsPersonnel()));
+        astechMode.setSelected(assistantMode(options.isAstechsAsPersonnel()));
         astechSkill.setSelected(options.getAstechSkillLevel());
-        medicMode.setSelected(assistantMode(options.isGenerateMedics(), options.isMedicsAsPersonnel()));
+        medicMode.setSelected(assistantMode(options.isMedicsAsPersonnel()));
         medicSkill.setSelected(options.getMedicSkillLevel());
         reserve.setSelected(options.isGenerateMedicalReserve());
         reservePercent.setValue(options.getMedicalReservePercent());
@@ -754,10 +751,7 @@ public final class PeoplePage {
         refresh();
     }
 
-    private static AssistantMode assistantMode(boolean generate, boolean asPersonnel) {
-        if (!generate) {
-            return AssistantMode.NONE;
-        }
+    private static AssistantMode assistantMode(boolean asPersonnel) {
         return asPersonnel ? AssistantMode.PEOPLE : AssistantMode.POOL;
     }
 
@@ -804,11 +798,11 @@ public final class PeoplePage {
             options.getSupportPersonnelSkillLevels().put(role, (level == null) ? SkillLevel.NONE : level);
         }
         AssistantMode astechs = astechMode.getSelected();
-        options.setGenerateAstechs(astechs != AssistantMode.NONE);
+        options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(astechs == AssistantMode.PEOPLE);
         options.setAstechSkillLevel(skillOrRandom(astechSkill));
         AssistantMode medics = medicMode.getSelected();
-        options.setGenerateMedics(medics != AssistantMode.NONE);
+        options.setGenerateMedics(true);
         options.setMedicsAsPersonnel(medics == AssistantMode.PEOPLE);
         options.setMedicSkillLevel(skillOrRandom(medicSkill));
         options.setGenerateMedicalReserve(reserve.isSelected());

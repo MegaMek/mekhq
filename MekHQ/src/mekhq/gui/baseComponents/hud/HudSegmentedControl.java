@@ -94,10 +94,6 @@ public class HudSegmentedControl<T> extends JPanel {
     private transient T selected;
     /** How many segments sit in a row before wrapping, or {@code 0} to keep every segment in one row. */
     private int columns;
-    /** A short note shown in the first empty cell of a short last row, or {@code null} for none. */
-    private @Nullable String fillerNote;
-    /** The tooltip of the filler note, or {@code null} for none. */
-    private @Nullable String fillerNoteTooltip;
 
     /**
      * One segment of the control.
@@ -188,16 +184,9 @@ public class HudSegmentedControl<T> extends JPanel {
         }
         // Fill out a short last row so its cells keep the same width as the rows above.
         for (int index = segments.size(); index < rows * perRow; index++) {
-            JPanel filler = new JPanel(new GridBagLayout());
+            JPanel filler = new JPanel();
             filler.setOpaque(true);
             filler.setBackground(SURFACE_DEEP);
-            if ((fillerNote != null) && (index == segments.size())) {
-                JLabel note = new JLabel(fillerNote, SwingConstants.CENTER);
-                note.setFont(hudFont(Font.PLAIN, 0.74f, 0.0f));
-                note.setForeground(CAUTION);
-                filler.setToolTipText(fillerNoteTooltip);
-                filler.add(note);
-            }
             add(filler);
         }
         setSelected(selected);
@@ -263,21 +252,6 @@ public class HudSegmentedControl<T> extends JPanel {
      */
     public void setColumns(int columns) {
         this.columns = Math.max(0, columns);
-    }
-
-    /**
-     * Shows a short note, such as a warning, in the empty space that wrapping leaves at the end of the last row. Has no
-     * effect while the segments fill every row. Call before {@link #setSegments(List)}.
-     *
-     * @param note    the note, or {@code null} for none
-     * @param tooltip the note's tooltip, or {@code null} for none
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public void setFillerNote(@Nullable String note, @Nullable String tooltip) {
-        this.fillerNote = note;
-        this.fillerNoteTooltip = tooltip;
     }
 
     /**
