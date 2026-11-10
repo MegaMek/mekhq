@@ -37,18 +37,16 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import jakarta.annotation.Nullable;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
 
 /**
  * Controls how the campaign values its units: by their construction cost, or by Battle Value under the Alternate Unit
  * Cost rule from <i>Hot Spots: Draconis Reach</i>.
  *
  * <ul>
- *     <li>{@link #TOTAL_WARFARE} - units are valued by their construction cost.</li>
- *     <li>{@link #CHAOS_CAMPAIGN} - every unit is valued by its Battle Value.</li>
- *     <li>{@link #MEKHQ} - as {@link #CHAOS_CAMPAIGN}, except large craft (DropShips,
- *     JumpShips, WarShips, and space stations) keep their construction cost. Their Battle Value is tiny next to their
- *     construction cost, so valuing them by it makes them absurdly cheap.</li>
+ *     <li>{@link #TOTAL_WARFARE} - units are bought at their construction cost and sold for the value of their parts,
+ *     so damage lowers the sell value.</li>
+ *     <li>{@link #CHAOS_CAMPAIGN} - every unit is bought for its base Battle Value and sold for half that, adjusted for
+ *     quality and obsolescence. Damage never lowers either value.</li>
  * </ul>
  *
  * @author Illiani
@@ -56,8 +54,7 @@ import megamek.common.units.UnitType;
  */
 public enum UnitCostModel {
     TOTAL_WARFARE("TOTAL_WARFARE"),
-    CHAOS_CAMPAIGN("CHAOS_CAMPAIGN"),
-    MEKHQ("MEKHQ");
+    CHAOS_CAMPAIGN("CHAOS_CAMPAIGN");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.UnitCostModel";
 
@@ -67,6 +64,26 @@ public enum UnitCostModel {
     UnitCostModel(final String lookUpName) {
         this.label = getTextAt(RESOURCE_BUNDLE, "UnitCostModel." + lookUpName + ".label");
         this.tooltip = getTextAt(RESOURCE_BUNDLE, "UnitCostModel." + lookUpName + ".tooltip");
+    }
+
+    /**
+     * Parses a saved unit cost model. Unknown values, including the removed {@code MEKHQ} model, fall back to
+     * {@link #TOTAL_WARFARE}, the default.
+     *
+     * @param text the saved name
+     *
+     * @return the matching model, or {@link #TOTAL_WARFARE} if none matches
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static UnitCostModel fromString(@Nullable String text) {
+        for (UnitCostModel model : values()) {
+            if (model.name().equalsIgnoreCase(text)) {
+                return model;
+            }
+        }
+        return TOTAL_WARFARE;
     }
 
     /**
@@ -86,30 +103,6 @@ public enum UnitCostModel {
     }
 
     /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isMekHQ() {
-        return this == MEKHQ;
-    }
-
-    /**
-     * @param isLargeCraft whether the unit is a DropShip, JumpShip, WarShip, or space station
-     *
-     * @return {@code true} if this model values such a unit by its Battle Value rather than its construction cost
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isBattleValueCost(boolean isLargeCraft) {
-        return switch (this) {
-            case TOTAL_WARFARE -> false;
-            case CHAOS_CAMPAIGN -> true;
-            case MEKHQ -> !isLargeCraft;
-        };
-    }
-
-    /**
      * @param unitEntity the unit's entity; may be {@code null}
      *
      * @return {@code true} if this model values the unit by its Battle Value rather than its construction cost;
@@ -119,7 +112,7 @@ public enum UnitCostModel {
      * @since 0.51.01
      */
     public boolean isBattleValueCost(@Nullable Entity unitEntity) {
-        return (unitEntity != null) && isBattleValueCost(unitEntity.isLargeCraft());
+        return (unitEntity != null) && isChaosCampaign();
     }
 
     /**
@@ -131,24 +124,7 @@ public enum UnitCostModel {
      * @since 0.51.01
      */
     public boolean isBattleValueCost(MekSummary summary) {
-        return isBattleValueCost(isLargeCraft(UnitType.determineUnitTypeCode(summary.getUnitType())));
-    }
-
-    /**
-     * Matches {@link Entity#isLargeCraft()}, which counts DropShips and every kind of JumpShip.
-     *
-     * @param unitTypeCode the unit's {@link UnitType} code
-     *
-     * @return {@code true} for DropShips, JumpShips, WarShips, and space stations
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static boolean isLargeCraft(int unitTypeCode) {
-        return (unitTypeCode == UnitType.DROPSHIP)
-                     || (unitTypeCode == UnitType.JUMPSHIP)
-                     || (unitTypeCode == UnitType.WARSHIP)
-                     || (unitTypeCode == UnitType.SPACE_STATION);
+        return isChaosCampaign();
     }
 
     /**

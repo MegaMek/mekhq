@@ -510,7 +510,17 @@ public class AtBDynamicScenarioFactory {
         return (int) floor(generatedEntities.size() / 4.0);
     }
 
-    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
+    /**
+     * Dresses a conventional infantry platoon for the scenario's air, pressure and temperature. Other unit types are
+     * left untouched.
+     *
+     * <p>Package-private so the regression tests can check the result against MegaMek's own deployment rules.</p>
+     *
+     * @param scenario        the scenario the unit will fight in
+     * @param entity          the unit to dress
+     * @param campaignOptions the campaign options, to check whether weather conditions are in use
+     */
+    static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
         if (entity instanceof ConvInfantry infantry) {
             boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
             boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
@@ -2566,19 +2576,27 @@ public class AtBDynamicScenarioFactory {
      * Swaps out infantry armor kit based on provided conditions. Alternate armor kits are snow/heat suits (temperature
      * only), light environment suits (low pressure only), and hostile environment suit (tainted or multiple
      * conditions).
+     * <p>
+     * Platoons dressed for tainted air are also made XCT Troops. MegaMek only lets conventional infantry operate in a
+     * tainted or toxic atmosphere when they are XCT <i>and</i> wear a suitable kit (TO:AR p.54), so a suit on its own
+     * leaves the platoon doomed the moment it deploys.
+     * <p>
+     * Package-private so the regression tests can check the result against MegaMek's own deployment rules.
+     * </p>
      *
      * @param platoon       Conventional infantry platoon to configure
      * @param isLowPressure true if atmosphere is too thin to breathe
      * @param isTainted     true if atmosphere has contaminants
      * @param temperature   Scenario temperature, in degrees C
      */
-    private static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
+    static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
           int temperature) {
         boolean isHot = temperature > 50;
         boolean isCold = temperature < -30;
 
         if (isTainted) {
             platoon.setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+            platoon.setSpecializations(platoon.getSpecializations() | ConvInfantry.XCT);
         } else if (!isLowPressure) {
 
             // Normal pressure, with extreme temperature

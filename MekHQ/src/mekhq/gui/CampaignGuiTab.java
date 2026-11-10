@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import java.awt.event.HierarchyEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -40,6 +41,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.DeferredRefreshes;
 
 /**
  * Abstract base class for CampaignGUI tab components. Custom tabs should extend CustomCampaignGuiTab instead of this
@@ -52,10 +54,44 @@ public abstract class CampaignGuiTab extends JPanel {
 
     protected String tabName;
 
+    private final DeferredRefreshes deferredRefreshes = new DeferredRefreshes();
+
     CampaignGuiTab(CampaignGUI gui, String tabName) {
         this.gui = gui;
         this.tabName = tabName;
         initTab();
+        // Selecting the tab, or showing the window it was undocked into, runs whatever was held while it was hidden
+        addHierarchyListener(event -> {
+            if (((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) && isShowing()) {
+                deferredRefreshes.runPending();
+            }
+        });
+    }
+
+    /**
+     * Runs a costly refresh now if this tab is on screen, and otherwise holds it until the tab is shown, so a hidden
+     * tab does not redo expensive work after every campaign event. Requests made while hidden run once.
+     *
+     * @param refreshName the name the refresh is held under, unique within this tab
+     * @param refresh     the refresh to run
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void refreshWhenShown(String refreshName, Runnable refresh) {
+        deferredRefreshes.request(refreshName, refresh, isShowing());
+    }
+
+    /**
+     * Runs a held refresh straight away, for a caller outside the tab that needs its result while the tab is hidden.
+     *
+     * @param refreshName the name the refresh is held under
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void runHeldRefresh(String refreshName) {
+        deferredRefreshes.runPending(refreshName);
     }
 
     @Override

@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
@@ -46,14 +47,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -147,6 +153,8 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final int BRIEFING_COLUMN_PADDING = 4;
     private static final int BRIEFING_SPLIT_DIVIDER_SIZE = 10;
     private static final int SCENARIO_TABLE_ROW_HEIGHT = 24;
+    private static final int SCENARIO_TABLE_CELL_PADDING = 12;
+    private static final String LAST_SCENARIO_COLUMN_CHOSEN_WIDTH = "mekhq.briefing.lastScenarioColumnChosenWidth";
 
     private final MekHQ app;
 
@@ -575,6 +583,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
             column.setCellRenderer(model.getRenderer());
         }
+        fitScenarioDateColumn(table);
 
         ScenarioTableMouseAdapter.connect(getCampaignGui(), table, model);
 
@@ -585,6 +594,35 @@ public final class BriefingTab extends CampaignGuiTab {
         });
 
         return table;
+    }
+
+    /**
+     * Widens the date column so that its sorted header and a date in the player's chosen display format fit without
+     * truncation. Dates are measured in bold because priority scenarios render bold, and every day of the year is
+     * measured because formats that spell out the month or weekday vary in width.
+     */
+    private static void fitScenarioDateColumn(JTable table) {
+        TableColumn column = table.getColumnModel().getColumn(ScenarioTableModel.COL_DATE);
+        FontMetrics metrics = table.getFontMetrics(table.getFont().deriveFont(Font.BOLD));
+        int contentWidth = 0;
+        LocalDate endDate = LocalDate.of(3001, 1, 1);
+        for (LocalDate date = LocalDate.of(3000, 1, 1); date.isBefore(endDate); date = date.plusDays(1)) {
+            String text = MekHQ.getMHQOptions().getDisplayFormattedDate(date);
+            contentWidth = Math.max(contentWidth, metrics.stringWidth(text));
+        }
+
+        int headerWidth = 0;
+        JTableHeader header = table.getTableHeader();
+        if (header != null) {
+            TableCellRenderer headerRenderer = (column.getHeaderRenderer() != null)
+                  ? column.getHeaderRenderer()
+                  : header.getDefaultRenderer();
+            headerWidth = headerRenderer.getTableCellRendererComponent(table, column.getHeaderValue(), false, false,
+                  -1, ScenarioTableModel.COL_DATE).getPreferredSize().width;
+        }
+
+        int fittedWidth = Math.max(contentWidth + scaleForGUI(SCENARIO_TABLE_CELL_PADDING), headerWidth);
+        column.setPreferredWidth(Math.max(column.getPreferredWidth(), fittedWidth));
     }
 
     /**
@@ -699,12 +737,46 @@ public final class BriefingTab extends CampaignGuiTab {
                 updateLastScenarioColumnWidth(table, tableScrollPane);
             }
         });
+        if (table.getTableHeader() != null) {
+            // The fit is skipped while a column is being dragged, so re-fit once the drag ends. The press is captured
+            // after the header UI has picked the column to resize; the re-fit is deferred so it runs after the header
+            // UI has cleared that column on release.
+            table.getTableHeader().addMouseListener(new MouseAdapter() {
+                private TableColumn resizedColumn;
+                private int widthAtPress;
+
+                @Override
+                public void mousePressed(MouseEvent evt) {
+                    resizedColumn = table.getTableHeader().getResizingColumn();
+                    widthAtPress = (resizedColumn == null) ? 0 : resizedColumn.getWidth();
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent evt) {
+                    int lastColumnIndex = table.getColumnCount() - 1;
+                    if ((resizedColumn != null) && (lastColumnIndex >= 0)
+                          && (resizedColumn == table.getColumnModel().getColumn(lastColumnIndex))
+                          && (resizedColumn.getWidth() != widthAtPress)) {
+                        table.putClientProperty(LAST_SCENARIO_COLUMN_CHOSEN_WIDTH, resizedColumn.getWidth());
+                    }
+                    resizedColumn = null;
+                    SwingUtilities.invokeLater(() -> updateLastScenarioColumnWidth(table, tableScrollPane));
+                }
+            });
+        }
         SwingUtilities.invokeLater(() -> updateLastScenarioColumnWidth(table, tableScrollPane));
     }
 
     private void updateLastScenarioColumnWidth(JTable table, JScrollPane tableScrollPane) {
         int lastColumnIndex = table.getColumnCount() - 1;
         if (lastColumnIndex < 0) {
+            return;
+        }
+
+        // While the player drags a column edge, JTable keeps the table width fixed until the drag ends and gives any
+        // width difference back to the dragged column. Refitting the last column mid-drag (e.g. when the horizontal
+        // scrollbar toggles and resizes the viewport) therefore undoes the drag, so the dragged column cannot grow.
+        if ((table.getTableHeader() != null) && (table.getTableHeader().getResizingColumn() != null)) {
             return;
         }
 
@@ -715,7 +787,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
         TableColumn lastColumn = table.getColumnModel().getColumn(lastColumnIndex);
         int availableWidth = tableScrollPane.getViewport().getExtentSize().width - fixedWidth;
-        int preferredWidth = Math.max(lastColumn.getMinWidth(), availableWidth);
+        // Fill any leftover space, but keep a width the player dragged the last column to, even when that needs a
+        // horizontal scrollbar.
+        int chosenWidth = (table.getClientProperty(LAST_SCENARIO_COLUMN_CHOSEN_WIDTH) instanceof Integer width)
+              ? width
+              : 0;
+        int preferredWidth = Math.max(lastColumn.getMinWidth(), Math.max(chosenWidth, availableWidth));
         if (lastColumn.getPreferredWidth() != preferredWidth) {
             lastColumn.setPreferredWidth(preferredWidth);
             table.revalidate();

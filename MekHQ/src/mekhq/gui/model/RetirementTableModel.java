@@ -55,6 +55,7 @@ import megamek.common.units.Tank;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
@@ -63,7 +64,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class RetirementTableModel extends AbstractTableModel {
     private static final MMLogger LOGGER = MMLogger.create(RetirementTableModel.class);
