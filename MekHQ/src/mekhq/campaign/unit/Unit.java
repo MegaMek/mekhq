@@ -163,6 +163,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
@@ -8179,31 +8180,48 @@ public class Unit implements ITechnology, ILocatable {
         return drivers.stream().filter(person -> entity instanceof Infantry).collect(Collectors.toList());
     }
 
+    /**
+     * Returns the real crew aboard this unit whose personnel status is {@link PersonnelStatus#ACTIVE}: drivers,
+     * gunners (unless they share the driver list), vessel crew, navigator and tech officer.
+     *
+     * <p>Injured crew still count. They hold their seats, so leaving them out made the unit look short-crewed and let
+     * temp crew be added on top of them.</p>
+     *
+     * @return the active crew of this unit
+     */
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
-        for (Person p : drivers) {
-            if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
-                continue;
-            }
-            crew.add(p);
-        }
+        addIfActive(crew, drivers);
 
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (Person p : gunners) {
-                if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
-                    continue;
-                }
-                crew.add(p);
-            }
+            addIfActive(crew, gunners);
         }
-        crew.addAll(vesselCrew);
+        addIfActive(crew, vesselCrew);
         if (navigator != null) {
-            crew.add(navigator);
+            addIfActive(crew, List.of(navigator));
         }
         if (techOfficer != null) {
-            crew.add(techOfficer);
+            addIfActive(crew, List.of(techOfficer));
         }
         return crew;
+    }
+
+    /**
+     * Adds every person in {@code candidates} whose personnel status is {@link PersonnelStatus#ACTIVE} to
+     * {@code crew}.
+     *
+     * @param crew       the list being built
+     * @param candidates the people to check
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void addIfActive(List<Person> crew, Collection<Person> candidates) {
+        for (Person person : candidates) {
+            if (person.getStatus().isActive()) {
+                crew.add(person);
+            }
+        }
     }
 
     public int getTempCrewByPersonnelRole(PersonnelRole personnelRole) {

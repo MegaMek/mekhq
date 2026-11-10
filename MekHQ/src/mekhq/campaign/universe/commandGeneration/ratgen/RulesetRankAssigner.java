@@ -752,7 +752,7 @@ public final class RulesetRankAssigner {
     /**
      * Returns every Person attached to a unit — drivers + gunners + vessel crew + navigator. We
      * collect manually instead of using {@code getActiveCrew()} because the latter filters out
-     * wounded Tank / Infantry pilots, and at generation time we want to count every assigned slot.
+     * anyone whose status is not Active, and at generation time we want to count every assigned slot.
      */
     private static List<Person> unitCrew(Unit unit) {
         List<Person> out = new ArrayList<>();
