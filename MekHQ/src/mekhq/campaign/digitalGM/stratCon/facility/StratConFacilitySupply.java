@@ -150,6 +150,24 @@ public final class StratConFacilitySupply {
     }
 
     /**
+     * @param track  the sector
+     * @param coords a hex in it
+     *
+     * @return {@code true} if a facility in the hex is a source of its side's supply. Its side's supply starts there,
+     *       so it is never cut off: interdicting the routes near it starves only the facilities beyond the cut.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isSupplySource(StratConTrackState track, StratConCoords coords) {
+        StratConFacility facility = track.getFacility(coords);
+        return (facility != null)
+                     && (isOnSide(facility, true) || isOnSide(facility, false))
+                     && !facility.isDefinitionMissing()
+                     && isSupplySource(facility.getFacilityType());
+    }
+
+    /**
      * Lays both sides' supply routes in a sector afresh, from nothing. Call when the sector itself is laid out - when
      * its roads are laid or relaid - since the routes follow the roads; anything else only needs
      * {@link #reconcileNetworks}.

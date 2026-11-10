@@ -59,6 +59,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor.OrderO
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
 /**
@@ -206,10 +207,7 @@ public class StratConFacilityDialog extends JDialog {
         }
 
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            html.append(getTextAt(STRATCON_BUNDLE,
-                  StratConFacilitySupply.isCutOff(track, coords) ?
-                        "stratConTab.hexInfo.supplyCut" :
-                        "stratConTab.hexInfo.supplyConnected"));
+            html.append(getTextAt(STRATCON_BUNDLE, StratConPanel.getSupplyStatusKey(track, coords)));
         }
         int besiegerCount = StratConFacilitySiege.getSieges(track, coords).size();
         if (besiegerCount > 0) {

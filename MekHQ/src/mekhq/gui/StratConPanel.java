@@ -2299,10 +2299,7 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
-                  StratConFacilitySupply.isCutOff(currentTrack, coords) ?
-                        "stratConTab.hexInfo.supplyCut" :
-                        "stratConTab.hexInfo.supplyConnected"));
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, getSupplyStatusKey(currentTrack, coords)));
         }
 
         int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
@@ -2321,6 +2318,26 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.synergy", partnerNames));
         }
+    }
+
+    /**
+     * @param track  the sector
+     * @param coords a facility's hex
+     *
+     * @return the {@code AtBStratCon} resource key for the facility's supply line: cut off, a source of its side's
+     *       supply (which is never cut off), or connected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getSupplyStatusKey(StratConTrackState track, StratConCoords coords) {
+        if (StratConFacilitySupply.isCutOff(track, coords)) {
+            return "stratConTab.hexInfo.supplyCut";
+        }
+        if (StratConFacilitySupply.isSupplySource(track, coords)) {
+            return "stratConTab.hexInfo.supplySource";
+        }
+        return "stratConTab.hexInfo.supplyConnected";
     }
 
     /**
