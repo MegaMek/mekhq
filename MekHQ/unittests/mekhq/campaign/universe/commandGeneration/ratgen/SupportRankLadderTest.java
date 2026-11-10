@@ -49,7 +49,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.ratgen.RulesetRankAssigner.RankFamily;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -73,21 +73,8 @@ class SupportRankLadderTest {
         Ranks.initializeRankSystems();
     }
 
-    private static Faction innerSphereFaction() {
-        Faction faction = mock(Faction.class);
-        when(faction.isClan()).thenReturn(false);
-        when(faction.isComStarOrWoB()).thenReturn(false);
-        return faction;
-    }
-
-    private static Faction clanFaction() {
-        Faction faction = mock(Faction.class);
-        when(faction.isClan()).thenReturn(true);
-        return faction;
-    }
-
     private static int rankFor(PersonnelRole role, SkillLevel skill) {
-        return RulesetRankAssigner.supportRankFor(role, skill, innerSphereFaction());
+        return RulesetRankAssigner.supportRankFor(role, skill, RankFamily.INNER_SPHERE);
     }
 
     @Test
@@ -186,9 +173,9 @@ class SupportRankLadderTest {
         // Neither organises medical or technical staff as a commissioned corps, so the ladder is not
         // imposed on them; that is a separate piece of work.
         int clanDoctor = RulesetRankAssigner.supportRankFor(PersonnelRole.DOCTOR, SkillLevel.ELITE,
-              clanFaction());
+              RankFamily.CLAN);
         int clanTech = RulesetRankAssigner.supportRankFor(PersonnelRole.MEK_TECH, SkillLevel.GREEN,
-              clanFaction());
+              RankFamily.CLAN);
         assertEquals(clanDoctor, clanTech, "Clan support staff keep one flat index for now");
     }
 
@@ -232,8 +219,8 @@ class SupportRankLadderTest {
     void anUnknownSkillLevelStillProducesASensibleRank() {
         // Defensive: null should not blow up or produce rank 0.
         assertTrue(RulesetRankAssigner.supportRankFor(PersonnelRole.DOCTOR, null,
-              innerSphereFaction()) >= Rank.RO_MIN);
+              RankFamily.INNER_SPHERE) >= Rank.RO_MIN);
         assertTrue(RulesetRankAssigner.supportRankFor(PersonnelRole.MEK_TECH, null,
-              innerSphereFaction()) > 0);
+              RankFamily.INNER_SPHERE) > 0);
     }
 }

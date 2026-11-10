@@ -133,17 +133,40 @@ public class ForceGeneratorTab {
             // Before setCurrentYear, which populates the pickers: the preference decides what they open on.
             applyPreferredEchelon(campaign.getPlayerForce().isClanForce());
             optionsView.setCurrentYear(campaign.getGameYear());
-            // Seed the faction from the campaign so the designer opens aligned to the campaign's faction
-            // rather than the view's built-in "IS" default. Must run after setCurrentYear, which would
-            // otherwise reset the selection.
-            Faction campaignFaction = campaign.getPlayerForce().getFaction();
-            if (campaignFaction != null) {
-                String code = campaignFaction.getShortName();
-                boolean seeded = optionsView.setSelectedFaction(code);
-                LOGGER.info("[CompanyGen][ForceGenTab][Faction] seed faction picker with campaign faction '{}': {}",
-                      code, seeded ? "applied" : "skipped (no matching FactionRecord in RATGenerator)");
-            }
+            // The command is always generated for the campaign's own faction; the designer offers no faction or
+            // command picker. Must run after setCurrentYear, which would otherwise reset the selection.
+            lockToCampaignFaction(optionsView);
         }
+    }
+
+    /**
+     * Points the force generator at the campaign's faction. A campaign faction the RAT Generator has no record of is
+     * tried through its parents, so {@code CS.X} falls back to {@code CS}, rather than leaving the generator on its
+     * built-in default.
+     *
+     * @param optionsView the force generator's settings
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void lockToCampaignFaction(ForceGeneratorOptionsView optionsView) {
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
+        if (campaignFaction == null) {
+            LOGGER.warn("[CompanyGen][ForceGenTab][Faction] campaign has no faction; the generator keeps its default");
+            return;
+        }
+        String candidate = campaignFaction.getShortName();
+        while ((candidate != null) && !candidate.isBlank()) {
+            if (optionsView.setSelectedFaction(candidate)) {
+                LOGGER.info("[CompanyGen][ForceGenTab][Faction] generating for campaign faction '{}' as '{}'",
+                      campaignFaction.getShortName(), candidate);
+                return;
+            }
+            int lastSeparator = candidate.lastIndexOf('.');
+            candidate = (lastSeparator < 0) ? null : candidate.substring(0, lastSeparator);
+        }
+        LOGGER.warn("[CompanyGen][ForceGenTab][Faction] campaign faction '{}' has no RAT Generator record, nor does"
+              + " any parent of it; the generator keeps its default", campaignFaction.getShortName());
     }
 
     private ExistingLift liftAlreadyInHangar() {
@@ -347,29 +370,9 @@ public class ForceGeneratorTab {
         targetOptions.setGenerateMercenaryCompanyCommandLance(generateCompanyCommandLance);
         ForceDescriptor fd = optionsView.buildForceDescriptor();
         if (fd != null) {
+            // The rank-authority faction stays the campaign's, which CommandGenerationDialog seeds: the force is
+            // always generated for it.
             targetOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
-            // Override the rank-authority faction with whatever the player picked on the Force page.
-            // CommandGenerationDialog seeded both inputs from campaign.getPlayerForce().getFaction() at
-            // dialog open (the picker via initializeEngine, CommandGenerationOptions.specifiedFaction via
-            // seedSpecifiedFactionFromCampaign). If the player changed the faction mid-dialog, that becomes
-            // the final authority for rank assignment so the rank picker and the unit picker stay aligned.
-            String snapshotFactionCode = fd.getFaction();
-            if (snapshotFactionCode != null && !snapshotFactionCode.isBlank()) {
-                Faction override = resolveRankAuthority(snapshotFactionCode);
-                if (override != null) {
-                    Faction previous = targetOptions.getSpecifiedFaction();
-                    targetOptions.setSpecifiedFaction(override);
-                    LOGGER.info("[CompanyGen][ForceGenTab][Faction] override specifiedFaction: '{}' -> '{}' (sourced from the Force page's faction picker)",
-                          previous == null ? "null" : previous.getShortName(),
-                          override.getShortName());
-                } else {
-                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] faction code '{}' has no matching mekhq.campaign.universe.Faction, nor does any parent of it; leaving specifiedFaction='{}' unchanged",
-                          snapshotFactionCode,
-                          targetOptions.getSpecifiedFaction() == null
-                                ? "null"
-                                : targetOptions.getSpecifiedFaction().getShortName());
-                }
-            }
         }
     }
 

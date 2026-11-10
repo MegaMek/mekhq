@@ -339,11 +339,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     /**
      * Overwrites {@link CommandGenerationOptions#getSpecifiedFaction()} with the current
      * campaign's faction. The CommandGenerationOptions constructor defaults specifiedFaction to a
-     * global default (typically Mercenary) regardless of campaign, so a Clan campaign loading the
-     * dialog for the first time would otherwise have a MERC rank-authority faction seeded —
-     * meaning {@code RulesetRankAssigner} resolves to MERC, picks the IS rank-index policy
-     * (enlisted=12 / support=8), and assigns IS rank names to Clan Persons. Seeding here makes
-     * the campaign-creation faction choice the default for rank assignment too.
+     * global default (typically Mercenary) regardless of campaign; the command is always generated
+     * for the campaign's faction, so the options are made to say so. Ranks do not come from it: they
+     * follow the rank system chosen in Campaign Options.
      *
      * @param options the fresh options about to be handed to the tabs
      * @param caller  identifier for the call site (logged so traces can distinguish first-open

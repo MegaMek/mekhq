@@ -59,7 +59,6 @@ import javax.swing.SwingUtilities;
 import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
 import megamek.client.ratgenerator.CrewDescriptor;
-import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.Picker;
@@ -68,9 +67,7 @@ import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportS
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.universe.FactionTag;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
@@ -115,7 +112,6 @@ public final class ForcePage {
     private final Map<Picker, HudChoice<Object>> pickers = new EnumMap<>(Picker.class);
     private final Map<Picker, JComponent> pickerRows = new EnumMap<>(Picker.class);
     private final Map<TransportShare, HudStepper> transport = new EnumMap<>(TransportShare.class);
-    private final JLabel yearLabel = muted("");
     private HudCheckBox fighterComplement;
     private HudCheckBox detachments;
     private HudCheckBox commandLance;
@@ -178,8 +174,7 @@ public final class ForcePage {
     // region Rail
 
     private JComponent buildRail() {
-        HudChoice<Object> faction = picker(Picker.FACTION, 0);
-        HudChoice<Object> subFaction = picker(Picker.SUB_FACTION, 0);
+        // No faction or command pickers: the command is always generated for the campaign's own faction.
         HudChoice<Object> formation = picker(Picker.FORMATION, 5);
         HudChoice<Object> rating = picker(Picker.RATING, 6);
         HudChoice<Object> experience = picker(Picker.EXPERIENCE, 5);
@@ -190,8 +185,6 @@ public final class ForcePage {
         HudChoice<Object> infantryClass = picker(Picker.INFANTRY_CLASS, 0);
         HudChoice<Object> flags = picker(Picker.FLAGS, 0);
 
-        pickerRows.put(Picker.FACTION, field(text("Designer.force.faction"), faction));
-        pickerRows.put(Picker.SUB_FACTION, field(text("Designer.force.subFaction"), subFaction));
         pickerRows.put(Picker.FORMATION, field(text("Designer.force.formation"), formation));
         pickerRows.put(Picker.RATING, field(text("Designer.force.rating"), rating));
         pickerRows.put(Picker.EXPERIENCE, field(text("Designer.force.experience"), experience));
@@ -251,8 +244,6 @@ public final class ForcePage {
         }
 
         JPanel rail = stack(
-              section(text("Designer.force.section.who"), null,
-                    pickerRows.get(Picker.FACTION), pickerRows.get(Picker.SUB_FACTION), yearLabel),
               section(text("Designer.force.section.shape"), null,
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
                     pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
@@ -305,22 +296,16 @@ public final class ForcePage {
             List<HudChoice.Choice<Object>> choices = new ArrayList<>();
             Object selection = view.getPickerSelection(picker);
             for (PickerChoice choice : view.getPickerChoices(picker)) {
-                // The aggregate and placeholder factions - All Clans, Inner Sphere, Periphery and the like - are
-                // not commands anyone founds. The one already selected is kept, so the picker never shows a blank.
-                if (isSpecialFaction(choice.value()) && (choice.value() != selection)) {
-                    continue;
-                }
                 choices.add(new HudChoice.Choice<>(choice.value(), choice.label()));
             }
             entry.getValue().setChoices(choices, selection);
             boolean worthShowing = switch (picker) {
                 // A list with nothing but its blank entry offers no choice.
-                case SUB_FACTION, FLAGS -> choices.size() > 1;
+                case FLAGS -> choices.size() > 1;
                 default -> true;
             };
             pickerRows.get(picker).setVisible(view.isPickerAvailable(picker) && worthShowing);
         }
-        yearLabel.setText(formatted("Designer.force.year", view.getCurrentYear()));
         for (Map.Entry<TransportShare, HudStepper> entry : transport.entrySet()) {
             entry.getValue().setValue((int) Math.round(view.getTransportPercent(entry.getKey())));
         }
@@ -330,21 +315,6 @@ public final class ForcePage {
         commandLance.setSelected(engine.isGenerateCompanyCommandLance());
         root.revalidate();
         root.repaint();
-    }
-
-    /**
-     * @param value a picker value
-     *
-     * @return {@code true} if the value is a faction tagged {@link FactionTag#SPECIAL}, such as All Clans
-     */
-    private static boolean isSpecialFaction(@Nullable Object value) {
-        if (!(value instanceof FactionRecord record)) {
-            return false;
-        }
-        // Factions.getFaction never answers null, so membership is checked against the key list first.
-        Factions factions = Factions.getInstance();
-        return factions.getFactionList().contains(record.getKey())
-              && factions.getFaction(record.getKey()).is(FactionTag.SPECIAL);
     }
 
     // endregion Rail
