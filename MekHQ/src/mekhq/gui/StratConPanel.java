@@ -1715,11 +1715,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(scenarioMarker2);
                     }
 
-                    if (currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).isOwnerAlliedToPlayer()) {
-                        drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
-                    }
+                    drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2451,14 +2447,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                             g2D.draw(forceMarker);
                         }
 
-                        Font currentFont = g2D.getFont();
-                        Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
-                              TextAttribute.WEIGHT_BOLD));
-                        g2D.setFont(newFont);
+                        // Labelled only while its hex is selected, the same as facilities.
+                        if (currentCoords.equals(boardState.getSelectedCoords())) {
+                            Font currentFont = g2D.getFont();
+                            Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
+                                  TextAttribute.WEIGHT_BOLD));
+                            g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
+                            drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
-                        g2D.setFont(currentFont);
+                            g2D.setFont(currentFont);
+                        }
                     }
                 }
 
