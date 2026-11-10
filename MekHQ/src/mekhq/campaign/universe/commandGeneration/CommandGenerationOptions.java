@@ -71,7 +71,7 @@ public class CommandGenerationOptions {
     private static final long DEFAULT_MINIMUM_STARTING_FLOAT = 10_000_000L;
 
     /** Half a year of running costs: enough to reach and see out a first contract before its pay arrives. */
-    public static final int DEFAULT_STARTING_CASH_MONTHS = 6;
+    public static final int DEFAULT_STARTING_CASH_MONTHS = 12;
 
     /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,

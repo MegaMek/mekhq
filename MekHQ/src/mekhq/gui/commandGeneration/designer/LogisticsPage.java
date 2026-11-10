@@ -68,7 +68,7 @@ public final class LogisticsPage {
     /** Where a spares meter reads full: twice a full restock. */
     private static final int SPARES_METER_FULL = 200;
     private static final int MAX_MONTHS = 120;
-    private static final int TRACK_MONTHS = 12;
+    private static final int TRACK_MONTHS = 24;
 
     /**
      * The restock categories the Spares section offers, each paired with the campaign option it reads and writes.

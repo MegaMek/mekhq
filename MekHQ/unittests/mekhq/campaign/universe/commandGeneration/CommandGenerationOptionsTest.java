@@ -113,10 +113,10 @@ class CommandGenerationOptionsTest {
         assertTrue(options.isGenerateOriginNodeFormationIcon());
         assertFalse(options.isUseOriginNodeFormationIconLogo());
 
-        // Finances: the command is granted free, with working capital defaulting to six months of its running
+        // Finances: the command is granted free, with working capital defaulting to twelve months of its running
         // costs, floored so it can pay its first month's wages.
         assertTrue(options.isProcessFinances());
-        assertEquals(6, options.getStartingCashMonths());
+        assertEquals(12, options.getStartingCashMonths());
         assertFalse(options.isRandomizeStartingCash());
         assertEquals(18, options.getRandomStartingCashDiceCount());
         assertEquals(10_000_000L, options.getMinimumStartingFloat());
