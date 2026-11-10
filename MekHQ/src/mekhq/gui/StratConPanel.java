@@ -1285,7 +1285,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     /**
      * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
      * box pinned to the top-right of the visible map area, then the sector's facility effects under it. The environment
-     * box is skipped for legacy sectors that carry no profile data.
+     * box is skipped for legacy sectors that carry no profile data. Either box can be hidden by the player (the
+     * toggles under the tab's Facilities button); a hidden environment box lets the facility effects move up.
      */
     private void drawSectorEnvironment(Graphics2D g2D) {
         if (currentTrack == null) {
@@ -1293,10 +1294,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         int nextBoxY = getVisibleRect().y;
-        if (currentTrack.getLatitudeBand() != null) {
+        if ((currentTrack.getLatitudeBand() != null) && MekHQ.getMHQOptions().getShowStratConSectorEnvironment()) {
             nextBoxY = drawHudBox(g2D, getSectorEnvironmentLines(), nextBoxY);
         }
-        drawSectorFacilityEffects(g2D, nextBoxY);
+        if (MekHQ.getMHQOptions().getShowStratConFacilityEffects()) {
+            drawSectorFacilityEffects(g2D, nextBoxY);
+        }
     }
 
     /**
