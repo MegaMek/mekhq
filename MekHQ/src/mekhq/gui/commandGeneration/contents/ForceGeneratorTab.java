@@ -126,8 +126,7 @@ public class ForceGeneratorTab {
         optionsView.setOnFactionChanged(this::factionChanged);
         optionsView.setExportMULButtonVisible(false);
         // The role filters restrict every draw in the tree to units that can fill the ticked role, which
-        // suits picking a lance of artillery carriers and not designing a command; the formation mix is
-        // the tool for shaping a command.
+        // suits picking a lance of artillery carriers and not designing a command.
         optionsView.setMissionRoleFiltersVisible(false);
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
@@ -324,24 +323,6 @@ public class ForceGeneratorTab {
         return optionsView == null ? null : optionsView.buildForceDescriptor();
     }
 
-    /** Forgets the formation the mix asks for, so a restored set of defaults asks for none. */
-    public void clearFormationMix() {
-        if (viewUi != null) {
-            viewUi.getOptionsView().clearFormationSelection();
-        }
-    }
-
-    /**
-     * Points the formation mix at a formation on the board, so its editor offers that formation's options rather than
-     * the settings'.
-     *
-     * @param node the formation, or {@code null} to hand the mix back to the settings
-     */
-    public void setFormationMixContext(@Nullable ForceDescriptor node) {
-        if (viewUi != null) {
-            viewUi.getOptionsView().setFormationMixContext(node);
-        }
-    }
 
     public boolean isGenerateCompanyCommandLance() {
         return generateCompanyCommandLance;

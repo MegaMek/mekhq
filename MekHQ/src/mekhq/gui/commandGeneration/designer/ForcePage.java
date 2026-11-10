@@ -119,7 +119,6 @@ public final class ForcePage {
     private HudCheckBox fighterComplement;
     private HudCheckBox detachments;
     private HudCheckBox commandLance;
-    private JLabel formationMixLink;
     private boolean railRefreshPending;
 
     // Board
@@ -210,13 +209,6 @@ public final class ForcePage {
                 view.setDetachmentsSelected(detachments.isSelected());
             }
         });
-        formationMixLink = Hud.link("", () -> {
-            ForceGeneratorOptionsView view = engine.getOptionsView();
-            if (view != null) {
-                view.openFormationMixEditor();
-            }
-        });
-        formationMixLink.setToolTipText(text("Designer.force.formationMix.tooltip"));
 
         for (TransportShare share : TransportShare.values()) {
             HudStepper stepper = new HudStepper(0, (share == TransportShare.CARGO) ? 500 : 200, 10,
@@ -266,8 +258,8 @@ public final class ForcePage {
                     pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
               section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION),
                     // The rail's width less its padding and the note's own.
-                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 64),
-                    commandLance, detachments, formationMixLink),
+                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 100),
+                    commandLance, detachments),
               section(text("Designer.force.section.quality"), null,
                     pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
               section(text("Designer.force.section.transport"), null, transportGrid, fighterComplement));
@@ -336,9 +328,6 @@ public final class ForcePage {
         fighterComplement.setSelected(view.isFighterComplementSelected());
         detachments.setSelected(view.isDetachmentsSelected());
         commandLance.setSelected(engine.isGenerateCompanyCommandLance());
-        String request = view.getFormationMixRequest();
-        formationMixLink.setText((request == null) ? text("Designer.force.formationMix.none")
-              : formatted("Designer.force.formationMix.request", request));
         root.revalidate();
         root.repaint();
     }
@@ -650,8 +639,6 @@ public final class ForcePage {
 
     private void select(ForceDescriptor node) {
         selected = node;
-        // Selecting a formation points the formation mix at it, so its editor offers that formation's options.
-        engine.setFormationMixContext((node.getEntity() == null) ? node : null);
         scheduleBoardRefresh();
     }
 

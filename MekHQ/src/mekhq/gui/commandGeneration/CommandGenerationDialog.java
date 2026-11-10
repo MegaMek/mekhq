@@ -331,9 +331,6 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         CommandGenerationOptions defaults = new CommandGenerationOptions();
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.loadValuesFromOptions(defaults);
-        // The formation mix lives on the force generator rather than in CommandGenerationOptions, so loading
-        // defaults does not reach it and it has to be cleared explicitly.
-        pane.getEngine().clearFormationMix();
         // As on first show: restoring defaults sets the naming method directly, so the faction's own
         // convention is re-applied afterwards rather than being overwritten by it.
         pane.applyFactionDrivenDefaults();
