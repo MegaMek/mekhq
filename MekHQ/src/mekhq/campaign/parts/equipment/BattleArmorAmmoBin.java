@@ -110,6 +110,14 @@ public class BattleArmorAmmoBin extends AmmoBin {
         return (getFullShots() * getNumTroopers()) - shotsNeeded;
     }
 
+    /**
+     * Every trooper in the squad carries a full bin.
+     */
+    @Override
+    protected int getStandardMunitionCapacityShots() {
+        return super.getStandardMunitionCapacityShots() * getNumTroopers();
+    }
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         Mounted<?> mounted = getMounted();

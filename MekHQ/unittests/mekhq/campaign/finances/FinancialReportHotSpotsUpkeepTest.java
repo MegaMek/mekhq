@@ -76,7 +76,9 @@ class FinancialReportHotSpotsUpkeepTest {
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
         campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, true);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 

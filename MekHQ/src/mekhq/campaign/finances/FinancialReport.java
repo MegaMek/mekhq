@@ -232,9 +232,13 @@ public class FinancialReport {
         if (campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
             financialReport.hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts();
         }
-        if (campaignOptions.isChargingPeacetimeCost()) {
+        if (campaignOptions.isChargingPeacetimeSpareParts()) {
             financialReport.coSpareParts = accountant.getMonthlySpareParts();
+        }
+        if (campaignOptions.isChargingPeacetimeTrainingMunitions()) {
             financialReport.coAmmo = accountant.getMonthlyAmmo();
+        }
+        if (campaignOptions.isChargingPeacetimeFuel()) {
             financialReport.coFuel = accountant.getMonthlyFuel();
         }
 

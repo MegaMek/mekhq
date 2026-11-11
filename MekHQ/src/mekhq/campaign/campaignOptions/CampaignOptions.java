@@ -590,16 +590,61 @@ public class CampaignOptions {
     }
 
     /**
-     * Hot Spots upkeep replaces peacetime operating costs, so they are never charged alongside it, whatever their own
-     * option says.
+     * Whether any part of peacetime operating costs (spare parts, training munitions, fuel) is selected, regardless of
+     * Hot Spots upkeep.
      *
-     * @return {@code true} if peacetime operating costs are charged
+     * @return {@code true} if at least one peacetime operating cost is selected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isAnyPeacetimeCostSelected() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS)
+                     || get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS)
+                     || get(CampaignOption.PAY_FOR_PEACETIME_FUEL);
+    }
+
+    /**
+     * Hot Spots upkeep replaces peacetime operating costs, so they are never charged alongside it, whatever their own
+     * options say.
+     *
+     * @return {@code true} if any peacetime operating cost is charged
      *
      * @author Illiani
      * @since 0.51.01
      */
     public boolean isChargingPeacetimeCost() {
-        return get(CampaignOption.USE_PEACETIME_COST) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+        return isAnyPeacetimeCostSelected() && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * @return {@code true} if peacetime spare parts are charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeSpareParts() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * @return {@code true} if peacetime training munitions are charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeTrainingMunitions() {
+        return get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * @return {@code true} if peacetime fuel is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeFuel() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_FUEL) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
     }
 
     public boolean isUseFactionStandingCommandCircuitSafe() {

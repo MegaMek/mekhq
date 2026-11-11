@@ -824,12 +824,14 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForHousing");
     public static final CampaignOption<Boolean> USE_LOAN_LIMITS =
           of(Boolean.class, false, "useLoanLimits");
-    public static final CampaignOption<Boolean> USE_PEACETIME_COST =
-          of(Boolean.class, false, "usePeacetimeCost");
-    public static final CampaignOption<Boolean> USE_EXTENDED_PARTS_MODIFIER =
-          of(Boolean.class, false, "useExtendedPartsModifier");
     public static final CampaignOption<Boolean> SHOW_PEACETIME_COST =
           of(Boolean.class, false, "showPeacetimeCost");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_SPARE_PARTS =
+          of(Boolean.class, false, "payForPeacetimeSpareParts");
+    public static final CampaignOption<Boolean> PAY_FOR_TRAINING_MUNITIONS =
+          of(Boolean.class, false, "payForTrainingMunitions");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_FUEL =
+          of(Boolean.class, false, "payForPeacetimeFuel");
     public static final CampaignOption<FinancialYearDuration> FINANCIAL_YEAR_DURATION =
           of(FinancialYearDuration.class, FinancialYearDuration.ANNUAL, "financialYearDuration");
     public static final CampaignOption<Boolean> NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT =

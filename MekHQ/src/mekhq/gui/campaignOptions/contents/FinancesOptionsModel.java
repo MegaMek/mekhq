@@ -43,9 +43,10 @@ import mekhq.campaign.finances.enums.UnitCostModel;
 class FinancesOptionsModel {
     boolean useLoanLimits;
     boolean usePercentageMaintenance;
-    boolean useExtendedPartsModifier;
-    boolean usePeacetimeCost;
     boolean showPeacetimeCost;
+    boolean payForPeacetimeSpareParts;
+    boolean payForTrainingMunitions;
+    boolean payForPeacetimeFuel;
     FinancialYearDuration financialYearDuration;
     boolean newFinancialYearFinancesToCSVExport;
     boolean simulateGrayMonday;
@@ -97,9 +98,10 @@ class FinancesOptionsModel {
     FinancesOptionsModel(@Nonnull CampaignOptions options) {
         useLoanLimits = options.get(CampaignOption.USE_LOAN_LIMITS);
         usePercentageMaintenance = options.get(CampaignOption.USE_PERCENTAGE_MAINTENANCE);
-        useExtendedPartsModifier = options.get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER);
-        usePeacetimeCost = options.get(CampaignOption.USE_PEACETIME_COST);
         showPeacetimeCost = options.get(CampaignOption.SHOW_PEACETIME_COST);
+        payForPeacetimeSpareParts = options.get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS);
+        payForTrainingMunitions = options.get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS);
+        payForPeacetimeFuel = options.get(CampaignOption.PAY_FOR_PEACETIME_FUEL);
         financialYearDuration = options.get(CampaignOption.FINANCIAL_YEAR_DURATION);
         newFinancialYearFinancesToCSVExport = options.get(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT);
         simulateGrayMonday = options.get(CampaignOption.SIMULATE_GRAY_MONDAY);
@@ -154,9 +156,10 @@ class FinancesOptionsModel {
     void applyTo(@Nonnull CampaignOptions options) {
         options.set(CampaignOption.USE_LOAN_LIMITS, useLoanLimits);
         options.set(CampaignOption.USE_PERCENTAGE_MAINTENANCE, usePercentageMaintenance);
-        options.set(CampaignOption.USE_EXTENDED_PARTS_MODIFIER, useExtendedPartsModifier);
-        options.set(CampaignOption.USE_PEACETIME_COST, usePeacetimeCost);
         options.set(CampaignOption.SHOW_PEACETIME_COST, showPeacetimeCost);
+        options.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, payForPeacetimeSpareParts);
+        options.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, payForTrainingMunitions);
+        options.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, payForPeacetimeFuel);
         options.set(CampaignOption.FINANCIAL_YEAR_DURATION, financialYearDuration);
         options.set(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT, newFinancialYearFinancesToCSVExport);
         options.set(CampaignOption.SIMULATE_GRAY_MONDAY, simulateGrayMonday);

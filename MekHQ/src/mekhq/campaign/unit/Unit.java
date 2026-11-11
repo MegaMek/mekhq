@@ -194,6 +194,10 @@ public class Unit implements ITechnology, ILocatable {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
+    /** CamOps: peacetime fuel use is four times the fuel capacity of 'Meks, vehicles, fighters and infantry */
+    private static final double PEACETIME_FUEL_MULTIPLIER = 4.0;
+    private static final double FUEL_COST_PER_TON_HYDROGEN = 15000.0;
+    private static final double FUEL_COST_PER_TON_PETROCHEMICALS = 1000.0;
 
     public static final int SITE_IMPROVISED = 0;
     public static final int SITE_FIELD_WORKSHOP = 1;
@@ -9066,15 +9070,19 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public String displayMonthlyCost() {
-        return "<b>Spare Parts</b>: " +
-                     getSparePartsCost().toAmountAndSymbolString() +
-                     "<br>" +
-                     "<b>Ammunition</b>: " +
-                     getAmmoCost().toAmountAndSymbolString() +
-                     "<br>" +
-                     "<b>Fuel</b>: ~" +
-                     getFuelCost(0).toAmountAndSymbolString() +
-                     "<br>";
+        // Only the parts of peacetime costs the campaign charges
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        StringBuilder report = new StringBuilder();
+        if (campaignOptions.isChargingPeacetimeSpareParts()) {
+            report.append("<b>Spare Parts</b>: ").append(getSparePartsCost().toAmountAndSymbolString()).append("<br>");
+        }
+        if (campaignOptions.isChargingPeacetimeTrainingMunitions()) {
+            report.append("<b>Ammunition</b>: ").append(getAmmoCost().toAmountAndSymbolString()).append("<br>");
+        }
+        if (campaignOptions.isChargingPeacetimeFuel()) {
+            report.append("<b>Fuel</b>: ~").append(getFuelCost().toAmountAndSymbolString()).append("<br>");
+        }
+        return report.toString();
     }
 
     public Money getSparePartsCost() {
@@ -9084,36 +9092,26 @@ public class Unit implements ITechnology, ILocatable {
 
         Money partsCost = Money.zero();
 
-        if (entity instanceof Jumpship) { // SpaceStation derives from JumpShip
+        // CamOps: 0.1% of mass a month (0.01% for JumpShips and space stations), conventional infantry 0.2% of the
+        // compartment that carries them
+        if (entity instanceof Warship) { // checked before JumpShip, which it derives from
+            partsCost = partsCost.plus(entity.getWeight() * 0.001 * 15000);
+        } else if (entity instanceof Jumpship) { // SpaceStation derives from JumpShip
             partsCost = partsCost.plus(entity.getWeight() * 0.0001 * 15000);
         } else if (entity instanceof Aero) {
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 15000);
         } else if (entity instanceof Tank) {
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 8000);
-        } else if ((entity instanceof Mek) || (entity instanceof BattleArmor)) {
+        } else if ((entity instanceof Mek) || (entity instanceof ProtoMek) || (entity instanceof BattleArmor)) {
+            // ProtoMeks aren't named by the rule, so they are costed as 'Meks
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
         } else if (entity instanceof Infantry) {
-            if (((Infantry) entity).isMechanized()) {
-                partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
-            } else if (entity.getMovementMode().isLegInfantry()) {
-                partsCost = partsCost.plus(3 * 0.002 * 10000);
-            } else if (entity.getMovementMode().isJumpInfantry()) {
-                partsCost = partsCost.plus(4 * 0.002 * 10000);
-            } else if (entity.getMovementMode().isMotorizedInfantry()) {
-                partsCost = partsCost.plus(6 * 0.002 * 10000);
-            } else {
-                partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
-                LOGGER.error("{} is not a generic CI. Movement mode is {}",
-                      getName(),
-                      entity.getMovementModeAsString());
-            }
+            // A conventional platoon's weight is its transport weight, the size of the compartment that carries it
+            partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
         } else {
-            // Only ProtoMeks should fall here. Anything else needs to be logged
-            if (!(entity instanceof ProtoMek)) {
-                LOGGER.error("{} has no Spare Parts value for unit type {}",
-                      getName(),
-                      Entity.getEntityTypeName(entity.getEntityType()));
-            }
+            LOGGER.error("{} has no Spare Parts value for unit type {}",
+                  getName(),
+                  Entity.getEntityTypeName(entity.getEntityType()));
         }
 
         // Quirks multiply the spare parts cost in turn (CO p.24), when the campaign uses quirks
@@ -9121,58 +9119,21 @@ public class Unit implements ITechnology, ILocatable {
             partsCost = partsCost.multipliedBy(SparePartsQuirkMultiplier.find(entity, getCampaign().getGameYear()));
         }
 
-        // Now for extended parts cost modifiers
-        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER)) {
-            Engine engine = entity.getEngine();
-            int currentYear = getCampaign().getGameYear();
-            TechRating rating = getTechRating();
-            if (((currentYear > 2859) && (currentYear < 3040))) {
-                if (!getCampaign().getPlayerForce().getFaction().isClan()) {
-                    if (!getCampaign().getPlayerForce().getFaction().isComStar()) {
-                        if (rating.isBetterThan(TechRating.D)) {
-                            partsCost = partsCost.multipliedBy(5.0);
-                        }
-                    }
-                }
-            }
-
-            if (rating.equals(TechRating.E)) {
-                partsCost = partsCost.multipliedBy(1.1);
-            } else if (rating.equals(TechRating.F)) {
-                partsCost = partsCost.multipliedBy(1.25);
-            }
-
-            if ((entity instanceof Tank) && (engine.getEngineType() == Engine.NORMAL_ENGINE)) {
-                partsCost = partsCost.multipliedBy(2.0);
-            }
-
-            // No engines for infantry or HHW
-            if (!(entity instanceof Infantry) && !(entity instanceof HandheldWeapon)) {
-                if ((engine.getEngineType() == Engine.XL_ENGINE) || (engine.getEngineType() == Engine.XXL_ENGINE)) {
-                    partsCost = partsCost.multipliedBy(2.5);
-                } else if (engine.getEngineType() == Engine.LIGHT_ENGINE) {
-                    partsCost = partsCost.multipliedBy(1.5);
-                }
-            }
-
-            if (entity.isClan()) {
-                if ((currentYear > 3048) && (currentYear < 3071)) {
-                    partsCost = partsCost.multipliedBy(5.0);
-                } else if (currentYear > 3070) {
-                    partsCost = partsCost.multipliedBy(4.0);
-                }
-            }
-        }
-
         return partsCost;
     }
 
+    /**
+     * Peacetime training ammunition (CamOps): a quarter of the cost of filling every ammunition bin, priced as standard
+     * rounds whatever munition the unit actually carries.
+     *
+     * @return the monthly peacetime ammunition cost of this unit
+     */
     public Money getAmmoCost() {
         Money ammoCost = Money.zero();
 
-        for (Part p : getParts()) {
-            if (p instanceof EquipmentPart && ((EquipmentPart) p).getType() instanceof AmmoType) {
-                ammoCost = ammoCost.plus(p.getStickerPrice());
+        for (Part part : getParts()) {
+            if (part instanceof AmmoBin ammoBin) {
+                ammoCost = ammoCost.plus(ammoBin.getStandardMunitionCapacityValue());
             }
         }
 
@@ -9180,136 +9141,158 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Calculates the monthly fuel cost for this unit, applying any available hydrogen production credits.
+     * The monthly peacetime fuel cost for this unit (CamOps), buying all the hydrogen it uses.
      *
-     * <p>Different entity types have different fuel requirements:</p>
-     * <ul>
-     *   <li>Large Craft and Small Craft: Calculated based on tons burned per day</li>
-     *   <li>Conventional Fighters: Use fighter-specific fuel cost calculation</li>
-     *   <li>Aerospace Fighters: Based on fuel tonnage multiplied by a factor of 4</li>
-     *   <li>Vehicles and Meks: Use vehicle-specific fuel cost calculation</li>
-     *   <li>Infantry: Use infantry-specific fuel cost calculation</li>
-     * </ul>
-     *
-     * <p>Hydrogen produced by fusion engines is credited against the unit's hydrogen usage, reducing the overall
-     * fuel cost.</p>
-     *
-     * @param hydrogenProduction The amount of hydrogen produced by fusion engines, which offsets hydrogen usage costs
-     *
-     * @return The calculated fuel cost as a Money object, always non-negative
+     * @return the fuel cost before any hydrogen from the force's own fusion engines is used
      */
-    public Money getFuelCost(int hydrogenProduction) {
-        final int FUEL_COST_PER_HYDROGEN = 15000;
+    public Money getFuelCost() {
+        return getFuelCost(0);
+    }
 
-        LOGGER.debug("getFuelCost: {} hydrogen production", hydrogenProduction);
+    /**
+     * The monthly peacetime fuel cost for this unit (CamOps), after drawing what hydrogen it can from the force's own
+     * production. Only the hydrogen still available is drawn, so callers sharing one pool between several units deduct
+     * {@link #getMonthlyHydrogenUsage()} from it after each unit.
+     *
+     * @param availableHydrogen tons of hydrogen still available from the force's fusion engines this month
+     *
+     * @return the calculated fuel cost, always non-negative
+     */
+    public Money getFuelCost(double availableHydrogen) {
+        MonthlyFuelUse fuelUse = getMonthlyFuelUse();
+        double purchasedHydrogen = Math.max(0, fuelUse.hydrogenTons() - Math.max(0, availableHydrogen));
+        return Money.of(purchasedHydrogen * FUEL_COST_PER_TON_HYDROGEN)
+                     .plus(fuelUse.petrochemicalTons() * FUEL_COST_PER_TON_PETROCHEMICALS);
+    }
 
-        Money fuelCost = Money.zero();
-        double hydrogenUsage = 0;
+    /**
+     * @return tons of hydrogen this unit burns in a peacetime month
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getMonthlyHydrogenUsage() {
+        return getMonthlyFuelUse().hydrogenTons();
+    }
 
+    /**
+     * Tons of each fuel a unit burns in a peacetime month.
+     *
+     * @param hydrogenTons      hydrogen, burned by fusion engines, fuel cells and spacecraft
+     * @param petrochemicalTons petrochemicals, burned by internal combustion engines and infantry
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private record MonthlyFuelUse(double hydrogenTons, double petrochemicalTons) {
+        private static final MonthlyFuelUse NONE = new MonthlyFuelUse(0, 0);
+
+        static MonthlyFuelUse hydrogen(double tons) {
+            return new MonthlyFuelUse(tons, 0);
+        }
+
+        static MonthlyFuelUse petrochemicals(double tons) {
+            return new MonthlyFuelUse(0, tons);
+        }
+
+        /**
+         * Fuel cells burn hydrogen and internal combustion engines petrochemicals. Fusion engines only burn hydrogen
+         * when they use it for thrust; other engines (batteries, solar, external power and so on) need no fuel.
+         */
+        static MonthlyFuelUse byEngine(Engine engine, double tons, boolean isFusionThrust) {
+            if ((engine.getEngineType() == Engine.FUEL_CELL) || (isFusionThrust && engine.isFusion())) {
+                return hydrogen(tons);
+            } else if (engine.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return petrochemicals(tons);
+            }
+            return NONE;
+        }
+    }
+
+    /**
+     * The fuel this unit burns in a peacetime month (CamOps): four times the fuel capacity of 'Meks, vehicles, fighters
+     * and infantry, and the strategic fuel use of spacecraft for their monthly burn-days.
+     *
+     * <ul>
+     *   <li>Large Craft and Small Craft: hydrogen for 15 burn-days (3 for JumpShips and space stations)</li>
+     *   <li>Fixed-wing support vehicles: the fuel their design carries</li>
+     *   <li>Conventional fighters: petrochemicals, or hydrogen when fusion powered</li>
+     *   <li>Aerospace fighters: hydrogen</li>
+     *   <li>Vehicles: the fuel they carry (10% of engine mass for combat vehicles); 'Meks: 10% of engine mass</li>
+     *   <li>Infantry: petrochemicals, 2% of their mass for jump battle armor and non-foot platoons</li>
+     * </ul>
+     */
+    private MonthlyFuelUse getMonthlyFuelUse() {
         // Check if the engine is null. This can occur if the entity does not have an engine installed.
         Engine engine = entity.getEngine();
         if (engine == null) {
-            return Money.zero();
+            return MonthlyFuelUse.NONE;
         }
 
-        // Calculate base fuel costs by entity type
         if (entity.isLargeCraft() || entity.isSmallCraft()) {
-            hydrogenUsage = getCraftMonthlyHydrogenUsage(entity);
+            return MonthlyFuelUse.hydrogen(getCraftMonthlyHydrogenUsage(entity));
+        } else if (entity instanceof FixedWingSupport fixedWingSupport) {
+            // Checked before fighters, as it is flagged as neither kind
+            return MonthlyFuelUse.byEngine(engine,
+                  fixedWingSupport.getFuelTonnage() * PEACETIME_FUEL_MULTIPLIER,
+                  true);
         } else if (entity.isConventionalFighter()) {
-            if (engine.isFusion()) {
-                hydrogenUsage = ((Aero) entity).getFuelTonnage() * 4.0;
-            } else {
-                fuelCost = fuelCost.plus(getFighterFuelCost(entity));
-            }
-        } else if (entity.isAerospaceFighter()) {
-            try {
-                hydrogenUsage = ((AeroSpaceFighter) entity).getFuelTonnage() * 4.0;
-            } catch (ClassCastException e) {
-                LOGGER.error("{} was thought to be an AeroSpace Fighter, but actually it isn't." +
-                                   " This should be looked into.", getName());
-            }
-        } else if (entity.isVehicle() || entity.isMek()) {
-            fuelCost = fuelCost.plus(getVehicleFuelCost(entity));
+            double fuelTons = ((Aero) entity).getFuelTonnage() * PEACETIME_FUEL_MULTIPLIER;
+            return engine.isFusion() ? MonthlyFuelUse.hydrogen(fuelTons) : MonthlyFuelUse.petrochemicals(fuelTons);
+        } else if (entity instanceof AeroSpaceFighter aeroSpaceFighter) {
+            return MonthlyFuelUse.hydrogen(aeroSpaceFighter.getFuelTonnage() * PEACETIME_FUEL_MULTIPLIER);
+        } else if (entity.isVehicle() && (entity instanceof Tank tank)) {
+            // Combat vehicles carry 10% of their engine mass in fuel; support vehicles carry what their design lists
+            return MonthlyFuelUse.byEngine(engine, tank.getFuelTonnage() * PEACETIME_FUEL_MULTIPLIER, false);
+        } else if (entity.isMek()) {
+            return MonthlyFuelUse.byEngine(engine,
+                  engine.getWeightEngine(entity) * 0.1 * PEACETIME_FUEL_MULTIPLIER,
+                  false);
         } else if (entity.isInfantry()) {
-            fuelCost = fuelCost.plus(getInfantryFuelCost(entity));
+            return MonthlyFuelUse.petrochemicals(getInfantryFuelTonnage() * PEACETIME_FUEL_MULTIPLIER);
         }
 
-        // Apply hydrogen production credit if there is any hydrogen usage
-        if (hydrogenUsage > 0) {
-            LOGGER.debug("getFuelCost: {} hydrogen usage", hydrogenUsage);
-            // Ensure hydrogen usage doesn't go negative after applying production credit
-            double actualHydrogenUsage = Math.max(0, hydrogenUsage - hydrogenProduction);
-            LOGGER.debug("getFuelCost: {} hydrogen usage after production credit", actualHydrogenUsage);
-            fuelCost = fuelCost.plus(Money.of(actualHydrogenUsage * FUEL_COST_PER_HYDROGEN));
-            LOGGER.debug("getFuelCost: {} fuel cost", fuelCost);
-        }
+        return MonthlyFuelUse.NONE;
+    }
 
-        return fuelCost;
+    /**
+     * Jump battle armor carries fuel equal to 2% of its mass. Conventional infantry that isn't on foot uses 2% of the
+     * compartment that carries it, which is the platoon's transport weight.
+     */
+    private double getInfantryFuelTonnage() {
+        if (entity instanceof BattleArmor) {
+            return (entity.getJumpMP() > 0) ? (entity.getWeight() * 0.02) : 0;
+        }
+        return (entity.getMovementMode() == EntityMovementMode.INF_LEG) ? 0 : (entity.getWeight() * 0.02);
     }
 
     /**
      * Calculates the average monthly hydrogen fuel usage for a given spacefaring entity.
      *
-     * <p>The calculation is based on the entity's class and mass, with values derived from CamOps. Different formulas
-     * are applied depending on whether the entity is a DropShip (with subtypes and weight considerations), Small Craft,
-     * Jumpship, or Warship.</p>
+     * <p>CamOps assumes DropShips, Small Craft and WarShips spend 15 burn-days of fuel a month, and JumpShips and
+     * space stations 3 for station-keeping. Each burn-day uses the craft's strategic fuel use, which MegaMek takes from
+     * its design (civilian or military, mass, and primitive build).</p>
      *
      * @param entity the {@link Entity} representing the spacecraft whose monthly hydrogen usage is to be calculated
      *
      * @return the total tons of hydrogen fuel consumed in an average month for the provided entity
      */
     public double getCraftMonthlyHydrogenUsage(Entity entity) {
-        final int NON_JUMPSHIP_BURN_PER_DAY = 15;
-        final int JUMPSHIP_BURN_PER_DAY = 3;
+        final int NON_JUMPSHIP_BURN_DAYS_PER_MONTH = 15;
+        final int JUMPSHIP_BURN_DAYS_PER_MONTH = 3;
 
-        double tonsBurnDay = 0;
-        if (entity instanceof Dropship) {
-            if (((SmallCraft) entity).getDesignType() != Dropship.MILITARY) {
-                if (entity.getWeight() < 1000) {
-                    tonsBurnDay = 1.84;
-                } else if (entity.getWeight() < 4000) {
-                    tonsBurnDay = 2.82;
-                } else if (entity.getWeight() < 9000) {
-                    tonsBurnDay = 3.37;
-                } else if (entity.getWeight() < 20000) {
-                    tonsBurnDay = 4.22;
-                } else if (entity.getWeight() < 30000) {
-                    tonsBurnDay = 6.52;
-                } else if (entity.getWeight() < 40000) {
-                    tonsBurnDay = 7.71;
-                } else if (entity.getWeight() < 50000) {
-                    tonsBurnDay = 7.74;
-                } else if (entity.getWeight() < 70000) {
-                    tonsBurnDay = 8.37;
-                } else {
-                    tonsBurnDay = 8.83;
-                }
-            } else {
-                tonsBurnDay = 1.84;
-            }
-            return tonsBurnDay * NON_JUMPSHIP_BURN_PER_DAY;
-        } else if ((entity instanceof SmallCraft)) {
-            return 1.84 * NON_JUMPSHIP_BURN_PER_DAY;
-        } else if (entity instanceof Jumpship) {
-            if (entity.getWeight() < 50000) {
-                tonsBurnDay = 2.82;
-            } else if (entity.getWeight() < 100000) {
-                tonsBurnDay = 9.77;
-            } else if (entity.getWeight() < 200000) {
-                tonsBurnDay = 19.75;
-            } else {
-                tonsBurnDay = 39.52;
-            }
-            if (entity instanceof Warship) {
-                return tonsBurnDay * NON_JUMPSHIP_BURN_PER_DAY;
-            }
-            return tonsBurnDay * JUMPSHIP_BURN_PER_DAY;
+        if (!(entity instanceof Aero aero)) {
+            return 0;
         }
-        return tonsBurnDay;
+
+        // SpaceStation derives from JumpShip; WarShip does too but burns like a DropShip
+        boolean isStationKeeping = (entity instanceof Jumpship) && !(entity instanceof Warship);
+        int burnDays = isStationKeeping ? JUMPSHIP_BURN_DAYS_PER_MONTH : NON_JUMPSHIP_BURN_DAYS_PER_MONTH;
+        return aero.getStrategicFuelUse() * burnDays;
     }
 
     /**
-     * Use {@link #getCraftMonthlyHydrogenUsage(Entity)} instead, so that hydrogen discounts can be accounted for
+     * Use {@link #getCraftMonthlyHydrogenUsage(Entity)} instead, so that the force's own hydrogen can be accounted for
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public Money getTonsBurnMonthCost(Entity entity) {
@@ -9357,46 +9340,6 @@ public class Unit implements ITechnology, ILocatable {
             return Money.of(tonsBurnDay * 3 * 15000);
         }
         return Money.of(tonsBurnDay);
-    }
-
-    public Money getFighterFuelCost(Entity entity) {
-        return Money.of(((Aero) entity).getFuelTonnage() * 4.0 * 1000.0);
-    }
-
-    public Money getVehicleFuelCost(Entity e) {
-        Engine en = e.getEngine();
-        if (e instanceof SupportTank) {
-            if (en.getEngineType() == Engine.FUEL_CELL) {
-                return Money.of(((SupportTank) e).getFuelTonnage() * 15000.0 * 4.0);
-            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
-                return Money.of(((SupportTank) e).getFuelTonnage() * 1000.0 * 4.0);
-            } else {
-                return Money.zero();
-            }
-        } else {
-            if (en.getEngineType() == Engine.FUEL_CELL) {
-                return Money.of(en.getWeightEngine(e) * 0.1 * 15000.0 * 4.0);
-            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
-                return Money.of(en.getWeightEngine(e) * 0.1 * 1000.0 * 4.0);
-            } else {
-                return Money.zero();
-            }
-        }
-    }
-
-    public Money getInfantryFuelCost(Entity e) {
-        if (e instanceof BattleArmor) {
-            if (e.getJumpMP() > 0) {
-                return Money.of(e.getWeight() * 0.02 * 1000.0 * 4.0);
-            } else {
-                return Money.zero();
-            }
-        }
-        if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
-            return Money.zero();
-        } else {
-            return Money.of(e.getWeight() * 0.02 * 1000.0 * 4.0);
-        }
     }
 
     /**
