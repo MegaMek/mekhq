@@ -113,6 +113,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -513,6 +514,10 @@ public class CampaignNewDayManager {
         }
 
         campaign.getPlayerForce().getHumanResources().resetAsTechMinutes(campaign.getCampaignOptions());
+
+        // Formations whose StratCon deployment ends today come home before the hangar is processed. Salvage from their
+        // battle arrives today too, and New Day Mass Repair must see their damaged units alongside it.
+        StratConGMs.processForceReturns(campaign);
 
         processNewDayUnits();
 
@@ -1465,12 +1470,29 @@ public class CampaignNewDayManager {
 
         cancelIneligibleFabrications();
 
+        // Note which units are still on their way, so the ones delivered today can be told apart afterwards
+        List<Unit> unitsInTransit = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (!unit.isPresent()) {
+                unitsInTransit.add(unit);
+            }
+        }
+
         LocationNewDayUtil.processAllLocationUnits(campaign);
 
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMHQOptions().getNewDayMRMS()) {
+            // Units delivered today, salvage above all, are left for a day so the player can choose Repair or Strip
+            // before any tech starts on them
+            Set<UUID> unitsArrivedToday = new HashSet<>();
+            for (Unit unit : unitsInTransit) {
+                if (unit.isPresent()) {
+                    unitsArrivedToday.add(unit.getId());
+                }
+            }
+
             try {
-                MRMSService.mrmsAllUnits(campaign);
+                MRMSService.mrmsAllUnits(campaign, unitsArrivedToday);
             } catch (Exception ex) {
                 LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
                 campaign.addReport(TECHNICAL,
