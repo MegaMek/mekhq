@@ -194,9 +194,11 @@ final class AptitudesPage {
             card.addToBody(ConsoleWidgets.wrapped(type.getFlavorText(false, true), TEXT_MUTED));
         }
         card.addToBody(ConsoleWidgets.legend(segments));
-        if (buy.ready() > 0) {
+        if (buy.hasCostText()) {
             card.addToBody(ConsoleWidgets.label(buy.costText("aptitudes.cost.single", "aptitudes.cost.range"), 0.84f,
                   TEXT_MUTED));
+        }
+        if (buy.ready() > 0) {
             card.addToBody(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, "aptitudes.line.can",
                   buy.ready()), getTextAt(RESOURCE_BUNDLE, "link.toggleThem"),
                   () -> console.toggle(buy.readyPeople())));

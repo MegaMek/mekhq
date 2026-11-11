@@ -291,8 +291,10 @@ final class AttributesPage {
         section.add(new StackedBar(segments));
         section.add(Box.createVerticalStrut(scaleForGUI(4)));
         section.add(ConsoleWidgets.legend(segments));
-        if (tally.ready() > 0) {
+        if (tally.hasCostText()) {
             section.add(leftAligned(ConsoleWidgets.label(costText(tally), 0.84f, TEXT_MUTED)));
+        }
+        if (tally.ready() > 0) {
             section.add(ConsoleWidgets.reasonLine(getFormattedTextAt(RESOURCE_BUNDLE, canKey, tally.ready()),
                   getTextAt(RESOURCE_BUNDLE, "link.toggleThem"), () -> console.toggle(tally.readyPeople())));
         }
@@ -334,7 +336,7 @@ final class AttributesPage {
     }
 
     private static void addCostLine(CatalogCard card, QuoteTally tally) {
-        if (tally.ready() > 0) {
+        if (tally.hasCostText()) {
             card.addToBody(ConsoleWidgets.label(costText(tally), 0.84f, TEXT_MUTED));
         }
     }

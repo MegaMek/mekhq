@@ -334,7 +334,7 @@ final class SkillsPage {
                   hasPaidLevel ? getTextAt(RESOURCE_BUNDLE, "skills.spread.key") : null));
         }
         card.addToBody(ConsoleWidgets.legend(segments));
-        if (improve.ready() > 0) {
+        if (improve.hasCostText()) {
             card.addToBody(ConsoleWidgets.label(improve.costText("skills.cost.single", "skills.cost.range"), 0.84f,
                   TEXT_MUTED));
         }
