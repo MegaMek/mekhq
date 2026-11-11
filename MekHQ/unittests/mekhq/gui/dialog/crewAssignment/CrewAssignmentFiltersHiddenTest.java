@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -95,7 +96,7 @@ class CrewAssignmentFiltersHiddenTest {
         state.unitType = "Mek";
         state.formation = "D-1";
         state.assignment = Assignment.EVERYONE;
-        state.role = PersonnelRole.MEKWARRIOR;
+        state.role = new SingleRole(PersonnelRole.MEKWARRIOR);
         state.condition = Condition.FIT;
         state.familiarity = FamiliarityBand.AT_LEAST_100;
         // The search box is above the list, not on the rail, so it stays in sight and is not counted
