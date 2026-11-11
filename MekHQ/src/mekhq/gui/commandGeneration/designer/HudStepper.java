@@ -59,8 +59,12 @@ import mekhq.gui.baseComponents.hud.HudButton;
  * the field applies it, Escape puts the shown value back.
  */
 public final class HudStepper extends JPanel {
-    /** The digits of a whole number, allowing grouping separators between them: "1,500,000" or "60%". */
-    private static final Pattern WHOLE_NUMBER = Pattern.compile("\\d[\\d,.'\\s\\u00A0\\u202F]*");
+    /**
+     * A whole number with optional grouping separators, each followed by exactly three digits ("1,500,000",
+     * "1.500.000", "60%"), then an optional decimal part ("1.5", "1,5") that is rounded away.
+     */
+    private static final Pattern WHOLE_NUMBER = Pattern.compile(
+          "(\\d+(?:[,.'\\s\\u00A0\\u202F]\\d{3}(?!\\d))*)(?:[.,](\\d+))?");
     /** A number that may have a decimal part, written with either a point or a comma: "1.5" or "1,5". */
     private static final Pattern DECIMAL_NUMBER = Pattern.compile("(\\d*)(?:[.,](\\d+))?");
 
@@ -178,7 +182,7 @@ public final class HudStepper extends JPanel {
         if (typed.equals(format.apply(value))) {
             return;
         }
-        Long parsed = parseTyped(typed);
+        Long parsed = parseTyped(typed, typedValueDivisor);
         if (parsed == null) {
             showValue();
             return;
@@ -193,25 +197,33 @@ public final class HudStepper extends JPanel {
 
     /**
      * Reads the first number in typed text, ignoring units and symbols around it ("60%", "2,000 ly", "3d6"), and scales
-     * it by the typed value divisor.
+     * it by the typed value divisor. With a divisor of 1, a point or comma counts as a grouping separator only when
+     * exactly three digits follow it; otherwise it starts a decimal part, which is rounded ("1.5" is 2, not 15).
      *
-     * @param typed the field's text
+     * @param typed             the field's text
+     * @param typedValueDivisor how many stepper units make one typed unit; 1 for a whole-number stepper
      *
      * @return the stepper value the text asks for, or {@code null} when it holds no number
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private Long parseTyped(String typed) {
+    static Long parseTyped(String typed, int typedValueDivisor) {
         try {
             if (typedValueDivisor == 1) {
                 Matcher matcher = WHOLE_NUMBER.matcher(typed);
                 if (!matcher.find()) {
                     return null;
                 }
-                String digits = matcher.group().replaceAll("\\D", "");
+                String digits = matcher.group(1).replaceAll("\\D", "");
                 // Longer than a long can hold: past any stepper's maximum anyway.
-                return (digits.length() > 18) ? Long.MAX_VALUE : Long.parseLong(digits);
+                if (digits.length() > 18) {
+                    return Long.MAX_VALUE;
+                }
+                long wholeNumber = Long.parseLong(digits);
+                String fractionPart = matcher.group(2);
+                boolean roundsUp = (fractionPart != null) && (fractionPart.charAt(0) >= '5');
+                return roundsUp ? (wholeNumber + 1) : wholeNumber;
             }
             Matcher matcher = DECIMAL_NUMBER.matcher(typed);
             while (matcher.find()) {

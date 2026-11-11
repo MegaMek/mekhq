@@ -159,7 +159,7 @@ public class CommandGenerationOptions {
     private boolean startCourseToContractPlanet;
 
     // Finances. Starting cash is working capital sized as a number of months of the command's running costs, never
-    // less than the minimum. The optional starting loan is a debt against the equipment the build creates.
+    // less than the minimum. The optional starting loan is a loan equal to the starting cash, doubling it.
     private int startingCashMonths;
     private long minimumStartingCash;
     private boolean startingLoan;
@@ -636,8 +636,7 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @return {@code true} if the command is founded owing a loan worth a tenth of what its equipment would cost to
-     *       buy
+     * @return {@code true} if the command is founded owing a loan equal to the starting cash, doubling it
      *
      * @author Illiani
      * @since 0.51.01
@@ -647,7 +646,7 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @param startingLoan {@code true} to found the command owing a loan worth a tenth of its equipment's buy cost
+     * @param startingLoan {@code true} to found the command owing a loan equal to the starting cash, doubling it
      *
      * @author Illiani
      * @since 0.51.01

@@ -171,7 +171,6 @@ public final class ForceSummary {
         }
     }
 
-    /** @return every unit rolled, struck out or not */
     /**
      * Whether another summary counts exactly the same units, the same ones struck out. A board rebuilt only to change
      * names or a highlight keeps its old summary when this holds, so work keyed to the summary, such as the People
@@ -196,6 +195,7 @@ public final class ForceSummary {
         return true;
     }
 
+    /** @return every unit rolled, struck out or not */
     public int getRolledUnits() {
         return rolledUnits;
     }
