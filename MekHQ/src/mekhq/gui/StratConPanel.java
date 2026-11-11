@@ -1285,7 +1285,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     /**
      * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
      * box pinned to the top-right of the visible map area, then the sector's facility effects under it. The environment
-     * box is skipped for legacy sectors that carry no profile data.
+     * box is skipped for legacy sectors that carry no profile data. Either box can be hidden by the player (the
+     * toggles under the tab's Facilities button); a hidden environment box lets the facility effects move up.
      */
     private void drawSectorEnvironment(Graphics2D g2D) {
         if (currentTrack == null) {
@@ -1293,10 +1294,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         int nextBoxY = getVisibleRect().y;
-        if (currentTrack.getLatitudeBand() != null) {
+        if ((currentTrack.getLatitudeBand() != null) && MekHQ.getMHQOptions().getShowStratConSectorEnvironment()) {
             nextBoxY = drawHudBox(g2D, getSectorEnvironmentLines(), nextBoxY);
         }
-        drawSectorFacilityEffects(g2D, nextBoxY);
+        if (MekHQ.getMHQOptions().getShowStratConFacilityEffects()) {
+            drawSectorFacilityEffects(g2D, nextBoxY);
+        }
     }
 
     /**
@@ -1715,11 +1718,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(scenarioMarker2);
                     }
 
-                    if (currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).isOwnerAlliedToPlayer()) {
-                        drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
-                    }
+                    drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2451,14 +2450,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                             g2D.draw(forceMarker);
                         }
 
-                        Font currentFont = g2D.getFont();
-                        Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
-                              TextAttribute.WEIGHT_BOLD));
-                        g2D.setFont(newFont);
+                        // Labelled only while its hex is selected, the same as facilities.
+                        if (currentCoords.equals(boardState.getSelectedCoords())) {
+                            Font currentFont = g2D.getFont();
+                            Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
+                                  TextAttribute.WEIGHT_BOLD));
+                            g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
+                            drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
-                        g2D.setFont(currentFont);
+                            g2D.setFont(currentFont);
+                        }
                     }
                 }
 
