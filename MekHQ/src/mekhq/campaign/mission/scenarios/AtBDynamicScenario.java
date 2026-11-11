@@ -742,6 +742,11 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
+    }
+
+    @Override
+    protected void afterLoadFromXml(final Version version) {
+        super.afterLoadFromXml(version);
         if (version.isLowerThan(new Version("0.51.02"))) {
             restoreFixedTimeLimitsFromTemplate();
         }
