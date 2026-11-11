@@ -2498,4 +2498,165 @@ class StratConRulesManagerTest {
             assertTrue(StratConRulesManager.getAvailableForceIDs(campaign, contract, false).isEmpty());
         }
     }
+
+    /**
+     * A company can be the combat team while its units sit in child lances. The commander's own lance is then not a
+     * combat team, so the defensive-assignment check (which gates leadership units and defensive minefields) has to
+     * resolve the company above it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class CommanderDefensiveAssignment {
+        private static final int COMPANY_ID = 3;
+        private static final int LANCE_ID = 4;
+
+        private Campaign campaign;
+        private AtBDynamicScenario scenario;
+        private Hashtable<Integer, CombatTeam> combatTeamsMap;
+        private Formation company;
+        private Formation lance;
+
+        private void setUp() {
+            campaign = MHQTestUtilities.mockCampaign();
+            scenario = mock(AtBDynamicScenario.class);
+            combatTeamsMap = new Hashtable<>();
+            when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+            company = mock(Formation.class);
+            when(company.getId()).thenReturn(COMPANY_ID);
+            when(company.getAllParents()).thenReturn(new ArrayList<>());
+            when(campaign.getPlayerForce().getFormation(COMPANY_ID)).thenReturn(company);
+
+            lance = mock(Formation.class);
+            when(lance.getId()).thenReturn(LANCE_ID);
+            when(lance.getAllParents()).thenReturn(new ArrayList<>(List.of(company)));
+            when(campaign.getPlayerForce().getFormation(LANCE_ID)).thenReturn(lance);
+
+            Unit commanderUnit = mock(Unit.class);
+            when(commanderUnit.getFormationId()).thenReturn(LANCE_ID);
+            Person commander = mock(Person.class);
+            when(commander.getUnit()).thenReturn(commanderUnit);
+            when(scenario.getLanceCommander(campaign)).thenReturn(commander);
+        }
+
+        private void makeCombatTeam(Formation formation, CombatRole role) {
+            when(formation.isCombatTeam()).thenReturn(true);
+            CombatTeam combatTeam = mock(CombatTeam.class);
+            when(combatTeam.getRole()).thenReturn(role);
+            combatTeamsMap.put(formation.getId(), combatTeam);
+        }
+
+        @Test
+        void frontlineCompanyAboveCommandersLanceIsDefensive() {
+            setUp();
+            makeCombatTeam(company, CombatRole.FRONTLINE);
+
+            assertTrue(StratConRulesManager.commanderLanceHasDefensiveAssignment(scenario, campaign));
+        }
+
+        @Test
+        void maneuverCompanyAboveCommandersLanceIsNotDefensive() {
+            setUp();
+            makeCombatTeam(company, CombatRole.MANEUVER);
+
+            assertFalse(StratConRulesManager.commanderLanceHasDefensiveAssignment(scenario, campaign));
+        }
+
+        @Test
+        void frontlineLanceThatIsItselfTheCombatTeamIsDefensive() {
+            setUp();
+            makeCombatTeam(lance, CombatRole.FRONTLINE);
+
+            assertTrue(StratConRulesManager.commanderLanceHasDefensiveAssignment(scenario, campaign));
+        }
+
+        @Test
+        void noCombatTeamInHierarchyIsNotDefensive() {
+            setUp();
+
+            assertFalse(StratConRulesManager.commanderLanceHasDefensiveAssignment(scenario, campaign));
+        }
+    }
+
+    /**
+     * Before commit the staged primary is not yet on the scenario, so its primary force list is empty. Leadership units
+     * must still be offered when the caller supplies the staged primary's formation IDs.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class EligibleLeadershipUnits {
+        private static final int PRIMARY_ID = 3;
+        private static final int AUXILIARY_LANCE_ID = 8;
+
+        private Campaign campaign;
+        private StratConScenario scenario;
+        private Unit auxiliaryUnit;
+
+        private Unit mockMekUnit(int formationId) {
+            Entity entity = mock(Entity.class);
+            when(entity.getUnitType()).thenReturn(UnitType.MEK);
+            when(entity.calculateBattleValue(true, true)).thenReturn(500);
+
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            when(unit.getId()).thenReturn(unitId);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.isAvailable()).thenReturn(true);
+            when(unit.getFormationId()).thenReturn(formationId);
+            when(campaign.getUnit(unitId)).thenReturn(unit);
+            return unit;
+        }
+
+        private void setUp() {
+            campaign = MHQTestUtilities.mockCampaign();
+            AbstractContract contract = mock(AbstractContract.class);
+            scenario = mock(StratConScenario.class);
+            when(scenario.getPrimaryForceIDs()).thenReturn(new ArrayList<>());
+            when(scenario.getBackingContract(campaign)).thenReturn(contract);
+
+            // The staged primary: one Mek, which sets the unit type leadership units must match.
+            UUID primaryUnitId = mockMekUnit(PRIMARY_ID).getId();
+            Formation primary = mock(Formation.class);
+            when(primary.getAllUnits(true)).thenReturn(new Vector<>(List.of(primaryUnitId)));
+            when(campaign.getPlayerForce().getFormation(PRIMARY_ID)).thenReturn(primary);
+
+            // Another frontline lance holding the candidate auxiliary Mek.
+            auxiliaryUnit = mockMekUnit(AUXILIARY_LANCE_ID);
+            Formation auxiliaryLance = mock(Formation.class);
+            when(auxiliaryLance.getId()).thenReturn(AUXILIARY_LANCE_ID);
+            when(auxiliaryLance.isCombatTeam()).thenReturn(true);
+            when(campaign.getPlayerForce().getFormation(AUXILIARY_LANCE_ID)).thenReturn(auxiliaryLance);
+
+            CombatTeam auxiliaryTeam = mock(CombatTeam.class);
+            when(auxiliaryTeam.getRole()).thenReturn(CombatRole.FRONTLINE);
+            when(auxiliaryTeam.getContract(campaign)).thenReturn(contract);
+            Hashtable<Integer, CombatTeam> combatTeamsMap = new Hashtable<>();
+            combatTeamsMap.put(AUXILIARY_LANCE_ID, auxiliaryTeam);
+            when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+
+            UUID auxiliaryUnitId = auxiliaryUnit.getId();
+            when(campaign.getPlayerForce().getAllUnitsInTheTOE(true)).thenReturn(List.of(auxiliaryUnitId));
+        }
+
+        @Test
+        void stagedPrimaryIdsOfferLeadershipUnitsBeforeCommit() {
+            setUp();
+
+            List<Unit> eligible = StratConRulesManager.getEligibleLeadershipUnits(campaign, scenario, 3,
+                  List.of(PRIMARY_ID));
+
+            assertEquals(List.of(auxiliaryUnit), eligible);
+        }
+
+        @Test
+        void emptyScenarioPrimaryOffersNoLeadershipUnits() {
+            setUp();
+
+            assertTrue(StratConRulesManager.getEligibleLeadershipUnits(campaign, scenario, 3).isEmpty());
+        }
+    }
 }
