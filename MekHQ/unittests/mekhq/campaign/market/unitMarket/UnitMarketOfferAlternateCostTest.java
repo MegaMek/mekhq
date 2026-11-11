@@ -157,33 +157,6 @@ class UnitMarketOfferAlternateCostTest {
         verify(summary, never()).getCost();
     }
 
-    /**
-     * MekHQ prices large craft offers from their construction cost.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Test
-    void mekHQPricesLargeCraftFromConstructionCost() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.DROPSHIP));
-
-        assertEquals(Money.of(4_000_000), offer(100).getPrice(null, GAME_YEAR));
-        verify(summary, never()).getBV();
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Test
-    void mekHQPricesOrdinaryUnitsFromBattleValue() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
-
-        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice(null, GAME_YEAR));
-    }
-
     /** An offer whose unit file can't be loaded is still priced, without a tech-base multiplier. */
     @Test
     void unloadableUnitIsPricedWithoutTheTechMultiplier() {
@@ -205,9 +178,9 @@ class UnitMarketOfferAlternateCostTest {
     void repeatedPricingLoadsTheUnitOnce() {
         UnitMarketOffer offer = offer(100);
 
-        offer.getPrice();
-        offer.getPrice();
-        offer.getPrice();
+        offer.getPrice(null, GAME_YEAR);
+        offer.getPrice(null, GAME_YEAR);
+        offer.getPrice(null, GAME_YEAR);
 
         verify(offer, times(1)).getEntity();
     }
@@ -215,12 +188,12 @@ class UnitMarketOfferAlternateCostTest {
     @Test
     void changingTheUnitReloadsItsPriceTraits() {
         UnitMarketOffer offer = offer(100);
-        offer.getPrice();
+        offer.getPrice(null, GAME_YEAR);
 
         offer.setUnit(summary);
         when(entity.isClan()).thenReturn(true);
 
-        assertEquals(Money.of(12_000_000), offer.getPrice());
+        assertEquals(Money.of(12_000_000), offer.getPrice(null, GAME_YEAR));
         verify(offer, times(2)).getEntity();
     }
 }

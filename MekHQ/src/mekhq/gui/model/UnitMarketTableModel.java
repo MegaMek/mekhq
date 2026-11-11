@@ -84,6 +84,7 @@ public class UnitMarketTableModel extends DataTableModel<UnitMarketOffer> {
         setData(offers, faction, gameYear);
     }
     //endregion Constructors
+
     /**
      * Replaces the displayed offers, along with the faction and year their prices are worked out for.
      *

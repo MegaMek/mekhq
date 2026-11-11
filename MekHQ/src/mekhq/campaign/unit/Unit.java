@@ -3469,7 +3469,7 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
+    public static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
           CampaignOptions campaignOptions) {
         if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);

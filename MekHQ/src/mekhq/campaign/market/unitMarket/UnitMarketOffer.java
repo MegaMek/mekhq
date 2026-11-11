@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.common.enums.TechRating;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
@@ -160,9 +161,9 @@ public class UnitMarketOffer {
             return cost;
         }
 
-        cost = cost.multipliedBy(Unit.getUnitPriceMultiplier(entity, campaignOptions))
+        cost = cost.multipliedBy(Unit.getUnitPriceMultiplier(traits.mixedTech(), traits.clan(), campaignOptions))
                      .multipliedBy(AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear,
-                           entity));
+                           traits.clan(), traits.mixedTech(), traits.techRating()));
 
         // Battle Value ignores price quirks, which the construction cost already includes
         if (isBattleValueCost()) {
@@ -183,14 +184,16 @@ public class UnitMarketOffer {
      * @param loaded               {@code false} when the unit file could not be loaded
      * @param mixedTech            whether the unit is mixed tech
      * @param clan                 whether the unit is Clan tech
+     * @param techRating           the unit's tech rating, for the acquisition multipliers; {@code null} if unknown
      * @param quirkPriceMultiplier the unit's price quirk multiplier, see {@link Unit#getQuirkPriceMultiplier(Entity)}
      */
-    private record PriceTraits(boolean loaded, boolean mixedTech, boolean clan, double quirkPriceMultiplier) {
+    private record PriceTraits(boolean loaded, boolean mixedTech, boolean clan, @Nullable TechRating techRating,
+          double quirkPriceMultiplier) {
         static PriceTraits of(@Nullable Entity entity) {
             if (entity == null) {
-                return new PriceTraits(false, false, false, 1.0);
+                return new PriceTraits(false, false, false, null, 1.0);
             }
-            return new PriceTraits(true, entity.isMixedTech(), entity.isClan(),
+            return new PriceTraits(true, entity.isMixedTech(), entity.isClan(), entity.getTechRating(),
                   Unit.getQuirkPriceMultiplier(entity));
         }
     }

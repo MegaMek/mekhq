@@ -104,8 +104,29 @@ public final class AcquisitionPriceMultipliers {
      */
     public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Entity entity) {
-        boolean isClanTech = entity.isClan() && !entity.isMixedTech();
-        return getMultiplier(campaignOptions, faction, gameYear, isClanTech, entity.getTechRating());
+        return getUnitMultiplier(campaignOptions, faction, gameYear, entity.isClan(), entity.isMixedTech(),
+              entity.getTechRating());
+    }
+
+    /**
+     * For callers that cache a unit's traits rather than keep its entity loaded, such as unit market offers.
+     *
+     * @param campaignOptions the campaign options holding the multipliers
+     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear        the current year
+     * @param isClan          whether the unit is Clan tech
+     * @param isMixedTech     whether the unit is mixed tech, which never pays the Clan tech multiplier
+     * @param techRating      the unit's tech rating, or {@code null} if it is unknown
+     *
+     * @return the acquisition price multiplier for the whole unit, as
+     *       {@link #getUnitMultiplier(CampaignOptions, Faction, int, Entity)} works it out
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
+          boolean isClan, boolean isMixedTech, @Nullable TechRating techRating) {
+        return getMultiplier(campaignOptions, faction, gameYear, isClan && !isMixedTech, techRating);
     }
 
     /**

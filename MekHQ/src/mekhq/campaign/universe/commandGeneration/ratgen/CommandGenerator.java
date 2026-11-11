@@ -1015,25 +1015,6 @@ public final class CommandGenerator {
     }
 
     /**
-     * Estimates the purchase value of a set of rolled entities the way {@link Unit#getBuyCost()}
-     * will price them once materialized (see {@link Unit#estimateBuyCost}), including Battle Value
-     * pricing when the {@link CampaignOption#UNIT_COST_MODEL} calls for it. Used by the Command
-     * Designer's starting-cash preview to price the design model before anything is committed.
-     *
-     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
-     * @param entities        the rolled entities to price (e.g. from {@link #collectEntities})
-     *
-     * @return the estimated total purchase value
-     */
-    public static Money estimateUnitValue(CampaignOptions campaignOptions, List<Entity> entities) {
-        Money total = Money.zero();
-        for (Entity entity : entities) {
-            total = total.plus(Unit.estimateBuyCost(entity, campaignOptions));
-        }
-        return total;
-    }
-
-    /**
      * Post-generation diagnostic that finds members which never made it into the TOE, so a playtest
      * can locate them from megamek.log alone. Logs every hangar unit not attached to any formation (an
      * orphan unit, with its crew) and every active person not assigned to a unit (summarized by role,
