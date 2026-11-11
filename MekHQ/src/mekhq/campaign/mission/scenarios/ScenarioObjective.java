@@ -318,7 +318,7 @@ public class ScenarioObjective {
         } else {
             // Generate the text with a marker in place of the turn count, then accept any number (or the "null" an
             // unset limit printed as) where the marker sits.
-            final String turnCountMarker = "\u0000TURNS\u0000";
+            final String turnCountMarker = "@@TURNS@@";
             String generatedWithMarker = buildGeneratedDescription(formatTimeLimitClause(turnCountMarker));
             int markerIndex = generatedWithMarker.indexOf(turnCountMarker);
             if (markerIndex < 0) {
@@ -327,7 +327,7 @@ public class ScenarioObjective {
                 String textBeforeTurnCount = generatedWithMarker.substring(0, markerIndex);
                 String textAfterTurnCount = generatedWithMarker.substring(markerIndex + turnCountMarker.length());
                 Pattern generatedTextPattern = Pattern.compile(Pattern.quote(textBeforeTurnCount) +
-                                                                     "(?:\\d[\\d.,\\s\\u00A0\\u202F]*|null)" +
+                                                                     "(?:\\d[\\d.,\\s\\p{Zs}]*|null)" +
                                                                      Pattern.quote(textAfterTurnCount));
                 matchesGeneratedText = generatedTextPattern.matcher(description).matches();
             }

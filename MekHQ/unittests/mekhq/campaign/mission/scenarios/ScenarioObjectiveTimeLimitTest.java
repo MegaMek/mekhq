@@ -66,7 +66,10 @@ import org.xml.sax.InputSource;
  * @since 0.51.01
  */
 class ScenarioObjectiveTimeLimitTest {
-    private static final Version VERSION = new Version();
+    /** A save version from before the time limit fix, so the load-time repair runs. */
+    private static final Version VERSION_BEFORE_FIX = new Version("0.51.01");
+    /** The first save version written with the fix, so the load-time repair is skipped. */
+    private static final Version VERSION_WITH_FIX = new Version("0.51.02");
 
     /** The Recon Evasion objective: keep 66% of the player's force intact for at least 12 turns. */
     private static ScenarioObjective fixedPreserveObjective(int timeLimit) {
@@ -209,9 +212,23 @@ class ScenarioObjectiveTimeLimitTest {
         scenario.setTemplate(template);
         scenario.getScenarioObjectives().add(fixedPreserveObjective(6));
 
-        AtBDynamicScenario loaded = loadScenario(writeScenario(scenario));
+        AtBDynamicScenario loaded = loadScenario(writeScenario(scenario), VERSION_BEFORE_FIX);
 
         assertEquals(12, loaded.getScenarioObjectives().get(0).getTimeLimit());
+    }
+
+    @Test
+    void loadKeepsDeliberateSixTurnLimitInSavesWrittenWithTheFix() throws Exception {
+        ScenarioTemplate template = new ScenarioTemplate();
+        template.scenarioObjectives.add(fixedPreserveObjective(12));
+
+        AtBDynamicScenario scenario = new AtBDynamicScenario();
+        scenario.setTemplate(template);
+        scenario.getScenarioObjectives().add(fixedPreserveObjective(6));
+
+        AtBDynamicScenario loaded = loadScenario(writeScenario(scenario), VERSION_WITH_FIX);
+
+        assertEquals(6, loaded.getScenarioObjectives().get(0).getTimeLimit());
     }
 
     @Test
@@ -223,7 +240,7 @@ class ScenarioObjectiveTimeLimitTest {
         scenario.setTemplate(template);
         scenario.getScenarioObjectives().add(fixedPreserveObjective(10));
 
-        AtBDynamicScenario loaded = loadScenario(writeScenario(scenario));
+        AtBDynamicScenario loaded = loadScenario(writeScenario(scenario), VERSION_BEFORE_FIX);
 
         assertEquals(10, loaded.getScenarioObjectives().get(0).getTimeLimit());
     }
@@ -252,10 +269,10 @@ class ScenarioObjectiveTimeLimitTest {
         return stringWriter.toString();
     }
 
-    private static AtBDynamicScenario loadScenario(String xml) throws Exception {
+    private static AtBDynamicScenario loadScenario(String xml, Version saveVersion) throws Exception {
         DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Element root = documentBuilder.parse(new InputSource(new StringReader(xml))).getDocumentElement();
-        Scenario loaded = Scenario.generateInstanceFromXML(root, mock(Campaign.class), VERSION);
+        Scenario loaded = Scenario.generateInstanceFromXML(root, mock(Campaign.class), saveVersion);
         return assertInstanceOf(AtBDynamicScenario.class, loaded);
     }
 }

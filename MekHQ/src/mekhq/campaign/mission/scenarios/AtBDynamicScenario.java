@@ -742,7 +742,9 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
-        restoreFixedTimeLimitsFromTemplate();
+        if (version.isLowerThan(new Version("0.51.02"))) {
+            restoreFixedTimeLimitsFromTemplate();
+        }
     }
 
     /**
@@ -752,6 +754,10 @@ public class AtBDynamicScenario extends AtBScenario {
      *
      * <p>Each scenario objective is matched to an unused template objective with the same criterion, amount and
      * at most/at least direction.</p>
+     *
+     * <p>This is a one-time repair for saves written before the fix, so it only runs for those saves. An objective
+     * left at exactly 6 turns can't be told apart from one a GM deliberately set to 6, so running it on every load
+     * would undo such edits.</p>
      *
      * @author Illiani
      * @since 0.51.01
