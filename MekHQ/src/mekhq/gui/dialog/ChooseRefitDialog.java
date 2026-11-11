@@ -370,7 +370,7 @@ public class ChooseRefitDialog extends JDialog {
         String explanation = getFormattedTextAt(RESOURCE_BUNDLE, "orderConfirm.explanation", btnRefit.getText(),
               btnCustomize.getText());
 
-        // Back is first, so closing the dialog with X orders nothing
+        // Back is first, so closing the dialog with X orders nothing, but the order button has focus
         List<String> buttons = List.of(getTextAt(RESOURCE_BUNDLE, "orderConfirm.button.back"),
               getTextAt(RESOURCE_BUNDLE, isAnythingToOrder ? "orderConfirm.button.order" : "orderConfirm.button.mark"));
         Person speaker = campaign.getPlayerForce()
@@ -378,7 +378,7 @@ public class ChooseRefitDialog extends JDialog {
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
         ImmersiveDialogSimple confirmation = new ImmersiveDialogSimple(campaign, speaker, null, message.toString(),
-              buttons, explanation, null, false);
+              buttons, explanation, null, false, ORDER_CONFIRMED);
         return confirmation.getDialogChoice() == ORDER_CONFIRMED;
     }
 
