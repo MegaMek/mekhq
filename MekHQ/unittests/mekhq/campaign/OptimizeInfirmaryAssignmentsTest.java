@@ -138,10 +138,12 @@ class OptimizeInfirmaryAssignmentsTest {
 
         new OptimizeInfirmaryAssignments(campaign);
 
-        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+        // Read the ID before verifying, as calling a mock inside verify(mock, never()) is itself verified
+        UUID injuredSurgeonId = injuredSurgeon.getId();
+        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeonId, healingWaitingPeriod);
         verify(injuredSurgeon).setDoctorId(otherSurgeon.getId(), healingWaitingPeriod);
         // The injured surgeon still takes the next patient
-        verify(minorPatient).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+        verify(minorPatient).setDoctorId(injuredSurgeonId, healingWaitingPeriod);
     }
 
     @Test
@@ -153,8 +155,10 @@ class OptimizeInfirmaryAssignmentsTest {
 
         new OptimizeInfirmaryAssignments(campaign);
 
-        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
-        verify(minorPatient).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+        // Read the ID before verifying, as calling a mock inside verify(mock, never()) is itself verified
+        UUID injuredSurgeonId = injuredSurgeon.getId();
+        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeonId, healingWaitingPeriod);
+        verify(minorPatient).setDoctorId(injuredSurgeonId, healingWaitingPeriod);
     }
 
     private void setUpInfirmary(List<Person> doctors, List<Person> patients) {
