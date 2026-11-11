@@ -68,6 +68,7 @@ class MarketsOptionsModel {
     SalvageSystem salvageSystem;
     boolean useRiskySalvage;
     boolean keepEnemyCamouflageOnSalvage;
+    boolean reduceSalvageQuality;
     boolean enableSalvageFlagByDefault;
     boolean useClanSalvageClause;
     boolean useDynamicDifficulty;
@@ -136,6 +137,7 @@ class MarketsOptionsModel {
         salvageSystem = options.get(CampaignOption.SALVAGE_SYSTEM);
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
         keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
+        reduceSalvageQuality = options.get(CampaignOption.IS_REDUCE_SALVAGE_QUALITY);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
         useClanSalvageClause = options.get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
@@ -222,6 +224,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.SALVAGE_SYSTEM, salvageSystem);
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
         options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
+        options.set(CampaignOption.IS_REDUCE_SALVAGE_QUALITY, reduceSalvageQuality);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
         options.set(CampaignOption.USE_CLAN_SALVAGE_CLAUSE, useClanSalvageClause);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
