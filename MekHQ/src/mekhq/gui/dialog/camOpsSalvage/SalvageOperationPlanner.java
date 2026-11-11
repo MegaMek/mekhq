@@ -229,9 +229,12 @@ public class SalvageOperationPlanner extends JDialog {
         }
     }
 
-    /** The orders the tech board can be sorted in. */
+    /**
+     * The orders the tech board can be sorted in. Every order sorts both ways, so, for example, green techs or the
+     * techs with the least time left can be brought to the top.
+     */
     private enum TechSort {
-        MINUTES, SKILL, NAME;
+        MINUTES, MINUTES_ASCENDING, SKILL, SKILL_ASCENDING, NAME, NAME_DESCENDING;
 
         @Override
         public String toString() {
@@ -1063,8 +1066,17 @@ public class SalvageOperationPlanner extends JDialog {
         if (sort == TechSort.SKILL) {
             return Comparator.comparing(SalvageTechCandidate::skillLevel).reversed().thenComparing(byName);
         }
+        if (sort == TechSort.SKILL_ASCENDING) {
+            return Comparator.comparing(SalvageTechCandidate::skillLevel).thenComparing(byName);
+        }
         if (sort == TechSort.NAME) {
             return byName;
+        }
+        if (sort == TechSort.NAME_DESCENDING) {
+            return byName.reversed();
+        }
+        if (sort == TechSort.MINUTES_ASCENDING) {
+            return Comparator.comparingInt(SalvageTechCandidate::minutesLeft).thenComparing(byName);
         }
         return Comparator.comparingInt(SalvageTechCandidate::minutesLeft).reversed().thenComparing(byName);
     }

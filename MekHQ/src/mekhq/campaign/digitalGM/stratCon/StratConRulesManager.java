@@ -2869,18 +2869,24 @@ public class StratConRulesManager {
     }
 
     /**
-     * Utility method to determine if the current scenario's force commander's force is on defence
+     * Utility method to determine if the current scenario's force commander's force is on defence.
+     *
+     * <p>The commander's unit may sit in a child formation (for example a lance inside a company) while the combat team
+     * tag is on a parent formation, so the governing combat team is resolved by walking up the hierarchy rather than by
+     * the commander's own formation alone.</p>
      */
     public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
         Person lanceCommander = scenario.getLanceCommander(campaign);
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                CombatTeam lance = campaign.getPlayerForce()
-                                         .getCombatTeamsAsMap(campaign)
-                                         .get(commanderUnit.getFormationId());
+                Formation commanderFormation = campaign.getPlayerForce().getFormation(commanderUnit.getFormationId());
+                if (commanderFormation == null) {
+                    return false;
+                }
 
-                return (lance != null) && lance.getRole().isFrontline();
+                CombatTeam combatTeam = resolveCombatTeam(commanderFormation, campaign);
+                return (combatTeam != null) && combatTeam.getRole().isFrontline();
             }
         }
 
@@ -4233,7 +4239,28 @@ public class StratConRulesManager {
      */
     public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratConScenario currentScenario,
           int leadershipSkill) {
-        List<Integer> forceIds = currentScenario.getPrimaryForceIDs();
+        return getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill,
+              currentScenario.getPrimaryForceIDs());
+    }
+
+    /**
+     * Retrieves a list of units that are eligible for leadership deployment, matching them against the supplied
+     * primary formations rather than the scenario's committed primary forces. The deployment wizard uses this before
+     * commit, when the staged primary has not yet been written to the scenario and its primary force list is still
+     * empty.
+     *
+     * @param campaign        The campaign instance holding the units and forces involved.
+     * @param currentScenario The current StratCon scenario being processed.
+     * @param leadershipSkill The leadership skill value used to calculate budget.
+     * @param primaryForceIds The formation IDs whose dominant unit type the leadership units must match.
+     *
+     * @return A list of {@code Unit} objects eligible for deployment as leadership units.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratConScenario currentScenario,
+          int leadershipSkill, List<Integer> primaryForceIds) {
         List<Unit> leadershipUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
@@ -4243,7 +4270,7 @@ public class StratConRulesManager {
 
         int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
 
-        int primaryUnitType = getPrimaryUnitType(campaign, forceIds);
+        int primaryUnitType = getPrimaryUnitType(campaign, primaryForceIds);
 
         // If there are no units (somehow), we've no reason to continue
         if (primaryUnitType == -1) {
