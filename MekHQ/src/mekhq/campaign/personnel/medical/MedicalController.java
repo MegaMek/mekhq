@@ -374,6 +374,13 @@ public class MedicalController {
             return false;
         }
 
+        if (doctor.getId().equals(patient.getId())) {
+            campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.selfTreatment",
+                  doctor.getHyperlinkedFullTitle()));
+            unassignDoctor(patient, doctor);
+            return false;
+        }
+
         if (!doctor.isDoctor()) {
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.notADoctor",
                   doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));

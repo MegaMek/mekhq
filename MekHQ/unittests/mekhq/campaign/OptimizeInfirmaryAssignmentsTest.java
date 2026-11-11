@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -127,6 +128,35 @@ class OptimizeInfirmaryAssignmentsTest {
         verify(minorPatient).setDoctorId(unskilledDoctor.getId(), healingWaitingPeriod);
     }
 
+    @Test
+    void injuredDoctorIsTreatedByAnotherDoctor() {
+        Person injuredSurgeon = doctor(3, EXP_VETERAN);
+        makePatient(injuredSurgeon, 5);
+        Person otherSurgeon = doctor(1, EXP_REGULAR);
+        Person minorPatient = patient(1);
+        setUpInfirmary(List.of(injuredSurgeon, otherSurgeon), List.of(minorPatient, injuredSurgeon));
+
+        new OptimizeInfirmaryAssignments(campaign);
+
+        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+        verify(injuredSurgeon).setDoctorId(otherSurgeon.getId(), healingWaitingPeriod);
+        // The injured surgeon still takes the next patient
+        verify(minorPatient).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+    }
+
+    @Test
+    void onlyDoctorIsNotAssignedToThemselves() {
+        Person injuredSurgeon = doctor(3, EXP_VETERAN);
+        makePatient(injuredSurgeon, 5);
+        Person minorPatient = patient(1);
+        setUpInfirmary(List.of(injuredSurgeon), List.of(minorPatient, injuredSurgeon));
+
+        new OptimizeInfirmaryAssignments(campaign);
+
+        verify(injuredSurgeon, never()).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+        verify(minorPatient).setDoctorId(injuredSurgeon.getId(), healingWaitingPeriod);
+    }
+
     private void setUpInfirmary(List<Person> doctors, List<Person> patients) {
         when(humanResources.getDoctors()).thenReturn(new ArrayList<>(doctors));
         when(humanResources.getPatients()).thenReturn(new ArrayList<>(patients));
@@ -169,8 +199,18 @@ class OptimizeInfirmaryAssignmentsTest {
      */
     private static Person patient(int severity) {
         Person patient = mock(Person.class);
-        when(patient.getNonPermanentInjurySeverity()).thenReturn(severity);
-        when(patient.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        makePatient(patient, severity);
         return patient;
+    }
+
+    /**
+     * Gives an existing mocked person, such as a doctor, the injuries of a free (non-prisoner) patient.
+     *
+     * @param person   the mocked person to injure
+     * @param severity the injury severity
+     */
+    private static void makePatient(Person person, int severity) {
+        when(person.getNonPermanentInjurySeverity()).thenReturn(severity);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
     }
 }
