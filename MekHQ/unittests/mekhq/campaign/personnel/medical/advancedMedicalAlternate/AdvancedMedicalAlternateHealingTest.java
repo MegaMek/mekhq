@@ -195,6 +195,19 @@ class AdvancedMedicalAlternateHealingTest {
     }
 
     @Test
+    @DisplayName("getInjuryPenalty reduces the injury penalty by 1 per MedTech level, to a minimum of 0")
+    void getInjuryPenalty_reducedByMedTech() {
+        Person patient = mock(Person.class);
+        when(patient.getTotalInjurySeverity()).thenReturn(4);
+        when(patient.getAdjustedToughness()).thenReturn(1);
+
+        assertEquals(3, AdvancedMedicalAlternateHealing.getInjuryPenalty(patient, 0));
+        assertEquals(1, AdvancedMedicalAlternateHealing.getInjuryPenalty(patient, 2));
+        assertEquals(0, AdvancedMedicalAlternateHealing.getInjuryPenalty(patient, 5));
+        assertEquals(3, AdvancedMedicalAlternateHealing.getInjuryPenalty(patient, -2));
+    }
+
+    @Test
     @DisplayName("getMiscPenalty applies trauma surgeon, prosthetic, and prosthetic technician modifiers")
     void getMiscPenalty_appliesAllRelevantModifiers() throws Exception {
         Set<BodyLocation> prostheticPenalties = Set.of(RIGHT_HAND);

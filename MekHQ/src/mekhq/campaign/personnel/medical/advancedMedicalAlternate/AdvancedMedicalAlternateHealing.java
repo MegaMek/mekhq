@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.MEDICAL_COMPLICATIO
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
+import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_CYBERNETICS;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
@@ -147,7 +148,7 @@ public class AdvancedMedicalAlternateHealing {
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
-            attemptHealing(campaign, patient, patient, modifiers, prostheticPenalties, 0, injury,
+            attemptHealing(campaign, patient, patient, modifiers, prostheticPenalties, 0, 0, injury,
                   healingSPAOptions, today, true);
         }
     }
@@ -264,9 +265,37 @@ public class AdvancedMedicalAlternateHealing {
         return miscPenalty;
     }
 
-    private static int getCyberneticsLevel(Person healer) {
-        Skill cyberneticsSkill = healer.getSkill(S_TECH_CYBERNETICS);
-        return (cyberneticsSkill == null) ? 0 : cyberneticsSkill.getTotalSkillLevel(healer.getSkillModifierData());
+    /**
+     * Works out the healing penalty caused by the patient's injuries.
+     *
+     * <p>The penalty is the patient's total injury severity, reduced by their adjusted Toughness and by each level the
+     * healer has in MedTech, to a minimum of 0.</p>
+     *
+     * @param patient      the person being treated
+     * @param medTechLevel the healer's MedTech skill level; a negative level gives no reduction
+     *
+     * @return the injury penalty to the healing roll, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getInjuryPenalty(Person patient, int medTechLevel) {
+        int injurySeverity = patient.getTotalInjurySeverity() - patient.getAdjustedToughness();
+        return max(0, injurySeverity - max(0, medTechLevel));
+    }
+
+    /**
+     * @param healer    the person providing care
+     * @param skillName the skill to look up
+     *
+     * @return the healer's total level in the skill, or 0 if they don't have it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getHealerSkillLevel(Person healer, String skillName) {
+        Skill skill = healer.getSkill(skillName);
+        return (skill == null) ? 0 : skill.getTotalSkillLevel(healer.getSkillModifierData());
     }
 
     /**
@@ -292,13 +321,14 @@ public class AdvancedMedicalAlternateHealing {
     private static void performHealingCheck(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
         HealingSPAOptions healingSPAOptions = HealingSPAOptions.from(doctor, patient);
-        int cyberneticsLevel = prostheticPenalties.isEmpty() ? 0 : getCyberneticsLevel(doctor);
+        int cyberneticsLevel = prostheticPenalties.isEmpty() ? 0 : getHealerSkillLevel(doctor, S_TECH_CYBERNETICS);
+        int medTechLevel = getHealerSkillLevel(doctor, S_MEDTECH);
         LocalDate today = campaign.getLocalDate();
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
-            attemptHealing(campaign, patient, doctor, modifiers, prostheticPenalties, cyberneticsLevel, injury,
-                  healingSPAOptions, today, false);
+            attemptHealing(campaign, patient, doctor, modifiers, prostheticPenalties, cyberneticsLevel, medTechLevel,
+                  injury, healingSPAOptions, today, false);
         }
     }
 
@@ -315,7 +345,8 @@ public class AdvancedMedicalAlternateHealing {
      * @param modifiers           A list of target roll modifiers that influence the healing outcome.
      * @param prostheticPenalties A set of body locations where prosthetic-related penalties may apply.
      * @param cyberneticsLevel    The healer's Tech/Cybernetics skill level, which reduces the prosthetic penalty.
-     * @param injury              The injury being treated, which includes severity, location, and status.
+     * @param medTechLevel        The healer's MedTech skill level, which reduces the injury penalty.
+     * @param injury             The injury being treated, which includes severity, location, and status.
      * @param healingSPAOptions   Various special options and attributes influencing the healing process, such as
      *                            holistic care or medical proficiency features.
      * @param today               The current date in the campaign, used for determining the healing progress for
@@ -328,7 +359,8 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static void attemptHealing(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, int cyberneticsLevel,
-          Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today, boolean isUnderAcademyCare) {
+          int medTechLevel, Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today,
+          boolean isUnderAcademyCare) {
         addPathologicInsightModifier(modifiers, injury, healingSPAOptions.hasPathologicInsight());
 
         // If we're performing unassisted healing, recovery time is substantially decreased sevenfold, as per ATOW
@@ -342,7 +374,7 @@ public class AdvancedMedicalAlternateHealing {
 
         if (!injury.isPermanent()) {
             // This needs to be refetched each cycle as the number of concurrent injuries might have changed
-            int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
+            int injuryPenalty = getInjuryPenalty(patient, medTechLevel);
 
             int healingDelta = healingSPAOptions.hasHolisticCareSPA() && randomInt(20) == 0 ? -2 : -1;
             injury.changeTime(healingDelta);
