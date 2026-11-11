@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javax.swing.JFrame;
 
+import jakarta.annotation.Nullable;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -567,6 +568,67 @@ public class FileDialogs {
     public static Optional<File> saveFinancesCSV(JFrame frame, Campaign campaign) {
         return saveWithBackup(frame, getTextAt("dlgSaveFinancesCSV.title"), MekHQ.getFinancesDirectory(),
               getDefaultFilename(campaign, getTextAt("dlgSaveFinancesCSV.fileSuffix")), FileType.CSV);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.json</code> file to export contract offers to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ContractOffers.json as default filename.
+     */
+    public static Optional<File> saveContracts(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveContracts.title"), MekHQ.getContractsDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveContracts.fileSuffix")), FileType.JSON);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.json</code> file of exported contract offers to
+     * import.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openContracts(JFrame frame) {
+        Optional<File> value = GUI.fileDialogOpen(frame,
+              getTextAt("dlgOpenContracts.title"),
+              FileType.JSON,
+              MekHQ.getContractsDirectory().getValue());
+
+        value.ifPresent(x -> MekHQ.getContractsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.pdf</code> file to export contract offers to.
+     * Uses <code>[Campaign Name]</code><code>[Date]</code>_ContractOffers.pdf as default filename.
+     */
+    public static Optional<File> saveContractsPDF(JFrame frame, Campaign campaign) {
+        return saveWithBackup(frame, getTextAt("dlgSaveContractsPDF.title"), MekHQ.getContractsDirectory(),
+              getDefaultFilename(campaign, getTextAt("dlgSaveContractsPDF.fileSuffix")), FileType.PDF);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a <code>.pdf</code> file to export glossary entries to.
+     * The glossary is not tied to a campaign, so the default filename is given rather than built from one.
+     *
+     * @param frame           the dialog's parent frame, or {@code null} for none
+     * @param defaultFilename the default filename, excluding its extension
+     *
+     * @return the file the user chose, or <code>Optional.empty</code> if the dialog was cancelled
+     */
+    public static Optional<File> saveGlossaryPDF(@Nullable JFrame frame, String defaultFilename) {
+        return saveWithBackup(frame, getTextAt("dlgSaveGlossaryPDF.title"), MekHQ.getGlossaryDirectory(),
+              defaultFilename, FileType.PDF);
+    }
+
+    /**
+     * Displays a dialog window from which the user can choose where to save a copy of one of MekHQ's guides.
+     *
+     * @param frame           the dialog's parent frame, or {@code null} for none
+     * @param defaultFilename the default filename, excluding its extension
+     *
+     * @return the file the user chose, or <code>Optional.empty</code> if the dialog was cancelled
+     */
+    public static Optional<File> saveGuideCopy(@Nullable JFrame frame, String defaultFilename) {
+        return saveWithBackup(frame, getTextAt("dlgSaveGuideCopy.title"), MekHQ.getGlossaryDirectory(),
+              defaultFilename, FileType.PDF);
     }
 
     /**

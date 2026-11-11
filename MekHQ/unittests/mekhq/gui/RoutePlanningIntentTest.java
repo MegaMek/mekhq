@@ -299,6 +299,58 @@ class RoutePlanningIntentTest {
         assertSame(origin, initializedIntent.getOrigin());
     }
 
+    @Test
+    void inSystemCourseRunsBetweenTwoWorldsWithoutAJump() {
+        PlanetarySystem home = system("Home");
+        Planet departure = world("departure", home);
+        Planet destination = world("destination", home);
+        RoutePlanningIntent intent = new RoutePlanningIntent(home);
+
+        assertTrue(intent.plotInSystem(departure, destination).changed());
+
+        JumpPath course = intent.getJumpPath();
+        assertIterableEquals(List.of(home), course.getSystems());
+        assertEquals(0, course.getJumps());
+        assertSame(departure, course.getOriginPlanet());
+        assertSame(destination, course.getTargetPlanet());
+        assertTrue(course.isInSystemTransfer());
+        assertEquals(home, intent.getOrigin());
+        assertIterableEquals(List.of(home), intent.getRequestedStops());
+    }
+
+    @Test
+    void inSystemCourseFromTheJumpPointHasNoDepartureWorld() {
+        PlanetarySystem home = system("Home");
+        Planet destination = world("destination", home);
+        RoutePlanningIntent intent = new RoutePlanningIntent(home);
+
+        assertTrue(intent.plotInSystem(null, destination).changed());
+
+        JumpPath course = intent.getJumpPath();
+        assertNull(course.getOriginPlanet());
+        assertSame(destination, course.getTargetPlanet());
+        assertFalse(course.isInSystemTransfer(), "Without a departure world the course is an inbound leg");
+    }
+
+    @Test
+    void inSystemCourseNeedsADifferentWorldOfTheSameSystem() {
+        PlanetarySystem home = system("Home");
+        Planet departure = world("departure", home);
+        Planet elsewhere = world("elsewhere", system("Elsewhere"));
+        RoutePlanningIntent intent = new RoutePlanningIntent(home);
+
+        assertFalse(intent.plotInSystem(departure, departure).changed());
+        assertFalse(intent.plotInSystem(departure, elsewhere).changed());
+        assertFalse(intent.plotInSystem(departure, null).changed());
+        assertTrue(intent.getJumpPath().isEmpty());
+    }
+
+    private static Planet world(String id, PlanetarySystem system) {
+        Planet planet = new Planet(id);
+        planet.setParentSystem(system);
+        return planet;
+    }
+
     private static PlanetarySystem system(String name) {
         return new PlanetarySystem(name);
     }

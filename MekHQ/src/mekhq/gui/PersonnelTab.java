@@ -70,9 +70,9 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -82,14 +82,12 @@ import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.tables.MHQTable;
-import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.FamilyTreeDialog;
-import mekhq.gui.dialog.QuickTrainDialog;
+import mekhq.gui.dialog.trainingConsole.TrainingConsole;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
@@ -286,35 +284,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
-        // Action buttons: Quick, and Mass training
-        RoundedJButton btnQuickTrain = new RoundedJButton(resourceMap.getString("btnQuickTrain.text"));
-        btnQuickTrain.setToolTipText(resourceMap.getString("btnQuickTrain.toolTipText"));
-        btnQuickTrain.addActionListener(e -> {
-            List<Person> selectedPersons = getSelectedPersons();
-            QuickTrain.QuickTrainOptions options = QuickTrain.QuickTrainOptions.buildQuickTrainOptions(
-                  getCampaignOptions());
-            QuickTrainDialog dialog = new QuickTrainDialog(getCampaign(), selectedPersons.isEmpty(), options);
-            if (!dialog.isCancel()) {
-                int targetSkillLevel = dialog.getSpinnerValue();
-                options = dialog.getSelectedOptions();
-
-                QuickTrain.processQuickTraining(selectedPersons,
-                      targetSkillLevel,
-                      getCampaign(),
-                      options,
-                      dialog.isContinuousTraining());
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 7;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(btnQuickTrain, gridBagConstraints);
-
         btnFamilyTree = new RoundedJButton(resourceMap.getString("btnFamilyTree.text"));
         btnFamilyTree.setToolTipText(resourceMap.getString("btnFamilyTree.toolTipText"));
         btnFamilyTree.setEnabled(false);
@@ -337,9 +306,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(btnFamilyTree, gridBagConstraints);
 
-        RoundedJButton btnMassTraining = new RoundedJButton(resourceMap.getString("btnMassTraining.text"));
-        btnMassTraining.setToolTipText(resourceMap.getString("btnMassTraining.toolTipText"));
-        btnMassTraining.addActionListener(e -> new BatchXPDialog(getFrame(), getCampaign()).setVisible(true));
+        // The Training Console: every way to spend XP, for any number of people, with the selection carried in
+        RoundedJButton btnTrainingConsole = new RoundedJButton(resourceMap.getString("btnTrainingConsole.text"));
+        btnTrainingConsole.setToolTipText(resourceMap.getString("btnTrainingConsole.toolTipText"));
+        btnTrainingConsole.addActionListener(e -> TrainingConsole.showFor(getFrame(), getCampaign(),
+              getSelectedPersons()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 9;
         gridBagConstraints.gridy = 0;
@@ -348,11 +319,16 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        add(btnMassTraining, gridBagConstraints);
+        add(btnTrainingConsole, gridBagConstraints);
 
         personnelTable = new MHQTable<>(new PersonnelTableModel(getCampaign()));
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         personnelTable.getSelectionModel().addListSelectionListener(ev -> {
+            // Wait for the final event: a filter or sort restores the selection through adjusting events, and
+            // rebuilding the view during that restore can clear the table's cached selection mid-restore
+            if (ev.getValueIsAdjusting()) {
+                return;
+            }
             refreshPersonnelView();
             // The family tree is drawn around a single person, so it needs exactly one selection
             btnFamilyTree.setEnabled(getSelectedPersons().size() == 1);
@@ -575,7 +551,7 @@ public final class PersonnelTab extends CampaignGuiTab {
      */
     public void refreshPersonnelList() {
         // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
-        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // worker grows it throws ConcurrentModificationException. The BulkGenerationCompletedEvent fired when the
         // generation completes reschedules this refresh against the finished campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
@@ -686,7 +662,7 @@ public final class PersonnelTab extends CampaignGuiTab {
      * @since 0.51.01
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         personnelListScheduler.schedule();
     }
 

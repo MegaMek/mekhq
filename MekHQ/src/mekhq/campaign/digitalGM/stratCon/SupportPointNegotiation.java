@@ -152,7 +152,7 @@ public class SupportPointNegotiation {
     private static void processContractSupportPoints(Campaign campaign, AbstractContract contract,
           List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = isInitialNegotiation ? contract.getMaximumSupportPoints() : contract.getScale();
+        int maxSupportPoints = contract.getMaximumSupportPoints();
 
         FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
         double regard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);

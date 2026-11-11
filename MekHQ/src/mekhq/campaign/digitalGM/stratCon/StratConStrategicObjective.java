@@ -52,6 +52,8 @@ public class StratConStrategicObjective {
     // Point of interest objectives follow their point of interest by ID rather than by hex: several points of interest
     // can share a hex (and a facility), and one can be moved, so these objectives leave objectiveCoords unset.
     private String pointOfInterestId;
+    // Kept so the objective still knows what its point of interest was once that point of interest is off the map.
+    private String pointOfInterestTypeId;
 
     public StratConCoords getObjectiveCoords() {
         return objectiveCoords;
@@ -91,6 +93,18 @@ public class StratConStrategicObjective {
 
     public void setPointOfInterestId(@Nullable String pointOfInterestId) {
         this.pointOfInterestId = pointOfInterestId;
+    }
+
+    /**
+     * @return the type ID of the point of interest a {@link StrategicObjectiveType#PointOfInterest} objective is tied
+     *       to, or {@code null} for any other kind of objective, or one from before the type was recorded
+     */
+    public @Nullable String getPointOfInterestTypeId() {
+        return pointOfInterestTypeId;
+    }
+
+    public void setPointOfInterestTypeId(@Nullable String pointOfInterestTypeId) {
+        this.pointOfInterestTypeId = pointOfInterestTypeId;
     }
 
     public int getDesiredObjectiveCount() {

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -50,20 +51,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
+import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -72,6 +61,8 @@ import javax.swing.table.TableRowSorter;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import megamek.common.ui.FastJScrollPane;
@@ -81,11 +72,9 @@ import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
@@ -295,12 +284,14 @@ public class SalariesPages {
 
         for (final SkillLevel skillLevel : skillLevels) {
             final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(), null, true);
-            label.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
+            label.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+                  "lblSkillLevelMultiplier.tooltip")));
             label.addMouseListener(createTipPanelUpdater("SkillLevelMultiplier"));
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
             final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, 0, 0, 100, 0.1, true);
-            spinner.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
+            spinner.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+                  "lblSkillLevelMultiplier.tooltip")));
             spinner.addMouseListener(createTipPanelUpdater("SkillLevelMultiplier"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
         }
@@ -374,7 +365,7 @@ public class SalariesPages {
     private JLabel createRoleSalaryLabel(PersonnelRole personnelRole) {
         String componentName = personnelRole.toString().replace(" ", "");
         JLabel label = new JLabel(personnelRole.toString());
-        label.setToolTipText(personnelRole.getDescription(false));
+        label.setToolTipText(wordWrap(personnelRole.getDescription(false)));
         label.addMouseListener(createTipPanelUpdater(null, personnelRole.getDescription(false)));
         label.setName("lbl" + componentName);
 
@@ -384,7 +375,7 @@ public class SalariesPages {
     private JSpinner createRoleSalarySpinner(PersonnelRole personnelRole) {
         String componentName = personnelRole.toString().replace(" ", "");
         JSpinner spinner = new JSpinner();
-        spinner.setToolTipText(personnelRole.getDescription(false));
+        spinner.setToolTipText(wordWrap(personnelRole.getDescription(false)));
         spinner.addMouseListener(createTipPanelUpdater(null, personnelRole.getDescription(false)));
         spinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
         spinner.setName("spn" + componentName);

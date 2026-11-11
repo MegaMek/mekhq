@@ -72,8 +72,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.RepairStatusChangedEvent;
@@ -117,6 +117,7 @@ import mekhq.service.mrms.MRMSService;
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(RepairTab.class);
+    private static final String PARTS_ACQUISITION_REFRESH = "RepairTab.partsAcquisition";
 
     private JTable servicedUnitTable;
     private JTable taskTable;
@@ -300,7 +301,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        // Tall enough for a tech's name, skills, repair abilities and day
+        // The minimum row height; the renderer grows a row when its tech's description needs more lines
         techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
@@ -422,7 +423,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(UIUtil.scaleForGUI(70));
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
-        taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
+        taskTable.getSelectionModel().addListSelectionListener(ev -> {
+            if (!ev.getValueIsAdjusting()) {
+                taskTableValueChanged();
+            }
+        });
         taskSorter = new TableRowSorter<>(taskModel);
         taskSorter.setComparator(0, new TaskSorter());
         taskTable.setRowSorter(taskSorter);
@@ -655,11 +660,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void servicedUnitTableValueChanged(ListSelectionEvent evt) {
-        if (ignoreUnitTable) {
+        // Wait for the final event: a filter or sort restores the selection through adjusting events, and reacting
+        // during that restore can clear the table's cached selection mid-restore
+        if (ignoreUnitTable || evt.getValueIsAdjusting()) {
             return;
         }
+        // The parts acquisition list covers every serviceable unit, whichever is selected, so it is not rebuilt here
         refreshTaskList();
-        refreshPartsAcquisition();
         int selected = servicedUnitTable.getSelectedRow();
         txtServicedUnitView.setText("");
         if (selected > -1) {
@@ -684,6 +691,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void techTableValueChanged(ListSelectionEvent evt) {
+        if (evt.getValueIsAdjusting()) {
+            return;
+        }
         updateTechTarget();
 
         taskTable.repaint();
@@ -850,7 +860,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the serviceable check
         // iterates every unit's part list, which the worker is concurrently appending to - reading it here threw
         // ConcurrentModificationException from the modal progress dialog's event pump. The generation fires an
-        // OrganizationChangedEvent when it completes, which reschedules this refresh against the finished campaign.
+        // BulkGenerationCompletedEvent when it completes, which reschedules this refresh against the finished campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] repair serviced unit refresh skipped - bulk generation in progress");
             return;
@@ -964,7 +974,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     private void refreshTechsList() {
         // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
-        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        // BulkGenerationCompletedEvent fired when it completes reschedules this refresh.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
         }
@@ -1035,13 +1045,29 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
 
+    /**
+     * Rebuilds the parts acquisition list behind the Parts Acquisition button. The rebuild checks the stock and the
+     * acquisition target of every part every serviceable unit is missing, which takes most of a second on a large
+     * campaign, so while this tab is hidden it waits until the tab is shown.
+     */
     public void refreshPartsAcquisition() {
-        refreshPartsAcquisitionService(true);
+        refreshWhenShown(PARTS_ACQUISITION_REFRESH, () -> refreshPartsAcquisitionService(true));
+    }
+
+    /**
+     * Brings the parts acquisition list up to date for a caller that reads it while this tab may be hidden, such as
+     * the Acquisitions dialog opened from the Command Center.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void ensurePartsAcquisitionCurrent() {
+        runHeldRefresh(PARTS_ACQUISITION_REFRESH);
     }
 
     public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
         // Rebuilding walks every unit's parts, which a bulk generation is mutating off the EDT; the
-        // OrganizationChangedEvent fired when it completes triggers the rebuild instead.
+        // BulkGenerationCompletedEvent fired when it completes triggers the rebuild instead.
         if (rebuildPartsList && getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] repair parts acquisition refresh skipped - bulk generation in progress");
             return;
@@ -1079,7 +1105,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      * @since 0.51.01
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         servicedUnitListScheduler.schedule();
         techsScheduler.schedule();
     }

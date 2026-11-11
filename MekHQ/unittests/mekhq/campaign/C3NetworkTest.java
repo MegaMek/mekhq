@@ -33,8 +33,13 @@
 package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -51,8 +56,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for C3i, NC3, and Nova CEWS network functionality in Campaign. These tests verify fixes for issue #8648 and
- * Nova CEWS support.
+ * Tests for C3 master/slave, C3i, NC3, and Nova CEWS network functionality in Campaign. These tests verify fixes for
+ * issue #8648, issue #6611, and Nova CEWS support.
  */
 class C3NetworkTest {
 
@@ -68,6 +73,8 @@ class C3NetworkTest {
         doCallRealMethod().when(force).getAvailableC3iNetworks();
         doCallRealMethod().when(force).getAvailableNC3Networks();
         doCallRealMethod().when(force).getAvailableNovaCEWSNetworks();
+        doCallRealMethod().when(force).getC3Nodes(any());
+        doCallRealMethod().when(force).removeUnitsFromC3Master(any(), any());
 
         // Those methods aggregate over the force's detachments via allUnits(); return our test units list.
         when(force.allUnits()).thenReturn(units);
@@ -136,6 +143,119 @@ class C3NetworkTest {
         when(mockUnit.getFormationId()).thenReturn(formationId);
 
         return mockUnit;
+    }
+
+    /**
+     * Creates a mock Unit with a mock Entity configured for C3 master/slave testing.
+     *
+     * @param c3UUID       the entity's own C3 UUID
+     * @param c3MasterUUID the C3 UUID of the entity's master, or {@code null} if unlinked
+     *
+     * @return configured mock Unit
+     */
+    private Unit createMockC3Unit(String c3UUID, String c3MasterUUID) {
+        Entity mockEntity = mock(Entity.class);
+        when(mockEntity.getC3UUIDAsString()).thenReturn(c3UUID);
+        when(mockEntity.getC3MasterIsUUIDAsString()).thenReturn(c3MasterUUID);
+
+        Unit mockUnit = mock(Unit.class);
+        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+        when(mockUnit.getEntity()).thenReturn(mockEntity);
+        when(mockUnit.getFormationId()).thenReturn(1);
+
+        return mockUnit;
+    }
+
+    @Nested
+    @DisplayName("C3 Master Node Tests")
+    class C3MasterNodeTests {
+
+        @Test
+        @DisplayName("getC3Nodes returns only units linked to the master")
+        void testGetC3NodesReturnsLinkedUnits() {
+            // Arrange
+            Unit master = createMockC3Unit("master", null);
+            Unit slave1 = createMockC3Unit("slave1", "master");
+            Unit slave2 = createMockC3Unit("slave2", "master");
+            Unit otherSlave = createMockC3Unit("otherSlave", "otherMaster");
+            Unit unlinked = createMockC3Unit("unlinked", null);
+            units.addAll(List.of(master, slave1, slave2, otherSlave, unlinked));
+
+            // Act
+            List<Unit> nodes = force.getC3Nodes(master);
+
+            // Assert
+            assertEquals(List.of(slave1, slave2), nodes);
+        }
+
+        @Test
+        @DisplayName("getC3Nodes excludes a master that is slaved to itself")
+        void testGetC3NodesExcludesSelfSlavedMaster() {
+            // Arrange - a company-level master is slaved to itself
+            Unit master = createMockC3Unit("master", "master");
+            Unit subMaster = createMockC3Unit("subMaster", "master");
+            units.addAll(List.of(master, subMaster));
+
+            // Act
+            List<Unit> nodes = force.getC3Nodes(master);
+
+            // Assert
+            assertEquals(List.of(subMaster), nodes);
+        }
+
+        @Test
+        @DisplayName("getC3Nodes returns an empty list when the master has no C3 UUID")
+        void testGetC3NodesEmptyWithoutC3UUID() {
+            // Arrange - a null master UUID must not match units with a null master reference
+            Unit master = createMockC3Unit(null, null);
+            Unit unlinked = createMockC3Unit("unlinked", null);
+            units.addAll(List.of(master, unlinked));
+
+            // Act
+            List<Unit> nodes = force.getC3Nodes(master);
+
+            // Assert
+            assertTrue(nodes.isEmpty());
+        }
+
+        @Test
+        @DisplayName("removeUnitsFromC3Master unlinks every node and the master's self-link")
+        void testRemoveUnitsFromC3MasterClearsNodesAndSelfLink() {
+            // Arrange
+            Unit master = createMockC3Unit("master", "master");
+            Unit slave = createMockC3Unit("slave", "master");
+            Unit otherSlave = createMockC3Unit("otherSlave", "otherMaster");
+            units.addAll(List.of(master, slave, otherSlave));
+
+            // Act
+            force.removeUnitsFromC3Master(master, null);
+
+            // Assert
+            verify(slave.getEntity()).setC3MasterIsUUIDAsString(null);
+            verify(slave.getEntity()).setC3Master(null, true);
+            verify(master.getEntity()).setC3MasterIsUUIDAsString(null);
+            verify(master.getEntity()).setC3Master(null, true);
+            verify(otherSlave.getEntity(), never()).setC3MasterIsUUIDAsString(any());
+            verify(otherSlave.getEntity(), never()).setC3Master(any(Entity.class), anyBoolean());
+        }
+
+        @Test
+        @DisplayName("removeUnitsFromC3Master keeps a master's link to its own company-level master")
+        void testRemoveUnitsFromC3MasterKeepsUpstreamLink() {
+            // Arrange - a lance-level master slaved to a company commander
+            Unit companyMaster = createMockC3Unit("companyMaster", "companyMaster");
+            Unit lanceMaster = createMockC3Unit("lanceMaster", "companyMaster");
+            Unit slave = createMockC3Unit("slave", "lanceMaster");
+            units.addAll(List.of(companyMaster, lanceMaster, slave));
+
+            // Act
+            force.removeUnitsFromC3Master(lanceMaster, null);
+
+            // Assert
+            verify(slave.getEntity()).setC3MasterIsUUIDAsString(null);
+            verify(lanceMaster.getEntity(), never()).setC3MasterIsUUIDAsString(any());
+            verify(lanceMaster.getEntity(), never()).setC3Master(any(Entity.class), anyBoolean());
+        }
     }
 
     @Nested

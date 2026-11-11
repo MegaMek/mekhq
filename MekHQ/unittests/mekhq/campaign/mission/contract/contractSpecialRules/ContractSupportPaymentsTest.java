@@ -193,6 +193,94 @@ class ContractSupportPaymentsTest {
 
     // endregion reimburseStraightSupport
 
+    // region reimburseMonthlyStraightSupport
+
+    @Test
+    void reimburseMonthlyStraightSupportCreditsAndReportsTheShare() {
+        AbstractContract contract = contractWithSupportMultiplier(0.5);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        String expectedNote = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.straightSupport.note",
+              "overhead costs");
+        verify(finances).credit(TransactionType.CONTRACT_PAYMENT, DATE, Money.of(500), expectedNote);
+        String expectedReport = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.straightSupport.report",
+              Money.of(500).toAmountAndSymbolString(), "overhead costs");
+        verify(campaign).addReport(FINANCES, expectedReport);
+    }
+
+    @Test
+    void reimburseMonthlyStraightSupportDoesNothingWhenNoContractIsActive() {
+        when(campaign.getActiveContracts()).thenReturn(Collections.emptyList());
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        verifyNoInteractions(finances);
+        verify(campaign, never()).addReport(any(), anyString());
+    }
+
+    @Test
+    void reimburseMonthlyStraightSupportNeverPaysBackMoreThanTheCost() {
+        AbstractContract contract = contractWithSupportMultiplier(1.5);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(DATE), eq(Money.of(1000)), anyString());
+    }
+
+    @Test
+    void reimburseMonthlyStraightSupportCapsTheDoubledShareAtTheCost() {
+        AbstractContract contract = contractWithSupportMultiplier(1.0);
+        when(contract.usesSpecialRule(DOUBLE_SUPPORT_PAYOUTS)).thenReturn(true);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        // 1000 * 1.0, doubled to 2000, is capped at the 1000 paid.
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(DATE), eq(Money.of(1000)), anyString());
+    }
+
+    @Test
+    void reimburseMonthlyStraightSupportDoublesAShareBelowTheCap() {
+        AbstractContract contract = contractWithSupportMultiplier(0.25);
+        when(contract.usesSpecialRule(DOUBLE_SUPPORT_PAYOUTS)).thenReturn(true);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        // 1000 * 0.25 = 250, doubled to 500.
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(DATE), eq(Money.of(500)), anyString());
+    }
+
+    @Test
+    void reimburseMonthlyStraightSupportWithholdsSilentlyUnderNoInContractSupport() {
+        AbstractContract contract = contractWithSupportMultiplier(0.5);
+        when(contract.usesSpecialRule(NO_IN_CONTRACT_SUPPORT)).thenReturn(true);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseMonthlyStraightSupport(campaign, Money.of(1000), "overhead costs");
+
+        verify(contract).changeWithheldSupportPayments(Money.of(500));
+        verifyNoInteractions(finances);
+        verify(campaign, never()).addReport(any(), anyString());
+    }
+
+    /** Repairs are not capped: only the monthly overhead and food and housing refunds are. */
+    @Test
+    void reimburseStraightSupportDoesNotCapRepairs() {
+        AbstractContract contract = contractWithSupportMultiplier(1.0);
+        when(contract.usesSpecialRule(DOUBLE_SUPPORT_PAYOUTS)).thenReturn(true);
+        when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        ContractSupportPayments.reimburseStraightSupport(campaign, Money.of(1000), "Repairs");
+
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(DATE), eq(Money.of(2000)), anyString());
+    }
+
+    // endregion reimburseMonthlyStraightSupport
+
     // region payBattlefieldLoss
 
     @Test

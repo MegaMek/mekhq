@@ -128,7 +128,7 @@ class ChaosContractDeterminationPayTest {
 
     private static AbstractContract contract(double exactScale, double basePayMultiplier) {
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(exactScale));
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundScale(exactScale));
         when(contract.getExactScale()).thenReturn(exactScale);
         when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
               ChaosContractDeterminationScale.getEconomicScale(exactScale, invocation.getArgument(0)));
@@ -277,12 +277,20 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void upkeepOverheadAndFoodAndHousingAreAllCovered() {
+        void upkeepIsCovered() {
             when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.of(5_000_000));
+
+            assertEquals(Money.of(5_000_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+        }
+
+        /** Straight support pays back overhead and food and housing, so Base Pay leaves them out. */
+        @Test
+        void overheadAndFoodAndHousingAreNotCovered() {
+            campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
             when(accountant.getOverheadExpenses()).thenReturn(Money.of(30_000));
             projectedMonthlyFoodAndHousing(12_000);
 
-            assertEquals(Money.of(5_042_000), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
+            assertEquals(Money.zero(), payScheme.getMonthlyPay(campaign, contract(3, 1.0)));
         }
 
         @Test
@@ -295,9 +303,9 @@ class ChaosContractDeterminationPayTest {
             projectedMonthlyFoodAndHousing(3_000);
             AbstractContract contract = contract(3, 1.0);
 
-            // 100,000 + 2,000 + 5,000 + 3,000
-            assertEquals(Money.of(110_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign, contract));
-            assertEquals(Money.of(110_000), payScheme.getMonthlyPay(campaign, contract));
+            // 100,000 + 2,000; overhead and food and housing are left out
+            assertEquals(Money.of(102_000), ChaosContractDeterminationPay.getCoveredMonthlyCosts(campaign, contract));
+            assertEquals(Money.of(102_000), payScheme.getMonthlyPay(campaign, contract));
         }
 
         @ParameterizedTest
@@ -554,11 +562,19 @@ class ChaosContractDeterminationPayTest {
     @Nested
     class FractionalScale {
         @Test
-        void withoutTheOptionPayRoundsScaleUp() {
+        void withoutTheOptionPayRoundsScaleToTheNearestWhole() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
 
-            // Scale 2.3 is paid as Scale 3
-            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+            // Scale 2.6 is paid as Scale 3
+            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(2.6, 1.0)));
+        }
+
+        @Test
+        void withoutTheOptionPayRoundsAPartScaleDown() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
+
+            // Scale 2.3 is paid as Scale 2
+            assertEquals(Money.of(1_000), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
         }
 
         @Test
@@ -590,8 +606,8 @@ class ChaosContractDeterminationPayTest {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
             campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
-            // Scale 2.3 rolls 3 times the tracks: 1150 / 3 (rounded)
-            assertEquals(Money.of(383), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+            // Scale 2.6 rolls 3 times the tracks: 1300 / 3 (rounded)
+            assertEquals(Money.of(433), payScheme.getCombatPay(campaign, contract(2.6, 1.0)));
         }
 
         @Test

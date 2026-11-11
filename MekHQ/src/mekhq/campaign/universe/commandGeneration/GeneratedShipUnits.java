@@ -56,7 +56,8 @@ final class GeneratedShipUnits {
     }
 
     /**
-     * Adds one hull to the hangar with a crew.
+     * Adds one hull to the hangar with a crew. The crew start on the campaign's rank system, as the rest of the
+     * command's personnel do.
      *
      * @param campaign the campaign that receives the ship
      * @param hull     the design

@@ -58,8 +58,8 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.GMModeEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -738,7 +738,7 @@ public final class FinancesTab extends CampaignGuiTab {
      * {@link #refreshFinancialReport()}.</p>
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 

@@ -165,12 +165,10 @@ public final class SupportPersonnelGenerator {
             LOGGER.info("[CompanyGen][Pipeline][Support] {} support vehicle(s) the stage will add are counted"
                         + " toward the mechanics", vehiclesStillToCome);
         }
-        Faction faction = resolveFaction(campaign, options);
-        int supportRank = RulesetRankAssigner.supportRankForFaction(faction);
-        // Resolve the rank system once so every Person we create renders rank names through the
-        // target faction's table — a Clan-generated tech needs to read as a Clan "Warrior" tech,
-        // not an IS "Corporal", even when generated into a Mercenary campaign.
-        RankSystem targetRankSystem = faction.getRankSystem();
+        Faction faction = resolveFaction(campaign);
+        // Every Person we create reads rank names from the rank system the player chose in Campaign
+        // Options, the same table as the rest of the command.
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
         RankValidator rankValidator = new RankValidator();
 
         List<Person> generated = new ArrayList<>();
@@ -194,7 +192,7 @@ public final class SupportPersonnelGenerator {
 
         // A freshly generated command should not open with an HR-strain turnover penalty, so top up
         // administrators until the strain modifier reaches zero (no-op when the rule is off).
-        administrators += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank, faction,
+        administrators += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, faction,
               targetRankSystem, rankValidator, generated);
 
         int totalTechs = mekTechs + mechanics + aeroTeks + baTechs;
@@ -233,18 +231,20 @@ public final class SupportPersonnelGenerator {
         // NONE (or null) = the "Random" picker option: roll each person's level individually (below).
         SkillLevel skillLevel = options.getSupportPersonnelSkillLevels().get(role);
 
+        int created = 0;
         for (int i = 0; i < count; i++) {
             // Resolve the level here rather than inside experienceLevelFor, so the rank can follow the
             // level this person actually rolled. With the "Random" picker each one differs.
             SkillLevel rolled = resolveRandom(skillLevel);
-            Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
-                  RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
-                  faction, targetRankSystem, rankValidator);
+            Person person = createAndRecruit(campaign, options, skillGen, role, toExperienceLevel(rolled),
+                  RulesetRankAssigner.supportRankFor(role, rolled, faction), faction, targetRankSystem,
+                  rankValidator);
             if (person != null) {
                 out.add(person);
+                created++;
             }
         }
-        return count;
+        return created;
     }
 
     /**
@@ -256,7 +256,7 @@ public final class SupportPersonnelGenerator {
      *
      * @return the number of active personnel with that primary role
      */
-    static int countActiveByRole(Campaign campaign, PersonnelRole role) {
+    public static int countActiveByRole(Campaign campaign, PersonnelRole role) {
         int matches = 0;
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole() == role) {
@@ -274,7 +274,7 @@ public final class SupportPersonnelGenerator {
      * @return the number of administrators added
      */
     private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CommandGenerationOptions options,
-          AbstractSkillGenerator skillGen, int supportRank, Faction faction,
+          AbstractSkillGenerator skillGen, Faction faction,
           RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_HR_STRAIN)) {
             return 0;
@@ -284,8 +284,10 @@ public final class SupportPersonnelGenerator {
 
         int added = 0;
         while (RetirementDefectionTracker.getHRStrainModifier(campaign) > 0 && added < MAX_HR_STRAIN_TOPUP) {
-            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR,
-                  experienceLevelFor(skillLevel), supportRank, faction, targetRankSystem, rankValidator);
+            SkillLevel rolled = resolveRandom(skillLevel);
+            Person admin = createAndRecruit(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR,
+                  toExperienceLevel(rolled), RulesetRankAssigner.supportRankFor(PersonnelRole.ADMINISTRATOR, rolled,
+                        faction), faction, targetRankSystem, rankValidator);
             if (admin == null) {
                 break;
             }
@@ -308,7 +310,7 @@ public final class SupportPersonnelGenerator {
             return 0;
         }
         int needed = ASTECHS_PER_TECH * totalTechs;
-        return applyAssistant(campaign, skillGen, PersonnelRole.ASTECH, needed,
+        return applyAssistant(campaign, options, skillGen, PersonnelRole.ASTECH, needed,
               options.isAstechsAsPersonnel(),
               options.getAstechSkillLevel(), faction, targetRankSystem, rankValidator,
               out, AssistantPool.ASTECH);
@@ -324,7 +326,7 @@ public final class SupportPersonnelGenerator {
             return 0;
         }
         int needed = MEDICS_PER_DOCTOR * totalDoctors;
-        return applyAssistant(campaign, skillGen, PersonnelRole.MEDIC, needed,
+        return applyAssistant(campaign, options, skillGen, PersonnelRole.MEDIC, needed,
               options.isMedicsAsPersonnel(),
               options.getMedicSkillLevel(), faction, targetRankSystem, rankValidator,
               out, AssistantPool.MEDIC);
@@ -332,8 +334,8 @@ public final class SupportPersonnelGenerator {
 
     private enum AssistantPool { ASTECH, MEDIC }
 
-    private static int applyAssistant(Campaign campaign, AbstractSkillGenerator skillGen,
-          PersonnelRole role, int needed, boolean asPersonnel, SkillLevel skillLevel,
+    private static int applyAssistant(Campaign campaign, CommandGenerationOptions options,
+          AbstractSkillGenerator skillGen, PersonnelRole role, int needed, boolean asPersonnel, SkillLevel skillLevel,
           Faction faction, RankSystem targetRankSystem, RankValidator rankValidator,
           List<Person> out, AssistantPool pool) {
         if (needed <= 0) {
@@ -341,16 +343,18 @@ public final class SupportPersonnelGenerator {
         }
         if (asPersonnel) {
             // NONE (or null) = "Random": roll each assistant's level individually.
+            int created = 0;
             for (int i = 0; i < needed; i++) {
                 SkillLevel rolled = resolveRandom(skillLevel);
-                Person person = createAndRecruit(campaign, skillGen, role, toExperienceLevel(rolled),
-                      RulesetRankAssigner.supportRankFor(role, rolled, campaign.getPlayerForce().getFaction()),
-                      faction, targetRankSystem, rankValidator);
+                Person person = createAndRecruit(campaign, options, skillGen, role, toExperienceLevel(rolled),
+                      RulesetRankAssigner.supportRankFor(role, rolled, faction), faction, targetRankSystem,
+                      rankValidator);
                 if (person != null) {
                     out.add(person);
+                    created++;
                 }
             }
-            return needed;
+            return created;
         }
         // Pool mode: anonymous slots in the campaign's astech / medic pool. No Persons created.
         switch (pool) {
@@ -362,17 +366,17 @@ public final class SupportPersonnelGenerator {
 
     /**
      * Creates a Person of {@code role}, regenerates their skills at {@code expLvl}, sets their
-     * rank to {@code supportRank}, and recruits them into the campaign. Returns the created
-     * Person, or {@code null} if recruitment failed.
+     * rank to {@code supportRank} when Automatically Assign Ranks is on, and recruits them into the
+     * campaign. Returns the created Person, or {@code null} if recruitment failed.
      *
      * <p>Swaps the Person's rank system to {@code targetRankSystem} before setting the rank index
      * — without that swap, a Mercenary campaign generating Clan support staff would render the
      * Clan-targeted index through the campaign's IS rank table, producing wrong names like
      * "Corporal" instead of the Clan equivalent.</p>
      */
-    private static @Nullable Person createAndRecruit(Campaign campaign, AbstractSkillGenerator skillGen,
-          PersonnelRole role, int expLvl, int supportRank, Faction faction, RankSystem targetRankSystem,
-          RankValidator rankValidator) {
+    private static @Nullable Person createAndRecruit(Campaign campaign, CommandGenerationOptions options,
+          AbstractSkillGenerator skillGen, PersonnelRole role, int expLvl, int supportRank, Faction faction,
+          RankSystem targetRankSystem, RankValidator rankValidator) {
         // A Clan's support castes are Clan-born, so their origin is pinned to the Clan rather than
         // drawn from the campaign's random origin options. That matters for names as much as for
         // descent: Clan personnel carry a given name alone, and a randomly assigned Inner Sphere
@@ -389,7 +393,9 @@ public final class SupportPersonnelGenerator {
         // Shared with the combat path so support staff get the same empty-rung handling. A ladder
         // index that no rank system is obliged to fill - SLDF leaves both 16 and 37 blank in every
         // profession column - otherwise renders as a bare "-" where the rank should be.
-        RulesetRankAssigner.setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
+        if (options.isAutomaticallyAssignRanks()) {
+            RulesetRankAssigner.setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
+        }
         boolean recruited = campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, PrisonerStatus.FREE, true, true, true);
         if (!recruited) {
             LOGGER.warn("[CompanyGen][Pipeline][Support] failed to recruit {} ({})",
@@ -400,22 +406,12 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * Picks the rank-authority faction the same way {@link RulesetRankAssigner#apply} does:
-     * honors {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
-     * to the campaign's faction.
+     * Picks the faction the support staff are organised and ranked as, the same way
+     * {@link RulesetRankAssigner#apply} does: the campaign's faction, set in Campaign Options.
      */
-    static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
-        Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getPlayerForce().getFaction();
-        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
-        Faction resolved = useSpecified ? specifiedFaction : campaignFaction;
-        if (resolved == null) {
-            resolved = campaignFaction;
-        }
-        LOGGER.info("[CompanyGen][Support][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
-              useSpecified,
-              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
-              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+    static Faction resolveFaction(Campaign campaign) {
+        Faction resolved = campaign.getPlayerForce().getFaction();
+        LOGGER.info("[CompanyGen][Support][Faction] campaign faction={} (isClan={} isComStarOrWoB={} isMercenary={})",
               resolved == null ? "null" : resolved.getShortName(),
               resolved != null && resolved.isClan(),
               resolved != null && resolved.isComStarOrWoB(),

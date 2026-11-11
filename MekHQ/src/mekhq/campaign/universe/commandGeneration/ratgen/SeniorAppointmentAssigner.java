@@ -205,6 +205,18 @@ public final class SeniorAppointmentAssigner {
      * @param candidates the people this generation created, from which the posts are filled
      */
     public static void assign(Campaign campaign, Collection<Person> candidates) {
+        assign(campaign, candidates, true);
+    }
+
+    /**
+     * As {@link #assign(Campaign, Collection)}, optionally leaving everyone's rank alone.
+     *
+     * @param campaign   the campaign being generated into
+     * @param candidates the people this generation created, from which the posts are filled
+     * @param promote    whether a post-holder is promoted to outrank their staff; {@code false} when the player
+     *                   turned off Automatically Assign Ranks, so the posts are filled without touching ranks
+     */
+    public static void assign(Campaign campaign, Collection<Person> candidates, boolean promote) {
         if (candidates.isEmpty()) {
             LOGGER.debug("[CompanyGen][Appointments] no generated personnel; nothing to appoint");
             return;
@@ -216,9 +228,9 @@ public final class SeniorAppointmentAssigner {
         int rankCeiling = Math.min(RANK_COLONEL, commanderRankCeiling(existingPersonnel, candidates));
         // Departments first: an overall head is promoted above the heads below them, which only works
         // if those heads already hold the rank they are entitled to.
-        assignDepartmentHeads(campaign, candidates, existingPersonnel, rankCeiling);
+        assignDepartmentHeads(campaign, candidates, existingPersonnel, rankCeiling, promote);
         for (Appointment appointment : Appointment.values()) {
-            assignOne(campaign, appointment, candidates, existingPersonnel, rankCeiling);
+            assignOne(campaign, appointment, candidates, existingPersonnel, rankCeiling, promote);
         }
     }
 
@@ -278,9 +290,10 @@ public final class SeniorAppointmentAssigner {
      * @param candidates        the people this generation created
      * @param existingPersonnel everyone already on the books, used to spot posts that are filled
      * @param rankCeiling       the highest rank a head may be promoted to
+     * @param promote           whether the head is promoted to outrank their staff
      */
     private static void assignDepartmentHeads(Campaign campaign, Collection<Person> candidates,
-          Collection<Person> existingPersonnel, int rankCeiling) {
+          Collection<Person> existingPersonnel, int rankCeiling, boolean promote) {
         Map<PersonnelRole, List<Person>> byDepartment = new LinkedHashMap<>();
         for (Person candidate : candidates) {
             if (candidate == null) {
@@ -318,7 +331,9 @@ public final class SeniorAppointmentAssigner {
             head.setDepartmentHead(true);
             LOGGER.info("[CompanyGen][Appointments] head of {} -> '{}', chosen from {} in the department",
                   role, head.getFullName(), staff.size());
-            promoteToOutrankTheirStaff(head, staff, "head of " + role, rankCeiling);
+            if (promote) {
+                promoteToOutrankTheirStaff(head, staff, "head of " + role, rankCeiling);
+            }
             grantLeadership(head, disciplineSkills, "head of " + role);
         }
     }
@@ -370,7 +385,7 @@ public final class SeniorAppointmentAssigner {
      * qualifies.
      */
     private static void assignOne(Campaign campaign, Appointment appointment, Collection<Person> candidates,
-          Collection<Person> existingPersonnel, int rankCeiling) {
+          Collection<Person> existingPersonnel, int rankCeiling, boolean promote) {
         Person incumbent = firstMatching(existingPersonnel, appointment.isHeldBy);
         if (incumbent != null) {
             LOGGER.debug("[CompanyGen][Appointments] {} left as is; already held by '{}'",
@@ -396,7 +411,9 @@ public final class SeniorAppointmentAssigner {
         LOGGER.info("[CompanyGen][Appointments] {} -> '{}' ({}), chosen from {} eligible",
               appointment.description, bestCandidate.getFullName(),
               bestCandidate.getPrimaryRole(), eligibleStaff.size());
-        promoteToOutrankTheirStaff(bestCandidate, eligibleStaff, appointment.description, rankCeiling);
+        if (promote) {
+            promoteToOutrankTheirStaff(bestCandidate, eligibleStaff, appointment.description, rankCeiling);
+        }
         grantLeadership(bestCandidate, appointment.disciplineSkills, appointment.description);
     }
 

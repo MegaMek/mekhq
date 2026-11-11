@@ -463,7 +463,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-                updateArmorKits(scenario, escapee);
+                updateArmorKits(scenario, escapee, campaign.getCampaignOptions());
             }
 
             generatedEntities.add(escapee);
@@ -496,7 +496,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
-            updateArmorKits(scenario, vip);
+            updateArmorKits(scenario, vip, campaign.getCampaignOptions());
         }
 
         Vector<Entity> generatedEntities = new Vector<>();
@@ -510,13 +510,39 @@ public class AtBDynamicScenarioFactory {
         return (int) floor(generatedEntities.size() / 4.0);
     }
 
-    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity) {
+    /**
+     * Dresses a conventional infantry platoon for the scenario's air, pressure and temperature. Other unit types are
+     * left untouched.
+     *
+     * <p>Package-private so the regression tests can check the result against MegaMek's own deployment rules.</p>
+     *
+     * @param scenario        the scenario the unit will fight in
+     * @param entity          the unit to dress
+     * @param campaignOptions the campaign options, to check whether weather conditions are in use
+     */
+    static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
         if (entity instanceof ConvInfantry infantry) {
             boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
             boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
-            int temperature = scenario.getTemperature();
+            int temperature = getBattleTemperature(scenario, campaignOptions);
             changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
         }
+    }
+
+    /**
+     * The temperature the battle will actually be fought at. When weather is in use, weather such as snow overrides
+     * the planet's base temperature, and that weather-modified value is what is handed to MegaMek; otherwise the base
+     * temperature stands.
+     *
+     * @param scenario        the scenario being generated
+     * @param campaignOptions the campaign options, to check whether weather conditions are in use
+     *
+     * @return the battle temperature, in degrees C
+     */
+    private static int getBattleTemperature(AtBScenario scenario, CampaignOptions campaignOptions) {
+        return campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS) ?
+                     scenario.getModifiedTemperature() :
+                     scenario.getTemperature();
     }
 
     /**
@@ -549,6 +575,17 @@ public class AtBDynamicScenarioFactory {
         } catch (Exception e) {
             LOGGER.error("Unable to parse MUL file {}", mulFile.getAbsolutePath(), e);
             return 0;
+        }
+
+        // Fixed MULs carry no environmental kit, so dress their infantry for the battlefield the same way randomly
+        // generated infantry are: temperature always applies, pressure and taint only with planetary modifiers.
+        boolean usePlanetaryModifiers = campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS);
+        for (Entity entity : generatedEntities) {
+            if (usePlanetaryModifiers) {
+                updateArmorKits(scenario, entity, campaign.getCampaignOptions());
+            } else if (entity instanceof ConvInfantry infantry) {
+                changeInfantryKit(infantry, false, false, getBattleTemperature(scenario, campaign.getCampaignOptions()));
+            }
         }
 
         BotForce generatedForce = new BotForce();
@@ -965,7 +1002,7 @@ public class AtBDynamicScenarioFactory {
                                 changeInfantryKit(infantryPlatoon,
                                       isLowPressure,
                                       isTainted,
-                                      scenario.getTemperature());
+                                      getBattleTemperature(scenario, campaign.getCampaignOptions()));
                             }
                         }
                     }
@@ -1247,7 +1284,10 @@ public class AtBDynamicScenarioFactory {
         if (!transportedEntities.isEmpty()) {
             // Transported units need to filter out battle armor before applying armor changes
             for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == INFANTRY).toList()) {
-                changeInfantryKit((ConvInfantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                changeInfantryKit((ConvInfantry) curPlatoon,
+                      isLowPressure,
+                      isTainted,
+                      getBattleTemperature(scenario, campaign.getCampaignOptions()));
             }
         }
 
@@ -2536,19 +2576,27 @@ public class AtBDynamicScenarioFactory {
      * Swaps out infantry armor kit based on provided conditions. Alternate armor kits are snow/heat suits (temperature
      * only), light environment suits (low pressure only), and hostile environment suit (tainted or multiple
      * conditions).
+     * <p>
+     * Platoons dressed for tainted air are also made XCT Troops. MegaMek only lets conventional infantry operate in a
+     * tainted or toxic atmosphere when they are XCT <i>and</i> wear a suitable kit (TO:AR p.54), so a suit on its own
+     * leaves the platoon doomed the moment it deploys.
+     * <p>
+     * Package-private so the regression tests can check the result against MegaMek's own deployment rules.
+     * </p>
      *
      * @param platoon       Conventional infantry platoon to configure
      * @param isLowPressure true if atmosphere is too thin to breathe
      * @param isTainted     true if atmosphere has contaminants
      * @param temperature   Scenario temperature, in degrees C
      */
-    private static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
+    static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
           int temperature) {
         boolean isHot = temperature > 50;
         boolean isCold = temperature < -30;
 
         if (isTainted) {
             platoon.setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+            platoon.setSpecializations(platoon.getSpecializations() | ConvInfantry.XCT);
         } else if (!isLowPressure) {
 
             // Normal pressure, with extreme temperature

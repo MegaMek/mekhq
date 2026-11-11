@@ -61,6 +61,7 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.CopySystemDataAction;
+import megamek.client.ui.ReleaseNotesAction;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
@@ -672,6 +673,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuHelp.addSeparator();
 
+        menuHelp.add(new ReleaseNotesAction("mekhq"));
         menuHelp.add(createMenuItem("menuAbout.text", KeyEvent.VK_A,
               event -> new MekHQAboutDialog(getFrame()).show()));
 

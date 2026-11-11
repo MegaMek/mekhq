@@ -49,15 +49,19 @@ public enum SupportTOEFormationTypes {
      * combat units, so the order of battle shows at a glance what lifts what.
      */
     TRANSPORT_COMMAND("TRANSPORT_COMMAND", FormationType.STANDARD),
-    /** The JumpShips that berth the command's DropShips. */
-    JUMPSHIP_COMMAND("JUMPSHIP_COMMAND", FormationType.CONVOY),
+    /**
+     * The JumpShips that berth the command's DropShips. A Support formation, not a Convoy: Resupply sends every
+     * Convoy formation out as a supply run.
+     */
+    JUMPSHIP_COMMAND("JUMPSHIP_COMMAND", FormationType.SUPPORT),
     /** The hulls that haul the command's own supplies. */
     CARGO_COMMAND("CARGO_COMMAND", FormationType.CONVOY),
     /**
      * The DropShips added after the support sections exist, to berth what the command's ships could not
-     * already carry - the support platoons and squads, and anything else left without a bay.
+     * already carry - the support platoons and squads, and anything else left without a bay. A Support formation,
+     * not a Convoy, so the troopships are not sent out as a supply run.
      */
-    TROOPSHIP_COMMAND("TROOPSHIP_COMMAND", FormationType.CONVOY);
+    TROOPSHIP_COMMAND("TROOPSHIP_COMMAND", FormationType.SUPPORT);
     //endregion Enum Declarations
 
     //region Variable Declarations

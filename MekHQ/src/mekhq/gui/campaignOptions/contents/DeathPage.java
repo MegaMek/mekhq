@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -46,10 +47,10 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -141,7 +142,7 @@ class DeathPage {
         JCheckBox[] ageGroupCheckBoxes = new JCheckBox[ageGroups.length];
         for (final AgeGroup ageGroup : ageGroups) {
             final JCheckBox checkBox = new JCheckBox(ageGroup.toString());
-            checkBox.setToolTipText(ageGroup.getToolTipText());
+            checkBox.setToolTipText(wordWrap(ageGroup.getToolTipText()));
             checkBox.setName("chk" + ageGroup);
             checkBox.addMouseListener(createTipPanelUpdater(null, ageGroup.getToolTipText()));
 

@@ -98,6 +98,7 @@ final class MarketOffersPage {
     private final DefaultListModel<AbstractContract> listModel = new DefaultListModel<>();
     private final JList<AbstractContract> list = new JList<>(listModel);
     private final HudConfirmButton clearBoard;
+    private final HudButton exportButton;
     private final JPanel dossierHolder = new JPanel(new BorderLayout());
 
     private AbstractContract shownInDossier;
@@ -178,6 +179,22 @@ final class MarketOffersPage {
         boardFoot.add(create);
         boardFoot.add(clearBoard);
 
+        // Sharing offers sits on a line of its own beneath the board's own tools.
+        exportButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.export")
+                                           .toUpperCase(Locale.ROOT), false, true);
+        exportButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.export.tooltip"));
+        exportButton.addActionListener(event -> market.exportOffers());
+        HudButton importButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.import")
+                                                     .toUpperCase(Locale.ROOT), false, true);
+        importButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.import.tooltip"));
+        importButton.addActionListener(event -> market.importOffers());
+        JPanel exchangeFoot = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(3)));
+        exchangeFoot.add(exportButton);
+        exchangeFoot.add(importButton);
+        JPanel feet = MarketHud.column();
+        feet.add(HudStyle.leftAligned(boardFoot));
+        feet.add(HudStyle.leftAligned(exchangeFoot));
+
         JPanel boardTop = MarketHud.column();
         boardTop.add(HudStyle.leftAligned(searchStrip));
         boardTop.add(Box.createVerticalStrut(scaleForGUI(8)));
@@ -195,7 +212,7 @@ final class MarketOffersPage {
         board.setPreferredSize(new Dimension(boardWidth, 0));
         board.add(boardTop, BorderLayout.NORTH);
         board.add(listScroll, BorderLayout.CENTER);
-        board.add(boardFoot, BorderLayout.SOUTH);
+        board.add(feet, BorderLayout.SOUTH);
 
         dossierHolder.setOpaque(true);
         dossierHolder.setBackground(SURFACE_DEEP);
@@ -237,6 +254,7 @@ final class MarketOffersPage {
         }
         clearBoard.reset();
         clearBoard.setArmed(!ordered.isEmpty());
+        exportButton.setArmed(!ordered.isEmpty());
 
         AbstractContract selected = market.selected();
         if (rebuildDossier || (selected != shownInDossier)) {
@@ -373,7 +391,7 @@ final class MarketOffersPage {
 
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(MarketHud.escape(marketName(contract))).append("</b><br>")
-                                       .append("<span style='font-size:smaller; color:").append(hex(TEXT_MUTED))
+                                       .append("<span style='color:").append(hex(TEXT_MUTED))
                                        .append("'>").append(MarketHud.escape(String.join(separator, parts)))
                                        .append("</span>");
             List<String> badges = new ArrayList<>();
@@ -382,7 +400,7 @@ final class MarketOffersPage {
                                  + MarketHud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
             }
             if (!badges.isEmpty()) {
-                html.append("<br><span style='font-size:smaller'><b>").append(String.join(separator, badges))
+                html.append("<br><span><b>").append(String.join(separator, badges))
                       .append("</b></span>");
             }
             text.setText(html.append("</html>").toString());

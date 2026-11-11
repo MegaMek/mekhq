@@ -37,6 +37,7 @@ import java.util.List;
 import jakarta.annotation.Nullable;
 import megamek.common.TargetRollModifier;
 import megamek.common.enums.TechBase;
+import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -82,15 +83,37 @@ public final class PlanetaryAcquisitionModifiers {
      * @return the same check, with the current system's modifiers when they apply
      */
     public static SkillCheck addForCurrentSystem(Campaign campaign, IAcquisitionWork acquisition, SkillCheck check) {
+        return check.withExternalModifiers(forCurrentSystem(campaign, acquisition));
+    }
+
+    /**
+     * Adds the current system's modifiers to acquisition modifiers that are only shown to the player, when Planetary
+     * Acquisition is on. Modifiers that already settle the outcome are left as they are.
+     *
+     * @param campaign    the campaign
+     * @param acquisition what is being bought
+     * @param modifiers   the modifiers to show, such as those from {@link Campaign#getAcquisitionModifiers}
+     *
+     * @return the same modifiers, with the current system's modifiers when they apply
+     */
+    public static TargetRoll addForCurrentSystem(Campaign campaign, IAcquisitionWork acquisition,
+          TargetRoll modifiers) {
+        if (modifiers.needsRoll()) {
+            forCurrentSystem(campaign, acquisition).forEach(modifiers::addModifier);
+        }
+        return modifiers;
+    }
+
+    private static List<TargetRollModifier> forCurrentSystem(Campaign campaign, IAcquisitionWork acquisition) {
         if (!campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_ACQUISITION)) {
-            return check;
+            return List.of();
         }
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
         if (currentSystem == null) {
             LOGGER.trace("[Acquisition] {}: no current system, so the shown odds leave out planet modifiers",
                   acquisition.getAcquisitionName());
-            return check;
+            return List.of();
         }
-        return check.withExternalModifiers(forSystem(campaign, acquisition, currentSystem));
+        return forSystem(campaign, acquisition, currentSystem);
     }
 }

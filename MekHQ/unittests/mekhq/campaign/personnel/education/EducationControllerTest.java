@@ -781,6 +781,34 @@ class EducationControllerTest {
         }
 
         @Test
+        void homeSchool_keepsInfirmaryDoctor() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+            UUID doctorId = UUID.randomUUID();
+
+            Person person = buildStudentPerson();
+            person.setDoctorId(doctorId, 3);
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertEquals(doctorId, person.getDoctorId());
+            assertEquals(3, person.getDaysToWaitForHealing());
+        }
+
+        @Test
+        void nonHomeSchool_releasesInfirmaryDoctor() {
+            Academy academy = buildAcademy(false, true);
+            PlanetarySystem currentSystem = mock(PlanetarySystem.class);
+            when(currentSystem.getId()).thenReturn("CurrentSystem");
+            when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+
+            Person person = buildStudentPerson();
+            person.setDoctorId(UUID.randomUUID(), 3);
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            assertNull(person.getDoctorId());
+        }
+
+        @Test
         void enrollingFromPlayerBase_remembersOriginBase() {
             Academy academy = buildAcademy(true, false);
             when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");

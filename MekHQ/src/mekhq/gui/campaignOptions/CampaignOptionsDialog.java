@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -286,7 +287,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
 
         String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
         if (!tooltipText.isEmpty()) {
-            button.setToolTipText(tooltipText);
+            button.setToolTipText(wordWrap(tooltipText));
         }
 
         button.addActionListener(evt -> action.run());
@@ -429,7 +430,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
             } else {
                 openFolderButton.setText(getTextAt(bundle, "savePresetSuccess.openFolder"));
             }
-            openFolderButton.setToolTipText(getTextAt(bundle, "savePresetSuccess.openFolder"));
+            openFolderButton.setToolTipText(wordWrap(getTextAt(bundle, "savePresetSuccess.openFolder")));
             openFolderButton.addActionListener(evt -> {
                 try {
                     Desktop.getDesktop().open(presetDirectory);

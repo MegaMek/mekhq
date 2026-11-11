@@ -167,6 +167,8 @@ import org.apache.commons.math3.util.Pair;
 public class StratConRulesManager {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
     public final static int BASE_LEADERSHIP_BUDGET = 500;
+    /** The Employer Support spent to recall a deployed formation before its return date. */
+    public static final int RECALL_FORMATION_SUPPORT_POINT_COST = 1;
 
     private static final MMLogger LOGGER = MMLogger.create(StratConRulesManager.class);
 
@@ -174,7 +176,6 @@ public class StratConRulesManager {
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
     // a facility your employer holds answers a fight's draw for support only 1 time in this many
     public static final int EMPLOYER_LEND_DIE_SIZE = 2;
-    public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
           "Hold Until Relief.json");
@@ -344,6 +345,12 @@ public class StratConRulesManager {
                 // otherwise, pick a random force from the avail
             } else {
                 Integer randomForceID = getRandomItem(availableForceIDs); // Can be null
+                if (randomForceID == null) {
+                    // Reuse a deployed Maneuver/Frontline team only as a daily scenario seed. Keep busy teams out of
+                    // the available-force list, which also feeds reinforcement assignment.
+                    randomForceID = getRandomItem(getBusyCombatFormationIDs(campaign, contract,
+                          campaign.getPlayerForce().getCombatTeamsAsList(campaign)));
+                }
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -693,8 +700,10 @@ public class StratConRulesManager {
     /**
      * Determines if a given StratCon scenario should be marked as critical within the context of a contract.
      * <p>
-     * This method evaluates the scenario's template, type, and the contract's command rights to decide if the scenario
-     * should be flagged as a "turning point." Turning Point scenarios can cause CVP to be increased or decreased.
+     * Special scenarios, strategic objectives, and combat challenges are never Turning Points. Any other scenario has a
+     * one-in-three chance of being one, whatever the contract's command rights: command rights are felt through
+     * Deployment Orders instead (see {@link StratConDeploymentOrders}). Under House command rights, a Turning Point also
+     * brings the House commander's attached units. Turning Point scenarios can cause CVP to be increased or decreased.
      * </p>
      *
      * @param contract          The {@link AbstractContract} representing the current contract.
@@ -713,28 +722,10 @@ public class StratConRulesManager {
             return;
         }
 
-        ContractCommandRights commandRights = contract.getCommandRights();
-        switch (commandRights) {
-            case INTEGRATED -> scenario.setTurningPoint(true);
-            case HOUSE -> {
-                if (randomInt(3) == 0) {
-                    scenario.setTurningPoint(true);
-                    setAttachedUnitsModifier(scenario, contract);
-                }
-            }
-            case LIAISON -> {
-                if (randomInt(3) == 0) {
-                    scenario.setTurningPoint(true);
-                }
-            }
-            case INDEPENDENT -> {
-                // Victory points only exist on a StratCon campaign state; treat a non-StratCon contract as having
-                // none, so it still qualifies as a turning point.
-                StratConCampaignState campaignState = contract.getStratConCampaignState();
-                int victoryPoints = (campaignState == null) ? 0 : campaignState.getVictoryPoints();
-                if (victoryPoints < INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
-                    scenario.setTurningPoint(true);
-                }
+        if (randomInt(3) == 0) {
+            scenario.setTurningPoint(true);
+            if (contract.getCommandRights().isHouse()) {
+                setAttachedUnitsModifier(scenario, contract);
             }
         }
     }
@@ -1587,9 +1578,6 @@ public class StratConRulesManager {
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
-                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
-                    // contract start.
-                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
                 }
             }
         }
@@ -2881,18 +2869,24 @@ public class StratConRulesManager {
     }
 
     /**
-     * Utility method to determine if the current scenario's force commander's force is on defence
+     * Utility method to determine if the current scenario's force commander's force is on defence.
+     *
+     * <p>The commander's unit may sit in a child formation (for example a lance inside a company) while the combat team
+     * tag is on a parent formation, so the governing combat team is resolved by walking up the hierarchy rather than by
+     * the commander's own formation alone.</p>
      */
     public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
         Person lanceCommander = scenario.getLanceCommander(campaign);
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                CombatTeam lance = campaign.getPlayerForce()
-                                         .getCombatTeamsAsMap(campaign)
-                                         .get(commanderUnit.getFormationId());
+                Formation commanderFormation = campaign.getPlayerForce().getFormation(commanderUnit.getFormationId());
+                if (commanderFormation == null) {
+                    return false;
+                }
 
-                return (lance != null) && lance.getRole().isFrontline();
+                CombatTeam combatTeam = resolveCombatTeam(commanderFormation, campaign);
+                return (combatTeam != null) && combatTeam.getRole().isFrontline();
             }
         }
 
@@ -3205,6 +3199,12 @@ public class StratConRulesManager {
     static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
+        return generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment, false);
+    }
+
+    static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
+          @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment, boolean suppressReport) {
         StratConScenario scenario = new StratConScenario();
 
         if (forceID == null) {
@@ -3291,9 +3291,7 @@ public class StratConRulesManager {
         // maintained
         // registering the scenario with the campaign should be done after setting
         // dates, otherwise, the report messages for new scenarios look weird
-        // also, suppress the "new scenario" report if not generating a scenario
-        // for a specific force, as this indicates a contract initialization
-        campaign.addScenario(backingScenario, contract, forceID == FORMATION_NONE);
+        campaign.addScenario(backingScenario, contract, suppressReport);
         scenario.setBackingScenarioID(backingScenario.getId());
 
         if (forceID > FORMATION_NONE) {
@@ -3742,6 +3740,8 @@ public class StratConRulesManager {
      *       (unless role restrictions are bypassed).</li>
      * </ul>
      *
+     * <p>Busy formations are never returned; callers that need a seed-only fallback must select one explicitly.</p>
+     *
      * @param campaign               The {@link Campaign} containing data regarding contracts, combat teams, and their
      *                               statuses.
      * @param contract               The {@link AbstractContract} contract for which combat teams are evaluated based on
@@ -3800,17 +3800,49 @@ public class StratConRulesManager {
             }
         }
 
-        if (suitableForces.isEmpty()) {
-            if (!bypassRoleRestrictions) {
-                LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
-                suitableForces = getAvailableForceIDs(campaign, contract, true);
-            } else {
-                LOGGER.info("No suitable combat teams found for contract {} despite relaxed restrictions." +
-                                  " Scenario generation will likely be skipped.", contract.getId());
-            }
+        if (suitableForces.isEmpty() && !bypassRoleRestrictions) {
+            LOGGER.info("No suitable combat teams found for contract {}. Relaxing restrictions", contract.getId());
+            suitableForces = getAvailableForceIDs(campaign, contract, true);
         }
 
         return suitableForces;
+    }
+
+    /**
+     * Retrieves the force IDs of combat teams on the contract that are already assigned to a scenario and hold a combat
+     * role ({@link CombatRole#MANEUVER} or {@link CombatRole#FRONTLINE}). These stand in for available forces when no
+     * idle combat team can be found, so that a scenario can still be generated.
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract the combat teams must be assigned to
+     * @param combatTeams all combat teams in the campaign
+     *
+     * @return the force IDs of busy combat formations on the contract; empty if there are none
+     */
+    private static List<Integer> getBusyCombatFormationIDs(Campaign campaign, AbstractContract contract,
+          List<CombatTeam> combatTeams) {
+        List<Integer> busyCombatFormations = new ArrayList<>();
+        for (CombatTeam combatTeam : combatTeams) {
+            if (!contract.equals(combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            Formation formation = combatTeam.getFormation(campaign);
+            if ((formation == null) || !formation.isDeployed()) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+                continue;
+            }
+
+            CombatRole combatRole = combatTeam.getRole();
+            if ((combatRole != null) && (combatRole.isManeuver() || combatRole.isFrontline())) {
+                busyCombatFormations.add(combatTeam.getFormationId());
+            }
+        }
+
+        return busyCombatFormations;
     }
 
     /**
@@ -4207,7 +4239,28 @@ public class StratConRulesManager {
      */
     public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratConScenario currentScenario,
           int leadershipSkill) {
-        List<Integer> forceIds = currentScenario.getPrimaryForceIDs();
+        return getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill,
+              currentScenario.getPrimaryForceIDs());
+    }
+
+    /**
+     * Retrieves a list of units that are eligible for leadership deployment, matching them against the supplied
+     * primary formations rather than the scenario's committed primary forces. The deployment wizard uses this before
+     * commit, when the staged primary has not yet been written to the scenario and its primary force list is still
+     * empty.
+     *
+     * @param campaign        The campaign instance holding the units and forces involved.
+     * @param currentScenario The current StratCon scenario being processed.
+     * @param leadershipSkill The leadership skill value used to calculate budget.
+     * @param primaryForceIds The formation IDs whose dominant unit type the leadership units must match.
+     *
+     * @return A list of {@code Unit} objects eligible for deployment as leadership units.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, StratConScenario currentScenario,
+          int leadershipSkill, List<Integer> primaryForceIds) {
         List<Unit> leadershipUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
@@ -4217,7 +4270,7 @@ public class StratConRulesManager {
 
         int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
 
-        int primaryUnitType = getPrimaryUnitType(campaign, forceIds);
+        int primaryUnitType = getPrimaryUnitType(campaign, primaryForceIds);
 
         // If there are no units (somehow), we've no reason to continue
         if (primaryUnitType == -1) {
@@ -4671,9 +4724,15 @@ public class StratConRulesManager {
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
-                // afterwards only when a GM edits the map - adding or removing a city or a facility. Resolving a
-                // scenario is playing on the map, not editing it: taking a base, or losing one, changes who holds
-                // the ground at the end of a road, not whether the road was ever built.
+                // afterwards only when a GM edits the map - its terrain or its cities. Resolving a scenario is playing
+                // on the map, not editing it: taking a base, or losing one, changes who holds the ground at the end of
+                // a road, not whether the road was ever built. Who holds it does decide where supply can go, though,
+                // so the supply routes, and which facilities they leave cut off, are brought up to date at once rather
+                // than the next day.
+                if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+                    StratConFacilitySupply.reconcileNetworks(track);
+                    StratConFacilitySupply.refreshCutOffFacilities(track, campaign);
+                }
 
                 processTrackForceReturnDates(track, campaign);
 
@@ -4951,6 +5010,69 @@ public class StratConRulesManager {
         for (int forceID : forcesToUndeploy) {
             track.unassignFormation(forceID);
         }
+    }
+
+    /**
+     * Whether a deployed formation may be recalled from the Area of Operations early, at the cost of Employer Support.
+     *
+     * <p>A formation committed to a scenario must see it through, and one carrying out a facility order stays until
+     * that order is completed or lifted.</p>
+     *
+     * @param forceID       the deployed formation's ID
+     * @param track         the track it is deployed to
+     * @param campaignState the contract's StratCon state, which holds the Employer Support
+     * @param campaign      the current campaign
+     *
+     * @return {@code true} if the formation can be recalled now
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canRecallFormation(int forceID, StratConTrackState track,
+          StratConCampaignState campaignState, Campaign campaign) {
+        if (!track.getAssignedForceCoords().containsKey(forceID)) {
+            return false;
+        }
+
+        if (campaignState.getSupportPoints() < RECALL_FORMATION_SUPPORT_POINT_COST) {
+            return false;
+        }
+
+        if (track.getFacilityOrder(forceID) != null) {
+            return false;
+        }
+
+        Formation formation = campaign.getPlayerForce().getFormation(forceID);
+        return (formation != null) && !formation.isDeployed();
+    }
+
+    /**
+     * Spends Employer Support to have a deployed formation return from the Area of Operations at once, rather than
+     * waiting for its return date. Does nothing if {@link #canRecallFormation} does not allow it.
+     *
+     * @param forceID       the deployed formation's ID
+     * @param track         the track it is deployed to
+     * @param campaignState the contract's StratCon state, which pays the Employer Support
+     * @param campaign      the current campaign
+     *
+     * @return {@code true} if the formation was recalled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean recallFormation(int forceID, StratConTrackState track, StratConCampaignState campaignState,
+          Campaign campaign) {
+        if (!canRecallFormation(forceID, track, campaignState, campaign)) {
+            return false;
+        }
+
+        campaignState.changeSupportPoints(-RECALL_FORMATION_SUPPORT_POINT_COST);
+        // With no facility order holding it, this also clears any instruction to remain deployed
+        track.unassignFormation(forceID);
+
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.formationRecalled",
+              campaign.getPlayerForce().getFormation(forceID).getName(), RECALL_FORMATION_SUPPORT_POINT_COST));
+        return true;
     }
 
     /**

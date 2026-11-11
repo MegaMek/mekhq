@@ -72,9 +72,9 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
@@ -794,6 +794,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // Tab backgrounds are not reset by a theme change, so recolor active nags for the new theme
+        if (tabLogs != null) {
+            for (DailyReportType type : DailyReportType.values()) {
+                if (isLogNagActive(type)) {
+                    nagLogTab(type);
+                }
+            }
+        }
+    }
+
     /**
      * Initialize the panel for displaying procurement information
      */
@@ -862,7 +875,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         TableRowSorter<ProcurementTableModel> shoppingSorter = new TableRowSorter<>(procurementModel);
         shoppingSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         shoppingSorter.setComparator(ProcurementTableModel.COL_TOTAL_COST, new FormattedNumberSorter());
-        shoppingSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
+        shoppingSorter.setComparator(ProcurementTableModel.COL_MODIFIERS, new TargetSorter());
         procurementTable.setRowSorter(shoppingSorter);
         TableColumn column;
         for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
@@ -971,7 +984,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
         // computation walks the campaign's hangar and location tree, which the worker is concurrently
         // mutating - reading it here threw ConcurrentModificationException from the modal progress
-        // dialog's event pump. The generation fires an OrganizationChangedEvent when it completes,
+        // dialog's event pump. The generation fires a BulkGenerationCompletedEvent when it completes,
         // which reschedules this refresh against the finished, consistent campaign.
         if (campaign.isBulkGenerationInProgress()) {
             return;
@@ -1282,8 +1295,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(OrganizationChangedEvent evt) {
-        // Fired once after a bulk force generation completes (among other org changes); reschedules the
+    public void handle(BulkGenerationCompletedEvent evt) {
+        // Fired once after a bulk force generation completes; reschedules the
         // basic-info/cargo refresh that refreshBasicInfo skipped while the generation was in progress.
         basicInfoScheduler.schedule();
     }

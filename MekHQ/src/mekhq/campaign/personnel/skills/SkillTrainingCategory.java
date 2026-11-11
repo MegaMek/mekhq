@@ -27,9 +27,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 /**
- * How a skill is priced by {@link SkillTrainingCosts}. Profession, Utility, and Roleplay skills share the profession
- * cost table, but each has its own improvement and recruitment cost multipliers. Every other skill uses the
- * non-profession table, at full price when improved, and shares the recruitment multiplier used for SPAs.
+ * How a skill is priced by {@link SkillTrainingCosts}. Every skill is a Profession, Utility, or Roleplay skill; all three
+ * share the profession cost table, but each has its own improvement and recruitment cost multipliers.
  *
  * @author Illiani
  * @since 0.51.01
@@ -40,8 +39,7 @@ public enum SkillTrainingCategory {
     UTILITY(CampaignOption.UTILITY_SKILL_TRAINING_COST_MULTIPLIER,
           CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER),
     ROLEPLAY(CampaignOption.ROLEPLAY_SKILL_TRAINING_COST_MULTIPLIER,
-          CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER),
-    OTHER(null, CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
+          CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER);
 
     private final CampaignOption<Double> trainingCostMultiplierOption;
     private final CampaignOption<Double> recruitmentCostMultiplierOption;
@@ -54,7 +52,8 @@ public enum SkillTrainingCategory {
 
     /**
      * Gets the category of a skill. A skill belonging to the person's primary or secondary role is always a profession
-     * skill, even if it is also a Utility skill.
+     * skill, even if it is also a Utility skill. A Roleplay skill outside the person's roles is priced as Roleplay; all
+     * other skills outside their roles, including Combat, Support, and Utility skills, are priced as Utility.
      *
      * @param isRoleSkill whether the skill belongs to the person's primary or secondary role
      * @param skillType   the skill's type
@@ -69,25 +68,11 @@ public enum SkillTrainingCategory {
             return PROFESSION;
         }
 
-        if (skillType.isUtilitySkill()) {
-            return UTILITY;
-        }
-
         if (skillType.isRoleplaySkill()) {
             return ROLEPLAY;
         }
 
-        return OTHER;
-    }
-
-    /**
-     * @return {@code true} if skills in this category are priced from the profession cost table
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isUsingProfessionCostTable() {
-        return this != OTHER;
+        return UTILITY;
     }
 
     /**
@@ -99,10 +84,6 @@ public enum SkillTrainingCategory {
      * @since 0.51.01
      */
     public double getTrainingCostMultiplier(CampaignOptions campaignOptions) {
-        if (trainingCostMultiplierOption == null) {
-            return 1.0;
-        }
-
         return campaignOptions.get(trainingCostMultiplierOption);
     }
 

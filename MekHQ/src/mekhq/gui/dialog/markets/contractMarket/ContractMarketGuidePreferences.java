@@ -47,8 +47,9 @@ import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog.MarketP
 
 /**
  * Which of the contract market's guides the player has seen: one per market page, one per tab of the GM contract
- * editor, and one for the negotiation table. A guide opens by itself the first time the player visits its page or tab,
- * or sits at the table, and only from its button after that. As with the Oracle Console's guides, the player can turn
+ * editor, one for the negotiation table, and one for the shell contract dialog. A guide opens by itself the first time
+ * the player visits its page or tab, sits at the table, or writes a shell contract, and only from its button after
+ * that. As with the Oracle Console's guides, the player can turn
  * that off from the checkbox at the foot of any guide.
  *
  * <p>The flags are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's
@@ -86,6 +87,7 @@ public final class ContractMarketGuidePreferences {
         }
         guides.addAll(ContractEditorDialog.guidePrefixes());
         guides.add(ContractNegotiationDialog.GUIDE_PREFIX);
+        guides.add(ShellContractDialog.GUIDE_PREFIX);
         for (String guide : guides) {
             // A guide's prefix ends in a dot (such as "guide.contractMarket.offers."); the flag's name drops it.
             String name = GUIDE_SEEN_PREFIX + guide.substring(0, guide.length() - 1);

@@ -32,11 +32,13 @@
  */
 package mekhq.gui.baseComponents.roundedComponents;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import megamek.client.ui.buttons.MMToggleButton;
@@ -107,14 +109,21 @@ public class RoundedMMToggleButton extends MMToggleButton {
 
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Fill the whole button while selected, so the state reads at a glance and not only from the small mark
+        Color baseColor = getBackground();
+        if (isSelected()) {
+            Color selectedBackground = UIManager.getColor("ToggleButton.selectedBackground");
+            baseColor = (selectedBackground == null) ? baseColor.darker() : selectedBackground;
+        }
+
         if (getModel().isPressed()) {
-            graphics2D.setColor(getBackground().darker());
+            graphics2D.setColor(baseColor.darker());
         } else if (getModel().isRollover()) {
-            graphics2D.setColor(getBackground().brighter());
+            graphics2D.setColor(baseColor.brighter());
         } else if (!getModel().isEnabled()) {
-            graphics2D.setColor(getBackground().darker());
+            graphics2D.setColor(baseColor.darker());
         } else {
-            graphics2D.setColor(getBackground());
+            graphics2D.setColor(baseColor);
         }
 
         int width = getWidth();

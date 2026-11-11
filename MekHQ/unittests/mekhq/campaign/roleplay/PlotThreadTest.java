@@ -111,6 +111,7 @@ class PlotThreadTest {
 
     @Test
     void flashpointsFallOnEveryFifthStepBeforeTheLast() {
+        assertEquals(List.of(), flashpoints(PlotThreadLength.BRIEF), "a brief thread's fifth step is its conclusion");
         assertEquals(List.of(5), flashpoints(PlotThreadLength.SHORT));
         assertEquals(List.of(5, 10), flashpoints(PlotThreadLength.MEDIUM));
         assertEquals(List.of(5, 10, 15), flashpoints(PlotThreadLength.LONG));

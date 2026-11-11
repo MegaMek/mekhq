@@ -65,6 +65,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
 
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,23 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertTrue(InterstellarMapPanel.shouldRenderSystem(true, true, false, true));
         assertTrue(InterstellarMapPanel.shouldRenderSystem(true, false, false, false));
         assertFalse(InterstellarMapPanel.shouldRenderSystem(false, false, true, true));
+    }
+
+    @Test
+    void systemsOnProposedOrActiveRouteCountAsRouteSystems() {
+        PlanetarySystem proposedStop = mock(PlanetarySystem.class);
+        PlanetarySystem activeStop = mock(PlanetarySystem.class);
+        PlanetarySystem offRoute = mock(PlanetarySystem.class);
+        JumpPath proposedPath = new JumpPath();
+        proposedPath.addSystem(proposedStop);
+        JumpPath activePath = new JumpPath();
+        activePath.addSystem(activeStop);
+
+        assertTrue(InterstellarMapPanel.isOnRoute(proposedStop, proposedPath, activePath));
+        assertTrue(InterstellarMapPanel.isOnRoute(activeStop, proposedPath, activePath));
+        assertTrue(InterstellarMapPanel.isOnRoute(activeStop, null, activePath));
+        assertFalse(InterstellarMapPanel.isOnRoute(offRoute, proposedPath, activePath));
+        assertFalse(InterstellarMapPanel.isOnRoute(proposedStop, null, null));
     }
 
     @Test
@@ -789,6 +807,38 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertEquals(new AffineTransform(1.75, 0.0, 0.0, 1.75, 12.0, 8.0), graphics.getTransform());
         graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 2.0, 0.5, 0.5));
         assertEquals(1.0, InterstellarMapPanel.alignToDevicePixels(graphics));
+        graphics.dispose();
+    }
+
+    @Test
+    void alignToDevicePixelsShiftsFullAndPartialRepaintsByTheSameSubPixelOffset() {
+        BufferedImage target = new BufferedImage(4, 4, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = target.createGraphics();
+        // Swing paints the whole panel and a small repaint region at these origins at 150% scaling
+        double[] repaintOrigins = { 7.5, -35.5, 0.5 };
+        for (double origin : repaintOrigins) {
+            graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 1.5, origin, origin));
+
+            InterstellarMapPanel.alignToDevicePixels(graphics);
+
+            assertEquals(origin + 0.5, graphics.getTransform().getTranslateX());
+            assertEquals(origin + 0.5, graphics.getTransform().getTranslateY());
+        }
+        graphics.dispose();
+    }
+
+    @Test
+    void prepareLayerBlitShiftsFullAndPartialRepaintsByTheSameSubPixelOffset() {
+        BufferedImage target = new BufferedImage(4, 4, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics2D graphics = target.createGraphics();
+        double[] repaintOrigins = { 7.5, -35.5, 0.5 };
+        for (double origin : repaintOrigins) {
+            graphics.setTransform(new AffineTransform(1.5, 0.0, 0.0, 1.5, origin, origin));
+
+            InterstellarMapPanel.prepareLayerBlit(graphics, 1.5);
+
+            assertEquals(AffineTransform.getTranslateInstance(origin + 0.5, origin + 0.5), graphics.getTransform());
+        }
         graphics.dispose();
     }
 

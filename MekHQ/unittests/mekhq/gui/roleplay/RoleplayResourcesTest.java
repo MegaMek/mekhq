@@ -53,6 +53,7 @@ import mekhq.campaign.roleplay.CampaignChronicle;
 import mekhq.campaign.roleplay.CheckDifficulty;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.NpcRating;
+import mekhq.campaign.roleplay.PlotThreadLength;
 import mekhq.campaign.roleplay.TravelRecord;
 import org.junit.jupiter.api.Test;
 
@@ -133,6 +134,10 @@ class RoleplayResourcesTest {
         for (NpcRating rating : NpcRating.values()) {
             assertTrue(properties.containsKey("NpcRating." + rating.name() + ".label"));
         }
+        for (PlotThreadLength length : PlotThreadLength.values()) {
+            assertTrue(properties.containsKey("PlotThreadLength." + length.name() + ".label"), length.name());
+            assertTrue(properties.containsKey("OracleConsole.threads.length.short." + length.name()), length.name());
+        }
         for (TravelRecord.Kind kind : TravelRecord.Kind.values()) {
             assertTrue(properties.containsKey("TravelLog.kind." + kind.name()), kind.name());
         }
@@ -142,6 +147,9 @@ class RoleplayResourcesTest {
         }
         for (CampaignChronicle.PersonChange change : CampaignChronicle.PersonChange.values()) {
             assertTrue(properties.containsKey("Chronicle.person." + change.name()), change.name());
+        }
+        for (CampaignChronicle.UltimatumChoice choice : CampaignChronicle.UltimatumChoice.values()) {
+            assertTrue(properties.containsKey("Chronicle.ultimatum." + choice.name()), choice.name());
         }
         for (JournalEntryType type : JournalEntryType.values()) {
             assertTrue(properties.containsKey("JournalEntryType." + type.name() + ".label"));

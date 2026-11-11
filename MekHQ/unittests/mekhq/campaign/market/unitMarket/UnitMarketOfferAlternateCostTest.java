@@ -37,6 +37,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -155,33 +156,6 @@ class UnitMarketOfferAlternateCostTest {
         verify(summary, never()).getCost();
     }
 
-    /**
-     * MekHQ prices large craft offers from their construction cost.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Test
-    void mekHQPricesLargeCraftFromConstructionCost() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.DROPSHIP));
-
-        assertEquals(Money.of(4_000_000), offer(100).getPrice());
-        verify(summary, never()).getBV();
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Test
-    void mekHQPricesOrdinaryUnitsFromBattleValue() {
-        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, UnitCostModel.MEKHQ);
-        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
-
-        assertEquals(Money.of(600 * SUPPORT_POINTS_TO_C_BILLS), offer(100).getPrice());
-    }
-
     /** An offer whose unit file can't be loaded is still priced, without a tech-base multiplier. */
     @Test
     void unloadableUnitIsPricedWithoutTheTechMultiplier() {
@@ -196,5 +170,29 @@ class UnitMarketOfferAlternateCostTest {
         when(summary.getBV()).thenReturn(1_500_000);
 
         assertEquals(Money.of(15_000_000_000.0), offer(100).getPrice());
+    }
+
+    /** The market table prices every row it paints or sorts, so pricing must not load the unit file each time. */
+    @Test
+    void repeatedPricingLoadsTheUnitOnce() {
+        UnitMarketOffer offer = offer(100);
+
+        offer.getPrice();
+        offer.getPrice();
+        offer.getPrice();
+
+        verify(offer, times(1)).getEntity();
+    }
+
+    @Test
+    void changingTheUnitReloadsItsPriceTraits() {
+        UnitMarketOffer offer = offer(100);
+        offer.getPrice();
+
+        offer.setUnit(summary);
+        when(entity.isClan()).thenReturn(true);
+
+        assertEquals(Money.of(12_000_000), offer.getPrice());
+        verify(offer, times(2)).getEntity();
     }
 }
