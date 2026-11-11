@@ -363,8 +363,6 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private void quickAssignTechs() {
-        // This is triggered by an explicit button press, so the dialog must always be shown and can't offer a "don't
-        // bother me again" option. Otherwise, the button would appear to do nothing.
         String confirmationBundle = "mekhq.resources.ImmersiveDialogConfirmation";
         String message = getText("AreYouSure.text") + "<p>" + getTextAt(confirmationBundle,
               "ImmersiveDialogConfirmation." + CONFIRMATION_ASSIGN_TECHS + ".text.primary") + "</p>";
