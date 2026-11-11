@@ -94,6 +94,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondi
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply.SupplyStatus;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -2298,7 +2299,10 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, getSupplyStatusKey(currentTrack, coords)));
+            String supplyStatusKey = getSupplyStatusKey(StratConFacilitySupply.getSupplyStatus(currentTrack, coords));
+            if (supplyStatusKey != null) {
+                infoBuilder.append(getTextAt(RESOURCE_BUNDLE, supplyStatusKey));
+            }
         }
 
         int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
@@ -2320,23 +2324,21 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * @param track  the sector
-     * @param coords a facility's hex
+     * @param supplyStatus a facility's standing on its side's supply lines
      *
-     * @return the {@code AtBStratCon} resource key for the facility's supply line: cut off, a source of its side's
-     *       supply (which is never cut off), or connected
+     * @return the {@code AtBStratCon} resource key for the hex information's supply line, or {@code null} when there
+     *       is nothing to show, because the sector has no supply lines
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static String getSupplyStatusKey(StratConTrackState track, StratConCoords coords) {
-        if (StratConFacilitySupply.isCutOff(track, coords)) {
-            return "stratConTab.hexInfo.supplyCut";
-        }
-        if (StratConFacilitySupply.isSupplySource(track, coords)) {
-            return "stratConTab.hexInfo.supplySource";
-        }
-        return "stratConTab.hexInfo.supplyConnected";
+    private static @Nullable String getSupplyStatusKey(SupplyStatus supplyStatus) {
+        return switch (supplyStatus) {
+            case NONE -> null;
+            case CUT -> "stratConTab.hexInfo.supplyCut";
+            case SOURCE -> "stratConTab.hexInfo.supplySource";
+            case CONNECTED -> "stratConTab.hexInfo.supplyConnected";
+        };
     }
 
     /**
