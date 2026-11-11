@@ -110,6 +110,11 @@ public class ImmersiveDialogCore extends JDialog {
     public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
     /** Links to a StratCon sector, as {@code STRATCON_SECTOR:<contract UUID>:<track index>}. */
     public final static String STRATCON_SECTOR_COMMAND_STRING = "STRATCON_SECTOR";
+    /**
+     * The response button that has keyboard focus unless a dialog asks for another: the first, which is also what
+     * closing the dialog with X returns.
+     */
+    public static final int FIRST_RESPONSE = 0;
 
     private final Campaign campaign;
 
@@ -123,6 +128,8 @@ public class ImmersiveDialogCore extends JDialog {
     private final Person rightSpeaker;
     private final TransmissionSignalQuality signalQuality;
     private final ResponseActivationController responseActivationController;
+    /** The index of the response button that has keyboard focus when the dialog opens, so Space presses it */
+    private final int focusedResponseIndex;
 
     private JSpinner spinner;
     private int spinnerValue;
@@ -278,6 +285,38 @@ public class ImmersiveDialogCore extends JDialog {
           String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
           @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
           @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, boolean isModal) {
+        this(campaign,
+              leftSpeaker,
+              rightSpeaker,
+              centerMessage,
+              buttons,
+              outOfCharacterMessage,
+              centerWidth,
+              isVerticalLayout,
+              supplementalPanel,
+              imageIcon,
+              signalQuality,
+              FIRST_RESPONSE,
+              isModal);
+    }
+
+    /**
+     * Constructs an immersive dialog that opens with keyboard focus on a chosen response button, so pressing Space
+     * picks it. Closing the dialog with X still returns the first response, so a dialog can keep a safe choice such as
+     * Cancel first while focusing the choice the player most likely wants.
+     *
+     * <p>The remaining parameters inherit the contracts documented by the adjacent constructors.</p>
+     *
+     * @param focusedResponseIndex the index in {@code buttons} of the response to focus; an index outside the list
+     *                             leaves focus on the first response
+     *
+     * @throws NullPointerException if {@code signalQuality} is {@code null}
+     */
+    public ImmersiveDialogCore(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+          String centerMessage, List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+          @Nullable Integer centerWidth, boolean isVerticalLayout, @Nullable JPanel supplementalPanel,
+          @Nullable ImageIcon imageIcon, TransmissionSignalQuality signalQuality, int focusedResponseIndex,
+          boolean isModal) {
         super(resolveOwner(campaign));
         if (getOwner() == null) {
             // Unowned dialogs get their own taskbar entry, so give it the MekHQ icon instead of the Java default
@@ -289,6 +328,7 @@ public class ImmersiveDialogCore extends JDialog {
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
         this.signalQuality = Objects.requireNonNull(signalQuality, "signalQuality");
+        this.focusedResponseIndex = focusedResponseIndex;
         responseActivationController = new ResponseActivationController(this::dispose);
 
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
@@ -870,6 +910,7 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.weightx = isVerticalLayout ? 1 : 0;
 
         List<TransmissionResponseButton> buttonList = new ArrayList<>();
+        TransmissionResponseButton focusedButton = null;
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
@@ -922,11 +963,15 @@ public class ImmersiveDialogCore extends JDialog {
             int responseIndex = buttons.indexOf(buttonStrings);
             button.addActionListener(evt -> responseActivationController.activate(
                 () -> captureResponseState(responseIndex)));
+            if (responseIndex == focusedResponseIndex) {
+                focusedButton = button;
+            }
 
             buttonList.add(button);
         }
 
         applyUniformButtonSizes(buttonList);
+        focusOnOpen(focusedButton);
 
         // Final pass: Add buttons to the panel
         for (TransmissionResponseButton button : buttonList) {
@@ -955,6 +1000,28 @@ public class ImmersiveDialogCore extends JDialog {
 
     static String resolveHorizontalButtonText(String label, String tooltip) {
         return label != null ? label : tooltip;
+    }
+
+    /**
+     * Gives the chosen response button keyboard focus when the dialog opens, in place of the first one.
+     *
+     * @param focusedButton the button for {@link #focusedResponseIndex}, or {@code null} if no button has that index
+     */
+    private void focusOnOpen(@Nullable JButton focusedButton) {
+        if (focusedResponseIndex == FIRST_RESPONSE) {
+            return;
+        }
+        if (focusedButton == null) {
+            LOGGER.debug("[ImmersiveDialog] No response {} to focus; the first response keeps focus",
+                  focusedResponseIndex);
+            return;
+        }
+        setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
+            @Override
+            public Component getInitialComponent(Window window) {
+                return focusedButton;
+            }
+        });
     }
 
     static void applyUniformButtonSizes(List<? extends JButton> buttons) {
