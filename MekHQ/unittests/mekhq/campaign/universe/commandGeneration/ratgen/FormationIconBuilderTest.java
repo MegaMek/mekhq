@@ -38,19 +38,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import mekhq.MHQConstants;
+import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
+import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.AddSupportUnitsToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes;
 import org.junit.jupiter.api.Assumptions;
@@ -93,7 +97,7 @@ class FormationIconBuilderTest {
         Formation recoveryOperations = formationNamed(campaign,
               SupportTOEFormationTypes.SALVAGE_FORMATION.getLabel());
 
-        assertEquals(MAINTENANCE_ICON, FormationIconBuilder.purposeIconFor(recoveryOperations, campaign),
+        assertEquals(MAINTENANCE_ICON, purposeIconFor(campaign, recoveryOperations),
               "the salvage formation is what the maintenance icon is for");
     }
 
@@ -107,7 +111,7 @@ class FormationIconBuilderTest {
 
         Formation lance = formationNamed(campaign, "Lance 1");
 
-        assertEquals(MAINTENANCE_ICON, FormationIconBuilder.purposeIconFor(lance, campaign),
+        assertEquals(MAINTENANCE_ICON, purposeIconFor(campaign, lance),
               "a lance of recovery vehicles is still recovery");
     }
 
@@ -121,7 +125,7 @@ class FormationIconBuilderTest {
         Formation logistics = formationNamed(campaign,
               SupportTOEFormationTypes.LOGISTICS_FORMATION.getLabel());
 
-        assertEquals(SUPPLY_ICON, FormationIconBuilder.purposeIconFor(logistics, campaign),
+        assertEquals(SUPPLY_ICON, purposeIconFor(campaign, logistics),
               "cargo trucks are supply, not maintenance");
     }
 
@@ -135,10 +139,10 @@ class FormationIconBuilderTest {
               MHQConstants.LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME);
         medical.setOverrideFormationLevel(FormationLevel.COMPANY);
 
-        assertTrue(FormationIconBuilder.refreshEchelonPiece(medical, campaign));
+        assertTrue(FormationIconBuilder.refreshEchelonPiece(medical, faction(campaign)));
         assertEquals(MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME, echelonFilename(medical),
               "a company carries the company symbol");
-        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, campaign), "and an up to date icon is left as is");
+        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, faction(campaign)), "and an up to date icon is left as is");
     }
 
     @Test
@@ -148,7 +152,7 @@ class FormationIconBuilderTest {
         Formation medical = formationWithEchelonPiece(campaign, "Custom/", "My Field Hospital.png");
         medical.setOverrideFormationLevel(FormationLevel.COMPANY);
 
-        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, campaign));
+        assertFalse(FormationIconBuilder.refreshEchelonPiece(medical, faction(campaign)));
         assertEquals("My Field Hospital.png", echelonFilename(medical));
     }
 
@@ -179,8 +183,7 @@ class FormationIconBuilderTest {
     @Test
     @DisplayName("A granted formation left blank gets its icon; one with any piece of its own is left alone")
     void blankIconsAreDrawnAndOthersAreLeftAlone() {
-        Assumptions.assumeTrue(mekhq.MHQStaticDirectoryManager.getFormationIcons() != null,
-              "the formation icon images are not available");
+        assumeFormationIcons();
         Campaign campaign = innerSphereCampaign();
         Formation blank = new Formation("Logistics");
         campaign.getPlayerForce().addFormation(blank,
@@ -189,12 +192,152 @@ class FormationIconBuilderTest {
         // In play, filing a unit raises the event that sets every formation's level; an icon needs a level.
         Formation.populateFormationLevelsFromOrigin(campaign);
 
-        FormationIconBuilder.decorateUndecorated(blank, campaign);
-        FormationIconBuilder.decorateUndecorated(custom, campaign);
+        decorateUndecorated(campaign, blank);
+        decorateUndecorated(campaign, custom);
 
         assertTrue(((LayeredFormationIcon) blank.getFormationIcon()).getPieces()
                          .containsKey(LayeredFormationIconLayer.FORMATION), "the blank formation was drawn");
         assertEquals("My Convoy.png", echelonFilename(custom), "the player's icon is untouched");
+    }
+
+    @Test
+    @DisplayName("A blank formation carrying only the operational status indicator is still drawn, and keeps it")
+    void aBlankIconWithAStatusIndicatorIsStillDrawn() {
+        assumeFormationIcons();
+        Campaign campaign = innerSphereCampaign();
+        Formation blank = new Formation("Lance");
+        campaign.getPlayerForce().addFormation(blank,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        Formation.populateFormationLevelsFromOrigin(campaign);
+        // The new day puts the indicator on every layered icon, blank ones included
+        FormationPieceIcon status = new FormationPieceIcon(LayeredFormationIconLayer.SPECIAL_MODIFIER,
+              MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_BORDER_PATH, OperationalStatus.FULLY_OPERATIONAL.getFilename());
+        ((LayeredFormationIcon) blank.getFormationIcon()).getPieces()
+              .put(LayeredFormationIconLayer.SPECIAL_MODIFIER, new ArrayList<>(List.of(status)));
+
+        assertEquals(1, decorateUndecorated(campaign, blank), "the indicator does not make the icon decorated");
+
+        Map<LayeredFormationIconLayer, List<FormationPieceIcon>> pieces =
+              ((LayeredFormationIcon) blank.getFormationIcon()).getPieces();
+        assertTrue(pieces.containsKey(LayeredFormationIconLayer.FORMATION), "the blank formation was drawn");
+        assertEquals(List.of(status), pieces.get(LayeredFormationIconLayer.SPECIAL_MODIFIER),
+              "and the indicator survives until the next day redraws it");
+    }
+
+    @Test
+    @DisplayName("A formation whose units changed gets the silhouette for the units it holds now")
+    void aChangedFormationGetsItsNewSilhouette() {
+        assumeFormationIcons();
+        Campaign campaign = innerSphereCampaign();
+        Formation lance = formationWithEchelonPiece(campaign, MHQConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME);
+        // Drawn while it was a medium 'Mek lance
+        setTypePieces(lance, MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME, "Medium.png");
+        // ...and now holds tanks
+        for (Unit vehicle : vehiclesInHangar(campaign, 4)) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, lance, campaign);
+        }
+
+        assertTrue(refreshTypePiece(campaign, lance));
+        assertFalse(typeFilenames(lance).contains(MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME),
+              "a lance of tanks no longer carries the 'Mek silhouette");
+        assertFalse(refreshTypePiece(campaign, lance), "and an up to date icon is left as is");
+    }
+
+    @Test
+    @DisplayName("A silhouette the player picked is never redrawn")
+    void aPlayersOwnSilhouetteIsLeftAlone() {
+        assumeFormationIcons();
+        Campaign campaign = innerSphereCampaign();
+        Formation lance = formationWithEchelonPiece(campaign, MHQConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_FORMATION_LANCE_FILENAME);
+        setTypePieces(lance, "Custom/", "My Mascot.png");
+        for (Unit vehicle : vehiclesInHangar(campaign, 4)) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, lance, campaign);
+        }
+
+        assertFalse(refreshTypePiece(campaign, lance));
+        assertEquals(List.of("My Mascot.png"), typeFilenames(lance));
+    }
+
+    @Test
+    @DisplayName("Builder silhouettes on an icon with the player's own echelon shape are left alone")
+    void aPlayersOwnEchelonProtectsTheSilhouette() {
+        assumeFormationIcons();
+        Campaign campaign = innerSphereCampaign();
+        Formation lance = formationWithEchelonPiece(campaign, "Custom/", "My Lance.png");
+        setTypePieces(lance, MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME, "Medium.png");
+        for (Unit vehicle : vehiclesInHangar(campaign, 4)) {
+            campaign.getPlayerForce().addUnitToFormation(vehicle, lance, campaign);
+        }
+
+        assertFalse(refreshTypePiece(campaign, lance), "the player built this icon, whatever pieces they used");
+        assertEquals(List.of(MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME, "Medium.png"),
+              typeFilenames(lance));
+    }
+
+    @Test
+    @DisplayName("Refreshing the TOE draws blank formations and brings the builder's icons up to date")
+    void refreshingTheTOEDrawsAndUpdates() {
+        assumeFormationIcons();
+        Campaign campaign = innerSphereCampaign();
+        Formation blank = new Formation("Lance");
+        campaign.getPlayerForce().addFormation(blank,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        Formation grown = formationWithEchelonPiece(campaign, MHQConstants.LAYERED_FORCE_ICON_FORMATION_INNER_SPHERE_PATH,
+              MHQConstants.LAYERED_FORCE_ICON_FORMATION_TEAM_FILENAME);
+        Formation custom = formationWithEchelonPiece(campaign, "Custom/", "My Company.png");
+        Formation.populateFormationLevelsFromOrigin(campaign);
+        grown.setOverrideFormationLevel(FormationLevel.COMPANY);
+        custom.setOverrideFormationLevel(FormationLevel.COMPANY);
+
+        FormationIconBuilder.refreshIcons(campaign.getPlayerForce().getFormations(), faction(campaign),
+              campaign::getUnit, campaign.getPlayerForce().getSupportCommandFormation());
+
+        assertTrue(((LayeredFormationIcon) blank.getFormationIcon()).getPieces()
+                         .containsKey(LayeredFormationIconLayer.FORMATION), "the blank formation was drawn");
+        assertEquals(MHQConstants.LAYERED_FORCE_ICON_FORMATION_COMPANY_FILENAME, echelonFilename(grown),
+              "the grown formation carries its new echelon");
+        assertEquals("My Company.png", echelonFilename(custom), "the player's icon is untouched");
+    }
+
+    private static void assumeFormationIcons() {
+        Assumptions.assumeTrue(MHQStaticDirectoryManager.getFormationIcons() != null,
+              "the formation icon images are not available");
+    }
+
+    private static Faction faction(Campaign campaign) {
+        return campaign.getPlayerForce().getFaction();
+    }
+
+    private static String purposeIconFor(Campaign campaign, Formation formation) {
+        return FormationIconBuilder.purposeIconFor(formation, campaign::getUnit,
+              campaign.getPlayerForce().getSupportCommandFormation());
+    }
+
+    private static int decorateUndecorated(Campaign campaign, Formation formation) {
+        return FormationIconBuilder.decorateUndecorated(formation, faction(campaign), campaign::getUnit,
+              campaign.getPlayerForce().getSupportCommandFormation());
+    }
+
+    private static boolean refreshTypePiece(Campaign campaign, Formation formation) {
+        return FormationIconBuilder.refreshTypePiece(formation, faction(campaign), campaign::getUnit,
+              campaign.getPlayerForce().getSupportCommandFormation());
+    }
+
+    private static void setTypePieces(Formation formation, String folder, String... filenames) {
+        List<FormationPieceIcon> pieces = new ArrayList<>();
+        for (String filename : filenames) {
+            pieces.add(new FormationPieceIcon(LayeredFormationIconLayer.TYPE, folder, filename));
+        }
+        ((LayeredFormationIcon) formation.getFormationIcon()).getPieces().put(LayeredFormationIconLayer.TYPE, pieces);
+    }
+
+    private static List<String> typeFilenames(Formation formation) {
+        return ((LayeredFormationIcon) formation.getFormationIcon()).getPieces()
+                     .get(LayeredFormationIconLayer.TYPE).stream().map(FormationPieceIcon::getFilename).toList();
     }
 
     /**

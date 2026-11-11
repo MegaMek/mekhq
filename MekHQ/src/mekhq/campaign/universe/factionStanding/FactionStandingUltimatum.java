@@ -38,6 +38,7 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
@@ -128,8 +129,9 @@ public final class FactionStandingUltimatum {
      * Creates a {@link Person} entity within the campaign from the provided agitator data.
      *
      * <p>The agitator will receive the specified name, role, and faction code; surname and bloodname fields are set
-     * to empty strings. As this information is pushed into the givenName, instead. The person is never added to the
-     * campaign, so dialogs show their faction logo rather than a portrait and their gender has no effect.</p>
+     * to empty strings. As this information is pushed into the givenName, instead. The person keeps the default
+     * portrait and is never added to the campaign, so dialogs show their faction logo rather than a portrait and their
+     * gender has no effect.</p>
      *
      * @param campaign the current campaign
      * @param agitator the side whose leader to create, with their name, role, and faction code
@@ -147,6 +149,7 @@ public final class FactionStandingUltimatum {
         person.setGivenName(agitator.name());
         person.setSurname("");
         person.setBloodname("");
+        person.setPortrait(new Portrait());
 
         return person;
     }

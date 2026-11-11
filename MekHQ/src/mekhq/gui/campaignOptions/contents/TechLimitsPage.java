@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -130,8 +131,8 @@ class TechLimitsPage {
         lblChoiceTechLevel.addMouseListener(createTipPanelUpdater("ChoiceTechLevel"));
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
         choiceTechLevel.addMouseListener(createTipPanelUpdater("ChoiceTechLevel"));
-        choiceTechLevel.setToolTipText(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
+        choiceTechLevel.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+              "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox",

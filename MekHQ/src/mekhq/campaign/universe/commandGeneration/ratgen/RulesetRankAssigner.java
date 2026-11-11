@@ -87,12 +87,11 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  * latter cannot be trusted at this point in the pipeline.</p>
  *
  * <p>Non-officer combat crew get an enlisted Sergeant rank (E12 IS, E4 Clan/CS); support staff get
- * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The campaign's
- * rank system (loaded from {@code data/universe/ranks.xml} per faction) maps the integer index to the
- * faction-appropriate display name.</p>
+ * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The rank system
+ * the player chose in Campaign Options maps the integer index to the display name; the campaign's
+ * faction picks the IS or Clan/CS slot layout.</p>
  *
- * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}. Honors
- * {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} for the faction picker.</p>
+ * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}.</p>
  */
 public final class RulesetRankAssigner {
 
@@ -186,17 +185,10 @@ public final class RulesetRankAssigner {
             return Result.none();
         }
 
-        Faction specifiedFaction = options.getSpecifiedFaction();
-        Faction campaignFaction = campaign.getPlayerForce().getFaction();
-        boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();
-        Faction faction = useSpecified ? specifiedFaction : campaignFaction;
-        if (faction == null) {
-            faction = campaignFaction;
-        }
-        LOGGER.info("[CompanyGen][RankAssign][Faction] resolve: useSpecified={} specifiedFaction={} campaignFaction={} -> resolved={} (isClan={} isComStarOrWoB={} isMercenary={})",
-              useSpecified,
-              specifiedFaction == null ? "null" : specifiedFaction.getShortName(),
-              campaignFaction == null ? "null" : campaignFaction.getShortName(),
+        // Campaign Options is the single source of truth for ranks: the campaign's faction picks the rank-slot
+        // layout below, and the campaign's rank system names the slots.
+        Faction faction = campaign.getPlayerForce().getFaction();
+        LOGGER.info("[CompanyGen][RankAssign][Faction] campaign faction={} (isClan={} isComStarOrWoB={} isMercenary={})",
               faction == null ? "null" : faction.getShortName(),
               faction != null && faction.isClan(),
               faction != null && faction.isComStarOrWoB(),
@@ -209,11 +201,10 @@ public final class RulesetRankAssigner {
               faction != null && (faction.isClan() || faction.isComStarOrWoB()),
               faction == null || (!faction.isClan() && !faction.isComStarOrWoB()));
 
-        // The Person's rank-name lookup uses its OWN rank system, not the campaign's. So an IS
-        // campaign generating a Clan force would render Clan-targeted rank indices through the
-        // campaign's IS rank table ("Lieutenant" instead of "Nova Commander"). Resolve the target
-        // faction's rank system here and apply it to every Person we rank below.
-        RankSystem targetRankSystem = faction.getRankSystem();
+        // The Person's rank-name lookup uses its OWN rank system. Everyone we rank below is put on the
+        // rank system the player chose in Campaign Options, so the whole command reads its ranks from
+        // one table and the generator never overrides the player's choice.
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
         RankValidator rankValidator = new RankValidator();
 
         LOGGER.info("[CompanyGen][RankAssign] START faction={} rankSystem={} enlistedRank={} supportRank={} root='{}' guidedLevels={} engineCommanders={} thread={}",
@@ -682,6 +673,83 @@ public final class RulesetRankAssigner {
     }
 
     /**
+     * The rank a ship's captain gets when the ship is added after the main rank pass: the company commander's slot,
+     * read as Captain, Star Captain or Demi-Precentor depending on the rank system.
+     */
+    static final int LATE_SHIP_CAPTAIN_RANK_INDEX = Rank.RWO_MAX + 4;
+
+    /**
+     * Ranks the crews of ships added after the main rank pass has run.
+     *
+     * <p>The lift top-up and the cargo lift add their DropShips and JumpShips once the support sections exist, which
+     * is after the main pass. Without this their crews arrive with no rank at all. Each captain gets
+     * {@link #LATE_SHIP_CAPTAIN_RANK_INDEX}. The rest of the crew get the same enlisted or support rank the main
+     * pass gives everyone else.</p>
+     *
+     * @param campaign the campaign the ships belong to
+     * @param options  the generation options; nothing is ranked when automatic ranks are off
+     * @param ships    the ships whose crews are ranked; anything that is not a large craft is skipped, and
+     *                 {@code null} is treated as an empty list
+     *
+     * @return how many people were given a rank
+     */
+    public static int rankLateShipCrews(Campaign campaign, CommandGenerationOptions options,
+          @Nullable List<Unit> ships) {
+        if ((campaign == null) || (options == null) || (ships == null) || ships.isEmpty()) {
+            return 0;
+        }
+        if (!options.isAutomaticallyAssignRanks()) {
+            LOGGER.info("[CompanyGen][RankAssign][LateShips] {} ship(s) left unranked: automatic ranks are off",
+                  ships.size());
+            return 0;
+        }
+        Faction faction = campaign.getPlayerForce().getFaction();
+        if (faction == null) {
+            LOGGER.warn("[CompanyGen][RankAssign][LateShips] {} ship(s) left unranked: the campaign has no faction",
+                  ships.size());
+            return 0;
+        }
+        int enlistedRank = enlistedRankForFaction(faction);
+        int supportRank = supportRankForFaction(faction);
+        RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
+        RankValidator rankValidator = new RankValidator();
+
+        int ranked = 0;
+        for (Unit ship : ships) {
+            if ((ship == null) || (ship.getEntity() == null) || !ship.getEntity().isLargeCraft()) {
+                continue;
+            }
+            Set<UUID> done = new HashSet<>();
+            Person captain = ship.getCommander();
+            if (captain != null) {
+                setRankWithFallback(captain, LATE_SHIP_CAPTAIN_RANK_INDEX, targetRankSystem, rankValidator);
+                done.add(captain.getId());
+                ranked++;
+            }
+            int enlisted = 0;
+            int support = 0;
+            // getCrew rather than unitCrew: it also holds the tech officer, who is crew aboard a ship.
+            for (Person person : ship.getCrew()) {
+                if ((person == null) || !done.add(person.getId())) {
+                    continue;
+                }
+                if (person.isSupport()) {
+                    setRankWithFallback(person, supportRank, targetRankSystem, rankValidator);
+                    support++;
+                } else if (person.isCombat()) {
+                    setRankWithFallback(person, enlistedRank, targetRankSystem, rankValidator);
+                    enlisted++;
+                }
+            }
+            ranked += enlisted + support;
+            LOGGER.info("[CompanyGen][RankAssign][LateShips] '{}': captain={} ({}), {} enlisted, {} support",
+                  ship.getName(), (captain == null) ? "none" : captain.getFullName(),
+                  (captain == null) ? "-" : captain.getRankName(), enlisted, support);
+        }
+        return ranked;
+    }
+
+    /**
      * Returns every Person attached to a unit — drivers + gunners + vessel crew + navigator. We
      * collect manually instead of using {@code getActiveCrew()} because the latter filters out
      * wounded Tank / Infantry pilots, and at generation time we want to count every assigned slot.
@@ -798,8 +866,10 @@ public final class RulesetRankAssigner {
      *
      * <p>Which band a role sits in follows real practice rather than canon, because canon does not
      * define separate medical or technical rank ladders - factions publish one ladder and MekHQ renders
-     * it through each profession's column. Physicians and administrators are commissioned and sit in
-     * the officer band; technicians and medics are enlisted and top out at the senior NCO ranks.</p>
+     * it through each profession's column. Physicians are commissioned and sit in the officer band;
+     * technicians and medics are enlisted and top out at the senior NCO ranks. Administrators are all
+     * Corporals whatever their skill; the chief administrator is raised above them by the appointment
+     * pass.</p>
      *
      * <p>Commissioned staff top out at Captain. Rank follows position rather than competence: mapping
      * skill straight onto seniority made every doctor in a command generated at Veteran a Major, and
@@ -828,18 +898,19 @@ public final class RulesetRankAssigner {
         if ((faction != null) && (faction.isComStarOrWoB() || faction.isClan())) {
             return supportRankForFaction(faction);
         }
+        if (role == PersonnelRole.ADMINISTRATOR) {
+            return RANK_CORPORAL;
+        }
         return isCommissionedSupportRole(role) ? commissionedRank(skill) : enlistedSupportRank(skill);
     }
 
     /**
-     * Whether a support role is commissioned. Physicians and administrators hold commissions in the
-     * services this ladder is modelled on; technicians, astechs and medics do not.
+     * Whether a support role is commissioned. Physicians hold commissions in the services this ladder is
+     * modelled on; technicians, astechs and medics do not. Administrators are handled before this, as a
+     * flat Corporal.
      */
     private static boolean isCommissionedSupportRole(PersonnelRole role) {
-        return switch (role) {
-            case DOCTOR, ADMINISTRATOR -> true;
-            default -> false;
-        };
+        return role == PersonnelRole.DOCTOR;
     }
 
     private static int commissionedRank(SkillLevel skill) {
@@ -868,15 +939,13 @@ public final class RulesetRankAssigner {
     }
 
     /**
-     * Switches the Person's rank system to the target faction's, then assigns the preferred rank
-     * index — walking DOWN the rank table if that index has no name for the Person's profession.
+     * Puts the Person on the target rank system (the campaign's, from Campaign Options), then assigns
+     * the preferred rank index, walking DOWN the rank table if that index has no name for the
+     * Person's profession.
      *
-     * <p>Two-step assignment is necessary because a Person's rank-name lookup goes through its
-     * own {@code RankSystem} instance, not the campaign's. If a Mercenary campaign generates a
-     * Clan force, the freshly-created Persons inherit the Mercenary rank system on construction;
-     * setting their rank index to 33 then renders as "Lieutenant" (the IS slot 33 name) instead
-     * of "Nova Commander" (the Clan slot 33 name). Swapping the rank system first ensures the
-     * index resolves through the correct table.</p>
+     * <p>A Person's rank-name lookup goes through its own {@code RankSystem} instance. Freshly
+     * created Persons already start on the campaign's system; the swap only moves someone who was
+     * on a different one, so the whole command reads its ranks from the table the player chose.</p>
      *
      * <p>{@link Profession#getProfessionFromBase(RankSystem, Rank)} already walks alternate
      * profession columns; this method handles the case where every profession in that walk

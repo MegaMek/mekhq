@@ -74,8 +74,8 @@ import mekhq.gui.baseComponents.hud.HudConfirmButton;
 
 /**
  * The console's Cast page: the characters the Oracle can pick when a random event involves an NPC. The list can be
- * reordered by dragging; removed characters move to their own filter and can be restored. The dossier shows a linked
- * person's portrait and role, and every journal entry the character appears in.
+ * reordered by dragging; removed characters move to their own filter, where they can be restored or deleted for good.
+ * The dossier shows a linked person's portrait and role, and every journal entry the character appears in.
  */
 class CastPage implements ConsoleSection {
     private static final MMLogger LOGGER = MMLogger.create(CastPage.class);
@@ -103,6 +103,7 @@ class CastPage implements ConsoleSection {
     private final HudButton rename;
     private final HudConfirmButton remove;
     private final HudButton restore;
+    private final HudConfirmButton delete;
     private final JLabel empty = Hud.notice("");
 
     /** The selected id, or {@code null} if nothing is selected. */
@@ -223,6 +224,10 @@ class CastPage implements ConsoleSection {
         restore = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.restore").toUpperCase(Locale.ROOT),
               false, true);
         restore.addActionListener(event -> setActive(true));
+        delete = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.delete").toUpperCase(Locale.ROOT),
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.confirmDelete").toUpperCase(Locale.ROOT), true);
+        delete.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.delete.toolTipText"));
+        delete.addActionListener(event -> deleteSelected());
         HudButton check = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.check").toUpperCase(Locale.ROOT),
               false, true);
         check.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.check.toolTipText"));
@@ -237,7 +242,7 @@ class CastPage implements ConsoleSection {
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
         dossier.add(leftAligned(renameRow));
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
-        dossier.add(leftAligned(rightButtonRow(null, rename, remove, restore, check, storyline)));
+        dossier.add(leftAligned(rightButtonRow(null, rename, remove, restore, delete, check, storyline)));
         dossier.add(Box.createVerticalStrut(scaleForGUI(14)));
         dossier.add(leftAligned(profile));
         dossier.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.appearances"))));
@@ -395,6 +400,9 @@ class CastPage implements ConsoleSection {
         remove.setVisible(character.isActive());
         remove.reset();
         restore.setVisible(!character.isActive());
+        // Only someone already removed can be deleted, so a single misclick never costs a cast member's tags.
+        delete.setVisible(!character.isActive());
+        delete.reset();
 
         profile.removeAll();
         if (!character.getNotes().isBlank()) {
@@ -476,6 +484,16 @@ class CastPage implements ConsoleSection {
             console.roleplay().removeCharacter(character);
             selectedId = null;
         }
+        console.changed();
+    }
+
+    private void deleteSelected() {
+        OracleCharacter character = console.roleplay().getCharacter(selectedId);
+        if (character == null || character.isActive()) {
+            return;
+        }
+        console.roleplay().deleteCharacter(character);
+        selectedId = null;
         console.changed();
     }
 

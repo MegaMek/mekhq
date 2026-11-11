@@ -547,6 +547,129 @@ public class CurrentLocationTest {
         }
     }
 
+    /** Tests for in-system transfers between two worlds of the current system. */
+    @Nested
+    class InSystemTransfer {
+        @Test
+        void setJumpPathPlacesTheWholeTransferAhead() {
+            Planet origin = mock(Planet.class);
+            Planet destination = mock(Planet.class);
+            when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(4.0);
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.setOriginPlanet(origin);
+            jumpPath.setTargetPlanet(destination);
+
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+            }
+
+            assertEquals(4.0, loc.getTransitTime(), 1e-9);
+            assertFalse(loc.isAtJumpPoint(), "A transfer between worlds never passes through the jump point");
+            assertTrue(loc.isInTransit());
+            assertEquals(0.0, loc.getPercentageTransit(), 1e-9);
+        }
+
+        @Test
+        void newDayArrivesAtTheTransferDestination() {
+            LocalDate today = LocalDate.of(2474, 11, 1);
+            Campaign campaign = mockCampaign();
+            when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            when(campaign.getLocalDate()).thenReturn(today);
+            when(campaign.getFutureContracts()).thenReturn(Collections.emptyList());
+            when(system.getRechargeTime(today, false)).thenReturn(176.0);
+            Planet origin = mock(Planet.class);
+            Planet destination = mock(Planet.class);
+            when(destination.getPrintableName(today)).thenReturn("Outer World");
+            when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(0.5);
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.setOriginPlanet(origin);
+            jumpPath.setTargetPlanet(destination);
+
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+
+                loc.newDay(campaign, false);
+
+                assertTrue(loc.isOnPlanet());
+                assertNull(loc.getJumpPath());
+                assertSame(destination, loc.getPlanet());
+                assertEquals(system, loc.getCurrentSystem(), "A transfer never leaves the system");
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("in transit to Outer World"));
+                verify(campaign).addReport(eq(DailyReportType.GENERAL), contains("Outer World reached."));
+                mekHQ.verify(() -> MekHQ.triggerEvent(isA(LocationChangedEvent.class)), never());
+            }
+        }
+
+        @Test
+        void cancellingMidTransferMeasuresFromTheWorldBeingFlownTo() {
+            Planet destination = mock(Planet.class);
+            when(destination.getTimeToJumpPoint(1.0)).thenReturn(6.0);
+            CurrentLocation loc = locationPartwayThroughTransfer(destination, 3.0);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(null);
+            }
+
+            // 3 days out from a world 6 days from its jump point is half way in, so half of the primary's 10 days
+            assertEquals(TIME_TO_JP * 0.5, loc.getTransitTime(), 1e-9);
+            assertTrue(loc.isInTransit());
+            assertFalse(loc.isAtJumpPoint());
+        }
+
+        @Test
+        void reRoutingMidTransferKeepsTheShareOfTheWayIn() {
+            Planet destination = mock(Planet.class);
+            when(destination.getTimeToJumpPoint(1.0)).thenReturn(6.0);
+            Planet newDestination = mock(Planet.class);
+            when(newDestination.getTimeToJumpPoint(1.0)).thenReturn(8.0);
+            CurrentLocation loc = locationPartwayThroughTransfer(destination, 3.0);
+            JumpPath reRoute = new JumpPath();
+            reRoute.addSystem(system);
+            reRoute.setTargetPlanet(newDestination);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(reRoute);
+            }
+
+            assertEquals(4.0, loc.getTransitTime(), 1e-9);
+            assertTrue(loc.isInTransit());
+        }
+
+        @Test
+        void cancellingFarFromTheDestinationWorldPlacesTheShipsAtTheJumpPoint() {
+            Planet destination = mock(Planet.class);
+            when(destination.getTimeToJumpPoint(1.0)).thenReturn(6.0);
+            CurrentLocation loc = locationPartwayThroughTransfer(destination, 9.0);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(null);
+            }
+
+            assertEquals(TIME_TO_JP, loc.getTransitTime(), 1e-9);
+            assertTrue(loc.isAtJumpPoint());
+        }
+
+        private CurrentLocation locationPartwayThroughTransfer(Planet destination, double daysToGo) {
+            Planet origin = mock(Planet.class);
+            when(origin.getTimeToPlanet(destination, 1.0)).thenReturn(12.0);
+            JumpPath jumpPath = new JumpPath();
+            jumpPath.addSystem(system);
+            jumpPath.setOriginPlanet(origin);
+            jumpPath.setTargetPlanet(destination);
+
+            CurrentLocation loc = new CurrentLocation(system, 0.0);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                loc.setJumpPath(jumpPath);
+            }
+            loc.setTransitTime(daysToGo);
+            return loc;
+        }
+    }
+
     @Nested
     class PersonChildSerialization {
 

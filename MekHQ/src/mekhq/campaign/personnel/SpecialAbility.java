@@ -208,6 +208,21 @@ public class SpecialAbility {
             }
         }
 
+        return isClanRequirementMet(isClanPilot);
+    }
+
+    /**
+     * Checks only this ability's Clan requirement, for callers that check its skill and ability prerequisites
+     * themselves, such as the Training Console checking them against training that is staged but not yet applied.
+     *
+     * @param isClanPilot whether the person is Clan personnel
+     *
+     * @return {@code true} if the ability has no Clan requirement, or the person meets it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isClanRequirementMet(boolean isClanPilot) {
         return !prereqMisc.containsKey(PREREQ_MISC_CLAN_PILOT) ||
                      (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLAN_PILOT)));
     }

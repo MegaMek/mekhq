@@ -55,6 +55,10 @@ import org.w3c.dom.NodeList;
  * <p>A path may optionally specify a {@link #getTargetPlanet() target planet} within its destination system; when set,
  * the final in-system leg is measured to that planet instead of the system's primary world.</p>
  *
+ * <p>A path made up of a single system that names both an {@link #getOriginPlanet() origin planet} and a target planet
+ * is an {@link #isInSystemTransfer() in-system transfer}: DropShips flying directly between two worlds of the same
+ * system, with no jump involved.</p>
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPath {
@@ -68,6 +72,13 @@ public class JumpPath {
      */
     @Nullable
     private Planet targetPlanet;
+
+    /**
+     * The planet within the first system this path departs from. Only meaningful for an
+     * {@link #isInSystemTransfer() in-system transfer}; {@code null} for every other path.
+     */
+    @Nullable
+    private Planet originPlanet;
 
     public JumpPath() {
         path = new ArrayList<>();
@@ -119,6 +130,37 @@ public class JumpPath {
         this.targetPlanet = targetPlanet;
     }
 
+    /**
+     * @return the planet an {@link #isInSystemTransfer() in-system transfer} departs from, or {@code null}
+     */
+    public @Nullable Planet getOriginPlanet() {
+        return originPlanet;
+    }
+
+    /**
+     * Sets the planet this path departs from. The planet is expected to belong to the {@link #getFirstSystem() first
+     * system} on the path.
+     *
+     * @param originPlanet the departure planet, or {@code null} if the path does not depart from a specific world
+     */
+    public void setOriginPlanet(final @Nullable Planet originPlanet) {
+        this.originPlanet = originPlanet;
+    }
+
+    /**
+     * @return {@code true} if this path is a direct flight between two different worlds of a single system
+     */
+    public boolean isInSystemTransfer() {
+        return (size() == 1) && (originPlanet != null) && (targetPlanet != null) && !originPlanet.equals(targetPlanet);
+    }
+
+    /**
+     * @return the in-system transfer time at 1g, in days, or {@code 0} if this path is not an in-system transfer
+     */
+    public double getInSystemTransferTime() {
+        return isInSystemTransfer() ? originPlanet.getTimeToPlanet(targetPlanet, 1.0) : 0.0;
+    }
+
     /** Rebinds systems and the destination world after planetary edits, preserving the route's waypoint order. */
     public void refreshPlanetarySystems(Campaign campaign) {
         for (int index = 0; index < path.size(); index++) {
@@ -136,6 +178,14 @@ public class JumpPath {
             targetPlanet = destination == null ? null : destination.getPlanetById(planetId);
             if (targetPlanet == null) {
                 LOGGER.warn("Couldn't find route destination world {}; falling back to the primary world.", planetId);
+            }
+        }
+        if (originPlanet != null) {
+            String planetId = originPlanet.getId();
+            PlanetarySystem origin = getFirstSystem();
+            originPlanet = origin == null ? null : origin.getPlanetById(planetId);
+            if (originPlanet == null) {
+                LOGGER.warn("Couldn't find route departure world {}.", planetId);
             }
         }
     }
@@ -258,6 +308,9 @@ public class JumpPath {
      * Calculates the total journey time for the path, including recharge, start, and end times, taking the fleet's
      * {@link JumpDriveProfile} into account.
      *
+     * <p>For an {@link #isInSystemTransfer() in-system transfer} this is the flight time still to go: the whole flight
+     * while {@code currentTransit} is {@code 0} (not yet departed), otherwise {@code currentTransit} itself.</p>
+     *
      * @param when                the date to use for all time calculations in the journey
      * @param currentTransit      the remaining fraction of the current transit
      * @param isUseCommandCircuit {@code true} if command circuits are used for the journey
@@ -271,6 +324,12 @@ public class JumpPath {
      */
     public double getTotalTime(LocalDate when, double currentTransit, boolean isUseCommandCircuit,
           @Nullable JumpDriveProfile jumpDriveProfile) {
+        if (isInSystemTransfer()) {
+            // Underway, currentTransit is the time still to go; before departure the fleet sits at its world with
+            // nothing travelled, so the whole flight lies ahead
+            double transferTime = getInSystemTransferTime();
+            return (currentTransit > 0) ? Math.min(currentTransit, transferTime) : transferTime;
+        }
         return getTotalRechargeTime(when, isUseCommandCircuit, jumpDriveProfile)
                      + getStartTime(currentTransit)
                      + getEndTime();
@@ -314,6 +373,9 @@ public class JumpPath {
         if (targetPlanet != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetPlanetId", targetPlanet.getId());
         }
+        if (originPlanet != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originPlanetId", originPlanet.getId());
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "jumpPath");
     }
 
@@ -323,6 +385,7 @@ public class JumpPath {
         try {
             retVal = new JumpPath();
             String targetPlanetId = null;
+            String originPlanetId = null;
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -336,12 +399,17 @@ public class JumpPath {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("targetPlanetId")) {
                     targetPlanetId = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("originPlanetId")) {
+                    originPlanetId = wn2.getTextContent();
                 }
             }
 
             // Resolve the target planet against the destination system after the whole path is built.
             if ((targetPlanetId != null) && (retVal.getLastSystem() != null)) {
                 retVal.setTargetPlanet(retVal.getLastSystem().getPlanetById(targetPlanetId));
+            }
+            if ((originPlanetId != null) && (retVal.getFirstSystem() != null)) {
+                retVal.setOriginPlanet(retVal.getFirstSystem().getPlanetById(originPlanetId));
             }
         } catch (Exception ex) {
             LOGGER.error("", ex);

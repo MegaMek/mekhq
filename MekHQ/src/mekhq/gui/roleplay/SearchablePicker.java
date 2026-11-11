@@ -59,7 +59,7 @@ import mekhq.gui.baseComponents.hud.Hud;
  *
  * @param <E> the type of entry
  */
-final class SearchablePicker<E> {
+public final class SearchablePicker<E> {
     private final String name;
     private final Function<E, String> display;
     private final Runnable onChange;
@@ -72,7 +72,7 @@ final class SearchablePicker<E> {
      * @param display  the text shown for, and searched in, each entry
      * @param onChange run when the player picks a different entry, but not when the entries are replaced
      */
-    SearchablePicker(final String name, final Function<E, String> display, final Runnable onChange) {
+    public SearchablePicker(final String name, final Function<E, String> display, final Runnable onChange) {
         this.name = name;
         this.display = display;
         this.onChange = onChange;
@@ -80,7 +80,7 @@ final class SearchablePicker<E> {
     }
 
     /** @return the component to add to a layout; it stays the same when the entries change */
-    JPanel getComponent() {
+    public JPanel getComponent() {
         return slot;
     }
 
@@ -90,7 +90,7 @@ final class SearchablePicker<E> {
      * @param items    the entries, in display order
      * @param selected the entry to select, or {@code null} for the first
      */
-    void setItems(final List<E> items, final @Nullable E selected) {
+    public void setItems(final List<E> items, final @Nullable E selected) {
         filling = true;
         try {
             SearchableComboBox<E> replacement = new SearchableComboBox<>(name, items, display);
@@ -119,7 +119,7 @@ final class SearchablePicker<E> {
     }
 
     /** @return every entry, in display order */
-    List<E> getItems() {
+    public List<E> getItems() {
         List<E> items = new ArrayList<>();
         for (int index = 0; index < combo.getItemCount(); index++) {
             items.add(combo.getItemAt(index));
@@ -128,7 +128,7 @@ final class SearchablePicker<E> {
     }
 
     /** @return the selected entry, or {@code null} if the list is empty */
-    @Nullable E getSelected() {
+    public @Nullable E getSelected() {
         return combo.getSelectedItem();
     }
 
@@ -137,14 +137,14 @@ final class SearchablePicker<E> {
      *
      * @param item the entry to select; one that isn't listed is ignored
      */
-    void setSelected(final @Nullable E item) {
+    public void setSelected(final @Nullable E item) {
         if (item != null && getItems().contains(item)) {
             combo.setSelectedItem(item);
         }
     }
 
     /** @param text the tooltip, kept when the entries are replaced */
-    void setToolTipText(final String text) {
+    public void setToolTipText(final String text) {
         combo.setToolTipText(text);
     }
 

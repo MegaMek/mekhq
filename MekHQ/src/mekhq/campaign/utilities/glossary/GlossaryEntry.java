@@ -93,6 +93,7 @@ public enum GlossaryEntry {
     CRISIS_SCENARIO("CRISIS_SCENARIO", new Version("0.50.06")),
     DAMAGED_PARTS("DAMAGED_PARTS", new Version("0.50.06")),
     DELIVERY_TIMES("DELIVERY_TIMES", new Version("0.50.06")),
+    DEPLOYMENT_ORDERS("DEPLOYMENT_ORDERS", new Version("0.51.01")),
     DEPRECATED("DEPRECATED", new Version("0.50.06")),
     DIGITAL_GM("DIGITAL_GM", new Version("0.50.10")),
     DISEASES("DISEASES", new Version("0.50.10")),
@@ -207,8 +208,9 @@ public enum GlossaryEntry {
     STRATCON_SCENARIOS("STRATCON_SCENARIOS", new Version("0.51.01")),
     STRATCON_SIEGES("STRATCON_SIEGES", new Version("0.51.01")),
     STRATCON_SINGLE_DROP("STRATCON_SINGLE_DROP", new Version("0.50.10")),
+    STRATCON_SUPPLY_INTERDICTION("STRATCON_SUPPLY_INTERDICTION", new Version("0.51.01")),
     STRATCON_SUPPLY_LINES("STRATCON_SUPPLY_LINES", new Version("0.51.01")),
-    STRATEGIC_OBJECTIVES("STRATEGIC_OBJECTIVES", new Version("0.50.06")),
+    STRATEGIC_OBJECTIVES("STRATEGIC_OBJECTIVES", new Version("0.51.01")),
     STRIPPING_AND_REPAIRING("STRIPPING_AND_REPAIRING", new Version("0.50.06")),
     SUPPORT_TEAMS("SUPPORT_TEAMS", new Version("0.51.01")),
     TECH_TIME("TECH_TIME", new Version("0.50.06")),
@@ -219,7 +221,7 @@ public enum GlossaryEntry {
     TRAITS("TRAITS", new Version("0.51.01")),
     TRAINING_COSTS("TRAINING_COSTS", new Version("0.51.01")),
     TRIAL_OF_POSSESSION("TRIAL_OF_POSSESSION", new Version("0.51.01")),
-    TURNING_POINTS("TURNING_POINTS", new Version("0.50.06")),
+    TURNING_POINTS("TURNING_POINTS", new Version("0.51.01")),
     TURNOVER("TURNOVER", new Version("0.50.06")),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
     UNLUCKY("UNLUCKY", new Version("0.51.01")),
@@ -270,6 +272,18 @@ public enum GlossaryEntry {
      */
     public String getTitle() {
         return getTextAt(RESOURCE_BUNDLE, lookUpName + ".title");
+    }
+
+    /**
+     * Returns the version in which this entry was added or last updated.
+     *
+     * @return the version this entry was added or last updated in
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Version getVersionAddedOrLastUpdated() {
+        return versionAddedOrLastUpdated;
     }
 
     /**

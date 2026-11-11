@@ -2068,6 +2068,42 @@ public class TransportCostCalculationsTest {
                               .get(null);
     }
 
+    @Test
+    public void journeyWithoutAJumpIsNotChargedForDockingCollars() {
+        // A lone DropShip has no JumpShip of its own, so it needs a hired collar - but only to jump
+        Entity dropShip = mock(Entity.class);
+        when(dropShip.isDropShip()).thenReturn(true);
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithEntity(dropShip)));
+
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            local.calculateJumpCostForEachDay();
+        }
+
+        assertEquals(1, local.getAdditionalCollarsRequired());
+        Money dailyCollarCost = Money.of(round(JUMP_SHIP_COLLAR_COST));
+        assertEquals(dailyCollarCost.multipliedBy(10).round(), local.calculateJumpCostForEntireJourney(10, 0));
+        assertTrue(local.calculateInSystemCostForEntireJourney(10).isZero(),
+              "No JumpShip is involved, so no collar is hired");
+    }
+
+    @Test
+    public void journeyCostChargesForJumpShipsOnlyWhenThePathJumps() {
+        Entity dropShip = mock(Entity.class);
+        when(dropShip.isDropShip()).thenReturn(true);
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithEntity(dropShip)));
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            local.calculateJumpCostForEachDay();
+        }
+        JumpPath inSystem = mock(JumpPath.class);
+        when(inSystem.getJumps()).thenReturn(0);
+        JumpPath oneJump = mock(JumpPath.class);
+        when(oneJump.getJumps()).thenReturn(1);
+
+        assertEquals(local.calculateInSystemCostForEntireJourney(10),
+              local.calculateCostForEntireJourney(10, inSystem));
+        assertEquals(local.calculateJumpCostForEntireJourney(10, 1), local.calculateCostForEntireJourney(10, oneJump));
+    }
+
     private static double getModularDivider() throws Exception {
         return (double) TransportCostCalculations.class.getDeclaredField("SPACE_STATION_MODULAR_COLLAR_NEED_DIVIDER")
                               .get(null);

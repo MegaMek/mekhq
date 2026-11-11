@@ -66,58 +66,64 @@ class UnitCostModelTest {
     void exactlyOneModelCheckMatches(UnitCostModel model) {
         assertEquals(model == UnitCostModel.TOTAL_WARFARE, model.isTotalWarfare());
         assertEquals(model == UnitCostModel.CHAOS_CAMPAIGN, model.isChaosCampaign());
-        assertEquals(model == UnitCostModel.MEKHQ, model.isMekHQ());
     }
 
     @ParameterizedTest
     @EnumSource(UnitCostModel.class)
-    void nameRoundTripsThroughValueOf(UnitCostModel model) {
-        assertTrue(model == UnitCostModel.valueOf(model.name()));
+    void nameRoundTripsThroughFromString(UnitCostModel model) {
+        assertTrue(model == UnitCostModel.fromString(model.name()));
+    }
+
+    /**
+     * The removed MekHQ model, and anything else unrecognised, loads as the default Total Warfare model.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "MEKHQ", "", "NOT_A_MODEL" })
+    void unknownNamesFallBackToTotalWarfare(String text) {
+        assertEquals(UnitCostModel.TOTAL_WARFARE, UnitCostModel.fromString(text));
     }
 
     @Test
-    void totalWarfareNeverUsesBattleValue() {
-        assertFalse(UnitCostModel.TOTAL_WARFARE.isBattleValueCost(false));
-        assertFalse(UnitCostModel.TOTAL_WARFARE.isBattleValueCost(true));
+    void nullFallsBackToTotalWarfare() {
+        assertEquals(UnitCostModel.TOTAL_WARFARE, UnitCostModel.fromString(null));
     }
 
-    @Test
-    void chaosCampaignAlwaysUsesBattleValue() {
-        assertTrue(UnitCostModel.CHAOS_CAMPAIGN.isBattleValueCost(false));
-        assertTrue(UnitCostModel.CHAOS_CAMPAIGN.isBattleValueCost(true));
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void totalWarfareNeverUsesBattleValue(boolean isLargeCraft) {
+        Entity entity = mock(Entity.class);
+        when(entity.isLargeCraft()).thenReturn(isLargeCraft);
+
+        assertFalse(UnitCostModel.TOTAL_WARFARE.isBattleValueCost(entity));
+        assertFalse(UnitCostModel.TOTAL_WARFARE.isBattleValueCost(mock(MekSummary.class)));
     }
 
-    @Test
-    void mekHQUsesBattleValueForEverythingButLargeCraft() {
-        assertTrue(UnitCostModel.MEKHQ.isBattleValueCost(false));
-        assertFalse(UnitCostModel.MEKHQ.isBattleValueCost(true));
+    /** Chaos Campaign values every unit by Battle Value, large craft included. */
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void chaosCampaignAlwaysUsesBattleValue(boolean isLargeCraft) {
+        Entity entity = mock(Entity.class);
+        when(entity.isLargeCraft()).thenReturn(isLargeCraft);
+
+        assertTrue(UnitCostModel.CHAOS_CAMPAIGN.isBattleValueCost(entity));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { UnitType.MEK, UnitType.TANK, UnitType.AEROSPACE_FIGHTER, UnitType.SMALL_CRAFT,
+                          UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
+    void chaosCampaignUsesBattleValueForEverySummary(int unitType) {
+        MekSummary summary = mock(MekSummary.class);
+        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
+
+        assertTrue(UnitCostModel.CHAOS_CAMPAIGN.isBattleValueCost(summary));
     }
 
     @ParameterizedTest
     @EnumSource(UnitCostModel.class)
     void nullEntityNeverUsesBattleValue(UnitCostModel model) {
         assertFalse(model.isBattleValueCost((Entity) null));
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void mekHQFollowsTheEntityLargeCraftCheck(boolean isLargeCraft) {
-        Entity entity = mock(Entity.class);
-        when(entity.isLargeCraft()).thenReturn(isLargeCraft);
-
-        assertEquals(!isLargeCraft, UnitCostModel.MEKHQ.isBattleValueCost(entity));
-    }
-
-    /** Matches {@link Entity#isLargeCraft()}: DropShips and every kind of JumpShip, but not small craft. */
-    @ParameterizedTest
-    @ValueSource(ints = { UnitType.MEK, UnitType.TANK, UnitType.AEROSPACE_FIGHTER, UnitType.SMALL_CRAFT,
-                          UnitType.DROPSHIP, UnitType.JUMPSHIP, UnitType.WARSHIP, UnitType.SPACE_STATION })
-    void mekHQFollowsTheSummaryUnitType(int unitType) {
-        MekSummary summary = mock(MekSummary.class);
-        when(summary.getUnitType()).thenReturn(UnitType.getTypeName(unitType));
-        boolean isLargeCraft = (unitType == UnitType.DROPSHIP) || (unitType == UnitType.JUMPSHIP)
-                                     || (unitType == UnitType.WARSHIP) || (unitType == UnitType.SPACE_STATION);
-
-        assertEquals(!isLargeCraft, UnitCostModel.MEKHQ.isBattleValueCost(summary));
     }
 }
