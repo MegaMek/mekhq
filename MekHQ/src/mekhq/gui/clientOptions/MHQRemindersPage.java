@@ -156,6 +156,7 @@ class MHQRemindersPage extends MHQOptionsPage {
               { "optionStratConDeployConfirmation", MHQConstants.CONFIRMATION_STRATCON_DEPLOY },
               { "optionResolveScenarioConfirmation", MHQConstants.CONFIRMATION_RESOLVE_SCENARIO },
               { "optionAbandonUnitsConfirmation", MHQConstants.CONFIRMATION_ABANDON_UNITS },
+              { "optionAssignTechsConfirmation", MHQConstants.CONFIRMATION_ASSIGN_TECHS },
               { "optionNewLifePathConfirmation", MHQConstants.CONFIRMATION_NEW_LIFE_PATH },
               { "optionRegenPathIdConfirmation", MHQConstants.CONFIRMATION_REGEN_PATH_ID },
               { "optionUpgradeLifePathsConfirmation", MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS },

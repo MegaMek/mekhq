@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
+import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -85,7 +86,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
@@ -360,11 +363,30 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private void quickAssignTechs() {
-        boolean allowIgnore = false;
-        ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(getCampaign(),
-              CONFIRMATION_ASSIGN_TECHS, allowIgnore);
+        // This is triggered by an explicit button press, so the dialog must always be shown and can't offer a "don't
+        // bother me again" option. Otherwise, the button would appear to do nothing.
+        String confirmationBundle = "mekhq.resources.ImmersiveDialogConfirmation";
+        String message = getText("AreYouSure.text") + "<p>" + getTextAt(confirmationBundle,
+              "ImmersiveDialogConfirmation." + CONFIRMATION_ASSIGN_TECHS + ".text.primary") + "</p>";
+        List<ButtonLabelTooltipPair> buttons = List.of(
+              new ButtonLabelTooltipPair(getTextAt(confirmationBundle, "ImmersiveDialogConfirmation.button.no"), null),
+              new ButtonLabelTooltipPair(getTextAt(confirmationBundle, "ImmersiveDialogConfirmation.button.yes"),
+                    null));
 
-        if (confirmation.wasConfirmed()) {
+        ImmersiveDialogCore dialog = new ImmersiveDialogCore(getCampaign(),
+              null,
+              null,
+              message,
+              buttons,
+              null,
+              ImmersiveDialogWidth.SMALL.getWidth(),
+              false,
+              null,
+              null,
+              true);
+
+        int confirmChoiceIndex = 1;
+        if (dialog.getDialogChoice() == confirmChoiceIndex) {
             boolean skipReports = true;
             AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }

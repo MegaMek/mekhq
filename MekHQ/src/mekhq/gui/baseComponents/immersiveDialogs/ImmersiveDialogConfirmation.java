@@ -87,26 +87,6 @@ public class ImmersiveDialogConfirmation extends ImmersiveDialogCore {
      * @since 0.50.07
      */
     public ImmersiveDialogConfirmation(Campaign campaign, String nagKey) {
-        this(campaign, nagKey, true);
-    }
-
-    /**
-     * Constructs a confirmation dialog for the provided campaign, presenting a localized "Are you sure?" message with
-     * "No" and "Yes" button choices.
-     *
-     * <p>After construction, the result of the user's choice may be queried via {@link #wasConfirmed()}.</p>
-     *
-     * @param campaign           the current {@link Campaign} context this dialog is associated with
-     * @param nagKey             the nag identifier used to look up additional text and, if {@code allowIgnore} is
-     *                           {@code true}, to track whether this confirmation should be ignored in the future
-     * @param allowIgnore        whether to show the "don't bother me again" checkbox. This should be {@code false} for
-     *                           confirmations triggered directly by an explicit user action (such as a button), where
-     *                           suppressing the dialog would leave the action without any visible response.
-     *
-     * @author Illiani
-     * @since 0.50.12
-     */
-    public ImmersiveDialogConfirmation(Campaign campaign, String nagKey, boolean allowIgnore) {
         super(campaign,
               null,
               null,
@@ -116,7 +96,7 @@ public class ImmersiveDialogConfirmation extends ImmersiveDialogCore {
               getSecondaryText(),
               ImmersiveDialogWidth.SMALL.getWidth(),
               false,
-              allowIgnore ? getSupplementalPanel(nagKey) : null,
+              getSupplementalPanel(nagKey),
               null,
               true);
 
