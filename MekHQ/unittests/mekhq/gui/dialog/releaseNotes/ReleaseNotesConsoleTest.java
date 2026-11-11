@@ -88,6 +88,16 @@ class ReleaseNotesConsoleTest {
     }
 
     @Test
+    void theSubtitleNamesTheStartOnlyWhenTheTabCoversARange() {
+        ReleaseNotes range = new ReleaseNotes("megamek", PAGE, "0.51.01.3", List.of(release("0.51.01.5", 5, "Five")));
+        ReleaseNotes single = new ReleaseNotes("mekhq", PAGE, null, List.of(release("0.51.01.5", 5, "Five")));
+
+        assertEquals("Everything that changed since 0.51.01.3.", ReleaseNotesConsole.subtitle(range));
+        assertEquals(ReleaseNotesConsole.subtitle(null), ReleaseNotesConsole.subtitle(single));
+        assertFalse(ReleaseNotesConsole.subtitle(single).contains("since"));
+    }
+
+    @Test
     void tabsAreMekHqThenTheApplicationsItIncludes() {
         assertEquals(List.of("MekHQ", "MegaMek", "MegaMekLab"),
               ReleaseNotesConsole.REPOSITORIES.stream().map(ReleaseNotesConsole::productName).toList());

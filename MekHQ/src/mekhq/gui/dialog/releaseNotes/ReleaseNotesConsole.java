@@ -65,6 +65,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import jakarta.annotation.Nullable;
 import megamek.SuiteConstants;
 import megamek.Version;
 import megamek.client.ui.dialogs.releaseNotes.ReleaseNotes;
@@ -299,10 +300,6 @@ public class ReleaseNotesConsole extends JDialog {
     private void showNotes(Tab tab, ReleaseNotes notes) {
         tab.notes = notes;
         tab.page = notes.page();
-        if (notes.since() != null) {
-            subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "ReleaseNotesConsole.subtitle.since",
-                  notes.since()));
-        }
         showText(tab, body(notes));
         refreshSummary();
     }
@@ -313,8 +310,10 @@ public class ReleaseNotesConsole extends JDialog {
         refreshSummary();
     }
 
+    /** Shows the selected tab's range under the title, and its summary in the footer. */
     private void refreshSummary() {
         Tab tab = tabs.get(selected);
+        subtitle.setText(subtitle(tab.failed ? null : tab.notes));
         if (tab.failed) {
             footerSummary.setText(getTextAt(RESOURCE_BUNDLE, "ReleaseNotesConsole.summary.failed"));
         } else if (tab.notes == null) {
@@ -322,6 +321,21 @@ public class ReleaseNotesConsole extends JDialog {
         } else {
             footerSummary.setText(summary(tab.notes));
         }
+    }
+
+    /**
+     * The line under the title for one tab: the version its notes start from when they cover a range, and the general
+     * text otherwise, including while they load.
+     *
+     * @param notes the tab's loaded notes, or {@code null} when they are not loaded
+     *
+     * @return the subtitle
+     */
+    static String subtitle(@Nullable ReleaseNotes notes) {
+        if ((notes == null) || (notes.since() == null)) {
+            return getTextAt(RESOURCE_BUNDLE, "ReleaseNotesConsole.subtitle");
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "ReleaseNotesConsole.subtitle.since", notes.since());
     }
 
     private static void showText(Tab tab, String body) {
