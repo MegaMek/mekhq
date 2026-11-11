@@ -94,6 +94,7 @@ class FinancesOptionsModel {
     double successionWarsAdvancedTechPriceMultiplier;
     double techRatingEPriceMultiplier;
     double techRatingFPriceMultiplier;
+    boolean applyAcquisitionMultipliersToParts;
     double[] usedPartPriceMultipliers;
     double damagedPartsValueMultiplier;
     double unrepairablePartsValueMultiplier;
@@ -154,6 +155,7 @@ class FinancesOptionsModel {
         successionWarsAdvancedTechPriceMultiplier = options.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER);
         techRatingEPriceMultiplier = options.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER);
         techRatingFPriceMultiplier = options.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER);
+        applyAcquisitionMultipliersToParts = options.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS);
         usedPartPriceMultipliers = Arrays.copyOf(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS),
               options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length);
         damagedPartsValueMultiplier = options.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER);
@@ -216,6 +218,7 @@ class FinancesOptionsModel {
         options.set(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER, successionWarsAdvancedTechPriceMultiplier);
         options.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, techRatingEPriceMultiplier);
         options.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, techRatingFPriceMultiplier);
+        options.set(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS, applyAcquisitionMultipliersToParts);
         for (int i = 0; i < Math.min(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length,
               usedPartPriceMultipliers.length); i++) {
             options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[i] = usedPartPriceMultipliers[i];

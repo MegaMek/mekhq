@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelU
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,6 +54,8 @@ import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -110,6 +113,7 @@ class PriceMultipliersPage {
     private JSpinner spnTechRatingEPriceMultiplier;
     private JLabel lblTechRatingFPriceMultiplier;
     private JSpinner spnTechRatingFPriceMultiplier;
+    private JCheckBox chkApplyAcquisitionMultipliersToParts;
 
     private JPanel pnlUsedPartsMultipliers;
     private JLabel[] lblUsedPartPriceMultipliers;
@@ -235,8 +239,8 @@ class PriceMultipliersPage {
 
     /**
      * Creates the Campaign Operations acquisition multipliers panel (CO p.14): the era- and faction-dependent Clan tech
-     * and tech rating multipliers, and the engine multipliers. These stack additively with each other (see
-     * {@link AcquisitionPriceMultipliers}).
+     * and tech rating multipliers, which stack additively with each other (see {@link AcquisitionPriceMultipliers}),
+     * and the unofficial toggle that also applies them to parts.
      *
      * @return a JPanel containing the components for setting the acquisition multipliers.
      */
@@ -305,7 +309,17 @@ class PriceMultipliersPage {
                 spnSuccessionWarsAdvancedTechPriceMultiplier, spnTechRatingEPriceMultiplier,
                 spnTechRatingFPriceMultiplier };
 
-        return createPriceMultiplierGridPanel("AcquisitionMultipliersPanel", labels, controls);
+        chkApplyAcquisitionMultipliersToParts = new CampaignOptionsCheckBox("ApplyAcquisitionMultipliersToParts",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkApplyAcquisitionMultipliersToParts.addMouseListener(
+              createTipPanelUpdater("ApplyAcquisitionMultipliersToParts"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("AcquisitionMultipliersWrapperPanel",
+              LABEL_COLUMN_WIDTH, GRID_CONTROL_COLUMN_WIDTH);
+        panel.addCheckBox(chkApplyAcquisitionMultipliersToParts);
+        panel.addFullWidthComponent(createPriceMultiplierGridPanel("AcquisitionMultipliersPanel", labels, controls));
+
+        return panel;
     }
 
     /**
@@ -455,6 +469,7 @@ class PriceMultipliersPage {
         spnSuccessionWarsAdvancedTechPriceMultiplier.setValue(model.successionWarsAdvancedTechPriceMultiplier);
         spnTechRatingEPriceMultiplier.setValue(model.techRatingEPriceMultiplier);
         spnTechRatingFPriceMultiplier.setValue(model.techRatingFPriceMultiplier);
+        chkApplyAcquisitionMultipliersToParts.setSelected(model.applyAcquisitionMultipliersToParts);
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             spnUsedPartPriceMultipliers[i].setValue(model.usedPartPriceMultipliers[i]);
@@ -487,6 +502,7 @@ class PriceMultipliersPage {
                 (double) spnSuccessionWarsAdvancedTechPriceMultiplier.getValue();
         model.techRatingEPriceMultiplier = (double) spnTechRatingEPriceMultiplier.getValue();
         model.techRatingFPriceMultiplier = (double) spnTechRatingFPriceMultiplier.getValue();
+        model.applyAcquisitionMultipliersToParts = chkApplyAcquisitionMultipliersToParts.isSelected();
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             model.usedPartPriceMultipliers[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();

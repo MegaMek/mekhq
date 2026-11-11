@@ -48,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.parts.meks.MekCockpit;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -86,6 +87,9 @@ public class TotalBuyCostTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.UNIT_COST_MODEL)).thenReturn(UnitCostModel.TOTAL_WARFARE);
         double[] usedPartMultipliers = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
         lenient().when(mockCampaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)).thenReturn(usedPartMultipliers);
 

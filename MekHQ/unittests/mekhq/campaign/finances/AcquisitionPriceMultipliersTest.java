@@ -262,9 +262,21 @@ class AcquisitionPriceMultipliersTest {
                   summary), DELTA);
         }
 
+        /** Parts only pay the multipliers when the unofficial option is on. */
+        @Test
+        void partsAreNotSurchargedByDefault() {
+            Part part = mock(Part.class);
+            when(part.getTechBase()).thenReturn(TechBase.CLAN);
+            when(part.getTechRating()).thenReturn(TechRating.F);
+
+            assertEquals(1.0, AcquisitionPriceMultipliers.getPartMultiplier(campaignOptions, innerSphere, GAME_YEAR,
+                  part), DELTA);
+        }
+
         /** ×5 for Clan tech before 3071 and ×1.25 for tech rating F: 1 + 4 + 0.25. */
         @Test
-        void clanPartsPayTheClanTechAndTechRatingMultipliers() {
+        void clanPartsPayTheClanTechAndTechRatingMultipliersWhenEnabled() {
+            campaignOptions.set(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS, true);
             Part part = mock(Part.class);
             when(part.getTechBase()).thenReturn(TechBase.CLAN);
             when(part.getTechRating()).thenReturn(TechRating.F);

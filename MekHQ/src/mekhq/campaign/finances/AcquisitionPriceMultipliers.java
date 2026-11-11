@@ -65,7 +65,8 @@ import mekhq.campaign.universe.Faction;
  * the listed years, nothing replaces the era multipliers, so tech rating E and F fall back to their usual multipliers
  * and Clan tech has no multiplier at all.</p>
  *
- * <p>The multiplier for a unit covers its whole price.</p>
+ * <p>The multiplier for a unit covers its whole price. Parts only pay the multipliers when the unofficial
+ * {@link CampaignOption#APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS} option is on.</p>
  *
  * <p>A mixed-tech unit pays none of the Clan tech multipliers, whatever its chassis: its mixed-tech unit price
  * multiplier already covers its Clan equipment.</p>
@@ -131,13 +132,18 @@ public final class AcquisitionPriceMultipliers {
      * @param gameYear        the current year
      * @param part            the part
      *
-     * @return the acquisition price multiplier for the part
+     * @return the acquisition price multiplier for the part; ×1 unless
+     *       {@link CampaignOption#APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS} is on
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static double getPartMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Part part) {
+        if (!campaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS)) {
+            return 1.0;
+        }
+
         return getMultiplier(campaignOptions, faction, gameYear, part.getTechBase() == TechBase.CLAN,
               part.getTechRating());
     }
