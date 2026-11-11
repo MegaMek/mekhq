@@ -159,6 +159,7 @@ public class CampaignGUI extends JPanel {
     /** The buttons of the refit site question, in the order they are shown */
     private static final int REFIT_SITE_CANCEL = 0;
     private static final int REFIT_SITE_MOVE = 2;
+    private static final int REFIT_CONFIRM_BEGIN = 1;
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1381,8 +1382,9 @@ public class CampaignGUI extends JPanel {
         List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.cancel"),
               getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.stay", currentSiteName),
               getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.move", requiredSiteName));
+        // Cancel stays first, so closing with X cancels, but the move the rules call for has focus
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
-              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false);
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false, REFIT_SITE_MOVE);
 
         return switch (dialog.getDialogChoice()) {
             case REFIT_SITE_CANCEL -> {
@@ -1491,10 +1493,11 @@ public class CampaignGUI extends JPanel {
     private boolean isRefitConfirmed(Refit refit) {
         List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.cancel"),
               getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.begin"));
+        // Cancel stays first, so closing with X cancels, but Begin has focus: the player just chose the tech
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
               RefitBriefing.describeInCharacter(getCampaign(), refit), buttons,
-              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false);
-        return dialog.getDialogChoice() == 1;
+              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false, REFIT_CONFIRM_BEGIN);
+        return dialog.getDialogChoice() == REFIT_CONFIRM_BEGIN;
     }
 
     /**
