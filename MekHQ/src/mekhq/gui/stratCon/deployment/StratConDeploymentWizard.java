@@ -568,8 +568,29 @@ public class StratConDeploymentWizard extends JDialog {
         }
 
         // A staged formation deploys with all of its units, so those units must not be offered again here.
-        List<Unit> eligibleUnits = getEligibleLeadershipUnits(campaign, scenario, leadershipSkill);
+        List<Unit> eligibleUnits = getEligibleLeadershipUnits(campaign, scenario, leadershipSkill,
+              leadershipPrimaryForceIds());
         allItems.addAll(StratConDeploymentService.excludeUnitsOfFormations(eligibleUnits, stagedFormations()));
+    }
+
+    /**
+     * The formations leadership units are matched against. A primary staged this session is not written to the scenario
+     * until commit, so the scenario's primary force list is still empty and would offer no leadership units at all; the
+     * staged primary is used instead. When reinforcing an already-committed scenario, its committed primary is used.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private List<Integer> leadershipPrimaryForceIds() {
+        if (stagedPrimaryForces.isEmpty()) {
+            return scenario.getPrimaryForceIDs();
+        }
+
+        List<Integer> stagedPrimaryForceIds = new ArrayList<>();
+        for (Formation stagedPrimaryForce : stagedPrimaryForces) {
+            stagedPrimaryForceIds.add(stagedPrimaryForce.getId());
+        }
+        return stagedPrimaryForceIds;
     }
 
     private void loadEligibleUtilityUnits() {

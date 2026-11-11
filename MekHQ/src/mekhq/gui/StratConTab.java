@@ -42,6 +42,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -64,6 +65,7 @@ import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.MHQOptions;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -112,15 +114,9 @@ public class StratConTab extends CampaignGuiTab {
     private List<StratConTrackState> currentSectorTracks;
     private JPanel infoPanel;
     private JLabel infoPanelText;
-    private RoundedJButton btnScoutSector;
-    private RoundedJButton btnResetSectorFog;
-    private RoundedJButton btnRegenerateSector;
-    private RoundedJButton btnResizeSector;
-    private RoundedJButton btnChangeTerrain;
-    private RoundedJButton btnEditSupportPoints;
-    private RoundedJButton btnEditVictoryPoints;
-    private RoundedJButton btnToggleHiddenObjects;
+    private JPanel gmToolsPanel;
     private RoundedJButton btnFacilities;
+    private JPanel hudTogglePanel;
     private JLabel objectiveStatusText;
     private JPanel threatLevelPanel;
     private JPanel deploymentTimePanel;
@@ -213,7 +209,8 @@ public class StratConTab extends CampaignGuiTab {
         // act on instead of running beneath the info panel as well. The tutorial link stays below them, at the very
         // bottom of the column.
         JPanel centerFooter = new JPanel(new BorderLayout());
-        centerFooter.add(initializeGmButtonPanel(), BorderLayout.NORTH);
+        gmToolsPanel = initializeGmButtonPanel();
+        centerFooter.add(gmToolsPanel, BorderLayout.NORTH);
         centerFooter.add(pnlTutorial, BorderLayout.SOUTH);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -272,6 +269,11 @@ public class StratConTab extends CampaignGuiTab {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;
         infoPanel.add(btnFacilities, constraints);
+
+        // Under it, one toggle per map HUD box, so the player can clear them off the map when they cover hexes.
+        hudTogglePanel = initializeHudTogglePanel();
+        constraints.gridy = gridY++;
+        infoPanel.add(hudTogglePanel, constraints);
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
 
@@ -298,6 +300,63 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
+     * Builds the row of buttons that show or hide the map's Sector Environment and Facility Effects boxes. The choice
+     * is stored in the MekHQ user preferences, so it carries over between campaigns and sessions.
+     *
+     * @return the button row
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JPanel initializeHudTogglePanel() {
+        MHQOptions options = MekHQ.getMHQOptions();
+
+        RoundedJButton btnToggleSectorEnvironment = new RoundedJButton();
+        btnToggleSectorEnvironment.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.toggleSectorEnvironment.tooltip"));
+        updateHudToggleText(btnToggleSectorEnvironment, "stratConTab.toggleSectorEnvironment",
+              options.getShowStratConSectorEnvironment());
+        btnToggleSectorEnvironment.addActionListener(evt -> {
+            boolean show = !options.getShowStratConSectorEnvironment();
+            options.setShowStratConSectorEnvironment(show);
+            updateHudToggleText(btnToggleSectorEnvironment, "stratConTab.toggleSectorEnvironment", show);
+            stratconPanel.repaint();
+        });
+
+        RoundedJButton btnToggleFacilityEffects = new RoundedJButton();
+        btnToggleFacilityEffects.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.toggleFacilityEffects.tooltip"));
+        updateHudToggleText(btnToggleFacilityEffects, "stratConTab.toggleFacilityEffects",
+              options.getShowStratConFacilityEffects());
+        btnToggleFacilityEffects.addActionListener(evt -> {
+            boolean show = !options.getShowStratConFacilityEffects();
+            options.setShowStratConFacilityEffects(show);
+            updateHudToggleText(btnToggleFacilityEffects, "stratConTab.toggleFacilityEffects", show);
+            stratconPanel.repaint();
+        });
+
+        JPanel togglePanel = new JPanel(new GridLayout(1, 2, UIUtil.scaleForGUI(5), 0));
+        togglePanel.setOpaque(false);
+        togglePanel.add(btnToggleSectorEnvironment);
+        togglePanel.add(btnToggleFacilityEffects);
+        return togglePanel;
+    }
+
+    /**
+     * Labels a HUD toggle with what clicking it will do: "Hide ..." while the box is shown, "Show ..." while hidden.
+     *
+     * @param button       the toggle
+     * @param keyPrefix    the resource key prefix; {@code .hide} and {@code .show} are appended
+     * @param isBoxShowing whether the box is currently drawn on the map
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void updateHudToggleText(RoundedJButton button, String keyPrefix, boolean isBoxShowing) {
+        button.setText(getTextAt(RESOURCE_BUNDLE, keyPrefix + (isBoxShowing ? ".hide" : ".show")));
+    }
+
+    /**
      * Creates a horizontally-filling, transparent host panel for a {@link ContractMeterBar}, adds it to the info panel
      * at the given grid row, and returns it. Restores the shared constraints afterward.
      */
@@ -314,69 +373,62 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
-     * Worker function that builds the GM sector-tool button bar shown beneath the sector pane. The buttons are enabled
-     * only for a GM (kept in sync by {@link #updateCampaignState()}).
-     *
-     * <p><b>Call this exactly once.</b> Each call builds a fresh set of buttons and reassigns the fields that track
-     * them, so a second call renders a second bar and leaves the first one's buttons orphaned - still visible, but no
-     * longer reachable by the GM-mode enabling.</p>
+     * Worker function that builds the GM sector-tool button bar shown beneath the sector pane. The whole bar is shown
+     * only in GM mode (kept in sync by {@link #updateCampaignState()}), so the buttons themselves need no GM checks.
      *
      * @return the button bar
      */
     private JPanel initializeGmButtonPanel() {
-        boolean isGM = getCampaignGui().getCampaign().isGM();
-
-        // "Scout Sector" - reveals every hex in the selected sector (GM only)
-        btnScoutSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.text"));
+        // "Scout Sector" - reveals every hex in the selected sector
+        RoundedJButton btnScoutSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.text"));
         btnScoutSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.tooltip"));
-        btnScoutSector.setEnabled(isGM);
         btnScoutSector.addActionListener(evt -> stratconPanel.scoutCurrentSector());
 
-        // "Reset Sector Fog" - un-reveals every hex in the selected sector (GM only)
-        btnResetSectorFog = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.text"));
+        // "Reset Sector Fog" - un-reveals every hex in the selected sector
+        RoundedJButton btnResetSectorFog = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.resetSectorFog.text"));
         btnResetSectorFog.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.tooltip"));
-        btnResetSectorFog.setEnabled(isGM);
         btnResetSectorFog.addActionListener(evt -> stratconPanel.resetSectorFog());
 
-        // "Regenerate Sector" - clears and re-rolls the selected sector's terrain (GM only)
-        btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.text"));
+        // "Regenerate Sector" - clears and re-rolls the selected sector's terrain
+        RoundedJButton btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.regenerateSector.text"));
         btnRegenerateSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.tooltip"));
-        btnRegenerateSector.setEnabled(isGM);
         btnRegenerateSector.addActionListener(evt -> {
             stratconPanel.regenerateCurrentSector();
             // Regeneration re-rolls the sector's environment (latitude, profiles); refresh the info panel to match.
             updateCampaignState();
         });
 
-        // "Change Terrain" - opens the terrain palette and puts the map into paint mode (GM only). It lives here
-        // rather than on the hex right-click menu because the palette paints wherever you drag, not just one hex.
-        btnChangeTerrain = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.changeTerrain.text"));
+        // "Change Terrain" - opens the terrain palette and puts the map into paint mode. It lives here rather than on
+        // the hex right-click menu because the palette paints wherever you drag, not just one hex.
+        RoundedJButton btnChangeTerrain = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.changeTerrain.text"));
         btnChangeTerrain.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.changeTerrain.tooltip"));
-        btnChangeTerrain.setEnabled(isGM);
         btnChangeTerrain.addActionListener(evt -> stratconPanel.openTerrainPaintDialog());
 
-        // "Resize Sector" - grows or shrinks the sector at its right and bottom edges (GM only)
-        btnResizeSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.text"));
+        // "Resize Sector" - grows or shrinks the sector at its right and bottom edges
+        RoundedJButton btnResizeSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.resizeSector.text"));
         btnResizeSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.tooltip"));
-        btnResizeSector.setEnabled(isGM);
         btnResizeSector.addActionListener(evt -> stratconPanel.resizeSector());
 
-        // "Toggle Hidden Objects" - reveals/hides cloaked scenarios, invisible facilities, and fog (GM only)
-        btnToggleHiddenObjects = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.text"));
+        // "Toggle Hidden Objects" - reveals/hides cloaked scenarios, invisible facilities, and fog
+        RoundedJButton btnToggleHiddenObjects = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.toggleHiddenObjects.text"));
         btnToggleHiddenObjects.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.tooltip"));
-        btnToggleHiddenObjects.setEnabled(isGM);
         btnToggleHiddenObjects.addActionListener(evt -> stratconPanel.toggleHiddenObjects());
 
-        // "Edit SP" - set the contract's support-point total (GM only)
-        btnEditSupportPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.editSupportPoints.text"));
+        // "Edit SP" - set the contract's support-point total
+        RoundedJButton btnEditSupportPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.editSupportPoints.text"));
         btnEditSupportPoints.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.editSupportPoints.tooltip"));
-        btnEditSupportPoints.setEnabled(isGM);
         btnEditSupportPoints.addActionListener(this::editSupportPoints);
 
-        // "Edit CVP" - set the contract's Contract Victory Point total (GM only)
-        btnEditVictoryPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.text"));
+        // "Edit CVP" - set the contract's Contract Victory Point total
+        RoundedJButton btnEditVictoryPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.editVictoryPoints.text"));
         btnEditVictoryPoints.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.tooltip"));
-        btnEditVictoryPoints.setEnabled(isGM);
         btnEditVictoryPoints.addActionListener(this::editVictoryPoints);
 
         int gap = UIUtil.scaleForGUI(5);
@@ -392,6 +444,7 @@ public class StratConTab extends CampaignGuiTab {
         gmButtonPanel.add(btnToggleHiddenObjects);
         gmButtonPanel.add(btnEditSupportPoints);
         gmButtonPanel.add(btnEditVictoryPoints);
+        gmButtonPanel.setVisible(getCampaignGui().getCampaign().isGM());
         return gmButtonPanel;
     }
 
@@ -624,35 +677,17 @@ public class StratConTab extends CampaignGuiTab {
             return;
         }
 
-        // The GM button bar tools are GM-only conveniences.
-        boolean isGM = getCampaignGui().getCampaign().isGM();
-        if (btnScoutSector != null) {
-            btnScoutSector.setEnabled(isGM);
-        }
-        if (btnResetSectorFog != null) {
-            btnResetSectorFog.setEnabled(isGM);
-        }
-        if (btnRegenerateSector != null) {
-            btnRegenerateSector.setEnabled(isGM);
-        }
-        if (btnResizeSector != null) {
-            btnResizeSector.setEnabled(isGM);
-        }
-        if (btnChangeTerrain != null) {
-            btnChangeTerrain.setEnabled(isGM);
-        }
-        if (btnToggleHiddenObjects != null) {
-            btnToggleHiddenObjects.setEnabled(isGM);
-        }
-        if (btnEditSupportPoints != null) {
-            btnEditSupportPoints.setEnabled(isGM);
-        }
-        if (btnEditVictoryPoints != null) {
-            btnEditVictoryPoints.setEnabled(isGM);
+        // The GM tools bar is only shown in GM mode.
+        if (gmToolsPanel != null) {
+            gmToolsPanel.setVisible(getCampaignGui().getCampaign().isGM());
         }
 
+        boolean hasStratConState = (currentContract != null) && (currentContract.getStratConCampaignState() != null);
         if (btnFacilities != null) {
-            btnFacilities.setVisible((currentContract != null) && (currentContract.getStratConCampaignState() != null));
+            btnFacilities.setVisible(hasStratConState);
+        }
+        if (hudTogglePanel != null) {
+            hudTogglePanel.setVisible(hasStratConState);
         }
 
         // No active/started contract selected: nothing to chart.
@@ -1263,7 +1298,7 @@ public class StratConTab extends CampaignGuiTab {
 
     @Subscribe
     public void handleGMMode(GMModeEvent ev) {
-        // Toggling GM mode enables/disables the GM button bar, so re-evaluate the tab's state immediately.
+        // Toggling GM mode shows/hides the GM tools bar, so re-evaluate the tab's state immediately.
         updateCampaignState();
     }
 
