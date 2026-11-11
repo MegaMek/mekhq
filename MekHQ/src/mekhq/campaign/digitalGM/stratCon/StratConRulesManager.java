@@ -3281,16 +3281,13 @@ public class StratConRulesManager {
         // An Official Challenge is issued through official channels, not stumbled into: it never spawns on a hex that
         // is already taken - by a deployed formation, a scenario, a facility, or an occupying point of interest. Move
         // it to a free hex instead, where the player chooses which formation answers it.
-        if (template.getStratConScenarioType().isOfficialChallenge() && isOccupiedForOfficialChallenge(track, coords)) {
-            StratConCoords freeCoords = StratConGMs.opForDeployment(campaign.getCampaignOptions())
-                                              .getUnoccupiedCoords(track);
-            if (freeCoords == null) {
+        if ((coords != null) && template.getStratConScenarioType().isOfficialChallenge()) {
+            coords = getOfficialChallengeCoords(campaign.getCampaignOptions(), track, coords);
+            if (coords == null) {
                 LOGGER.warn("No free hex for an Official Challenge on track {}; skipping scenario generation.",
                       track.getDisplayableName());
                 return null;
             }
-
-            coords = freeCoords;
         }
 
         AtBDynamicScenario backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template,
@@ -3379,6 +3376,29 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * Picks the hex an Official Challenge is placed on: the rolled hex if it is free (see
+     * {@link #isOccupiedForOfficialChallenge}), otherwise a free hex chosen by the active GM's OpFor deployment
+     * strategy.
+     *
+     * @param campaignOptions the campaign options, used to consult the active GM
+     * @param track           the track the challenge is placed on
+     * @param coords          the hex the challenge was rolled for, or {@code null} if it has no position
+     *
+     * @return the hex to place the challenge on, or {@code null} if the rolled hex is taken and no free hex exists
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable StratConCoords getOfficialChallengeCoords(CampaignOptions campaignOptions,
+          StratConTrackState track, @Nullable StratConCoords coords) {
+        if (!isOccupiedForOfficialChallenge(track, coords)) {
+            return coords;
+        }
+
+        return StratConGMs.opForDeployment(campaignOptions).getUnoccupiedCoords(track);
+    }
+
     static boolean isOccupiedForOfficialChallenge(@Nullable StratConTrackState track,
           @Nullable StratConCoords coords) {
         if ((track == null) || (coords == null)) {
