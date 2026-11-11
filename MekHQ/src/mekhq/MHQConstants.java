@@ -80,6 +80,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SHOW_COMMAND_GENERATOR = "showCompanyGenerator";
     public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
     public static final String SHOW_WARRIORS_ALMANAC = "showWarriorsAlmanac";
+    public static final String LOCK_MAIN_TAB_ORDER = "lockMainTabOrder";
+    public static final String LOCK_MAIN_TAB_DETACHING = "lockMainTabDetaching";
 
     // Personnel record logs - controls whether each personnel record section starts expanded
     public static final String DISPLAY_PERSONNEL_LOG = "displayPersonnelLog";
@@ -170,6 +172,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
+    public static final String SHOW_STRAT_CON_SECTOR_ENVIRONMENT = "showStratConSectorEnvironment";
+    public static final String SHOW_STRAT_CON_FACILITY_EFFECTS = "showStratConFacilityEffects";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -240,6 +244,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String DO_NOT_MOTHBALL_SALVAGE = "doNotMothballSalvage";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";
+    public static final String NEW_DAY_AUTO_FORMATION_ICONS = "newDayAutoFormationIcons";
     // endregion New Day
 
     // region Campaign XML Save Options

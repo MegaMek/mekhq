@@ -55,6 +55,12 @@ public interface KitIssueSection {
     /** The tab body for this kit family. */
     JComponent getComponent();
 
+    /**
+     * The key this kit family's guide is stored and read under, such as {@link KitIssueGuidePreferences#ARMOR_GUIDE}.
+     * Families that work the same way may share a guide.
+     */
+    String getGuideKey();
+
     /** Whether the player has made any selection in this section that a commit would act on. */
     boolean hasPendingChanges();
 

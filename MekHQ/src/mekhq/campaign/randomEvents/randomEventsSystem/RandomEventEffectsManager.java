@@ -72,6 +72,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1087,6 +1088,11 @@ public class RandomEventEffectsManager {
         List<AbstractContract> potentialTargets = new ArrayList<>();
 
         for (AbstractContract contract : campaign.getActiveContracts()) {
+            // Shell contracts have no morale to shift
+            if (contract instanceof ShellContract) {
+                continue;
+            }
+
             ContractMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {

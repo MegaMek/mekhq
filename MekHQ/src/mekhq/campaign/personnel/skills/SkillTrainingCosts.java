@@ -64,11 +64,6 @@ public final class SkillTrainingCosts {
     private static final int[] PROFESSION_COSTS_IN_SUPPORT_POINTS = { 0, 0, 100, 200, 700, 1200, 1200 };
 
     /**
-     * Costs for all other skills, indexed by experience level.
-     */
-    private static final int[] NON_PROFESSION_COSTS_IN_SUPPORT_POINTS = { 0, 0, 100, 300, 700, 1200, 2200 };
-
-    /**
      * Gets the C-bill cost of improving a person's skill by one level.
      *
      * @param campaign  the campaign, for the profession skill and skill modifier options
@@ -89,19 +84,20 @@ public final class SkillTrainingCosts {
 
         boolean isRoleSkill = isRoleSkill(campaign, person.getPrimaryRole(), skillName)
                                     || isRoleSkill(campaign, person.getSecondaryRole(), skillName);
-        return getSkillImprovementCost(campaign, person, skillName, isRoleSkill,
-              getSkillModifierData(campaign, person));
+        return getSkillImprovementCost(campaign, person, skillName, isRoleSkill);
     }
 
     /**
      * As {@link #getSkillImprovementCost(Campaign, Person, String)}, for callers that have already worked out the
-     * person's role skills and skill modifiers, such as a menu listing every skill.
+     * person's role skills, such as a menu listing every skill.
      *
-     * @param campaign          the campaign
-     * @param person            the person improving the skill
-     * @param skillName         the name of the skill being improved (or gained)
-     * @param isRoleSkill       whether the skill belongs to the person's primary or secondary role
-     * @param skillModifierData the person's skill modifiers, which decide the skill's experience level
+     * <p>The cost follows the skill's trained level alone. Attributes, abilities, injuries and other modifiers change
+     * how well the person uses the skill, not what training it costs.</p>
+     *
+     * @param campaign    the campaign
+     * @param person      the person improving the skill
+     * @param skillName   the name of the skill being improved (or gained)
+     * @param isRoleSkill whether the skill belongs to the person's primary or secondary role
      *
      * @return the cost, or zero if the option is disabled or the improvement doesn't reach a new priced experience
      *       level
@@ -110,21 +106,40 @@ public final class SkillTrainingCosts {
      * @since 0.51.01
      */
     public static Money getSkillImprovementCost(Campaign campaign, Person person, String skillName,
-          boolean isRoleSkill, SkillModifierData skillModifierData) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
-            return Money.zero();
-        }
-
+          boolean isRoleSkill) {
         SkillType skillType = SkillType.getType(skillName);
         if (skillType == null) {
             return Money.zero();
         }
 
-        // Use the level including modifiers, as shown to the player; improving the skill raises it by one
+        // Improving the skill raises its trained level by one
         Skill skill = person.getSkill(skillName);
-        int currentLevel = skill == null ? -1 : skill.getTotalSkillLevel(skillModifierData);
-        int currentExperienceLevel = skill == null ? -1 : skillType.getExperienceLevel(currentLevel);
+        int currentLevel = skill == null ? -1 : skill.getLevel();
+        return getSkillImprovementCost(campaign.getCampaignOptions(), skillType, isRoleSkill, currentLevel);
+    }
+
+    /**
+     * Gets the C-bill cost of raising a skill by one level from a given level, for callers that price improvements
+     * that haven't happened yet, such as the Training Console pricing the second of two staged improvements.
+     *
+     * @param campaignOptions the campaign's options
+     * @param skillType       the skill
+     * @param isRoleSkill     whether the skill is one of the person's role skills
+     * @param currentLevel    the skill's current trained level, without modifiers, or {@code -1} if the person
+     *                        doesn't have the skill yet
+     *
+     * @return the cost, or zero if improvement costs are disabled or the improvement doesn't reach a new, priced
+     *       experience level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getSkillImprovementCost(CampaignOptions campaignOptions, SkillType skillType,
+          boolean isRoleSkill, int currentLevel) {
+        if (!campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
+            return Money.zero();
+        }
+        int currentExperienceLevel = currentLevel < 0 ? -1 : skillType.getExperienceLevel(currentLevel);
         int nextExperienceLevel = skillType.getExperienceLevel(currentLevel + 1);
 
         if (nextExperienceLevel <= currentExperienceLevel || nextExperienceLevel < EXP_REGULAR) {
@@ -132,10 +147,10 @@ public final class SkillTrainingCosts {
         }
 
         SkillTrainingCategory category = SkillTrainingCategory.getCategory(isRoleSkill, skillType);
-        int[] costTable = getCostTable(category);
         int cappedExperienceLevel = Math.min(nextExperienceLevel, EXP_LEGENDARY);
 
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(costTable[cappedExperienceLevel])
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(
+                    PROFESSION_COSTS_IN_SUPPORT_POINTS[cappedExperienceLevel])
                      .multipliedBy(category.getTrainingCostMultiplier(campaignOptions));
     }
 
@@ -220,12 +235,11 @@ public final class SkillTrainingCosts {
 
             SkillTrainingCategory category = SkillTrainingCategory.getCategory(roleSkills.contains(skillName),
                   skillType);
-            int[] costTable = getCostTable(category);
             int experienceLevel = Math.min(
                   skillType.getExperienceLevel(skill.getTotalSkillLevel(skillModifierData)), EXP_LEGENDARY);
             long skillSupportPoints = 0;
             for (int level = EXP_REGULAR; level <= experienceLevel; level++) {
-                skillSupportPoints += costTable[level];
+                skillSupportPoints += PROFESSION_COSTS_IN_SUPPORT_POINTS[level];
             }
             supportPointsByCategory.put(category, supportPointsByCategory.get(category) + skillSupportPoints);
         }
@@ -237,16 +251,6 @@ public final class SkillTrainingCosts {
                   Money.of((double) entry.getValue() * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION));
         }
         return costsByCategory;
-    }
-
-    /**
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static int[] getCostTable(SkillTrainingCategory category) {
-        return category.isUsingProfessionCostTable()
-                     ? PROFESSION_COSTS_IN_SUPPORT_POINTS
-                     : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
     }
 
     /**

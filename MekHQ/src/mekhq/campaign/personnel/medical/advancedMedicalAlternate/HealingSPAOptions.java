@@ -62,4 +62,13 @@ record HealingSPAOptions(
               doctorOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT),
               patientOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC));
     }
+
+    /**
+     * Builds the options for a patient treated by caregivers outside the campaign (such as academy medical staff), who
+     * have no doctor SPAs of their own.
+     */
+    static HealingSPAOptions fromPatientOnly(Person patient) {
+        return new HealingSPAOptions(false, false, false, false, false,
+              patient.getOptions().booleanOption(UNOFFICIAL_HYPOCHONDRIAC));
+    }
 }

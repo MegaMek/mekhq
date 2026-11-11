@@ -43,8 +43,6 @@ import java.nio.charset.StandardCharsets;
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.common.preference.ClientPreferences;
-import megamek.common.preference.PreferenceManager;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,34 +51,30 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 /**
- * Tests for the campaign options that MegaMek holds globally: percent female, the name generator faction and the
- * strategic view minimap theme. They must persist with the campaign options (so presets carry them), reading them must
- * never touch the globals, and {@link CampaignOptions#applyGlobalSettings()} must push them out. The globals are saved
- * and restored around each test so no state leaks into other tests.
+ * Tests for the campaign options that MegaMek holds globally: percent female and the name generator faction. They must
+ * persist with the campaign options (so presets carry them), reading them must never touch the globals, and
+ * {@link CampaignOptions#applyGlobalSettings()} must push them out. The globals are saved and restored around each test
+ * so no state leaks into other tests.
  *
  * @author Illiani
  * @since 0.51.01
  */
 class CampaignOptionsGlobalSettingsTest {
     private static final Version VERSION = new Version("0.51.01");
-    private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
 
     private int originalPercentFemale;
     private String originalChosenFaction;
-    private String originalStrategicViewTheme;
 
     @BeforeEach
     void rememberGlobals() {
         originalPercentFemale = RandomGenderGenerator.getPercentFemale();
         originalChosenFaction = RandomNameGenerator.getInstance().getChosenFaction();
-        originalStrategicViewTheme = CLIENT_PREFERENCES.getStrategicViewTheme().getName();
     }
 
     @AfterEach
     void restoreGlobals() {
         RandomGenderGenerator.setPercentFemale(originalPercentFemale);
         RandomNameGenerator.getInstance().setChosenFaction(originalChosenFaction);
-        CLIENT_PREFERENCES.setStrategicViewTheme(originalStrategicViewTheme);
     }
 
     private static CampaignOptions roundTrip(final CampaignOptions original) {
@@ -99,30 +93,25 @@ class CampaignOptionsGlobalSettingsTest {
         final CampaignOptions original = new CampaignOptions();
         original.set(CampaignOption.PERCENT_FEMALE, 73);
         original.set(CampaignOption.NAME_GENERATOR_FACTION, "FS");
-        original.set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, "test.theme");
 
         final CampaignOptions reloaded = roundTrip(original);
 
         assertEquals(73, reloaded.get(CampaignOption.PERCENT_FEMALE));
         assertEquals("FS", reloaded.get(CampaignOption.NAME_GENERATOR_FACTION));
-        assertEquals("test.theme", reloaded.get(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME));
     }
 
     @Test
     void readingOptions_leavesTheGlobalsAlone() {
         RandomGenderGenerator.setPercentFemale(11);
         RandomNameGenerator.getInstance().setChosenFaction("CC");
-        CLIENT_PREFERENCES.setStrategicViewTheme("before.theme");
 
         final CampaignOptions original = new CampaignOptions();
         original.set(CampaignOption.PERCENT_FEMALE, 73);
         original.set(CampaignOption.NAME_GENERATOR_FACTION, "FS");
-        original.set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, "test.theme");
         roundTrip(original);
 
         assertEquals(11, RandomGenderGenerator.getPercentFemale());
         assertEquals("CC", RandomNameGenerator.getInstance().getChosenFaction());
-        assertEquals("before.theme", CLIENT_PREFERENCES.getStrategicViewTheme().getName());
     }
 
     @Test
@@ -130,12 +119,10 @@ class CampaignOptionsGlobalSettingsTest {
         final CampaignOptions options = new CampaignOptions();
         options.set(CampaignOption.PERCENT_FEMALE, 73);
         options.set(CampaignOption.NAME_GENERATOR_FACTION, "FS");
-        options.set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, "test.theme");
 
         options.applyGlobalSettings();
 
         assertEquals(73, RandomGenderGenerator.getPercentFemale());
         assertEquals("FS", RandomNameGenerator.getInstance().getChosenFaction());
-        assertEquals("test.theme", CLIENT_PREFERENCES.getStrategicViewTheme().getName());
     }
 }

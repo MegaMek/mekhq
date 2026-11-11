@@ -170,6 +170,16 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         super.removeNotify();
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // The labels embed theme-dependent HTML colours, so rebuild them after a theme change. The campaign is still
+        // null when the superclass constructor first calls this.
+        if (campaign != null) {
+            refresh();
+        }
+    }
+
     /**
      * Updates the location title, dynamic images, planetary/transit info text, and the visibility and state of the
      * Hiring Hall button based on the current location context.
@@ -366,10 +376,10 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
             return "";
         }
         TransportCostCalculations calculation = campaign.getTransportCostCalculation(EXP_REGULAR);
-        if (jumpPath.getJumps() > 0) {
+        if ((jumpPath.getJumps() > 0) || jumpPath.isInSystemTransfer()) {
             int duration = (int) Math.ceil(jumpPath.getTotalTime(campaign.getLocalDate(), location.getTransitTime(),
                   campaign.isUseCommandCircuit(), campaign.getJumpDriveProfile(location)));
-            Money jumpCost = calculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+            Money jumpCost = calculation.calculateCostForEntireJourney(duration, jumpPath);
             return getFormattedTextAt("info.jumpCost.remaining", jumpCost.toAmountString());
         } else {
             Money jumpCost = calculation.calculateJumpCostForEntireJourney(7, 0);

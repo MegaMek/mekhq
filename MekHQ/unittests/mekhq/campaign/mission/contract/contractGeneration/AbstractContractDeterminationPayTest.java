@@ -295,7 +295,7 @@ class AbstractContractDeterminationPayTest {
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
 
         AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundUpScale(scale));
+        when(contract.getScale()).thenReturn(ChaosContractDeterminationScale.roundScale(scale));
         when(contract.getEconomicScale(anyBoolean())).thenAnswer(invocation ->
               ChaosContractDeterminationScale.getEconomicScale(scale, invocation.getArgument(0)));
         when(contract.getTransportMultiplier()).thenReturn(transportMultiplier);
@@ -326,9 +326,15 @@ class AbstractContractDeterminationPayTest {
     }
 
     @Test
-    void transportPayRoundsScaleUpWithoutFractionalScale() {
-        // 50 * scale(2.4 -> 3) * jumps(2) = 300 support points
-        assertEquals(Money.of(300), transportPay(2.4, false, 2, 1.0, false, false, false));
+    void transportPayRoundsScaleToTheNearestWholeWithoutFractionalScale() {
+        // 50 * scale(2.6 -> 3) * jumps(2) = 300 support points
+        assertEquals(Money.of(300), transportPay(2.6, false, 2, 1.0, false, false, false));
+    }
+
+    @Test
+    void transportPayRoundsAPartScaleDownWithoutFractionalScale() {
+        // 50 * scale(2.4 -> 2) * jumps(2) = 200 support points
+        assertEquals(Money.of(200), transportPay(2.4, false, 2, 1.0, false, false, false));
     }
 
     @Test

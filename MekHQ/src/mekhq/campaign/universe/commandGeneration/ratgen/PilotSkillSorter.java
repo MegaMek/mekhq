@@ -37,14 +37,15 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 
@@ -54,7 +55,13 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  * <p>The roll gives every unit a pilot in no particular order of skill. This walks the TO&amp;E in order, the
  * command lance first and the first company next, and for each kind of single-pilot unit hands the seats out to
  * that kind's pilots best first, so the top of the TO&amp;E gets the best pilots. Pilots only swap between units
- * of the same kind, so a MekWarrior never ends up in a fighter. Crews of more than one stay where they are.</p>
+ * that take the same pilot role, so a MekWarrior never ends up in a fighter or a LAM. Crews of more than one stay
+ * where they are.
+ * Only the units the build created take part: a command built into an existing campaign leaves the player's
+ * own pilots where they are.</p>
+ *
+ * <p>Kinds are told apart by the unit's driver role rather than its unit type: a LAM reports the same unit type
+ * as a Mek, and sorting by type would hand its seat to whichever MekWarrior or LAM pilot was most skilled.</p>
  */
 public final class PilotSkillSorter {
 
@@ -69,12 +76,14 @@ public final class PilotSkillSorter {
     /**
      * Reseats the single-pilot units' pilots so the leading lances hold the most skilled.
      *
-     * @param campaign the campaign whose TO&amp;E is read and whose units are reseated
-     * @param options  the generation options; nothing happens unless Assign Most Skilled to Primary Lances is on
+     * @param campaign     the campaign whose TO&amp;E is read and whose units are reseated
+     * @param options      the generation options; nothing happens unless Assign Most Skilled to Primary Lances
+     *                     is on
+     * @param builtUnitIds the units this build created; only their pilots are reseated
      *
      * @return how many pilots changed unit
      */
-    public static int apply(Campaign campaign, CommandGenerationOptions options) {
+    public static int apply(Campaign campaign, CommandGenerationOptions options, Set<UUID> builtUnitIds) {
         if (!options.isAssignMostSkilledToPrimaryLances()) {
             LOGGER.info("{} off; pilots stay where the roll put them", LOG_TAG);
             return 0;
@@ -85,21 +94,24 @@ public final class PilotSkillSorter {
             return 0;
         }
 
-        Map<Integer, List<Unit>> soloUnitsByKind = new LinkedHashMap<>();
+        Map<PersonnelRole, List<Unit>> soloUnitsByKind = new LinkedHashMap<>();
         for (UUID unitId : root.getAllUnits(false)) {
+            if (!builtUnitIds.contains(unitId)) {
+                continue;
+            }
             Unit unit = campaign.getUnit(unitId);
             if (isSingleSeatWithPilot(unit)) {
-                soloUnitsByKind.computeIfAbsent(unit.getEntity().getUnitType(), kind -> new ArrayList<>()).add(unit);
+                soloUnitsByKind.computeIfAbsent(unit.getDriverRole(), kind -> new ArrayList<>()).add(unit);
             }
         }
 
         Comparator<Person> mostSkilledFirst = OfficerSelector.mostSkilledFirst(campaign);
         int moved = 0;
-        for (Map.Entry<Integer, List<Unit>> kind : soloUnitsByKind.entrySet()) {
+        for (Map.Entry<PersonnelRole, List<Unit>> kind : soloUnitsByKind.entrySet()) {
             int movedOfKind = reseat(kind.getValue(), mostSkilledFirst);
             moved += movedOfKind;
             LOGGER.info("{} {}: {} pilot(s) moved; seats in TO&E order now {}", LOG_TAG,
-                  UnitType.getTypeName(kind.getKey()), movedOfKind, seating(campaign, kind.getValue()));
+                  kind.getKey(), movedOfKind, seating(campaign, kind.getValue()));
         }
         LOGGER.info("{} {} pilot(s) moved so the leading lances hold the most skilled, across {} kind(s) of unit",
               LOG_TAG, moved, soloUnitsByKind.size());

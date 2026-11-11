@@ -504,7 +504,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // Campaign upgrading
                 // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
                 // dialogs will get 'stuck' behind other dialogs
-                if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
+                if (isUpgradePromptRequired(campaignVersion, MHQConstants.VERSION)) {
                     handleCampaignUpgrading(application, campaign);
                 }
                 // endregion Progress 7
@@ -549,6 +549,30 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         private static void handleCampaignUpgrading(MekHQ app, Campaign campaign) {
             CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign);
+        }
+
+        /**
+         * Determines whether loading a campaign saved in an older version should prompt the player to upgrade.
+         *
+         * <p>Only a change in the major, minor, or patch component warrants the prompt. A newer revision of the same
+         * release (for example, 0.51.01 to 0.51.01.1) is a point release, so the prompt is skipped.</p>
+         *
+         * @param campaignVersion the version the campaign was saved in
+         * @param currentVersion  the version currently running
+         *
+         * @return {@code true} if the campaign predates the current release, ignoring revisions
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        private static boolean isUpgradePromptRequired(Version campaignVersion, Version currentVersion) {
+            Version campaignRelease = new Version(campaignVersion.getMajor(),
+                  campaignVersion.getMinor(),
+                  campaignVersion.getPatch());
+            Version currentRelease = new Version(currentVersion.getMajor(),
+                  currentVersion.getMinor(),
+                  currentVersion.getPatch());
+            return campaignRelease.isLowerThan(currentRelease);
         }
 
         /**

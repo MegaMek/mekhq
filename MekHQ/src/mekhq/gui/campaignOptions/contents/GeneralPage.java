@@ -222,8 +222,7 @@ public class GeneralPage {
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getPlayerForce().getFaction(), campaign.getLocalDate()));
-        comboFaction.setToolTipText(String.format("<html>%s</html>",
-              getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
+        comboFaction.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Randomize faction
         btnRandomFaction = createButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));

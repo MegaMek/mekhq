@@ -35,6 +35,8 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.util.Set;
+
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -74,7 +76,8 @@ class PilotSkillSorterTest {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setAssignMostSkilledToPrimaryLances(true);
 
-        int moved = PilotSkillSorter.apply(campaign, options);
+        int moved = PilotSkillSorter.apply(campaign, options,
+              Set.of(firstSeat.getId(), secondSeat.getId(), thirdSeat.getId()));
 
         assertEquals(2, moved, "the veteran and the green pilot swap seats");
         assertSame(veteran, firstSeat.getCommander());
@@ -82,6 +85,29 @@ class PilotSkillSorterTest {
         assertSame(green, thirdSeat.getCommander());
         assertSame(firstSeat, veteran.getUnit());
         assertSame(thirdSeat, green.getUnit());
+    }
+
+    @Test
+    void aLamKeepsItsLamPilotWhenMekWarriorsAreSorted() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation firstLance = lance(campaign, "First Lance");
+        Formation secondLance = lance(campaign, "Second Lance");
+        Unit lamSeat = lamIn(campaign, firstLance);
+        Unit mekSeat = mekIn(campaign, firstLance);
+        Unit secondLanceSeat = mekIn(campaign, secondLance);
+        Person lamPilot = lamPilot(campaign, lamSeat, 1);
+        Person green = pilot(campaign, mekSeat, 2);
+        Person veteran = pilot(campaign, secondLanceSeat, 5);
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        options.setAssignMostSkilledToPrimaryLances(true);
+
+        int moved = PilotSkillSorter.apply(campaign, options,
+              Set.of(lamSeat.getId(), mekSeat.getId(), secondLanceSeat.getId()));
+
+        assertEquals(2, moved, "only the two MekWarriors swap; the LAM is sorted on its own");
+        assertSame(lamPilot, lamSeat.getCommander(), "a LAM seat is never handed to a MekWarrior");
+        assertSame(veteran, mekSeat.getCommander());
+        assertSame(green, secondLanceSeat.getCommander());
     }
 
     @Test
@@ -96,10 +122,29 @@ class PilotSkillSorterTest {
         CommandGenerationOptions off = new CommandGenerationOptions();
         off.setAssignMostSkilledToPrimaryLances(false);
 
-        int moved = PilotSkillSorter.apply(campaign, off);
+        int moved = PilotSkillSorter.apply(campaign, off, Set.of(firstSeat.getId(), secondSeat.getId()));
 
         assertEquals(0, moved);
         assertSame(green, firstSeat.getCommander());
+    }
+
+    @Test
+    void pilotsOfUnitsTheBuildDidNotCreateStayPut() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation existingLance = lance(campaign, "Existing Lance");
+        Formation builtLance = lance(campaign, "Built Lance");
+        Unit existingSeat = mekIn(campaign, existingLance);
+        Unit builtSeat = mekIn(campaign, builtLance);
+        Person existingGreen = pilot(campaign, existingSeat, 1);
+        Person builtVeteran = pilot(campaign, builtSeat, 5);
+        CommandGenerationOptions options = new CommandGenerationOptions();
+        options.setAssignMostSkilledToPrimaryLances(true);
+
+        int moved = PilotSkillSorter.apply(campaign, options, Set.of(builtSeat.getId()));
+
+        assertEquals(0, moved, "a pilot the campaign already had is not traded into the new command");
+        assertSame(existingGreen, existingSeat.getCommander());
+        assertSame(builtVeteran, builtSeat.getCommander());
     }
 
     private static Formation lance(Campaign campaign, String name) {
@@ -112,6 +157,25 @@ class PilotSkillSorterTest {
         Unit unit = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         campaign.getPlayerForce().addUnitToFormation(unit, lance.getId(), campaign);
         return unit;
+    }
+
+    private static Unit lamIn(Campaign campaign, Formation lance) {
+        Unit unit = campaign.addNewUnit(UnitTestUtilities.getWaspLAMMk1(), false, 0, PartQuality.QUALITY_D);
+        campaign.getPlayerForce().addUnitToFormation(unit, lance.getId(), campaign);
+        return unit;
+    }
+
+    /** A LAM pilot seated in the unit, with the given Mek and aerospace skill levels; higher is better. */
+    private static Person lamPilot(Campaign campaign, Unit unit, int skillLevel) {
+        Person person = new Person(campaign);
+        person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.LAM_PILOT);
+        person.addSkill(SkillType.S_GUN_MEK, skillLevel, 0);
+        person.addSkill(SkillType.S_PILOT_MEK, skillLevel, 0);
+        person.addSkill(SkillType.S_GUN_AERO, skillLevel, 0);
+        person.addSkill(SkillType.S_PILOT_AERO, skillLevel, 0);
+        campaign.importPerson(person);
+        unit.addPilotOrSoldier(person);
+        return person;
     }
 
     /** A MekWarrior seated in the unit, with the given gunnery and piloting skill level; higher is better. */

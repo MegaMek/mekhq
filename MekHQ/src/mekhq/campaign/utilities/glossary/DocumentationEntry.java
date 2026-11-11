@@ -115,6 +115,30 @@ public enum DocumentationEntry {
     }
 
     /**
+     * Returns the lookup name for this documentation entry.
+     *
+     * @return the lookup name for this entry
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getLookUpName() {
+        return lookUpName;
+    }
+
+    /**
+     * Returns the version in which this entry was added or last updated.
+     *
+     * @return the version this entry was added or last updated in
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Version getVersionAddedOrLastUpdated() {
+        return versionAddedOrLastUpdated;
+    }
+
+    /**
      * Returns the title of this object, possibly appended with an icon/text indicating if it was added or updated since
      * the last development or milestone version.
      *

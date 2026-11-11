@@ -44,6 +44,7 @@ import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
@@ -62,10 +63,15 @@ import mekhq.campaign.universe.Faction;
  * <p>Only crew members who do not already hold a rank are affected; existing ranks
  * are always preserved.</p>
  *
+ * <p>Crew keep their own rank system, which for generated crew is the one the player chose in Campaign Options. The
+ * faction only picks which rank indices are used.</p>
+ *
  * @author Illiani
  * @since 0.51.0
  */
 public final class AutomaticRankAssigner {
+    private static final MMLogger LOGGER = MMLogger.create(AutomaticRankAssigner.class);
+
     private static final String NO_RANK = "None";
     private static final String MISSING_RANK = "-";
 
@@ -115,15 +121,16 @@ public final class AutomaticRankAssigner {
         boolean factionIsClan = faction.isClan();
         boolean factionIsComStarOrWoB = faction.isComStarOrWoB();
 
+        Person unitCommander = null;
         if (!factionIsClan && !factionIsComStarOrWoB) {
-            Person unitCommander = unit.getCommander();
+            unitCommander = unit.getCommander();
             if ((unitCommander == null) && !crew.isEmpty()) {
                 unitCommander = crew.getFirst();
             }
+        }
 
-            if (unitCommander != null) {
-                unitCommander.setRank(COMMANDER_RANK_INDEX);
-            }
+        if (unitCommander != null) {
+            unitCommander.setRank(COMMANDER_RANK_INDEX);
         }
 
         for (Person person : crew) {
@@ -162,6 +169,47 @@ public final class AutomaticRankAssigner {
             // Everyone else
             cachedLeaderRank = assignNormalRank(person, cachedNormalRank);
         }
+    }
+
+    /**
+     * The faction's rank system, when it is one personnel can be put on.
+     *
+     * @param faction       the faction, or {@code null} for none
+     * @param rankValidator the validator that decides whether the system is usable
+     *
+     * @return the faction's rank system, or {@code null} when there is no faction or its rank system is missing or
+     *       invalid; the reason is logged
+     */
+    private static @Nullable RankSystem usableRankSystemOf(@Nullable Faction faction, RankValidator rankValidator) {
+        if (faction == null) {
+            LOGGER.debug("[AutoRank] no faction given; personnel keep the rank system they were created with");
+            return null;
+        }
+        RankSystem rankSystem = faction.getRankSystem();
+        if (!rankValidator.validate(rankSystem, false)) {
+            LOGGER.warn("[AutoRank] faction {} names rank system '{}', which is missing or invalid; personnel keep the"
+                        + " rank system they were created with, so their rank names are read from that table",
+                  faction.getShortName(), faction.getRankSystemCode());
+            return null;
+        }
+        return rankSystem;
+    }
+
+    /**
+     * Puts the person on the given rank system, unless they are on it already.
+     *
+     * @param person        the person
+     * @param rankSystem    the rank system to adopt
+     * @param rankValidator the validator that checks the person's rank still exists on the new system
+     *
+     * @return {@code true} when the person's rank system changed; {@code false} when they were on it already
+     */
+    private static boolean adoptRankSystem(Person person, RankSystem rankSystem, RankValidator rankValidator) {
+        if (rankSystem.equals(person.getRankSystem())) {
+            return false;
+        }
+        person.setRankSystem(rankValidator, rankSystem);
+        return true;
     }
 
     /**
@@ -310,12 +358,12 @@ public final class AutomaticRankAssigner {
             return;
         }
 
-        RankSystem rankSystem = person.getOriginFaction().getRankSystem();
         final RankValidator rankValidator = new RankValidator();
-        if (!rankValidator.validate(rankSystem, false)) {
+        RankSystem rankSystem = usableRankSystemOf(person.getOriginFaction(), rankValidator);
+        if (rankSystem == null) {
             return;
         }
-        person.setRankSystem(rankValidator, rankSystem);
+        adoptRankSystem(person, rankSystem, rankValidator);
 
         AutomaticRankAssigner.assignAscendingRank(person, rankLevel);
     }

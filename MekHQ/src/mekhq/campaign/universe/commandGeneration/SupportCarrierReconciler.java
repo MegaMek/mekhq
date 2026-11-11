@@ -403,7 +403,8 @@ public final class SupportCarrierReconciler {
                     built.add(formation);
                 }
             }
-            FormationIconBuilder.applyIconsToFormations(built, campaign);
+            FormationIconBuilder.applyIconsToFormations(built, campaign.getPlayerForce().getFaction(),
+                  campaign::getUnit, campaign.getPlayerForce().getSupportCommandFormation());
         } else {
             LOGGER.info("[SupportTeams] Seating {} loose support character(s) into the existing support teams", loose.size());
         }

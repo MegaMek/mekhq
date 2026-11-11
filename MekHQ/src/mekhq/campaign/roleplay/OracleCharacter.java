@@ -46,7 +46,8 @@ import org.w3c.dom.NodeList;
  * campaign's personnel, in which case its name follows theirs.
  *
  * <p>Removing a character from the cast only marks it inactive, so journal entries tagged with it keep their name and
- * the character can be restored. The Oracle only picks active characters.</p>
+ * the character can be restored. The Oracle only picks active characters. {@link Roleplay#deleteCharacter} removes a
+ * character for good.</p>
  */
 public class OracleCharacter {
     private UUID id = UUID.randomUUID();

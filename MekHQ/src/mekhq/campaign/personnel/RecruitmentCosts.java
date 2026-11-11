@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel;
 
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import mekhq.campaign.Campaign;
@@ -49,7 +51,7 @@ import mekhq.utilities.spaUtilities.SpaUtilities;
  * training costs C-bills, a recruit instead costs what their training would have cost: every priced experience level
  * their skills have reached if skill training costs C-bills, plus every SPA they hold if SPA training costs C-bills.
  * Profession, Utility, and Roleplay skills each have their own multiplier (Roleplay defaults to zero, leaving those
- * skills out); other skills and SPAs are multiplied by {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}.</p>
+ * skills out); SPAs are multiplied by {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -100,9 +102,8 @@ public final class RecruitmentCosts {
 
     /**
      * Gets what a recruit's training would have cost. Each {@link SkillTrainingCategory} of skills is multiplied by its
-     * own recruitment multiplier; other skills and SPAs are multiplied by
-     * {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}. Skill levels are only counted if skill training
-     * costs C-bills, and SPAs only if SPA training does.
+     * own recruitment multiplier; SPAs are multiplied by {@link CampaignOption#RECRUITMENT_TRAINING_COST_MULTIPLIER}.
+     * Skill levels are only counted if skill training costs C-bills, and SPAs only if SPA training does.
      *
      * @param campaign the campaign
      * @param person   the recruit
@@ -113,23 +114,62 @@ public final class RecruitmentCosts {
      * @since 0.51.01
      */
     public static Money getTrainingBasedCost(Campaign campaign, Person person) {
+        return getTrainingBasedCostBreakdown(campaign, person).total();
+    }
+
+    /**
+     * As {@link #getTrainingBasedCost(Campaign, Person)}, split into the cost of each {@link SkillTrainingCategory} of
+     * skills and of SPAs, with their recruitment multipliers already applied.
+     *
+     * @param campaign the campaign
+     * @param person   the recruit
+     *
+     * @return the training-based recruitment cost, by part
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static TrainingCostBreakdown getTrainingBasedCostBreakdown(Campaign campaign, Person person) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Money trainingCost = Money.zero();
+        Map<SkillTrainingCategory, Money> skillCosts = new EnumMap<>(SkillTrainingCategory.class);
+        for (SkillTrainingCategory category : SkillTrainingCategory.values()) {
+            skillCosts.put(category, Money.zero());
+        }
+
         if (campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
             Map<SkillTrainingCategory, Money> skillTrainingCosts =
                   SkillTrainingCosts.getAccumulatedSkillTrainingCosts(campaign, person);
             for (Map.Entry<SkillTrainingCategory, Money> entry : skillTrainingCosts.entrySet()) {
                 double multiplier = entry.getKey().getRecruitmentCostMultiplier(campaignOptions);
-                trainingCost = trainingCost.plus(entry.getValue().multipliedBy(multiplier));
+                skillCosts.put(entry.getKey(), entry.getValue().multipliedBy(multiplier));
             }
         }
 
+        Money spaCost = Money.zero();
         if (campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
             double multiplier = campaignOptions.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
-            trainingCost = trainingCost.plus(SpaUtilities.getAccumulatedSpaTrainingCost(person)
-                                                   .multipliedBy(multiplier));
+            spaCost = SpaUtilities.getAccumulatedSpaTrainingCost(person).multipliedBy(multiplier);
         }
 
-        return trainingCost;
+        return new TrainingCostBreakdown(skillCosts, spaCost);
+    }
+
+    /**
+     * A training-based recruitment cost, split by part. Recruitment multipliers have already been applied.
+     *
+     * @param skillCosts the cost of the recruit's skills in each {@link SkillTrainingCategory}; every category is
+     *                   present
+     * @param spaCost    the cost of the recruit's SPAs
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record TrainingCostBreakdown(Map<SkillTrainingCategory, Money> skillCosts, Money spaCost) {
+        /**
+         * @return the combined cost of every part
+         */
+        public Money total() {
+            return spaCost.plus(List.copyOf(skillCosts.values()));
+        }
     }
 }

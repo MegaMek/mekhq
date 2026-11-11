@@ -64,6 +64,11 @@ public class UnitMarketOffer {
     private MekSummary unit;
     private int percent;
     private int transitDuration;
+    /**
+     * The facts about the offered unit that its price needs. Loading the unit means parsing its file, and the market
+     * table prices every row it paints or sorts, so these are read from the file once rather than on every repaint.
+     */
+    private @Nullable PriceTraits priceTraits;
     // endregion Variable Declarations
 
     // region Constructors
@@ -105,6 +110,7 @@ public class UnitMarketOffer {
 
     public void setUnit(final MekSummary unit) {
         this.unit = unit;
+        priceTraits = null;
     }
 
     public int getPercent() {
@@ -147,8 +153,8 @@ public class UnitMarketOffer {
     public Money getPrice(@Nullable Faction faction, int gameYear) {
         Money cost = getBaseCost().multipliedBy(getPercent()).dividedBy(100);
 
-        final Entity entity = getEntity();
-        if (entity == null) {
+        final PriceTraits traits = getPriceTraits();
+        if (!traits.loaded()) {
             // The unit failed to load; skip the unit price multiplier rather than crashing the market display.
             // We should be dropping it elsewhere, so this is just added security.
             return cost;
@@ -160,10 +166,33 @@ public class UnitMarketOffer {
 
         // Battle Value ignores price quirks, which the construction cost already includes
         if (isBattleValueCost()) {
-            cost = cost.multipliedBy(Unit.getQuirkPriceMultiplier(entity));
+            cost = cost.multipliedBy(traits.quirkPriceMultiplier());
         }
 
         return cost;
+    }
+
+    private PriceTraits getPriceTraits() {
+        if (priceTraits == null) {
+            priceTraits = PriceTraits.of(getEntity());
+        }
+        return priceTraits;
+    }
+
+    /**
+     * @param loaded               {@code false} when the unit file could not be loaded
+     * @param mixedTech            whether the unit is mixed tech
+     * @param clan                 whether the unit is Clan tech
+     * @param quirkPriceMultiplier the unit's price quirk multiplier, see {@link Unit#getQuirkPriceMultiplier(Entity)}
+     */
+    private record PriceTraits(boolean loaded, boolean mixedTech, boolean clan, double quirkPriceMultiplier) {
+        static PriceTraits of(@Nullable Entity entity) {
+            if (entity == null) {
+                return new PriceTraits(false, false, false, 1.0);
+            }
+            return new PriceTraits(true, entity.isMixedTech(), entity.isClan(),
+                  Unit.getQuirkPriceMultiplier(entity));
+        }
     }
 
     /**
@@ -246,11 +275,13 @@ public class UnitMarketOffer {
         // The MekSummary can be present in the cache index while the underlying file no longer parses
         // (stale/broken custom, moved or corrupt file). Such an offer is unpurchasable, so drop it here
         // rather than let it linger as a phantom row that crashes the market display and cannot be bought.
-        if (retVal.getEntity() == null) {
+        final Entity entity = retVal.getEntity();
+        if (entity == null) {
             LOGGER.error("Failed to load entity for unit {}, removing the offer from the market.",
                   retVal.getUnit().getName());
             return null;
         }
+        retVal.priceTraits = PriceTraits.of(entity);
 
         return retVal;
     }

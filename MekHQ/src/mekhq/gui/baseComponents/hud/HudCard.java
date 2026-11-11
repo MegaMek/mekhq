@@ -173,6 +173,31 @@ public class HudCard extends JPanel {
      */
     public HudCard show(Color ringColor, boolean isRingFilled, String name, @Nullable String role, List<Tag> tags,
           String sub, @Nullable String figure, @Nullable String figureUnit, boolean isSelected) {
+        return show(ringColor, isRingFilled, name, role, tags, sub, figure, TEXT, figureUnit, isSelected);
+    }
+
+    /**
+     * Configures the card for one row, with the figure in a colour of its own, for example green for money gained and
+     * red for money spent.
+     *
+     * @param ringColor    the status ring's colour
+     * @param isRingFilled {@code true} to fill the ring with a tint of its colour
+     * @param name         the row's name
+     * @param role         a muted word or two after the name, or {@code null} for none
+     * @param tags         the tags to show after the name; any beyond four are dropped
+     * @param sub          the muted sub-line
+     * @param figure       the figure on the right, or {@code null} for none
+     * @param figureColor  the figure's colour
+     * @param figureUnit   the unit shown under the figure, or {@code null} for none
+     * @param isSelected   {@code true} if the row is selected
+     *
+     * @return this card, ready to be returned by a list cell renderer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public HudCard show(Color ringColor, boolean isRingFilled, String name, @Nullable String role, List<Tag> tags,
+          String sub, @Nullable String figure, Color figureColor, @Nullable String figureUnit, boolean isSelected) {
         ring.setColor(ringColor, isRingFilled);
         nameLabel.setText(name);
         roleLabel.setText((role == null) ? "" : role);
@@ -188,6 +213,7 @@ public class HudCard extends JPanel {
         }
         subLabel.setText(sub);
         figureLabel.setText((figure == null) ? "" : figure);
+        figureLabel.setForeground(figureColor);
         figureUnitLabel.setText((figureUnit == null) ? "" : figureUnit);
 
         setOpaque(true);

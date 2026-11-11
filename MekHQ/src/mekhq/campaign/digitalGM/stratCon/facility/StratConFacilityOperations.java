@@ -255,7 +255,7 @@ public final class StratConFacilityOperations {
      *
      * @return the orders that make sense on that hex, whether or not they can be given right now: the enemy facility
      *       orders on an enemy facility, Fortify and Reinforce on the player's side's facility, and Build on a hex
-     *       with nothing on it, along with Interdict Supply if it carries a road
+     *       with nothing on it, along with Interdict Supply if a known enemy supply route runs through it
      *
      * @author Illiani
      * @since 0.51.01
@@ -267,7 +267,8 @@ public final class StratConFacilityOperations {
             boolean isSuitable;
             if (facility == null) {
                 isSuitable = (operation == FacilityOperation.BUILD)
-                                   || ((operation == FacilityOperation.INTERDICT) && track.isRoad(coords));
+                                   || ((operation == FacilityOperation.INTERDICT)
+                                             && isKnownEnemySupplyRoute(track, coords));
             } else if (facility.isOwnerAlliedToPlayer()) {
                 isSuitable = operation.isOnOwnFacility();
             } else {
@@ -432,13 +433,22 @@ public final class StratConFacilityOperations {
         if (!StratConFacilitySupply.isSupplyLinesActive(campaign)) {
             return "reason.supplyLinesOff";
         }
-        if (!track.isRoad(coords) || (track.getFacility(coords) != null)) {
-            return "reason.notRoad";
+        if (!isKnownEnemySupplyRoute(track, coords) || (track.getFacility(coords) != null)) {
+            return "reason.notSupplyRoute";
         }
         if (track.getScenario(coords) != null) {
             return "reason.scenarioUnderway";
         }
         return track.isRoadCut(coords) ? "reason.alreadyCut" : null;
+    }
+
+    /**
+     * @return {@code true} if the hex is scouted and one of the enemy's supply routes runs through it. An unscouted
+     *       hex never counts, so the orders on offer give away no route the player hasn't seen.
+     */
+    private static boolean isKnownEnemySupplyRoute(StratConTrackState track, StratConCoords coords) {
+        return track.coordsRevealed(coords.getX(), coords.getY())
+                     && StratConFacilitySupply.isOnSupplyNetwork(track, coords, false);
     }
 
     private static boolean isBuildUnderway(StratConTrackState track, StratConCoords coords) {
@@ -812,8 +822,7 @@ public final class StratConFacilityOperations {
         facility.setGarrison(facility.getGarrisonMaximum());
         track.addFacility(order.getTargetCoords(), facility);
         track.getRevealedCoords().add(order.getTargetCoords());
-        // A new base belongs on the road grid, as one placed by any other means does.
-        StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
+        // The roads are left as they are: building a base lays no new road.
         report(campaign, "report.built", facility.getDisplayableName());
     }
 

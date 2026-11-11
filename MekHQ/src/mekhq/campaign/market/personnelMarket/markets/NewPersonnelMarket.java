@@ -75,6 +75,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
@@ -107,6 +108,7 @@ public class NewPersonnelMarket {
     private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
+    static final double MINIMUM_APPLICANT_MULTIPLIER = 0.1;
 
     private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -975,6 +977,9 @@ public class NewPersonnelMarket {
      * <p>This method selects an entry from the ordered market entries, iterates through available fallback
      * professions if necessary, and creates a new {@link Person}.</p>
      *
+     * <p>If {@link CampaignOption#PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS} is enabled, civilian professions are
+     * never picked, and no applicant is generated if a profession falls back to a civilian one.</p>
+     *
      * @param unorderedMarketEntries a mapping of {@link PersonnelRole} to {@link PersonnelMarketEntry} representing all
      *                               personnel market entries.
      * @param orderedMarketEntries   a list of {@link PersonnelMarketEntry} objects, ordered by profession.
@@ -985,6 +990,11 @@ public class NewPersonnelMarket {
     @Nullable
     Person generateSingleApplicant(Map<PersonnelRole, PersonnelMarketEntry> unorderedMarketEntries,
           List<PersonnelMarketEntry> orderedMarketEntries) {
+        boolean isCivilianApplicantsDisabled = isCivilianApplicantsDisabled();
+        if (isCivilianApplicantsDisabled) {
+            orderedMarketEntries = removeCivilianEntries(orderedMarketEntries);
+        }
+
         PersonnelMarketEntry entry = pickEntry(orderedMarketEntries);
         if (entry == null) {
             logger.error("No personnel market entries found. Check the data folder for the appropriate YAML file.");
@@ -998,6 +1008,12 @@ public class NewPersonnelMarket {
                                "fallback structure of the YAML file is incorrect.",
                   originalEntry.profession(),
                   getGameYear());
+            return null;
+        }
+
+        // A normal profession can fall back to a civilian one, so double-check it's permitted
+        if (isCivilianApplicantsDisabled && entry.profession().isCivilian()) {
+            logger.debug("Skipping fallback profession {} as civilian applicants are disabled.", entry.profession());
             return null;
         }
 
@@ -1194,6 +1210,56 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Returns a copy of the supplied market entries with all civilian professions removed.
+     *
+     * @param marketEntries the market entries to filter
+     *
+     * @return a new list containing only the non-civilian entries, in their original order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<PersonnelMarketEntry> removeCivilianEntries(List<PersonnelMarketEntry> marketEntries) {
+        return marketEntries.stream().filter(entry -> !entry.profession().isCivilian()).toList();
+    }
+
+    /**
+     * Checks whether civilian applicants have been disabled via
+     * {@link CampaignOption#PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS}.
+     *
+     * @return {@code true} if civilian applicants should not be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isCivilianApplicantsDisabled() {
+        return campaign != null &&
+                     campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_DISABLE_CIVILIAN_APPLICANTS);
+    }
+
+    /**
+     * Scales the supplied number of recruitment rolls by {@link CampaignOption#PERSONNEL_MARKET_APPLICANT_MULTIPLIER}.
+     *
+     * <p>The multiplier is treated as being at least {@link #MINIMUM_APPLICANT_MULTIPLIER}.</p>
+     *
+     * @param rolls the unmodified number of recruitment rolls
+     *
+     * @return the modified number of recruitment rolls, rounded to the nearest whole number, to a minimum of {@code 0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    int applyApplicantMultiplier(int rolls) {
+        if (campaign == null) {
+            return rolls;
+        }
+
+        double multiplier = Math.max(MINIMUM_APPLICANT_MULTIPLIER,
+              campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_MARKET_APPLICANT_MULTIPLIER));
+        return Math.max(0, (int) Math.round(rolls * multiplier));
+    }
+
+    /**
      * Processes an XML node containing applicant data and loads it into the supplied personnel market.
      *
      * @param personnelMarket the personnel market instance being loaded
@@ -1302,5 +1368,19 @@ public class NewPersonnelMarket {
 
     public Money getHiringCost(Person applicant) {
         return Money.zero();
+    }
+
+    /**
+     * Gets the cost of hiring an applicant, split by part, so the hiring hall can show how it is made up.
+     *
+     * @param applicant the applicant
+     *
+     * @return the hiring cost, by part; its total matches {@link #getHiringCost(Person)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
+        return HiringCostBreakdown.free();
     }
 }
