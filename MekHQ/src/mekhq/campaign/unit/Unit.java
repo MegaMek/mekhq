@@ -2135,7 +2135,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         // Get the "buy new" price
-        Money buyNewPrice = getBuyCost();
+        Money buyNewPrice = getPurchaseCost();
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
               buyNewPrice.toAmountAndSymbolString())).append("<br>");
 
@@ -2161,6 +2161,13 @@ public class Unit implements ITechnology, ILocatable {
                       yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
                 sellFor = currentWorth.multipliedBy(obsoleteMultiplier);
             }
+        }
+
+        double acquisitionMultiplier = getAcquisitionMultiplier();
+        if (acquisitionMultiplier != 1.0) {
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.acquisition",
+                  String.format("%.2f", acquisitionMultiplier))).append("<br>");
+            sellFor = sellFor.multipliedBy(acquisitionMultiplier);
         }
 
         breakdown.append("<hr>");
@@ -3254,15 +3261,41 @@ public class Unit implements ITechnology, ILocatable {
     /**
      * @return what the campaign pays to buy this unit: its {@link #getBuyCost()} times its Campaign Operations
      *       acquisition multiplier (see {@link AcquisitionPriceMultipliers}). The acquisition multiplier only applies
-     *       when buying, so it never touches the unit's value once owned (selling, maintenance, contract pay).
+     *       when buying or selling (see {@link #getSalePrice()}), so it never touches the unit's value once owned
+     *       (maintenance, contract pay, battle loss compensation).
      *
      * @author Illiani
      * @since 0.51.01
      */
     public Money getPurchaseCost() {
-        return calculateBuyCost().multipliedBy(AcquisitionPriceMultipliers.getUnitMultiplier(
-              getCampaign().getCampaignOptions(), getCampaign().getPlayerForce().getFaction(),
-              getCampaign().getGameYear(), getEntity()));
+        return calculateBuyCost().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * The sale side of {@link #getPurchaseCost()}: the same whole-unit acquisition multiplier applies, so a unit sells
+     * at the same multiple of its value that it was bought at. Only actual sales use this; anything that values an
+     * owned unit (maintenance, contract pay, collateral, salvage) uses {@link #getSellValue()}.
+     *
+     * @return what the campaign receives for selling this unit: its {@link #getSellValue()} times its Campaign
+     *       Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getSalePrice() {
+        return getSellValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * @return this unit's Campaign Operations acquisition multiplier for the campaign's current faction and year; ×1
+     *       for a unit without an entity
+     */
+    private double getAcquisitionMultiplier() {
+        if (getEntity() == null) {
+            return 1.0;
+        }
+        return AcquisitionPriceMultipliers.getUnitMultiplier(getCampaign().getCampaignOptions(),
+              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear(), getEntity());
     }
 
     /**

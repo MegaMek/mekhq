@@ -44,6 +44,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.Faction;
@@ -52,6 +53,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * Tests {@link AcquisitionPriceMultipliers}: the Campaign Operations (CO p.14) acquisition price multipliers, set to
@@ -98,6 +100,16 @@ class AcquisitionPriceMultipliersTest {
     private double engineMultiplier(int engineType, boolean isCombatVehicle) {
         return AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, false, TechRating.D,
               engineType, isCombatVehicle);
+    }
+
+    /** Only the Total Warfare unit cost model uses the acquisition multipliers. */
+    @ParameterizedTest
+    @EnumSource(value = UnitCostModel.class, names = "TOTAL_WARFARE", mode = EnumSource.Mode.EXCLUDE)
+    void otherUnitCostModelsIgnoreTheMultipliers(UnitCostModel unitCostModel) {
+        campaignOptions.set(CampaignOption.UNIT_COST_MODEL, unitCostModel);
+
+        assertEquals(1.0, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
+              TechRating.F, Engine.XL_ENGINE, true), DELTA);
     }
 
     /** Every multiplier defaults to ×1, so existing campaigns are priced as before. */
@@ -268,14 +280,14 @@ class AcquisitionPriceMultipliersTest {
                   entity), DELTA);
         }
 
-        /** A mixed-tech unit on a Clan chassis is Clan tech. */
+        /** A mixed-tech unit on a Clan chassis only pays its mixed-tech unit price multiplier. */
         @Test
-        void clanChassisMixedTechEntitiesPayTheClanTechMultiplier() {
+        void clanChassisMixedTechEntitiesDoNotPayTheClanTechMultiplier() {
             Entity entity = mock(Entity.class);
             when(entity.isClan()).thenReturn(true);
             when(entity.isMixedTech()).thenReturn(true);
 
-            assertEquals(5.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
+            assertEquals(1.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
                   entity), DELTA);
         }
 

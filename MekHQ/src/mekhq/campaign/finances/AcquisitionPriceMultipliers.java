@@ -74,9 +74,15 @@ import mekhq.campaign.universe.Faction;
  *
  * <p>The multiplier for a unit covers its whole price. Engine multipliers also apply to engines bought as parts.</p>
  *
- * <p>These are acquisition multipliers: they only apply to what the campaign pays when buying (see
- * {@link mekhq.campaign.unit.Unit#getPurchaseCost()} and {@link Part#getPurchaseCost()}), never to the value of what
- * it already owns.</p>
+ * <p>A mixed-tech unit pays none of the Clan tech multipliers, whatever its chassis: its mixed-tech unit price
+ * multiplier already covers its Clan equipment.</p>
+ *
+ * <p>These multipliers only apply to what the campaign pays when buying and receives when selling (see
+ * {@link mekhq.campaign.unit.Unit#getPurchaseCost()}, {@link mekhq.campaign.unit.Unit#getSalePrice()},
+ * {@link Part#getPurchaseCost()} and {@link Part#getSalePrice()}), never to the value of what it owns (maintenance,
+ * contract pay, battle loss compensation, salvage). They only apply under the
+ * {@link mekhq.campaign.finances.enums.UnitCostModel#TOTAL_WARFARE} {@link CampaignOption#UNIT_COST_MODEL}; every
+ * other model leaves them at ×1.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -99,17 +105,19 @@ public final class AcquisitionPriceMultipliers {
      * @param gameYear        the current year
      * @param entity          the unit's entity
      *
-     * @return the acquisition price multiplier for the whole unit. Only a unit built on a Clan chassis pays the Clan
-     *       tech multiplier: an Inner Sphere unit carrying some Clan equipment is priced as Inner Sphere tech (its
-     *       mixed-tech unit price multiplier already covers that equipment).
+     * @return the acquisition price multiplier for the whole unit. Only a pure Clan unit pays the Clan tech
+     *       multiplier: a mixed-tech unit, on either chassis, is covered by its mixed-tech unit price multiplier.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Entity entity) {
-        int engineType = entity.hasEngine() ? entity.getEngine().getEngineType() : NO_ENGINE_TYPE;
-        return getMultiplier(campaignOptions, faction, gameYear, entity.isClan(),
+        // hasEngine() reads the field, but some entities (such as FighterSquadron) override getEngine() to return null
+        Engine engine = entity.getEngine();
+        int engineType = (engine != null) ? engine.getEngineType() : NO_ENGINE_TYPE;
+        boolean isClanTech = entity.isClan() && !entity.isMixedTech();
+        return getMultiplier(campaignOptions, faction, gameYear, isClanTech,
               entity.getTechRating(), engineType, entity.isCombatVehicle());
     }
 
@@ -130,7 +138,8 @@ public final class AcquisitionPriceMultipliers {
         int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
         boolean isVehicle = (unitTypeCode == UnitType.TANK) || (unitTypeCode == UnitType.VTOL)
                                   || (unitTypeCode == UnitType.NAVAL);
-        return getMultiplier(campaignOptions, faction, gameYear, summary.isClan(),
+        boolean isClanTech = summary.isClan() && !summary.isMixedTech();
+        return getMultiplier(campaignOptions, faction, gameYear, isClanTech,
               summary.getTechRating(), summary.getEngineType(), isVehicle && !summary.isSupport());
     }
 
@@ -149,7 +158,7 @@ public final class AcquisitionPriceMultipliers {
           Part part) {
         int engineType = NO_ENGINE_TYPE;
         boolean isCombatVehicleEngine = false;
-        if (part instanceof EnginePart enginePart) {
+        if ((part instanceof EnginePart enginePart) && (enginePart.getEngine() != null)) {
             Engine engine = enginePart.getEngine();
             engineType = engine.getEngineType();
             isCombatVehicleEngine = engine.hasFlag(Engine.TANK_ENGINE) && !engine.hasFlag(Engine.SUPPORT_VEE_ENGINE);
@@ -168,13 +177,18 @@ public final class AcquisitionPriceMultipliers {
      * @param engineType      the item's engine type, such as {@link Engine#XL_ENGINE}, or a negative value for none
      * @param isCombatVehicle whether the item is a combat vehicle, or an engine built for one
      *
-     * @return the sum of every applicable surcharge's increase over ×1, times every applicable discount
+     * @return the sum of every applicable surcharge's increase over ×1, times every applicable discount; ×1 unless
+     *       the campaign uses the {@link mekhq.campaign.finances.enums.UnitCostModel#TOTAL_WARFARE} unit cost model
      *
      * @author Illiani
      * @since 0.51.01
      */
     static double getMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           boolean isClanTech, @Nullable TechRating techRating, int engineType, boolean isCombatVehicle) {
+        if (!campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isTotalWarfare()) {
+            return 1.0;
+        }
+
         boolean isClanFaction = (faction != null) && faction.isClan();
         // The Word of Blake grew out of ComStar and kept its stockpiles of advanced technology
         boolean isComStarFaction = (faction != null) && faction.isComStarOrWoB();

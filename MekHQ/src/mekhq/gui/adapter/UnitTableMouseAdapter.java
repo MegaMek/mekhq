@@ -353,7 +353,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (!unit.isDeployed()) {
                     sellableUnits.add(unit);
-                    totalValue = totalValue.plus(unit.getSellValue());
+                    totalValue = totalValue.plus(unit.getSalePrice());
                 }
             }
 

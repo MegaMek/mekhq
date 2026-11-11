@@ -307,8 +307,8 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     /**
-     * The acquisition multiplier only applies when buying, so it never touches the part's value once owned (selling,
-     * salvage, the parts-based unit value).
+     * The acquisition multiplier only applies when buying or selling (see {@link #getSalePrice()}), so it never
+     * touches the part's value once owned (salvage, the parts-based unit value).
      *
      * @return what the campaign pays to buy this part: its {@link #getActualValue()} times its Campaign Operations
      *       acquisition multiplier (see {@link AcquisitionPriceMultipliers})
@@ -317,8 +317,28 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      * @since 0.51.01
      */
     public Money getPurchaseCost() {
-        return getActualValue().multipliedBy(AcquisitionPriceMultipliers.getPartMultiplier(
-              campaign.getCampaignOptions(), campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this));
+        return getActualValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * The sale side of {@link #getPurchaseCost()}. Only actual sales of spares use this.
+     *
+     * @return what the campaign receives for selling this part: its {@link #getActualValue()} times its Campaign
+     *       Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getSalePrice() {
+        return getActualValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * @return this part's Campaign Operations acquisition multiplier for the campaign's current faction and year
+     */
+    private double getAcquisitionMultiplier() {
+        return AcquisitionPriceMultipliers.getPartMultiplier(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this);
     }
 
     @Override

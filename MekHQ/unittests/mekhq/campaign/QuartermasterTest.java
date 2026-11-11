@@ -583,7 +583,7 @@ public class QuartermasterTest {
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
         Money sellValue = Money.of(42.0);
-        when(mockUnit.getSellValue()).thenReturn(sellValue);
+        when(mockUnit.getSalePrice()).thenReturn(sellValue);
         when(mockCampaign.removeUnit(mockUnit.getId())).thenReturn(true);
 
         // When you sell a unit with a certain value...
@@ -603,7 +603,7 @@ public class QuartermasterTest {
         Unit mockUnit = mock(Unit.class);
         UUID mockId = UUID.randomUUID();
         when(mockUnit.getId()).thenReturn(mockId);
-        when(mockUnit.getSellValue()).thenReturn(Money.of(42.0));
+        when(mockUnit.getSalePrice()).thenReturn(Money.of(42.0));
 
         // When you sell a unit...
         quartermaster.sellUnit(mockUnit);
@@ -1087,7 +1087,7 @@ public class QuartermasterTest {
         Part mockPart = mock(Part.class);
         when(mockPart.isSpare()).thenReturn(true);
         when(mockPart.getQuantity()).thenReturn(2);
-        when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
+        when(mockPart.getSalePrice()).thenReturn(Money.of(1.0));
 
         // ...so try to sell 2 of them...
         quartermaster.sellPart(mockPart, 2);
@@ -1112,7 +1112,7 @@ public class QuartermasterTest {
         Part mockPart = mock(Part.class);
         when(mockPart.isSpare()).thenReturn(true);
         when(mockPart.getQuantity()).thenReturn(10);
-        when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
+        when(mockPart.getSalePrice()).thenReturn(Money.of(1.0));
 
         // ...so try to sell some of them...
         int saleQuantity = 7;
@@ -1136,7 +1136,7 @@ public class QuartermasterTest {
         when(mockPart.isSpare()).thenReturn(true);
         int warehouseQuantity = 5;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
-        when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
+        when(mockPart.getSalePrice()).thenReturn(Money.of(1.0));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1161,7 +1161,7 @@ public class QuartermasterTest {
         int warehouseQuantity = 5;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
         double value = 1.0;
-        when(mockPart.getActualValue()).thenReturn(Money.of(value));
+        when(mockPart.getSalePrice()).thenReturn(Money.of(value));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1207,7 +1207,7 @@ public class QuartermasterTest {
         when(mockPart.isSpare()).thenReturn(true);
         int warehouseQuantity = 10;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
-        when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
+        when(mockPart.getSalePrice()).thenReturn(Money.of(1.0));
 
         // ...so try to sell all of them...
         quartermaster.sellPart(mockPart);
@@ -1290,7 +1290,7 @@ public class QuartermasterTest {
         AmmoStorage mockAmmo = mock(AmmoStorage.class);
         when(mockAmmo.isSpare()).thenReturn(true);
         when(mockAmmo.getShots()).thenReturn(100);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell 2 of them...
         quartermaster.sellAmmo(mockAmmo, 2);
@@ -1315,7 +1315,7 @@ public class QuartermasterTest {
         AmmoStorage mockAmmo = mock(AmmoStorage.class);
         when(mockAmmo.isSpare()).thenReturn(true);
         when(mockAmmo.getShots()).thenReturn(10);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(10.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(10.0));
 
         // ...so try to sell some of them...
         int saleQuantity = 7;
@@ -1339,7 +1339,7 @@ public class QuartermasterTest {
         when(mockAmmo.isSpare()).thenReturn(true);
         int warehouseQuantity = 5;
         when(mockAmmo.getShots()).thenReturn(warehouseQuantity);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(5.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(5.0));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1364,7 +1364,7 @@ public class QuartermasterTest {
         int warehouseQuantity = 5;
         when(mockAmmo.getShots()).thenReturn(warehouseQuantity);
         double value = 5.0;
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(value));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(value));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1412,7 +1412,7 @@ public class QuartermasterTest {
         when(mockAmmo.isSpare()).thenReturn(true);
         int warehouseQuantity = 100;
         when(mockAmmo.getShots()).thenReturn(warehouseQuantity);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell all of them...
         quartermaster.sellAmmo(mockAmmo);
@@ -1438,7 +1438,7 @@ public class QuartermasterTest {
         AmmoStorage mockAmmo = mock(AmmoStorage.class);
         when(mockAmmo.isSpare()).thenReturn(true);
         when(mockAmmo.getShots()).thenReturn(10);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(10.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(10.0));
 
         // ...so try to sell some of them...
         int saleQuantity = 7;
@@ -1466,7 +1466,7 @@ public class QuartermasterTest {
         when(mockAmmo.isSpare()).thenReturn(true);
         int warehouseQuantity = 100;
         when(mockAmmo.getShots()).thenReturn(warehouseQuantity);
-        when(mockAmmo.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockAmmo.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell all of them...
         quartermaster.sellPart(mockAmmo);
@@ -1549,7 +1549,7 @@ public class QuartermasterTest {
         Armor mockArmor = mock(Armor.class);
         when(mockArmor.isSpare()).thenReturn(true);
         when(mockArmor.getAmount()).thenReturn(100);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell 2 of them...
         quartermaster.sellArmor(mockArmor, 2);
@@ -1574,7 +1574,7 @@ public class QuartermasterTest {
         Armor mockArmor = mock(Armor.class);
         when(mockArmor.isSpare()).thenReturn(true);
         when(mockArmor.getAmount()).thenReturn(10);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(10.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(10.0));
 
         // ...so try to sell some of them...
         int saleQuantity = 7;
@@ -1598,7 +1598,7 @@ public class QuartermasterTest {
         when(mockArmor.isSpare()).thenReturn(true);
         int warehouseQuantity = 5;
         when(mockArmor.getAmount()).thenReturn(warehouseQuantity);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(5.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(5.0));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1623,7 +1623,7 @@ public class QuartermasterTest {
         int warehouseQuantity = 5;
         when(mockArmor.getAmount()).thenReturn(warehouseQuantity);
         double value = 5.0;
-        when(mockArmor.getActualValue()).thenReturn(Money.of(value));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(value));
 
         // ...so try to sell more of them than we have...
         int saleQuantity = 100;
@@ -1671,7 +1671,7 @@ public class QuartermasterTest {
         when(mockArmor.isSpare()).thenReturn(true);
         int warehouseQuantity = 100;
         when(mockArmor.getAmount()).thenReturn(warehouseQuantity);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell all of them...
         quartermaster.sellArmor(mockArmor);
@@ -1697,7 +1697,7 @@ public class QuartermasterTest {
         Armor mockArmor = mock(Armor.class);
         when(mockArmor.isSpare()).thenReturn(true);
         when(mockArmor.getAmount()).thenReturn(10);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(10.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(10.0));
 
         // ...so try to sell some of them...
         int saleQuantity = 7;
@@ -1725,7 +1725,7 @@ public class QuartermasterTest {
         when(mockArmor.isSpare()).thenReturn(true);
         int warehouseQuantity = 100;
         when(mockArmor.getAmount()).thenReturn(warehouseQuantity);
-        when(mockArmor.getActualValue()).thenReturn(Money.of(100.0));
+        when(mockArmor.getSalePrice()).thenReturn(Money.of(100.0));
 
         // ...so try to sell all of them...
         quartermaster.sellPart(mockArmor);
