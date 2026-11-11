@@ -36,6 +36,7 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDepl
 
 import java.util.*;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -211,6 +212,8 @@ public class SalvageOperationDraft {
     /**
      * Lists every formation that could be a salvage team: Salvage formations first, then combat teams, each
      * alphabetically. Formations that can't join are included, with the reason, so the player can see why.
+     *
+     * <p>Salvage formations nested in another Salvage formation are part of that team and aren't listed separately.</p>
      */
     private List<TeamOption> buildTeamOptions() {
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
@@ -220,10 +223,7 @@ public class SalvageOperationDraft {
         List<Formation> salvageFormations = new ArrayList<>();
         Set<Integer> listedIds = new LinkedHashSet<>();
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            Formation parentFormation = formation.getParentFormation();
-            boolean isNestedInSalvageFormation = (parentFormation != null) &&
-                                                       parentFormation.getFormationType().isSalvage();
-            if (formation.getFormationType().isSalvage() && !isNestedInSalvageFormation) {
+            if (formation.getFormationType().isSalvage() && !hasSalvageAncestor(formation)) {
                 salvageFormations.add(formation);
                 listedIds.add(formation.getId());
             }
@@ -244,7 +244,7 @@ public class SalvageOperationDraft {
             combatTeams.add(formation);
         }
 
-        salvageFormations.sort(Comparator.comparing(Formation::getFullName));
+        salvageFormations.sort(SalvageOperationDraft::compareKeepingNestedTogether);
         combatTeams.sort(Comparator.comparing(Formation::getFullName));
 
         List<TeamOption> options = new ArrayList<>();
@@ -259,14 +259,53 @@ public class SalvageOperationDraft {
         return options;
     }
 
-    /** Checks whether a formation contains, or is contained by, any of the given formations. */
-    private static boolean isNestedWithAny(Formation formation, List<Formation> listedFormations) {
-        for (Formation listedFormation : listedFormations) {
-            if (isAncestorOf(listedFormation, formation) || isAncestorOf(formation, listedFormation)) {
+    /** Checks whether a formation is nested anywhere under another Salvage formation. */
+    private static boolean hasSalvageAncestor(Formation formation) {
+        for (Formation parent = formation.getParentFormation(); parent != null; parent = parent.getParentFormation()) {
+            if (parent.getFormationType().isSalvage()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Orders formations alphabetically by their parents' names first, then their own, so each formation comes directly
+     * after its parent.
+     */
+    private static int compareKeepingNestedTogether(Formation first, Formation second) {
+        List<String> firstPath = rootFirstNames(first);
+        List<String> secondPath = rootFirstNames(second);
+        for (int i = 0; (i < firstPath.size()) && (i < secondPath.size()); i++) {
+            int comparison = firstPath.get(i).compareTo(secondPath.get(i));
+            if (comparison != 0) {
+                return comparison;
+            }
+        }
+        // One is the other's parent; the parent comes first
+        return Integer.compare(firstPath.size(), secondPath.size());
+    }
+
+    private static List<String> rootFirstNames(Formation formation) {
+        List<String> names = new ArrayList<>();
+        for (Formation current = formation; current != null; current = current.getParentFormation()) {
+            names.addFirst(current.getFullName());
+        }
+        return names;
+    }
+
+    /** Checks whether a formation contains, or is contained by, any of the given formations. */
+    private static boolean isNestedWithAny(Formation formation, List<Formation> listedFormations) {
+        for (Formation listedFormation : listedFormations) {
+            if (isNestedWith(formation, listedFormation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isNestedWith(Formation formation, Formation otherFormation) {
+        return isAncestorOf(otherFormation, formation) || isAncestorOf(formation, otherFormation);
     }
 
     private static boolean isAncestorOf(Formation possibleAncestor, Formation formation) {
@@ -279,18 +318,16 @@ public class SalvageOperationDraft {
         return false;
     }
 
-    private TeamAvailability getAvailability(Formation formation, LocalHangar hangar,
+    private TeamAvailability getAvailability(@Nonnull Formation formation, LocalHangar hangar,
           List<AbstractContract> activeContracts, List<Integer> alreadyAssignedFormations) {
         if (formation.getSalvageUnitCount(hangar, isInSpace, salvageRules) <= 0) {
             return TeamAvailability.NO_SALVAGE_UNITS;
         }
 
-        // A formation already assigned to this operation skips the StratCon check. Otherwise, a player who assigns
-        // a formation and then cancels at the last minute would find it unavailable for the operation it was
-        // assigned to.
-        boolean isDeployedToStratCon = !alreadyAssignedFormations.contains(formation.getId()) &&
-                                             isForceDeployedToStratCon(activeContracts, formation.getId());
-        if (!formation.isDeployed() && !isDeployedToStratCon) {
+        boolean isDeployedToStratCon = isDeployedToStratCon(formation, activeContracts, alreadyAssignedFormations);
+        boolean isDeployed = formation.isDeployed() || formation.getAllSubFormations().stream()
+                                                                  .anyMatch(Formation::isDeployed);
+        if (!isDeployed && !isDeployedToStratCon) {
             return TeamAvailability.AVAILABLE;
         }
 
@@ -301,10 +338,40 @@ public class SalvageOperationDraft {
         return TeamAvailability.DEPLOYED;
     }
 
-    /** Checks whether a formation, or any formation above it, is deployed to this scenario. */
+    /**
+     * Checks whether a formation, or any formation above it, is deployed on StratCon. StratCon only records the
+     * formation that was deployed, so a nested formation has to check its parents.
+     *
+     * <p>Formations already assigned to this operation are skipped. Otherwise, a player who assigns a formation and
+     * then cancels at the last minute would find it, or the formations nested in it, unavailable for the operation it
+     * was assigned to.</p>
+     */
+    private static boolean isDeployedToStratCon(Formation formation, List<AbstractContract> activeContracts,
+          List<Integer> alreadyAssignedFormations) {
+        for (Formation current = formation; current != null; current = current.getParentFormation()) {
+            if (!alreadyAssignedFormations.contains(current.getId()) &&
+                      isForceDeployedToStratCon(activeContracts, current.getId())) {
+                return true;
+            }
+        }
+        for (Formation descendant : formation.getAllSubFormations()) {
+            if (!alreadyAssignedFormations.contains(descendant.getId()) &&
+                      isForceDeployedToStratCon(activeContracts, descendant.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Checks whether a formation, or any formation above or below it, is deployed to this scenario. */
     private boolean isDeployedToThisScenario(Formation formation) {
         for (Formation current = formation; current != null; current = current.getParentFormation()) {
             if (current.getScenarioId() == scenario.getId()) {
+                return true;
+            }
+        }
+        for (Formation descendant : formation.getAllSubFormations()) {
+            if (descendant.getScenarioId() == scenario.getId()) {
                 return true;
             }
         }
@@ -350,7 +417,8 @@ public class SalvageOperationDraft {
     }
 
     /**
-     * Stages a team, bringing its techs along.
+     * Stages a team, bringing its techs along. Any staged team that contains it, or that it contains, is unstaged, so
+     * no unit joins the operation twice.
      *
      * @param option the team
      *
@@ -360,9 +428,15 @@ public class SalvageOperationDraft {
      * @since 0.51.01
      */
     public boolean stage(TeamOption option) {
-        if (!option.availability().isStageable() || !stagedFormationIds.add(option.formation().getId())) {
+        if (!option.availability().isStageable() || isStaged(option)) {
             return false;
         }
+        for (TeamOption stagedTeam : getStagedTeams()) {
+            if (isNestedWith(option.formation(), stagedTeam.formation())) {
+                unstage(stagedTeam);
+            }
+        }
+        stagedFormationIds.add(option.formation().getId());
         for (UUID techId : getTeamTechIds(option.formation())) {
             addToPool(techId);
             selectedTechIds.add(techId);

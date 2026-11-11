@@ -77,4 +77,13 @@ public class TestSystems extends Systems {
     public TestSystems() {
         super();
     }
+
+    /**
+     * Indexes the systems loaded so far by location, as loading the startup data does. Without this, lookups of
+     * nearby systems (such as the systems planetary acquisition shops in) find nothing, since {@link #load(String)}
+     * alone does not index what it loads.
+     */
+    public void indexLoadedSystems() {
+        cleanupSystems();
+    }
 }

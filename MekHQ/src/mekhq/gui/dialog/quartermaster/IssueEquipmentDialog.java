@@ -36,11 +36,14 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -66,6 +69,12 @@ import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.hud.HudTabStrip;
 
@@ -79,6 +88,9 @@ import mekhq.gui.baseComponents.hud.HudTabStrip;
  * <p>The dialog is drawn as a heads-up display in the style of the interstellar-map tab, the StratCon deployment
  * wizard, and the contract debrief console (see {@link Hud}): a command bar with live procurement tiles and a
  * segmented section strip, HUD kit cards, and a footer bar with the HUD buttons.</p>
+ *
+ * <p>Each kit family has a guide that slides over the dialog, opened by the guide button or by itself the first time
+ * the player reaches that family's page, as the Oracle Console's guides do.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -113,6 +125,12 @@ public class IssueEquipmentDialog extends JDialog {
     private transient HudStatTile costTile;
     private transient JLabel summaryLabel;
     private transient HudButton issueButton;
+
+    /** The section on screen, whose guide the guide button opens. */
+    private transient KitIssueSection currentSection;
+    private transient HudButton guideButton;
+    private transient HudCheckBox autoOpenGuides;
+    private transient HudGuideDrawer guideDrawer;
 
     /**
      * Opens the dialog for a selection of personnel and/or units. Units contribute their crews. If nothing in the
@@ -188,6 +206,12 @@ public class IssueEquipmentDialog extends JDialog {
         recalculate();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
+        });
         setMinimumSize(scaleForGUI(820, 640));
         getContentPane().setPreferredSize(scaleForGUI(960, 760));
         pack();
@@ -209,9 +233,14 @@ public class IssueEquipmentDialog extends JDialog {
             titles.add(section.getTitle());
             pages.add(section.getComponent(), Integer.toString(index));
         }
+        guideButton = new HudButton("", false, true);
+        guideButton.setToolTipText(guideText("button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+
         sectionStrip = new HudTabStrip(titles, false, index -> {
             pageLayout.show(pages, Integer.toString(index));
             sectionStrip.setSelected(index);
+            showSectionGuide(sections.get(index));
         });
         sectionStrip.setSelected(0);
 
@@ -220,6 +249,8 @@ public class IssueEquipmentDialog extends JDialog {
         content.add(buildFooter(), BorderLayout.SOUTH);
 
         setContentPane(content);
+        buildGuide();
+        showSectionGuide(sections.getFirst());
     }
 
     // region Command bar
@@ -271,8 +302,13 @@ public class IssueEquipmentDialog extends JDialog {
         topRow.add(identity, BorderLayout.CENTER);
         topRow.add(tiles, BorderLayout.EAST);
 
+        JPanel stripRow = new JPanel(new BorderLayout(scaleForGUI(12), 0));
+        stripRow.setOpaque(false);
+        stripRow.add(sectionStrip, BorderLayout.CENTER);
+        stripRow.add(guideButton, BorderLayout.EAST);
+
         commandBar.add(topRow, BorderLayout.CENTER);
-        commandBar.add(sectionStrip, BorderLayout.SOUTH);
+        commandBar.add(stripRow, BorderLayout.SOUTH);
         return commandBar;
     }
     // endregion Command bar
@@ -396,6 +432,11 @@ public class IssueEquipmentDialog extends JDialog {
             @Override
             public String getTitle() {
                 return getTextAt(RESOURCE_BUNDLE, "tab.armor");
+            }
+
+            @Override
+            public String getGuideKey() {
+                return KitIssueGuidePreferences.ARMOR_GUIDE;
             }
 
             @Override
@@ -709,6 +750,85 @@ public class IssueEquipmentDialog extends JDialog {
               key -> ArmorKitIssuer.localStock(byCategory.getOrDefault(key, List.of()), campaign));
     }
     // endregion Actions & totals
+
+    // region Guides
+
+    /**
+     * Builds the guide drawer, which floats over the dialog above a scrim; Escape or a click on the scrim closes it.
+     */
+    private void buildGuide() {
+        autoOpenGuides = new HudCheckBox(guideText("autoOpen"));
+        autoOpenGuides.addActionListener(event -> KitIssueGuidePreferences.getInstance()
+                                                        .setGuideAutoOpen(autoOpenGuides.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(guideText("tab.steps"), guideText("tab.example"),
+              guideText("tab.terms")), autoOpenGuides, guideText("close"), this::closeGuide);
+        guideDrawer.install(getRootPane());
+    }
+
+    /** Points the guide button at a section's guide, and opens it if the player hasn't seen it yet. */
+    private void showSectionGuide(KitIssueSection section) {
+        closeGuide();
+        currentSection = section;
+        guideButton.setText("?  " + guideText(section.getGuideKey() + ".button").toUpperCase(Locale.ROOT));
+        maybeOpenGuide();
+    }
+
+    /** Opens the section's guide by itself the first time the player sees it, unless they turned that off. */
+    private void maybeOpenGuide() {
+        KitIssueGuidePreferences preferences = KitIssueGuidePreferences.getInstance();
+        if (isShowing() && preferences.isGuideAutoOpen() && !preferences.isGuideSeen(currentSection.getGuideKey())) {
+            openGuide();
+        }
+    }
+
+    /** Opens the guide for the section on screen, marking it seen so it does not open by itself again. */
+    private void openGuide() {
+        KitIssueGuidePreferences preferences = KitIssueGuidePreferences.getInstance();
+        preferences.setGuideSeen(currentSection.getGuideKey(), true);
+        autoOpenGuides.setSelected(preferences.isGuideAutoOpen());
+        guideDrawer.open(createGuide(currentSection.getGuideKey()));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds a kit family's guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code guide.armor.step.1.title}, {@code .step.2.title}, ...), read until the next number is missing, so text
+     * can be added or reworded without code changes.
+     *
+     * @param guideKey the family's guide key
+     *
+     * @return the guide
+     */
+    private static Guide createGuide(String guideKey) {
+        String prefix = guideKey + ".";
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "step." + number + ".title")); number++) {
+            steps.add(new Step(guideText(prefix + "step." + number + ".title"),
+                  guideText(prefix + "step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "example." + number + ".who")); number++) {
+            example.add(new ExampleLine(guideText(prefix + "example." + number + ".who"),
+                  guideText(prefix + "example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText(prefix + "term." + number + ".name")); number++) {
+            terms.add(new Term(guideText(prefix + "term." + number + ".name"),
+                  guideText(prefix + "term." + number + ".text")));
+        }
+        return new Guide(guideText(prefix + "eyebrow"), guideText(prefix + "title"), steps, null,
+              guideText("exampleIntro"), example, terms, null);
+    }
+
+    /** @return the guide text under {@code guide.}, which every guide's keys share */
+    private static String guideText(String key) {
+        return getTextAt(RESOURCE_BUNDLE, "guide." + key);
+    }
+
+    // endregion Guides
 
     // region Kit display helpers
     private String kitDisplayName(String internalName) {

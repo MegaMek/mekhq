@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
@@ -157,6 +158,21 @@ public class StratConScenarioFactory {
         }
 
         return template.clone();
+    }
+
+    /**
+     * Lists the force IDs used by the loaded scenario templates, such as {@code Player} and {@code OpFor}. A scenario
+     * modifier's force can only sync with, or link objectives to, a force that its scenario's template defines, so
+     * editors offer these as the choices.
+     *
+     * @return the distinct force IDs, sorted
+     */
+    public static Set<String> getAllScenarioForceIds() {
+        Set<String> forceIds = new TreeSet<>();
+        for (ScenarioTemplate template : dynamicScenarioNameMap.values()) {
+            forceIds.addAll(template.getScenarioForces().keySet());
+        }
+        return forceIds;
     }
 
     /**

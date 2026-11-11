@@ -44,15 +44,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
 import jakarta.annotation.Nullable;
@@ -91,6 +84,7 @@ public class ContractDossierPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
     private static final int PORTRAIT_SIZE = 48;
+    private static final int COPIED_CONFIRMATION_MILLIS = 1800;
 
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
@@ -168,9 +162,15 @@ public class ContractDossierPanel extends JPanel {
                                                              .toUpperCase(Locale.ROOT),
               getTextAt(RESOURCE_BUNDLE, "button.contractMarket.delete.confirm").toUpperCase(Locale.ROOT), true);
         delete.addActionListener(event -> actions.delete(contract));
+        HudButton discord = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord")
+                                                .toUpperCase(Locale.ROOT), false, true);
+        discord.setToolTipText(getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord.tooltip"));
+        discord.addActionListener(event -> confirmCopied(discord, actions.copyForDiscord(contract)));
 
         JPanel buttons = Hud.transparentPanel(null);
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+        buttons.add(discord);
+        buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(edit);
         buttons.add(Box.createHorizontalStrut(scaleForGUI(5)));
         buttons.add(delete);
@@ -180,6 +180,16 @@ public class ContractDossierPanel extends JPanel {
 
         header.add(side, BorderLayout.EAST);
         return header;
+    }
+
+    /** Briefly relabels the Discord button to say whether the copy worked, then puts its label back. */
+    private static void confirmCopied(HudButton button, boolean copied) {
+        String outcome = copied ? "button.contractMarket.discord.copied" : "button.contractMarket.discord.failed";
+        button.setText(getTextAt(RESOURCE_BUNDLE, outcome).toUpperCase(Locale.ROOT));
+        Timer restore = new Timer(COPIED_CONFIRMATION_MILLIS, event -> button.setText(
+              getTextAt(RESOURCE_BUNDLE, "button.contractMarket.discord").toUpperCase(Locale.ROOT)));
+        restore.setRepeats(false);
+        restore.start();
     }
 
     private JPanel buildIdentity() {
@@ -458,6 +468,14 @@ public class ContractDossierPanel extends JPanel {
         costBar.setToolTipText(expensesBreakdown);
         MarketHud.addSpanning(money, costBar, 3);
 
+        Money straightSupport = estimate.straightSupport();
+        if (straightSupport.isPositive()) {
+            MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.straightSupport"),
+                  signedAmount(straightSupport), READY,
+                  MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                        "dossier.contractMarket.profit.straightSupport.tooltip")), false);
+        }
+
         Money net = estimate.estimatedNet();
         MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
               signedAmount(net), net.isNegative() ? DANGER : READY, null, true);
@@ -529,8 +547,8 @@ public class ContractDossierPanel extends JPanel {
     // region Briefing
 
     /**
-     * The briefing that opens the Overview: the contact's portrait and pitch, then the contract's own (Markdown)
-     * description when it has one.
+     * The briefing that opens the Overview: the contact's portrait, then the contract's own (Markdown) description when
+     * it has one, or the generated pitch when it does not.
      */
     private JPanel buildBriefing() {
         Person negotiator = contract.getEmployerNegotiator();
@@ -558,20 +576,14 @@ public class ContractDossierPanel extends JPanel {
         text.add(leftAligned(nameLine));
         text.add(Box.createVerticalStrut(scaleForGUI(6)));
 
-        // Set larger than the figures below, so the pitch fills the height the route preview beside it takes.
-        JTextArea quote = MarketHud.wrappedText(ContractContactStatement.forContract(campaign, contract), TEXT_MUTED,
-              Font.ITALIC, 1.06f);
-        quote.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, BORDER_CYAN),
-              BorderFactory.createEmptyBorder(0, scaleForGUI(10), 0, 0)));
-        text.add(leftAligned(quote));
-
         String description = contract.getDescription();
-        if (!StringUtils.isBlank(description)) {
-            text.add(Box.createVerticalStrut(scaleForGUI(12)));
-            text.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE,
-                  "dossier.contractMarket.section.briefing"))));
-            text.add(Box.createVerticalStrut(scaleForGUI(4)));
+        if (StringUtils.isBlank(description)) {
+            // Set larger than the figures below, so the pitch fills the height the route preview beside it takes.
+            JTextArea quote = MarketHud.wrappedText(ContractContactStatement.forContract(campaign, contract),
+                  TEXT_MUTED, Font.ITALIC, 1.06f);
+            quote.setBorder(createQuoteBorder());
+            text.add(leftAligned(quote));
+        } else {
             JEditorPane descriptionPane = new JEditorPane();
             descriptionPane.setContentType("text/html");
             // Set before the text: a caret that follows the text ends up below it, and scrolling it into view would
@@ -581,17 +593,24 @@ public class ContractDossierPanel extends JPanel {
             descriptionPane.setEditable(false);
             descriptionPane.setFocusable(false);
             descriptionPane.setOpaque(false);
-            descriptionPane.setBorder(null);
+            descriptionPane.setBorder(createQuoteBorder());
             // Honoring the display properties makes the HTML take the HUD's font and colour instead of the default
             // dark text, which would vanish on the dark surface.
             descriptionPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             descriptionPane.setForeground(TEXT_MUTED);
-            descriptionPane.setFont(hudFont(Font.PLAIN, 1.0f, 0.0f));
+            descriptionPane.setFont(hudFont(Font.PLAIN, 1.06f, 0.0f));
             text.add(leftAligned(descriptionPane));
         }
         // Pinned to the top: stretched to the route preview's height, the quote's rule would run on below the text.
         briefing.add(MarketHud.topAligned(text), BorderLayout.CENTER);
         return briefing;
+    }
+
+    /** The cyan rule down the left of the contact's words, set off from them by a small gap. */
+    private static Border createQuoteBorder() {
+        return BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, BORDER_CYAN),
+              BorderFactory.createEmptyBorder(0, scaleForGUI(10), 0, 0));
     }
 
     // endregion Briefing

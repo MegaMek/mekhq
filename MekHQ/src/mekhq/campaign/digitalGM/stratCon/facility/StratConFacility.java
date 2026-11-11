@@ -454,8 +454,8 @@ public class StratConFacility {
     }
 
     /**
-     * @return {@code true} if the facility has been linked to its holder's supply lines since it last changed sides.
-     *       Only such a facility can be cut off; one that was never on them supplies itself.
+     * @return {@code true} if the facility has had a route on its holder's supply lines since it last changed sides.
+     *       Only such a facility is reported as back on them once it stops being cut off.
      *
      * @author Illiani
      * @since 0.51.01

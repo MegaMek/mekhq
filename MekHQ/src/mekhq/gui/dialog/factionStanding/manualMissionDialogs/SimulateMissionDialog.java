@@ -63,7 +63,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * Dialog window to simulate missions and adjust faction standings based on employer, enemy, and mission status
@@ -583,7 +583,7 @@ public class SimulateMissionDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            GlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
+            GlossaryConsole.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 

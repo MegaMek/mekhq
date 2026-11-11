@@ -774,8 +774,13 @@ public class FactionStandings {
      * accolade level will be increased for the provided date. The updated accolade level is then returned; if no change
      * is needed, {@code null} is returned.</p>
      *
-     * @param faction the {@link Faction} object to check against
-     * @param today   the date to use when recording a possible accolade improvement
+     * <p>Once a playable faction has reached {@link FactionAccoladeLevel#ADOPTION_OR_MEKS}, it will only continue to
+     * award accolades if the campaign belongs to that faction. A campaign that refused the faction's offer to join
+     * (or later left the faction) no longer receives accolades from it.</p>
+     *
+     * @param faction         the {@link Faction} object to check against
+     * @param campaignFaction the campaign's current {@link Faction}
+     * @param today           the date to use when recording a possible accolade improvement
      *
      * @return the new {@link FactionAccoladeLevel} if an accolade change occurred, or {@code null} if there was no
      *       change
@@ -783,7 +788,8 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, LocalDate today) {
+    public @Nullable FactionAccoladeLevel checkForAccolade(Faction faction, Faction campaignFaction,
+          LocalDate today) {
         if (faction.isAggregate()) {
             return null;
         }
@@ -791,6 +797,16 @@ public class FactionStandings {
         String factionCode = faction.getShortName();
         if (factionJudgment.factionHasCensure(factionCode)) {
             LOGGER.debug("Faction {} has a censure, so accolade improvement is impossible.", factionCode);
+            return null;
+        }
+
+        // Non-playable factions never make the adoption offer, so they are free to continue awarding accolades
+        boolean isPastAdoptionOffer = faction.isPlayable() &&
+                                            factionJudgment.getAccoladeForFaction(factionCode).getRecognition() >=
+                                                  FactionAccoladeLevel.ADOPTION_OR_MEKS.getRecognition();
+        if (isPastAdoptionOffer && !faction.equals(campaignFaction)) {
+            LOGGER.debug("Faction {} has already offered adoption, so accolade improvement is impossible.",
+                  factionCode);
             return null;
         }
 

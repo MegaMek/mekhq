@@ -1237,7 +1237,8 @@ public class InterstellarMapPanel extends JPanel {
               && (Math.abs(transform.getScaleX() - pixelScale) < 0.000_001)
               && (Math.abs(transform.getScaleY() - pixelScale) < 0.000_001)) {
             graphics.setTransform(AffineTransform.getTranslateInstance(
-                  Math.rint(transform.getTranslateX()), Math.rint(transform.getTranslateY())));
+                  roundDeviceTranslation(transform.getTranslateX()),
+                  roundDeviceTranslation(transform.getTranslateY())));
         } else {
             graphics.scale(1.0 / pixelScale, 1.0 / pixelScale);
         }
@@ -5737,9 +5738,20 @@ public class InterstellarMapPanel extends JPanel {
         double pixelScale = devicePixelScale(transform);
         if ((pixelScale == transform.getScaleX()) && (pixelScale == transform.getScaleY())) {
             graphics.setTransform(new AffineTransform(pixelScale, 0.0, 0.0, pixelScale,
-                  Math.rint(transform.getTranslateX()), Math.rint(transform.getTranslateY())));
+                  roundDeviceTranslation(transform.getTranslateX()),
+                  roundDeviceTranslation(transform.getTranslateY())));
         }
         return pixelScale;
+    }
+
+    /**
+     * Rounds a device-space translation to a whole pixel, always rounding halves up. Swing paints small repaint
+     * regions into buffers at other integer offsets, which keep the same fractional part but change the integer
+     * part. {@link Math#rint} rounds halves to the even neighbour, so it could shift a partial repaint one physical
+     * pixel away from the surrounding map at 150% display scaling and leave jagged seams behind animations.
+     */
+    static double roundDeviceTranslation(double translation) {
+        return Math.floor(translation + 0.5);
     }
 
     static boolean canCacheRenderLayer(int width, int height) {
@@ -9565,10 +9577,18 @@ public class InterstellarMapPanel extends JPanel {
             return false;
         }
         if (hideEmpty) {
-            // Filter out "empty" systems
-            return (renderData != null) && !renderData.empty();
+            // Empty systems stay selectable while on a route, since the map still draws them as waypoints
+            boolean systemEmpty = (renderData == null) || renderData.empty();
+            return shouldRenderSystem(true, systemEmpty, false,
+                  isOnRoute(system, jumpPath, getActiveJumpPath()));
         }
         return true;
+    }
+
+    static boolean isOnRoute(PlanetarySystem system, @Nullable JumpPath proposedPath,
+          @Nullable JumpPath activePath) {
+        return ((proposedPath != null) && proposedPath.contains(system))
+              || ((activePath != null) && activePath.contains(system));
     }
 
     /**

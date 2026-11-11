@@ -36,15 +36,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 
 /**
  * Options for the Command Generator (the ratgen-driven force-generation pipeline behind the Command
@@ -54,7 +55,7 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
  * carries only the members the Command Generator actually consumes, with defaults matching the
  * legacy {@code RULESET_BASED} configuration. The rolled force itself is described by the embedded
  * {@link ForceDescriptorSnapshot}; everything else here controls how {@link CommandGenerator}
- * materializes the roll into the campaign (support staff, tech assignment, ranks, flags, formation
+ * materializes the roll into the campaign (support staff, random origin, ranks, flags, formation
  * icons, and the OtherTab simulation / contract / finance toggles).</p>
  *
  * <p>The options are dialog-lifetime state: they are populated from the Command Designer tabs on
@@ -69,9 +70,12 @@ public class CommandGenerationOptions {
      */
     private static final long DEFAULT_MINIMUM_STARTING_FLOAT = 10_000_000L;
 
+    /** Half a year of running costs: enough to reach and see out a first contract before its pay arrives. */
+    public static final int DEFAULT_STARTING_CASH_MONTHS = 6;
+
     /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
-     * doctor, and administrators - matches the SetupTab spinner/dropdown layout.
+     * doctor, and administrators - matches the People page's support staff table.
      */
     private static final PersonnelRole[] SUPPORT_ROLES_FOR_COVERAGE = {
           PersonnelRole.MEK_TECH,
@@ -111,17 +115,6 @@ public class CommandGenerationOptions {
     private boolean generateMedicalReserve;
     private int medicalReservePercent;
 
-    // Tech-to-unit assignment sort grid. Three sort slots each holding a
-    // TechAssignmentSortFactor; the assigner chains them in slot order (primary -> secondary ->
-    // tertiary). Each slot has its own ascending / descending direction.
-    private boolean assignTechsToUnits;
-    private TechAssignmentSortFactor techAssignmentPrimarySort;
-    private boolean techAssignmentPrimaryDescending;
-    private TechAssignmentSortFactor techAssignmentSecondarySort;
-    private boolean techAssignmentSecondaryDescending;
-    private TechAssignmentSortFactor techAssignmentTertiarySort;
-    private boolean techAssignmentTertiaryDescending;
-
     // Officer assignment and personnel flags
     private boolean generateCaptains;
     private boolean assignCompanyCommanderFlag;
@@ -132,7 +125,6 @@ public class CommandGenerationOptions {
     private boolean prioritizeOfficerCombatSkills;
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
-    private boolean useSpecifiedFactionToAssignRanks;
     private boolean assignMekWarriorsCallSigns;
     private boolean assignFounderFlag;
 
@@ -143,6 +135,11 @@ public class CommandGenerationOptions {
     // generate an augmented command.
     private boolean useImplants;
     private NeuralInterfaceMode neuralInterfaceMode;
+    private boolean applyAugmentationRules = true;
+
+    // Random origin for the people this run generates. Applied to the campaign only for the length of the build;
+    // the campaign's own Random Origin options are restored afterwards.
+    private RandomOriginOptions randomOriginOptions;
 
     // Force naming and formation icons
     private ForceNamingMethod forceNamingMethod;
@@ -162,12 +159,12 @@ public class CommandGenerationOptions {
     private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
-    // Finances. Starting cash is working capital sized as a percentage of the generated units'
-    // total purchase cost (or a dice roll when randomized); the pay-for toggles then debit the
+    // Finances. Starting cash is working capital sized as a number of months of the command's running
+    // costs (or a dice roll when randomized); the pay-for toggles then debit the
     // command's real generation costs, flooring at the minimum float with an optional loan for the
     // shortfall.
     private boolean processFinances;
-    private int startingCashPercent;
+    private int startingCashMonths;
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
     private long minimumStartingFloat;
@@ -192,7 +189,7 @@ public class CommandGenerationOptions {
 
         // Support personnel: full canonical coverage for every support role, with skill level left at
         // the "Random" default (SkillLevel.NONE) so each generated person rolls their own level. The user opts
-        // into full coverage changes or a fixed skill level via the SetupTab.
+        // into full coverage changes or a fixed skill level on the People page.
         final Map<PersonnelRole, Integer> coveragePercents = new HashMap<>();
         final Map<PersonnelRole, SkillLevel> skillLevels = new HashMap<>();
         for (final PersonnelRole role : SUPPORT_ROLES_FOR_COVERAGE) {
@@ -213,15 +210,6 @@ public class CommandGenerationOptions {
         setGenerateMedicalReserve(true);
         setMedicalReservePercent(10);
 
-        // Tech-to-unit assignment grid defaults: officers first, then heaviest, then best pilot.
-        setAssignTechsToUnits(true);
-        setTechAssignmentPrimarySort(TechAssignmentSortFactor.PILOT_RANK);
-        setTechAssignmentPrimaryDescending(true);
-        setTechAssignmentSecondarySort(TechAssignmentSortFactor.UNIT_WEIGHT);
-        setTechAssignmentSecondaryDescending(true);
-        setTechAssignmentTertiarySort(TechAssignmentSortFactor.PILOT_SKILL);
-        setTechAssignmentTertiaryDescending(true);
-
         // Officer assignment and personnel flags
         setGenerateCaptains(true);
         setAssignCompanyCommanderFlag(true);
@@ -232,9 +220,6 @@ public class CommandGenerationOptions {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(true);
         setAutomaticallyAssignRanks(true);
-        // Default ON so the target faction's rank system (Clan ranks for a Clan target, ComStar
-        // ranks for a CS target, etc.) drives the generated commanders' rank names.
-        setUseSpecifiedFactionToAssignRanks(true);
         setAssignMekWarriorsCallSigns(true);
         setAssignFounderFlag(true);
 
@@ -243,8 +228,20 @@ public class CommandGenerationOptions {
         setUseImplants(false);
         setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
 
+        // Random origin: everyone generated, dependents included, gets a randomized origin with the extra
+        // random planetary origin.
+        RandomOriginOptions origin = new RandomOriginOptions(true);
+        origin.setRandomizeOrigin(true);
+        origin.setRandomizeDependentOrigin(true);
+        origin.setRandomizeAroundSpecifiedPlanet(false);
+        origin.setOriginSearchRadius(0);
+        origin.setOriginDistanceScale(0.6);
+        origin.setAllowClanOrigins(false);
+        origin.setExtraRandomOrigin(true);
+        setRandomOriginOptions(origin);
+
         // Force naming and formation icons
-        setForceNamingMethod(ForceNamingMethod.CCB_1943);
+        setForceNamingMethod(ForceNamingMethod.ICAO_1956);
         // On by default: numbered regiments ("1st Mek Regiment") are the form players expect,
         // and the naming alphabet still drives every echelon below regiment level.
         setAlwaysNumberRegiments(true);
@@ -254,7 +251,7 @@ public class CommandGenerationOptions {
         setUseOriginNodeFormationIconLogo(false);
 
         // Starting simulation
-        setRunStartingSimulation(true);
+        setRunStartingSimulation(false);
         setSimulationDuration(10);
         setSimulateRandomMarriages(true);
         setSimulateRandomProcreation(true);
@@ -263,17 +260,17 @@ public class CommandGenerationOptions {
         setSelectStartingContract(true);
         setStartCourseToContractPlanet(true);
 
-        // Finances. Pay for Initial Setup defaults OFF: with the percentage-of-unit-value cash base,
-        // paying for the units would always dwarf the base (10% cash vs 100% cost) and floor every
-        // default build into a maximum loan. Out of the box the command is granted free with its
-        // working capital; players opt into the pay-for accounting. The minimum float leaves the
-        // command able to pay its first month's wages rather than starting broke.
+        // Finances. Pay for Initial Setup defaults OFF: a few months of running costs is far less than
+        // the units cost to buy, so paying for them would floor every default build into a maximum
+        // loan. Out of the box the command is granted free with its working capital; players opt into
+        // the pay-for accounting. The minimum float leaves the command able to pay its first month's
+        // wages rather than starting broke when the campaign charges little or nothing.
         setProcessFinances(true);
-        setStartingCashPercent(10);
+        setStartingCashMonths(DEFAULT_STARTING_CASH_MONTHS);
         setRandomizeStartingCash(false);
         setRandomStartingCashDiceCount(18);
         setMinimumStartingFloat(DEFAULT_MINIMUM_STARTING_FLOAT);
-        setStartingLoan(true);
+        setStartingLoan(false);
         setPayForSetup(false);
         setPayForPersonnel(true);
         setPayForUnits(true);
@@ -396,62 +393,6 @@ public class CommandGenerationOptions {
         this.medicalReservePercent = medicalReservePercent;
     }
 
-    public boolean isAssignTechsToUnits() {
-        return assignTechsToUnits;
-    }
-
-    public void setAssignTechsToUnits(final boolean assignTechsToUnits) {
-        this.assignTechsToUnits = assignTechsToUnits;
-    }
-
-    public TechAssignmentSortFactor getTechAssignmentPrimarySort() {
-        return techAssignmentPrimarySort;
-    }
-
-    public void setTechAssignmentPrimarySort(final TechAssignmentSortFactor techAssignmentPrimarySort) {
-        this.techAssignmentPrimarySort = techAssignmentPrimarySort;
-    }
-
-    public boolean isTechAssignmentPrimaryDescending() {
-        return techAssignmentPrimaryDescending;
-    }
-
-    public void setTechAssignmentPrimaryDescending(final boolean techAssignmentPrimaryDescending) {
-        this.techAssignmentPrimaryDescending = techAssignmentPrimaryDescending;
-    }
-
-    public TechAssignmentSortFactor getTechAssignmentSecondarySort() {
-        return techAssignmentSecondarySort;
-    }
-
-    public void setTechAssignmentSecondarySort(final TechAssignmentSortFactor techAssignmentSecondarySort) {
-        this.techAssignmentSecondarySort = techAssignmentSecondarySort;
-    }
-
-    public boolean isTechAssignmentSecondaryDescending() {
-        return techAssignmentSecondaryDescending;
-    }
-
-    public void setTechAssignmentSecondaryDescending(final boolean techAssignmentSecondaryDescending) {
-        this.techAssignmentSecondaryDescending = techAssignmentSecondaryDescending;
-    }
-
-    public TechAssignmentSortFactor getTechAssignmentTertiarySort() {
-        return techAssignmentTertiarySort;
-    }
-
-    public void setTechAssignmentTertiarySort(final TechAssignmentSortFactor techAssignmentTertiarySort) {
-        this.techAssignmentTertiarySort = techAssignmentTertiarySort;
-    }
-
-    public boolean isTechAssignmentTertiaryDescending() {
-        return techAssignmentTertiaryDescending;
-    }
-
-    public void setTechAssignmentTertiaryDescending(final boolean techAssignmentTertiaryDescending) {
-        this.techAssignmentTertiaryDescending = techAssignmentTertiaryDescending;
-    }
-
     public boolean isGenerateCaptains() {
         return generateCaptains;
     }
@@ -524,14 +465,6 @@ public class CommandGenerationOptions {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
     }
 
-    public boolean isUseSpecifiedFactionToAssignRanks() {
-        return useSpecifiedFactionToAssignRanks;
-    }
-
-    public void setUseSpecifiedFactionToAssignRanks(final boolean useSpecifiedFactionToAssignRanks) {
-        this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
-    }
-
     public boolean isAssignMekWarriorsCallSigns() {
         return assignMekWarriorsCallSigns;
     }
@@ -570,6 +503,26 @@ public class CommandGenerationOptions {
 
     public void setNeuralInterfaceMode(final NeuralInterfaceMode neuralInterfaceMode) {
         this.neuralInterfaceMode = neuralInterfaceMode;
+    }
+
+    public boolean shouldApplyAugmentationRules() {
+        return applyAugmentationRules;
+    }
+
+    public void setApplyAugmentationRules(final boolean applyAugmentationRules) {
+        this.applyAugmentationRules = applyAugmentationRules;
+    }
+
+    /**
+     * @return the Random Origin options the people generated by this run are given, in place of the campaign's own
+     *       for the length of the build
+     */
+    public RandomOriginOptions getRandomOriginOptions() {
+        return randomOriginOptions;
+    }
+
+    public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
+        this.randomOriginOptions = randomOriginOptions;
     }
 
     public ForceNamingMethod getForceNamingMethod() {
@@ -681,17 +634,18 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * Starting cash as a percentage of the generated units' total purchase cost. {@code 10} grants
-     * working capital worth a tenth of the command's units.
+     * Starting cash as a number of months of the built command's running costs: salaries, maintenance,
+     * overhead, food and housing, and Hot Spots upkeep, each counted only while the campaign charges it.
+     * {@code 6} grants working capital to run the command for half a year without income.
      *
-     * @return the starting-cash percentage
+     * @return the number of months of running costs granted as starting cash
      */
-    public int getStartingCashPercent() {
-        return startingCashPercent;
+    public int getStartingCashMonths() {
+        return startingCashMonths;
     }
 
-    public void setStartingCashPercent(final int startingCashPercent) {
-        this.startingCashPercent = startingCashPercent;
+    public void setStartingCashMonths(final int startingCashMonths) {
+        this.startingCashMonths = startingCashMonths;
     }
 
     public boolean isRandomizeStartingCash() {
@@ -800,13 +754,6 @@ public class CommandGenerationOptions {
               && Objects.equals(medicSkillLevel, other.medicSkillLevel)
               && (generateMedicalReserve == other.generateMedicalReserve)
               && (medicalReservePercent == other.medicalReservePercent)
-              && (assignTechsToUnits == other.assignTechsToUnits)
-              && Objects.equals(techAssignmentPrimarySort, other.techAssignmentPrimarySort)
-              && (techAssignmentPrimaryDescending == other.techAssignmentPrimaryDescending)
-              && Objects.equals(techAssignmentSecondarySort, other.techAssignmentSecondarySort)
-              && (techAssignmentSecondaryDescending == other.techAssignmentSecondaryDescending)
-              && Objects.equals(techAssignmentTertiarySort, other.techAssignmentTertiarySort)
-              && (techAssignmentTertiaryDescending == other.techAssignmentTertiaryDescending)
               && (generateCaptains == other.generateCaptains)
               && (assignCompanyCommanderFlag == other.assignCompanyCommanderFlag)
               && (applyOfficerStatBonusToWorstSkill == other.applyOfficerStatBonusToWorstSkill)
@@ -816,11 +763,11 @@ public class CommandGenerationOptions {
               && (prioritizeOfficerCombatSkills == other.prioritizeOfficerCombatSkills)
               && (assignMostSkilledToPrimaryLances == other.assignMostSkilledToPrimaryLances)
               && (automaticallyAssignRanks == other.automaticallyAssignRanks)
-              && (useSpecifiedFactionToAssignRanks == other.useSpecifiedFactionToAssignRanks)
               && (assignMekWarriorsCallSigns == other.assignMekWarriorsCallSigns)
               && (assignFounderFlag == other.assignFounderFlag)
               && (useImplants == other.useImplants)
               && Objects.equals(neuralInterfaceMode, other.neuralInterfaceMode)
+              && sameRandomOrigin(randomOriginOptions, other.randomOriginOptions)
               && Objects.equals(forceNamingMethod, other.forceNamingMethod)
               && (alwaysNumberRegiments == other.alwaysNumberRegiments)
               && (generateFormationIcons == other.generateFormationIcons)
@@ -834,7 +781,7 @@ public class CommandGenerationOptions {
               && (selectStartingContract == other.selectStartingContract)
               && (startCourseToContractPlanet == other.startCourseToContractPlanet)
               && (processFinances == other.processFinances)
-              && (startingCashPercent == other.startingCashPercent)
+              && (startingCashMonths == other.startingCashMonths)
               && (randomizeStartingCash == other.randomizeStartingCash)
               && (randomStartingCashDiceCount == other.randomStartingCashDiceCount)
               && (minimumStartingFloat == other.minimumStartingFloat)
@@ -845,6 +792,38 @@ public class CommandGenerationOptions {
               && (payForParts == other.payForParts)
               && (payForArmour == other.payForArmour)
               && (payForAmmunition == other.payForAmmunition);
+    }
+
+    /**
+     * Compares two sets of Random Origin options by value; {@link RandomOriginOptions} has no {@code equals} of its
+     * own, and the specified planet is compared by ID.
+     */
+    private static boolean sameRandomOrigin(@Nullable RandomOriginOptions first,
+          @Nullable RandomOriginOptions second) {
+        if ((first == null) || (second == null)) {
+            return first == second;
+        }
+        return (first.isRandomizeOrigin() == second.isRandomizeOrigin())
+              && (first.isRandomizeDependentOrigin() == second.isRandomizeDependentOrigin())
+              && (first.isRandomizeAroundSpecifiedPlanet() == second.isRandomizeAroundSpecifiedPlanet())
+              && Objects.equals(planetId(first), planetId(second))
+              && (first.getOriginSearchRadius() == second.getOriginSearchRadius())
+              && (Double.compare(first.getOriginDistanceScale(), second.getOriginDistanceScale()) == 0)
+              && (first.isAllowClanOrigins() == second.isAllowClanOrigins())
+              && (first.isExtraRandomOrigin() == second.isExtraRandomOrigin());
+    }
+
+    private static int randomOriginHash(@Nullable RandomOriginOptions origin) {
+        if (origin == null) {
+            return 0;
+        }
+        return Objects.hash(origin.isRandomizeOrigin(), origin.isRandomizeDependentOrigin(),
+              origin.isRandomizeAroundSpecifiedPlanet(), planetId(origin), origin.getOriginSearchRadius(),
+              origin.getOriginDistanceScale(), origin.isAllowClanOrigins(), origin.isExtraRandomOrigin());
+    }
+
+    private static @Nullable String planetId(RandomOriginOptions origin) {
+        return (origin.getSpecifiedPlanet() == null) ? null : origin.getSpecifiedPlanet().getId();
     }
 
     @Override
@@ -862,13 +841,6 @@ public class CommandGenerationOptions {
               medicSkillLevel,
               generateMedicalReserve,
               medicalReservePercent,
-              assignTechsToUnits,
-              techAssignmentPrimarySort,
-              techAssignmentPrimaryDescending,
-              techAssignmentSecondarySort,
-              techAssignmentSecondaryDescending,
-              techAssignmentTertiarySort,
-              techAssignmentTertiaryDescending,
               generateCaptains,
               assignCompanyCommanderFlag,
               applyOfficerStatBonusToWorstSkill,
@@ -878,11 +850,11 @@ public class CommandGenerationOptions {
               prioritizeOfficerCombatSkills,
               assignMostSkilledToPrimaryLances,
               automaticallyAssignRanks,
-              useSpecifiedFactionToAssignRanks,
               assignMekWarriorsCallSigns,
               assignFounderFlag,
               useImplants,
               neuralInterfaceMode,
+              randomOriginHash(randomOriginOptions),
               forceNamingMethod,
               alwaysNumberRegiments,
               generateFormationIcons,
@@ -896,7 +868,7 @@ public class CommandGenerationOptions {
               selectStartingContract,
               startCourseToContractPlanet,
               processFinances,
-              startingCashPercent,
+              startingCashMonths,
               randomizeStartingCash,
               randomStartingCashDiceCount,
               minimumStartingFloat,

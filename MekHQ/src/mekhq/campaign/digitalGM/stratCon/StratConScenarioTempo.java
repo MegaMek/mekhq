@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static java.lang.Math.max;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -319,7 +320,9 @@ public final class StratConScenarioTempo {
                 continue;
             }
 
-            if (scheduledPointOfInterest.isStrategicObjective()) {
+            // Deployment Orders are rolled again whole, so they never count against the definition's share.
+            if (scheduledPointOfInterest.isStrategicObjective()
+                      && !isDeploymentOrder(scheduledPointOfInterest.getTypeId())) {
                 committedObjectiveCount++;
             }
             for (Map.Entry<String, String> entry : scheduledPointOfInterest.getInitialState().entrySet()) {
@@ -342,7 +345,7 @@ public final class StratConScenarioTempo {
 
     /**
      * Counts the point of interest objectives on the contract's map, met or not. One that was withdrawn has lost its
-     * objective too, so it is not counted.
+     * objective too, so it is not counted; nor is a Deployment Order, which is not one of the definition's.
      *
      * @author Illiani
      * @since 0.51.01
@@ -351,7 +354,8 @@ public final class StratConScenarioTempo {
         int count = 0;
         for (StratConTrackState track : campaignState.getTracks()) {
             for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
-                if (objective.getObjectiveType() == StrategicObjectiveType.PointOfInterest) {
+                if ((objective.getObjectiveType() == StrategicObjectiveType.PointOfInterest)
+                          && !isDeploymentOrder(objective.getPointOfInterestTypeId())) {
                     count++;
                 }
             }

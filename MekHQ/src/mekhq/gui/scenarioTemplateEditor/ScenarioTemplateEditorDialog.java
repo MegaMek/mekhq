@@ -239,9 +239,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
 
     /**
-     * Reads the fixed-MUL file names from the MUL directory, to be offered by the force editor.
+     * Reads the fixed-MUL file names from the MUL directory, to be offered by the force editor. Shared with the other
+     * tools that host a {@link ForceEditorPanel}.
      */
-    private static List<String> readMulFileNames() {
+    public static List<String> readMulFileNames() {
         List<String> names = new ArrayList<>();
         File mulDir = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY);
         if (mulDir.exists() && mulDir.isDirectory()) {

@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,10 +46,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridBagLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,24 +88,35 @@ import mekhq.campaign.mission.scenarios.salvage.WreckRecovery;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard;
 import mekhq.gui.baseComponents.hud.HudCard.Tag;
+import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.ExampleLine;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Guide;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 import mekhq.gui.baseComponents.hud.HudStatTile;
-import mekhq.gui.baseComponents.hud.HudVerdictBanner;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 /**
  * The post-scenario salvage console, where the player recovers a scenario's wrecks and decides what happens to them.
  *
  * <p>The console is styled on the contract debrief and the StratCon deployment wizard. Its header shows the recovery
- * conditions and running tallies (salvage rights, money, tech time), and a verdict banner lists anything that stops
- * the player confirming. Below, a board of wreck cards sits beside an inspector for the selected wreck: its recovery
- * units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining capacity.</p>
+ * conditions and running tallies (salvage rights, money, tech time), and the Confirm button's tooltip lists anything
+ * that stops the player confirming. Below, a board of wreck cards sits beside an inspector for the selected wreck: its
+ * recovery units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining
+ * capacity.</p>
+ *
+ * <p>A guide slides over the console to explain it, opened by its button or by itself the first time the console
+ * opens, as the Oracle Console's guides do.</p>
  *
  * <p>The console holds no salvage rules of its own. It renders a {@link SalvageRecoverySession}, which applies the
  * campaign's salvage system and settlement, and records the player's choices in it. The salvage rules build the
@@ -115,6 +130,7 @@ public class SalvageRecoveryConsole extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
     private static final String KEY = "SalvageRecoveryConsole.";
     private static final Dimension DEFAULT_SIZE = scaleForGUI(1120, 760);
+    private static final String GUIDE_PREFIX = "guide.";
 
     private final transient Campaign campaign;
     private final boolean isInSpace;
@@ -133,7 +149,6 @@ public class SalvageRecoveryConsole extends JDialog {
     private HudStatTile secondMoneyTile;
     /** The tech time tile, or {@code null} under salvage systems that don't use salvage teams. */
     private HudStatTile techTimeTile;
-    private final HudVerdictBanner verdictBanner = new HudVerdictBanner();
 
     // Board
     private final Map<BoardFilter, HudChip> chips = new HashMap<>();
@@ -143,8 +158,10 @@ public class SalvageRecoveryConsole extends JDialog {
     // Inspector
     private final JLabel dossierTitle = new JLabel();
     private final JLabel dossierSub = new JLabel();
-    private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false);
-    private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false);
+    // Compact, as they sit on the row beside the wreck's name
+    private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false,
+          true);
+    private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false, true);
     private final JPanel assignmentSection = Hud.transparentPanel(null);
     // Each wreck offers different recovery units, so the searchable slots are rebuilt inside their rows. The slots are
     // null until the first wreck is shown.
@@ -161,6 +178,9 @@ public class SalvageRecoveryConsole extends JDialog {
     private final JList<Unit> fleetList = new JList<>(fleetModel);
     private final JPanel dossier = Hud.transparentPanel(null);
     private final JLabel emptyDossier = Hud.notice(text("dossier.empty"));
+
+    // Guide
+    private HudGuideDrawer guideDrawer;
 
     // Buttons
     private HudButton confirmButton;
@@ -212,10 +232,6 @@ public class SalvageRecoveryConsole extends JDialog {
         north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
         north.add(leftAligned(buildCommandBar(scenario)));
         north.add(leftAligned(buildTiles()));
-        JPanel bannerHolder = Hud.transparentPanel(new BorderLayout());
-        bannerHolder.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), 0, scaleForGUI(12)));
-        bannerHolder.add(verdictBanner, BorderLayout.CENTER);
-        north.add(leftAligned(bannerHolder));
         add(north, BorderLayout.NORTH);
 
         JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildBoard(), buildInspector());
@@ -227,6 +243,8 @@ public class SalvageRecoveryConsole extends JDialog {
         add(body, BorderLayout.CENTER);
 
         add(buildButtons(), BorderLayout.SOUTH);
+
+        buildGuide();
 
         setSize(DEFAULT_SIZE);
         setPreferredSize(DEFAULT_SIZE);
@@ -249,7 +267,13 @@ public class SalvageRecoveryConsole extends JDialog {
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.25f, 0.16f));
         titleRow.add(title, BorderLayout.WEST);
-        titleRow.add(buildConditionChips(), BorderLayout.EAST);
+        HudButton guideButton = new HudButton("?  " + guideText("button").toUpperCase(Locale.ROOT), false, true);
+        guideButton.setToolTipText(guideText("button.toolTipText"));
+        guideButton.addActionListener(event -> openGuide());
+        JPanel titleControls = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
+        titleControls.add(buildConditionChips());
+        titleControls.add(guideButton);
+        titleRow.add(titleControls, BorderLayout.EAST);
         commandBar.add(leftAligned(titleRow));
         commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
         commandBar.add(leftAligned(Hud.hint(instructions())));
@@ -411,11 +435,13 @@ public class SalvageRecoveryConsole extends JDialog {
         dossier.add(Box.createVerticalStrut(scaleForGUI(4)));
         dossierTitle.setForeground(TEXT);
         dossierTitle.setFont(hudFont(Font.BOLD, 1.15f, 0.04f));
-        dossier.add(leftAligned(dossierTitle));
         dossierSub.setForeground(TEXT_MUTED);
         dossierSub.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
-        dossier.add(leftAligned(dossierSub));
-        dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
+        JPanel identity = Hud.transparentPanel(null);
+        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
+        identity.add(leftAligned(dossierTitle));
+        identity.add(leftAligned(dossierSub));
+
         readoutButton.addActionListener(event -> showReadout());
         // Field stripping isn't implemented yet; the disabled button reserves its place in the dossier
         stripButton.setArmed(false);
@@ -425,10 +451,17 @@ public class SalvageRecoveryConsole extends JDialog {
                 fieldStrip(focused);
             }
         });
-        JPanel dossierButtons = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(8), 0));
+        JPanel dossierButtons = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
         dossierButtons.add(readoutButton);
         dossierButtons.add(stripButton);
-        dossier.add(leftAligned(wrapWest(dossierButtons)));
+        // The buttons share the wreck's name and details row, centred against them, to save vertical space
+        JPanel buttonHolder = Hud.transparentPanel(new GridBagLayout());
+        buttonHolder.add(dossierButtons);
+
+        JPanel headerRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(12), 0));
+        headerRow.add(identity, BorderLayout.CENTER);
+        headerRow.add(buttonHolder, BorderLayout.EAST);
+        dossier.add(leftAligned(stretch(headerRow)));
 
         if (session.isUsingSalvageOperations()) {
             assignmentSection.setLayout(new BoxLayout(assignmentSection, BoxLayout.Y_AXIS));
@@ -570,12 +603,6 @@ public class SalvageRecoveryConsole extends JDialog {
         return buttons;
     }
 
-    private static JComponent wrapWest(JComponent component) {
-        JPanel holder = Hud.transparentPanel(new BorderLayout());
-        holder.add(component, BorderLayout.WEST);
-        return stretch(holder);
-    }
-
     /**
      * Lets a component fill the width of a vertical box. The wrapper follows the component's height as its content
      * changes, where a fixed maximum size would not.
@@ -588,17 +615,96 @@ public class SalvageRecoveryConsole extends JDialog {
 
     // endregion Layout
 
+    // region Guide
+
+    /**
+     * Builds the guide drawer, which floats over the console above a scrim, and opens it by itself when the console
+     * first appears if the player hasn't seen it yet. Escape or a click on the scrim closes it.
+     */
+    private void buildGuide() {
+        SalvageRecoveryGuidePreferences preferences = SalvageRecoveryGuidePreferences.getInstance();
+        HudCheckBox alwaysOpen = new HudCheckBox(guideText("alwaysOpen"));
+        alwaysOpen.setSelected(preferences.isGuideAlwaysOpen());
+        alwaysOpen.addActionListener(event -> preferences.setGuideAlwaysOpen(alwaysOpen.isSelected()));
+        guideDrawer = new HudGuideDrawer(List.of(guideText("tab.steps"), guideText("tab.example"),
+              guideText("tab.terms")), alwaysOpen, guideText("close"), this::closeGuide);
+        guideDrawer.install(getRootPane());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                maybeOpenGuide();
+            }
+        });
+    }
+
+    /** Opens the guide if the player hasn't seen it yet, or has asked to see it every time. */
+    private void maybeOpenGuide() {
+        SalvageRecoveryGuidePreferences preferences = SalvageRecoveryGuidePreferences.getInstance();
+        if (!preferences.isGuideSeen() || preferences.isGuideAlwaysOpen()) {
+            openGuide();
+        }
+    }
+
+    private void openGuide() {
+        SalvageRecoveryGuidePreferences.getInstance().setGuideSeen(true);
+        guideDrawer.open(createGuide());
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    /**
+     * Builds the guide from the resource bundle. The steps, example lines and terms are numbered keys
+     * ({@code SalvageRecoveryConsole.guide.step.1.title}, {@code .step.2.title}, ...), read until the next number is
+     * missing, so text can be added or reworded without code changes.
+     *
+     * @return the guide
+     */
+    private Guide createGuide() {
+        List<Step> steps = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("step." + number + ".title")); number++) {
+            steps.add(new Step(guideText("step." + number + ".title"), guideText("step." + number + ".text")));
+        }
+        List<ExampleLine> example = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("example." + number + ".who")); number++) {
+            example.add(new ExampleLine(guideText("example." + number + ".who"),
+                  guideText("example." + number + ".text")));
+        }
+        List<Term> terms = new ArrayList<>();
+        for (int number = 1; isResourceKeyValid(guideText("term." + number + ".name")); number++) {
+            terms.add(new Term(guideText("term." + number + ".name"), guideText("term." + number + ".text")));
+        }
+
+        JPanel glossary = Hud.transparentPanel(null);
+        glossary.setLayout(new BoxLayout(glossary, BoxLayout.Y_AXIS));
+        glossary.add(leftAligned(Hud.eyebrow(guideText("glossary"))));
+        glossary.add(Box.createVerticalStrut(scaleForGUI(4)));
+        glossary.add(leftAligned(Hud.link(GlossaryEntry.FORCE_TYPE_SALVAGE.getTitle(),
+              () -> GlossaryConsole.showEntry(this, GlossaryEntry.FORCE_TYPE_SALVAGE))));
+
+        return new Guide(guideText("eyebrow"), guideText("title"), steps, null, guideText("exampleIntro"), example,
+              terms, glossary);
+    }
+
+    private static String guideText(String key) {
+        return text(GUIDE_PREFIX + key);
+    }
+
+    // endregion Guide
+
     // region Refresh
 
     private void refreshAll() {
         isRefreshing = true;
         try {
             refreshTiles();
-            refreshBanner();
             refreshBoard();
             refreshInspector();
             refreshFleet();
             confirmButton.setArmed(requireSession().canConfirm());
+            confirmButton.setToolTipText(confirmBlockText());
             if (stealButton != null) {
                 stealButton.setArmed(requireSession().canSteal());
             }
@@ -625,9 +731,12 @@ public class SalvageRecoveryConsole extends JDialog {
 
         if (settlement.isKeptSalvageBought()) {
             firstMoneyTile.setValue(session.getCashShare().toAmountString(), READY);
+            // Any purchase is money out, so it reads amber like the Buy claims that add to it, and red once the player
+            // can't afford it.
             Money purchaseCost = session.getPurchaseCost();
-            boolean isAffordable = purchaseCost.compareTo(session.getAvailableFunds()) <= 0;
-            secondMoneyTile.setValue(purchaseCost.toAmountString(), isAffordable ? TEXT : DANGER);
+            Color purchaseColor = !isPurchaseAffordable(session) ? DANGER :
+                                        (purchaseCost.isPositive() ? CAUTION : TEXT);
+            secondMoneyTile.setValue(purchaseCost.toAmountString(), purchaseColor);
             secondMoneyTile.setSub(formatted("tile.purchaseCost.sub", session.getAvailableFunds().toAmountString()));
         } else if (!settlement.canKeepSalvage()) {
             firstMoneyTile.setValue(session.getExchangeUnitTotal().toAmountString(), TEXT);
@@ -654,17 +763,15 @@ public class SalvageRecoveryConsole extends JDialog {
         }
     }
 
-    private void refreshBanner() {
+    /**
+     * @return what stops the player confirming, one reason per line, for the Confirm button's tooltip; or {@code null}
+     *       if nothing does
+     */
+    private @Nullable String confirmBlockText() {
         SalvageRecoverySession session = requireSession();
         List<ConfirmBlocker> blockers = session.getConfirmBlockers();
         if (blockers.isEmpty()) {
-            int wreckCount = session.getRecoveries().size();
-            String reason = session.isUsingSalvageOperations() ?
-                                  formatted("verdict.ready.operations", session.getRecoveredCount(), wreckCount,
-                                        wreckCount - session.getRecoveredCount()) :
-                                  formatted("verdict.ready.automatic", wreckCount);
-            verdictBanner.setVerdict(text("verdict.ready"), reason, text("badge.ready"), READY);
-            return;
+            return null;
         }
 
         List<String> reasons = new ArrayList<>();
@@ -680,8 +787,8 @@ public class SalvageRecoveryConsole extends JDialog {
                       session.getAvailableMinutes());
             });
         }
-        verdictBanner.setVerdict(text("verdict.blocked"), String.join(text("blocker.separator"), reasons),
-              text("badge.blocked"), DANGER);
+        return "<html><div style='width:" + scaleForGUI(280) + "px'><b>" + text("verdict.blocked") + "</b><br>" +
+                     String.join("<br>", reasons) + "</div></html>";
     }
 
     private void refreshBoard() {
@@ -731,6 +838,7 @@ public class SalvageRecoveryConsole extends JDialog {
 
         TestUnit wreck = recovery.getWreck();
         dossierTitle.setText(wreck.getName());
+        dossierTitle.setToolTipText(wreck.getName()); // The name can be cut short beside the dossier buttons
         String sub = formatted("dossier.sub", wreckWeight(wreck),
               session.getSettlement().getSalvageValue(wreck).toAmountString());
         if (session.isUsingSalvageOperations()) {
@@ -856,18 +964,30 @@ public class SalvageRecoveryConsole extends JDialog {
         for (SalvageClaim claim : session.getAvailableClaims()) {
             String title;
             String sub;
+            // Money the claim earns reads green and money it costs amber, so a Buy is never mistaken for a free pick;
+            // a Buy the player couldn't pay for, on top of their other purchases, reads red.
+            Color subColor = null;
             switch (claim) {
                 case EMPLOYER -> {
                     title = text("claim.EMPLOYER");
                     Money cashShare = settlement.getCashShare(value);
-                    sub = cashShare.isPositive() ?
-                                formatted("claim.EMPLOYER.share.sub", compactMoney(cashShare)) :
-                                text("claim.EMPLOYER.sub");
+                    if (cashShare.isPositive()) {
+                        sub = formatted("claim.EMPLOYER.share.sub", compactMoney(cashShare));
+                        subColor = READY;
+                    } else {
+                        sub = text("claim.EMPLOYER.sub");
+                    }
                 }
                 case KEEP -> {
                     if (settlement.isKeptSalvageBought()) {
                         title = text("claim.BUY");
                         sub = formatted("claim.BUY.sub", compactMoney(settlement.getPurchaseCost(value)));
+                        Money keptValueIfBought = (session.getClaim(recovery) == SalvageClaim.KEEP) ?
+                                                        session.getKeptValue() :
+                                                        session.getKeptValue().plus(value);
+                        subColor = settlement.canAfford(keptValueIfBought, session.getAvailableFunds()) ?
+                                         CAUTION :
+                                         DANGER;
                     } else if (session.isKeptSalvageStealOnly()) {
                         title = text("claim.KEEP");
                         sub = text("claim.KEEP.steal.sub");
@@ -879,10 +999,11 @@ public class SalvageRecoveryConsole extends JDialog {
                 case SELL -> {
                     title = text("claim.SELL");
                     sub = formatted("claim.SELL.sub", compactMoney(value));
+                    subColor = READY;
                 }
                 default -> throw new IllegalStateException("Unexpected claim: " + claim);
             }
-            segments.add(new Segment<>(claim, title, sub, isRecovered));
+            segments.add(new Segment<>(claim, title, sub, isRecovered, subColor));
         }
         claimControl.setSegments(segments);
         claimControl.setSelected(session.getClaim(recovery));
@@ -1044,6 +1165,11 @@ public class SalvageRecoveryConsole extends JDialog {
         return (entity == null) ? 0.0 : entity.getWeight();
     }
 
+    /** @return {@code true} if the player can pay for every wreck they are buying */
+    private static boolean isPurchaseAffordable(SalvageRecoverySession session) {
+        return session.getSettlement().canAfford(session.getKeptValue(), session.getAvailableFunds());
+    }
+
     /** Shortens a money amount for cards and segments: 6.4M, 950K, or the plain amount below a thousand. */
     private static String compactMoney(Money money) {
         double amount = money.getAmount().doubleValue();
@@ -1147,9 +1273,24 @@ public class SalvageRecoveryConsole extends JDialog {
                       ownedUnitCounts.getChassisCount(entity)));
             }
 
+            // A recovered wreck the player is buying or selling shows what that does to their funds; any other shows
+            // its salvage value.
+            SalvageSettlement settlement = session.getSettlement();
+            Money value = settlement.getSalvageValue(wreck);
+            String figure = compactMoney(value);
+            Color figureColor = TEXT;
+            if (recovery.isRecovered()) {
+                SalvageClaim claim = session.getClaim(recovery);
+                if ((claim == SalvageClaim.KEEP) && settlement.isKeptSalvageBought()) {
+                    figure = formatted("money.cost", compactMoney(settlement.getPurchaseCost(value)));
+                    figureColor = isPurchaseAffordable(session) ? CAUTION : DANGER;
+                } else if (claim == SalvageClaim.SELL) {
+                    figure = formatted("money.gain", figure);
+                    figureColor = READY;
+                }
+            }
             return card.show(statusColor(recovery), recovery.isRecovered(), wreck.getName(), null, tags,
-                  sub.toString(), compactMoney(session.getSettlement().getSalvageValue(wreck)), text("money.unit"),
-                  isSelected);
+                  sub.toString(), figure, figureColor, text("money.unit"), isSelected);
         }
 
         private Tag claimTag(SalvageClaim claim) {

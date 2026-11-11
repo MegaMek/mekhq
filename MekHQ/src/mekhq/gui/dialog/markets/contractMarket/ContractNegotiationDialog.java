@@ -461,7 +461,7 @@ public class ContractNegotiationDialog extends JDialog {
               Money.of(facilityUnitCost[index]).toAmountAndSymbolString());
         String benefit = getTextAt(RESOURCE_BUNDLE, labelKey + ".benefit");
         JLabel name = new JLabel("<html>" + MarketHud.escape(getTextAt(RESOURCE_BUNDLE, labelKey))
-                                       + "<br><span style='font-size:smaller; color:" + hex(TEXT_FAINT) + "'>"
+                                       + "<br><span style='color:" + hex(TEXT_FAINT) + "'>"
                                        + MarketHud.escape(costEach) + " &middot; " + MarketHud.escape(benefit)
                                        + "</span></html>");
         name.setForeground(TEXT);
@@ -1792,7 +1792,7 @@ public class ContractNegotiationDialog extends JDialog {
                 chips.add(chip(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.plateau"), TEXT_FAINT));
             }
             if (!chips.isEmpty()) {
-                html.append("&nbsp;&nbsp;&nbsp;<span style='font-size:smaller'>")
+                html.append("&nbsp;&nbsp;&nbsp;<span>")
                       .append(String.join("&nbsp;&nbsp;", chips))
                       .append("</span>");
             }

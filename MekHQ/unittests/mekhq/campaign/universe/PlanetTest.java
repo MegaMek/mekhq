@@ -34,6 +34,7 @@ package mekhq.campaign.universe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -137,5 +138,18 @@ public class PlanetTest {
 
         assertNotNull(atmosphericTaint, "a valueless atmosphere entry must not read back as null");
         assertEquals(AtmosphericTaint.BREATHABLE, atmosphericTaint);
+    }
+
+    @Test
+    void distanceToPlanetIsZeroForItselfAndTheSameInEitherDirection() {
+        // Neither world has an orbit radius on record, so both sit at the 0.5 AU fallback
+        Planet first = new Planet("first");
+        Planet second = new Planet("second");
+
+        assertEquals(0.0, first.getDistanceToPlanet(first));
+        assertEquals(Math.sqrt(0.5) * StarUtil.AU, first.getDistanceToPlanet(second), 1.0);
+        assertEquals(first.getDistanceToPlanet(second), second.getDistanceToPlanet(first), 1.0e-6);
+        assertTrue(first.getTimeToPlanet(second, 1.0) > 0.0);
+        assertEquals(0.0, first.getTimeToPlanet(first, 1.0));
     }
 }

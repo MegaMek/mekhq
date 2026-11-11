@@ -108,6 +108,8 @@ class XpAwardsPage {
     private JSpinner spnVocationalXPFrequency;
     private JLabel lblVocationalXPTargetNumber;
     private JSpinner spnVocationalXPTargetNumber;
+
+    private JPanel pnlContractOutcomes;
     private JLabel lblMissionXpFail;
     private JSpinner spnMissionXpFail;
     private JLabel lblMissionXpSuccess;
@@ -144,6 +146,7 @@ class XpAwardsPage {
         pnlTasks = createTasksPanel();
         pnlScenarios = createScenariosPanel();
         pnlMissions = createMissionsPanel();
+        pnlContractOutcomes = createContractOutcomesPanel();
         pnlAdministrators = createAdministratorsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("XpAwardsPage", "XpAwardsPage", imageAddress)
@@ -161,6 +164,9 @@ class XpAwardsPage {
                 .section("lblMissionsPanel.text",
                         "lblMissionsPanel.summary",
                         pnlMissions)
+                .section("lblContractOutcomesPanel.text",
+                        "lblContractOutcomesPanel.summary",
+                        pnlContractOutcomes)
                 .section("lblAdministratorsXpPanel.text",
                         "lblAdministratorsXpPanel.summary",
                         pnlAdministrators,
@@ -199,6 +205,21 @@ class XpAwardsPage {
         panel.addPairs(labels, controls);
 
         return panel;
+    }
+
+    /**
+     * Creates an invisible placeholder control for a paired grid cell that should stay empty, so the next pair starts
+     * on a new row.
+     *
+     * @return a transparent, empty component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nonnull JComponent createEmptyGridCell() {
+        JPanel emptyCell = new JPanel();
+        emptyCell.setOpaque(false);
+        return emptyCell;
     }
 
     /**
@@ -272,8 +293,10 @@ class XpAwardsPage {
         spnKills = new CampaignOptionsSpinner("Kills", 0, 0, 100, 1);
         spnKills.addMouseListener(createTipPanelUpdater("Kills"));
 
-        JComponent[] labels = { lblScenarioXP, lblKillXP, lblKills };
-        JComponent[] controls = { spnScenarioXP, spnKillXP, spnKills };
+        // The empty cell gives the kill award pair ("XP per" ... "Kills") its own row, so the two halves of the
+        // sentence read together instead of wrapping across rows.
+        JComponent[] labels = { lblScenarioXP, new JLabel(), lblKillXP, lblKills };
+        JComponent[] controls = { spnScenarioXP, createEmptyGridCell(), spnKillXP, spnKills };
 
         return createAdvancementPairedGrid("ScenariosPanel", labels, controls);
     }
@@ -302,6 +325,22 @@ class XpAwardsPage {
         spnVocationalXPTargetNumber = new CampaignOptionsSpinner("VocationalXPTargetNumber", 2, 0, 12, 1);
         spnVocationalXPTargetNumber.addMouseListener(createTipPanelUpdater("VocationalXPTargetNumber"));
 
+        JComponent[] labels = { lblVocationalXP, lblVocationalXPFrequency, lblVocationalXPTargetNumber };
+        JComponent[] controls = { spnVocationalXP, spnVocationalXPFrequency, spnVocationalXPTargetNumber };
+
+        return createAdvancementPairedGrid("MissionsPanel", labels, controls);
+    }
+
+    /**
+     * Creates and returns the Contract Outcomes panel, which holds the XP awarded to all active personnel when a
+     * contract ends in failure, success, or outstanding success (StratCon).
+     *
+     * @return A {@code JPanel} containing configuration options for contract outcome experience awards.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nonnull JPanel createContractOutcomesPanel() {
         lblMissionXpFail = new CampaignOptionsLabel("MissionXpFail");
         lblMissionXpFail.addMouseListener(createTipPanelUpdater("MissionXpFail"));
         spnMissionXpFail = new CampaignOptionsSpinner("MissionXpFail", 1, 0, 20, 1);
@@ -317,12 +356,10 @@ class XpAwardsPage {
         spnMissionXpOutstandingSuccess = new CampaignOptionsSpinner("MissionXpOutstandingSuccess", 1, 0, 20, 1);
         spnMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater("MissionXpOutstandingSuccess"));
 
-        JComponent[] labels = { lblVocationalXP, lblVocationalXPFrequency, lblVocationalXPTargetNumber,
-                lblMissionXpFail, lblMissionXpSuccess, lblMissionXpOutstandingSuccess };
-        JComponent[] controls = { spnVocationalXP, spnVocationalXPFrequency, spnVocationalXPTargetNumber,
-                spnMissionXpFail, spnMissionXpSuccess, spnMissionXpOutstandingSuccess };
+        JComponent[] labels = { lblMissionXpFail, lblMissionXpSuccess, lblMissionXpOutstandingSuccess };
+        JComponent[] controls = { spnMissionXpFail, spnMissionXpSuccess, spnMissionXpOutstandingSuccess };
 
-        return createAdvancementPairedGrid("MissionsPanel", labels, controls);
+        return createAdvancementPairedGrid("ContractOutcomesPanel", labels, controls);
     }
 
     /**

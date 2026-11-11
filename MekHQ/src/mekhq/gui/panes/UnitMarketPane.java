@@ -384,7 +384,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         setMarketTable(new JTable(getMarketModel(), columnModel, null));
         getMarketTable().setName("marketTable");
         getMarketTable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        getMarketTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        // Subsequent-columns resizing keeps a dragged edge under the mouse; resizing all columns also moved columns to
+        // the left of the dragged edge, so it appeared to move the wrong way
+        getMarketTable().setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         getMarketTable().createDefaultColumnsFromModel();
         getMarketTable().setRowSorter(getMarketSorter());
         for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {

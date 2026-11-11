@@ -121,7 +121,26 @@ public class TechTableModel extends DataTableModel<Person> {
             }
             c.setBackground(table.getBackground());
             c.setForeground(table.getForeground());
+            fitRowHeight(table, row);
             return c;
+        }
+
+        /**
+         * Grows (or shrinks back) the row so the tech's full description fits. The table's default row height stays
+         * the minimum, so the portrait is never squeezed, but a tech with repair abilities and a selected task can
+         * need more lines than that.
+         *
+         * @param table the table being rendered
+         * @param row   the view index of the row being rendered
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        private void fitRowHeight(JTable table, int row) {
+            int neededHeight = Math.max(table.getRowHeight(), getPreferredSize().height);
+            if (table.getRowHeight(row) != neededHeight) {
+                table.setRowHeight(row, neededHeight);
+            }
         }
     }
 

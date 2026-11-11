@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -117,6 +119,9 @@ public class StratConCampaignState {
     private LocalDate lastCounterattackDate;
     private LocalDate enemyEngineersScheduledUntil;
     private final List<LocalDate> enemyEngineerDates;
+    // enemy supply interdictions; see StratConFacilitySupply
+    private LocalDate supplyInterdictionsScheduledUntil;
+    private final List<LocalDate> supplyInterdictionDates;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -133,6 +138,7 @@ public class StratConCampaignState {
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
+        supplyInterdictionDates = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
@@ -141,6 +147,7 @@ public class StratConCampaignState {
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
+        supplyInterdictionDates = new ArrayList<>();
         setContract(contract);
     }
 
@@ -258,6 +265,36 @@ public class StratConCampaignState {
     }
 
     /**
+     * @return the day up to which enemy supply interdictions have been scheduled, exclusive, or {@code null} if none
+     *       have been
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    public @Nullable LocalDate getSupplyInterdictionsScheduledUntil() {
+        return supplyInterdictionsScheduledUntil;
+    }
+
+    public void setSupplyInterdictionsScheduledUntil(@Nullable LocalDate supplyInterdictionsScheduledUntil) {
+        this.supplyInterdictionsScheduledUntil = supplyInterdictionsScheduledUntil;
+    }
+
+    /**
+     * @return the still-to-come days on which enemy supply interdictions appear, one entry each (mutable; drained as
+     *       they appear)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    @XmlElementWrapper(name = "supplyInterdictionDates")
+    @XmlElement(name = "supplyInterdictionDate")
+    public List<LocalDate> getSupplyInterdictionDates() {
+        return supplyInterdictionDates;
+    }
+
+    /**
      * Moves every date still to come in the contract's pre-rolled schedule - its ordinary scenarios, its
      * strategic-objective scenarios, and its points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
      * keeps its place within the contract.
@@ -275,6 +312,7 @@ public class StratConCampaignState {
         scheduledScenarioDates.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
         strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
         enemyEngineerDates.replaceAll(engineerDate -> engineerDate.plusDays(days));
+        supplyInterdictionDates.replaceAll(interdictionDate -> interdictionDate.plusDays(days));
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
             if (spawnDate != null) {
@@ -646,12 +684,13 @@ public class StratConCampaignState {
      * <p>A contract can be ended early only if:</p>
      * <ul>
      *   <li>The base contract allows early termination</li>
-     *   <li>There is at least one strategic objective defined</li>
+     *   <li>There is at least one strategic objective defined, other than a Deployment Order</li>
      *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
      *   <li>No strategic-objective point of interest is still waiting to appear</li>
      * </ul>
      *
-     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open.</p>
+     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open, nor do Deployment Orders:
+     * the employer simply stops issuing them once the contract ends. One already issued must still be resolved.</p>
      *
      * @return {@code true} if the contract can be ended early, {@code false} otherwise
      *
@@ -672,10 +711,13 @@ public class StratConCampaignState {
         for (StratConTrackState track : tracks) {
             List<StratConStrategicObjective> objectives = track.getStrategicObjectives();
             for (StratConStrategicObjective objective : objectives) {
-
-                hasObjectives = true;
                 if (!objective.isObjectiveResolved(track)) {
                     return false;
+                }
+
+                // A Deployment Order is the employer's, not the contract's: it cannot be the one objective met.
+                if (!isDeploymentOrder(objective.getPointOfInterestTypeId())) {
+                    hasObjectives = true;
                 }
             }
         }
@@ -684,14 +726,16 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return {@code true} if a point of interest that will be a strategic objective is still scheduled to appear
+     * @return {@code true} if a point of interest that will be a strategic objective, other than a Deployment Order, is
+     *       still scheduled to appear
      *
      * @author Illiani
      * @since 0.51.01
      */
     boolean hasScheduledStrategicObjectivePointsOfInterest() {
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
-            if (scheduledPointOfInterest.isStrategicObjective()) {
+            if (scheduledPointOfInterest.isStrategicObjective()
+                      && !isDeploymentOrder(scheduledPointOfInterest.getTypeId())) {
                 return true;
             }
         }

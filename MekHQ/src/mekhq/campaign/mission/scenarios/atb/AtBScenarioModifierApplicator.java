@@ -34,14 +34,15 @@ package mekhq.campaign.mission.scenarios.atb;
 
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.*;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.common.HitData;
 import megamek.common.ToHitData;
-import megamek.common.board.Board;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.Mounted;
@@ -51,16 +52,13 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -71,6 +69,8 @@ import mekhq.campaign.universe.Factions;
  */
 public class AtBScenarioModifierApplicator {
     private static final MMLogger LOGGER = MMLogger.create(AtBScenarioModifierApplicator.class);
+
+    static final int MINIMUM_UNITS_AFTER_REMOVAL = 1;
 
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
@@ -135,6 +135,10 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Worker function that removes the number of units from the specified side.
+     *
+     * <p>Units are only taken from that side's bot forces that are subject to random removal, and the side always
+     * keeps at least one unit. Without that floor, a modifier that removes a full lance would wipe out a side that
+     * only fielded a lance or fewer in total, leaving the scenario with no opposition.</p>
      */
     public static void removeUnits(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient,
           int unitRemovalCount) {
@@ -158,20 +162,34 @@ public class AtBScenarioModifierApplicator {
             actualUnitsToRemove = CombatTeam.getStandardFormationSize(faction);
         }
 
-        for (int x = 0; x < actualUnitsToRemove; x++) {
-            int botForceIndex = Compute.randomInt(scenario.getNumBots());
-            BotForce bf = scenario.getBotForce(botForceIndex);
-            ScenarioForceTemplate template = scenario.getBotForceTemplates().get(bf);
-            boolean subjectToRemoval = (template != null) && template.isSubjectToRandomRemoval();
+        int recipientTeam = ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal());
 
-            // only remove units from a bot force if it's on the affected team
-            // AND if it has any units to remove
-            if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) &&
-                      !bf.getFullEntityList(campaign).isEmpty() &&
-                      subjectToRemoval) {
-                int unitIndexToRemove = Compute.randomInt(bf.getFullEntityList(campaign).size());
-                bf.removeEntity(unitIndexToRemove);
+        for (int x = 0; x < actualUnitsToRemove; x++) {
+            int sideUnitCount = 0;
+            List<BotForce> eligibleForces = new ArrayList<>();
+
+            for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+                BotForce botForce = scenario.getBotForce(botIndex);
+                if (botForce.getTeam() != recipientTeam) {
+                    continue;
+                }
+
+                sideUnitCount += botForce.getFullEntityList(campaign).size();
+
+                // Only fixed entities can be removed, so forces without any can't give up a unit
+                ScenarioForceTemplate template = scenario.getBotForceTemplates().get(botForce);
+                if ((template != null) && template.isSubjectToRandomRemoval() &&
+                          !botForce.getFixedEntityList().isEmpty()) {
+                    eligibleForces.add(botForce);
+                }
             }
+
+            if ((sideUnitCount <= MINIMUM_UNITS_AFTER_REMOVAL) || eligibleForces.isEmpty()) {
+                return;
+            }
+
+            BotForce botForce = eligibleForces.get(Compute.randomInt(eligibleForces.size()));
+            botForce.removeEntity(Compute.randomInt(botForce.getFixedEntityList().size()));
         }
     }
 
@@ -275,80 +293,67 @@ public class AtBScenarioModifierApplicator {
     }
 
     /**
-     * Helper function that sets up and "ambush", meaning declaring as "hidden" some portion of: all non-airborne units
-     * on the specified side that will be on the battlefield at the start of the scenario
+     * Helper function that sets up an "ambush" for the force added by a scenario modifier. If that force will be on
+     * the battlefield at the start of the scenario, some portion of its non-airborne units are declared as "hidden".
+     * The force keeps the deployment zone from its own definition. No other force in the scenario is affected.
      * <p>
-     * Also marks any such forces as able to deploy "anywhere".
+     * Forces with a destination edge are left alone, as they need to keep moving toward that edge.
+     * <p>
+     * The force is found by object identity, as the modifier's own template object is the one generated into the
+     * scenario. Another force that happens to share its name is not affected.
+     *
+     * @param scenario    The scenario to process.
+     * @param campaign    The current campaign.
+     * @param ambushForce The force template added by the scenario modifier.
      */
-    public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
-        if (eventRecipient == ForceAlignment.Player) {
-            for (int forceID : scenario.getForceIDs()) {
-                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-
-                if (forceTemplate.getArrivalTurn() == 0) {
-                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
-
-                    // Prevent Hidden Units from Causing Issues if Disabled
-                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
-                        continue;
-                    }
-
-                    Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
-
-                    // we can hide the "commander tactics skill" number of units, but we must keep
-                    // at least one visible
-                    // as the bot is unable to handle an invisible op for at the moment.
-                    int maxHiddenUnits = Math.min(playerFormation.getAllUnits(false).size() - 1,
-                          scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
-                    int numHiddenUnits = 0;
-
-                    for (UUID unitID : playerFormation.getAllUnits(false)) {
-                        if (numHiddenUnits >= maxHiddenUnits) {
-                            break;
-                        }
-
-                        Unit currentUnit = campaign.getUnit(unitID);
-                        // to hide, a unit must exist and not be in midair
-                        if (currentUnit != null &&
-                                  !currentUnit.getEntity().isAero() &&
-                                  !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
-                            currentUnit.getEntity().setHidden(true);
-                            numHiddenUnits++;
-                        }
-                    }
-                }
-            }
-            // logic for bot ambushes is a little different
-        } else if (eventRecipient == ForceAlignment.Opposing) {
-            for (int x = 0; x < scenario.getNumBots(); x++) {
-                BotForce currentBotForce = scenario.getBotForce(x);
-                ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
-
-                if (forceTemplate.getArrivalTurn() == 0) {
-                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
-
-                    // Prevent Hidden Units from Causing Issues if Disabled
-                    if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
-                        continue;
-                    }
-
-                    int maxHiddenUnits = currentBotForce.getFullEntityList(campaign).size() / 2;
-                    int numHiddenUnits = 0;
-
-                    for (Entity entity : currentBotForce.getFullEntityList(campaign)) {
-                        if (numHiddenUnits >= maxHiddenUnits) {
-                            break;
-                        }
-
-                        // to hide, a unit must not be in midair
-                        if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
-                            entity.setHidden(true);
-                            numHiddenUnits++;
-                        }
-                    }
-                }
-            }
+    public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ScenarioForceTemplate ambushForce) {
+        // Prevent Hidden Units from Causing Issues if Disabled
+        if (!campaign.getGameOptions().booleanOption(OptionsConstants.ADVANCED_HIDDEN_UNITS)) {
+            LOGGER.debug("Skipping ambush for {}: hidden units are disabled", ambushForce.getForceName());
+            return;
         }
+
+        if (ambushForce.getArrivalTurn() != 0) {
+            LOGGER.debug("Skipping ambush for {}: it arrives on turn {}, not at the start", ambushForce.getForceName(),
+                  ambushForce.getArrivalTurn());
+            return;
+        }
+
+        // Forces with a destination edge (such as convoys) are meant to cross the map. Hidden units never move, so leave
+        // these forces out of the ambush.
+        if (ambushForce.getDestinationZone() != CardinalEdge.NONE.getIndex()) {
+            LOGGER.debug("Skipping ambush for {}: it has destination edge {}", ambushForce.getForceName(),
+                  ambushForce.getDestinationZone());
+            return;
+        }
+
+        int totalHiddenUnits = 0;
+
+        for (BotForce botForce : scenario.getBotForces()) {
+            if (scenario.getBotForceTemplates().get(botForce) != ambushForce) {
+                continue;
+            }
+
+            List<Entity> entities = botForce.getFullEntityList(campaign);
+            int maxHiddenUnits = entities.size() / 2;
+            int numHiddenUnits = 0;
+
+            for (Entity entity : entities) {
+                if (numHiddenUnits >= maxHiddenUnits) {
+                    break;
+                }
+
+                // to hide, a unit must not be in midair
+                if (!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+                    entity.setHidden(true);
+                    numHiddenUnits++;
+                }
+            }
+
+            totalHiddenUnits += numHiddenUnits;
+        }
+
+        LOGGER.debug("Ambush for {}: hid {} unit(s)", ambushForce.getForceName(), totalHiddenUnits);
     }
 
     /**

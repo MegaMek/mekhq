@@ -67,12 +67,11 @@ class RecruitmentCostsTest {
     private static final Money PROFESSION_TRAINING = Money.of(2_000_000);
     private static final Money UTILITY_TRAINING = Money.of(1_000_000);
     private static final Money ROLEPLAY_TRAINING = Money.of(800_000);
-    private static final Money OTHER_TRAINING = Money.of(1_000_000);
     /**
-     * Every skill at the default multipliers: Profession and other skills x 1.5, Utility x 1, Roleplay left out
-     * (2,000,000 x 1.5 + 1,000,000 x 1 + 1,000,000 x 1.5)
+     * Every skill at the default multipliers: Profession x 1.5, Utility x 1, Roleplay left out
+     * (2,000,000 x 1.5 + 1,000,000 x 1)
      */
-    private static final Money DEFAULT_SKILL_RECRUITMENT_COST = Money.of(5_500_000);
+    private static final Money DEFAULT_SKILL_RECRUITMENT_COST = Money.of(4_000_000);
     private static final Money SPA_TRAINING = Money.of(2_400_000);
 
     private Campaign campaign;
@@ -95,8 +94,7 @@ class RecruitmentCostsTest {
 
         skillTrainingCosts = mockStatic(SkillTrainingCosts.class);
         skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCosts(any(), any()))
-              .thenReturn(skillTrainingByCategory(PROFESSION_TRAINING, UTILITY_TRAINING, ROLEPLAY_TRAINING,
-                    OTHER_TRAINING));
+              .thenReturn(skillTrainingByCategory(PROFESSION_TRAINING, UTILITY_TRAINING, ROLEPLAY_TRAINING));
         spaUtilities = mockStatic(SpaUtilities.class);
         spaUtilities.when(() -> SpaUtilities.getAccumulatedSpaTrainingCost(any())).thenReturn(SPA_TRAINING);
     }
@@ -108,12 +106,11 @@ class RecruitmentCostsTest {
     }
 
     private static Map<SkillTrainingCategory, Money> skillTrainingByCategory(Money profession, Money utility,
-          Money roleplay, Money other) {
+          Money roleplay) {
         Map<SkillTrainingCategory, Money> costs = new EnumMap<>(SkillTrainingCategory.class);
         costs.put(SkillTrainingCategory.PROFESSION, profession);
         costs.put(SkillTrainingCategory.UTILITY, utility);
         costs.put(SkillTrainingCategory.ROLEPLAY, roleplay);
-        costs.put(SkillTrainingCategory.OTHER, other);
         return costs;
     }
 
@@ -163,14 +160,29 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
 
-        // 5,500,000 + 2,400,000 x 1.5
-        assertEquals(Money.of(9_100_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 4,000,000 + 2,400,000 x 1.5
+        assertEquals(Money.of(7_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
-    /** Profession and Utility skills (2,000,000 x 1.5 + 1,000,000 x 1) are unaffected; other skills and SPAs scale. */
+    @Test
+    void breakdownSplitsTheCostBySkillCategoryAndSpas() {
+        campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
+        campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
+
+        RecruitmentCosts.TrainingCostBreakdown breakdown =
+              RecruitmentCosts.getTrainingBasedCostBreakdown(campaign, person);
+
+        assertEquals(Money.of(3_000_000), breakdown.skillCosts().get(SkillTrainingCategory.PROFESSION));
+        assertEquals(Money.of(1_000_000), breakdown.skillCosts().get(SkillTrainingCategory.UTILITY));
+        assertEquals(Money.zero(), breakdown.skillCosts().get(SkillTrainingCategory.ROLEPLAY));
+        assertEquals(Money.of(3_600_000), breakdown.spaCost());
+        assertEquals(RecruitmentCosts.getRecruitmentCost(campaign, person), breakdown.total());
+    }
+
+    /** Skills (2,000,000 x 1.5 + 1,000,000 x 1) are unaffected; only SPAs scale. */
     @ParameterizedTest
-    @CsvSource({ "0.0, 4000000", "1.0, 7400000", "2.5, 12500000" })
-    void otherSkillsAndSpasMultiplierScalesOnlyOtherSkillsAndSpas(double multiplier, long expected) {
+    @CsvSource({ "0.0, 4000000", "1.0, 6400000", "2.5, 10000000" })
+    void spaMultiplierScalesOnlySpas(double multiplier, long expected) {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER, multiplier);
@@ -183,8 +195,8 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_PROFESSION_SKILL_COST_MULTIPLIER, 3.0);
 
-        // 2,000,000 x 3 + 1,000,000 x 1 + 1,000,000 x 1.5
-        assertEquals(Money.of(8_500_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 2,000,000 x 3 + 1,000,000 x 1
+        assertEquals(Money.of(7_000_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -192,8 +204,8 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_UTILITY_SKILL_COST_MULTIPLIER, 3.0);
 
-        // 1,000,000 x 3 + (2,000,000 + 1,000,000) x 1.5
-        assertEquals(Money.of(7_500_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 1,000,000 x 3 + 2,000,000 x 1.5
+        assertEquals(Money.of(6_000_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -201,8 +213,8 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.RECRUITMENT_ROLEPLAY_SKILL_COST_MULTIPLIER, 2.0);
 
-        // 5,500,000 + 800,000 x 2
-        assertEquals(Money.of(7_100_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
+        // 4,000,000 + 800,000 x 2
+        assertEquals(Money.of(5_600_000), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }
 
     @Test
@@ -233,7 +245,7 @@ class RecruitmentCostsTest {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
         campaignOptions.set(CampaignOption.USE_SPA_TRAINING_COSTS, true);
         skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCosts(any(), any()))
-              .thenReturn(skillTrainingByCategory(Money.zero(), Money.zero(), Money.zero(), Money.zero()));
+              .thenReturn(skillTrainingByCategory(Money.zero(), Money.zero(), Money.zero()));
         spaUtilities.when(() -> SpaUtilities.getAccumulatedSpaTrainingCost(any())).thenReturn(Money.zero());
 
         assertEquals(Money.zero(), RecruitmentCosts.getRecruitmentCost(campaign, person));

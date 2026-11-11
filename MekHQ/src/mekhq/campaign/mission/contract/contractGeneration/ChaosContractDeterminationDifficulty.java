@@ -36,37 +36,41 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.common.enums.SkillLevel.ELITE;
-import static megamek.common.enums.SkillLevel.changeByDelta;
 import static megamek.common.units.UnitType.MEK;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToDoubleFunction;
 
 import megamek.client.ratgenerator.FactionRecord;
-import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
+import megamek.common.battleValue.BVCalculator;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.RATGeneratorConnector;
 
 /**
  * Estimates a difficulty rating for an {@link AbstractContract}.
  *
- * <p>The rating compares the estimated combat strength of the opposing force (an average-'Mek BV estimate drawn from
- * the enemy faction's RAT tables, scaled by their skill) against the player's participating combat units. A value of
- * {@code 5} represents roughly even forces; every 20% difference in relative strength shifts the rating by one point,
- * producing values from {@code 1} (easiest) to {@code 10} (hardest).</p>
+ * <p>The rating compares the estimated per-unit combat strength of the opposing force (an average-'Mek BV estimate
+ * drawn from the enemy faction's RAT tables at their equipment rating, scaled by their skill) against the player's
+ * participating combat units, each scaled by its own crew's skill. Both sides are measured like-for-like: the enemy
+ * estimate is drawn from 'Mek tables, so the player's 'Meks are what it is compared against (see
+ * {@link #estimatePlayerPower(List)}). A value of {@code 5} represents roughly even forces; every 20% difference in
+ * relative strength shifts the rating by one point, producing values from {@code 1} (easiest) to {@code 10}
+ * (hardest).</p>
+ *
+ * <p>Only the player's own units are counted; allied forces play no part in the rating.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
 public class ChaosContractDeterminationDifficulty {
-    /** Generic BV is used so this scale matches the one AtB contracts are rated on. */
-    private static final boolean USE_GENERIC_BV = true;
     public static final int UNKNOWN_DIFFICULTY = -99;
     /** The 1-10 band the rating is reported on; the skulls in the contract market render the same scale. */
     public static final int MINIMUM_DIFFICULTY = 1;
@@ -125,46 +129,66 @@ public class ChaosContractDeterminationDifficulty {
 
     /**
      * Adjusts a faction's effective skill level to account for special training characteristics. ComStar Special
-     * Operations ({@code SOC}) forces are treated as {@link SkillLevel#ELITE}, and Clan factions are treated as one
-     * skill level higher than their nominal rating.
+     * Operations ({@code SOC}) forces never rate below {@link SkillLevel#ELITE}; a force already generated above that
+     * keeps its higher skill.
+     *
+     * <p>Clan forces receive no adjustment here: contract generation ({@link ChaosEmployerForceRating}) already
+     * raises Clan skill and floors it at Veteran, so bumping it again would count the Clan edge twice.</p>
      *
      * @author Illiani
      * @since 0.51.01
      */
     static SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
-        if (Objects.equals(factionCode, "SOC")) {
+        if (Objects.equals(factionCode, "SOC") && (skillLevel.getExperienceLevel() < ELITE.getExperienceLevel())) {
             return ELITE;
-        }
-
-        if (Factions.getInstance().getFaction(factionCode).isClan()) {
-            // Clan forces fight one skill level above their nominal rating, clamped so an already-top-tier faction
-            // (LEGENDARY) does not overflow the enum.
-            return changeByDelta(skillLevel, 1);
         }
 
         return skillLevel;
     }
 
     /**
-     * Estimates the average combat power of the player's participating combat units.
+     * Estimates the average combat power of the player's participating combat units, each scaled by its own crew's
+     * skill.
      *
      * @author Illiani
      * @since 0.51.01
      */
     static double estimatePlayerPower(List<Entity> units) {
-        if (units.isEmpty()) {
+        return estimatePlayerPower(units, unit -> BVCalculator.bvMultiplier(unit, new ArrayList<>()));
+    }
+
+    /**
+     * Estimates the average combat power of the player's participating combat units.
+     *
+     * <p>Generic BV reflects only a unit's type and tonnage, so each unit's value is scaled by its crew's skill
+     * multiplier - the same Total Warfare table the enemy's skill multiplier is drawn from. Without this the enemy's
+     * skill would count and the player's would not.</p>
+     *
+     * <p>The enemy estimate is sampled from 'Mek tables, so the player's side is measured like-for-like: when the
+     * player fields any 'Meks, only those are averaged. Otherwise light units such as conventional infantry (a few
+     * dozen generic BV against a 'Mek's thousand-plus) would drag the average down and make every contract look
+     * harder than it is. A force with no 'Meks at all is averaged across everything it fields.</p>
+     *
+     * @param units                the player's combat units
+     * @param crewSkillMultipliers supplies the crew skill BV multiplier for a unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double estimatePlayerPower(List<Entity> units, ToDoubleFunction<Entity> crewSkillMultipliers) {
+        List<Entity> meks = units.stream().filter(Entity::isMek).toList();
+        List<Entity> comparableUnits = meks.isEmpty() ? units : meks;
+
+        if (comparableUnits.isEmpty()) {
             return 0;
         }
 
-        int totalBV = 0;
-        int totalGBV = 0;
-
-        for (Entity unit : units) {
-            totalBV += unit.calculateBattleValue();
-            totalGBV += unit.getGenericBattleValue();
+        double totalPower = 0;
+        for (Entity unit : comparableUnits) {
+            totalPower += unit.getGenericBattleValue() * crewSkillMultipliers.applyAsDouble(unit);
         }
 
-        return averageBattleValue(totalBV, totalGBV, units.size());
+        return totalPower / comparableUnits.size();
     }
 
     /**
@@ -195,8 +219,9 @@ public class ChaosContractDeterminationDifficulty {
     static double estimateMekStrength(int gameYear, String factionCode, int quality) {
         final double ERROR = 0;
 
-        RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
-        FactionRecord faction = ratGenerator.getFaction(factionCode);
+        // Factions that exist in MekHQ but have no RAT record (or no rating system of their own) fall back to the
+        // generic Inner Sphere, Periphery or Clan record, the same as when their forces are generated.
+        FactionRecord faction = Factions.getInstance().getFactionRecordOrFallback(factionCode);
 
         if (faction == null) {
             return ERROR;
@@ -204,10 +229,13 @@ public class ChaosContractDeterminationDifficulty {
 
         UnitTable unitTable;
         try {
+            // The RAT generator looks ratings up by the faction's own rating names ("F".."A", or the Clan ladder),
+            // so the numeric equipment rating has to be translated; passing the bare number silently matches nothing
+            // and drops the rating adjustment altogether.
             unitTable = findTable(faction,
                   MEK,
                   gameYear,
-                  String.valueOf(quality),
+                  RATGeneratorConnector.getFactionSpecificRating(faction, quality),
                   new ArrayList<>(),
                   NETWORK_NONE,
                   new ArrayList<>(),
@@ -219,22 +247,20 @@ public class ChaosContractDeterminationDifficulty {
             return ERROR;
         }
 
-        int totalBV = 0;
-        int totalGBV = 0;
-        int totalWeight = 0;
+        // Generic BV is used on both sides so the scale matches the one AtB contracts are rated on; skill is applied
+        // separately (by the caller for the enemy, per crew for the player).
+        long totalGBV = 0;
+        long totalWeight = 0;
 
         for (int i = 0; i < unitTable.getNumEntries(); i++) {
-            int battleValue = unitTable.getBV(i);
-
             // Salvage entries have no associated unit data.
-            if (battleValue == 0) {
+            if (unitTable.getBV(i) == 0) {
                 continue;
             }
 
             int weight = unitTable.getEntryWeight(i);
 
-            totalBV += battleValue * weight;
-            totalGBV += unitTable.getMekSummary(i).getGenericBattleValue() * weight;
+            totalGBV += (long) unitTable.getMekSummary(i).getGenericBattleValue() * weight;
             totalWeight += weight;
         }
 
@@ -242,20 +268,6 @@ public class ChaosContractDeterminationDifficulty {
             return ERROR;
         }
 
-        return averageBattleValue(totalBV, totalGBV, totalWeight);
-    }
-
-    /**
-     * Computes an average (generic) battle value.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static double averageBattleValue(int totalBV, int totalGBV, int divisor) {
-        if (divisor == 0) {
-            return 0;
-        }
-
-        return USE_GENERIC_BV ? (double) totalGBV / divisor : (double) totalBV / divisor;
+        return (double) totalGBV / totalWeight;
     }
 }

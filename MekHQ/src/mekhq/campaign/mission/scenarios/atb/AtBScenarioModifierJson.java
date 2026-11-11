@@ -95,7 +95,21 @@ public final class AtBScenarioModifierJson {
     static void toFile(AtBScenarioModifier modifier, File outputFile) throws IOException {
         // Lead the file with the license header (as '#' comment lines) then a blank line, then the JSON. The header
         // carries the file's copyright year forward; ALLOW_YAML_COMMENTS skips it on read.
-        String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(modifier);
+        String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + toJsonString(modifier);
         Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Renders a scenario modifier as the JSON that {@link #toFile} writes, without the license header. Editors use it
+     * to compare modifier states, such as when checking for unsaved changes.
+     *
+     * @param modifier the modifier to render
+     *
+     * @return the modifier's JSON
+     *
+     * @throws IOException if the modifier cannot be rendered
+     */
+    public static String toJsonString(AtBScenarioModifier modifier) throws IOException {
+        return MAPPER.writeValueAsString(modifier);
     }
 }

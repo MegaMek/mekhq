@@ -120,6 +120,8 @@ class MHQOptionsModel {
     boolean showCommandGenerator;
     boolean showUnitPicturesOnTOE;
     boolean showWarriorsAlmanac;
+    boolean lockMainTabOrder;
+    boolean lockMainTabDetaching;
     // endregion Display - General
 
     // region Display - Record Logs
@@ -199,6 +201,7 @@ class MHQOptionsModel {
     // region New Day - Formation Icons
     boolean newDayFormationIconOperationalStatus;
     FormationIconOperationalStatusStyle newDayFormationIconOperationalStatusStyle;
+    boolean newDayAutoFormationIcons;
     // endregion New Day - Formation Icons
 
     // region Campaign Save
@@ -239,6 +242,8 @@ class MHQOptionsModel {
         showCommandGenerator = options.getShowCommandGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
         showWarriorsAlmanac = options.getShowWarriorsAlmanac();
+        lockMainTabOrder = options.getLockMainTabOrder();
+        lockMainTabDetaching = options.getLockMainTabDetaching();
 
         // Display - Record Logs
         displayPersonnelLog = options.getDisplayPersonnelLog();
@@ -382,6 +387,7 @@ class MHQOptionsModel {
         // New Day - Formation Icons
         newDayFormationIconOperationalStatus = options.getNewDayFormationIconOperationalStatus();
         newDayFormationIconOperationalStatusStyle = options.getNewDayFormationIconOperationalStatusStyle();
+        newDayAutoFormationIcons = options.getNewDayAutoFormationIcons();
 
         // Campaign Save
         preferGzippedOutput = options.getPreferGzippedOutput();
@@ -437,6 +443,8 @@ class MHQOptionsModel {
         options.setShowCommandGenerator(showCommandGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
         options.setShowWarriorsAlmanac(showWarriorsAlmanac);
+        options.setLockMainTabOrder(lockMainTabOrder);
+        options.setLockMainTabDetaching(lockMainTabDetaching);
 
         options.setDisplayPersonnelLog(displayPersonnelLog);
         options.setDisplayScenarioLog(displayScenarioLog);
@@ -579,6 +587,7 @@ class MHQOptionsModel {
         // New Day - Formation Icons
         options.setNewDayFormationIconOperationalStatus(newDayFormationIconOperationalStatus);
         options.setNewDayFormationIconOperationalStatusStyle(newDayFormationIconOperationalStatusStyle);
+        options.setNewDayAutoFormationIcons(newDayAutoFormationIcons);
 
         // Campaign Save
         options.setPreferGzippedOutput(preferGzippedOutput);

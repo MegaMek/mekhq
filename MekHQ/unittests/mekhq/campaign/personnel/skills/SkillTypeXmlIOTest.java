@@ -34,11 +34,14 @@ package mekhq.campaign.personnel.skills;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import megamek.Version;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -132,14 +135,48 @@ class SkillTypeXmlIOTest {
         assertArrayEquals(costs, reloaded.getCosts(), "costs");
     }
 
+    /**
+     * Saves and presets written before Tech/Cybernetics became a Utility skill store it as Roleplay (General); loading
+     * them must upgrade the subtype.
+     */
+    @Test
+    void readUpgradesLegacyTechCyberneticsSubType() throws Exception {
+        Node legacy = writeLegacyTechCybernetics();
+        SkillType.generateInstanceFromXML(legacy, new Version());
+
+        assertEquals(SkillSubType.UTILITY, SkillType.getType(SkillType.S_TECH_CYBERNETICS).getSubType());
+    }
+
+    @Test
+    void separateReadUpgradesLegacyTechCyberneticsSubType() throws Exception {
+        Map<String, SkillType> hash = new HashMap<>();
+        SkillType.generateSeparateInstanceFromXML(writeLegacyTechCybernetics(), hash, new Version());
+
+        assertEquals(SkillSubType.UTILITY, hash.get(SkillType.S_TECH_CYBERNETICS).getSubType());
+    }
+
+    private static Node writeLegacyTechCybernetics() throws Exception {
+        String xml = writeSkillType(SkillType.getType(SkillType.S_TECH_CYBERNETICS))
+                           .replace("<subType>UTILITY</subType>", "<subType>ROLEPLAY_GENERAL</subType>");
+        assertTrue(xml.contains("<subType>ROLEPLAY_GENERAL</subType>"), "legacy subType was not written: " + xml);
+        return parse(xml);
+    }
+
     private static Node writeSkillTypeAndReparse(SkillType skillType) throws Exception {
+        return parse(writeSkillType(skillType));
+    }
+
+    private static String writeSkillType(SkillType skillType) {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
             skillType.writeToXML(printWriter, 0);
         }
+        return stringWriter.toString();
+    }
 
+    private static Node parse(String xml) throws Exception {
         return MHQXMLUtility.newSafeDocumentBuilder()
-                     .parse(new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8)))
+                     .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                      .getDocumentElement();
     }
 }

@@ -34,10 +34,14 @@ package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,8 +50,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class AcademyTests {
@@ -181,5 +189,54 @@ class AcademyTests {
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
         when(campaign.getPlayerForce().getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
+    }
+
+    /**
+     * Regression test for #10664: a Capellan-origin person must not be offered a Federated Suns academy while FS and
+     * CC are at war, as {@link Academy#isFactionConflict} would expel them.
+     */
+    @Test
+    void testGetFilteredFactionExcludesFactionAtWarWithOriginOnly() {
+        assertNull(getFilteredFactionWithWarState(true, false));
+    }
+
+    @Test
+    void testGetFilteredFactionExcludesFactionAtWarWithCampaignOnly() {
+        assertNull(getFilteredFactionWithWarState(false, true));
+    }
+
+    @Test
+    void testGetFilteredFactionAllowsFactionAtPeaceWithBoth() {
+        assertEquals("FS", getFilteredFactionWithWarState(false, false));
+    }
+
+    private String getFilteredFactionWithWarState(boolean isAtWarWithOrigin, boolean isAtWarWithCampaign) {
+        Faction originFaction = new Faction("CC", "");
+        Faction campaignFaction = new Faction("FWL", "");
+        Faction academyFaction = new Faction("FS", "");
+
+        Person person = Mockito.mock(Person.class);
+        when(person.getOriginFaction()).thenReturn(originFaction);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(2869, 3, 15));
+
+        try (MockedStatic<RandomFactionGenerator> mockedGenerator = mockStatic(RandomFactionGenerator.class);
+              MockedStatic<Factions> mockedFactions = mockStatic(Factions.class)) {
+            FactionHints hints = Mockito.mock(FactionHints.class);
+            when(hints.isAtWarWith(Mockito.eq(originFaction), Mockito.eq(academyFaction), any()))
+                  .thenReturn(isAtWarWithOrigin);
+            when(hints.isAtWarWith(Mockito.eq(campaignFaction), Mockito.eq(academyFaction), any()))
+                  .thenReturn(isAtWarWithCampaign);
+            RandomFactionGenerator generator = Mockito.mock(RandomFactionGenerator.class);
+            when(generator.getFactionHints()).thenReturn(hints);
+            mockedGenerator.when(RandomFactionGenerator::getInstance).thenReturn(generator);
+
+            Factions factions = Mockito.mock(Factions.class);
+            when(factions.getFaction("FS")).thenReturn(academyFaction);
+            mockedFactions.when(Factions::getInstance).thenReturn(factions);
+
+            return new Academy().getFilteredFaction(campaign, person, List.of("FS"));
+        }
     }
 }

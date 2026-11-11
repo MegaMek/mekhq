@@ -78,6 +78,7 @@ import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
 import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
+import megamek.client.ui.dialogs.releaseNotes.ReleaseNotes;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.util.UIUtil;
@@ -157,6 +158,8 @@ public class MekHQ implements GameListener {
     private static ObservableString campaignsDirectory;
     private static ObservableString scenarioTemplatesDirectory;
     private static ObservableString financesDirectory;
+    private static ObservableString contractsDirectory;
+    private static ObservableString glossaryDirectory;
 
     // stuff related to MM games
     private Server myServer = null;
@@ -223,6 +226,14 @@ public class MekHQ implements GameListener {
         return financesDirectory;
     }
 
+    public static ObservableString getContractsDirectory() {
+        return contractsDirectory;
+    }
+
+    public static ObservableString getGlossaryDirectory() {
+        return glossaryDirectory;
+    }
+
     protected static MekHQ getInstance() {
         return new MekHQ();
     }
@@ -251,6 +262,7 @@ public class MekHQ implements GameListener {
         // Show licensing/welcome dialog after startup screen is visible
         LicensingDialog.showIfNeeded(null,
               "Welcome to " + MHQConstants.PROJECT_NAME + " " + MHQConstants.VERSION);
+        ReleaseNotes.rememberRunningVersion();
     }
 
     /**
@@ -326,6 +338,12 @@ public class MekHQ implements GameListener {
 
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
+
+            contractsDirectory = new ObservableString("contractsDirectory", ".");
+            preferences.manage(new StringPreference(contractsDirectory));
+
+            glossaryDirectory = new ObservableString("glossaryDirectory", ".");
+            preferences.manage(new StringPreference(glossaryDirectory));
         } catch (Exception ex) {
             LOGGER.error(ex, "Failed to set user preferences");
         }

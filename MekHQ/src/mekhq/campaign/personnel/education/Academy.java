@@ -693,7 +693,8 @@ public class Academy implements Comparable<Academy> {
                     return faction.getShortName();
                 }
             } else {
-                if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate()) ||
+                // Must mirror isFactionConflict, which expels the student if either faction is at war
+                if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate()) &&
                           !hints.isAtWarWith(campaignFaction, faction, campaign.getLocalDate())) {
                     return faction.getShortName();
                 }

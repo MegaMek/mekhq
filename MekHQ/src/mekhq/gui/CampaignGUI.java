@@ -33,6 +33,7 @@
  */
 package mekhq.gui;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -106,6 +107,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -135,23 +137,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
-import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.EasyBugReportDialog;
-import mekhq.gui.dialog.HireBulkPersonnelDialog;
-import mekhq.gui.dialog.MekHQUnitSelectorDialog;
-import mekhq.gui.dialog.NewsDialog;
-import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.RefitNameDialog;
-import mekhq.gui.dialog.RefitPartsArrivedNotice;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.UnitMarketDialog;
-import mekhq.gui.dialog.glossary.GlossaryDialog;
+import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.preferences.TabOrderPreference;
 import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -166,6 +159,7 @@ public class CampaignGUI extends JPanel {
     /** The buttons of the refit site question, in the order they are shown */
     private static final int REFIT_SITE_CANCEL = 0;
     private static final int REFIT_SITE_MOVE = 2;
+    private static final int REFIT_CONFIRM_BEGIN = 1;
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -191,6 +185,8 @@ public class CampaignGUI extends JPanel {
 
     /* for the main panel */
     private EnhancedTabbedPane tabMain;
+    /** The user's preferred order of the main tabs, holding every tab type, including hidden and detached tabs. */
+    private final List<MHQTabType> tabOrder = new ArrayList<>(List.of(MHQTabType.values()));
 
     private MekHQMenuBar windowMenu;
 
@@ -355,6 +351,22 @@ public class CampaignGUI extends JPanel {
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
+        applyTabLockOptions();
+
+        // While the tab order is locked, a tab dropped back onto the tab strip returns to its usual place rather than
+        // wherever it was dropped
+        tabMain.addTabStateListener(new EnhancedTabbedPane.TabStateListener() {
+            @Override
+            public void onTabReattached(int tabIndex, Component component) {
+                if (MekHQ.getMHQOptions().getLockMainTabOrder() && (component instanceof CampaignGuiTab tab)) {
+                    tabMain.remove(tab);
+                    int index = tabInsertIndex(tab);
+                    tabMain.insertTab(tab.getTabName(), null, tab, null, index);
+                    tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
+                    tabMain.setSelectedIndex(index);
+                }
+            }
+        });
 
         boolean isMaplessMode = getCampaign().getCampaignOptions().isUseStratConMaplessMode();
         int stratConTabIndex = tabMain.indexOfTab(MHQTabType.STRAT_CON.toString());
@@ -366,9 +378,22 @@ public class CampaignGUI extends JPanel {
         // check to see if we just selected the command center tab
         // and if so change its color to standard
         tabMain.addChangeListener(evt -> {
-            if (tabMain.getSelectedIndex() == 0) {
-                tabMain.setBackgroundAt(0, null);
+            if ((commandCenterTab != null) && (tabMain.getSelectedComponent() == commandCenterTab)) {
+                tabMain.setBackgroundAt(tabMain.getSelectedIndex(), null);
                 logNagActive = false;
+            }
+        });
+
+        // Remember the order the user drags the tabs into, so it can be restored on the next launch
+        tabMain.addTabStateListener(new EnhancedTabbedPane.TabStateListener() {
+            @Override
+            public void onTabMoved(int oldIndex, int tabIndex, Component component) {
+                recordTabOrder();
+            }
+
+            @Override
+            public void onTabReattached(int tabIndex, Component component) {
+                recordTabOrder();
             }
         });
 
@@ -442,6 +467,7 @@ public class CampaignGUI extends JPanel {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(CampaignGUI.class);
             frame.setName("mainWindow");
             preferences.manage(new JWindowPreference(frame));
+            preferences.manage(new TabOrderPreference("mainTabOrder", tabOrder));
             UIUtil.keepOnScreen(frame);
         } catch (Exception ex) {
             logger.error("Failed to set user preferences", ex);
@@ -572,7 +598,7 @@ public class CampaignGUI extends JPanel {
         // regularly miss that they have to press something to get a starting force at all.
         btnCommandGenerator = new AccentRoundedJButton(resourceMap.getString("btnCommandGenerator.text"),
               Accent.CAUTION);
-        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.setToolTipText(wordWrap(resourceMap.getString("btnCommandGenerator.toolTipText")));
         btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
         btnCommandGenerator.addActionListener(event -> {
             new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true);
@@ -635,7 +661,7 @@ public class CampaignGUI extends JPanel {
         AccentRoundedJButton btnGlossary = new AccentRoundedJButton(resourceMap.getString("btnGlossary.text"),
               Accent.REFERENCE);
         btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
-        btnGlossary.addActionListener(event -> new GlossaryDialog(getFrame()));
+        btnGlossary.addActionListener(event -> GlossaryConsole.showFor(getFrame()));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnGlossary, gridBagConstraints);
@@ -746,7 +772,8 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Checks if tab is present in the tab panel. If not, adds it to the panel and activates it.
+     * Checks if tab is present in the tab panel. If not, adds it to the panel at its place in the user's preferred tab
+     * order and activates it.
      *
      * @param tab The tab to activate
      */
@@ -754,15 +781,31 @@ public class CampaignGUI extends JPanel {
         if (tabMain.indexOfComponent(tab) >= 0) {
             return;
         }
-        int index =
-              IntStream.range(0, tabMain.getTabCount()).filter(
-                          i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType().ordinal() >
-                                     tab.tabType().ordinal())
-                    .findFirst()
-                    .orElse(tabMain.getTabCount());
+        int index = tabInsertIndex(tab);
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
         SwingUtilities.invokeLater(tab::refreshAll);
+    }
+
+    /**
+     * @param tab a tab that is not currently in the tab panel
+     *
+     * @return the index the tab belongs at in the tab panel, before the first tab that comes after it
+     */
+    private int tabInsertIndex(CampaignGuiTab tab) {
+        int position = tabOrder.indexOf(tab.tabType());
+        return IntStream.range(0, tabMain.getTabCount())
+                     .filter(i -> tabOrder.indexOf(((CampaignGuiTab) tabMain.getComponentAt(i)).tabType()) > position)
+                     .findFirst()
+                     .orElse(tabMain.getTabCount());
+    }
+
+    /**
+     * Applies the client options that lock the main tabs against being reordered or detached.
+     */
+    private void applyTabLockOptions() {
+        tabMain.setTabReorderingEnabled(!MekHQ.getMHQOptions().getLockMainTabOrder());
+        tabMain.setTabDetachingEnabled(!MekHQ.getMHQOptions().getLockMainTabDetaching());
     }
 
     /**
@@ -772,6 +815,18 @@ public class CampaignGUI extends JPanel {
      */
     private void deactivateTab(CampaignGuiTab tab) {
         tabMain.remove(tab);
+    }
+
+    /**
+     * Updates the preferred tab order to match the tabs currently in the tab panel. Tabs not in the panel (hidden or
+     * detached) keep their existing slots, so they return to the same place when shown again.
+     */
+    private void recordTabOrder() {
+        List<MHQTabType> attachedOrder = IntStream.range(0, tabMain.getTabCount())
+                                               .mapToObj(i -> ((CampaignGuiTab) tabMain.getComponentAt(i)).tabType())
+                                               .toList();
+        Iterator<MHQTabType> attached = attachedOrder.iterator();
+        tabOrder.replaceAll(tabType -> attachedOrder.contains(tabType) ? attached.next() : tabType);
     }
 
     public boolean showRetirementDefectionDialog() {
@@ -973,7 +1028,9 @@ public class CampaignGUI extends JPanel {
      * Determines whether the contract market should be inaccessible because the campaign already holds a contract.
      *
      * <p>Access is only permitted while a contract is held if StratCon is disabled campaign-wide and none of the held
-     * contracts (including accepted contracts that have not yet started) have StratCon enabled.</p>
+     * contracts (including accepted contracts that have not yet started) have StratCon enabled. Shell contracts never
+     * block it, as they are never tied into StratCon, so a shell can be followed by a market contract. The reverse is
+     * not true: shells are created from the market, so none can be added while a StratCon contract blocks it.</p>
      *
      * @return {@code true} if the contract market should be blocked
      *
@@ -982,7 +1039,12 @@ public class CampaignGUI extends JPanel {
      */
     private boolean isContractMarketBlockedByActiveContract() {
         Campaign campaign = getCampaign();
-        List<AbstractContract> heldContracts = campaign.getActiveContracts(true);
+        List<AbstractContract> heldContracts = new ArrayList<>();
+        for (AbstractContract contract : campaign.getActiveContracts(true)) {
+            if (!(contract instanceof ShellContract)) {
+                heldContracts.add(contract);
+            }
+        }
         if (heldContracts.isEmpty()) {
             return false;
         }
@@ -1320,8 +1382,9 @@ public class CampaignGUI extends JPanel {
         List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.cancel"),
               getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.stay", currentSiteName),
               getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.button.move", requiredSiteName));
+        // Cancel stays first, so closing with X cancels, but the move the rules call for has focus
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null, inCharacter, buttons,
-              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false);
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSite.rules"), null, false, REFIT_SITE_MOVE);
 
         return switch (dialog.getDialogChoice()) {
             case REFIT_SITE_CANCEL -> {
@@ -1430,10 +1493,11 @@ public class CampaignGUI extends JPanel {
     private boolean isRefitConfirmed(Refit refit) {
         List<String> buttons = List.of(getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.cancel"),
               getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.button.begin"));
+        // Cancel stays first, so closing with X cancels, but Begin has focus: the player just chose the tech
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(getCampaign(), refit.getTech(), null,
               RefitBriefing.describeInCharacter(getCampaign(), refit), buttons,
-              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false);
-        return dialog.getDialogChoice() == 1;
+              RefitBriefing.describeOutOfCharacter(getCampaign(), refit), null, false, REFIT_CONFIRM_BEGIN);
+        return dialog.getDialogChoice() == REFIT_CONFIRM_BEGIN;
     }
 
     /**
@@ -1665,6 +1729,18 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 Utilities.copyfile(backupFile, file);
                 backupFile.delete();
+            }
+        }
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        // Tab backgrounds are not reset by a theme change, so recolor an active Command Center nag for the new theme
+        if (logNagActive && (tabMain != null) && (commandCenterTab != null)) {
+            int commandCenterIndex = tabMain.indexOfComponent(commandCenterTab);
+            if (commandCenterIndex >= 0) {
+                tabMain.setBackgroundAt(commandCenterIndex, UIUtil.uiDarkBlue());
             }
         }
     }
@@ -2618,6 +2694,7 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
         refreshGuiScale();
+        applyTabLockOptions();
     }
     // endregion Subscriptions
 }

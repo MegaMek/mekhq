@@ -53,6 +53,8 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
@@ -112,6 +114,55 @@ class AddSupportUnitsToTOETest {
             assertEquals(PersonnelRole.MECHANIC, crewMember.getPrimaryRole(),
                   "its crew comes from the section, not from new hires");
         }
+    }
+
+    @Test
+    void organize_filesRecoveryVehiclesInASalvageFormation() {
+        // The Recovery Company was built as a Support formation, so the salvage planner never offered it as a team.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 8), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle's formation is a Salvage formation");
+        assertEquals(FormationType.SUPPORT,
+              campaign.getPlayerForce().getSupportCommandFormation().getFormationType(),
+              "while Support Command itself stays a Support formation");
+    }
+
+    @Test
+    void organize_keepsTheRecoveryCompanyWhenItIsAllTheSectionHolds() {
+        // With a single mechanic, the whole maintenance section is the recovery vehicle's crew. The tidy-up pass that
+        // splices out single-child layers used to fold the Recovery Company into the section, and the vehicle with it.
+        Campaign campaign = campaignWithCamOpsSalvage();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.MECHANIC, 1), false,
+              campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "the recovery vehicle still sits in a Salvage formation");
+    }
+
+    @Test
+    void topUp_buildsTheRecoveryCompanyAsASalvageFormation() {
+        Campaign campaign = campaignWithCamOpsSalvage();
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
+        SupportPersonnelToTOE.organize(campaign, newStaff(campaign, PersonnelRole.ADMINISTRATOR, 4), false,
+              campaign.getPlayerForce().getFaction());
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit recoveryVehicle = unitNamedLike(campaign, "APC");
+
+        SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, SupportCapability.SALVAGE,
+              SupportPersonnelToTOE.VehicleCrewSource.TEMPORARY_CREW, campaign.getPlayerForce().getFaction());
+
+        assertEquals(FormationType.SALVAGE, formationOf(campaign, recoveryVehicle).getFormationType(),
+              "a Recovery Company made when salvage is switched on later is a Salvage formation too");
     }
 
     @Test
@@ -371,6 +422,34 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void fillShortCrews_newHiresStayOnTheCampaignsRankSystem() {
+        // Issue 10867: the hires were moved to the faction's rank system, overriding the one the player chose in
+        // Campaign Options. Every person the Command Generator makes now stays on the campaign's.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit vehicle = unitNamedLike(campaign, "APC");
+        Formation company = new Formation("Field Hospital Company");
+        campaign.getPlayerForce().addFormation(company,
+              campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN), campaign);
+        campaign.getPlayerForce().addUnitToFormation(vehicle, company.getId(), campaign);
+        assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
+              "this test is only meaningful while the vehicle is short of crew");
+        RankSystem combineRanks = Ranks.getRankSystemFromCode("DCMS");
+        campaign.getPlayerForce().setRankSystem(combineRanks);
+        assertEquals("DCMS", campaign.getPlayerForce().getRankSystem().getCode(),
+              "this test is only meaningful once the campaign is on a rank system other than the default");
+
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
+
+        assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are filled with hires");
+        for (Person hire : vehicle.getCrew()) {
+            assertEquals("DCMS", hire.getRankSystem().getCode(),
+                  hire.getFullName() + " is on the rank system set in Campaign Options");
+        }
+    }
+
+    @Test
     void idleOwnedVehicles_leavesAVehicleThePlayerHasPutToUseAlone() {
         // A vehicle the player crewed, or filed in a formation of their own, is in use. It counts towards the
         // target but is not taken over by the support teams.
@@ -529,6 +608,35 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void addSupportUnitsToTOE_filesTheLiftAsSupportNotConvoy() {
+        // Issue 10899: the Troopship Command was a Convoy formation, so Resupply sent its DropShips out as a supply
+        // run and the player got a Convoy Rescue mission for two Overlords and a Condor. The JumpShips had the same
+        // type. Both now file as Support, under a Transport Command that stays Standard.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit troopship = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(troopship),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.TROOPSHIP_COMMAND);
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.JUMPSHIP_COMMAND);
+
+        Formation troopshipCommand = formationOf(campaign, troopship);
+        assertEquals(FormationType.SUPPORT, troopshipCommand.getFormationType(),
+              "the Troopship Command is a Support formation");
+        Formation transportCommand = troopshipCommand.getParentFormation();
+        assertNotNull(transportCommand);
+        Formation jumpShipCommand = null;
+        for (Formation child : transportCommand.getSubFormations()) {
+            if (child.getName().equalsIgnoreCase(SupportTOEFormationTypes.JUMPSHIP_COMMAND.getLabel())) {
+                jumpShipCommand = child;
+            }
+        }
+        assertNotNull(jumpShipCommand, "the JumpShip Command is filed under the Transport Command");
+        assertEquals(FormationType.SUPPORT, jumpShipCommand.getFormationType(),
+              "the JumpShip Command is a Support formation");
+    }
+
+    @Test
     void vehiclesStillNeeded_freshCampaignGetsTheFullCount() {
         // A newly generated command owns no capability vehicles, so generation is unchanged: it builds them all.
         Campaign campaign = MHQTestUtilities.getTestCampaign();
@@ -616,6 +724,12 @@ class AddSupportUnitsToTOETest {
             staff.add(campaign.getPlayerForce().getHumanResources().newPerson(campaign, role, PersonnelRole.NONE));
         }
         return staff;
+    }
+
+    private static Formation formationOf(Campaign campaign, Unit unit) {
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        assertNotNull(formation, "expected " + unit.getName() + " to be filed in a formation");
+        return formation;
     }
 
     private static Unit unitNamedLike(Campaign campaign, String namePart) {

@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.medical.advancedMedical;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.skills.Skill;
@@ -100,6 +102,54 @@ public final class InjuryUtil {
         }
         genNaturalHealing(campaign, person).forEach(GameEffect::apply);
         person.decrementDaysToWaitForHealing();
+    }
+
+    /**
+     * Run a daily healing check for a student whose injuries are tended by their academy's medical staff. The staff
+     * keep the injuries from worsening, so no untreated effects are applied, and treat them on the same schedule as an
+     * assigned doctor.
+     */
+    public static void resolveDailyHealingUnderAcademyCare(Campaign campaign, Person person) {
+        if (person.getDaysToWaitForHealing() <= 0) {
+            genAcademyTreatment(campaign, person).forEach(GameEffect::apply);
+        }
+        genNaturalHealing(campaign, person).forEach(GameEffect::apply);
+        person.decrementDaysToWaitForHealing();
+    }
+
+    /**
+     * Generates the treatment of a student's untreated injuries by their academy's medical staff. Each injury is
+     * treated on a 2d6 roll of {@link MedicalController#ACADEMY_MEDICAL_CARE_TARGET_NUMBER} or better. A failed roll
+     * leaves the injury untreated until the next attempt, but never worsens it.
+     */
+    private static List<GameEffect> genAcademyTreatment(Campaign campaign, Person person) {
+        List<GameEffect> result = new ArrayList<>();
+        boolean isTreatmentAttempted = false;
+
+        for (Injury injury : person.getInjuries()) {
+            if (injury.isWorkedOn()) {
+                continue;
+            }
+
+            isTreatmentAttempted = true;
+            if (Compute.d6(2) >= ACADEMY_MEDICAL_CARE_TARGET_NUMBER) {
+                result.add(new GameEffect(String.format("Academy medical staff successfully treated %s of %s.",
+                      injury.getName(),
+                      person.getHyperlinkedName()), rnd -> injury.setWorkedOn(true)));
+            } else {
+                result.add(new GameEffect(String.format("Academy medical staff were unable to treat %s of %s.",
+                      injury.getName(),
+                      person.getHyperlinkedName())));
+            }
+        }
+
+        if (isTreatmentAttempted) {
+            result.add(new GameEffect("Academy medical staff schedule the next treatment",
+                  rnd -> person.setDaysToWaitForHealing(campaign.getCampaignOptions()
+                                                              .get(CampaignOption.HEAL_WAITING_PERIOD))));
+        }
+
+        return result;
     }
 
     /** Resolve injury modifications in case of entering combat with active ones */

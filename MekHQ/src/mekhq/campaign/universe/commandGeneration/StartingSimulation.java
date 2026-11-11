@@ -56,7 +56,9 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
  * campaign's random marriage and procreation rules week by week over them, the way the retired AtB Company
  * Generator did, so some arrive married and some with children. The campaign's own date does not move, and
  * nothing else in the campaign is touched. Births here leave no postpartum recovery and show no announcement, and
- * anyone still needing treatment is healed at the end, since the command is meant to start ready for work.</p>
+ * anyone still needing treatment is healed at the end, since the command is meant to start ready for work. For the
+ * same reason, a mother who gives birth within the simulated history never goes on maternity leave: leave would
+ * strip her unit and tech assignments, and the birth would not restore them.</p>
  *
  * <p>The rules used are the campaign's: a campaign whose random marriage or procreation method is off gets no
  * marriages or births from this, and the log says so.</p>

@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,6 +87,32 @@ class StratConCampaignStateEarlyEndTest {
         campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(LATER, "UnitTestType", false));
 
         assertTrue(campaignState.canEndContractEarly());
+    }
+
+    @Test
+    void aDeploymentOrderStillToAppearDoesNot() {
+        campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(LATER,
+              StratConDeploymentOrderBehavior.TYPE_ID,
+              true));
+
+        assertTrue(campaignState.canEndContractEarly(), "the employer simply stops issuing orders");
+    }
+
+    @Test
+    void aCarriedOutDeploymentOrderAloneDoesNotLetTheContractEndEarly() {
+        StratConStrategicObjective carriedOutOrder = new StratConStrategicObjective();
+        carriedOutOrder.setObjectiveType(StrategicObjectiveType.PointOfInterest);
+        carriedOutOrder.setPointOfInterestTypeId(StratConDeploymentOrderBehavior.TYPE_ID);
+        carriedOutOrder.setDesiredObjectiveCount(1);
+        carriedOutOrder.setCurrentObjectiveCount(1);
+
+        StratConTrackState track = new StratConTrackState();
+        track.addStrategicObjective(carriedOutOrder);
+        StratConCampaignState ordersOnlyState = new StratConCampaignState();
+        ordersOnlyState.setAllowEarlyVictory(true);
+        ordersOnlyState.addTrack(track);
+
+        assertFalse(ordersOnlyState.canEndContractEarly(), "a Deployment Order is not one of the contract's objectives");
     }
 
     @Test

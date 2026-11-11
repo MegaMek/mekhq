@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions;
 
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL;
@@ -60,7 +59,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -78,24 +76,21 @@ import megamek.client.ui.settings.SettingsRoute;
 import megamek.client.ui.util.UIUtil;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
-import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.quartermaster.DefaultKitChanges;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.gui.CampaignGUI;
@@ -1057,7 +1052,7 @@ public class CampaignOptionsPane extends JPanel {
 
         boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
         if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
-            inoculateAllCharacters(campaign);
+            Inoculations.inoculateAllForNewlyEnabledDiseases(campaign);
         }
 
         boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel() &&
@@ -1113,77 +1108,6 @@ public class CampaignOptionsPane extends JPanel {
         // holding one of those implants needs the prosthetics recorded, or the first daily check takes it away.
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
-        }
-    }
-
-    /**
-     * Inoculates all campaign personnel for their current planet and origin planet.
-     *
-     * <p>
-     * This method adds planetary inoculation records for:
-     * </p>
-     *
-     * <ul>
-     * <li>The current planet (if the campaign is on a planet, not in transit)</li>
-     * <li>Each person's origin planet</li>
-     * </ul>
-     *
-     * <p>
-     * Personnel are assumed to have prior inoculation for their home planet, while
-     * current planet inoculation
-     * requires campaign location tracking.
-     * </p>
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static void inoculateAllCharacters(Campaign campaign) {
-        final AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
-        final LocalDate currentDay = campaign.getLocalDate();
-
-        final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
-
-        final Planet planet = location.isOnPlanet() ? location.getPlanet() : null;
-        final String planetId = (planet != null) ? planet.getId() : null;
-        final String systemId = (planet != null) ? planet.getParentSystem().getId() : null;
-
-        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
-            // Inoculate for current location, if applicable
-            if (planet != null) {
-                inoculate(person, planet, planetId, systemId, currentDay, curesBySystem);
-            }
-
-            // Inoculate for origin planet
-            final Planet origin = person.getOriginPlanet();
-            if (origin == null) {
-                continue;
-            }
-
-            inoculate(
-                  person,
-                  origin,
-                  origin.getId(),
-                  origin.getParentSystem().getId(),
-                  currentDay,
-                  curesBySystem);
-        }
-    }
-
-    private static void inoculate(Person person, Planet planet, String planetId, String systemId, LocalDate today,
-          Map<String, Set<InjuryType>> curesBySystem) {
-        if (!person.hasPlanetaryInoculation(planetId)) {
-            person.addPlanetaryInoculation(planetId);
-            MedicalLogger.inoculation(person, today, planet.getName(today));
-        }
-
-        final Set<InjuryType> activeCures = curesBySystem.computeIfAbsent(systemId,
-              id -> getAllSystemSpecificDiseasesWithCures(id, today, true));
-
-        for (InjuryType injuryType : activeCures) {
-            if (!person.hasCanonDiseaseInoculation(injuryType.getKey())) {
-                person.addCanonDiseaseInoculation(injuryType.getKey());
-                MedicalLogger.specificInoculation(person, today, injuryType.getSimpleName());
-            }
         }
     }
 
