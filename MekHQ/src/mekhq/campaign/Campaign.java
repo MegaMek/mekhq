@@ -2506,7 +2506,8 @@ public class Campaign implements ITechManager {
 
         // no roll can reach the target number, so don't roll; the verbose report still shows the failure and its TN
         boolean isOutOfReach = isOutOfReach(skillCheck);
-        boolean isSuccess = !isOutOfReach && skillCheck.resolve(false, null).isSuccess();
+        ActionCheckResult result = isOutOfReach ? null : skillCheck.resolve(false, null);
+        boolean isSuccess = result != null && result.isSuccess();
         if (getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -2524,9 +2525,13 @@ public class Campaign implements ITechManager {
                   techBonus, industryBonus, outputsBonus));
         }
         if (isOutOfReach) {
+            return new AcquisitionContactResult(PartAcquisitionResult.OutOfReach, 0);
+        }
+        if (!isSuccess) {
             return new AcquisitionContactResult(PartAcquisitionResult.PlanetSpecificFailure, 0);
         }
-        AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck, result));
+        return new AcquisitionContactResult(PartAcquisitionResult.Success,
+              AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck, result));
     }
 
     /**
