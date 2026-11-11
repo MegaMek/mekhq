@@ -360,17 +360,11 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private void quickAssignTechs() {
-        boolean wasConfirmedOverall;
+        boolean allowIgnore = false;
+        ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(getCampaign(),
+              CONFIRMATION_ASSIGN_TECHS, allowIgnore);
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_ASSIGN_TECHS)) {
-            ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(getCampaign(),
-                  CONFIRMATION_ASSIGN_TECHS);
-            wasConfirmedOverall = confirmation.wasConfirmed();
-        } else {
-            wasConfirmedOverall = true;
-        }
-
-        if (wasConfirmedOverall) {
+        if (confirmation.wasConfirmed()) {
             boolean skipReports = true;
             AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
