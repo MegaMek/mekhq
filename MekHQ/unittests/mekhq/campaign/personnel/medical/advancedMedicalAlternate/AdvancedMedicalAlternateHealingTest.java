@@ -58,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -76,6 +77,7 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -192,6 +194,47 @@ class AdvancedMedicalAlternateHealingTest {
               new Class<?>[] { Person.class }, patient);
 
         assertEquals(Set.of(RIGHT_HAND), penalties);
+    }
+
+    @Test
+    @DisplayName("getConcurrentInjuryPenalty ignores the injury being treated")
+    void getConcurrentInjuryPenalty_ignoresTreatedInjury() {
+        Injury injury = mock(Injury.class);
+        when(injury.getHits()).thenReturn(1);
+
+        Person singleInjuryPatient = mock(Person.class);
+        when(singleInjuryPatient.getTotalInjurySeverity()).thenReturn(1);
+        when(singleInjuryPatient.getAdjustedToughness()).thenReturn(0);
+        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(singleInjuryPatient, injury));
+
+        Person multipleInjuryPatient = mock(Person.class);
+        when(multipleInjuryPatient.getTotalInjurySeverity()).thenReturn(4);
+        when(multipleInjuryPatient.getAdjustedToughness()).thenReturn(1);
+        assertEquals(2, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(multipleInjuryPatient, injury));
+
+        Person toughPatient = mock(Person.class);
+        when(toughPatient.getTotalInjurySeverity()).thenReturn(2);
+        when(toughPatient.getAdjustedToughness()).thenReturn(3);
+        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(toughPatient, injury));
+    }
+
+    @Test
+    @DisplayName("getHealingReport notes whether a roll decides the outcome or only delays recovery")
+    void getHealingReport_notesWhatTheRollMeans() {
+        ActionCheckResult success = new ActionCheckResult(new ActionCheckRoll(9, List.of(4, 5)), 1, false, "success");
+        ActionCheckResult failure = new ActionCheckResult(new ActionCheckRoll(5, List.of(2, 3)), -3, false, "failure");
+
+        try (MockedStatic<MHQInternationalization> i18n = mockStatic(MHQInternationalization.class)) {
+            i18n.when(() -> MHQInternationalization.getTextAt(anyString(), anyString()))
+                  .thenAnswer(invocation -> invocation.getArgument(1));
+
+            assertEquals(failure.getReport() + " AdvancedMedicalAlternateHealing.check.final",
+                  AdvancedMedicalAlternateHealing.getHealingReport(failure, true));
+            assertEquals(success.getReport() + " AdvancedMedicalAlternateHealing.check.progress",
+                  AdvancedMedicalAlternateHealing.getHealingReport(success, false));
+            assertEquals(failure.getReport() + " AdvancedMedicalAlternateHealing.check.delayed",
+                  AdvancedMedicalAlternateHealing.getHealingReport(failure, false));
+        }
     }
 
     @Test
@@ -466,6 +509,8 @@ class AdvancedMedicalAlternateHealingTest {
             medicalLogger.verifyNoInteractions();
         }
 
+        verify(campaign).addReport(eq(DailyReportType.SKILL_CHECKS),
+              endsWith(" AdvancedMedicalAlternateHealing.check.delayed"));
         verify(injury).changeTime(-1);
         verify(injury).changeTime(1);
         verify(injury, never()).setPermanent(anyBoolean());
@@ -506,6 +551,7 @@ class AdvancedMedicalAlternateHealingTest {
                         int.class,
                         boolean.class,
                         boolean.class,
+                        boolean.class,
                         boolean.class
                   },
                   doctor,
@@ -515,7 +561,8 @@ class AdvancedMedicalAlternateHealingTest {
                   6,
                   true,
                   false,
-                  false);
+                  false,
+                  true);
 
             assertEquals(1, margin);
             verify(doctor).spendEdge();
