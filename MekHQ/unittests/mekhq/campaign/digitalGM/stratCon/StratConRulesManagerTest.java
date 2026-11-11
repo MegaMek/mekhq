@@ -482,7 +482,9 @@ class StratConRulesManagerTest {
               .thenReturn(100);
         // The ambush branch marks the generated scenario as a crisis via its backing scenario, so it must be present.
         StratConScenario generatedScenario = mock(StratConScenario.class);
-        when(generatedScenario.getBackingScenario()).thenReturn(mock(AtBDynamicScenario.class));
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getStratConScenarioType()).thenReturn(ScenarioType.NONE);
+        when(generatedScenario.getBackingScenario()).thenReturn(backingScenario);
         rulesManager.when(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(), any(),
               any(), any(), any())).thenReturn(generatedScenario);
         rulesManager.when(() -> StratConRulesManager.finalizeBackingScenario(any(), any(), any(), anyBoolean(),
