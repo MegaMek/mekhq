@@ -110,12 +110,6 @@ class PriceMultipliersPage {
     private JSpinner spnTechRatingEPriceMultiplier;
     private JLabel lblTechRatingFPriceMultiplier;
     private JSpinner spnTechRatingFPriceMultiplier;
-    private JLabel lblCombatVehicleFusionEnginePriceMultiplier;
-    private JSpinner spnCombatVehicleFusionEnginePriceMultiplier;
-    private JLabel lblXLEnginePriceMultiplier;
-    private JSpinner spnXLEnginePriceMultiplier;
-    private JLabel lblLightEnginePriceMultiplier;
-    private JSpinner spnLightEnginePriceMultiplier;
 
     private JPanel pnlUsedPartsMultipliers;
     private JLabel[] lblUsedPartPriceMultipliers;
@@ -303,48 +297,13 @@ class PriceMultipliersPage {
                 0.1);
         spnTechRatingFPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingFPriceMultiplier"));
 
-        lblCombatVehicleFusionEnginePriceMultiplier = new CampaignOptionsLabel(
-              "CombatVehicleFusionEnginePriceMultiplier", getMetadata(new Version(0, 51, 1)));
-        lblCombatVehicleFusionEnginePriceMultiplier.addMouseListener(
-                createTipPanelUpdater("CombatVehicleFusionEnginePriceMultiplier"));
-        spnCombatVehicleFusionEnginePriceMultiplier = new CampaignOptionsSpinner(
-                "CombatVehicleFusionEnginePriceMultiplier",
-                1.0,
-                0.1,
-                100,
-                0.1);
-        spnCombatVehicleFusionEnginePriceMultiplier.addMouseListener(
-                createTipPanelUpdater("CombatVehicleFusionEnginePriceMultiplier"));
-
-        lblXLEnginePriceMultiplier = new CampaignOptionsLabel("XLEnginePriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
-        lblXLEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("XLEnginePriceMultiplier"));
-        spnXLEnginePriceMultiplier = new CampaignOptionsSpinner("XLEnginePriceMultiplier",
-                1.0,
-                0.1,
-                100,
-                0.1);
-        spnXLEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("XLEnginePriceMultiplier"));
-
-        lblLightEnginePriceMultiplier = new CampaignOptionsLabel("LightEnginePriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
-        lblLightEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("LightEnginePriceMultiplier"));
-        spnLightEnginePriceMultiplier = new CampaignOptionsSpinner("LightEnginePriceMultiplier",
-                1.0,
-                0.1,
-                100,
-                0.1);
-        spnLightEnginePriceMultiplier.addMouseListener(createTipPanelUpdater("LightEnginePriceMultiplier"));
-
         // Layout the Panel
         JComponent[] labels = { lblClanTechInvasionPriceMultiplier, lblClanTechPostInvasionPriceMultiplier,
                 lblSuccessionWarsAdvancedTechPriceMultiplier, lblTechRatingEPriceMultiplier,
-                lblTechRatingFPriceMultiplier, lblCombatVehicleFusionEnginePriceMultiplier,
-                lblXLEnginePriceMultiplier, lblLightEnginePriceMultiplier };
+                lblTechRatingFPriceMultiplier };
         JComponent[] controls = { spnClanTechInvasionPriceMultiplier, spnClanTechPostInvasionPriceMultiplier,
                 spnSuccessionWarsAdvancedTechPriceMultiplier, spnTechRatingEPriceMultiplier,
-                spnTechRatingFPriceMultiplier, spnCombatVehicleFusionEnginePriceMultiplier,
-                spnXLEnginePriceMultiplier, spnLightEnginePriceMultiplier };
+                spnTechRatingFPriceMultiplier };
 
         return createPriceMultiplierGridPanel("AcquisitionMultipliersPanel", labels, controls);
     }
@@ -496,9 +455,6 @@ class PriceMultipliersPage {
         spnSuccessionWarsAdvancedTechPriceMultiplier.setValue(model.successionWarsAdvancedTechPriceMultiplier);
         spnTechRatingEPriceMultiplier.setValue(model.techRatingEPriceMultiplier);
         spnTechRatingFPriceMultiplier.setValue(model.techRatingFPriceMultiplier);
-        spnCombatVehicleFusionEnginePriceMultiplier.setValue(model.combatVehicleFusionEnginePriceMultiplier);
-        spnXLEnginePriceMultiplier.setValue(model.xlEnginePriceMultiplier);
-        spnLightEnginePriceMultiplier.setValue(model.lightEnginePriceMultiplier);
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             spnUsedPartPriceMultipliers[i].setValue(model.usedPartPriceMultipliers[i]);
@@ -531,10 +487,6 @@ class PriceMultipliersPage {
                 (double) spnSuccessionWarsAdvancedTechPriceMultiplier.getValue();
         model.techRatingEPriceMultiplier = (double) spnTechRatingEPriceMultiplier.getValue();
         model.techRatingFPriceMultiplier = (double) spnTechRatingFPriceMultiplier.getValue();
-        model.combatVehicleFusionEnginePriceMultiplier =
-                (double) spnCombatVehicleFusionEnginePriceMultiplier.getValue();
-        model.xlEnginePriceMultiplier = (double) spnXLEnginePriceMultiplier.getValue();
-        model.lightEnginePriceMultiplier = (double) spnLightEnginePriceMultiplier.getValue();
         for (int i = 0; i < Math.min(spnUsedPartPriceMultipliers.length,
                 model.usedPartPriceMultipliers.length); i++) {
             model.usedPartPriceMultipliers[i] = (Double) spnUsedPartPriceMultipliers[i].getValue();

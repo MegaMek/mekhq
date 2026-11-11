@@ -38,13 +38,10 @@ import java.util.List;
 import jakarta.annotation.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.equipment.Engine;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.Faction;
 
@@ -61,10 +58,6 @@ import mekhq.campaign.universe.Faction;
  *     {@link CampaignOption#SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER}. Otherwise
  *     {@link CampaignOption#TECH_RATING_E_PRICE_MULTIPLIER} or
  *     {@link CampaignOption#TECH_RATING_F_PRICE_MULTIPLIER}.</li>
- *     <li>A fusion engine in a combat vehicle:
- *     {@link CampaignOption#COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER}.</li>
- *     <li>An XL engine: {@link CampaignOption#XL_ENGINE_PRICE_MULTIPLIER}.</li>
- *     <li>A light fusion engine: {@link CampaignOption#LIGHT_ENGINE_PRICE_MULTIPLIER}.</li>
  * </ul>
  *
  * <p>Every surcharge that applies stacks additively: ×5 and ×1.25 together make ×5.25. Discounts (multipliers below
@@ -72,7 +65,7 @@ import mekhq.campaign.universe.Faction;
  * the listed years, nothing replaces the era multipliers, so tech rating E and F fall back to their usual multipliers
  * and Clan tech has no multiplier at all.</p>
  *
- * <p>The multiplier for a unit covers its whole price. Engine multipliers also apply to engines bought as parts.</p>
+ * <p>The multiplier for a unit covers its whole price.</p>
  *
  * <p>A mixed-tech unit pays none of the Clan tech multipliers, whatever its chassis: its mixed-tech unit price
  * multiplier already covers its Clan equipment.</p>
@@ -93,9 +86,6 @@ public final class AcquisitionPriceMultipliers {
     static final int CLAN_INVASION_START_YEAR = 3049;
     static final int CLAN_INVASION_END_YEAR = 3070;
 
-    /** The engine type {@link megamek.common.loaders.MekSummaryCache} records for a unit without an engine. */
-    private static final int NO_ENGINE_TYPE = -1;
-
     private AcquisitionPriceMultipliers() {
     }
 
@@ -113,12 +103,8 @@ public final class AcquisitionPriceMultipliers {
      */
     public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Entity entity) {
-        // hasEngine() reads the field, but some entities (such as FighterSquadron) override getEngine() to return null
-        Engine engine = entity.getEngine();
-        int engineType = (engine != null) ? engine.getEngineType() : NO_ENGINE_TYPE;
         boolean isClanTech = entity.isClan() && !entity.isMixedTech();
-        return getMultiplier(campaignOptions, faction, gameYear, isClanTech,
-              entity.getTechRating(), engineType, entity.isCombatVehicle());
+        return getMultiplier(campaignOptions, faction, gameYear, isClanTech, entity.getTechRating());
     }
 
     /**
@@ -135,12 +121,8 @@ public final class AcquisitionPriceMultipliers {
      */
     public static double getUnitMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           MekSummary summary) {
-        int unitTypeCode = UnitType.determineUnitTypeCode(summary.getUnitType());
-        boolean isVehicle = (unitTypeCode == UnitType.TANK) || (unitTypeCode == UnitType.VTOL)
-                                  || (unitTypeCode == UnitType.NAVAL);
         boolean isClanTech = summary.isClan() && !summary.isMixedTech();
-        return getMultiplier(campaignOptions, faction, gameYear, isClanTech,
-              summary.getTechRating(), summary.getEngineType(), isVehicle && !summary.isSupport());
+        return getMultiplier(campaignOptions, faction, gameYear, isClanTech, summary.getTechRating());
     }
 
     /**
@@ -149,23 +131,15 @@ public final class AcquisitionPriceMultipliers {
      * @param gameYear        the current year
      * @param part            the part
      *
-     * @return the acquisition price multiplier for the part; only engine parts pick up the engine multipliers
+     * @return the acquisition price multiplier for the part
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static double getPartMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
           Part part) {
-        int engineType = NO_ENGINE_TYPE;
-        boolean isCombatVehicleEngine = false;
-        if ((part instanceof EnginePart enginePart) && (enginePart.getEngine() != null)) {
-            Engine engine = enginePart.getEngine();
-            engineType = engine.getEngineType();
-            isCombatVehicleEngine = engine.hasFlag(Engine.TANK_ENGINE) && !engine.hasFlag(Engine.SUPPORT_VEE_ENGINE);
-        }
-
         return getMultiplier(campaignOptions, faction, gameYear, part.getTechBase() == TechBase.CLAN,
-              part.getTechRating(), engineType, isCombatVehicleEngine);
+              part.getTechRating());
     }
 
     /**
@@ -174,8 +148,6 @@ public final class AcquisitionPriceMultipliers {
      * @param gameYear        the current year
      * @param isClanTech      whether the item is Clan tech
      * @param techRating      the item's tech rating, or {@code null} if it is unknown
-     * @param engineType      the item's engine type, such as {@link Engine#XL_ENGINE}, or a negative value for none
-     * @param isCombatVehicle whether the item is a combat vehicle, or an engine built for one
      *
      * @return the sum of every applicable surcharge's increase over ×1, times every applicable discount; ×1 unless
      *       the campaign uses the {@link mekhq.campaign.finances.enums.UnitCostModel#TOTAL_WARFARE} unit cost model
@@ -184,7 +156,7 @@ public final class AcquisitionPriceMultipliers {
      * @since 0.51.01
      */
     static double getMultiplier(CampaignOptions campaignOptions, @Nullable Faction faction, int gameYear,
-          boolean isClanTech, @Nullable TechRating techRating, int engineType, boolean isCombatVehicle) {
+          boolean isClanTech, @Nullable TechRating techRating) {
         if (!campaignOptions.get(CampaignOption.UNIT_COST_MODEL).isTotalWarfare()) {
             return 1.0;
         }
@@ -211,18 +183,6 @@ public final class AcquisitionPriceMultipliers {
                 multipliers.add(campaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER));
             } else {
                 multipliers.add(campaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER));
-            }
-        }
-
-        if (engineType >= 0) {
-            if (isCombatVehicle && Engine.isFusion(engineType)) {
-                multipliers.add(campaignOptions.get(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER));
-            }
-
-            if (engineType == Engine.XL_ENGINE) {
-                multipliers.add(campaignOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER));
-            } else if (engineType == Engine.LIGHT_ENGINE) {
-                multipliers.add(campaignOptions.get(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER));
             }
         }
 

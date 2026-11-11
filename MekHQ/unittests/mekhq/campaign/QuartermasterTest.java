@@ -48,8 +48,8 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
@@ -495,9 +495,9 @@ public class QuartermasterTest {
         // If we pay for units...
         when(mockOptions.get(CampaignOption.PAY_FOR_UNITS)).thenReturn(true);
 
-        // ...and XL engines cost 2.5x to buy...
-        double xlMultiplier = 2.5;
-        when(mockOptions.get(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER)).thenReturn(xlMultiplier);
+        // ...and tech rating F costs 1.25x to buy...
+        double techRatingFMultiplier = 1.25;
+        when(mockOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER)).thenReturn(techRatingFMultiplier);
 
         // ...and can afford a unit...
         Finances mockFinances = mock(Finances.class);
@@ -506,16 +506,15 @@ public class QuartermasterTest {
         doReturn(true).when(mockFinances)
               .debit(eq(TransactionType.UNIT_PURCHASE), any(), captor.capture(), anyString());
 
-        // ...and the unit has an XL engine...
+        // ...and the unit is tech rating F...
         Entity mockEntity = mock(Entity.class);
-        when(mockEntity.hasEngine()).thenReturn(true);
-        when(mockEntity.getEngine()).thenReturn(new Engine(200, Engine.XL_ENGINE, 0));
+        when(mockEntity.getTechRating()).thenReturn(TechRating.F);
         double cost = 1.0;
         doReturn(cost).when(mockEntity).getCost(anyBoolean());
 
         // ...then buying it should cost the multiplied amount...
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
-        assertEquals(Money.of(xlMultiplier * cost), captor.getValue());
+        assertEquals(Money.of(techRatingFMultiplier * cost), captor.getValue());
 
         // ...but the unit's value should not change.
         assertEquals(Money.of(cost), new Unit(mockEntity, mockCampaign).getBuyCost());

@@ -38,14 +38,11 @@ import static org.mockito.Mockito.when;
 
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.equipment.Engine;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
-import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.UnitCostModel;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +58,6 @@ import org.junit.jupiter.params.provider.EnumSource;
  */
 class AcquisitionPriceMultipliersTest {
     private static final double DELTA = 1e-9;
-    private static final int NO_ENGINE = -1;
 
     private CampaignOptions campaignOptions;
     private Faction innerSphere;
@@ -77,9 +73,6 @@ class AcquisitionPriceMultipliersTest {
         campaignOptions.set(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER, 5.0);
         campaignOptions.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, 1.1);
         campaignOptions.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, 1.25);
-        campaignOptions.set(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER, 2.0);
-        campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 2.5);
-        campaignOptions.set(CampaignOption.LIGHT_ENGINE_PRICE_MULTIPLIER, 1.5);
 
         innerSphere = mock(Faction.class);
         clan = mock(Faction.class);
@@ -93,13 +86,7 @@ class AcquisitionPriceMultipliersTest {
     }
 
     private double multiplier(Faction faction, int year, boolean isClanTech, TechRating techRating) {
-        return AcquisitionPriceMultipliers.getMultiplier(campaignOptions, faction, year, isClanTech, techRating,
-              NO_ENGINE, false);
-    }
-
-    private double engineMultiplier(int engineType, boolean isCombatVehicle) {
-        return AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, false, TechRating.D,
-              engineType, isCombatVehicle);
+        return AcquisitionPriceMultipliers.getMultiplier(campaignOptions, faction, year, isClanTech, techRating);
     }
 
     /** Only the Total Warfare unit cost model uses the acquisition multipliers. */
@@ -109,14 +96,14 @@ class AcquisitionPriceMultipliersTest {
         campaignOptions.set(CampaignOption.UNIT_COST_MODEL, unitCostModel);
 
         assertEquals(1.0, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
-              TechRating.F, Engine.XL_ENGINE, true), DELTA);
+              TechRating.F), DELTA);
     }
 
     /** Every multiplier defaults to ×1, so existing campaigns are priced as before. */
     @Test
     void defaultsLeavePricesUnchanged() {
         assertEquals(1.0, AcquisitionPriceMultipliers.getMultiplier(new CampaignOptions(), innerSphere, 3060, true,
-              TechRating.F, Engine.XL_ENGINE, true), DELTA);
+              TechRating.F), DELTA);
     }
 
     @Nested
@@ -185,39 +172,6 @@ class AcquisitionPriceMultipliersTest {
     }
 
     @Nested
-    class Engines {
-        @Test
-        void xlEnginesAreSurcharged() {
-            assertEquals(2.5, engineMultiplier(Engine.XL_ENGINE, false), DELTA);
-        }
-
-        @Test
-        void lightEnginesAreSurcharged() {
-            assertEquals(1.5, engineMultiplier(Engine.LIGHT_ENGINE, false), DELTA);
-        }
-
-        @Test
-        void fusionEnginesAreSurchargedInCombatVehicles() {
-            assertEquals(2.0, engineMultiplier(Engine.NORMAL_ENGINE, true), DELTA);
-        }
-
-        @Test
-        void fusionEnginesAreNotSurchargedOutsideCombatVehicles() {
-            assertEquals(1.0, engineMultiplier(Engine.NORMAL_ENGINE, false), DELTA);
-        }
-
-        @Test
-        void nonFusionEnginesAreNotSurchargedInCombatVehicles() {
-            assertEquals(1.0, engineMultiplier(Engine.COMBUSTION_ENGINE, true), DELTA);
-        }
-
-        @Test
-        void unitsWithoutAnEngineAreUnaffected() {
-            assertEquals(1.0, engineMultiplier(NO_ENGINE, true), DELTA);
-        }
-    }
-
-    @Nested
     class Stacking {
         /** ×4 for Clan tech after 3070 and ×1.25 for tech rating F: 1 + 3 + 0.25. */
         @Test
@@ -225,40 +179,30 @@ class AcquisitionPriceMultipliersTest {
             assertEquals(4.25, multiplier(innerSphere, 3080, true, TechRating.F), DELTA);
         }
 
-        /** ×2 for a fusion engine in a combat vehicle and ×2.5 for an XL engine: 1 + 1 + 1.5. */
-        @Test
-        void engineMultipliersStackAdditively() {
-            assertEquals(3.5, engineMultiplier(Engine.XL_ENGINE, true), DELTA);
-        }
-
-        /** ×0.5 for an XL engine and ×0.5 for tech rating E: 0.5 × 0.5, where adding them would make it free. */
+        /** ×0.5 for Clan tech and ×0.5 for tech rating E: 0.5 × 0.5, where adding them would make it free. */
         @Test
         void discountsStackMultiplicatively() {
-            campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 0.5);
             campaignOptions.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, 0.5);
 
-            assertEquals(0.25, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, false,
-                  TechRating.E, Engine.XL_ENGINE, false), DELTA);
+            assertEquals(0.25, multiplier(innerSphere, 3060, true, TechRating.E), DELTA);
         }
 
+        /** Adding two ×0.1 discounts would go negative; multiplying them gives ×0.01. */
         @Test
         void discountsCanNotMakeAnItemFree() {
             campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 0.1);
             campaignOptions.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, 0.1);
-            campaignOptions.set(CampaignOption.COMBAT_VEHICLE_FUSION_ENGINE_PRICE_MULTIPLIER, 0.1);
-            campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.1);
 
-            assertEquals(0.0001, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
-                  TechRating.F, Engine.XL_ENGINE, true), DELTA);
+            assertEquals(0.01, multiplier(innerSphere, 3060, true, TechRating.F), DELTA);
         }
 
-        /** ×5 for Clan tech before 3071, then ×0.5 for an XL engine: (1 + 4) × 0.5. */
+        /** ×5 for Clan tech before 3071, then ×0.5 for tech rating E: (1 + 4) × 0.5. */
         @Test
         void discountsApplyAfterTheSurcharges() {
-            campaignOptions.set(CampaignOption.XL_ENGINE_PRICE_MULTIPLIER, 0.5);
+            campaignOptions.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, 0.5);
 
-            assertEquals(2.5, AcquisitionPriceMultipliers.getMultiplier(campaignOptions, innerSphere, 3060, true,
-                  TechRating.D, Engine.XL_ENGINE, false), DELTA);
+            assertEquals(2.5, multiplier(innerSphere, 3060, true, TechRating.E), DELTA);
         }
     }
 
@@ -267,16 +211,14 @@ class AcquisitionPriceMultipliersTest {
     class EntryPoints {
         private static final int GAME_YEAR = 3060;
 
-        /** Tech rating E, a fusion engine in a combat vehicle, and an XL engine: 1 + 0.1 + 1 + 1.5. */
+        /** ×5 for Clan tech before 3071 and ×1.1 for tech rating E: 1 + 4 + 0.1. */
         @Test
-        void entityMultiplierCoversItsTechRatingAndEngine() {
+        void entityMultiplierCoversItsTechBaseAndTechRating() {
             Entity entity = mock(Entity.class);
+            when(entity.isClan()).thenReturn(true);
             when(entity.getTechRating()).thenReturn(TechRating.E);
-            when(entity.hasEngine()).thenReturn(true);
-            when(entity.getEngine()).thenReturn(new Engine(200, Engine.XL_ENGINE, Engine.TANK_ENGINE));
-            when(entity.isCombatVehicle()).thenReturn(true);
 
-            assertEquals(3.6, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
+            assertEquals(5.1, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
                   entity), DELTA);
         }
 
@@ -304,56 +246,20 @@ class AcquisitionPriceMultipliersTest {
         @Test
         void innerSphereChassisMixedTechSummariesDoNotPayTheClanTechMultiplier() {
             MekSummary summary = mock(MekSummary.class);
-            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.MEK));
             when(summary.isMixedTech()).thenReturn(true);
-            when(summary.getEngineType()).thenReturn(Engine.NORMAL_ENGINE);
 
             assertEquals(1.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
                   summary), DELTA);
         }
 
-        /** Tech rating F during the Succession Wars, a fusion engine in a combat vehicle, and an XL engine. */
+        /** Tech rating F during the Succession Wars. */
         @Test
         void summaryMultiplierMatchesTheEntity() {
             MekSummary summary = mock(MekSummary.class);
-            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.TANK));
             when(summary.getTechRating()).thenReturn(TechRating.F);
-            when(summary.getEngineType()).thenReturn(Engine.XL_ENGINE);
 
-            assertEquals(7.5, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, 3000,
+            assertEquals(5.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, 3000,
                   summary), DELTA);
-        }
-
-        @Test
-        void supportVehicleSummariesAreNotCombatVehicles() {
-            MekSummary summary = mock(MekSummary.class);
-            when(summary.getUnitType()).thenReturn(UnitType.getTypeName(UnitType.TANK));
-            when(summary.isSupport()).thenReturn(true);
-            when(summary.getEngineType()).thenReturn(Engine.NORMAL_ENGINE);
-
-            assertEquals(1.0, AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, innerSphere, GAME_YEAR,
-                  summary), DELTA);
-        }
-
-        @Test
-        void combatVehicleEnginePartsPayTheEngineMultipliers() {
-            EnginePart part = mock(EnginePart.class);
-            when(part.getEngine()).thenReturn(new Engine(200, Engine.XL_ENGINE, Engine.TANK_ENGINE));
-            when(part.getTechRating()).thenReturn(TechRating.D);
-
-            assertEquals(3.5, AcquisitionPriceMultipliers.getPartMultiplier(campaignOptions, innerSphere, GAME_YEAR,
-                  part), DELTA);
-        }
-
-        @Test
-        void supportVehicleEnginePartsAreNotCombatVehicleEngines() {
-            EnginePart part = mock(EnginePart.class);
-            when(part.getEngine()).thenReturn(new Engine(200, Engine.NORMAL_ENGINE,
-                  Engine.TANK_ENGINE | Engine.SUPPORT_VEE_ENGINE));
-            when(part.getTechRating()).thenReturn(TechRating.D);
-
-            assertEquals(1.0, AcquisitionPriceMultipliers.getPartMultiplier(campaignOptions, innerSphere, GAME_YEAR,
-                  part), DELTA);
         }
 
         /** ×5 for Clan tech before 3071 and ×1.25 for tech rating F: 1 + 4 + 0.25. */
