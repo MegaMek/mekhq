@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
@@ -215,7 +216,8 @@ public class SupportCapabilityShortfallDialog extends JDialog {
         if (anyUsesTemporaryCrews) {
             pnlCenter.add(Box.createVerticalStrut(PADDING));
             chkUseTemporaryCrews = new JCheckBox(getText("supportCapabilityGrant.useTemporaryCrews.text"));
-            chkUseTemporaryCrews.setToolTipText(getText("supportCapabilityGrant.useTemporaryCrews.toolTipText"));
+            chkUseTemporaryCrews.setToolTipText(wordWrap(getText(
+                  "supportCapabilityGrant.useTemporaryCrews.toolTipText")));
             chkUseTemporaryCrews.setAlignmentX(Component.LEFT_ALIGNMENT);
             chkUseTemporaryCrews.setSelected(true);
             pnlCenter.add(chkUseTemporaryCrews);

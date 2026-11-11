@@ -1,0 +1,181 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ae97-7c69-baf6-fd74085e37be
+</UUID>
+
+<UnitType>
+AeroSpaceFighter
+</UnitType>
+
+<Name>
+Eisensturm
+</Name>
+
+<Model>
+EST-O
+</Model>
+
+<mul id:>
+4114
+</mul id:>
+
+<year>
+3066
+</year>
+
+<type>
+IS Level 2
+</type>
+
+<role>
+Dogfighter
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<SafeThrust>
+6
+</SafeThrust>
+
+<cockpit_type>
+0
+</cockpit_type>
+
+<heatsinks>
+11
+</heatsinks>
+
+<sink_type>
+1
+</sink_type>
+
+<fuel>
+400
+</fuel>
+
+<engine_type>
+2
+</engine_type>
+
+<armor_type>
+19
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+-1
+</armor_tech_level>
+
+<omni>
+1
+</omni>
+
+<armor>
+110
+85
+85
+69
+</armor>
+
+<Nose Equipment>
+ISGaussRifle:OMNI
+ISGaussRifle:OMNI
+Medium Laser:OMNI
+Medium Laser:OMNI
+</Nose Equipment>
+
+<Left Wing Equipment>
+Large Laser:OMNI
+</Left Wing Equipment>
+
+<Right Wing Equipment>
+Large Laser:OMNI
+</Right Wing Equipment>
+
+<Aft Equipment>
+</Aft Equipment>
+
+<Wings Equipment>
+</Wings Equipment>
+
+<Fuselage Equipment>
+IS Gauss Ammo:OMNI
+IS Gauss Ammo:OMNI
+IS Gauss Ammo:OMNI
+IS Gauss Ammo:OMNI
+</Fuselage Equipment>
+
+<capabilities>
+<p>The Eisensturm's Bowie E2 airframe houses a GM 380 XL engine, providing safe thrust of six and a maximum thrust of nine. This makes the ninety-five-ton fighter remarkably fast and agile for its weight class. Protection comes from nineteen and a half tons of Donegal Omni-Sheath ferro-aluminum armor, giving the craft excellent survivability against both Inner Sphere and Clan opponents. The combination of the XL engine and ferro-aluminum armor frees up a generous forty-six tons of pod space, one of the largest capacities of any Inner Sphere OmniFighter. This vast payload allowance enables a wide range of weapon configurations suited to nearly any combat role.</p><p>The trade-off for this impressive pod capacity is limited heat-dissipation capability, with only eleven double heat sinks mounted on the base chassis. Several configurations push the design's cooling systems to their limits, and pilots must exercise careful heat management during extended engagements. The Rander 250 communications system and Rander TA7 targeting and tracking system provide solid battlefield awareness, rounding out a platform that combines heavy protection with exceptional versatility.</p>
+</capabilities>
+
+<overview>
+<p>The Eisensturm is a ninety-five-ton Inner Sphere OmniFighter developed by Lockheed/CBM Corporation for the Lyran Alliance Armed Forces. Conceived in 3060 as part of a long-term effort to produce a homegrown Alliance OmniFighter, the massive design was intended to replace the aging Chippewa in frontline service. Equally capable in space and atmospheric operations, the Eisensturm earned a reputation for resilience and devastating firepower that belied typical concerns about Inner Sphere OmniFighter designs. Much of the development cost was shouldered by Lockheed/CBM rather than the Lyran military, a financial gamble that proved enormously successful for the company. The Eisensturm's name translates from German as "Iron Storm," a fitting title for one of the heaviest OmniFighters in the Inner Sphere arsenal.</p>
+</overview>
+
+<deployment>
+<p>The Prime configuration builds its firepower around twin Gauss rifles and two medium lasers mounted in the nose, supported by a large laser fitted to each wing. Four tons of Gauss ammunition allow the rifles to serve as the primary weapons while keeping laser-generated heat manageable. This balanced loadout makes the Prime an effective standoff fighter that retains credible close-range punch.</p>
+</deployment>
+
+<history>
+<p>Work on the Eisensturm began in 3060 when the LAAF selected Lockheed/CBM Corporation to develop a domestically produced OmniFighter for the Lyran Alliance. The program moved quickly, and a fixed-configuration prototype designated the EST-R3 began trials in 3062. When the FedCom Civil War erupted, the R3 was pressed into service, entering combat just as fighting intensified across the Lyran state.</p><p>The R3 proved devastating during ground attack runs against Clan Jade Falcon incursions in 3065, playing a substantial role in beating back the invaders along the Lyran-Falcon border. It also saw action against Draconis Combine forces during the broader conflict. These successes validated the design and generated considerable enthusiasm within the LAAF.</p><p>Development of the full OmniPod configuration was slowed by the Civil War, delaying completion until late 3066. Once the EST-O entered production, Lockheed/CBM manufactured the Eisensturm at both their Donegal and Tharkad facilities. Company executives enthusiastically dubbed their creation the "MoniFighter," and the design's success prompted Lockheed to develop additional OmniFighters for the medium and light airframe markets, leading to the Morgenstern and Sternensturm programs.</p><p>In an unusual move for such a new and advanced design, the Eisensturm was offered for sale on the open market almost immediately, with several mercenary units placing orders for delivery. The Jihad brought significant disruption to production. Blakist forces destroyed the Donegal plant's military production lines in a nuclear raid, and the Tharkad facility suffered serious damage during the Word of Blake's assault on the Lyran capital. The Tharkad plant eventually recovered, and by 3145 the Eisensturm line was the only one still operational at that facility after Clan Wolf's attack on Tharkad, with all other Lockheed/CBM production lines offline for repairs.</p>
+</history>
+
+<manufacturer>
+Lockheed/CBM Corp.|Lockheed/CBM Corp.
+</manufacturer>
+
+<primaryFactory>
+Donegal|Tharkad
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Bowie
+ENGINE:GM
+ARMOR:Donegal
+COMMUNICATIONS:Rander
+TARGETING:Rander
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:E2
+ENGINE:380 XL
+ARMOR:Omni-Sheath Ferro-Aluminum
+COMMUNICATIONS:250
+TARGETING:TA7
+</systemModels>
+
+<source>
+TR:3067
+</source>
+
+<published>
+RS:3067u
+</published>
+
+<tonnage>
+95.0
+</tonnage>
+

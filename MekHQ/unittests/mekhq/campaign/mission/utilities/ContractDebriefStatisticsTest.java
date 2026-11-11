@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,7 +55,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Verifies the combat-record roll-up, win-rate calculation, and - the substantive new behaviour - the
  * {@link MissionStatus} recommendation. The recommendation follows the game's own win rule (contract score vs required
- * victory points) and treats an early termination that has not met that target as a breach.
+ * victory points) and treats an early termination as a breach unless that target is met and StratCon allows the early
+ * end.
  *
  * @author Illiani
  * @since 0.51.01
@@ -132,7 +134,9 @@ class ContractDebriefStatisticsTest {
 
     @Test
     void recommendsSuccessWhenVictoryPointTargetMet() {
-        StratConCampaignState state = stratConWith(5, new ArrayList<>());
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        StratConCampaignState state = stratConWith(5, objectives);
         AbstractContract contract = baseContract(new ArrayList<>());
         when(contract.getRequiredVictoryPoints()).thenReturn(3);
         when(contract.getStratConCampaignState()).thenReturn(state);
@@ -144,14 +148,105 @@ class ContractDebriefStatisticsTest {
     }
 
     @Test
-    void recommendsSuccessWhenTargetMetEvenEndingEarly() {
-        StratConCampaignState state = stratConWith(3, new ArrayList<>());
+    void recommendsSuccessWhenTargetMetOnContractWithoutStrategicObjectives() {
+        // Mapless mode and objective-less contract types (a Retainer, say) never get a strategic objective; they must
+        // still be able to earn a Perfect Success on victory points alone.
+        StratConCampaignState state = stratConWith(5, new ArrayList<>());
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        ContractDebriefStatistics statistics = from(contract);
+
+        assertFalse(statistics.isMissingCompletedStrategicObjective());
+        assertEquals(MissionStatus.SUCCESS, statistics.getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsPartialWhenTargetMetButNoStrategicObjectiveSecured() {
+        // Objectives still open at the contract's close were neither secured nor failed.
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(false, false));
+        objectives.add(objective(false, false));
+        StratConCampaignState state = stratConWith(5, objectives);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        ContractDebriefStatistics statistics = from(contract);
+
+        assertEquals(0, statistics.getObjectivesFailed());
+        assertEquals(MissionStatus.PARTIAL, statistics.getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsPartialWhenTargetMetButAStrategicObjectiveFailed() {
+        // A lapsed Deployment Order, say: the contract's terms were met, but not every objective was.
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        objectives.add(objective(false, true));
+        StratConCampaignState state = stratConWith(5, objectives);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        ContractDebriefStatistics statistics = from(contract);
+
+        assertEquals(1, statistics.getObjectivesFailed());
+        assertEquals(MissionStatus.PARTIAL, statistics.getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsSuccessWhenTargetMetAndEveryObjectiveSecured() {
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        StratConCampaignState state = stratConWith(5, objectives);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+
+        assertEquals(MissionStatus.SUCCESS, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsSuccessWhenTargetMetAndEarlyEndAllowed() {
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        StratConCampaignState state = stratConWith(3, objectives);
+        when(state.canEndContractEarly()).thenReturn(true);
         AbstractContract contract = baseContract(new ArrayList<>());
         when(contract.getRequiredVictoryPoints()).thenReturn(1);
         when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getEndingDate()).thenReturn(FUTURE_END);
 
         assertEquals(MissionStatus.SUCCESS, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsBreachWhenEndingEarlyAboveTargetButEarlyEndNotAllowed() {
+        // Victory points accrue mid-contract, so passing the target does not release the unit while strategic
+        // objectives remain open. Walking away then is a breach.
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(false, false));
+        StratConCampaignState state = stratConWith(5, objectives);
+        when(state.canEndContractEarly()).thenReturn(false);
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+        when(contract.getEndingDate()).thenReturn(FUTURE_END);
+
+        assertEquals(MissionStatus.BREACH, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsBreachWhenEndingEarlyWithoutStratCon() {
+        // Without StratCon there is no early end on the contract's own terms, however well the fighting went.
+        List<Scenario> winning = new ArrayList<>();
+        winning.add(scenarioWith(ScenarioStatus.VICTORY));
+        AbstractContract contract = baseContract(winning);
+        when(contract.getEndingDate()).thenReturn(FUTURE_END);
+
+        assertEquals(MissionStatus.BREACH, from(contract).getRecommendedStatus());
     }
 
     @Test
@@ -201,7 +296,9 @@ class ContractDebriefStatisticsTest {
 
     @Test
     void recommendsMandatedStatusOverSuccess() {
-        StratConCampaignState state = stratConWith(5, new ArrayList<>());
+        List<StratConStrategicObjective> objectives = new ArrayList<>();
+        objectives.add(objective(true, false));
+        StratConCampaignState state = stratConWith(5, objectives);
         AbstractContract contract = baseContract(new ArrayList<>());
         when(contract.getRequiredVictoryPoints()).thenReturn(3);
         when(contract.getStratConCampaignState()).thenReturn(state);

@@ -158,10 +158,19 @@ class AccountantHotSpotsUpkeepTest {
         }
 
         @Test
-        void aPartScaleIsChargedAsAWholeScale() {
-            tableOfOrganizationWithBattleValue(BATTLE_VALUE_PER_SCALE + 1);
+        void aPartScaleIsChargedAsTheNearestWholeScale() {
+            // Scale 1.6 is charged as Scale 2
+            tableOfOrganizationWithBattleValue(BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE * 3 / 5));
 
             assertEquals(supportPoints(1_000), accountant.getHotSpotsUpkeepCosts());
+        }
+
+        @Test
+        void aSmallPartScaleIsRoundedDown() {
+            // Scale 1.0002 is charged as Scale 1
+            tableOfOrganizationWithBattleValue(BATTLE_VALUE_PER_SCALE + 1);
+
+            assertEquals(supportPoints(500), accountant.getHotSpotsUpkeepCosts());
         }
 
         @Test

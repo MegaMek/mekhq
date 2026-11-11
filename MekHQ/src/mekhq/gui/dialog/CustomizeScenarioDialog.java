@@ -1209,6 +1209,14 @@ public class CustomizeScenarioDialog extends JDialog {
         if (modifierObject instanceof String modifier) {
             AtBScenarioModifier modifierPtr = AtBScenarioModifier.getScenarioModifier(modifier);
             if (modifierPtr != null) {
+                // Before the scenario is finalized, hand the modifier to the scenario instead, so finalizing runs both
+                // its pre- and post-force-generation steps (ambush logic needs the latter). Processing it here as well
+                // would apply it twice.
+                if ((scenarioPtr.getNumBots() == 0) && !scenarioPtr.isFinalized()) {
+                    scenarioPtr.addScenarioModifier(modifierPtr);
+                    return;
+                }
+
                 EventTiming timing = scenarioPtr.getNumBots() > 0 ?
                                            EventTiming.PostForceGeneration :
                                            EventTiming.PreForceGeneration;

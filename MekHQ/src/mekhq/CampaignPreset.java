@@ -689,8 +689,12 @@ public class CampaignPreset {
 
                     // region Continuous
                     case "gameOptions":
-                        preset.setGameOptions(new GameOptions());
-                        preset.getGameOptions().fillFromXML(wn.getChildNodes());
+                        // An empty element means the preset has no game options. Defaulting them instead would make
+                        // applying the preset reset every MegaMek option the player has set.
+                        if (hasElementChild(wn)) {
+                            preset.setGameOptions(new GameOptions());
+                            preset.getGameOptions().fillFromXML(wn.getChildNodes());
+                        }
                         break;
                     case "campaignOptions":
                         preset.setCampaignOptions(CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
@@ -751,6 +755,17 @@ public class CampaignPreset {
         }
         return preset;
     }
+
+    private static boolean hasElementChild(final Node node) {
+        final NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Creates a copy of the given preset that shares no objects with it, by writing it to XML and parsing it back. This
      * goes through exactly the same IO as a preset file, so the copy holds precisely what saving the source would

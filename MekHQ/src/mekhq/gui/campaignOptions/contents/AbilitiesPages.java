@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_CLOSE;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_OPEN;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_OR_SEPARATOR;
@@ -48,32 +49,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Vector;
 import java.util.function.Consumer;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.settings.SectionHeaderControlProvider;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -86,7 +69,6 @@ import mekhq.gui.campaignOptions.components.AbilitySelectorDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
-import megamek.client.ui.settings.SectionHeaderControlProvider;
 import mekhq.gui.campaignOptions.components.SkillPrerequisitesDialog;
 import mekhq.utilities.ReportingUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
@@ -365,7 +347,7 @@ public class AbilitiesPages {
 
         String tooltip = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
         if (isResourceKeyValid(tooltip)) {
-            button.setToolTipText(tooltip);
+            button.setToolTipText(wordWrap(tooltip));
         }
 
         return button;
@@ -514,7 +496,7 @@ public class AbilitiesPages {
             headerToggle.setName("chkHeader" + ability.getName());
             headerToggle.setOpaque(false);
             headerToggle.setSelected(abilityInfo.isEnabled());
-            headerToggle.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text"));
+            headerToggle.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "abilityEnable.text")));
             headerToggle.addActionListener(e -> setAbilityEnabled(headerToggle.isSelected()));
 
             headerControl.setLayout(new BoxLayout(headerControl, BoxLayout.X_AXIS));
@@ -629,8 +611,8 @@ public class AbilitiesPages {
 
             JButton btnEditSkills = new JButton(getTextAt(getCampaignOptionsResourceBundle(),
                   "abilityEditSkills.text"));
-            btnEditSkills.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
-                  "abilityEditSkills.tooltip"));
+            btnEditSkills.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(),
+                  "abilityEditSkills.tooltip")));
             btnEditSkills.addActionListener(e -> {
                 SkillPrerequisitesDialog dialog = new SkillPrerequisitesDialog(SwingUtilities.getWindowAncestor(this),
                       ability);
@@ -785,7 +767,7 @@ public class AbilitiesPages {
             JButton btnRemove = new JButton("\u2715");
             btnRemove.putClientProperty("JButton.buttonType", "borderless");
             btnRemove.setMargin(new Insets(0, UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4)));
-            btnRemove.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "abilityRemove.tooltip"));
+            btnRemove.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "abilityRemove.tooltip")));
             btnRemove.addActionListener(e -> onRemove.run());
             row.add(btnRemove, BorderLayout.EAST);
 

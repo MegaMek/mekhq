@@ -126,6 +126,22 @@ class ForceEditorPanelTest {
     }
 
     @Test
+    void loadForceTreatsMissingSyncTypeAsNone() {
+        // some shipped modifier files (e.g. AlliedAirGarrison.json) store a null sync type
+        ScenarioForceTemplate source = new ScenarioForceTemplate(ForceAlignment.Allied.ordinal(),
+              ForceGenerationMethod.BVScaled.ordinal(), 1.0, List.of(1), 5, 50, UnitType.AEROSPACE_FIGHTER);
+        source.setForceName("Air Garrison");
+        source.setSyncDeploymentType(null);
+
+        ForceEditorPanel panel = new ForceEditorPanel(List.of());
+        panel.loadForce(source);
+
+        ScenarioForceTemplate result = panel.buildForceTemplate();
+        assertEquals(SynchronizedDeploymentType.None, result.getSyncDeploymentType());
+        assertEquals(List.of(1), result.getDeploymentZones());
+    }
+
+    @Test
     void getForceNameReflectsLoadedForce() {
         ScenarioForceTemplate source = new ScenarioForceTemplate(ForceAlignment.Player.ordinal(),
               ForceGenerationMethod.PlayerSupplied.ordinal(), 1.0, List.of(1), 5, 50,

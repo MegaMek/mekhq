@@ -335,8 +335,14 @@ public class EducationController {
         }
 
         // change status will wipe the academic information, so must always precede the
-        // setters
+        // setters. It also unassigns the person's doctor, but home-schooled students remain with the unit and so stay
+        // under the care of the infirmary.
+        UUID doctorId = person.getDoctorId();
+        int daysToWaitForHealing = person.getDaysToWaitForHealing();
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
+        if (academy.isHomeSchool()) {
+            person.setDoctorId(doctorId, daysToWaitForHealing);
+        }
 
         // remember where the student left from, so they can return there once their education ends
         person.setEduOriginBaseId(LocationUtils.findEffectiveBase(person) instanceof PlayerBase originBase

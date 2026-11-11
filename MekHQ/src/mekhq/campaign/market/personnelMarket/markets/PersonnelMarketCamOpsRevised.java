@@ -205,6 +205,6 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
             rolls += additionalRecruits;
         }
 
-        setRecruitmentRolls(rolls);
+        setRecruitmentRolls(applyApplicantMultiplier(rolls));
     }
 }

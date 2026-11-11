@@ -226,6 +226,24 @@ public class Roleplay {
     }
 
     /**
+     * Deletes a character for good: they leave the cast and every journal entry stops being tagged with them. The
+     * entries themselves are kept. Travel records keep the name they were written with.
+     *
+     * @param character the character to delete
+     *
+     * @return {@code true} if the character was in the cast, active or removed
+     */
+    public boolean deleteCharacter(final OracleCharacter character) {
+        if (!characters.remove(character)) {
+            return false;
+        }
+        for (JournalEntry entry : allEntries()) {
+            entry.getCharacters().remove(character.getId());
+        }
+        return true;
+    }
+
+    /**
      * Returns a removed character to the end of the cast.
      *
      * @param character the character to restore
@@ -354,6 +372,17 @@ public class Roleplay {
             }
         }
         return removed;
+    }
+
+    /**
+     * Deletes an entry from the journal, whether it is a note or an Oracle log record.
+     *
+     * @param entry the entry to delete
+     *
+     * @return {@code true} if the entry was found and deleted
+     */
+    public boolean deleteEntry(final JournalEntry entry) {
+        return journal.remove(entry) || oracleLog.remove(entry);
     }
 
     /**

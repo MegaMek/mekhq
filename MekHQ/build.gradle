@@ -243,8 +243,6 @@ ext {
     // MekHQ runs MegaMek's client and its 3D board in this JVM, so these match MegaMek's mmJvmOptions.
     mhqJvmOptions = [
             '-Xmx4096m',
-            '-XX:+UseZGC',
-            '-XX:+ZGenerational',
             '--add-opens',
             'java.base/java.util=ALL-UNNAMED',
             '--add-opens',
@@ -332,6 +330,8 @@ jar {
                 .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
                 .collect { "lib/${it.name}" }.join(' '))
         attributes "Add-Opens": 'java.base/java.util java.base/java.util.concurrent'
+        // Tells the MegaMek Launcher to wait for the first window (see MegaMek's LauncherReadySignal)
+        attributes "MegaMek-Launcher-Ready": '1'
         attributes "Build-Date": LocalDateTime.now()
         attributes "Sealed": true
     }
@@ -363,10 +363,11 @@ spotless {
     // checkout that has no origin/main to ratchet against.
     enforceCheck = false
 
-    // Until the whole tree has been formatted once, only look at files that differ from origin/main. Pass
+    // Until the whole tree has been formatted once, only look at files that differ from origin/main (or
+    // -PspotlessRatchetFrom=<ref>, which CI sets to the PR's target branch). Pass
     // -PspotlessFullTree to format everything (used for the one-time reformat and to measure it).
     if (!project.hasProperty('spotlessFullTree')) {
-        ratchetFrom 'origin/main'
+        ratchetFrom project.findProperty('spotlessRatchetFrom') ?: 'origin/main'
     }
 
     java {

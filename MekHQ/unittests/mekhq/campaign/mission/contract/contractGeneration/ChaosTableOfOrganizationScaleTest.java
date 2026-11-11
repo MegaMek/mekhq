@@ -115,7 +115,7 @@ class ChaosTableOfOrganizationScaleTest {
     }
 
     private int scale(boolean convertSupportPoints) {
-        return ChaosContractDeterminationScale.roundUpScale(exactScale(convertSupportPoints));
+        return ChaosContractDeterminationScale.roundScale(exactScale(convertSupportPoints));
     }
 
     private double exactScale(boolean convertSupportPoints) {
@@ -146,8 +146,8 @@ class ChaosTableOfOrganizationScaleTest {
         }
 
         @Test
-        void partScalesRoundUp() {
-            addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE + 1);
+        void partScalesRoundToTheNearestScale() {
+            addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE + (BATTLE_VALUE_PER_SCALE / 2));
 
             assertEquals(2, scale(false));
         }
@@ -288,9 +288,9 @@ class ChaosTableOfOrganizationScaleTest {
         @Test
         void changingTheConversionOptionRecalculates() {
             addUnit(FORMATION_ID, false, CONVERTED_BATTLE_VALUE_PER_SCALE);
-            // 20,500 / 4,500 rounds up to 5
+            // 20,500 / 4,500 rounds to 5
             assertEquals(5,
-                  ChaosContractDeterminationScale.roundUpScale(
+                  ChaosContractDeterminationScale.roundScale(
                         ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign)));
 
             campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, true);

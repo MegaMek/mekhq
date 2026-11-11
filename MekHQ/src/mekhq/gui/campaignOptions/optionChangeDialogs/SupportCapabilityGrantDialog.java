@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
 import static java.lang.Integer.MAX_VALUE;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
@@ -204,7 +205,8 @@ public class SupportCapabilityGrantDialog extends JDialog {
     private void addCrewingChoices(JPanel pnlCenter) {
         if (canCrewFromExistingStaff()) {
             chkCrewFromExistingStaff = new JCheckBox(getText("supportCapabilityGrant.crewFromExistingStaff.text"));
-            chkCrewFromExistingStaff.setToolTipText(getText("supportCapabilityGrant.crewFromExistingStaff.toolTipText"));
+            chkCrewFromExistingStaff.setToolTipText(wordWrap(getText(
+                  "supportCapabilityGrant.crewFromExistingStaff.toolTipText")));
             chkCrewFromExistingStaff.setAlignmentX(Component.LEFT_ALIGNMENT);
             chkCrewFromExistingStaff.setSelected(true);
             pnlCenter.add(chkCrewFromExistingStaff);
@@ -212,7 +214,8 @@ public class SupportCapabilityGrantDialog extends JDialog {
 
         if (usesTemporaryCrews()) {
             chkUseTemporaryCrews = new JCheckBox(getText("supportCapabilityGrant.useTemporaryCrews.text"));
-            chkUseTemporaryCrews.setToolTipText(getText("supportCapabilityGrant.useTemporaryCrews.toolTipText"));
+            chkUseTemporaryCrews.setToolTipText(wordWrap(getText(
+                  "supportCapabilityGrant.useTemporaryCrews.toolTipText")));
             chkUseTemporaryCrews.setAlignmentX(Component.LEFT_ALIGNMENT);
             chkUseTemporaryCrews.setSelected(true);
             pnlCenter.add(chkUseTemporaryCrews);

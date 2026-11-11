@@ -64,6 +64,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,6 +156,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE = "StickyForce";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
+    private static final String RIGHT_CLICK_COMMAND_RECALL_FORCE = "RecallForce";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
     private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
@@ -181,6 +183,21 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /** Opacity of a point of interest that has been resolved or has expired, so it reads as spent. */
     private static final float INACTIVE_POINT_OF_INTEREST_ALPHA = 0.5f;
+
+    /**
+     * Supply routes are dotted lines in their side's map color, each dot ringed by a dark casing so it holds up on
+     * terrain close to its own color. The dash is a short stroke with round caps, which draws as a dot.
+     */
+    private static final float SUPPLY_ROUTE_STROKE_WIDTH = 3.0f;
+    private static final float SUPPLY_ROUTE_CASING_STROKE_WIDTH = SUPPLY_ROUTE_STROKE_WIDTH + 2.0f;
+    private static final float[] SUPPLY_ROUTE_DASH = { 1.0f, 7.0f };
+    private static final Color SUPPLY_ROUTE_CASING_COLOR = new Color(0, 0, 0, 170);
+
+    /**
+     * How far each side's routes are drawn off the hex centers, in opposite directions, so where both sides' supply
+     * runs along the same road both lines still show.
+     */
+    private static final int SUPPLY_ROUTE_SIDE_OFFSET = 3;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
@@ -594,9 +611,9 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Rebuilds the current sector's road network after a GM edit to its cities or facilities, so the roads keep serving
-     * the settlements that are actually there. Facilities are folded in only when the planet's owner holds them, and a
-     * road-less sector generator ignores the request entirely.
+     * Rebuilds the current sector's road network after a GM edit to its cities, so the roads keep serving the
+     * settlements that are actually there. Facilities are folded in only when the planet's owner holds them, and a
+     * road-less sector generator ignores the request entirely. Adding or removing a facility does not call this.
      */
     private void recalculateRoads() {
         if ((currentTrack == null) || (campaignState == null)) {
@@ -604,6 +621,18 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         StratConContractInitializer.connectFacilitiesToRoads(currentTrack, campaignState.getContract(), campaign);
+    }
+
+    /**
+     * Checks the current sector's supply at once after a GM edit to its facilities, rather than waiting for the next
+     * day: one added is joined to its side's routes, one removed or captured stops carrying them, the cut-off marks
+     * are brought up to date, and the player is told if their side is left with no source of supply. The roads are
+     * left as they are. It is not the start of a month, so nothing starves.
+     */
+    private void refreshSupply() {
+        if (currentTrack != null) {
+            StratConFacilitySupply.processSupply(currentTrack, campaign, false);
+        }
     }
 
     /**
@@ -701,6 +730,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                 stickyForceItem.addActionListener(this);
                 stickyForceItem.setSelected(currentTrack.getStickyForces().contains(forceID));
                 rightClickMenu.add(stickyForceItem);
+
+                if (campaignState != null) {
+                    rightClickMenu.add(buildRecallFormationItem(forceID, forceName));
+                }
             }
         }
 
@@ -792,6 +825,45 @@ public class StratConPanel extends JPanel implements ActionListener {
                 rightClickMenu.add(resetDeploymentItem);
             }
         }
+    }
+
+    /**
+     * Builds the item that spends Employer Support to recall a deployed formation early. It is disabled, with a tooltip
+     * saying why, when the formation can't be recalled.
+     *
+     * @param forceID   the deployed formation's ID
+     * @param forceName the deployed formation's name
+     *
+     * @return the menu item
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenuItem buildRecallFormationItem(int forceID, String forceName) {
+        JMenuItem recallItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.recall",
+              forceName,
+              StratConRulesManager.RECALL_FORMATION_SUPPORT_POINT_COST));
+        recallItem.setActionCommand(RIGHT_CLICK_COMMAND_RECALL_FORCE);
+        recallItem.putClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID, forceID);
+        recallItem.addActionListener(this);
+
+        if (!StratConRulesManager.canRecallFormation(forceID, currentTrack, campaignState, campaign)) {
+            recallItem.setEnabled(false);
+
+            Formation formation = campaign.getPlayerForce().getFormation(forceID);
+            String reasonKey;
+            if ((formation != null) && formation.isDeployed()) {
+                reasonKey = "stratConTab.contextMenu.recall.inScenario";
+            } else if (currentTrack.getFacilityOrder(forceID) != null) {
+                reasonKey = "stratConTab.contextMenu.recall.facilityOrder";
+            } else {
+                reasonKey = "stratConTab.contextMenu.recall.noSupport";
+            }
+            recallItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, reasonKey));
+        }
+
+        return recallItem;
     }
 
     /**
@@ -1146,6 +1218,9 @@ public class StratConPanel extends JPanel implements ActionListener {
         drawCities(g2D);
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawSupplyNetworks(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawPointsOfInterest(g2D);
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
@@ -1210,7 +1285,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     /**
      * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
      * box pinned to the top-right of the visible map area, then the sector's facility effects under it. The environment
-     * box is skipped for legacy sectors that carry no profile data.
+     * box is skipped for legacy sectors that carry no profile data. Either box can be hidden by the player (the
+     * toggles under the tab's Facilities button); a hidden environment box lets the facility effects move up.
      */
     private void drawSectorEnvironment(Graphics2D g2D) {
         if (currentTrack == null) {
@@ -1218,10 +1294,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         int nextBoxY = getVisibleRect().y;
-        if (currentTrack.getLatitudeBand() != null) {
+        if ((currentTrack.getLatitudeBand() != null) && MekHQ.getMHQOptions().getShowStratConSectorEnvironment()) {
             nextBoxY = drawHudBox(g2D, getSectorEnvironmentLines(), nextBoxY);
         }
-        drawSectorFacilityEffects(g2D, nextBoxY);
+        if (MekHQ.getMHQOptions().getShowStratConFacilityEffects()) {
+            drawSectorFacilityEffects(g2D, nextBoxY);
+        }
     }
 
     /**
@@ -1640,11 +1718,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(scenarioMarker2);
                     }
 
-                    if (currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).isOwnerAlliedToPlayer()) {
-                        drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
-                    }
+                    drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -1776,6 +1850,125 @@ public class StratConPanel extends JPanel implements ActionListener {
         Polygon hex = generateGraphHex();
         hex.translate(center.x, center.y);
         return new Area(hex);
+    }
+
+    /**
+     * Renders both sides' supply routes (see {@link StratConFacilitySupply}) as dotted lines - the player's side in the
+     * allied map color, the enemy's in the hostile one - with a stub off the map wherever a route leaves the sector by
+     * road. Only the part of a route that runs through a scouted hex is drawn; the rest stays hidden rather than fading,
+     * so an enemy route is learned only as the ground it crosses is scouted.
+     *
+     * <p>Drawn after cities, so a route stays visible through a city hex, and before points of interest and facilities,
+     * which sit on top of it. Nothing is drawn while supply lines are out of use.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void drawSupplyNetworks(Graphics2D g2D) {
+        if (!StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+            return;
+        }
+
+        drawSupplyNetwork(g2D, currentTrack.getEnemySupplyNetwork(), HOSTILE_POINT_OF_INTEREST_COLOR,
+              SUPPLY_ROUTE_SIDE_OFFSET);
+        drawSupplyNetwork(g2D, currentTrack.getPlayerSupplyNetwork(), ALLIED_POINT_OF_INTEREST_COLOR,
+              -SUPPLY_ROUTE_SIDE_OFFSET);
+    }
+
+    private void drawSupplyNetwork(Graphics2D g2D, StratConSupplyNetwork network, Color color, int offset) {
+        if (network.getLinks().isEmpty()) {
+            return;
+        }
+
+        Path2D.Double routes = new Path2D.Double();
+        Set<StratConCoords> usedRoadExits = new HashSet<>();
+        for (StratConSupplyLink link : network.getLinks()) {
+            Point from = hexCenter(link.getFrom().getX(), link.getFrom().getY());
+            Point to = hexCenter(link.getTo().getX(), link.getTo().getY());
+            routes.moveTo(from.x, from.y);
+            routes.lineTo(to.x, to.y);
+
+            if (network.isRoot(link.getTo()) && currentTrack.getRoadExits().contains(link.getTo())) {
+                usedRoadExits.add(link.getTo());
+            }
+        }
+
+        // A route that starts from a road leaving the sector is shown leaving with it.
+        for (StratConCoords roadExit : usedRoadExits) {
+            Point from = hexCenter(roadExit.getX(), roadExit.getY());
+            Point off = offMapPoint(roadExit);
+            routes.moveTo(from.x, from.y);
+            routes.lineTo(off.x, off.y);
+        }
+
+        Shape pushClip = g2D.getClip();
+        Stroke pushStroke = g2D.getStroke();
+        Color pushColor = g2D.getColor();
+
+        Area unscouted = unscoutedSupplyRouteArea(network, usedRoadExits);
+        if (unscouted != null) {
+            // Everything the routes could touch - the current clip, or their own bounds grown so no dot is clipped -
+            // less the unscouted hexes they cross.
+            Rectangle roomForStrokes = routes.getBounds();
+            roomForStrokes.grow((int) SUPPLY_ROUTE_CASING_STROKE_WIDTH + SUPPLY_ROUTE_SIDE_OFFSET,
+                  (int) SUPPLY_ROUTE_CASING_STROKE_WIDTH + SUPPLY_ROUTE_SIDE_OFFSET);
+            Area scoutedClip = new Area((pushClip != null) ? pushClip : roomForStrokes);
+            scoutedClip.subtract(unscouted);
+            g2D.setClip(scoutedClip);
+        }
+
+        routes.transform(AffineTransform.getTranslateInstance(offset, offset));
+        g2D.setStroke(new BasicStroke(SUPPLY_ROUTE_CASING_STROKE_WIDTH, BasicStroke.CAP_ROUND,
+              BasicStroke.JOIN_ROUND, 10.0f, SUPPLY_ROUTE_DASH, 0.0f));
+        g2D.setColor(SUPPLY_ROUTE_CASING_COLOR);
+        g2D.draw(routes);
+        g2D.setStroke(new BasicStroke(SUPPLY_ROUTE_STROKE_WIDTH, BasicStroke.CAP_ROUND,
+              BasicStroke.JOIN_ROUND, 10.0f, SUPPLY_ROUTE_DASH, 0.0f));
+        g2D.setColor(color);
+        g2D.draw(routes);
+
+        g2D.setClip(pushClip);
+        g2D.setStroke(pushStroke);
+        g2D.setColor(pushColor);
+    }
+
+    /**
+     * @return the union of every unscouted hex a supply route may cross (in road-drawing space), for hiding those
+     *       parts of the routes - or {@code null} when nothing needs hiding. A link between adjacent hexes lies within
+     *       those two hexes. A Supply Depot's straight link to a facility nearby may cross any hex within the depot's
+     *       reach, so all of those count. An off-map stub gets a phantom hex beyond the edge that follows its border
+     *       hex's scouted state, as the roads' stubs do.
+     */
+    private @Nullable Area unscoutedSupplyRouteArea(StratConSupplyNetwork network,
+          Set<StratConCoords> usedRoadExits) {
+        if (currentTrack.isGmRevealed()) {
+            return null;
+        }
+
+        Set<StratConCoords> crossedHexes = new HashSet<>();
+        for (StratConSupplyLink link : network.getLinks()) {
+            crossedHexes.add(link.getFrom());
+            crossedHexes.add(link.getTo());
+            if (!StratConHexGeometry.neighbors(currentTrack, link.getTo()).contains(link.getFrom())) {
+                crossedHexes.addAll(StratConHexGeometry.withinRadius(currentTrack,
+                      link.getTo(),
+                      StratConFacilitySupply.DEPOT_RANGE));
+            }
+        }
+
+        Area unscouted = new Area();
+        for (StratConCoords coords : crossedHexes) {
+            if (!currentTrack.coordsRevealed(coords.getX(), coords.getY())) {
+                unscouted.add(hexArea(hexCenter(coords.getX(), coords.getY())));
+            }
+        }
+        for (StratConCoords roadExit : usedRoadExits) {
+            if (!currentTrack.coordsRevealed(roadExit.getX(), roadExit.getY())) {
+                unscouted.add(hexArea(offMapPoint(roadExit)));
+            }
+        }
+
+        return unscouted.isEmpty() ? null : unscouted;
     }
 
     /**
@@ -2162,7 +2355,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function to render facility icons to the given surface.
+     * Worker function to render facility icons to the given surface. A facility's name and status label is drawn only
+     * while its hex is selected.
      */
     private void drawFacilities(Graphics2D g2D) {
         Polygon facilityMarker = new Polygon();
@@ -2195,11 +2389,15 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
-                    String attributesLabel = getFacilityAttributesLabel(facility, currentCoords);
-                    if (attributesLabel != null) {
-                        // Directly under the name, with no leader line of its own, so it reads as part of the label.
-                        drawTextEffect(g2D, facilityMarker, attributesLabel, currentCoords, false);
+                    // Labelled only while its hex is selected: a label on every facility hides too much of the map.
+                    if (currentCoords.equals(boardState.getSelectedCoords())) {
+                        drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
+                        String attributesLabel = getFacilityAttributesLabel(facility, currentCoords);
+                        if (attributesLabel != null) {
+                            // Directly under the name, with no leader line of its own, so it reads as part of the
+                            // label.
+                            drawTextEffect(g2D, facilityMarker, attributesLabel, currentCoords, false);
+                        }
                     }
                 }
 
@@ -2252,14 +2450,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                             g2D.draw(forceMarker);
                         }
 
-                        Font currentFont = g2D.getFont();
-                        Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
-                              TextAttribute.WEIGHT_BOLD));
-                        g2D.setFont(newFont);
+                        // Labelled only while its hex is selected, the same as facilities.
+                        if (currentCoords.equals(boardState.getSelectedCoords())) {
+                            Font currentFont = g2D.getFont();
+                            Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
+                                  TextAttribute.WEIGHT_BOLD));
+                            g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
+                            drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
-                        g2D.setFont(currentFont);
+                            g2D.setFont(currentFont);
+                        }
                     }
                 }
 
@@ -2681,6 +2882,16 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
             }
 
+            // A facility's own hex says how it is supplied with the facility; an open hex says whose supply crosses it.
+            if ((facility == null) && StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+                if (StratConFacilitySupply.isOnSupplyNetwork(currentTrack, boardState.getSelectedCoords(), true)) {
+                    infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.supplyRoute.player"));
+                }
+                if (StratConFacilitySupply.isOnSupplyNetwork(currentTrack, boardState.getSelectedCoords(), false)) {
+                    infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.supplyRoute.enemy"));
+                }
+            }
+
         } else {
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.reconIncomplete",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
@@ -2839,6 +3050,7 @@ public class StratConPanel extends JPanel implements ActionListener {
      *       {@link #openDeploymentWizard}, on the Primary page (bare hex or unresolved scenario) or the Reinforce page
      *       (committed scenario) as appropriate.</li>
      *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
+     *   <li>{@code RECALL_FORCE} - spends Employer Support to have a force return from the track at once.</li>
      *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
      *       removing a facility recomputes roads; capturing deliberately does not.</li>
      *   <li>{@code ADD_CITY} / {@code REMOVE_CITY} - GM city edits, each recomputing roads.</li>
@@ -2881,9 +3093,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
 
                 break;
+            case RIGHT_CLICK_COMMAND_RECALL_FORCE:
+                int recalledForceID = (int) ((JMenuItem) evt.getSource())
+                      .getClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID);
+                if (StratConRulesManager.recallFormation(recalledForceID, currentTrack, campaignState, campaign)) {
+                    infoArea.setText(buildSelectedHexInfo(campaign));
+                    isContractViewStale = true;
+                }
+                break;
             case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);
-                recalculateRoads();
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConGMs.facility(campaign.getCampaignOptions())
@@ -2892,6 +3112,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 // neither lays new road nor tears up the old. Recalculating would also rebuild the whole network from
                 // scratch, so a single capture could redraw roads across the sector. Capturing the same facility by
                 // winning a scenario leaves the network alone for the same reason.
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_SET_FACILITY_STATE:
                 @SuppressWarnings("unchecked")
@@ -2912,7 +3133,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility newFacility = new StratConFacility(facilityDefinition, owner);
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
-                recalculateRoads();
+                refreshSupply();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);

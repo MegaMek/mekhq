@@ -49,6 +49,21 @@ import mekhq.gui.utilities.ComponentColors;
 public final class MHQOptions extends SuiteOptions {
     private static final MMLogger LOGGER = MMLogger.create(MHQOptions.class);
 
+    // Stock report font colours. The dark theme values are the long-standing defaults; the light theme values are
+    // deeper variants that stay readable on a light background.
+    private static final int DARK_THEME_NEGATIVE = 0xDF5341;
+    private static final int DARK_THEME_AMAZING = 0xC344C3;
+    private static final int DARK_THEME_POSITIVE = 0x7FCF43;
+    private static final int DARK_THEME_WARNING = 0xEE9A00;
+    private static final int DARK_THEME_SKILL_GREEN = 0xCFAB43;
+    private static final int DARK_THEME_SKILL_VETERAN = 0x5CE8E0;
+    private static final int LIGHT_THEME_NEGATIVE = 0xC0392B;
+    private static final int LIGHT_THEME_AMAZING = 0x9C27B0;
+    private static final int LIGHT_THEME_POSITIVE = 0x2E7D32;
+    private static final int LIGHT_THEME_WARNING = 0xB35C00;
+    private static final int LIGHT_THEME_SKILL_GREEN = 0x8A6D00;
+    private static final int LIGHT_THEME_SKILL_VETERAN = 0x00838F;
+
     // region Display Tab
     public String getDisplayDateFormat() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
@@ -140,6 +155,22 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setShowWarriorsAlmanac(final boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_WARRIORS_ALMANAC, value);
+    }
+
+    public boolean getLockMainTabOrder() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.LOCK_MAIN_TAB_ORDER, false);
+    }
+
+    public void setLockMainTabOrder(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.LOCK_MAIN_TAB_ORDER, value);
+    }
+
+    public boolean getLockMainTabDetaching() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.LOCK_MAIN_TAB_DETACHING, false);
+    }
+
+    public void setLockMainTabDetaching(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.LOCK_MAIN_TAB_DETACHING, value);
     }
 
     // region Personnel Record Logs
@@ -850,6 +881,46 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.USE_ALTERNATE_STRAT_CON_FOG_OF_WAR, value);
     }
 
+    /**
+     * @return whether the StratCon map shows the Sector Environment box in its top-right corner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getShowStratConSectorEnvironment() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.SHOW_STRAT_CON_SECTOR_ENVIRONMENT, true);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setShowStratConSectorEnvironment(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.SHOW_STRAT_CON_SECTOR_ENVIRONMENT, value);
+    }
+
+    /**
+     * @return whether the StratCon map shows the Facility Effects box in its top-right corner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getShowStratConFacilityEffects() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE)
+                     .getBoolean(MHQConstants.SHOW_STRAT_CON_FACILITY_EFFECTS, true);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setShowStratConFacilityEffects(boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putBoolean(MHQConstants.SHOW_STRAT_CON_FACILITY_EFFECTS, value);
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
@@ -861,8 +932,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorNegative() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_NEGATIVE, 0xDF5341));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_NEGATIVE, DARK_THEME_NEGATIVE, LIGHT_THEME_NEGATIVE);
     }
 
     /**
@@ -877,8 +947,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorAmazing() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_AMAZING, 0xC344C3));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_AMAZING, DARK_THEME_AMAZING, LIGHT_THEME_AMAZING);
     }
 
     public String getFontColorAmazingHexColor() {
@@ -890,8 +959,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorPositive() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_POSITIVE, 0x7FCF43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_POSITIVE, DARK_THEME_POSITIVE, LIGHT_THEME_POSITIVE);
     }
 
     /**
@@ -906,8 +974,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorWarning() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_WARNING, 0xEE9A00));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_WARNING, DARK_THEME_WARNING, LIGHT_THEME_WARNING);
     }
 
     /**
@@ -923,8 +990,7 @@ public final class MHQOptions extends SuiteOptions {
 
 
     public Color getFontColorSkillUltraGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, 0xDF5341));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, DARK_THEME_NEGATIVE, LIGHT_THEME_NEGATIVE);
     }
 
     /**
@@ -940,8 +1006,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillGreen() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_GREEN, 0xCFAB43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_GREEN, DARK_THEME_SKILL_GREEN, LIGHT_THEME_SKILL_GREEN);
     }
 
     /**
@@ -956,8 +1021,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillRegular() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR, 0x7FCF43));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_REGULAR, DARK_THEME_POSITIVE, LIGHT_THEME_POSITIVE);
     }
 
     /**
@@ -972,8 +1036,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillVeteran() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN, 0x5CE8E0));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_VETERAN, DARK_THEME_SKILL_VETERAN, LIGHT_THEME_SKILL_VETERAN);
     }
 
     /**
@@ -988,8 +1051,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getFontColorSkillElite() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                               .getInt(MHQConstants.FONT_COLOR_SKILL_ELITE, 0xC344C3));
+        return getThemedFontColor(MHQConstants.FONT_COLOR_SKILL_ELITE, DARK_THEME_AMAZING, LIGHT_THEME_AMAZING);
     }
 
     /**
@@ -1003,6 +1065,30 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ELITE, value.getRGB());
     }
 
+
+    /**
+     * Returns a stored font colour, treating either stock default as "use the default for the current theme". The
+     * options dialog saves every colour, so the stock values end up stored; matching both of them keeps the colour
+     * following theme switches, while any custom colour the player picked is returned unchanged.
+     */
+    private Color getThemedFontColor(String key, int darkThemeDefault, int lightThemeDefault) {
+        int stored = userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(key, darkThemeDefault) & 0xFFFFFF;
+        if ((stored == darkThemeDefault) || (stored == lightThemeDefault)) {
+            return new Color(isDarkTheme() ? darkThemeDefault : lightThemeDefault);
+        }
+        return new Color(stored);
+    }
+
+    private static boolean isDarkTheme() {
+        Color background = UIManager.getColor("Panel.background");
+        if (background == null) {
+            return false;
+        }
+        double luminance = 0.2126 * background.getRed()
+                                 + 0.7152 * background.getGreen()
+                                 + 0.0722 * background.getBlue();
+        return luminance < 128;
+    }
 
     /**
      * Converts the font color to a hexadecimal color representation.
@@ -1482,6 +1568,20 @@ public final class MHQOptions extends SuiteOptions {
     public void setNewDayFormationIconOperationalStatusStyle(final FormationIconOperationalStatusStyle value) {
         userPreferences.node(MHQConstants.NEW_DAY_NODE)
               .put(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE, value.name());
+    }
+
+    /**
+     * @return whether each new day draws icons for blank formations and updates the icons MekHQ drew to match their
+     *       formations' size and units
+     */
+    public boolean getNewDayAutoFormationIcons() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.NEW_DAY_AUTO_FORMATION_ICONS, false);
+    }
+
+    public void setNewDayAutoFormationIcons(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.NEW_DAY_AUTO_FORMATION_ICONS, value);
     }
     // endregion New Day
 

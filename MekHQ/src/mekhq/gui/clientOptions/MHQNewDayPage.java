@@ -91,6 +91,7 @@ class MHQNewDayPage extends MHQOptionsPage {
     // New Day - Formation Icons
       private SettingsCheckBox chkNewDayFormationIconOperationalStatus;
     private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
+      private SettingsCheckBox chkNewDayAutoFormationIcons;
 
     MHQNewDayPage(MHQOptionsModel model) {
         super(model);
@@ -187,6 +188,8 @@ class MHQNewDayPage extends MHQOptionsPage {
     }
 
     private JPanel createNewDayFormationSection() {
+        chkNewDayAutoFormationIcons = checkBox("chkNewDayAutoFormationIcons", model.newDayAutoFormationIcons);
+
         chkNewDayFormationIconOperationalStatus =
               checkBox("chkNewDayFormationIconOperationalStatus", model.newDayFormationIconOperationalStatus);
 
@@ -221,6 +224,7 @@ class MHQNewDayPage extends MHQOptionsPage {
 
       SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayFormationContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
+        panel.addCheckBox(chkNewDayAutoFormationIcons);
         panel.addCheckBox(chkNewDayFormationIconOperationalStatus);
         panel.addRow(labelStyle, comboNewDayFormationIconOperationalStatusStyle);
         return panel;
@@ -302,5 +306,6 @@ class MHQNewDayPage extends MHQOptionsPage {
         model.newDayFormationIconOperationalStatus = chkNewDayFormationIconOperationalStatus.isSelected();
         model.newDayFormationIconOperationalStatusStyle =
               Objects.requireNonNull(comboNewDayFormationIconOperationalStatusStyle.getSelectedItem());
+        model.newDayAutoFormationIcons = chkNewDayAutoFormationIcons.isSelected();
     }
 }

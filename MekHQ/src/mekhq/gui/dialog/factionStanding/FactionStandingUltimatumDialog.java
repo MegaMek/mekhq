@@ -53,6 +53,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.events.UltimatumResolvedEvent;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -80,7 +81,8 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDial
  * arguing for it, and the second-in-command, the ultimatum's single dissenting voice, arguing against. The player then
  * picks a side, or goes rogue, in the {@link UltimatumSidePickerDialog} carousel. The aftermath covers the news
  * bulletin, the dissenter leaving if the choice goes against them, the loyalty checks of everyone else, standing
- * changes with every faction involved, and, for violent ultimatums, damage to the campaign's units.</p>
+ * changes with every faction involved, and, for violent ultimatums, damage to the campaign's units. Finally an
+ * {@link UltimatumResolvedEvent} is triggered, so the roleplay journal can record the decision.</p>
  *
  * <p>The picker's "Ignore Ultimatum (GM)" button, always offered, ends the ultimatum with no consequences at
  * all.</p>
@@ -189,6 +191,15 @@ public class FactionStandingUltimatumDialog {
             UltimatumUnitDamage.damageUnits(campaign,
                   UltimatumUnitDamage.getDepartedShare(personnelBeforeDecision));
         }
+
+        Faction chosenFaction = choice.kind().isGoingRogue() ? getRogueFaction(choice.kind())
+                                      : sides.get(choice.sideIndex()).faction();
+        List<Person> departed = personnelBeforeDecision.stream()
+                                      .filter(person -> person.getStatus().isDepartedUnit()
+                                                              || person.getStatus().isDead())
+                                      .toList();
+        MekHQ.triggerEvent(new UltimatumResolvedEvent(campaign, ultimatumName, chosenFaction,
+              choice.kind().isGoingRogue(), departed));
     }
 
     /**
@@ -523,9 +534,7 @@ public class FactionStandingUltimatumDialog {
               FactionJudgmentSceneType.GO_ROGUE,
               originalFaction);
 
-        Faction newFaction = Factions.getInstance()
-                                   .getFaction(choice.kind() == ChoiceKind.MERCENARY ? MERCENARY_FACTION_CODE
-                                                     : PIRATE_FACTION_CODE);
+        Faction newFaction = getRogueFaction(choice.kind());
         // A violent transition is treated as a defection. processGoingRogue also lowers standing with the old faction.
         processGoingRogue(campaign, newFaction, commander, secondInCommand, isViolentTransition, true,
               isTrackingFactionStanding, divisiveness);
@@ -539,6 +548,19 @@ public class FactionStandingUltimatumDialog {
                 GoingRogue.processFactionStandingChangeForOldFaction(campaign, sideFaction);
             }
         }
+    }
+
+    /**
+     * @param kind {@link ChoiceKind#MERCENARY} or {@link ChoiceKind#PIRATE}
+     *
+     * @return the faction the campaign joins by going rogue that way
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Faction getRogueFaction(ChoiceKind kind) {
+        return Factions.getInstance()
+                     .getFaction(kind == ChoiceKind.MERCENARY ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
     }
 
     /**

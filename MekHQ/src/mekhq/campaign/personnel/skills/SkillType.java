@@ -1544,9 +1544,23 @@ public class SkillType {
                 skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
 
+            updateSkillSubType(skillType);
+
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
             LOGGER.error("", ex);
+        }
+    }
+
+    /**
+     * Corrects the subtype of skills whose subtype has changed since the save or preset was written.
+     *
+     * @param skillType the freshly parsed skill type
+     */
+    private static void updateSkillSubType(SkillType skillType) {
+        // <51.01 compatibility handler
+        if (S_TECH_CYBERNETICS.equals(skillType.name)) {
+            skillType.subType = UTILITY;
         }
     }
 
@@ -1600,6 +1614,8 @@ public class SkillType {
             if (!hasNaturalAptitudeCost) {
                 skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
+
+            updateSkillSubType(skillType);
 
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
@@ -2172,7 +2188,7 @@ public class SkillType {
         return new SkillType(S_TECH_CYBERNETICS,
               9,
               false,
-              ROLEPLAY_GENERAL,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,

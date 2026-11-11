@@ -167,5 +167,22 @@ class UnitTempCrewAssignmentTest {
         assertTrue(platoon.isFullyCrewed(), "the platoon has exactly as many troopers as places");
     }
 
+    /**
+     * The temp crew released are the seat's, not the newcomer's primary role's: a doctor who also soldiers still
+     * replaces one temp trooper, rather than leaving the platoon over strength.
+     */
+    @Test
+    void someoneServingThroughTheirSecondaryRoleStillReplacesATempTrooper() {
+        Unit platoon = platoonWithTempCrew(0);
+        int tempCrewBefore = platoon.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER);
+        Person doctorWhoSoldiers = crewMember(PersonnelRole.DOCTOR);
+        doctorWhoSoldiers.setSecondaryRoleDirect(PersonnelRole.SOLDIER);
+
+        platoon.addPilotOrSoldier(doctorWhoSoldiers);
+
+        assertEquals(tempCrewBefore - 1, platoon.getTempCrewByPersonnelRole(PersonnelRole.SOLDIER));
+        assertTrue(platoon.isFullyCrewed(), "the platoon has exactly as many troopers as places");
+    }
+
     // endregion infantry
 }

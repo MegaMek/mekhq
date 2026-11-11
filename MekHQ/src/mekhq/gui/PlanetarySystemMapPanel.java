@@ -32,13 +32,7 @@
  */
 package mekhq.gui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -46,6 +40,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -61,6 +58,7 @@ import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.text.JTextComponent;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
@@ -70,6 +68,7 @@ import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.PlayerBase;
@@ -98,6 +97,9 @@ public class PlanetarySystemMapPanel extends JPanel {
     private final CampaignGUI hqView;
     private PlanetarySystem system;
     private int selectedPlanet;
+    private JumpPath plannedRoute = new JumpPath();
+
+    private static final Color PLANNED_ROUTE_COLOR = new Color(65, 210, 224);
 
     // various images to paint
     private BufferedImage imgZenithPoint;
@@ -203,7 +205,6 @@ public class PlanetarySystemMapPanel extends JPanel {
                 // star size is minimum of half the image or 20% of total width
                 int starWidth = Math.min(maxStarWidth, (int) Math.round(0.2 * getWidth()));
                 int rectWidth = (getWidth() - starWidth) / n;
-                int midpoint = rectWidth / 2;
                 int y = getHeight() / 2;
                 int x;
 
@@ -271,32 +272,63 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
                 Map<String, Integer> playerBaseCounts = playerBaseCountsByPlanet();
 
+                // where is the force within this system
+                AbstractLocation forceLocation = PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                                       .getForceDetachment()
+                                                       .getCurrentLocation();
+                boolean isForceInSystem = forceLocation.getCurrentSystem().equals(system);
+                JumpPath activeRoute = forceLocation.getJumpPath();
+                boolean isTransferring = isForceInSystem && (activeRoute != null)
+                                               && activeRoute.isInSystemTransfer() && isInSystemRoute(activeRoute);
+                int forcePosition = getPosition(getForceWorld(forceLocation, activeRoute));
+                if (isForceInSystem) {
+                    updateShipImages();
+                }
+
+                // in-system courses are drawn first, so the worlds they connect sit on top of them
+                int jumpPointLineX = jumpshipX + shipImgSize;
+                int jumpPointLineY = forceLocation.isJumpZenith() ? jumpshipY + shipImgSize : jumpshipY - shipImgSize;
+                if (isForceInSystem && isInSystemRoute(plannedRoute)) {
+                    Planet destination = plannedRoute.getTargetPlanet();
+                    int destinationPosition = getPosition(destination);
+                    int destinationX = planetX(destinationPosition, starWidth, rectWidth);
+                    int destinationTop = y - (scaledDiameter(destination, biggestDiameterPixels, biggestDiameter) / 2);
+                    if (plannedRoute.isInSystemTransfer()) {
+                        Planet departure = plannedRoute.getOriginPlanet();
+                        QuadCurve2D course = createTransferCourse(
+                              planetX(getPosition(departure), starWidth, rectWidth),
+                              y - (scaledDiameter(departure, biggestDiameterPixels, biggestDiameter) / 2),
+                              destinationX, destinationTop, y);
+                        drawCourse(g2, course, PLANNED_ROUTE_COLOR);
+                    } else {
+                        // not at a world, so the course runs from the jump point side of the system
+                        drawCourse(g2, new Line2D.Double(jumpPointLineX, jumpPointLineY, destinationX,
+                              destinationTop), PLANNED_ROUTE_COLOR);
+                    }
+                }
+                QuadCurve2D activeTransferCourse = null;
+                if (isTransferring) {
+                    Planet departure = activeRoute.getOriginPlanet();
+                    activeTransferCourse = createTransferCourse(
+                          planetX(getPosition(departure), starWidth, rectWidth),
+                          y - (scaledDiameter(departure, biggestDiameterPixels, biggestDiameter) / 2),
+                          planetX(forcePosition, starWidth, rectWidth),
+                          y - (scaledDiameter(activeRoute.getTargetPlanet(), biggestDiameterPixels,
+                                biggestDiameter) / 2),
+                          y);
+                    drawCourse(g2, activeTransferCourse, Color.YELLOW);
+                }
+
                 for (int i = 1; i <= n; i++) {
-                    x = (rectWidth * (i - 1)) + starWidth + midpoint;
+                    x = planetX(i, starWidth, rectWidth);
                     Planet p = system.getPlanet(i);
 
                     if (null != p) {
-                        // diameters need to be scaled relative to the largest planet, but linear
-                        // scale will make all but gas/ice giants tiny. log scale made sizes too close,
-                        // but cubic root scale seems to work pretty well.
-                        int diameter = (int) ((biggestDiameterPixels)
-                                                    * (Math.cbrt(p.getDiameter()) / Math.cbrt(biggestDiameter)));
-                        if (diameter < minDiameter) {
-                            diameter = minDiameter;
-                        } else if (diameter > maxDiameter) {
-                            diameter = maxDiameter;
-                        }
+                        int diameter = scaledDiameter(p, biggestDiameterPixels, biggestDiameter);
                         int radius = diameter / 2;
 
-                        // check for current location - we assume you are on primary planet for now
-                        if (mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
-                                  .getForceDetachment()
-                                  .getCurrentLocation()
-                                  .getCurrentSystem()
-                                  .equals(system)
-                                  && i == system.getPrimaryPlanetPosition()) {
-                            updateShipImages();
-
+                        // check for current location; an in-system transfer is drawn once all worlds are in place
+                        if (isForceInSystem && !isTransferring && (i == forcePosition)) {
                             JumpPath jp = mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
                                                 .getForceDetachment()
                                                 .getCurrentLocation()
@@ -428,6 +460,23 @@ public class PlanetarySystemMapPanel extends JPanel {
                             rectWidth - UIUtil.scaleForGUI(6));
                     }
                 }
+
+                if (activeTransferCourse != null) {
+                    double progress = Math.clamp(forceLocation.getPercentageTransit(), 0.0, 1.0);
+                    Point2D shipPosition = getPointOnCourse(activeTransferCourse, progress);
+                    int shipX = (int) Math.round(shipPosition.getX());
+                    int shipY = (int) Math.round(shipPosition.getY());
+                    drawRing(g2, shipX, shipY, shipImgSize / 2, Color.ORANGE);
+                    if (null != imgDropshipFleet) {
+                        drawRotatedImage(g2, imgDropshipFleet, getCourseHeading(activeTransferCourse, progress),
+                              shipX - (shipImgSize / 2), shipY - (shipImgSize / 2), shipImgSize, shipImgSize);
+                    }
+                    // the JumpShips wait at the jump point
+                    if (null != imgJumpshipFleet) {
+                        drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                              shipImgSize);
+                    }
+                }
             }
         };
 
@@ -442,6 +491,9 @@ public class PlanetarySystemMapPanel extends JPanel {
         getActionMap().put("back", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (isTextFieldFocused()) {
+                    return;
+                }
                 back();
             }
         });
@@ -454,6 +506,9 @@ public class PlanetarySystemMapPanel extends JPanel {
         getActionMap().put("left", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (isTextFieldFocused()) {
+                    return;
+                }
                 int target_pos = selectedPlanet - 1;
                 if (target_pos < 1) {
                     return;
@@ -471,6 +526,9 @@ public class PlanetarySystemMapPanel extends JPanel {
         getActionMap().put("right", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (isTextFieldFocused()) {
+                    return;
+                }
                 int target_pos = selectedPlanet + 1;
                 if (target_pos > (system.getPlanets().size())) {
                     return;
@@ -812,6 +870,122 @@ public class PlanetarySystemMapPanel extends JPanel {
         if (null != jumpship) {
             imgJumpshipFleet = Utilities.toBufferedImage(jumpship.getImage(this));
         }
+    }
+
+    /**
+     * Sets the course the player is planning, so an in-system course within this system can be previewed.
+     *
+     * @param route the planned route, or {@code null} if none is planned
+     */
+    public void setPlannedRoute(@Nullable JumpPath route) {
+        plannedRoute = (route == null) ? new JumpPath() : route;
+    }
+
+    /**
+     * @return the world the force is at, or headed for on its final in-system leg
+     */
+    private static @Nullable Planet getForceWorld(AbstractLocation location, @Nullable JumpPath activeRoute) {
+        if ((activeRoute != null) && (activeRoute.size() == 1) && (activeRoute.getTargetPlanet() != null)) {
+            return activeRoute.getTargetPlanet();
+        }
+        return location.getPlanet();
+    }
+
+    /**
+     * @return the position of {@code planet} within its system, or {@code 0} if it has none
+     */
+    private static int getPosition(@Nullable Planet planet) {
+        Integer position = (planet == null) ? null : planet.getSystemPosition();
+        return (position == null) ? 0 : position;
+    }
+
+    /**
+     * @return whether {@code route} is a course between worlds of the displayed system
+     */
+    private boolean isInSystemRoute(@Nullable JumpPath route) {
+        if ((route == null) || (route.size() != 1) || !system.equals(route.getFirstSystem())) {
+            return false;
+        }
+        Planet destination = route.getTargetPlanet();
+        return (destination != null) && system.equals(destination.getParentSystem()) && (getPosition(destination) > 0)
+                     && ((route.getOriginPlanet() == null) || (getPosition(route.getOriginPlanet()) > 0));
+    }
+
+    /**
+     * @return the x-axis position of the center of the planet at {@code position}
+     */
+    private static int planetX(int position, int starWidth, int rectWidth) {
+        return starWidth + (rectWidth * (position - 1)) + (rectWidth / 2);
+    }
+
+    /**
+     * @return the drawn diameter of {@code planet}, in pixels
+     */
+    private static int scaledDiameter(Planet planet, int biggestDiameterPixels, double biggestDiameter) {
+        // diameters need to be scaled relative to the largest planet, but linear
+        // scale will make all but gas/ice giants tiny. log scale made sizes too close,
+        // but cubic root scale seems to work pretty well.
+        int diameter = (int) ((biggestDiameterPixels) * (Math.cbrt(planet.getDiameter()) / Math.cbrt(biggestDiameter)));
+        return Math.clamp(diameter, minDiameter, maxDiameter);
+    }
+
+    /**
+     * Creates the arc an in-system transfer follows, rising above the worlds between its two ends so it doesn't cross
+     * them.
+     *
+     * @param centerY the y-axis position the worlds are drawn along
+     */
+    private static QuadCurve2D createTransferCourse(int departureX, int departureY, int destinationX,
+          int destinationY, int centerY) {
+        double lift = Math.min(Math.max(Math.abs(destinationX - departureX) / 2.0, UIUtil.scaleForGUI(48)),
+              centerY - UIUtil.scaleForGUI(24));
+        double controlY = Math.min(departureY, destinationY) - lift;
+        return new QuadCurve2D.Double(departureX, departureY, (departureX + destinationX) / 2.0, controlY,
+              destinationX, destinationY);
+    }
+
+    /**
+     * Draws a course as a dashed line of the given color.
+     */
+    private static void drawCourse(Graphics2D g, Shape course, Color color) {
+        Stroke originalStroke = g.getStroke();
+        g.setColor(color);
+        g.setStroke(new BasicStroke(UIUtil.scaleForGUI(3), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+              new float[] { UIUtil.scaleForGUI(9) }, 0));
+        g.draw(course);
+        g.setStroke(originalStroke);
+    }
+
+    /**
+     * @return the point {@code progress} of the way along {@code course}
+     */
+    private static Point2D getPointOnCourse(QuadCurve2D course, double progress) {
+        double remaining = 1 - progress;
+        double x = (remaining * remaining * course.getX1()) + (2 * remaining * progress * course.getCtrlX())
+                         + (progress * progress * course.getX2());
+        double y = (remaining * remaining * course.getY1()) + (2 * remaining * progress * course.getCtrlY())
+                         + (progress * progress * course.getY2());
+        return new Point2D.Double(x, y);
+    }
+
+    /**
+     * @return the rotation, in degrees clockwise from facing up, of a ship {@code progress} of the way along
+     *       {@code course}
+     */
+    private static double getCourseHeading(QuadCurve2D course, double progress) {
+        double dx = (2 * (1 - progress) * (course.getCtrlX() - course.getX1()))
+                          + (2 * progress * (course.getX2() - course.getCtrlX()));
+        double dy = (2 * (1 - progress) * (course.getCtrlY() - course.getY1()))
+                          + (2 * progress * (course.getY2() - course.getCtrlY()));
+        return Math.toDegrees(Math.atan2(dx, -dy));
+    }
+
+    /**
+     * The navigation HUD's search fields share the window with this panel, so letters typed there must not also move
+     * the planet selection.
+     */
+    private static boolean isTextFieldFocused() {
+        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof JTextComponent;
     }
 
     private final transient List<ActionListener> listeners = new ArrayList<>();

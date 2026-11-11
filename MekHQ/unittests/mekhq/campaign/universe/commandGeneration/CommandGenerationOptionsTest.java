@@ -40,8 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -96,21 +97,15 @@ class CommandGenerationOptionsTest {
     void constructor_pipelineDefaults_matchLegacyRulesetBasedConfiguration() {
         CommandGenerationOptions options = new CommandGenerationOptions();
 
-        // Tech-to-unit assignment grid: officers first, then heaviest, then best pilot.
-        assertTrue(options.isAssignTechsToUnits());
-        assertEquals(TechAssignmentSortFactor.PILOT_RANK, options.getTechAssignmentPrimarySort());
-        assertTrue(options.isTechAssignmentPrimaryDescending());
-        assertEquals(TechAssignmentSortFactor.UNIT_WEIGHT, options.getTechAssignmentSecondarySort());
-        assertTrue(options.isTechAssignmentSecondaryDescending());
-        assertEquals(TechAssignmentSortFactor.PILOT_SKILL, options.getTechAssignmentTertiarySort());
-        assertTrue(options.isTechAssignmentTertiaryDescending());
-
         // Rank assignment and personnel flags.
         assertTrue(options.isAutomaticallyAssignRanks());
-        assertTrue(options.isUseSpecifiedFactionToAssignRanks());
         assertTrue(options.isAssignCompanyCommanderFlag());
         assertTrue(options.isAssignMekWarriorsCallSigns());
         assertTrue(options.isAssignFounderFlag());
+
+        // Formation naming.
+        assertEquals(ForceNamingMethod.ICAO_1956, options.getForceNamingMethod());
+        assertTrue(options.isAlwaysNumberRegiments());
 
         // Formation icons.
         assertTrue(options.isGenerateFormationIcons());
@@ -118,11 +113,15 @@ class CommandGenerationOptionsTest {
         assertTrue(options.isGenerateOriginNodeFormationIcon());
         assertFalse(options.isUseOriginNodeFormationIconLogo());
 
-        // Finances: the command is granted free, with working capital defaulting to 10% of the
-        // generated units' purchase cost, floored so it can pay its first month's wages.
+        // Finances: the command is granted free, with working capital defaulting to six months of its running
+        // costs, floored so it can pay its first month's wages.
         assertTrue(options.isProcessFinances());
-        assertEquals(10, options.getStartingCashPercent());
+        assertEquals(6, options.getStartingCashMonths());
+        assertFalse(options.isRandomizeStartingCash());
+        assertEquals(18, options.getRandomStartingCashDiceCount());
         assertEquals(10_000_000L, options.getMinimumStartingFloat());
+        assertFalse(options.isStartingLoan());
+        assertFalse(options.isPayForSetup());
     }
 
     /**
@@ -142,10 +141,25 @@ class CommandGenerationOptionsTest {
         // A medical reserve so the command can absorb casualties from its first contract.
         assertTrue(options.isGenerateMedicalReserve());
 
-        // The command arrives with a history: marriages and children from the years before play.
-        assertTrue(options.isRunStartingSimulation());
+        // The starting simulation is opt-in; its sub-options stay on so turning it on gives the command a history.
+        assertFalse(options.isRunStartingSimulation());
+        assertEquals(10, options.getSimulationDuration());
         assertTrue(options.isSimulateRandomMarriages());
         assertTrue(options.isSimulateRandomProcreation());
+    }
+
+    @Test
+    void constructor_randomOriginDefaults_randomizeEveryoneWithTheExtraPlanetaryOrigin() {
+        RandomOriginOptions origin = new CommandGenerationOptions().getRandomOriginOptions();
+
+        assertNotNull(origin);
+        assertTrue(origin.isRandomizeOrigin());
+        assertTrue(origin.isRandomizeDependentOrigin());
+        assertFalse(origin.isRandomizeAroundSpecifiedPlanet());
+        assertEquals(0, origin.getOriginSearchRadius());
+        assertEquals(0.6, origin.getOriginDistanceScale(), 0.0001);
+        assertFalse(origin.isAllowClanOrigins());
+        assertTrue(origin.isExtraRandomOrigin());
     }
 
     @Test
@@ -177,5 +191,9 @@ class CommandGenerationOptionsTest {
         changed = new CommandGenerationOptions();
         changed.getForceDescriptorSnapshot().setYear(3025);
         assertNotEquals(options, changed, "the force description is part of the settings");
+
+        changed = new CommandGenerationOptions();
+        changed.getRandomOriginOptions().setOriginSearchRadius(250);
+        assertNotEquals(options, changed, "the Random Origin choices are part of the settings");
     }
 }
