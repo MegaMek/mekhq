@@ -69,6 +69,7 @@ import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.UnitCostModel;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -140,6 +141,14 @@ public class RefitTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER)).thenReturn(1d);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.UNIT_COST_MODEL)).thenReturn(UnitCostModel.TOTAL_WARFARE);
         double[] usedPartMultipliers = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
         lenient().when(mockCampaignOptions.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)).thenReturn(usedPartMultipliers);
 

@@ -313,7 +313,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getActualValue();
+        return getNewPart().getPurchaseCost();
     }
 
     public int getShotsNeeded() {

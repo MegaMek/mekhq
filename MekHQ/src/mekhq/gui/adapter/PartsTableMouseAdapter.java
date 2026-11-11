@@ -128,7 +128,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount = refundAmount.plus(p.getActualValue()
+                    refundAmount = refundAmount.plus(p.getPurchaseCost()
                                                            .multipliedBy(p.getQuantity())
                                                            .multipliedBy(gui.getCampaign()
                                                                                .getCampaignOptions()

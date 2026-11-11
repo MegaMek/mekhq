@@ -126,6 +126,7 @@ import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
 import mekhq.campaign.events.units.UnitArrivedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -2141,7 +2142,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         // Get the "buy new" price
-        Money buyNewPrice = getBuyCost();
+        Money buyNewPrice = getPurchaseCost();
         breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
               buyNewPrice.toAmountAndSymbolString())).append("<br>");
 
@@ -2167,6 +2168,13 @@ public class Unit implements ITechnology, ILocatable {
                       yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
                 sellFor = currentWorth.multipliedBy(obsoleteMultiplier);
             }
+        }
+
+        double acquisitionMultiplier = getAcquisitionMultiplier();
+        if (acquisitionMultiplier != 1.0) {
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.acquisition",
+                  String.format("%.2f", acquisitionMultiplier))).append("<br>");
+            sellFor = sellFor.multipliedBy(acquisitionMultiplier);
         }
 
         breakdown.append("<hr>");
@@ -3254,6 +3262,56 @@ public class Unit implements ITechnology, ILocatable {
     // End Transport Assignments
 
     public Money getBuyCost() {
+        return calculateBuyCost();
+    }
+
+    /**
+     * @return what the campaign pays to buy this unit: its {@link #getBuyCost()} times its Campaign Operations
+     *       acquisition multiplier (see {@link AcquisitionPriceMultipliers}). The acquisition multiplier only applies
+     *       when buying or selling (see {@link #getSalePrice()}), so it never touches the unit's value once owned
+     *       (maintenance, contract pay, battle loss compensation).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getPurchaseCost() {
+        return calculateBuyCost().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * The sale side of {@link #getPurchaseCost()}: the same whole-unit acquisition multiplier applies, so a unit sells
+     * at the same multiple of its value that it was bought at. Only actual sales use this; anything that values an
+     * owned unit (maintenance, contract pay, collateral, salvage) uses {@link #getSellValue()}.
+     *
+     * @return what the campaign receives for selling this unit: its {@link #getSellValue()} times its Campaign
+     *       Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getSalePrice() {
+        return getSellValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * @return this unit's Campaign Operations acquisition multiplier for the campaign's current faction and year; ×1
+     *       for a unit without an entity
+     */
+    private double getAcquisitionMultiplier() {
+        if (getEntity() == null) {
+            return 1.0;
+        }
+        return AcquisitionPriceMultipliers.getUnitMultiplier(getCampaign().getCampaignOptions(),
+              getCampaign().getPlayerForce().getFaction(), getCampaign().getGameYear(), getEntity());
+    }
+
+    /**
+     * Kept apart from {@link #getBuyCost()} so {@link #getPurchaseCost()} stays correct for subclasses, such as
+     * {@link UnitOrder}, whose buy cost is their purchase cost.
+     *
+     * @return the unit's value before any acquisition multiplier
+     */
+    private Money calculateBuyCost() {
         if (isUseAlternateUnitCost()) {
             return getAlternateUnitCost();
         }
@@ -3326,6 +3384,46 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Estimates what {@link #getPurchaseCost()} will return for an entity that has not yet been made into a unit: its
+     * {@link #estimateBuyCost(Entity, CampaignOptions)} times its acquisition multiplier.
+     *
+     * @param unitEntity      the entity to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear        the current year
+     *
+     * @return what the campaign would pay to buy the entity
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimatePurchaseCost(Entity unitEntity, CampaignOptions campaignOptions,
+          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
+        return estimateBuyCost(unitEntity, campaignOptions).multipliedBy(
+              AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear, unitEntity));
+    }
+
+    /**
+     * Estimates what {@link #getPurchaseCost()} will return for a unit from its {@link MekSummary} alone: its
+     * {@link #estimateBuyCost(MekSummary, CampaignOptions)} times its acquisition multiplier.
+     *
+     * @param summary         the unit to price
+     * @param campaignOptions the campaign options supplying the pricing rules and multipliers
+     * @param faction         the buying campaign's faction, or {@code null} to treat it as neither Clan nor ComStar
+     * @param gameYear        the current year
+     *
+     * @return what the campaign would pay to buy the unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money estimatePurchaseCost(MekSummary summary, CampaignOptions campaignOptions,
+          @Nullable mekhq.campaign.universe.Faction faction, int gameYear) {
+        return estimateBuyCost(summary, campaignOptions).multipliedBy(
+              AcquisitionPriceMultipliers.getUnitMultiplier(campaignOptions, faction, gameYear, summary));
+    }
+
+    /**
      * @param unitEntity      the entity to price
      * @param campaignOptions the campaign options supplying the unit price multipliers
      *
@@ -3362,7 +3460,7 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
+    public static double getUnitPriceMultiplier(Entity unitEntity, CampaignOptions campaignOptions) {
         return getUnitPriceMultiplier(unitEntity.isMixedTech(), unitEntity.isClan(), campaignOptions);
     }
 
@@ -3376,7 +3474,7 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
+    public static double getUnitPriceMultiplier(boolean isMixedTech, boolean isClan,
           CampaignOptions campaignOptions) {
         if (isMixedTech) {
             return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
