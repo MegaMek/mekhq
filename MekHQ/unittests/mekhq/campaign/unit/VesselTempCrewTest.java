@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -51,6 +52,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -108,6 +110,7 @@ class VesselTempCrewTest {
 
     private Person mockPerson() {
         Person person = mock(Person.class);
+        lenient().when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         UUID id = UUID.randomUUID();
         when(person.getId()).thenReturn(id);
         when(person.getFullName()).thenReturn("Crew Member");

@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -54,6 +55,7 @@ import java.util.UUID;
 
 import megamek.common.units.Dropship;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,6 +126,7 @@ class UnitCrewRepairTest {
     private Person mockPerson() {
         UUID id = UUID.randomUUID();
         Person person = mock(Person.class);
+        lenient().when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.getId()).thenReturn(id);
         when(person.getUnit()).thenReturn(dropShip);
         when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);

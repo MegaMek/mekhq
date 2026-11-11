@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -50,6 +51,7 @@ import java.util.UUID;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.enums.CrewSeat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,7 @@ class UnitCrewSeatTest {
     private Person createPerson() {
         UUID personId = UUID.randomUUID();
         Person person = mock(Person.class);
+        lenient().when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.getId()).thenReturn(personId);
         when(campaign.getPlayerForce().getHumanResources().getPerson(eq(personId))).thenReturn(person);
         return person;
