@@ -9302,6 +9302,9 @@ public class Unit implements ITechnology, ILocatable {
             partsCost = partsCost.multipliedBy(SparePartsQuirkMultiplier.find(entity, getCampaign().getGameYear()));
         }
 
+        // Spare parts are bought, so they also pay the unit's Equipment Availability & Cost Table multipliers (CO p.24)
+        partsCost = partsCost.multipliedBy(getAcquisitionMultiplier());
+
         return partsCost;
     }
 

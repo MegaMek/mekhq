@@ -73,8 +73,9 @@ import mekhq.campaign.universe.Faction;
  *
  * <p>These multipliers only apply to what the campaign pays when buying and receives when selling (see
  * {@link mekhq.campaign.unit.Unit#getPurchaseCost()}, {@link mekhq.campaign.unit.Unit#getSalePrice()},
- * {@link Part#getPurchaseCost()} and {@link Part#getSalePrice()}), never to the value of what it owns (maintenance,
- * contract pay, battle loss compensation, salvage). They only apply under the
+ * {@link Part#getPurchaseCost()} and {@link Part#getSalePrice()}), and to the spare parts it buys each month for its
+ * units ({@link mekhq.campaign.unit.Unit#getSparePartsCost()}, CO p.24), never to the value of what it owns
+ * (maintenance, contract pay, battle loss compensation, salvage). They only apply under the
  * {@link mekhq.campaign.finances.enums.UnitCostModel#TOTAL_WARFARE} {@link CampaignOption#UNIT_COST_MODEL}; every
  * other model leaves them at ×1.</p>
  *

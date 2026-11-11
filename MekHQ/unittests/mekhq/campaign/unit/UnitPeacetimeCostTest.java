@@ -35,6 +35,8 @@ package mekhq.campaign.unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.AmmoType.Munitions;
@@ -108,6 +110,16 @@ class UnitPeacetimeCostTest {
 
         // A platoon's weight is its transport weight; 0.2% of it at 10,000 a ton
         assertMoney(platoon.getEntity().getWeight() * 0.002 * 10000, platoon.getSparePartsCost());
+    }
+
+    @Test
+    void sparePartsPayTheUnitsAcquisitionMultiplier() {
+        scenario.getCampaign().setLocalDate(LocalDate.of(3060, 1, 1));
+        scenario.getCampaign().getCampaignOptions().set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 5.0);
+        Unit clanMek = scenario.withUnit(UnitFixture.HOPLITE_C);
+
+        // CO p.24: spare parts are multiplied by the Equipment Availability & Cost Table multipliers (CO p.14)
+        assertMoney(clanMek.getEntity().getWeight() * 0.001 * 10000 * 5.0, clanMek.getSparePartsCost());
     }
 
     // Fuel

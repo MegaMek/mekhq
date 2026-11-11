@@ -156,7 +156,7 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
                 }
             }
-            // Removed option: CamOps no longer has extended spare parts modifiers.
+            // Removed option: spare parts now always pay the acquisition price multipliers (CO p.24).
             case "useExtendedPartsModifier" -> {
             }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
