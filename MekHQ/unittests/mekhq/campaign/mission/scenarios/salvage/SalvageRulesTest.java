@@ -399,7 +399,8 @@ class SalvageRulesTest {
                 verifyConfirmedSalvageSettled(utilities, campaign, contract, scenario);
                 List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(90)));
-                utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(any(), anyList(), anyInt()),
+                utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(any(), anyList(), anyInt(),
+                            anyBoolean()),
                       never());
             }
         }
@@ -441,7 +442,7 @@ class SalvageRulesTest {
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(), anyList(),
                       anyList(), anyList(), anyBoolean()), never());
                 utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
-                      eq(0)));
+                      eq(0), eq(false)));
                 utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(0)));
             }
         }
@@ -458,7 +459,26 @@ class SalvageRulesTest {
 
                 List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
-                      eq(3)));
+                      eq(3), eq(false)));
+            }
+        }
+
+        @Test
+        void carefulSalvageMakesRiskySalvageChecksCareful() {
+            Campaign campaign = campaign(true);
+            Scenario scenario = scenario(true, true);
+            SalvageRecoverySession session = confirmedSession();
+            when(session.isCarefulSalvage()).thenReturn(true);
+
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(session)) {
+                STRICT.resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed,
+                      presenter);
+
+                List<UUID> techs = scenario.getSalvageTechs();
+                utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
+                      eq(3), eq(true)));
+                utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(90)));
             }
         }
 

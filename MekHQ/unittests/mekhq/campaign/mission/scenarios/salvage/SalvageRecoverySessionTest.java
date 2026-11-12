@@ -310,6 +310,80 @@ class SalvageRecoverySessionTest {
 
             assertEquals(75, session.getRecoveryTimeData(session.getRecoveries().getFirst()).totalRecoveryTime());
         }
+
+        @Test
+        void salvageIsNotCarefulByDefault() {
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 100, 75)), List.of(), 600, 0, 0, 0);
+
+            assertFalse(session.isCarefulSalvage());
+            assertEquals(75, session.getRecoveryMinutes(session.getRecoveries().getFirst()));
+        }
+
+        @Test
+        void carefulSalvageTakesTenTimesAsLong() {
+            Unit truck = tank(0, 100);
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 100, 75)), List.of(truck), 1000, 0, 0, 0);
+            WreckRecovery recovery = session.getRecoveries().getFirst();
+            session.assign(recovery, truck, null);
+
+            session.setCarefulSalvage(true);
+
+            assertTrue(session.isCarefulSalvage());
+            assertEquals(750, session.getRecoveryMinutes(recovery));
+            assertEquals(750, session.getUsedMinutes());
+            // The breakdown still shows the wreck's own recovery time
+            assertEquals(75, session.getRecoveryTimeData(recovery).totalRecoveryTime());
+        }
+
+        @Test
+        void turningCarefulSalvageOffRestoresTheNormalTime() {
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 100, 75)), List.of(), 600, 0, 0, 0);
+            WreckRecovery recovery = session.getRecoveries().getFirst();
+
+            session.setCarefulSalvage(true);
+            session.setCarefulSalvage(false);
+
+            assertEquals(75, session.getRecoveryMinutes(recovery));
+        }
+
+        @Test
+        void carefulSalvageCanRunOutOfTechTime() {
+            Unit truck = tank(0, 100);
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 100, 75)), List.of(truck), 600, 0, 0, 0);
+            session.assign(session.getRecoveries().getFirst(), truck, null);
+            assertTrue(session.canConfirm());
+
+            session.setCarefulSalvage(true);
+
+            assertEquals(List.of(ConfirmBlocker.NOT_ENOUGH_TECH_TIME), session.getConfirmBlockers());
+        }
+
+        @Test
+        void carefulSalvageOnlyAutoAssignsWhatFitsInTheTechTime() {
+            Unit truckA = tank(0, 100);
+            Unit truckB = tank(0, 100);
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 1000, 60), wreck(20, 500, 60)), List.of(truckA, truckB), 1000, 0, 0, 0);
+            session.setCarefulSalvage(true);
+
+            assertEquals(1, session.autoAssign());
+            assertEquals(600, session.getUsedMinutes());
+            assertTrue(session.canConfirm());
+        }
+
+        @Test
+        void carefulSalvageTimeSaturatesRatherThanOverflowing() {
+            SalvageRecoverySession session = session(new CamOpsStrictSalvage(), new CappedSalvageSettlement(0.5),
+                  List.of(wreck(20, 100, Integer.MAX_VALUE / 2)), List.of(), 600, 0, 0, 0);
+
+            session.setCarefulSalvage(true);
+
+            assertEquals(Integer.MAX_VALUE, session.getRecoveryMinutes(session.getRecoveries().getFirst()));
+        }
     }
 
     @Nested

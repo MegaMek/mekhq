@@ -70,6 +70,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -213,6 +214,9 @@ public class SalvageRecoveryConsole extends JDialog {
         this.session = session;
 
         ownedUnitCounts = OwnedUnitCounts.of(campaign.getPlayerForce().getHangar().getUnits());
+        if (isCarefulSalvageOffered()) {
+            session.setCarefulSalvage(SalvageRecoveryPreferences.getInstance().isCarefulSalvage());
+        }
         buildWindow(scenario);
         focused = session.getRecoveries().isEmpty() ? null : session.getRecoveries().getFirst();
         refreshAll();
@@ -574,6 +578,10 @@ public class SalvageRecoveryConsole extends JDialog {
         if (requireSession().isUsingSalvageOperations()) {
             buttons.add(Hud.hint(text("footer")), BorderLayout.WEST);
 
+            if (isCarefulSalvageOffered()) {
+                actions.add(buildCarefulSalvageCheckBox());
+            }
+
             HudButton autoAssignButton = new HudButton(text("button.autoAssign").toUpperCase(Locale.ROOT), false);
             autoAssignButton.addActionListener(event -> {
                 requireSession().autoAssign();
@@ -601,6 +609,43 @@ public class SalvageRecoveryConsole extends JDialog {
         actions.add(confirmButton);
         buttons.add(actions, BorderLayout.EAST);
         return buttons;
+    }
+
+    /**
+     * Whether the player can have their techs work carefully. Careful salvage only makes accidents rarer, so it is
+     * offered only when the techs spend time recovering wrecks and risky salvage is on.
+     *
+     * @return {@code true} if the careful salvage checkbox is shown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isCarefulSalvageOffered() {
+        return requireSession().isUsingSalvageOperations() &&
+                     campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE);
+    }
+
+    /**
+     * Builds the checkbox that has the salvage techs work carefully. Its state is remembered between salvage
+     * operations.
+     *
+     * @return the checkbox
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JComponent buildCarefulSalvageCheckBox() {
+        HudCheckBox carefulSalvage = new HudCheckBox(text("button.carefulSalvage"));
+        carefulSalvage.setToolTipText(formatted("button.carefulSalvage.tooltip",
+              SalvageRecoverySession.CAREFUL_SALVAGE_TIME_MULTIPLIER));
+        carefulSalvage.setSelected(requireSession().isCarefulSalvage());
+        carefulSalvage.addActionListener(event -> {
+            boolean isSelected = carefulSalvage.isSelected();
+            SalvageRecoveryPreferences.getInstance().setCarefulSalvage(isSelected);
+            requireSession().setCarefulSalvage(isSelected);
+            refreshAll();
+        });
+        return carefulSalvage;
     }
 
     /**
@@ -846,7 +891,7 @@ public class SalvageRecoveryConsole extends JDialog {
         }
         dossierSub.setText(sub);
         RecoveryTimeData timeData = session.getRecoveryTimeData(recovery);
-        dossierSub.setToolTipText((timeData == null) ? null : timeData.getRecoveryTimeBreakdownString(true));
+        dossierSub.setToolTipText((timeData == null) ? null : recoveryTimeTooltip(session, recovery, timeData));
 
         if (session.isUsingSalvageOperations()) {
             firstSlot = refreshSlot(firstSlotRow, firstSlot, recovery, recovery.getFirstUnit(),
@@ -869,6 +914,22 @@ public class SalvageRecoveryConsole extends JDialog {
         statusLabel.setForeground(statusColor(recovery));
 
         refreshClaim(recovery);
+    }
+
+    /**
+     * Builds the tooltip breaking down a wreck's recovery time, including the careful salvage multiplier if it applies.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static String recoveryTimeTooltip(SalvageRecoverySession session, WreckRecovery recovery,
+          RecoveryTimeData timeData) {
+        String breakdown = timeData.getRecoveryTimeBreakdownString(false);
+        if (session.isCarefulSalvage()) {
+            breakdown += formatted("dossier.carefulSalvage", SalvageRecoverySession.CAREFUL_SALVAGE_TIME_MULTIPLIER,
+                  session.getRecoveryMinutes(recovery));
+        }
+        return "<html>" + breakdown + "</html>";
     }
 
     /**
