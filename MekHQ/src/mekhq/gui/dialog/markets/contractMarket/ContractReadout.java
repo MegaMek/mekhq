@@ -48,6 +48,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.personnel.Person;
 import org.apache.commons.lang3.StringUtils;
 import org.commonmark.parser.Parser;
@@ -185,7 +186,7 @@ public record ContractReadout(String employerLine, String title, String statusLi
         rows.add(row("dossier.contractMarket.intel.morale",
               ContractMarketFormatting.intel(contract, ObfuscatableIntel.MORALE,
                     contract.getMoraleLevel().toString())));
-        rows.add(row("dossier.contractMarket.intel.intensity", String.valueOf(contract.getTrackCount())));
+        rows.add(row("dossier.contractMarket.intel.intensity", ChaosContractDeterminationScale.formatScale(contract.getExactScale(), true)));
 
         // The same one-line advisory the dossier shows for a contract with a special nature.
         List<String> notes = new ArrayList<>();

@@ -56,6 +56,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
@@ -403,7 +404,8 @@ public class ContractDossierPanel extends JPanel {
         addRow(intel, "dossier.contractMarket.intel.threat", intelValue(ObfuscatableIntel.THREAT, threat(contract)));
         addRow(intel, "dossier.contractMarket.intel.morale",
               intelValue(ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
-        addRow(intel, "dossier.contractMarket.intel.intensity", String.valueOf(contract.getTrackCount()));
+        addRow(intel, "dossier.contractMarket.intel.intensity",
+              ChaosContractDeterminationScale.formatScale(contract.getExactScale(), true));
 
         // A muted, one-line advisory for a contract with a special nature. The natures are mutually exclusive, so at
         // most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell that (with the

@@ -69,6 +69,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
@@ -327,8 +328,8 @@ final class MarketComparePage {
         textRow(built, "dossier.contractMarket.intel.morale", offers,
               contract -> intel(contract, ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
         rankedRow(built, "dossier.contractMarket.intel.intensity", false, offers,
-              contract -> String.valueOf(contract.getTrackCount()), contract -> (double) contract.getTrackCount(),
-              Better.NEITHER);
+              contract -> ChaosContractDeterminationScale.formatScale(contract.getExactScale(), true),
+              AbstractContract::getExactScale, Better.NEITHER);
 
         section(built, "compare.contractMarket.section.terms");
         // Command rights run from least freedom (Integrated) to most (Independent), so a later right is better.
