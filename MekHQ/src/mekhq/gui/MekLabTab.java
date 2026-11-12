@@ -58,6 +58,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Aero;
 import megamek.common.units.ConvInfantry;
@@ -150,16 +151,30 @@ public class MekLabTab extends CampaignGuiTab {
     private JLabel lblTons;
 
     private JPanel shoppingPanel;
-    private final MegaMekLabFileSaver fileSaver;
 
     // region Constructors
     public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
-        this.fileSaver = new MegaMekLabFileSaver(LOGGER, resources.getString("dialog.saveAs.title"));
         this.repaint();
     }
     // endregion Constructors
+
+    /**
+     * Creates the file saver used by "Save For Later". If the player has set a user directory (where custom units are
+     * loaded from), the save dialog opens there instead of the working directory, so units are not accidentally saved
+     * to the wrong location. A fresh saver is needed because its file chooser reads the starting directory only when
+     * it is constructed.
+     *
+     * @return a file saver whose save dialog starts in the user directory when one is set
+     */
+    private MegaMekLabFileSaver createFileSaver() {
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if ((userDirectory != null) && !userDirectory.isBlank() && new File(userDirectory).isDirectory()) {
+            CConfig.setParam(CConfig.FILE_LAST_DIRECTORY, userDirectory);
+        }
+        return new MegaMekLabFileSaver(LOGGER, resources.getString("dialog.saveAs.title"));
+    }
 
     @Override
     public void initTab() {
@@ -176,7 +191,7 @@ public class MekLabTab extends CampaignGuiTab {
             Entity entity = labPanel.getEntity();
             UnitUtil.compactCriticalSlots(entity);
             labPanel.refreshAll(); // The crits may have moved
-            fileSaver.saveUnitAs(this.getFrame(), entity);
+            createFileSaver().saveUnitAs(this.getFrame(), entity);
             // Refresh unit cache so newly-saved file is available for refits.
             MekSummaryCache.refreshUnitData(false);
         });
