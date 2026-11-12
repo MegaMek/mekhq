@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -135,7 +137,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
         if (instructions != null) {
             JLabel lblInstructions = new JLabel(instructions);
-            lblInstructions.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            lblInstructions.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(5), scaleForGUI(5),
+                  scaleForGUI(5)));
             getContentPane().add(lblInstructions, BorderLayout.PAGE_START);
         }
         getContentPane().add(value, BorderLayout.CENTER);
