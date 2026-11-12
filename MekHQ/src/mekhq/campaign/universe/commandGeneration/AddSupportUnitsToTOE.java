@@ -183,11 +183,16 @@ public class AddSupportUnitsToTOE {
      * nothing in it is removed. Support carriers - the squads and platoons that carry the support staff - are never
      * moved.</p>
      *
+     * <p>Once a formation is split into lances, the lances do its job: they take the formation's type, and for a
+     * type MekHQ only gives to the formation that does the work - Convoy, Salvage, Security - the formation above
+     * them becomes a Standard one, as it would if the player had built the lances by hand. A Logistics company of
+     * two lances is therefore a Standard formation holding two Convoys, rather than a Convoy holding Convoys.</p>
+     *
      * @param campaign  the campaign that owns the TOE
      * @param group     the formation whose vehicles are arranged
      * @param lanceSize vehicles in a full lance; zero or less leaves the formation as it is
      * @param namer     the name of the lance at a given position, counting from one
-     * @param type      the formation type to give a new lance
+     * @param type      the formation type to give the lances
      *
      * @return the lances created; empty when none were needed
      */
@@ -198,6 +203,7 @@ public class AddSupportUnitsToTOE {
             return created;
         }
         removeEmptyLances(campaign, group, namer);
+        FormationType lanceType = lanceTypeFor(group, namer, type);
 
         List<Unit> looseVehicles = new ArrayList<>();
         for (UUID unitId : group.getUnits()) {
@@ -214,6 +220,7 @@ public class AddSupportUnitsToTOE {
             }
         }
         if (looseVehicles.isEmpty() || (!hasLances && (looseVehicles.size() <= lanceSize))) {
+            typeLances(group, namer, lanceType);
             return created;
         }
 
@@ -222,7 +229,8 @@ public class AddSupportUnitsToTOE {
             before.add(child.getId());
         }
         for (Unit vehicle : looseVehicles) {
-            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, type, looseVehicles.size());
+            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, lanceType,
+                  looseVehicles.size());
             campaign.getPlayerForce().addUnitToFormation(vehicle, lance.getId(), campaign);
         }
         for (Formation child : group.getSubFormations()) {
@@ -232,7 +240,61 @@ public class AddSupportUnitsToTOE {
         }
         LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
               looseVehicles.size(), lanceSize, created.size());
+        typeLances(group, namer, lanceType);
         return created;
+    }
+
+    /**
+     * The type a formation's lances should have. A formation already split into lances may have been made Standard by
+     * {@link #typeLances}, so its lances, not the formation, say what job they do.
+     *
+     * @param group the formation whose lances are typed
+     * @param namer the name of the lance at a given position, counting from one
+     * @param type  the type asked for
+     *
+     * @return {@code type}, unless it is Standard and the formation already has lances of another type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FormationType lanceTypeFor(Formation group, IntFunction<String> namer, FormationType type) {
+        if (!type.isStandard()) {
+            return type;
+        }
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer) && !child.getFormationType().isStandard()) {
+                return child.getFormationType();
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Gives a formation's lances their type and, when that type is one MekHQ keeps off the formations above it -
+     * Convoy, Salvage, Security - makes the formation itself Standard. A formation with no lances is left as it is,
+     * because it is itself the lance.
+     *
+     * @param group     the formation whose lances are typed
+     * @param namer     the name of the lance at a given position, counting from one
+     * @param lanceType the type the lances do their job as
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void typeLances(Formation group, IntFunction<String> namer, FormationType lanceType) {
+        boolean hasLances = false;
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer)) {
+                child.setFormationType(lanceType, true);
+                hasLances = true;
+            }
+        }
+        if (hasLances && !lanceType.isStandard() && lanceType.shouldStandardizeParents()
+                  && !group.isFormationType(FormationType.STANDARD)) {
+            LOGGER.info("[SupportTOE] '{}': its lances are {} formations, so it becomes a Standard one",
+                  group.getName(), lanceType);
+            group.setFormationType(FormationType.STANDARD, false);
+        }
     }
 
     /** Removes the lances under {@code group} that no longer hold anything. */

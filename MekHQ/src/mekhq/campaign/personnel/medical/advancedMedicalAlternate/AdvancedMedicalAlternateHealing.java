@@ -158,7 +158,8 @@ public class AdvancedMedicalAlternateHealing {
      * <p>This method scans all permanent injuries and records the primary body locations that are associated with
      * prosthetic subtypes. These locations will later receive a flat penalty to healing attempts.</p>
      *
-     * <p>Cloned limbs are excluded, as they are biological replacements rather than artificial prosthetics.</p>
+     * <p>Cloned limbs are excluded, as they are biological replacements rather than artificial prosthetics. Cosmetic
+     * surgery and fracture repair are excluded too, as they fit nothing artificial.</p>
      *
      * @param patient the person whose permanent injuries are being examined
      *
@@ -171,7 +172,7 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = new HashSet<>();
         for (Injury injury : patient.getPermanentInjuries()) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification() && !isClonedLimb(injury)) {
+            if (injurySubType.isPermanentModification() && incursProstheticPenalty(injury)) {
                 BodyLocation location = injury.getLocation();
                 BodyLocation primaryLocation = location.getPrimaryLocation();
 
@@ -183,14 +184,14 @@ public class AdvancedMedicalAlternateHealing {
         return prostheticPenalties;
     }
 
-    private static boolean isClonedLimb(Injury injury) {
+    private static boolean incursProstheticPenalty(Injury injury) {
         InjuryType injuryType = injury.getType();
         if (injuryType == null) {
-            return false;
+            return true;
         }
 
         ProstheticType prostheticType = ProstheticType.getProstheticFromInjury(injuryType);
-        return prostheticType != null && prostheticType.isClonedLimb();
+        return prostheticType == null || prostheticType.incursProstheticHealingPenalty();
     }
 
     /**

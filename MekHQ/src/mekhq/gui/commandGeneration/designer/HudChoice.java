@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -75,9 +76,13 @@ public final class HudChoice<T> extends JPanel {
      * @param label the text shown for it
      * @param sub   a short line under the label when shown as a segment, or {@code null}
      */
-    public record Choice<T>(@Nullable T value, String label, @Nullable String sub) {
+    public record Choice<T>(@Nullable T value, String label, @Nullable String sub, @Nullable Color subColor) {
         public Choice(@Nullable T value, String label) {
-            this(value, label, null);
+            this(value, label, null, null);
+        }
+
+        public Choice(@Nullable T value, String label, @Nullable String sub) {
+            this(value, label, sub, null);
         }
     }
 
@@ -109,6 +114,9 @@ public final class HudChoice<T> extends JPanel {
     private boolean firstIsRandom;
     private final JComboBox<Item> dropDown = new JComboBox<>();
     private boolean filling;
+    /** Whether the entries have been laid out at least once, and the Random setting they were laid out with. */
+    private boolean showingBuilt;
+    private boolean builtFirstIsRandom;
     private boolean showingSegments;
 
     /**
@@ -174,6 +182,12 @@ public final class HudChoice<T> extends JPanel {
      * @param selected   the value to select; one that is not offered leaves nothing selected
      */
     public void setChoices(List<Choice<T>> newChoices, @Nullable T selected) {
+        // The Force page re-reads every picker on each selection event, and most of those leave the entries as they
+        // were. Rebuilding the segments for nothing was much of what a click on the rail cost.
+        if (showingBuilt && newChoices.equals(choices) && (builtFirstIsRandom == firstIsRandom)) {
+            setSelected(selected);
+            return;
+        }
         filling = true;
         try {
             choices.clear();
@@ -194,7 +208,7 @@ public final class HudChoice<T> extends JPanel {
                 List<Segment<Integer>> leadList = new ArrayList<>();
                 if (leadOnOwnRow) {
                     Choice<T> choice = choices.get(0);
-                    leadList.add(new Segment<>(0, choice.label(), choice.sub(), true));
+                    leadList.add(new Segment<>(0, choice.label(), choice.sub(), true, choice.subColor()));
                 }
                 lead.setSegments(leadList);
                 lead.setVisible(leadOnOwnRow);
@@ -203,7 +217,7 @@ public final class HudChoice<T> extends JPanel {
                 List<Segment<Integer>> list = new ArrayList<>();
                 for (int index = first; index < choices.size(); index++) {
                     Choice<T> choice = choices.get(index);
-                    list.add(new Segment<>(index, choice.label(), choice.sub(), true));
+                    list.add(new Segment<>(index, choice.label(), choice.sub(), true, choice.subColor()));
                 }
                 segments.setSegments(list);
                 // Stacked under the lead row, the rest share its bottom edge rather than drawing a second one.
@@ -225,6 +239,8 @@ public final class HudChoice<T> extends JPanel {
                 showingSegments = useSegments;
             }
             setMaximumSize(new Dimension(Short.MAX_VALUE, getPreferredSize().height));
+            showingBuilt = true;
+            builtFirstIsRandom = firstIsRandom;
             revalidate();
             repaint();
         } finally {

@@ -81,6 +81,7 @@ import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechSpecialization;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
@@ -131,7 +132,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                 campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), false, true),
           level -> "<html>" + SkillType.getColoredExperienceLevelName(level) + "</html>"),
     PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
-          (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate())),
+          (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate())
+                                      + TechSpecialization.describeAsRoleSuffix(person, campaign)),
     UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignment),
     UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,

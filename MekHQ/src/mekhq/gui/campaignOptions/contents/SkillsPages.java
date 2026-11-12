@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPageContentWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -858,7 +859,7 @@ public class SkillsPages {
             FontMetrics fontMetrics = getFontMetrics(getFont());
             int textWidth = fontMetrics.stringWidth(text) + insets.left + insets.right;
             int columnWidth = table.getColumnModel().getColumn(column).getWidth();
-            setToolTipText(textWidth > columnWidth ? text : null);
+            setToolTipText(textWidth > columnWidth ? wordWrap(text) : null);
             return this;
         }
     }
