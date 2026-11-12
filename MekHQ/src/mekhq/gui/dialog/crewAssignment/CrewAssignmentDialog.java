@@ -43,18 +43,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
@@ -66,6 +59,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
@@ -86,8 +80,13 @@ import mekhq.gui.baseComponents.hud.HudFilterList.Item;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleFilter;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleGroup;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.UnitStatus;
 import mekhq.gui.model.LocationFilterItem;
 
@@ -150,10 +149,20 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.assignment = value;
         refresh();
     });
-    private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
+    private final HudFilterList<RoleFilter> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
         refresh();
     });
+    private final HudFilterList<Condition> conditionFilter = new HudFilterList<>(value -> {
+        state.condition = value;
+        refresh();
+    });
+    private final HudFilterList<FamiliarityBand> familiarityFilter = new HudFilterList<>(value -> {
+        state.familiarity = value;
+        refresh();
+    });
+    /** Names the chassis the familiarity filter measures against. */
+    private final JLabel familiarityBasis = new JLabel();
 
     private final CardLayout pageCards = new CardLayout();
     private final JPanel pageHolder = new JPanel(pageCards);
@@ -167,6 +176,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private final HudCheckBox autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "guide.autoOpen"));
     private final HudGuideDrawer guideDrawer;
     private final HudButton guideButton = new HudButton("", false, true);
+    /** Hides or shows the filter rail on every page, for more room for the lists. */
+    private final HudButton filtersButton = new HudButton("", false, true);
     /** The page whose guide was last offered, so moving to another page offers that page's guide once. */
     private CrewAssignmentPage guideOfferedFor;
 
@@ -253,6 +264,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
               autoOpenGuides, getTextAt(RESOURCE_BUNDLE, "guide.close"), this::closeGuide);
         guideButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "guide.button.toolTipText"));
         guideButton.addActionListener(event -> openGuide(state.page));
+        filtersButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "filters.button.toolTipText"));
+        filtersButton.addActionListener(event -> {
+            guidePreferences.setFiltersHidden(railHolder.isVisible());
+            refresh();
+        });
 
         preselect(units, people);
         buildUI();
@@ -399,6 +415,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         bar.add(topRow, BorderLayout.CENTER);
         JPanel modesRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         modesRow.add(modeSelector, BorderLayout.CENTER);
+        // Far left, above the filter rail it hides
+        modesRow.add(filtersButton, BorderLayout.WEST);
         modesRow.add(guideButton, BorderLayout.EAST);
         bar.add(modesRow, BorderLayout.SOUTH);
         return bar;
@@ -421,6 +439,18 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
         peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
         peopleRail.add(leftAligned(roleFilter));
+        peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
+        peopleRail.add(leftAligned(conditionFilter));
+        if (data.familiarityMode().isEnabled()) {
+            familiarityBasis.setForeground(TEXT_MUTED);
+            familiarityBasis.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
+            peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
+            peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.familiarity"))));
+            peopleRail.add(leftAligned(familiarityBasis));
+            peopleRail.add(Box.createVerticalStrut(scaleForGUI(4)));
+            peopleRail.add(leftAligned(familiarityFilter));
+        }
 
         railHolder.setOpaque(false);
         railHolder.add(railScroll(unitRail), CrewAssignmentPage.UNITS.name());
@@ -508,6 +538,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                                              .toUpperCase(Locale.ROOT));
         pageCards.show(pageHolder, state.page.name());
         railCards.show(railHolder, state.page.name());
+        refreshFiltersButton();
         subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", data.locationName(),
               campaign.getLocalDate()));
 
@@ -580,20 +611,44 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private void refreshPersonnelPage(AssignmentPlan plan) {
         List<PersonEntry> shown = new ArrayList<>();
         Map<PersonnelRole, Integer> byRole = new TreeMap<>();
+        Map<RoleGroup, Integer> byRoleGroup = new EnumMap<>(RoleGroup.class);
         int unassigned = 0;
         int roleTotal = 0;
+        Map<Condition, Integer> byCondition = new EnumMap<>(Condition.class);
+        Map<FamiliarityBand, Integer> byFamiliarity = new EnumMap<>(FamiliarityBand.class);
+        Familiarity familiarityMode = data.familiarityMode();
+        String familiarityChassis = state.familiarityChassis();
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
-            boolean isAssigned = plan.plannedUnitOf(person) != null;
+            // Counted the way the list filters, so the rail's counts match the rows shown
+            boolean isAssigned = CrewAssignmentState.isAssigned(person, plan);
             if (!isAssigned) {
                 unassigned++;
             }
             if ((state.assignment == Assignment.EVERYONE) || ((state.assignment == Assignment.ASSIGNED) == isAssigned)) {
                 roleTotal++;
                 for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
-                    if (role.isCombat()) {
+                    if (CrewAssignmentState.isFilterableRole(role)) {
                         byRole.merge(role, 1, Integer::sum);
+                    }
+                }
+                for (RoleGroup group : RoleGroup.values()) {
+                    if (CrewAssignmentState.matches(person, group)) {
+                        byRoleGroup.merge(group, 1, Integer::sum);
+                    }
+                }
+                for (Condition condition : Condition.values()) {
+                    if (CrewAssignmentState.matches(entry, condition)) {
+                        byCondition.merge(condition, 1, Integer::sum);
+                    }
+                }
+                if (familiarityMode.isEnabled()) {
+                    int score = CrewAssignmentState.familiarityScore(person, familiarityChassis);
+                    for (FamiliarityBand band : FamiliarityBand.values()) {
+                        if (CrewAssignmentState.matches(score, band)) {
+                            byFamiliarity.merge(band, 1, Integer::sum);
+                        }
                     }
                 }
             }
@@ -611,11 +666,26 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                     people.size() - unassigned),
               new Item<>(Assignment.EVERYONE, getTextAt(RESOURCE_BUNDLE, "Assignment.EVERYONE"), people.size())));
         assignmentFilter.setSelected(state.assignment);
-        List<Item<PersonnelRole>> roles = new ArrayList<>();
+        List<Item<RoleFilter>> roles = new ArrayList<>();
         roles.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allRoles"), roleTotal));
-        byRole.forEach((role, count) -> roles.add(new Item<>(role, role.getLabel(false), count)));
+        // The groups are always offered, so the player can see there are none rather than wonder where they went
+        for (RoleGroup group : RoleGroup.values()) {
+            roles.add(new Item<>(group, getTextAt(RESOURCE_BUNDLE, "RoleGroup." + group.name()),
+                  byRoleGroup.getOrDefault(group, 0)));
+        }
+        byRole.forEach((role, count) -> roles.add(new Item<>(new SingleRole(role), role.getLabel(false), count)));
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
+        List<Item<Condition>> conditions = new ArrayList<>();
+        for (Condition condition : Condition.values()) {
+            conditions.add(new Item<>(condition, getTextAt(RESOURCE_BUNDLE, "Condition." + condition.name()),
+                  byCondition.getOrDefault(condition, 0)));
+        }
+        conditionFilter.setItems(conditions);
+        conditionFilter.setSelected(state.condition);
+        if (familiarityMode.isEnabled()) {
+            refreshFamiliarityFilter(familiarityMode, familiarityChassis, byFamiliarity);
+        }
 
         List<JComponent> chips = new ArrayList<>();
         if (state.qualifiedFor != null) {
@@ -638,6 +708,55 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             chips.add(chip);
         }
         peoplePage.setChips(chips);
+    }
+
+    /**
+     * Shows or hides the filter rail as the player last chose. While it is hidden, the button counts the page's rail
+     * filters still narrowing the list, so a hidden filter cannot quietly leave someone out.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void refreshFiltersButton() {
+        boolean isHidden = CrewAssignmentGuidePreferences.getInstance().isFiltersHidden();
+        if (railHolder.isVisible() == isHidden) {
+            railHolder.setVisible(!isHidden);
+            getContentPane().revalidate();
+            getContentPane().repaint();
+        }
+        String text;
+        if (!isHidden) {
+            text = getTextAt(RESOURCE_BUNDLE, "filters.hide");
+        } else {
+            int active = state.activeRailFilters(state.page);
+            text = (active == 0) ? getTextAt(RESOURCE_BUNDLE, "filters.show") :
+                         getFormattedTextAt(RESOURCE_BUNDLE, "filters.show.active", active);
+        }
+        filtersButton.setText(text.toUpperCase(Locale.ROOT));
+    }
+
+    /**
+     * Fills the familiarity filter, offering only the bands the mode's cap can reach, and names the chassis it
+     * measures against.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void refreshFamiliarityFilter(Familiarity familiarityMode, @Nullable String familiarityChassis,
+          Map<FamiliarityBand, Integer> byFamiliarity) {
+        familiarityBasis.setText((familiarityChassis == null) ?
+                                       getTextAt(RESOURCE_BUNDLE, "rail.familiarity.best") :
+                                       getFormattedTextAt(RESOURCE_BUNDLE, "rail.familiarity.chassis",
+                                             familiarityChassis));
+        List<Item<FamiliarityBand>> bands = new ArrayList<>();
+        for (FamiliarityBand band : FamiliarityBand.values()) {
+            if (band.getThreshold() <= familiarityMode.getFamiliarityCap()) {
+                bands.add(new Item<>(band, getTextAt(RESOURCE_BUNDLE, "FamiliarityBand." + band.name()),
+                      byFamiliarity.getOrDefault(band, 0)));
+            }
+        }
+        familiarityFilter.setItems(bands);
+        familiarityFilter.setSelected(state.familiarity);
     }
 
     private void refreshReviewPage(AssignmentPlan plan) {
@@ -670,7 +789,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private void refreshTiles(AssignmentPlan plan) {
         int unassigned = 0;
         for (PersonEntry entry : data.people()) {
-            if (plan.plannedUnitOf(entry.person()) == null) {
+            // The tile counts combat personnel only, not the techs and other staff the page also lists
+            Person person = entry.person();
+            boolean isCombat = person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat();
+            if (isCombat && (plan.plannedUnitOf(person) == null)) {
                 unassigned++;
             }
         }
@@ -834,7 +956,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     @Override
     public void autoFill() {
-        List<Person> candidates = data.people().stream().map(PersonEntry::person).toList();
+        List<Person> candidates = new ArrayList<>();
+        for (PersonEntry entry : data.people()) {
+            if (CrewAssignmentData.isAutoFillCandidate(entry.person())) {
+                candidates.add(entry.person());
+            }
+        }
         if (state.targetTech) {
             TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates);
             reportStaged(result.staged().size(), 0);
@@ -1108,6 +1235,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         state.unitType = null;
         state.formation = null;
         state.role = null;
+        state.condition = Condition.ANY;
+        state.familiarity = FamiliarityBand.ANY;
         lastUnitIndex = -1;
         lastPersonIndex = -1;
         // The row renderers hold the plan they draw from, so they are given the new one
