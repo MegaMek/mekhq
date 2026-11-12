@@ -44,9 +44,7 @@ import java.util.Map;
 import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -97,14 +95,6 @@ class CrewAssignmentStateFamiliarityTest {
     void scoreWithoutChassisIsTheBestFamiliarity() {
         assertEquals(250, CrewAssignmentState.familiarityScore(personWith(Map.of("Atlas", 150, "Locust", 250)), null));
         assertEquals(0, CrewAssignmentState.familiarityScore(personWith(Map.of()), null));
-    }
-
-    @Test
-    void chassisComesFromTheSeatBeingFilledFirst() {
-        CrewAssignmentState state = new CrewAssignmentState();
-        state.openUnit = unitWithChassis("Locust");
-        state.qualifiedFor = new SeatFilter(unitWithChassis("Atlas"), SeatType.PILOT);
-        assertEquals("Atlas", state.familiarityChassis());
     }
 
     @Test

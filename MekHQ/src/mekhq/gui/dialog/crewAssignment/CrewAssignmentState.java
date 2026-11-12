@@ -180,9 +180,6 @@ final class CrewAssignmentState {
         }
     }
 
-    /** A seat type on one unit, used to show only the people who qualify for it. */
-    record SeatFilter(Unit unit, SeatType seat) {}
-
     CrewAssignmentPage page = CrewAssignmentPage.ASSIGN;
 
     // Unit cards
@@ -209,10 +206,6 @@ final class CrewAssignmentState {
     /** Stays {@link FamiliarityBand#ANY} while chassis familiarity is off, as the filter is not offered then. */
     FamiliarityBand familiarity = FamiliarityBand.ANY;
     String peopleQuery = "";
-    /** When set, the people list shows only people who could take this seat, even if it is full now. */
-    @Nullable SeatFilter qualifiedFor;
-    /** When set, the people list shows only techs who could take this unit on, or already maintain it. */
-    @Nullable Unit techFor;
 
     /** The selected people, in the order they were selected; the first selected are the first assigned. */
     final Set<Person> selectedPeople = new LinkedHashSet<>();
@@ -428,14 +421,6 @@ final class CrewAssignmentState {
                   && !matches(familiarityScore(person, familiarityChassis()), familiarity)) {
             return false;
         }
-        if ((page != CrewAssignmentPage.TECHS) && (qualifiedFor != null)
-                  && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
-                  && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
-            return false;
-        }
-        if ((techFor != null) && !person.equals(plan.plannedTechOf(techFor)) && !plan.canStageTech(person, techFor)) {
-            return false;
-        }
         return matches(entry.searchText(), peopleQuery);
     }
 
@@ -522,8 +507,8 @@ final class CrewAssignmentState {
     }
 
     /**
-     * The unit whose chassis the familiarity filter measures against: the unit a seat or tech is being found for, or
-     * else the unit whose card is open. With none of those, there is no one chassis to measure.
+     * The unit whose chassis the familiarity filter measures against: the unit whose card is open. With no card open,
+     * there is no one chassis to measure.
      *
      * @return the unit, or {@code null} to measure each person's best familiarity with any chassis
      *
@@ -531,12 +516,6 @@ final class CrewAssignmentState {
      * @since 0.51.01
      */
     @Nullable Unit familiarityUnit() {
-        if (qualifiedFor != null) {
-            return qualifiedFor.unit();
-        }
-        if (techFor != null) {
-            return techFor;
-        }
         return openUnit;
     }
 

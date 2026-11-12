@@ -72,7 +72,6 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
-import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -321,19 +320,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             }
         }
         if (!state.pinnedUnits.isEmpty()) {
-            // Opened for these units: list only them, however well they are crewed, and show who could fill the
-            // first open seat when there is just the one
+            // Opened for these units: list only them, however well they are crewed, with the first one's card open
             state.unitStatus = UnitStatus.ALL;
-            Unit first = state.pinnedUnits.iterator().next();
-            state.openUnit = first;
-            if (state.pinnedUnits.size() == 1) {
-                for (CrewSeat seat : data.plan().seatsOf(first)) {
-                    if (data.plan().openSeats(first, seat.type()) > 0) {
-                        state.qualifiedFor = new SeatFilter(first, seat.type());
-                        break;
-                    }
-                }
-            }
+            state.openUnit = state.pinnedUnits.iterator().next();
         } else if (state.selectedPeople.size() == 1) {
             // Opened for one person: list only the units with a seat they could take
             state.seatsForPerson = state.selectedPeople.iterator().next();
@@ -759,25 +748,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                 chips.add(chip);
             }
         }
-        if ((state.qualifiedFor != null) && !isTechsPage()) {
-            SeatFilter filter = state.qualifiedFor;
-            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "personnel.qualifiedFor",
-                  CrewRowRenderers.seatLabel(filter.unit(), filter.seat()), filter.unit().getName()), () -> {
-                state.qualifiedFor = null;
-                refresh();
-            });
-            chip.setActive(true);
-            chips.add(chip);
-        }
-        if (state.techFor != null) {
-            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "personnel.techFor",
-                  state.techFor.getName()), () -> {
-                state.techFor = null;
-                refresh();
-            });
-            chip.setActive(true);
-            chips.add(chip);
-        }
         peoplePage.setChips(chips);
     }
 
@@ -1009,15 +979,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     /**
      * Moves to a page. Going between the Assign and Techs pages starts the filters that mean something different on
-     * each of them over, so a role or a "who fits" filter from one page cannot quietly empty the other; the people
+     * each of them over, so a role filter from one page cannot quietly empty the other; the people
      * ticked stay ticked. Coming back from the Review page changes nothing.
      */
     private void enterPage(CrewAssignmentPage page) {
         if (page.isWorkPage() && (page != lastWorkPage)) {
             state.assignment = CrewAssignmentState.defaultAssignment(page);
             state.role = null;
-            state.qualifiedFor = null;
-            state.techFor = null;
             state.seatsForPerson = null;
             state.unitsForTech = null;
             state.targetTech = false;
@@ -1293,30 +1261,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     @Override
-    public void findTechFor(Unit unit) {
-        // The list narrows to the techs who could take the unit on; the player ticks one and presses its button
-        state.techFor = unit;
-        state.qualifiedFor = null;
-        state.assignment = Assignment.EVERYONE;
-        state.role = null;
-        state.peopleQuery = "";
-        peoplePage.setSearchText("");
-        refresh();
-    }
-
-    @Override
-    public void findPeopleFor(Unit unit, SeatType seat) {
-        // The list narrows to the free people who could take the seat; the player ticks them and presses its button
-        state.qualifiedFor = new SeatFilter(unit, seat);
-        state.techFor = null;
-        state.assignment = Assignment.UNASSIGNED;
-        state.role = null;
-        state.peopleQuery = "";
-        peoplePage.setSearchText("");
-        refresh();
-    }
-
-    @Override
     public void toggleUnit(Unit unit) {
         state.openUnit = unit.equals(state.openUnit) ? null : unit;
         refresh();
@@ -1365,8 +1309,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.role = null;
             state.condition = Condition.ANY;
             state.familiarity = FamiliarityBand.ANY;
-            state.qualifiedFor = null;
-            state.techFor = null;
             state.peopleQuery = "";
             peoplePage.setSearchText("");
         }
@@ -1443,8 +1385,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         state.openUnit = null;
         state.seatsForPerson = null;
         state.unitsForTech = null;
-        state.qualifiedFor = null;
-        state.techFor = null;
         state.targetTech = false;
         state.isSpreadPreview = false;
         state.unitType = null;

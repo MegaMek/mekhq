@@ -88,7 +88,7 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  */
 final class CrewUnitBoard extends JPanel {
     private static final String RESOURCE_BUNDLE = CrewAssignmentDialog.RESOURCE_BUNDLE;
-    /** Wide enough for a seat's name and count, an Assign button naming one person, and the "Who fits?" link. */
+    /** Wide enough for a seat's name and count, and an Assign button naming one person. */
     private static final int PREFERRED_WIDTH = 560;
     private static final int MINIMUM_WIDTH = 480;
     /** How many cards are built at first, and how many more each "Show more" adds. */
@@ -142,10 +142,6 @@ final class CrewUnitBoard extends JPanel {
         void chooseTargetSeat(SeatType seat);
 
         void chooseTargetTech();
-
-        void findPeopleFor(Unit unit, SeatType seat);
-
-        void findTechFor(Unit unit);
 
         /** Opens a unit's card, or closes it if it is the open one. */
         void toggleUnit(Unit unit);
@@ -706,14 +702,9 @@ final class CrewUnitBoard extends JPanel {
             right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, (tech == null) ? "board.assignTech" :
                                                                              "board.replaceTech",
                   candidate.getFullName(), plan.techMinutesNeeded(candidate, unit)), () -> actions.assignTech(unit)));
-            right.add(Box.createHorizontalStrut(scaleForGUI(10)));
         } else if (!cannot.isEmpty() && !isOpen) {
             right.add(Hud.hint(shortReason(cannot)));
-            right.add(Box.createHorizontalStrut(scaleForGUI(10)));
         }
-        JLabel find = Hud.link(text("board.find"), () -> actions.findTechFor(unit));
-        find.setToolTipText(text("board.findTech.toolTipText"));
-        right.add(find);
 
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         line.add(left, BorderLayout.CENTER);
@@ -756,20 +747,13 @@ final class CrewUnitBoard extends JPanel {
         if ((placing == 1) && (first != null)) {
             right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.one", first.getFullName()),
                   () -> actions.assignToSeat(unit, type)));
-            right.add(Box.createHorizontalStrut(scaleForGUI(10)));
         } else if (placing > 1) {
             right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.many", placing),
                   () -> actions.assignToSeat(unit, type)));
-            right.add(Box.createHorizontalStrut(scaleForGUI(10)));
         } else if (!cannot.isEmpty() && !isOpen && (open > 0)) {
             // A closed card only explains a seat that has room; a full seat needs no explanation on every card
             right.add(Hud.hint(shortReason(cannot)));
-            right.add(Box.createHorizontalStrut(scaleForGUI(10)));
         }
-        // Offered even when the seat is full, to see who else could take it
-        JLabel find = Hud.link(text("board.find"), () -> actions.findPeopleFor(unit, type));
-        find.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "board.find.toolTipText", seatName));
-        right.add(find);
 
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         line.add(Hud.eyebrow(seatName + "  " + seatCoverage.real() + "/" + seat.capacity()), BorderLayout.WEST);
